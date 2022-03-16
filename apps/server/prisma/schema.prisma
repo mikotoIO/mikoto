@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id       String @id @default(uuid()) @db.Uuid
+  email    String @unique
+  passhash String
+  User     User[]
+}
+
+model User {
+  id      String @id @default(uuid()) @db.Uuid
+  name    String
+  spaceId String @db.Uuid
+  space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  accountId String    @db.Uuid
+  account   Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  Message   Message[]
+
+  @@unique([accountId, spaceId])
+  @@index([spaceId])
+}
+
+model Space {
+  id      String    @id @default(uuid()) @db.Uuid
+  name    String
+  User    User[]
+  Channel Channel[]
+}
+
+model Channel {
+  id      String    @id @default(uuid()) @db.Uuid
+  name    String
+  spaceId String    @db.Uuid
+  space   Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  Message Message[]
+
+  @@index([spaceId])
+}
+
+model Message {
+  id        String   @id @default(uuid()) @db.Uuid
+  content   String
+  timestamp DateTime
+
+  authorId  String? @db.Uuid
+  author    User?   @relation(fields: [authorId], references: [id])
+  channelId String  @db.Uuid
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@index([channelId])
+  @@index([timestamp])
+}

@@ -1,0 +1,37 @@
+import "reflect-metadata";
+import 'dotenv/config';
+
+import { useContainer, useExpressServer } from "routing-controllers";
+import * as path from "path";
+import socketio from "socket.io";
+import { useContainer as useSocketContainer,
+  useSocketServer } from "socket-controllers";
+import { Container } from "typedi";
+import * as http from "http";
+import cors from "cors";
+import express from "express";
+
+const app = express();
+const server = new http.Server(app);
+const io = new socketio.Server(server, {
+  cors: { origin: "*" }
+});
+
+Container.set(socketio.Server, io)
+
+app.use(cors());
+
+useContainer(Container);
+useSocketContainer(Container);
+
+useExpressServer(app, {
+  controllers: [path.join(__dirname + "/controllers/*.js")]
+});
+
+useSocketServer(io, {
+  controllers: [path.join(__dirname + "/ws-controllers/*.js")]
+});
+
+server.listen(9500, () => {
+  console.log("Mikoto server started!");
+});

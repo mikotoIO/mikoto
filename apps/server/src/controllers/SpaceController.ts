@@ -15,4 +15,10 @@ export class SpaceController {
     return await this.prisma.space
       .findUnique({ where: { id } });
   }
+
+  @Get('/spaces/:spaceId/channels')
+  async getChannels(@Param('spaceId') spaceId: string) {
+    return await this.prisma.channel
+      .findMany({ where: { spaceId } });
+  }
 }

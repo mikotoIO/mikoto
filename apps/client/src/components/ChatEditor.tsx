@@ -62,10 +62,11 @@ const EditorWrapper = styled.div`
 `;
 
 interface ChatEditorProps {
+  channelName: string;
   onMessageSend: (message: string) => void;
 }
 
-export default function ChatEditor({ onMessageSend }: ChatEditorProps) {
+export default function ChatEditor({ channelName, onMessageSend }: ChatEditorProps) {
   const [editorState, setEditorState] = React.useState(() => EditorState.createEmpty());
 
   return (
@@ -73,7 +74,7 @@ export default function ChatEditor({ onMessageSend }: ChatEditorProps) {
       <Editor
         editorState={editorState}
         onChange={setEditorState}
-        placeholder="Message #dank-channel"
+        placeholder={`Message #${channelName}`}
         keyBindingFn={(e) => {
           if (e.key === 'Enter' && !e.shiftKey) return 'send';
           return Draft.getDefaultKeyBinding(e);

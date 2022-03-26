@@ -16,6 +16,11 @@ export interface SimpleUser {
   name: string;
 }
 
+export interface Channel {
+  id: string;
+  name: string;
+}
+
 export default class MikotoApi {
   axios: AxiosInstance;
   io!: Socket;

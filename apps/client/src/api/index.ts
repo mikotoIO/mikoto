@@ -28,9 +28,9 @@ export default class MikotoApi {
     this.axios = axios.create({
       baseURL: 'http://localhost:9500',
     });
-    // this.io = io('http://localhost:9500')
-    // this.io.on('connect', () => {
-    //   console.log('socket live!');
-    // });
+    this.io = io('http://localhost:9500')
+    this.io.on('connect', () => {
+      console.log('socket live!');
+    });
   }
 }

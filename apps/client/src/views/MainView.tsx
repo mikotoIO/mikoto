@@ -81,13 +81,16 @@ const TabbedViewContainer = styled.div`
 
 const TabBar = styled.div`
   font-size: 14px;
-  height: 40px;
+  height: 36px;
   display: flex;
 `;
 
 const TabItem = styled.div`
   height: 100%;
-  padding: 4px 32px 0;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   
   background-color: ${p => p.theme.colors.N800};
   border-left: 4px solid #3b83ff;

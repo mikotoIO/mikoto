@@ -1,8 +1,16 @@
-import { PrismaClient } from "@prisma/client";
-import { Body, JsonController, Post } from "routing-controllers";
+import {Account, PrismaClient} from "@prisma/client";
+import {Body, JsonController, Post, UnauthorizedError} from "routing-controllers";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Service } from "typedi";
+import crypto from 'crypto';
+import { promisify } from 'util';
+
+const randomBytes = promisify(crypto.randomBytes);
+async function generateRandomToken() {
+  const b = await randomBytes(128);
+  return b.toString('base64url');
+}
 
 interface RegisterPayload {
   email: string;
@@ -23,6 +31,35 @@ export class AccountController {
     this.prisma = new PrismaClient();
   }
 
+  private async createTokenPair(account: Account, oldToken?: string) {
+    const accessToken = jwt.sign({}, process.env.SECRET!, {
+      expiresIn: '1d',
+      subject: account.id,
+    });
+    const refreshToken = await generateRandomToken();
+    const expiresAt = new Date(Date.now() + 86400000 * 30);
+
+    if (oldToken) {
+      await this.prisma.refreshToken.update({
+        where: { token: oldToken },
+        data: {
+          token: refreshToken,
+          expiresAt,
+        },
+      });
+
+      return { accessToken, refreshToken };
+    }
+    await this.prisma.refreshToken.create({
+      data: {
+        accountId: account.id,
+        token: refreshToken,
+        expiresAt,
+      }
+    });
+    return { accessToken, refreshToken };
+  }
+
   @Post('/account/register')
   async register(@Body() body: RegisterPayload) {
     return await this.prisma.account.create({
@@ -35,15 +72,21 @@ export class AccountController {
 
   @Post('/account/login')
   async login(@Body() body: LoginPayload) {
-    const user = await this.prisma.account
+    const account = await this.prisma.account
       .findUnique({ where: { email: body.email } });
-    if (user && await bcrypt.compare(body.password, user.passhash)) {
-      const accessToken = jwt.sign({}, process.env.SECRET!, {
-        expiresIn: '1d',
-        subject: user.id,
-      });
-      return { accessToken };
+    if (account && await bcrypt.compare(body.password, account.passhash)) {
+      return await this.createTokenPair(account)
     }
-    return { error: 'Incorrect credentials' }
+    throw new UnauthorizedError('Incorrect Credentials');
+  }
+
+  @Post('/account/refresh')
+  async refresh(@Body() body: { refreshToken: string }) {
+    const account = await this.prisma.refreshToken
+      .findUnique({ where: { token: body.refreshToken } }).account();
+    if (account === null) {
+      throw new UnauthorizedError('Invalid Token');
+    }
+    return await this.createTokenPair(account, body.refreshToken);
   }
 }

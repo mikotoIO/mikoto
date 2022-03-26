@@ -11,10 +11,21 @@ datasource db {
 }
 
 model Account {
-  id       String @id @default(uuid()) @db.Uuid
-  email    String @unique
-  passhash String
-  User     User[]
+  id           String         @id @default(uuid()) @db.Uuid
+  email        String         @unique
+  passhash     String
+  User         User[]
+  RefreshToken RefreshToken[]
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  token     String   @unique
+  expiresAt DateTime
+  accountId String   @db.Uuid
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
 }
 
 model User {
@@ -25,9 +36,22 @@ model User {
 
   accountId String    @db.Uuid
   account   Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  roles     Role[]
   Message   Message[]
 
   @@unique([accountId, spaceId])
+  @@index([spaceId])
+}
+
+model Role {
+  id          String @id @default(uuid()) @db.Uuid
+  name        String
+  color       String
+  permissions String
+  users       User[]
+
+  spaceId String @db.Uuid
+  space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   @@index([spaceId])
 }
 
@@ -36,6 +60,7 @@ model Space {
   name    String
   User    User[]
   Channel Channel[]
+  Role    Role[]
 }
 
 model Channel {

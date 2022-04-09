@@ -1,4 +1,4 @@
-import { Body, Get, JsonController, Param, Post } from "routing-controllers";
+import {Body, Delete, Get, JsonController, NotFoundError, Param, Post} from "routing-controllers";
 import { PrismaClient } from "@prisma/client";
 import { Server } from "socket.io";
 import { Service } from "typedi";
@@ -12,9 +12,7 @@ interface MessagePayload {
 export class ChannelController {
   private prisma: PrismaClient;
 
-  constructor(
-    private io: Server
-  ) {
+  constructor(private io: Server) {
     this.prisma = new PrismaClient();
   }
 
@@ -38,8 +36,11 @@ export class ChannelController {
 
   @Post("/channels/:id")
   async sendMessage(@Param("id") id: string, @Body() body: MessagePayload) {
+    console.log(this.io)
+    const channel = await this.prisma.channel.findUnique({ where: { id } });
+    if (channel === null) throw new NotFoundError('ChannelNotFound');
 
-    return await this.prisma.message.create({
+    const message = await this.prisma.message.create({
       data: {
         channelId: id,
         timestamp: new Date(),
@@ -47,5 +48,23 @@ export class ChannelController {
         content: body.content
       }
     });
+    this.io.in(channel.spaceId).emit('sendMessage', message);
+    return message;
+  }
+
+  @Delete('/channels/:id/messages/:messageId')
+  async deleteMessage(@Param("id") id: string, @Param("messageId") messageId: string) {
+    // TODO: Permision checking
+    const channel = await this.prisma.channel.findUnique({ where: { id } });
+    if (channel === null) throw new NotFoundError('ChannelNotFound');
+
+    const message = await this.prisma.message.findUnique({
+      where: { id: messageId }
+    })
+    await this.prisma.message.delete({
+      where: { id: messageId }
+    });
+    this.io.in(channel.spaceId).emit('deleteMessage', message);
+    return message;
   }
 }

@@ -10,6 +10,13 @@ export class SpaceController {
     this.prisma = new PrismaClient();
   }
 
+  @Get('/hello')
+  hello() {
+    return {
+      version: 'mikoto:DEVELOPMENT',
+    }
+  }
+
   @Get('/spaces/:id')
   async getOne(@Param('id') id: string) {
     return await this.prisma.space

@@ -1,6 +1,8 @@
-import { ConnectedSocket, MessageBody, OnConnect, OnDisconnect, OnMessage,
-  SocketController } from "socket-controllers";
-import { Socket } from "socket.io";
+import {
+  ConnectedSocket, MessageBody, OnConnect, OnDisconnect, OnMessage,
+  SocketController, SocketIO
+} from "socket-controllers";
+import {Server, Socket} from "socket.io";
 import { Service } from "typedi";
 
 @SocketController()
@@ -9,6 +11,7 @@ export class MessageController {
   @OnConnect()
   connection(@ConnectedSocket() socket: Socket) {
     console.log("client connected");
+    socket.join('bcc723e1-c8c9-4489-bc58-7172d70190eb'); // TODO: Add a socket endpoint for space joins
   }
 
   @OnDisconnect()

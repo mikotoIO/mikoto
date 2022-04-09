@@ -1,5 +1,6 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
+
 import './index.css';
 import {RecoilRoot} from "recoil";
 import { ThemeProvider } from 'styled-components';
@@ -7,17 +8,22 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 import { theme } from './themes';
+import { MantineProvider } from '@mantine/core';
+const SilentRecoilRoot = RecoilRoot as any;
 
-ReactDOM.render(
-  <React.StrictMode>
-    <RecoilRoot>
-      <ThemeProvider theme={theme}>
-        <App />
-      </ThemeProvider>
-    </RecoilRoot>
-  </React.StrictMode>,
-  document.getElementById('root'),
-);
+
+ReactDOM.createRoot(document.getElementById('root')!)
+  .render(
+    <React.StrictMode>
+      <SilentRecoilRoot>
+        <ThemeProvider theme={theme}>
+          <MantineProvider theme={{ colorScheme: 'dark' }}>
+            <App />
+          </MantineProvider>
+        </ThemeProvider>
+      </SilentRecoilRoot>
+    </React.StrictMode>
+  );
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

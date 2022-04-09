@@ -3,14 +3,16 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from "remark-gfm";
 import styled from 'styled-components';
 import {Message} from "../api";
+import {useRecoilState} from "recoil";
+import {contextMenuState} from "./ContextMenu";
 
 const dateFormat = new Intl.DateTimeFormat('en', {day: 'numeric', month: 'long', year: 'numeric'});
 
 function isToday(someDate: Date): boolean {
   const today = new Date()
-  return someDate.getDate() == today.getDate() &&
-    someDate.getMonth() == today.getMonth() &&
-    someDate.getFullYear() == today.getFullYear()
+  return someDate.getDate() === today.getDate() &&
+    someDate.getMonth() === today.getMonth() &&
+    someDate.getFullYear() === today.getFullYear()
 }
 
 function padTime(n: number): string {
@@ -85,15 +87,24 @@ interface MessageProps {
 }
 
 export default function MessageItem({ message }: MessageProps) {
+  const [, setContextMenu] = useRecoilState(contextMenuState);
+
   const time = new Date(message.timestamp);
   return (
-    <MessageContainer>
+    <MessageContainer onContextMenu={e => {
+      e.preventDefault();
+      setContextMenu({
+        position: {top: e.clientY, left: e.clientX},
+        variant: { kind: 'message', message }
+      });
+    }}>
       <Avatar src={avatarUrl} />
       <MessageInner>
         <NameBox>
           <Name color="white">{message.author?.name ?? 'Ghost'}</Name>
           <Timestamp>
             {isToday(time) ? 'Today at ' : dateFormat.format(time)}
+            {' '}
             {padTime(time.getHours())}:{padTime(time.getMinutes())}
           </Timestamp>
         </NameBox>

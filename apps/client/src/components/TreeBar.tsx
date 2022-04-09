@@ -2,13 +2,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
 import {faHashtag, faToriiGate} from "@fortawesome/free-solid-svg-icons";
 import {Channel} from "../api";
-import React from "react";
+import React, {useId} from "react";
+import {useRecoilState} from "recoil";
+import {contextMenuState} from "./ContextMenu";
 
 export const TreeContainer = styled.ul`
+  height: 100%;
   list-style: none;
-  margin: 10px;
-  padding: 0;
-  // width: 100%;
+  margin: 0;
+  padding: 10px;
   box-sizing: border-box;
 `;
 
@@ -51,5 +53,25 @@ export function TreeNode({ channel, ...props }: TreeNodeProps) {
       </IconContainer>
       {channel.name}
     </TreeNodeElement>
+  )
+}
+
+const ContextMenu = styled.div`
+  position: fixed;
+  background-color: blue;
+`;
+
+export function TreeBar({ channels, onClick }: { channels: Channel[], onClick: (channel: Channel) => void }) {
+  const [, setContextMenu] = useRecoilState(contextMenuState);
+
+  return (
+    <TreeContainer onContextMenu={e => {
+      e.preventDefault();
+      setContextMenu({ position: {top: e.clientY, left: e.clientX}, variant: { kind: 'treebar' } });
+    }}>
+      {channels.map(x =>
+        <TreeNode channel={x} key={x.id} onClick={() => onClick(x)}/>
+      )}
+    </TreeContainer>
   )
 }

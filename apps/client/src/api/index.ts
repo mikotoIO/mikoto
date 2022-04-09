@@ -32,5 +32,8 @@ export default class MikotoApi {
     this.io.on('connect', () => {
       console.log('socket live!');
     });
+    // this.io.on('sendMessage', x => {
+    //   console.log(x)
+    // })
   }
 }

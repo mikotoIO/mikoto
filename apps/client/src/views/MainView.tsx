@@ -1,11 +1,13 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import MikotoApi, {Channel, Message} from "../api";
 import ChatEditor from "../components/ChatEditor";
 import MessageItem from "../components/Message";
-import {TreeContainer, TreeNode} from "../components/TreeBar";
+import {TreeBar, TreeContainer, TreeNode} from "../components/TreeBar";
+import {Socket} from "socket.io-client";
 
 const AppContainer = styled.div`
+  overflow: hidden;
   background-color: ${(p) => p.theme.colors.N900};
   color: white;
   display: grid;
@@ -36,13 +38,24 @@ interface MessageViewProps {
   channel: Channel;
 }
 
+function useSocketIO<T>(io: Socket, ev: string, fn: (data: T) => void, deps?: React.DependencyList | undefined) {
+  useEffect(() => {
+    io.on(ev, fn);
+    return () => {
+      io.off(ev, fn);
+    }
+  }, [ev, fn, deps, io])
+}
+
 function MessageView({ channel }: MessageViewProps) {
   // const channelId = '076a960d-5c78-41a3-9c7a-9e82036979f7'
 
   const [messages, setMessages] = useState<Message[]>([]);
-  const ref = React.useRef<any>();
+  const ref = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
-    ref.current.scrollTop = ref.current.scrollHeight;
+    if (ref.current) {
+      ref.current.scrollTop = ref.current.scrollHeight;
+    }
   });
 
   React.useEffect(() => {
@@ -52,17 +65,27 @@ function MessageView({ channel }: MessageViewProps) {
       });
   }, [channel.id]);
 
+  const onMessage = (x: any) => {
+
+  }
+
+  useSocketIO<Message>(api.io, 'sendMessage', (x) => {
+    console.log(x);
+    if (x.channelId === channel.id) {
+      setMessages((xs) => [...xs, x])
+    }
+  }, [channel.id]);
+
   return (
     <MessageViewContainer>
       <Messages ref={ref}>
         {messages.map((msg) => <MessageItem key={msg.id} message={msg}/>)}
       </Messages>
       <ChatEditor channelName={channel.name} onMessageSend={async (msg) => {
-        const m = await api.axios.post<Message>(`/channels/${channel.id}`, {
+        await api.axios.post<Message>(`/channels/${channel.id}`, {
           content: msg,
         });
-
-        setMessages((xs) => [...xs, m.data])
+        // setMessages((xs) => [...xs, m.data])
       }}
       />
     </MessageViewContainer>
@@ -122,13 +145,9 @@ export default function MainView() {
   return (
     <AppContainer>
       <Sidebar>
-        <TreeContainer>
-          {channels.map(x =>
-            <TreeNode channel={x} key={x.id} onClick={() => {
-              setCurrentChannel(x)
-            }}/>
-          )}
-        </TreeContainer>
+        <TreeBar channels={channels} onClick={(ch) => {
+          setCurrentChannel(ch);
+        }}/>
       </Sidebar>
       <TabbedView>
         {currentChannel && <MessageView channel={currentChannel}/>}

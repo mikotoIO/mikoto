@@ -75,11 +75,11 @@ export default function ChatEditor({ channelName, onMessageSend }: ChatEditorPro
         editorState={editorState}
         onChange={setEditorState}
         placeholder={`Message #${channelName}`}
-        keyBindingFn={(e) => {
+        keyBindingFn={(e: React.KeyboardEvent<{}>) => {
           if (e.key === 'Enter' && !e.shiftKey) return 'send';
           return Draft.getDefaultKeyBinding(e);
         }}
-        handlePastedText={(text) => {
+        handlePastedText={(text: string) => {
           const newContent = Modifier.insertText(
             editorState.getCurrentContent(),
             editorState.getSelection(),
@@ -93,7 +93,7 @@ export default function ChatEditor({ channelName, onMessageSend }: ChatEditorPro
           ));
           return 'handled';
         }}
-        handleKeyCommand={(cmd) => {
+        handleKeyCommand={(cmd: string) => {
           if (cmd === 'send') {
             const text = editorState.getCurrentContent()
               .getPlainText().trim();

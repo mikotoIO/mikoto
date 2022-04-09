@@ -1,6 +1,6 @@
-# Turborepo starter
+# Mikoto
 
-This is an official Yarn v1 starter turborepo.
+This is the Turborepo setup for Mikoto.
 
 ## What's inside?
 

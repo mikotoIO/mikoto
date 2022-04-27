@@ -5,9 +5,7 @@ import { Service } from "typedi";
 @JsonController()
 @Service()
 export class SpaceController {
-  private prisma: PrismaClient;
-  constructor() {
-    this.prisma = new PrismaClient();
+  constructor(private prisma: PrismaClient) {
   }
 
   @Get('/hello')

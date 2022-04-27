@@ -2,7 +2,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from "remark-gfm";
 import styled from 'styled-components';
-import {Message} from "../api";
+import {Message} from "../models";
 import {useRecoilState} from "recoil";
 import {contextMenuState} from "./ContextMenu";
 
@@ -19,11 +19,11 @@ function padTime(n: number): string {
   return String(n).padStart(2, '0')
 }
 
-const MessageContainer = styled.div`
+const MessageContainer = styled.div<{isSimple?: boolean}>`
   display: grid;
   grid-template-columns: min-content auto;
   grid-gap: 16px;
-  padding: 8px 20px;
+  padding: ${p => p.isSimple ? '0' : '8px'} 20px 4px;
   &:hover {
     background-color: rgba(0, 0, 0, 0.06)
   }
@@ -84,30 +84,33 @@ const NameBox = styled.div`
 
 interface MessageProps {
   message: Message;
+  isSimple?: boolean;
 }
 
-export default function MessageItem({ message }: MessageProps) {
+export default function MessageItem({ message, isSimple }: MessageProps) {
   const [, setContextMenu] = useRecoilState(contextMenuState);
 
   const time = new Date(message.timestamp);
   return (
-    <MessageContainer onContextMenu={e => {
+    <MessageContainer
+      isSimple={isSimple}
+      onContextMenu={e => {
       e.preventDefault();
       setContextMenu({
         position: {top: e.clientY, left: e.clientX},
         variant: { kind: 'message', message }
       });
     }}>
-      <Avatar src={avatarUrl} />
+      {isSimple ? <div style={{ width: '40px' }}/> : <Avatar src={avatarUrl}/>}
       <MessageInner>
-        <NameBox>
+        {!isSimple && <NameBox>
           <Name color="white">{message.author?.name ?? 'Ghost'}</Name>
           <Timestamp>
             {isToday(time) ? 'Today at ' : dateFormat.format(time)}
             {' '}
             {padTime(time.getHours())}:{padTime(time.getMinutes())}
           </Timestamp>
-        </NameBox>
+        </NameBox>}
         <ReactMarkdown
           children={message.content}
           remarkPlugins={[remarkGfm]}

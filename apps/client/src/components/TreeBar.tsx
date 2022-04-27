@@ -1,8 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
-import {faHashtag, faToriiGate} from "@fortawesome/free-solid-svg-icons";
-import {Channel} from "../api";
-import React, {useId} from "react";
+import {faHashtag} from "@fortawesome/free-solid-svg-icons";
+import {Channel} from "../models";
+import React from "react";
 import {useRecoilState} from "recoil";
 import {contextMenuState} from "./ContextMenu";
 

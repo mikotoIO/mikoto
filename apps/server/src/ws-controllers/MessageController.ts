@@ -1,8 +1,8 @@
 import {
   ConnectedSocket, MessageBody, OnConnect, OnDisconnect, OnMessage,
-  SocketController, SocketIO
+  SocketController
 } from "socket-controllers";
-import {Server, Socket} from "socket.io";
+import {Socket} from "socket.io";
 import { Service } from "typedi";
 
 @SocketController()
@@ -10,14 +10,14 @@ import { Service } from "typedi";
 export class MessageController {
   @OnConnect()
   connection(@ConnectedSocket() socket: Socket) {
-    console.log("client connected");
+    // console.log("client connected");
     socket.join('bcc723e1-c8c9-4489-bc58-7172d70190eb'); // TODO: Add a socket endpoint for space joins
   }
 
   @OnDisconnect()
   disconnect(@ConnectedSocket() socket: Socket) {
     // socket.data['test'] = '';
-    console.log("client disconnected");
+    // console.log("client disconnected");
   }
 
   @OnMessage("message-send")

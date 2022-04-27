@@ -10,6 +10,7 @@ import { Container } from "typedi";
 import * as http from "http";
 import cors from "cors";
 import express from "express";
+import {PrismaClient} from "@prisma/client";
 
 const app = express();
 const server = new http.Server(app);
@@ -17,6 +18,8 @@ const io = new socketio.Server(server, {
   cors: { origin: "*" }
 });
 
+const prisma = new PrismaClient();
+Container.set(PrismaClient, prisma)
 Container.set(socketio.Server, io)
 
 app.use(cors());

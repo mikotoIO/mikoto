@@ -25,10 +25,7 @@ interface LoginPayload {
 @JsonController()
 @Service()
 export class AccountController {
-  private prisma: PrismaClient;
-
-  constructor() {
-    this.prisma = new PrismaClient();
+  constructor(private prisma: PrismaClient) {
   }
 
   private async createTokenPair(account: Account, oldToken?: string) {

@@ -1,9 +1,11 @@
 import {atom, useRecoilState} from "recoil";
 import styled from "styled-components";
 import useEventListener from "@use-it/event-listener";
-import {Message} from "../api";
-import {Button, Group, Input, Modal, TextInput} from '@mantine/core';
-import {useState} from "react";
+import {Message} from "../models";
+import {Button, Modal, TextInput} from '@mantine/core';
+import React, {useEffect, useRef, useState} from "react";
+import MikotoApi, {useMikoto} from "../api";
+import {useForm} from "@mantine/form";
 
 type ContextMenuVariant =
     { kind: 'treebar' }
@@ -39,13 +41,7 @@ const ContextMenuBase = styled.div`
   font-size: 14px;
   border-radius: 4px;
   background-color: ${p => p.theme.colors.N1100};
-  position: absolute;
 `;
-
-interface SwitchContextMenuProps {
-  variant: ContextMenuVariant;
-  point: { top: number, left: number };
-}
 
 const ContextMenuLink = styled.a`
   display: block;
@@ -58,39 +54,72 @@ const ContextMenuLink = styled.a`
   }
 `;
 
-function TreebarContext() {
-  const [contextMenu, setContextMenu] = useRecoilState(contextMenuState);
-  const [modal, setModal] = useState('');
+type ModalStates =
+  { kind: 'createChannel' }
+  | null;
+
+const modalState = atom<ModalStates>({
+  key: 'modal',
+  default: null,
+})
+
+function CreateChannelModal() {
+  const mikoto = useMikoto();
+  const [modal, setModal] = useRecoilState(modalState);
+  const form = useForm({
+    initialValues: {
+      channelName: '',
+    }
+  });
 
   return (
-    <ContextMenuBase style={{...contextMenu!.position}}>
-      <Modal
-        opened={modal === 'createChannel'}
-        onClose={() => setModal('')}
-        title="Create Channel"
-      >
-        <TextInput label="Channel Name" placeholder="#awesome-channel"/>
-        <Group mt={8}><Button>Create Channel</Button></Group>
-      </Modal>
+    <Modal
+      opened={!!(modal && modal.kind === 'createChannel')}
+      onClose={() => setModal(null)}
+      title="Create Channel"
+    >
+      <form onSubmit={form.onSubmit(async () => {
+        await mikoto.createChannel('bcc723e1-c8c9-4489-bc58-7172d70190eb', form.values.channelName);
+        setModal(null)
+      })}>
+        <TextInput label="Channel Name" placeholder="New Channel"
+                   {...form.getInputProps('channelName')}
+        />
+        <Button mt={16} fullWidth type="submit">Create Channel</Button>
+      </form>
+    </Modal>
+  )
+}
+
+function TreebarContext() {
+  const [, setModal] = useRecoilState(modalState);
+
+  return (
+    <ContextMenuBase>
       <ContextMenuLink onClick={() => {
-        setModal('createChannel');
+        setModal({ kind: 'createChannel' });
       }}>Create Channel</ContextMenuLink>
       <ContextMenuLink>Invite People</ContextMenuLink>
     </ContextMenuBase>
   )
 }
 
-function SwitchContextMenu({ variant, point }: SwitchContextMenuProps) {
-  const [, setContextMenu] = useRecoilState(contextMenuState);
+function SwitchContextMenu() {
+  const [contextMenu, setContextMenu] = useRecoilState(contextMenuState);
+  const mikoto = useMikoto();
+
+  if (contextMenu === null) return null; // not going to happen tho
+  const { variant } = contextMenu;
 
   switch (variant.kind) {
     case "treebar":
       return <TreebarContext/>
     case "message":
       return (
-        <ContextMenuBase style={{...point}}>
-          <ContextMenuLink onClick={() => {
+        <ContextMenuBase>
+          <ContextMenuLink onClick={async () => {
             setContextMenu(null);
+            await mikoto.deleteMessage(variant.message.channelId, variant.message.id)
           }}>Delete Message</ContextMenuLink>
         </ContextMenuBase>
       )
@@ -99,18 +128,52 @@ function SwitchContextMenu({ variant, point }: SwitchContextMenuProps) {
   }
 }
 
+const ContextWrapper = styled.div`
+  position: absolute;
+  &:focus {
+    outline: none;
+  }
+`;
+
+function useOutsideAlerter(ref: React.RefObject<HTMLDivElement>, handleClickOutside: (event: MouseEvent) => void) {
+  useEffect(() => {
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [ref, handleClickOutside]);
+}
+
 export function ContextMenuKit() {
   const [contextMenu, setContextMenu] = useRecoilState(contextMenuState);
+  const ref = useRef<HTMLDivElement>(null);
+  useOutsideAlerter(ref, (ev) => {
+    if (ref.current && !ref.current.contains(ev.target as any)) {
+      setContextMenu(null);
+    }
+  });
 
   useEventListener('keydown', (ev: KeyboardEvent) => {
     if (ev.code === 'Escape') {
       setContextMenu(null);
     }
-  })
+  });
 
   return (
     <ContextMenuOverlay tabIndex={0}>
-      {contextMenu && <SwitchContextMenu variant={contextMenu.variant} point={contextMenu.position}/>}
+      <CreateChannelModal />
+
+      {contextMenu &&
+        <ContextWrapper
+          ref={ref}
+          style={{...contextMenu.position}}
+        >
+
+          <SwitchContextMenu/>
+        </ContextWrapper>
+      }
     </ContextMenuOverlay>
   )
 }

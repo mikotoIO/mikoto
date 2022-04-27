@@ -6,6 +6,7 @@ import {LoginView, RegisterView} from "./views/AuthView";
 import MainView from "./views/MainView";
 import styled from "styled-components";
 import {ContextMenuKit} from "./components/ContextMenu";
+import MikotoApi, {MikotoContext} from "./api";
 
 const accessTokenAtom = atom<string>({
   key: 'user',

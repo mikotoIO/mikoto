@@ -7,13 +7,32 @@ interface MessagePayload {
   content: string;
 }
 
+interface ChannelPayload {
+  spaceId: string;
+  name: string;
+}
+
 @JsonController()
 @Service()
 export class ChannelController {
-  private prisma: PrismaClient;
+  constructor(private prisma: PrismaClient, private io: Server) {
+  }
 
-  constructor(private io: Server) {
-    this.prisma = new PrismaClient();
+  @Post("/channels")
+  async createChannel(@Body() body: ChannelPayload) {
+    return await this.prisma.channel.create({
+      data: {
+        name: body.name,
+        spaceId: body.spaceId
+      }
+    })
+  }
+
+  @Delete("/channels/:id")
+  async deleteChannel(@Param("id") id: string) {
+    return await this.prisma.channel.delete({
+      where: { id }
+    })
   }
 
   @Get("/channels/:id")
@@ -34,9 +53,8 @@ export class ChannelController {
     return messages.reverse();
   }
 
-  @Post("/channels/:id")
+  @Post("/channels/:id/messages")
   async sendMessage(@Param("id") id: string, @Body() body: MessagePayload) {
-    console.log(this.io)
     const channel = await this.prisma.channel.findUnique({ where: { id } });
     if (channel === null) throw new NotFoundError('ChannelNotFound');
 
@@ -48,7 +66,7 @@ export class ChannelController {
         content: body.content
       }
     });
-    this.io.in(channel.spaceId).emit('sendMessage', message);
+    this.io.in(channel.spaceId).emit('messageCreate', message);
     return message;
   }
 
@@ -64,7 +82,7 @@ export class ChannelController {
     await this.prisma.message.delete({
       where: { id: messageId }
     });
-    this.io.in(channel.spaceId).emit('deleteMessage', message);
+    this.io.in(channel.spaceId).emit('messageDelete', message);
     return message;
   }
 }

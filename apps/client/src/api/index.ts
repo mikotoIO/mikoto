@@ -1,39 +1,62 @@
 import axios, {AxiosInstance} from 'axios';
 import {Socket, io} from "socket.io-client";
-
-export interface Message {
-  id: string;
-  content: string;
-  timestamp: string;
-  authorId: string | null;
-  channelId: string;
-
-  author: SimpleUser | null;
-}
-
-export interface SimpleUser {
-  id: string;
-  name: string;
-}
-
-export interface Channel {
-  id: string;
-  name: string;
-}
+import {Channel, Message} from "../models";
+import React, {useContext} from "react";
 
 export default class MikotoApi {
   axios: AxiosInstance;
   io!: Socket;
-  constructor() {
+  constructor(url: string) {
     this.axios = axios.create({
-      baseURL: 'http://localhost:9500',
+      baseURL: url,
     });
-    this.io = io('http://localhost:9500')
+    this.io = io(url)
     this.io.on('connect', () => {
       console.log('socket live!');
     });
-    // this.io.on('sendMessage', x => {
-    //   console.log(x)
-    // })
   }
+
+  //region Channels
+  async getChannels(): Promise<Channel[]> {
+    const { data } = await this.axios.get<Channel[]>(`/spaces/bcc723e1-c8c9-4489-bc58-7172d70190eb/channels`);
+    return data;
+  }
+
+  async createChannel(spaceId: string, name: string): Promise<Channel> {
+    const { data } = await this.axios.post<Channel>('/channels', {
+      spaceId, name
+    });
+    return data;
+  }
+
+  async deleteChannel(channelId: string): Promise<Channel> {
+    const { data } = await this.axios.delete<Channel>(`/channels/${channelId}`);
+    return data;
+  }
+  //endregion
+
+  //region Messages
+  async getMessages(channelId: string): Promise<Message[]> {
+    const { data } = await this.axios.get<Message[]>(`/channels/${channelId}/messages`);
+    return data;
+  }
+
+  async sendMessage(channelId: string, content: string): Promise<Message> {
+    const { data } = await this.axios.post<Message>(`/channels/${channelId}/messages`, {
+      content,
+    })
+    return data;
+  }
+
+  async deleteMessage(channelId: string, messageId: string): Promise<Message> {
+    const { data } = await this.axios.delete<Message>(`/channels/${channelId}/messages/${messageId}`)
+    return data;
+  }
+  //endregion
+}
+
+export const MikotoContext = React.createContext<MikotoApi>(undefined!);
+
+export function useMikoto() {
+  return useContext(MikotoContext);
 }

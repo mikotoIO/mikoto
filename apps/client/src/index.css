@@ -1,16 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
 
+:root {
+  --main-font: 'Open Sans', sans-serif;
+}
+
 body {
   margin: 0;
   background-color: #2F3237;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--main-font);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
 }
 
 ::-webkit-scrollbar {

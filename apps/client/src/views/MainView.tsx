@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
-import MikotoApi, {Channel, Message} from "../api";
-import ChatEditor from "../components/ChatEditor";
+import {useMikoto} from "../api";
+import {Channel, Message} from "../models";
 import MessageItem from "../components/Message";
-import {TreeBar, TreeContainer, TreeNode} from "../components/TreeBar";
+import {TreeBar} from "../components/TreeBar";
 import {Socket} from "socket.io-client";
+import {atom, useRecoilState} from "recoil";
+import {MessageInput} from "../components/MessageInput";
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -25,14 +27,15 @@ const Sidebar = styled.div`
 const MessageViewContainer = styled.div`
   background-color: ${(p) => p.theme.colors.N800};
   height: 100%;
+  display: flex;
+  flex-direction: column;
 `;
 
 const Messages = styled.div`
   overflow-y: auto;
-  height: calc(100% - 80px);
+  // height: calc(100% - 80px);
+  flex-grow: 1;
 `;
-
-const api = new MikotoApi();
 
 interface MessageViewProps {
   channel: Channel;
@@ -48,7 +51,7 @@ function useSocketIO<T>(io: Socket, ev: string, fn: (data: T) => void, deps?: Re
 }
 
 function MessageView({ channel }: MessageViewProps) {
-  // const channelId = '076a960d-5c78-41a3-9c7a-9e82036979f7'
+  const mikoto = useMikoto();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const ref = React.useRef<HTMLDivElement>(null);
@@ -59,33 +62,34 @@ function MessageView({ channel }: MessageViewProps) {
   });
 
   React.useEffect(() => {
-    api.axios.get<Message[]>(`/channels/${channel.id}/messages`)
-      .then(({data}) => {
-        setMessages(data);
-      });
-  }, [channel.id]);
+    mikoto.getMessages(channel.id)
+      .then(setMessages);
+  }, [mikoto, channel.id]);
 
-  const onMessage = (x: any) => {
-
-  }
-
-  useSocketIO<Message>(api.io, 'sendMessage', (x) => {
-    console.log(x);
+  useSocketIO<Message>(mikoto.io, 'messageCreate', (x) => {
     if (x.channelId === channel.id) {
       setMessages((xs) => [...xs, x])
+    }
+  }, [channel.id]);
+
+  useSocketIO<Message>(mikoto.io, 'messageDelete', (msg) => {
+    if (msg.channelId === channel.id) {
+      setMessages((xs) => xs.filter(x => msg.id !== x.id))
     }
   }, [channel.id]);
 
   return (
     <MessageViewContainer>
       <Messages ref={ref}>
-        {messages.map((msg) => <MessageItem key={msg.id} message={msg}/>)}
+        {messages.map((msg, idx) => {
+          const prevMsg = messages[idx - 1];
+          const simpleMessage = prevMsg && prevMsg.authorId === msg.authorId &&
+            (new Date(msg.timestamp).getTime() - new Date(prevMsg.timestamp).getTime())< 5 * 60 * 1000;
+          return <MessageItem key={msg.id} message={msg} isSimple={simpleMessage}/>
+        })}
       </Messages>
-      <ChatEditor channelName={channel.name} onMessageSend={async (msg) => {
-        await api.axios.post<Message>(`/channels/${channel.id}`, {
-          content: msg,
-        });
-        // setMessages((xs) => [...xs, m.data])
+      <MessageInput channelName={channel.name} onMessageSend={async (msg) => {
+        await mikoto.sendMessage(channel.id, msg);
       }}
       />
     </MessageViewContainer>
@@ -119,27 +123,33 @@ const TabItem = styled.div`
   border-left: 4px solid #3b83ff;
 `;
 
+const currentChannelState = atom<Channel|null>({
+  key: 'currentChannel',
+  default: null,
+});
+
 function TabbedView({children}: TabbedViewProps) {
+  const [currentChannel] = useRecoilState(currentChannelState);
+
   return (
     <TabbedViewContainer>
       <TabBar>
-        <TabItem>general</TabItem>
+        <TabItem>{currentChannel?.name}</TabItem>
       </TabBar>
       {children}
     </TabbedViewContainer>
   );
 }
 
-export default function MainView() {
-  const [currentChannel, setCurrentChannel] = useState<Channel|null>(null)
-  const [channels, setChannels] = useState<Channel[]>([])
+function AppView() {
+  const [currentChannel, setCurrentChannel] = useRecoilState(currentChannelState);
+  const [channels, setChannels] = useState<Channel[]>([]);
+  const mikoto = useMikoto();
 
   React.useEffect(() => {
-    api.axios.get<Channel[]>(`/spaces/bcc723e1-c8c9-4489-bc58-7172d70190eb/channels`)
-      .then(({data}) => {
-        setChannels(data);
-      });
-  }, []);
+    mikoto.getChannels().then(setChannels);
+  }, [mikoto]);
+
 
 
   return (
@@ -153,5 +163,11 @@ export default function MainView() {
         {currentChannel && <MessageView channel={currentChannel}/>}
       </TabbedView>
     </AppContainer>
+  );
+}
+
+export default function MainView() {
+  return (
+    <AppView />
   );
 }

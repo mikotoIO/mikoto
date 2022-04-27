@@ -9,8 +9,8 @@ import reportWebVitals from './reportWebVitals';
 
 import { theme } from './themes';
 import { MantineProvider } from '@mantine/core';
+import MikotoApi, { MikotoContext } from "./api";
 const SilentRecoilRoot = RecoilRoot as any;
-
 
 ReactDOM.createRoot(document.getElementById('root')!)
   .render(
@@ -18,7 +18,9 @@ ReactDOM.createRoot(document.getElementById('root')!)
       <SilentRecoilRoot>
         <ThemeProvider theme={theme}>
           <MantineProvider theme={{ colorScheme: 'dark' }}>
-            <App />
+            <MikotoContext.Provider value={new MikotoApi('http://localhost:9500')}>
+              <App />
+            </MikotoContext.Provider>
           </MantineProvider>
         </ThemeProvider>
       </SilentRecoilRoot>

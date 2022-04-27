@@ -3,9 +3,11 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from "remark-gfm";
 import styled from 'styled-components';
 import {Message} from "../models";
-import {useRecoilState, useSetRecoilState} from "recoil";
+import {useSetRecoilState} from "recoil";
 import {contextMenuState} from "./ContextMenu";
 import { Modal } from '@mantine/core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faArrowUpRightFromSquare} from "@fortawesome/free-solid-svg-icons";
 
 const dateFormat = new Intl.DateTimeFormat('en', {day: 'numeric', month: 'long', year: 'numeric'});
 
@@ -112,7 +114,14 @@ const ImageModal = styled(Modal)`
 `;
 
 const ImageModalTitleLink = styled.a`
-  color: white;
+  color: #8b8b8b;
+  transition-duration: 0.2s;
+
+  &:hover {
+    color: white;
+    text-decoration: underline;
+  }
+
   text-decoration: none;
   outline: none;
 `;
@@ -126,7 +135,11 @@ function MessageImage({src, alt}: MessageImageProps) {
         opened={opened}
         onClose={() => setOpened(false)}
         centered withCloseButton={false}
-        title={<ImageModalTitleLink href={src} target="_blank">Source</ImageModalTitleLink>}
+        title={
+          <ImageModalTitleLink href={src} target="_blank">
+            Source <FontAwesomeIcon icon={faArrowUpRightFromSquare}/>
+          </ImageModalTitleLink>
+        }
       >
         <img src={src} alt={alt} style={{ maxWidth: '100%' }}/>
       </ImageModal>

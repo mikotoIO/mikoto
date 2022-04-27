@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {useState} from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from "remark-gfm";
 import styled from 'styled-components';
 import {Message} from "../models";
-import {useRecoilState} from "recoil";
+import {useRecoilState, useSetRecoilState} from "recoil";
 import {contextMenuState} from "./ContextMenu";
+import { Modal } from '@mantine/core';
 
 const dateFormat = new Intl.DateTimeFormat('en', {day: 'numeric', month: 'long', year: 'numeric'});
 
@@ -13,6 +14,22 @@ function isToday(someDate: Date): boolean {
   return someDate.getDate() === today.getDate() &&
     someDate.getMonth() === today.getMonth() &&
     someDate.getFullYear() === today.getFullYear()
+}
+
+function isUrl(s: string) {
+  let url;
+
+  try {
+    url = new URL(s);
+  } catch (_) {
+    return false;
+  }
+
+  return url.protocol === "http:" || url.protocol === "https:";
+}
+
+function isUrlImage(url: string): boolean {
+  return(url.match(/\.(jpeg|jpg|gif|png)$/) !== null);
 }
 
 function padTime(n: number): string {
@@ -59,6 +76,7 @@ const MessageInner = styled.div`
     }
   }
   img {
+    max-height: 300px;
     max-width: 400px;
   }
 `;
@@ -82,15 +100,56 @@ const NameBox = styled.div`
   }
 `;
 
+interface MessageImageProps {
+  src?: string;
+  alt?: string;
+}
+
+const ImageModal = styled(Modal)`
+  .mantine-Paper-root {
+    background-color: transparent;
+  }
+`;
+
+const ImageModalTitleLink = styled.a`
+  color: white;
+  text-decoration: none;
+  outline: none;
+`;
+
+function MessageImage({src, alt}: MessageImageProps) {
+  const [opened, setOpened] = useState(false);
+
+  return (
+    <>
+      <ImageModal
+        opened={opened}
+        onClose={() => setOpened(false)}
+        centered withCloseButton={false}
+        title={<ImageModalTitleLink href={src} target="_blank">Source</ImageModalTitleLink>}
+      >
+        <img src={src} alt={alt} style={{ maxWidth: '100%' }}/>
+      </ImageModal>
+      <img src={src} alt={alt} style={{ cursor: 'pointer' }} onClick={() => {
+        setOpened(true);
+      }}/>
+    </>
+  )
+}
+
 interface MessageProps {
   message: Message;
   isSimple?: boolean;
 }
 
 export default function MessageItem({ message, isSimple }: MessageProps) {
-  const [, setContextMenu] = useRecoilState(contextMenuState);
+  const setContextMenu = useSetRecoilState(contextMenuState);
 
   const time = new Date(message.timestamp);
+
+  const content = isUrl(message.content) && isUrlImage(message.content) ?
+    `![Image Embed](${message.content})` : message.content;
+
   return (
     <MessageContainer
       isSimple={isSimple}
@@ -112,7 +171,14 @@ export default function MessageItem({ message, isSimple }: MessageProps) {
           </Timestamp>
         </NameBox>}
         <ReactMarkdown
-          children={message.content}
+          children={content}
+          components={{
+            img({ src, alt }) {
+              return (
+                <MessageImage src={src} alt={alt} />
+              )
+            }
+          }}
           remarkPlugins={[remarkGfm]}
         />
       </MessageInner>

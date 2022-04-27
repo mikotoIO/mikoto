@@ -3,7 +3,7 @@ import styled from "styled-components";
 import {faHashtag} from "@fortawesome/free-solid-svg-icons";
 import {Channel} from "../models";
 import React from "react";
-import {useRecoilState} from "recoil";
+import {useRecoilState, useSetRecoilState} from "recoil";
 import {contextMenuState} from "./ContextMenu";
 
 export const TreeContainer = styled.ul`
@@ -56,13 +56,8 @@ export function TreeNode({ channel, ...props }: TreeNodeProps) {
   )
 }
 
-const ContextMenu = styled.div`
-  position: fixed;
-  background-color: blue;
-`;
-
 export function TreeBar({ channels, onClick }: { channels: Channel[], onClick: (channel: Channel) => void }) {
-  const [, setContextMenu] = useRecoilState(contextMenuState);
+  const setContextMenu = useSetRecoilState(contextMenuState);
 
   return (
     <TreeContainer onContextMenu={e => {

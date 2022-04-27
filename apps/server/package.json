@@ -19,7 +19,8 @@
   },
   "scripts": {
     "start": "tsc && node ./dist",
-    "test": "jest"
+    "test": "jest",
+    "studio": "prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^3.10.0",

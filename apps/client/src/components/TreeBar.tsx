@@ -3,7 +3,7 @@ import styled from "styled-components";
 import {faHashtag} from "@fortawesome/free-solid-svg-icons";
 import {Channel} from "../models";
 import React from "react";
-import {useRecoilState, useSetRecoilState} from "recoil";
+import {useSetRecoilState} from "recoil";
 import {contextMenuState} from "./ContextMenu";
 
 export const TreeContainer = styled.ul`

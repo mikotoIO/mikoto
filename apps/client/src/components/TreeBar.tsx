@@ -4,7 +4,11 @@ import { faHashtag } from '@fortawesome/free-solid-svg-icons';
 import { Channel } from '../models';
 import React, { useState } from 'react';
 import { useSetRecoilState } from 'recoil';
-import { contextMenuState } from './ContextMenu';
+import {
+  contextMenuState,
+  TreebarContext,
+  useContextMenu,
+} from './ContextMenu';
 import { useMikoto } from '../api';
 import { useSocketIO } from '../hooks/UseSocketIO';
 
@@ -73,19 +77,10 @@ export function TreeBar({ onClick }: { onClick: (channel: Channel) => void }) {
   useSocketIO<Channel>(mikoto.io, 'channelDelete', (channel) => {
     setChannels((xs) => xs.filter((x) => x.id !== channel.id));
   });
-
-  const setContextMenu = useSetRecoilState(contextMenuState);
+  const contextMenu = useContextMenu(() => <TreebarContext />);
 
   return (
-    <TreeContainer
-      onContextMenu={(e) => {
-        e.preventDefault();
-        setContextMenu({
-          position: { top: e.clientY, left: e.clientX },
-          variant: { kind: 'treebar' },
-        });
-      }}
-    >
+    <TreeContainer onContextMenu={contextMenu}>
       {channels.map((x) => (
         <TreeNode channel={x} key={x.id} onClick={() => onClick(x)} />
       ))}

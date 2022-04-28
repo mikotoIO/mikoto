@@ -1,27 +1,22 @@
-import { atom, useRecoilState } from 'recoil';
+import { atom, useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 import useEventListener from '@use-it/event-listener';
-import { Message } from '../models';
 import { Button, Modal, TextInput } from '@mantine/core';
 import React, { useEffect, useRef } from 'react';
 import { useMikoto } from '../api';
 import { useForm } from '@mantine/form';
 import constants from '../constants';
 
-type ContextMenuVariant =
-  | { kind: 'treebar' }
-  | { kind: 'message'; message: Message };
-
 interface ContextMenuData {
   position: {
     top: number;
     left: number;
   };
-  variant: ContextMenuVariant;
+  elem: React.ReactNode;
 }
 
 export const contextMenuState = atom<ContextMenuData | null>({
-  key: 'contextMenu',
+  key: 'contextComponent',
   default: null,
 });
 
@@ -34,7 +29,7 @@ const ContextMenuOverlay = styled.div`
   height: 100vh;
 `;
 
-const ContextMenuBase = styled.div`
+export const ContextMenuBase = styled.div`
   color: white;
   pointer-events: all;
   width: 160px;
@@ -44,7 +39,7 @@ const ContextMenuBase = styled.div`
   background-color: ${(p) => p.theme.colors.N1100};
 `;
 
-const ContextMenuLink = styled.a`
+export const ContextMenuLink = styled.a`
   display: block;
   padding: 6px 8px;
   box-sizing: border-box;
@@ -100,9 +95,8 @@ function CreateChannelModal() {
   );
 }
 
-function TreebarContext() {
+export function TreebarContext() {
   const [, setModal] = useRecoilState(modalState);
-
   return (
     <ContextMenuBase>
       <ContextMenuLink
@@ -115,37 +109,6 @@ function TreebarContext() {
       <ContextMenuLink>Invite People</ContextMenuLink>
     </ContextMenuBase>
   );
-}
-
-function SwitchContextMenu() {
-  const [contextMenu, setContextMenu] = useRecoilState(contextMenuState);
-  const mikoto = useMikoto();
-
-  if (contextMenu === null) return null; // not going to happen tho
-  const { variant } = contextMenu;
-
-  switch (variant.kind) {
-    case 'treebar':
-      return <TreebarContext />;
-    case 'message':
-      return (
-        <ContextMenuBase>
-          <ContextMenuLink
-            onClick={async () => {
-              setContextMenu(null);
-              await mikoto.deleteMessage(
-                variant.message.channelId,
-                variant.message.id,
-              );
-            }}
-          >
-            Delete Message
-          </ContextMenuLink>
-        </ContextMenuBase>
-      );
-    default:
-      return null;
-  }
 }
 
 const ContextWrapper = styled.div`
@@ -170,28 +133,48 @@ function useOutsideAlerter(
 }
 
 export function ContextMenuKit() {
-  const [contextMenu, setContextMenu] = useRecoilState(contextMenuState);
+  const [context, setContext] = useRecoilState(contextMenuState);
+
   const ref = useRef<HTMLDivElement>(null);
   useOutsideAlerter(ref, (ev) => {
     if (ref.current && !ref.current.contains(ev.target as any)) {
-      setContextMenu(null);
+      setContext(null);
     }
   });
 
   useEventListener('keydown', (ev: KeyboardEvent) => {
     if (ev.code === 'Escape') {
-      setContextMenu(null);
+      setContext(null);
     }
   });
 
   return (
     <ContextMenuOverlay tabIndex={0}>
       <CreateChannelModal />
-      {contextMenu && (
-        <ContextWrapper ref={ref} style={{ ...contextMenu.position }}>
-          <SwitchContextMenu />
+      {context && (
+        <ContextWrapper ref={ref} style={{ ...context.position }}>
+          {context.elem}
         </ContextWrapper>
       )}
     </ContextMenuOverlay>
   );
+}
+
+interface ContextMenuFns {
+  destroy(): void;
+}
+
+export function useContextMenu(fn: (fns: ContextMenuFns) => React.ReactNode) {
+  const setContextMenu = useSetRecoilState(contextMenuState);
+  return (ev: React.MouseEvent) => {
+    ev.preventDefault();
+    setContextMenu({
+      position: { top: ev.clientY, left: ev.clientX },
+      elem: fn({
+        destroy() {
+          setContextMenu(null);
+        },
+      }),
+    });
+  };
 }

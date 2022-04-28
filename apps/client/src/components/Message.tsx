@@ -3,11 +3,15 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import styled from 'styled-components';
 import { Message } from '../models';
-import { useSetRecoilState } from 'recoil';
-import { contextMenuState } from './ContextMenu';
+import {
+  ContextMenuBase,
+  ContextMenuLink,
+  useContextMenu,
+} from './ContextMenu';
 import { Modal } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+import { useMikoto } from '../api';
 
 const dateFormat = new Intl.DateTimeFormat('en', {
   day: 'numeric',
@@ -169,7 +173,19 @@ interface MessageProps {
 }
 
 export default function MessageItem({ message, isSimple }: MessageProps) {
-  const setContextMenu = useSetRecoilState(contextMenuState);
+  const menu = useContextMenu(({ destroy }) => (
+    <ContextMenuBase>
+      <ContextMenuLink
+        onClick={async () => {
+          destroy();
+          await mikoto.deleteMessage(message.channelId, message.id);
+        }}
+      >
+        Delete Message
+      </ContextMenuLink>
+    </ContextMenuBase>
+  ));
+  const mikoto = useMikoto();
 
   const time = new Date(message.timestamp);
 
@@ -179,16 +195,7 @@ export default function MessageItem({ message, isSimple }: MessageProps) {
       : message.content;
 
   return (
-    <MessageContainer
-      isSimple={isSimple}
-      onContextMenu={(e) => {
-        e.preventDefault();
-        setContextMenu({
-          position: { top: e.clientY, left: e.clientX },
-          variant: { kind: 'message', message },
-        });
-      }}
-    >
+    <MessageContainer isSimple={isSimple} onContextMenu={menu}>
       {isSimple ? (
         <div style={{ width: '40px' }} />
       ) : (

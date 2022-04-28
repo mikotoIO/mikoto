@@ -2,7 +2,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 const sharedCss = css`
-  margin-top: 12px;
+  margin-top: 20px;
 
   resize: none;
   max-height: 300px;

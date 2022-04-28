@@ -1,5 +1,5 @@
 {
-  "name": "turborepo-basic-shared",
+  "name": "mikoto-monorepo",
   "version": "0.0.0",
   "private": true,
   "workspaces": [

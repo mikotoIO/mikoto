@@ -85,7 +85,6 @@ function CreateChannelModal() {
           );
           setModal(null);
           form.reset();
-          window.location.reload(); // TODO workaround until we have channel created event
         })}
       >
         <TextInput

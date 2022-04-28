@@ -2,9 +2,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styled from 'styled-components';
 import { faHashtag } from '@fortawesome/free-solid-svg-icons';
 import { Channel } from '../models';
-import React from 'react';
+import React, { useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import { contextMenuState } from './ContextMenu';
+import { useMikoto } from '../api';
+import { useSocketIO } from '../hooks/UseSocketIO';
 
 export const TreeContainer = styled.ul`
   height: 100%;
@@ -56,13 +58,18 @@ export function TreeNode({ channel, ...props }: TreeNodeProps) {
   );
 }
 
-export function TreeBar({
-  channels,
-  onClick,
-}: {
-  channels: Channel[];
-  onClick: (channel: Channel) => void;
-}) {
+export function TreeBar({ onClick }: { onClick: (channel: Channel) => void }) {
+  const [channels, setChannels] = useState<Channel[]>([]);
+  const mikoto = useMikoto();
+
+  React.useEffect(() => {
+    mikoto.getChannels().then(setChannels);
+  }, [mikoto]);
+
+  useSocketIO<Channel>(mikoto.io, 'channelCreate', (channel) => {
+    setChannels((xs) => [...xs, channel]);
+  });
+
   const setContextMenu = useSetRecoilState(contextMenuState);
 
   return (

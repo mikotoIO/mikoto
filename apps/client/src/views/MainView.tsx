@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useMikoto } from '../api';
 import { Channel, Message } from '../models';
 import MessageItem from '../components/Message';
 import { TreeBar } from '../components/TreeBar';
-import { Socket } from 'socket.io-client';
 import { atom, useRecoilState } from 'recoil';
 import { MessageInput } from '../components/MessageInput';
+import { useSocketIO } from '../hooks/UseSocketIO';
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -39,20 +39,6 @@ const Messages = styled.div`
 
 interface MessageViewProps {
   channel: Channel;
-}
-
-function useSocketIO<T>(
-  io: Socket,
-  ev: string,
-  fn: (data: T) => void,
-  deps?: React.DependencyList | undefined,
-) {
-  useEffect(() => {
-    io.on(ev, fn);
-    return () => {
-      io.off(ev, fn);
-    };
-  }, [ev, fn, deps, io]);
 }
 
 function MessageView({ channel }: MessageViewProps) {
@@ -166,18 +152,11 @@ function TabbedView({ children }: TabbedViewProps) {
 function AppView() {
   const [currentChannel, setCurrentChannel] =
     useRecoilState(currentChannelState);
-  const [channels, setChannels] = useState<Channel[]>([]);
-  const mikoto = useMikoto();
-
-  React.useEffect(() => {
-    mikoto.getChannels().then(setChannels);
-  }, [mikoto]);
 
   return (
     <AppContainer>
       <Sidebar>
         <TreeBar
-          channels={channels}
           onClick={(ch) => {
             setCurrentChannel(ch);
           }}

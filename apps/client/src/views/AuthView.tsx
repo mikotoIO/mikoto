@@ -3,6 +3,7 @@ import React, {useState} from "react";
 import {useForm} from "react-hook-form";
 import {useNavigate} from "react-router-dom";
 import styled from "styled-components";
+import Constants from "../constants";
 
 const AuthViewContainer = styled.div`
   height: 100vh;
@@ -62,7 +63,7 @@ const Button = styled.button`
 `;
 
 const authAxios = axios.create({
-  baseURL: 'http://localhost:9500',
+  baseURL: Constants.ApiPath,
 });
 
 export function AuthView({ children }: { children: React.ReactNode }) {

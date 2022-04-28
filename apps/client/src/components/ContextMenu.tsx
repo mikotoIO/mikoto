@@ -6,6 +6,7 @@ import {Button, Modal, TextInput} from '@mantine/core';
 import React, {useEffect, useRef, useState} from "react";
 import MikotoApi, {useMikoto} from "../api";
 import {useForm} from "@mantine/form";
+import Constants from "../constants";
 
 type ContextMenuVariant =
     { kind: 'treebar' }
@@ -79,8 +80,8 @@ function CreateChannelModal() {
       title="Create Channel"
     >
       <form onSubmit={form.onSubmit(async () => {
-        await mikoto.createChannel('bcc723e1-c8c9-4489-bc58-7172d70190eb', form.values.channelName);
-        setModal(null)
+        await mikoto.createChannel(Constants.DefaultSpace, form.values.channelName);
+        setModal(null);
       })}>
         <TextInput label="Channel Name" placeholder="New Channel"
                    {...form.getInputProps('channelName')}

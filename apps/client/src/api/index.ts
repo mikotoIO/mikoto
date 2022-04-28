@@ -2,6 +2,7 @@ import axios, {AxiosInstance} from 'axios';
 import {Socket, io} from "socket.io-client";
 import {Channel, Message} from "../models";
 import React, {useContext} from "react";
+import Constants from "../constants";
 
 export default class MikotoApi {
   axios: AxiosInstance;
@@ -18,7 +19,7 @@ export default class MikotoApi {
 
   //region Channels
   async getChannels(): Promise<Channel[]> {
-    const { data } = await this.axios.get<Channel[]>(`/spaces/bcc723e1-c8c9-4489-bc58-7172d70190eb/channels`);
+    const { data } = await this.axios.get<Channel[]>(`/spaces/${Constants.DefaultSpace}/channels`);
     return data;
   }
 

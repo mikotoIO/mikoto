@@ -4,6 +4,7 @@ import {
 } from "socket-controllers";
 import {Socket} from "socket.io";
 import { Service } from "typedi";
+import Constants from "../constants";
 
 @SocketController()
 @Service()
@@ -11,7 +12,7 @@ export class MessageController {
   @OnConnect()
   connection(@ConnectedSocket() socket: Socket) {
     // console.log("client connected");
-    socket.join('bcc723e1-c8c9-4489-bc58-7172d70190eb'); // TODO: Add a socket endpoint for space joins
+    socket.join(Constants.DefaultSpace); // TODO: Add a socket endpoint for space joins
   }
 
   @OnDisconnect()

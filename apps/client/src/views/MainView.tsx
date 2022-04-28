@@ -7,6 +7,14 @@ import { TreeBar } from '../components/TreeBar';
 import { atom, useRecoilState } from 'recoil';
 import { MessageInput } from '../components/MessageInput';
 import { useSocketIO } from '../hooks/UseSocketIO';
+import {
+  TabBar,
+  TabbedViewContainer,
+  TabbedViewProps,
+  TabItem,
+} from '../components/TabBar';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSquareXmark } from '@fortawesome/free-solid-svg-icons';
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -33,7 +41,6 @@ const MessageViewContainer = styled.div`
 
 const Messages = styled.div`
   overflow-y: auto;
-  // height: calc(100% - 80px);
   flex-grow: 1;
 `;
 
@@ -104,45 +111,20 @@ function MessageView({ channel }: MessageViewProps) {
   );
 }
 
-interface TabbedViewProps {
-  children: React.ReactNode;
-}
-
-const TabbedViewContainer = styled.div`
-  grid-area: main;
-  display: grid;
-  grid-template-rows: 32px calc(100vh - 32px);
-`;
-
-const TabBar = styled.div`
-  font-size: 14px;
-  height: 36px;
-  display: flex;
-`;
-
-const TabItem = styled.div`
-  height: 100%;
-  padding: 0 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background-color: ${(p) => p.theme.colors.N800};
-  border-left: 4px solid #3b83ff;
-`;
-
 const currentChannelState = atom<Channel | null>({
   key: 'currentChannel',
   default: null,
 });
 
-function TabbedView({ children }: TabbedViewProps) {
-  const [currentChannel] = useRecoilState(currentChannelState);
-
+function TabbedView({ children, channels }: TabbedViewProps) {
   return (
     <TabbedViewContainer>
       <TabBar>
-        <TabItem>{currentChannel?.name}</TabItem>
+        {channels.map((channel) => (
+          <TabItem key={channel.id} active>
+            {channel.name}
+          </TabItem>
+        ))}
       </TabBar>
       {children}
     </TabbedViewContainer>
@@ -162,7 +144,10 @@ function AppView() {
           }}
         />
       </Sidebar>
-      <TabbedView>
+      <TabbedView
+        channels={currentChannel ? [currentChannel] : []}
+        activeChannelId={currentChannel?.id}
+      >
         {currentChannel && <MessageView channel={currentChannel} />}
       </TabbedView>
     </AppContainer>

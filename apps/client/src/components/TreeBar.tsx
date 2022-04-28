@@ -3,11 +3,9 @@ import styled from 'styled-components';
 import { faHashtag } from '@fortawesome/free-solid-svg-icons';
 import { Channel } from '../models';
 import React, { useState } from 'react';
-import { useSetRecoilState } from 'recoil';
 import {
   ContextMenuBase,
   ContextMenuLink,
-  contextMenuState,
   TreebarContext,
   useContextMenu,
 } from './ContextMenu';
@@ -54,10 +52,18 @@ const IconContainer = styled.span`
 `;
 
 export function TreeNode({ channel, ...props }: TreeNodeProps) {
-  const menu = useContextMenu(() => {
+  const mikoto = useMikoto();
+  const menu = useContextMenu(({ destroy }) => {
     return (
       <ContextMenuBase>
-        <ContextMenuLink>Hello</ContextMenuLink>
+        <ContextMenuLink
+          onClick={async () => {
+            destroy();
+            await mikoto.deleteChannel(channel.id);
+          }}
+        >
+          Delete Channel
+        </ContextMenuLink>
       </ContextMenuBase>
     );
   });

@@ -11,7 +11,7 @@ import * as http from "http";
 import cors from "cors";
 import express from "express";
 import {PrismaClient} from "@prisma/client";
-import Constants from "./constants";
+import constants from "./constants";
 
 const app = express();
 const server = new http.Server(app);
@@ -36,6 +36,6 @@ useSocketServer(io, {
   controllers: [path.join(__dirname + "/ws-controllers/*.js")]
 });
 
-server.listen(Constants.ApiPort, () => {
-  console.log(`Mikoto server started! listening on ${Constants.getApiPath()}`);
+server.listen(constants.apiPort, () => {
+  console.log(`Mikoto server started! listening on ${constants.getApiPath()}`);
 });

@@ -1,24 +1,9 @@
 import React from 'react';
 import './App.css';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import {atom} from "recoil";
 import {LoginView, RegisterView} from "./views/AuthView";
 import MainView from "./views/MainView";
-import styled from "styled-components";
 import {ContextMenuKit} from "./components/ContextMenu";
-import MikotoApi, {MikotoContext} from "./api";
-
-const accessTokenAtom = atom<string>({
-  key: 'user',
-  default: '',
-});
-
-const ContextMenuOverlay = styled.div`
-  position: fixed;
-  pointer-events: none;
-  width: 100vw;
-  height: 100vh;
-`;
 
 function App() {
   return (

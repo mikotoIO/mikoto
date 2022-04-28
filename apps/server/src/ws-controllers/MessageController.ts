@@ -1,5 +1,5 @@
 import {
-  ConnectedSocket, MessageBody, OnConnect, OnDisconnect, OnMessage,
+  ConnectedSocket, MessageBody, OnConnect, OnMessage,
   SocketController,
 } from 'socket-controllers';
 import { Socket } from 'socket.io';
@@ -13,12 +13,6 @@ export class MessageController {
   connection(@ConnectedSocket() socket: Socket) {
     // console.log("client connected");
     socket.join(constants.defaultSpace); // TODO: Add a socket endpoint for space joins
-  }
-
-  @OnDisconnect()
-  disconnect(@ConnectedSocket() socket: Socket) {
-    // socket.data['test'] = '';
-    // console.log("client disconnected");
   }
 
   @OnMessage('message-send')

@@ -3,8 +3,8 @@ import styled from "styled-components";
 import useEventListener from "@use-it/event-listener";
 import {Message} from "../models";
 import {Button, Modal, TextInput} from '@mantine/core';
-import React, {useEffect, useRef, useState} from "react";
-import MikotoApi, {useMikoto} from "../api";
+import React, {useEffect, useRef} from "react";
+import {useMikoto} from "../api";
 import {useForm} from "@mantine/form";
 import constants from "../constants";
 

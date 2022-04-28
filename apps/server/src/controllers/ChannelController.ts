@@ -27,19 +27,23 @@ export class ChannelController {
 
   @Post('/channels')
   async createChannel(@Body() body: ChannelPayload) {
-    return this.prisma.channel.create({
+    const channel = await this.prisma.channel.create({
       data: {
         name: body.name,
         spaceId: body.spaceId,
       },
     });
+    this.io.in(channel.spaceId).emit('channelCreate', channel);
+    return channel;
   }
 
   @Delete('/channels/:id')
   async deleteChannel(@Param('id') id: string) {
-    return this.prisma.channel.delete({
+    const channel = await this.prisma.channel.delete({
       where: { id },
     });
+    this.io.in(channel.spaceId).emit('channelDelete', channel);
+    return channel;
   }
 
   @Get('/channels/:id')

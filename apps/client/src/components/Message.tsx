@@ -1,21 +1,27 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from "remark-gfm";
+import remarkGfm from 'remark-gfm';
 import styled from 'styled-components';
-import {Message} from "../models";
-import {useSetRecoilState} from "recoil";
-import {contextMenuState} from "./ContextMenu";
+import { Message } from '../models';
+import { useSetRecoilState } from 'recoil';
+import { contextMenuState } from './ContextMenu';
 import { Modal } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faArrowUpRightFromSquare} from "@fortawesome/free-solid-svg-icons";
+import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 
-const dateFormat = new Intl.DateTimeFormat('en', {day: 'numeric', month: 'long', year: 'numeric'});
+const dateFormat = new Intl.DateTimeFormat('en', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
 
 function isToday(someDate: Date): boolean {
-  const today = new Date()
-  return someDate.getDate() === today.getDate() &&
+  const today = new Date();
+  return (
+    someDate.getDate() === today.getDate() &&
     someDate.getMonth() === today.getMonth() &&
     someDate.getFullYear() === today.getFullYear()
+  );
 }
 
 function isUrl(s: string) {
@@ -27,26 +33,26 @@ function isUrl(s: string) {
     return false;
   }
 
-  return url.protocol === "http:" || url.protocol === "https:";
+  return url.protocol === 'http:' || url.protocol === 'https:';
 }
 
 function isUrlImage(url: string): boolean {
-  return(url.match(/\.(jpeg|jpg|gif|png)$/) !== null);
+  return url.match(/\.(jpeg|jpg|gif|png)$/) !== null;
 }
 
 function padTime(n: number): string {
-  return String(n).padStart(2, '0')
+  return String(n).padStart(2, '0');
 }
 
-const MessageContainer = styled.div<{isSimple?: boolean}>`
+const MessageContainer = styled.div<{ isSimple?: boolean }>`
   display: grid;
   grid-template-columns: min-content auto;
   grid-gap: 16px;
-  padding: ${p => p.isSimple ? '0' : '8px'} 20px 4px;
+  padding: ${(p) => (p.isSimple ? '0' : '8px')} 20px 4px;
   &:hover {
-    background-color: rgba(0, 0, 0, 0.06)
+    background-color: rgba(0, 0, 0, 0.06);
   }
-  
+
   p {
     margin: 0;
   }
@@ -58,7 +64,8 @@ const Avatar = styled.img`
   border-radius: 8px;
 `;
 
-const avatarUrl = 'https://avatars.githubusercontent.com/u/16204510?s=400&u=6af0bd4744044945ae81e5ba5a57e0f2ecc38997';
+const avatarUrl =
+  'https://avatars.githubusercontent.com/u/16204510?s=400&u=6af0bd4744044945ae81e5ba5a57e0f2ecc38997';
 
 const MessageInner = styled.div`
   padding-top: 4px;
@@ -72,7 +79,7 @@ const MessageInner = styled.div`
     border-radius: 4px;
   }
   a {
-    color: #00AFF4;
+    color: #00aff4;
     &:not(:hover) {
       text-decoration: none;
     }
@@ -126,7 +133,7 @@ const ImageModalTitleLink = styled.a`
   outline: none;
 `;
 
-function MessageImage({src, alt}: MessageImageProps) {
+function MessageImage({ src, alt }: MessageImageProps) {
   const [opened, setOpened] = useState(false);
 
   return (
@@ -134,20 +141,26 @@ function MessageImage({src, alt}: MessageImageProps) {
       <ImageModal
         opened={opened}
         onClose={() => setOpened(false)}
-        centered withCloseButton={false}
+        centered
+        withCloseButton={false}
         title={
           <ImageModalTitleLink href={src} target="_blank">
-            Source <FontAwesomeIcon icon={faArrowUpRightFromSquare}/>
+            Source <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
           </ImageModalTitleLink>
         }
       >
-        <img src={src} alt={alt} style={{ maxWidth: '100%' }}/>
+        <img src={src} alt={alt} style={{ maxWidth: '100%' }} />
       </ImageModal>
-      <img src={src} alt={alt} style={{ cursor: 'pointer' }} onClick={() => {
-        setOpened(true);
-      }}/>
+      <img
+        src={src}
+        alt={alt}
+        style={{ cursor: 'pointer' }}
+        onClick={() => {
+          setOpened(true);
+        }}
+      />
     </>
-  )
+  );
 }
 
 interface MessageProps {
@@ -160,37 +173,43 @@ export default function MessageItem({ message, isSimple }: MessageProps) {
 
   const time = new Date(message.timestamp);
 
-  const content = isUrl(message.content) && isUrlImage(message.content) ?
-    `![Image Embed](${message.content})` : message.content;
+  const content =
+    isUrl(message.content) && isUrlImage(message.content)
+      ? `![Image Embed](${message.content})`
+      : message.content;
 
   return (
     <MessageContainer
       isSimple={isSimple}
-      onContextMenu={e => {
-      e.preventDefault();
-      setContextMenu({
-        position: {top: e.clientY, left: e.clientX},
-        variant: { kind: 'message', message }
-      });
-    }}>
-      {isSimple ? <div style={{ width: '40px' }}/> : <Avatar src={avatarUrl}/>}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        setContextMenu({
+          position: { top: e.clientY, left: e.clientX },
+          variant: { kind: 'message', message },
+        });
+      }}
+    >
+      {isSimple ? (
+        <div style={{ width: '40px' }} />
+      ) : (
+        <Avatar src={avatarUrl} />
+      )}
       <MessageInner>
-        {!isSimple && <NameBox>
-          <Name color="white">{message.author?.name ?? 'Ghost'}</Name>
-          <Timestamp>
-            {isToday(time) ? 'Today at ' : dateFormat.format(time)}
-            {' '}
-            {padTime(time.getHours())}:{padTime(time.getMinutes())}
-          </Timestamp>
-        </NameBox>}
+        {!isSimple && (
+          <NameBox>
+            <Name color="white">{message.author?.name ?? 'Ghost'}</Name>
+            <Timestamp>
+              {isToday(time) ? 'Today at ' : dateFormat.format(time)}{' '}
+              {padTime(time.getHours())}:{padTime(time.getMinutes())}
+            </Timestamp>
+          </NameBox>
+        )}
         <ReactMarkdown
           children={content}
           components={{
             img({ src, alt }) {
-              return (
-                <MessageImage src={src} alt={alt} />
-              )
-            }
+              return <MessageImage src={src} alt={alt} />;
+            },
           }}
           remarkPlugins={[remarkGfm]}
         />

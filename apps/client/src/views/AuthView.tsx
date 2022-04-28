@@ -1,9 +1,9 @@
-import axios from "axios";
-import React from "react";
-import {useForm} from "react-hook-form";
-import {useNavigate} from "react-router-dom";
-import styled from "styled-components";
-import constants from "../constants";
+import axios from 'axios';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import constants from '../constants';
 
 const AuthViewContainer = styled.div`
   height: 100vh;
@@ -13,11 +13,11 @@ const AuthViewContainer = styled.div`
 
 const AuthViewInner = styled.div`
   color: white;
-  background-color: ${p => p.theme.colors.N800};
+  background-color: ${(p) => p.theme.colors.N800};
 `;
 
 const BackgroundArt = styled.div`
-  background: url("/images/background-1.jpg") no-repeat center center fixed;
+  background: url('/images/background-1.jpg') no-repeat center center fixed;
   background-size: cover;
 `;
 
@@ -35,12 +35,12 @@ const Input = styled.input`
   font-size: 16px;
   color: white;
   border-radius: 4px;
-  background-color: ${p => p.theme.colors.N700};
-  border: 1px solid ${p => p.theme.colors.N1000};
+  background-color: ${(p) => p.theme.colors.N700};
+  border: 1px solid ${(p) => p.theme.colors.N1000};
 
   &:focus {
     outline: none;
-    border-color: ${p => p.theme.colors.B800};
+    border-color: ${(p) => p.theme.colors.B800};
   }
 `;
 
@@ -55,9 +55,9 @@ const Button = styled.button`
   width: 100%;
   padding: 16px;
   font-size: 16px;
-  
+
   color: white;
-  background-color: ${p => p.theme.colors.B800};
+  background-color: ${(p) => p.theme.colors.B800};
   border: none;
   border-radius: 4px;
 `;
@@ -70,10 +70,10 @@ export function AuthView({ children }: { children: React.ReactNode }) {
   return (
     <AuthViewContainer>
       <AuthViewInner>
-        <Logo src='/logo.png'/>
+        <Logo src="/logo.png" />
         {children}
       </AuthViewInner>
-      <BackgroundArt/>
+      <BackgroundArt />
     </AuthViewContainer>
   );
 }
@@ -84,16 +84,20 @@ export function LoginView() {
 
   return (
     <AuthView>
-      <Form onSubmit={handleSubmit(async formData => {
-        const { data } = await authAxios.post('/account/login', formData);
-        console.log(data);
-        navigate('/');
-      })}>
-        <Input placeholder='Email' {...register('email')}/>
-        <Input placeholder='Password' type='password' {...register('password')}/>
-        <Button>
-          Log In
-        </Button>
+      <Form
+        onSubmit={handleSubmit(async (formData) => {
+          const { data } = await authAxios.post('/account/login', formData);
+          console.log(data);
+          navigate('/');
+        })}
+      >
+        <Input placeholder="Email" {...register('email')} />
+        <Input
+          placeholder="Password"
+          type="password"
+          {...register('password')}
+        />
+        <Button>Log In</Button>
       </Form>
     </AuthView>
   );
@@ -105,15 +109,19 @@ export function RegisterView() {
 
   return (
     <AuthView>
-      <Form onSubmit={handleSubmit(async data => {
-        await authAxios.post('/account/register', data);
-        navigate('/');
-      })}>
-        <Input placeholder='Email' {...register('email')}/>
-        <Input placeholder='Password' type='password' {...register('password')}/>
-        <Button>
-          Register
-        </Button>
+      <Form
+        onSubmit={handleSubmit(async (data) => {
+          await authAxios.post('/account/register', data);
+          navigate('/');
+        })}
+      >
+        <Input placeholder="Email" {...register('email')} />
+        <Input
+          placeholder="Password"
+          type="password"
+          {...register('password')}
+        />
+        <Button>Register</Button>
       </Form>
     </AuthView>
   );

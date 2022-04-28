@@ -1,10 +1,10 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import styled from "styled-components";
-import {faHashtag} from "@fortawesome/free-solid-svg-icons";
-import {Channel} from "../models";
-import React from "react";
-import {useSetRecoilState} from "recoil";
-import {contextMenuState} from "./ContextMenu";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import styled from 'styled-components';
+import { faHashtag } from '@fortawesome/free-solid-svg-icons';
+import { Channel } from '../models';
+import React from 'react';
+import { useSetRecoilState } from 'recoil';
+import { contextMenuState } from './ContextMenu';
 
 export const TreeContainer = styled.ul`
   height: 100%;
@@ -21,10 +21,10 @@ const TreeNodeElement = styled.li`
   border-radius: 4px;
   display: flex;
   align-items: center;
-  color: rgba(255,255,255,0.8);
-  
+  color: rgba(255, 255, 255, 0.8);
+
   &:hover {
-    background-color: ${p => p.theme.colors.N700};
+    background-color: ${(p) => p.theme.colors.N700};
   }
 `;
 
@@ -53,20 +53,31 @@ export function TreeNode({ channel, ...props }: TreeNodeProps) {
       </IconContainer>
       {channel.name}
     </TreeNodeElement>
-  )
+  );
 }
 
-export function TreeBar({ channels, onClick }: { channels: Channel[], onClick: (channel: Channel) => void }) {
+export function TreeBar({
+  channels,
+  onClick,
+}: {
+  channels: Channel[];
+  onClick: (channel: Channel) => void;
+}) {
   const setContextMenu = useSetRecoilState(contextMenuState);
 
   return (
-    <TreeContainer onContextMenu={e => {
-      e.preventDefault();
-      setContextMenu({ position: {top: e.clientY, left: e.clientX}, variant: { kind: 'treebar' } });
-    }}>
-      {channels.map(x =>
-        <TreeNode channel={x} key={x.id} onClick={() => onClick(x)}/>
-      )}
+    <TreeContainer
+      onContextMenu={(e) => {
+        e.preventDefault();
+        setContextMenu({
+          position: { top: e.clientY, left: e.clientX },
+          variant: { kind: 'treebar' },
+        });
+      }}
+    >
+      {channels.map((x) => (
+        <TreeNode channel={x} key={x.id} onClick={() => onClick(x)} />
+      ))}
     </TreeContainer>
-  )
+  );
 }

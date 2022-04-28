@@ -1,9 +1,9 @@
-import React from "react";
-import styled, { css } from "styled-components";
+import React from 'react';
+import styled, { css } from 'styled-components';
 
 const sharedCss = css`
   margin-top: 12px;
-  
+
   resize: none;
   max-height: 300px;
   font-size: 14px;
@@ -16,7 +16,7 @@ const sharedCss = css`
     outline: none;
   }
   border-radius: 4px;
-  
+
   grid-area: 1 / 1 / 2 / 2;
 `;
 
@@ -27,8 +27,7 @@ const AutoGrow = styled.div`
 const MessageInputDouble = styled.span`
   ${sharedCss};
   white-space: pre-line;
-  visibility: hidden;
-;
+  visibility: hidden; ;
 `;
 
 const Outer = styled.div`
@@ -44,12 +43,12 @@ const Typing = styled.div`
 const MessageInputBox = styled.textarea`
   ${sharedCss};
   color: white; // #dcddde
-  background-color: ${(p) => p.theme.colors.N700};;
+  background-color: ${(p) => p.theme.colors.N700}; ;
 `;
 
 interface MessageProps {
   channelName: string;
-  onMessageSend: ((text: string) => void);
+  onMessageSend: (text: string) => void;
 }
 
 // the input box for messages.
@@ -63,23 +62,28 @@ export function MessageInput(props: MessageProps) {
     <Outer>
       <AutoGrow>
         <MessageInputBox
-          placeholder={`Message #${props.channelName}`} rows={1} ref={ref}
-          value={text} onChange={x => setText(x.target.value)}
-          onKeyDown={ev => {
-             if (ev.code === 'Enter' && !ev.shiftKey) {
-               props.onMessageSend(text);
-               setText('');
-               ev.preventDefault();
-             }
-           }}
+          placeholder={`Message #${props.channelName}`}
+          rows={1}
+          ref={ref}
+          value={text}
+          onChange={(x) => setText(x.target.value)}
+          onKeyDown={(ev) => {
+            if (ev.code === 'Enter' && !ev.shiftKey) {
+              props.onMessageSend(text);
+              setText('');
+              ev.preventDefault();
+            }
+          }}
         />
         <MessageInputDouble>{text}</MessageInputDouble>
       </AutoGrow>
       <Typing>
-        {(typing.length !== 0) && <div>
-          {typing.join(', ')} {typing.length === 1 ? 'is': 'are'} typing...
-        </div>}
+        {typing.length !== 0 && (
+          <div>
+            {typing.join(', ')} {typing.length === 1 ? 'is' : 'are'} typing...
+          </div>
+        )}
       </Typing>
     </Outer>
-  )
+  );
 }

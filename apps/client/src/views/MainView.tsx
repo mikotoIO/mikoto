@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from "react";
-import styled from "styled-components";
-import {useMikoto} from "../api";
-import {Channel, Message} from "../models";
-import MessageItem from "../components/Message";
-import {TreeBar} from "../components/TreeBar";
-import {Socket} from "socket.io-client";
-import {atom, useRecoilState} from "recoil";
-import {MessageInput} from "../components/MessageInput";
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { useMikoto } from '../api';
+import { Channel, Message } from '../models';
+import MessageItem from '../components/Message';
+import { TreeBar } from '../components/TreeBar';
+import { Socket } from 'socket.io-client';
+import { atom, useRecoilState } from 'recoil';
+import { MessageInput } from '../components/MessageInput';
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -15,7 +15,7 @@ const AppContainer = styled.div`
   display: grid;
   grid-template-rows: 100vh;
   grid-template-columns: 300px calc(100vw - 300px);
-  grid-template-areas: "sidebar main";
+  grid-template-areas: 'sidebar main';
 `;
 
 const Sidebar = styled.div`
@@ -41,13 +41,18 @@ interface MessageViewProps {
   channel: Channel;
 }
 
-function useSocketIO<T>(io: Socket, ev: string, fn: (data: T) => void, deps?: React.DependencyList | undefined) {
+function useSocketIO<T>(
+  io: Socket,
+  ev: string,
+  fn: (data: T) => void,
+  deps?: React.DependencyList | undefined,
+) {
   useEffect(() => {
     io.on(ev, fn);
     return () => {
       io.off(ev, fn);
-    }
-  }, [ev, fn, deps, io])
+    };
+  }, [ev, fn, deps, io]);
 }
 
 function MessageView({ channel }: MessageViewProps) {
@@ -62,42 +67,59 @@ function MessageView({ channel }: MessageViewProps) {
   });
 
   React.useEffect(() => {
-    mikoto.getMessages(channel.id)
-      .then(setMessages);
+    mikoto.getMessages(channel.id).then(setMessages);
   }, [mikoto, channel.id]);
 
-  useSocketIO<Message>(mikoto.io, 'messageCreate', (x) => {
-    if (x.channelId === channel.id) {
-      setMessages((xs) => [...xs, x])
-    }
-  }, [channel.id]);
+  useSocketIO<Message>(
+    mikoto.io,
+    'messageCreate',
+    (x) => {
+      if (x.channelId === channel.id) {
+        setMessages((xs) => [...xs, x]);
+      }
+    },
+    [channel.id],
+  );
 
-  useSocketIO<Message>(mikoto.io, 'messageDelete', (msg) => {
-    if (msg.channelId === channel.id) {
-      setMessages((xs) => xs.filter(x => msg.id !== x.id))
-    }
-  }, [channel.id]);
+  useSocketIO<Message>(
+    mikoto.io,
+    'messageDelete',
+    (msg) => {
+      if (msg.channelId === channel.id) {
+        setMessages((xs) => xs.filter((x) => msg.id !== x.id));
+      }
+    },
+    [channel.id],
+  );
 
   return (
     <MessageViewContainer>
       <Messages ref={ref}>
         {messages.map((msg, idx) => {
           const prevMsg = messages[idx - 1];
-          const simpleMessage = prevMsg && prevMsg.authorId === msg.authorId &&
-            (new Date(msg.timestamp).getTime() - new Date(prevMsg.timestamp).getTime())< 5 * 60 * 1000;
-          return <MessageItem key={msg.id} message={msg} isSimple={simpleMessage}/>
+          const simpleMessage =
+            prevMsg &&
+            prevMsg.authorId === msg.authorId &&
+            new Date(msg.timestamp).getTime() -
+              new Date(prevMsg.timestamp).getTime() <
+              5 * 60 * 1000;
+          return (
+            <MessageItem key={msg.id} message={msg} isSimple={simpleMessage} />
+          );
         })}
       </Messages>
-      <MessageInput channelName={channel.name} onMessageSend={async (msg) => {
-        await mikoto.sendMessage(channel.id, msg);
-      }}
+      <MessageInput
+        channelName={channel.name}
+        onMessageSend={async (msg) => {
+          await mikoto.sendMessage(channel.id, msg);
+        }}
       />
     </MessageViewContainer>
   );
 }
 
 interface TabbedViewProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 const TabbedViewContainer = styled.div`
@@ -118,17 +140,17 @@ const TabItem = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  
-  background-color: ${p => p.theme.colors.N800};
+
+  background-color: ${(p) => p.theme.colors.N800};
   border-left: 4px solid #3b83ff;
 `;
 
-const currentChannelState = atom<Channel|null>({
+const currentChannelState = atom<Channel | null>({
   key: 'currentChannel',
   default: null,
 });
 
-function TabbedView({children}: TabbedViewProps) {
+function TabbedView({ children }: TabbedViewProps) {
   const [currentChannel] = useRecoilState(currentChannelState);
 
   return (
@@ -142,7 +164,8 @@ function TabbedView({children}: TabbedViewProps) {
 }
 
 function AppView() {
-  const [currentChannel, setCurrentChannel] = useRecoilState(currentChannelState);
+  const [currentChannel, setCurrentChannel] =
+    useRecoilState(currentChannelState);
   const [channels, setChannels] = useState<Channel[]>([]);
   const mikoto = useMikoto();
 
@@ -150,24 +173,23 @@ function AppView() {
     mikoto.getChannels().then(setChannels);
   }, [mikoto]);
 
-
-
   return (
     <AppContainer>
       <Sidebar>
-        <TreeBar channels={channels} onClick={(ch) => {
-          setCurrentChannel(ch);
-        }}/>
+        <TreeBar
+          channels={channels}
+          onClick={(ch) => {
+            setCurrentChannel(ch);
+          }}
+        />
       </Sidebar>
       <TabbedView>
-        {currentChannel && <MessageView channel={currentChannel}/>}
+        {currentChannel && <MessageView channel={currentChannel} />}
       </TabbedView>
     </AppContainer>
   );
 }
 
 export default function MainView() {
-  return (
-    <AppView />
-  );
+  return <AppView />;
 }

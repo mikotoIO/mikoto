@@ -1,8 +1,8 @@
-import axios, {AxiosInstance} from 'axios';
-import {Socket, io} from "socket.io-client";
-import {Channel, Message} from "../models";
-import React, {useContext} from "react";
-import constants from "../constants";
+import axios, { AxiosInstance } from 'axios';
+import { Socket, io } from 'socket.io-client';
+import { Channel, Message } from '../models';
+import React, { useContext } from 'react';
+import constants from '../constants';
 
 export default class MikotoApi {
   axios: AxiosInstance;
@@ -11,7 +11,7 @@ export default class MikotoApi {
     this.axios = axios.create({
       baseURL: url,
     });
-    this.io = io(url)
+    this.io = io(url);
     this.io.on('connect', () => {
       console.log('socket live!');
     });
@@ -19,13 +19,16 @@ export default class MikotoApi {
 
   //region Channels
   async getChannels(): Promise<Channel[]> {
-    const { data } = await this.axios.get<Channel[]>(`/spaces/${constants.defaultSpace}/channels`);
+    const { data } = await this.axios.get<Channel[]>(
+      `/spaces/${constants.defaultSpace}/channels`,
+    );
     return data;
   }
 
   async createChannel(spaceId: string, name: string): Promise<Channel> {
     const { data } = await this.axios.post<Channel>('/channels', {
-      spaceId, name
+      spaceId,
+      name,
     });
     return data;
   }
@@ -38,19 +41,26 @@ export default class MikotoApi {
 
   //region Messages
   async getMessages(channelId: string): Promise<Message[]> {
-    const { data } = await this.axios.get<Message[]>(`/channels/${channelId}/messages`);
+    const { data } = await this.axios.get<Message[]>(
+      `/channels/${channelId}/messages`,
+    );
     return data;
   }
 
   async sendMessage(channelId: string, content: string): Promise<Message> {
-    const { data } = await this.axios.post<Message>(`/channels/${channelId}/messages`, {
-      content,
-    })
+    const { data } = await this.axios.post<Message>(
+      `/channels/${channelId}/messages`,
+      {
+        content,
+      },
+    );
     return data;
   }
 
   async deleteMessage(channelId: string, messageId: string): Promise<Message> {
-    const { data } = await this.axios.delete<Message>(`/channels/${channelId}/messages/${messageId}`)
+    const { data } = await this.axios.delete<Message>(
+      `/channels/${channelId}/messages/${messageId}`,
+    );
     return data;
   }
   //endregion

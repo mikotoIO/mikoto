@@ -1,5 +1,11 @@
 import {
-  Body, Delete, Get, JsonController, NotFoundError, Param, Post,
+  Body,
+  Delete,
+  Get,
+  JsonController,
+  NotFoundError,
+  Param,
+  Post,
 } from 'routing-controllers';
 import { PrismaClient } from '@prisma/client';
 import { Server } from 'socket.io';
@@ -17,8 +23,7 @@ interface ChannelPayload {
 @JsonController()
 @Service()
 export class ChannelController {
-  constructor(private prisma: PrismaClient, private io: Server) {
-  }
+  constructor(private prisma: PrismaClient, private io: Server) {}
 
   @Post('/channels')
   async createChannel(@Body() body: ChannelPayload) {
@@ -39,8 +44,7 @@ export class ChannelController {
 
   @Get('/channels/:id')
   async getOne(@Param('id') id: string) {
-    return this.prisma.channel
-      .findUnique({ where: { id } });
+    return this.prisma.channel.findUnique({ where: { id } });
   }
 
   @Get('/channels/:id/messages')
@@ -72,7 +76,10 @@ export class ChannelController {
   }
 
   @Delete('/channels/:id/messages/:messageId')
-  async deleteMessage(@Param('id') id: string, @Param('messageId') messageId: string) {
+  async deleteMessage(
+    @Param('id') id: string,
+    @Param('messageId') messageId: string,
+  ) {
     // TODO: Permision checking
     const channel = await this.prisma.channel.findUnique({ where: { id } });
     if (channel === null) throw new NotFoundError('ChannelNotFound');

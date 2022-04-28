@@ -1,6 +1,9 @@
 import { Account, PrismaClient } from '@prisma/client';
 import {
-  Body, JsonController, Post, UnauthorizedError,
+  Body,
+  JsonController,
+  Post,
+  UnauthorizedError,
 } from 'routing-controllers';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -27,8 +30,7 @@ interface LoginPayload {
 @JsonController()
 @Service()
 export class AccountController {
-  constructor(private prisma: PrismaClient) {
-  }
+  constructor(private prisma: PrismaClient) {}
 
   private async createTokenPair(account: Account, oldToken?: string) {
     const accessToken = jwt.sign({}, process.env.SECRET!, {
@@ -71,9 +73,10 @@ export class AccountController {
 
   @Post('/account/login')
   async login(@Body() body: LoginPayload) {
-    const account = await this.prisma.account
-      .findUnique({ where: { email: body.email } });
-    if (account && await bcrypt.compare(body.password, account.passhash)) {
+    const account = await this.prisma.account.findUnique({
+      where: { email: body.email },
+    });
+    if (account && (await bcrypt.compare(body.password, account.passhash))) {
       return this.createTokenPair(account);
     }
     throw new UnauthorizedError('Incorrect Credentials');
@@ -82,7 +85,8 @@ export class AccountController {
   @Post('/account/refresh')
   async refresh(@Body() body: { refreshToken: string }) {
     const account = await this.prisma.refreshToken
-      .findUnique({ where: { token: body.refreshToken } }).account();
+      .findUnique({ where: { token: body.refreshToken } })
+      .account();
     if (account === null) {
       throw new UnauthorizedError('Invalid Token');
     }

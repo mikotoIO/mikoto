@@ -1,5 +1,8 @@
 import {
-  ConnectedSocket, MessageBody, OnConnect, OnMessage,
+  ConnectedSocket,
+  MessageBody,
+  OnConnect,
+  OnMessage,
   SocketController,
 } from 'socket-controllers';
 import { Socket } from 'socket.io';

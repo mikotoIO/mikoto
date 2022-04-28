@@ -7,6 +7,7 @@ module.exports = {
     "class-methods-use-this": "off",
     "import/prefer-default-export": "off",
     "no-param-reassign": "off",
-    "no-console": "off"
+    "no-console": "off",
+    "object-curly-spacing": ["error", "always"]
   }
 }

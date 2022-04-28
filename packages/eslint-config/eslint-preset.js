@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ["airbnb", "airbnb-typescript"],
+  extends: ["airbnb", "airbnb-typescript", "prettier"],
   settings: {
     next: {
       rootDir: ["apps/*/", "packages/*/"],

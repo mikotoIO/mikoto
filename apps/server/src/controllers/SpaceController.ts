@@ -5,8 +5,7 @@ import { Service } from 'typedi';
 @JsonController()
 @Service()
 export class SpaceController {
-  constructor(private prisma: PrismaClient) {
-  }
+  constructor(private prisma: PrismaClient) {}
 
   @Get('/hello')
   hello() {
@@ -17,13 +16,11 @@ export class SpaceController {
 
   @Get('/spaces/:id')
   async getOne(@Param('id') id: string) {
-    return this.prisma.space
-      .findUnique({ where: { id } });
+    return this.prisma.space.findUnique({ where: { id } });
   }
 
   @Get('/spaces/:spaceId/channels')
   async getChannels(@Param('spaceId') spaceId: string) {
-    return this.prisma.channel
-      .findMany({ where: { spaceId } });
+    return this.prisma.channel.findMany({ where: { spaceId } });
   }
 }

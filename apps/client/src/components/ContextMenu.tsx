@@ -82,6 +82,7 @@ function CreateChannelModal() {
       <form onSubmit={form.onSubmit(async () => {
         await mikoto.createChannel(Constants.DefaultSpace, form.values.channelName);
         setModal(null);
+        form.reset();
       })}>
         <TextInput label="Channel Name" placeholder="New Channel"
                    {...form.getInputProps('channelName')}

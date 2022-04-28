@@ -188,7 +188,6 @@ export function ContextMenuKit() {
   return (
     <ContextMenuOverlay tabIndex={0}>
       <CreateChannelModal />
-
       {contextMenu && (
         <ContextWrapper ref={ref} style={{ ...contextMenu.position }}>
           <SwitchContextMenu />

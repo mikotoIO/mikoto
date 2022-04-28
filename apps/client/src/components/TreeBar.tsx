@@ -70,6 +70,10 @@ export function TreeBar({ onClick }: { onClick: (channel: Channel) => void }) {
     setChannels((xs) => [...xs, channel]);
   });
 
+  useSocketIO<Channel>(mikoto.io, 'channelDelete', (channel) => {
+    setChannels((xs) => xs.filter((x) => x.id !== channel.id));
+  });
+
   const setContextMenu = useSetRecoilState(contextMenuState);
 
   return (

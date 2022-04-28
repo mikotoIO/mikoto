@@ -5,6 +5,8 @@ import { Channel } from '../models';
 import React, { useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import {
+  ContextMenuBase,
+  ContextMenuLink,
   contextMenuState,
   TreebarContext,
   useContextMenu,
@@ -52,8 +54,16 @@ const IconContainer = styled.span`
 `;
 
 export function TreeNode({ channel, ...props }: TreeNodeProps) {
+  const menu = useContextMenu(() => {
+    return (
+      <ContextMenuBase>
+        <ContextMenuLink>Hello</ContextMenuLink>
+      </ContextMenuBase>
+    );
+  });
+
   return (
-    <TreeNodeElement {...props}>
+    <TreeNodeElement {...props} onContextMenu={menu}>
       <IconContainer>
         <FontAwesomeIcon icon={faHashtag} />
       </IconContainer>
@@ -77,7 +87,9 @@ export function TreeBar({ onClick }: { onClick: (channel: Channel) => void }) {
   useSocketIO<Channel>(mikoto.io, 'channelDelete', (channel) => {
     setChannels((xs) => xs.filter((x) => x.id !== channel.id));
   });
-  const contextMenu = useContextMenu(() => <TreebarContext />);
+  const contextMenu = useContextMenu(() => {
+    return <TreebarContext />;
+  });
 
   return (
     <TreeContainer onContextMenu={contextMenu}>

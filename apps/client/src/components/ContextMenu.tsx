@@ -6,7 +6,7 @@ import {Button, Modal, TextInput} from '@mantine/core';
 import React, {useEffect, useRef, useState} from "react";
 import MikotoApi, {useMikoto} from "../api";
 import {useForm} from "@mantine/form";
-import Constants from "../constants";
+import constants from "../constants";
 
 type ContextMenuVariant =
     { kind: 'treebar' }
@@ -80,7 +80,7 @@ function CreateChannelModal() {
       title="Create Channel"
     >
       <form onSubmit={form.onSubmit(async () => {
-        await mikoto.createChannel(Constants.DefaultSpace, form.values.channelName);
+        await mikoto.createChannel(constants.defaultSpace, form.values.channelName);
         setModal(null);
         form.reset();
         window.location.reload(); // TODO workaround until we have channel created event

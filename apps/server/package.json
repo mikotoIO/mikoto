@@ -39,5 +39,8 @@
     "socket.io": "^4.4.1",
     "typedi": "^0.10.0",
     "uuid": "^8.3.2"
-  }
+  },
+  "bundledDependencies": [
+    "eslint-config"
+  ]
 }

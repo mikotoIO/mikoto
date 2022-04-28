@@ -1,8 +1,10 @@
-import {Account, PrismaClient} from "@prisma/client";
-import {Body, JsonController, Post, UnauthorizedError} from "routing-controllers";
+import { Account, PrismaClient } from '@prisma/client';
+import {
+  Body, JsonController, Post, UnauthorizedError,
+} from 'routing-controllers';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { Service } from "typedi";
+import { Service } from 'typedi';
 import crypto from 'crypto';
 import { promisify } from 'util';
 
@@ -52,18 +54,18 @@ export class AccountController {
         accountId: account.id,
         token: refreshToken,
         expiresAt,
-      }
+      },
     });
     return { accessToken, refreshToken };
   }
 
   @Post('/account/register')
   async register(@Body() body: RegisterPayload) {
-    return await this.prisma.account.create({
+    return this.prisma.account.create({
       data: {
         email: body.email,
         passhash: await bcrypt.hash(body.password, 10),
-      }
+      },
     });
   }
 
@@ -72,7 +74,7 @@ export class AccountController {
     const account = await this.prisma.account
       .findUnique({ where: { email: body.email } });
     if (account && await bcrypt.compare(body.password, account.passhash)) {
-      return await this.createTokenPair(account)
+      return this.createTokenPair(account);
     }
     throw new UnauthorizedError('Incorrect Credentials');
   }
@@ -84,6 +86,6 @@ export class AccountController {
     if (account === null) {
       throw new UnauthorizedError('Invalid Token');
     }
-    return await this.createTokenPair(account, body.refreshToken);
+    return this.createTokenPair(account, body.refreshToken);
   }
 }

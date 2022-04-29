@@ -1,18 +1,10 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { Channel } from '../models';
 import { ChannelIcon } from './ChannelIcon';
 import { faX } from '@fortawesome/free-solid-svg-icons';
-
-interface TabbedViewProps {
-  channels: Channel[];
-  activeChannelId?: string;
-  children: React.ReactNode;
-
-  onClick?: (channel: Channel) => void;
-  onClose?: (channel: Channel) => void;
-}
+import { useDrag, useDrop } from 'react-dnd';
 
 const TabbedViewContainer = styled.div`
   grid-area: main;
@@ -43,7 +35,7 @@ const CloseButton = styled.div<{ active?: boolean }>`
   }
 `;
 
-const TabItem = styled.div<{ active?: boolean }>`
+const TabItemElement = styled.div<{ active?: boolean }>`
   user-select: none;
   cursor: pointer;
   height: 100%;
@@ -62,43 +54,91 @@ const TabItem = styled.div<{ active?: boolean }>`
   border-right: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
+interface TabItemProps {
+  channel: Channel;
+  active: boolean;
+  onClick: (channel: Channel) => void;
+  onClose: (channel: Channel) => void;
+}
+
+function TabItem({ channel, active, onClick, onClose }: TabItemProps) {
+  const [, drag] = useDrag(() => ({
+    type: 'CHANNEL',
+    item: { id: channel.id },
+  }));
+
+  return (
+    <TabItemElement
+      ref={drag}
+      key={channel.id}
+      active={active}
+      onClick={() => {
+        onClick(channel);
+      }}
+    >
+      <ChannelIcon size={20} />
+      <div>{channel.name}</div>
+      <CloseButton
+        active={active}
+        onClick={(ev) => {
+          ev.stopPropagation();
+          onClose(channel);
+        }}
+      >
+        <FontAwesomeIcon icon={faX} />
+      </CloseButton>
+    </TabItemElement>
+  );
+}
+
+interface TabbedViewProps {
+  channels: Channel[];
+  activeChannelId?: string;
+  children: React.ReactNode;
+
+  onClick?: (channel: Channel) => void;
+  onClose?: (channel: Channel) => void;
+  onReorder?: (channel: Channel) => void;
+}
+
 export function TabbedView({
   children,
   channels,
   activeChannelId,
   onClick,
   onClose,
+  onReorder,
 }: TabbedViewProps) {
   const clickFn = onClick ?? (() => {});
   const closeFn = onClose ?? (() => {});
+  const reorderFn = onReorder ?? (() => {});
+
+  const findChannelCallback = useCallback(
+    (id: string) => {
+      return channels.find((x) => x.id === id);
+    },
+    [channels],
+  );
+
+  const [, drop] = useDrop({
+    accept: 'CHANNEL',
+    drop(item) {
+      reorderFn(findChannelCallback((item as any).id)!);
+    },
+  });
 
   return (
     <TabbedViewContainer>
-      <TabBar>
-        {channels.map((channel) => {
-          const isActive = activeChannelId === channel.id;
-          return (
-            <TabItem
-              key={channel.id}
-              active={isActive}
-              onClick={() => {
-                clickFn(channel);
-              }}
-            >
-              <ChannelIcon size={20} />
-              <div>{channel.name}</div>
-              <CloseButton
-                active={isActive}
-                onClick={(ev) => {
-                  ev.stopPropagation();
-                  closeFn(channel);
-                }}
-              >
-                <FontAwesomeIcon icon={faX} />
-              </CloseButton>
-            </TabItem>
-          );
-        })}
+      <TabBar ref={drop}>
+        {channels.map((channel) => (
+          <TabItem
+            channel={channel}
+            active={activeChannelId === channel.id}
+            onClick={clickFn}
+            onClose={closeFn}
+            key={channel.id}
+          />
+        ))}
       </TabBar>
       {children}
     </TabbedViewContainer>

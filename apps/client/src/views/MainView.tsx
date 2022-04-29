@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { useMikoto } from '../api';
 import { Channel, Message } from '../models';
 import MessageItem from '../components/Message';
 import { TreeBar } from '../components/TreeBar';
-import { atom, useRecoilState } from 'recoil';
 import { MessageInput } from '../components/MessageInput';
 import { useSocketIO } from '../hooks/UseSocketIO';
 import { TabbedView } from '../components/TabBar';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSquareXmark } from '@fortawesome/free-solid-svg-icons';
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -129,11 +126,18 @@ function AppView() {
           setCurrentChannel(channel);
         }}
         onClose={(channel) => {
+          console.log(tabbedChannels);
           const filteredTabs = tabbedChannels.filter(
             (x) => channel.id !== x.id,
           );
           setTabbedChannels(filteredTabs);
           setCurrentChannel(filteredTabs[0] ? filteredTabs[0] : null);
+        }}
+        onReorder={(channel) => {
+          const filteredTabs = tabbedChannels.filter(
+            (x) => channel.id !== x.id,
+          );
+          setTabbedChannels([...filteredTabs, channel]);
         }}
       >
         {currentChannel && <MessageView channel={currentChannel} />}

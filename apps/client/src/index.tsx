@@ -11,6 +11,9 @@ import { theme } from './themes';
 import { MantineProvider } from '@mantine/core';
 import MikotoApi, { MikotoContext } from './api';
 import constants from './constants';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
 const SilentRecoilRoot = RecoilRoot as any;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -18,9 +21,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <SilentRecoilRoot>
       <ThemeProvider theme={theme}>
         <MantineProvider theme={{ colorScheme: 'dark' }}>
-          <MikotoContext.Provider value={new MikotoApi(constants.apiPath)}>
-            <App />
-          </MikotoContext.Provider>
+          <DndProvider backend={HTML5Backend}>
+            <MikotoContext.Provider value={new MikotoApi(constants.apiPath)}>
+              <App />
+            </MikotoContext.Provider>
+          </DndProvider>
         </MantineProvider>
       </ThemeProvider>
     </SilentRecoilRoot>

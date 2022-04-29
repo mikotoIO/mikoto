@@ -11,6 +11,7 @@ import {
 } from './ContextMenu';
 import { useMikoto } from '../api';
 import { useSocketIO } from '../hooks/UseSocketIO';
+import { ChannelIcon } from './ChannelIcon';
 
 export const TreeContainer = styled.ul`
   height: 100%;
@@ -38,19 +39,6 @@ interface TreeNodeProps extends React.HTMLAttributes<HTMLLIElement> {
   channel: Channel;
 }
 
-const IconContainer = styled.span`
-  background-color: #3b83ff;
-  color: white;
-  border-radius: 3px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  margin-right: 8px;
-  width: 24px;
-  height: 24px;
-`;
-
 export function TreeNode({ channel, ...props }: TreeNodeProps) {
   const mikoto = useMikoto();
   const menu = useContextMenu(({ destroy }) => {
@@ -70,9 +58,7 @@ export function TreeNode({ channel, ...props }: TreeNodeProps) {
 
   return (
     <TreeNodeElement {...props} onContextMenu={menu}>
-      <IconContainer>
-        <FontAwesomeIcon icon={faHashtag} />
-      </IconContainer>
+      <ChannelIcon />
       {channel.name}
     </TreeNodeElement>
   );

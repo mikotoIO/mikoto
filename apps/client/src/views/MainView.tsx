@@ -125,6 +125,9 @@ function AppView() {
       <TabbedView
         channels={tabbedChannels}
         activeChannelId={currentChannel?.id}
+        onClick={(channel) => {
+          setCurrentChannel(channel);
+        }}
       >
         {currentChannel && <MessageView channel={currentChannel} />}
       </TabbedView>

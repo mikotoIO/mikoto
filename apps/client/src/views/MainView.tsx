@@ -129,7 +129,11 @@ function AppView() {
           setCurrentChannel(channel);
         }}
         onClose={(channel) => {
-          setTabbedChannels((xs) => xs.filter((x) => channel.id !== x.id));
+          const filteredTabs = tabbedChannels.filter(
+            (x) => channel.id !== x.id,
+          );
+          setTabbedChannels(filteredTabs);
+          setCurrentChannel(filteredTabs[0] ? filteredTabs[0] : null);
         }}
       >
         {currentChannel && <MessageView channel={currentChannel} />}

@@ -11,6 +11,7 @@ interface TabbedViewProps {
   children: React.ReactNode;
 
   onClick?: (channel: Channel) => void;
+  onClose?: (channel: Channel) => void;
 }
 
 const TabbedViewContainer = styled.div`
@@ -43,6 +44,7 @@ const CloseButton = styled.div<{ active?: boolean }>`
 `;
 
 const TabItem = styled.div<{ active?: boolean }>`
+  user-select: none;
   cursor: pointer;
   height: 100%;
   padding: 0 8px 0 20px;
@@ -65,8 +67,10 @@ export function TabbedView({
   channels,
   activeChannelId,
   onClick,
+  onClose,
 }: TabbedViewProps) {
   const clickFn = onClick ?? (() => {});
+  const closeFn = onClose ?? (() => {});
 
   return (
     <TabbedViewContainer>
@@ -83,7 +87,13 @@ export function TabbedView({
             >
               <ChannelIcon size={20} />
               <div>{channel.name}</div>
-              <CloseButton active={isActive}>
+              <CloseButton
+                active={isActive}
+                onClick={(ev) => {
+                  ev.stopPropagation();
+                  closeFn(channel);
+                }}
+              >
                 <FontAwesomeIcon icon={faX} />
               </CloseButton>
             </TabItem>

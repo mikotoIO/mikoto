@@ -128,6 +128,9 @@ function AppView() {
         onClick={(channel) => {
           setCurrentChannel(channel);
         }}
+        onClose={(channel) => {
+          setTabbedChannels((xs) => xs.filter((x) => channel.id !== x.id));
+        }}
       >
         {currentChannel && <MessageView channel={currentChannel} />}
       </TabbedView>

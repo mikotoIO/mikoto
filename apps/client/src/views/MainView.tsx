@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useMikoto } from '../api';
 import { Channel, Message } from '../models';
@@ -126,7 +126,6 @@ function AppView() {
           setCurrentChannel(channel);
         }}
         onClose={(channel) => {
-          console.log(tabbedChannels);
           const filteredTabs = tabbedChannels.filter(
             (x) => channel.id !== x.id,
           );

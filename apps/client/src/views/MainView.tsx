@@ -7,12 +7,7 @@ import { TreeBar } from '../components/TreeBar';
 import { atom, useRecoilState } from 'recoil';
 import { MessageInput } from '../components/MessageInput';
 import { useSocketIO } from '../hooks/UseSocketIO';
-import {
-  TabBar,
-  TabbedViewContainer,
-  TabbedViewProps,
-  TabItem,
-} from '../components/TabBar';
+import { TabbedView } from '../components/TabBar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquareXmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -111,41 +106,24 @@ function MessageView({ channel }: MessageViewProps) {
   );
 }
 
-const currentChannelState = atom<Channel | null>({
-  key: 'currentChannel',
-  default: null,
-});
-
-function TabbedView({ children, channels }: TabbedViewProps) {
-  return (
-    <TabbedViewContainer>
-      <TabBar>
-        {channels.map((channel) => (
-          <TabItem key={channel.id} active>
-            {channel.name}
-          </TabItem>
-        ))}
-      </TabBar>
-      {children}
-    </TabbedViewContainer>
-  );
-}
-
 function AppView() {
-  const [currentChannel, setCurrentChannel] =
-    useRecoilState(currentChannelState);
+  const [currentChannel, setCurrentChannel] = useState<Channel | null>(null);
+  const [tabbedChannels, setTabbedChannels] = useState<Channel[]>([]);
 
   return (
     <AppContainer>
       <Sidebar>
         <TreeBar
           onClick={(ch) => {
+            if (!tabbedChannels.some((x) => x.id === ch.id)) {
+              setTabbedChannels((xs) => [...xs, ch]);
+            }
             setCurrentChannel(ch);
           }}
         />
       </Sidebar>
       <TabbedView
-        channels={currentChannel ? [currentChannel] : []}
+        channels={tabbedChannels}
         activeChannelId={currentChannel?.id}
       >
         {currentChannel && <MessageView channel={currentChannel} />}

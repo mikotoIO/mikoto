@@ -14,7 +14,7 @@ const TabbedViewContainer = styled.div`
 
 const TabBar = styled.div`
   font-size: 14px;
-  height: 44px;
+  height: 40px;
   display: flex;
 `;
 

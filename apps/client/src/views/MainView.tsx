@@ -132,11 +132,18 @@ function AppView() {
           setTabbedChannels(filteredTabs);
           setCurrentChannel(filteredTabs[0] ? filteredTabs[0] : null);
         }}
-        onReorder={(channel) => {
+        onReorder={(channel, dragIndex, dropIndex) => {
+          if (dragIndex === dropIndex) return;
           const filteredTabs = tabbedChannels.filter(
             (x) => channel.id !== x.id,
           );
-          setTabbedChannels([...filteredTabs, channel]);
+          if (dropIndex === -1) {
+            setTabbedChannels([...filteredTabs, channel]);
+          } else {
+            const na = [...filteredTabs];
+            na.splice(dropIndex, 0, channel);
+            setTabbedChannels(na);
+          }
         }}
       >
         {currentChannel && <MessageView channel={currentChannel} />}

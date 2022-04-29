@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useCallback } from 'react';
+import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { Channel } from '../models';
 import { ChannelIcon } from './ChannelIcon';
@@ -57,19 +57,41 @@ const TabItemElement = styled.div<{ active?: boolean }>`
 interface TabItemProps {
   channel: Channel;
   active: boolean;
+  index: number;
   onClick: (channel: Channel) => void;
   onClose: (channel: Channel) => void;
+  onReorder: (channel: Channel, dragIndex: number, dropIndex: number) => void;
 }
 
-function TabItem({ channel, active, onClick, onClose }: TabItemProps) {
-  const [, drag] = useDrag(() => ({
+interface TabDndItem {
+  channel: Channel;
+  dragIndex: number;
+}
+
+function TabItem({
+  channel,
+  active,
+  onClick,
+  onClose,
+  onReorder,
+  index,
+}: TabItemProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [, drag] = useDrag<TabDndItem>({
     type: 'CHANNEL',
-    item: { id: channel.id },
-  }));
+    item: { channel, dragIndex: index },
+  });
+  const [, drop] = useDrop<TabDndItem>({
+    accept: 'CHANNEL',
+    drop(item) {
+      onReorder(item.channel, item.dragIndex, index);
+    },
+  });
+  drag(drop(ref));
 
   return (
     <TabItemElement
-      ref={drag}
+      ref={ref}
       key={channel.id}
       active={active}
       onClick={() => {
@@ -98,8 +120,12 @@ interface TabbedViewProps {
 
   onClick?: (channel: Channel) => void;
   onClose?: (channel: Channel) => void;
-  onReorder?: (channel: Channel) => void;
+  onReorder?: (channel: Channel, dragIndex: number, dropIndex: number) => void;
 }
+
+const DropRest = styled.div`
+  flex-grow: 1;
+`;
 
 export function TabbedView({
   children,
@@ -113,32 +139,28 @@ export function TabbedView({
   const closeFn = onClose ?? (() => {});
   const reorderFn = onReorder ?? (() => {});
 
-  const findChannelCallback = useCallback(
-    (id: string) => {
-      return channels.find((x) => x.id === id);
-    },
-    [channels],
-  );
-
-  const [, drop] = useDrop({
+  const [, drop] = useDrop<TabDndItem>({
     accept: 'CHANNEL',
     drop(item) {
-      reorderFn(findChannelCallback((item as any).id)!);
+      reorderFn(item.channel, 0, -1);
     },
   });
 
   return (
     <TabbedViewContainer>
-      <TabBar ref={drop}>
-        {channels.map((channel) => (
+      <TabBar>
+        {channels.map((channel, index) => (
           <TabItem
             channel={channel}
             active={activeChannelId === channel.id}
             onClick={clickFn}
             onClose={closeFn}
+            onReorder={reorderFn}
+            index={index}
             key={channel.id}
           />
         ))}
+        <DropRest ref={drop} />
       </TabBar>
       {children}
     </TabbedViewContainer>

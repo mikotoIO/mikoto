@@ -7,6 +7,7 @@ import { faX } from '@fortawesome/free-solid-svg-icons';
 import { useDrag, useDrop } from 'react-dnd';
 
 const TabbedViewContainer = styled.div`
+  background-color: ${(p) => p.theme.colors.N1000};
   grid-area: main;
   display: grid;
   grid-template-rows: 40px calc(100vh - 40px);
@@ -44,7 +45,8 @@ const TabItemElement = styled.div<{ active?: boolean }>`
   align-items: center;
   justify-content: center;
 
-  background-color: ${(p) => (p.active ? p.theme.colors.N800 : 'transparent')};
+  background-color: ${(p) =>
+    p.active ? p.theme.colors.N800 : p.theme.colors.N900};
 
   &:hover {
     background-color: ${(p) => p.theme.colors.N700};
@@ -127,6 +129,27 @@ const DropRest = styled.div`
   flex-grow: 1;
 `;
 
+const WelcomeContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: rgba(255, 255, 255, 0.6);
+`;
+
+const MikotoLogo = styled.img`
+  width: 220px;
+`;
+
+function WelcomeToMikoto() {
+  return (
+    <WelcomeContainer>
+      <MikotoLogo src="/logo.svg" />
+      <h1>Welcome to Mikoto!</h1>
+    </WelcomeContainer>
+  );
+}
+
 export function TabbedView({
   children,
   channels,
@@ -162,7 +185,7 @@ export function TabbedView({
         ))}
         <DropRest ref={drop} />
       </TabBar>
-      {children}
+      {channels.length ? children : <WelcomeToMikoto />}
     </TabbedViewContainer>
   );
 }

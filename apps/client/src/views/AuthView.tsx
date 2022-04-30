@@ -16,8 +16,10 @@ const AuthViewInner = styled.div`
   background-color: ${(p) => p.theme.colors.N800};
 `;
 
+const bgImageUrl = '/images/background-1.jpg';
+
 const BackgroundArt = styled.div`
-  background: url('/images/background-1.jpg') no-repeat center center fixed;
+  background: url('${bgImageUrl}') no-repeat center center fixed;
   background-size: cover;
 `;
 
@@ -45,9 +47,9 @@ const Input = styled.input`
 `;
 
 const Logo = styled.img`
-  width: 120px;
+  width: 80px;
   display: block;
-  margin: 100px auto 0;
+  margin: 100px auto 20px;
 `;
 
 const Button = styled.button`
@@ -70,7 +72,7 @@ export function AuthView({ children }: { children: React.ReactNode }) {
   return (
     <AuthViewContainer>
       <AuthViewInner>
-        <Logo src="/logo.png" />
+        <Logo src="/logo.svg" />
         {children}
       </AuthViewInner>
       <BackgroundArt />

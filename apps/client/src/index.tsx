@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom';
 
 import './index.css';
 import { RecoilRoot } from 'recoil';
@@ -16,7 +16,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const SilentRecoilRoot = RecoilRoot as any;
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+ReactDOM.render(
   <React.StrictMode>
     <SilentRecoilRoot>
       <ThemeProvider theme={theme}>
@@ -30,6 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       </ThemeProvider>
     </SilentRecoilRoot>
   </React.StrictMode>,
+  document.getElementById('root')!,
 );
 
 // If you want to start measuring performance in your app, pass a function

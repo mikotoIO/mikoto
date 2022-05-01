@@ -1,10 +1,11 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { Channel } from '../models';
 import { ChannelIcon } from './ChannelIcon';
-import { faX } from '@fortawesome/free-solid-svg-icons';
 import { useDrag, useDrop } from 'react-dnd';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faX } from '@fortawesome/free-solid-svg-icons';
 
 const TabbedViewContainer = styled.div`
   background-color: ${(p) => p.theme.colors.N1000};

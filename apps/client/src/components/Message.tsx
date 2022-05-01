@@ -149,7 +149,8 @@ function MessageImage({ src, alt }: MessageImageProps) {
         withCloseButton={false}
         title={
           <ImageModalTitleLink href={src} target="_blank">
-            Source <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+            Source
+            <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
           </ImageModalTitleLink>
         }
       >

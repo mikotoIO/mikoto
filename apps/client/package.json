@@ -18,8 +18,11 @@
     "axios": "^0.26.0",
     "draft-js": "^0.11.7",
     "draftjs-utils": "^0.10.2",
+    "livekit-client": "^0.18.3",
+    "livekit-react": "^0.7.1",
     "markdown-draft-js": "^2.4.0",
     "react": "^18.0.0",
+    "react-aspect-ratio": "^1.1.2",
     "react-autosize-textarea": "^7.1.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
@@ -37,7 +40,7 @@
     "yarn": "^1.22.18"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "GENERATE_SOURCEMAP=false react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -78,6 +81,6 @@
     "eslint-plugin-jsx-a11y": "6.5.1",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "4.3.0",
-    "react-scripts": "5.0.0"
+    "react-scripts": "^5.0.1"
   }
 }

@@ -1,3 +1,4 @@
+import { Button, Input } from '@mantine/core';
 import axios from 'axios';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -30,38 +31,10 @@ const Form = styled.form`
   margin: 0 auto;
 `;
 
-const Input = styled.input`
-  box-sizing: border-box;
-  width: 100%;
-  padding: 16px;
-  font-size: 16px;
-  color: white;
-  border-radius: 4px;
-  background-color: ${(p) => p.theme.colors.N700};
-  border: 1px solid ${(p) => p.theme.colors.N1000};
-
-  &:focus {
-    outline: none;
-    border-color: ${(p) => p.theme.colors.B800};
-  }
-`;
-
 const Logo = styled.img`
   width: 80px;
   display: block;
   margin: 100px auto 20px;
-`;
-
-const Button = styled.button`
-  box-sizing: border-box;
-  width: 100%;
-  padding: 16px;
-  font-size: 16px;
-
-  color: white;
-  background-color: ${(p) => p.theme.colors.B800};
-  border: none;
-  border-radius: 4px;
 `;
 
 const authAxios = axios.create({
@@ -93,13 +66,14 @@ export function LoginView() {
           navigate('/');
         })}
       >
-        <Input placeholder="Email" {...register('email')} />
+        <Input size="md" placeholder="Email" {...register('email')} />
         <Input
+          size="md"
           placeholder="Password"
           type="password"
           {...register('password')}
         />
-        <Button>Log In</Button>
+        <Button type="submit">Log In</Button>
       </Form>
     </AuthView>
   );
@@ -117,13 +91,14 @@ export function RegisterView() {
           navigate('/');
         })}
       >
-        <Input placeholder="Email" {...register('email')} />
+        <Input size="md" placeholder="Email" {...register('email')} />
         <Input
+          size="md"
           placeholder="Password"
           type="password"
           {...register('password')}
         />
-        <Button>Register</Button>
+        <Button type="submit">Register</Button>
       </Form>
     </AuthView>
   );

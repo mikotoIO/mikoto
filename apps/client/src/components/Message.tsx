@@ -68,8 +68,7 @@ const Avatar = styled.img`
   border-radius: 8px;
 `;
 
-const avatarUrl =
-  'https://avatars.githubusercontent.com/u/16204510?s=400&u=6af0bd4744044945ae81e5ba5a57e0f2ecc38997';
+const avatarUrl = '/images/default_avatar.png';
 
 const MessageInner = styled.div`
   padding-top: 4px;

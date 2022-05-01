@@ -1,0 +1,15 @@
+{
+  "name": "mikoto-electron",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.6.4"
+  },
+  "dependencies": {
+    "electron": "^18.2.0"
+  },
+  "scripts": {
+    "start": "tsc && electron ./dist"
+  }
+}

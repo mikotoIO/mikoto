@@ -8,7 +8,7 @@ import {
   useContextMenu,
 } from './ContextMenu';
 import { useMikoto } from '../api';
-import { useSocketIO } from '../hooks/UseSocketIO';
+import { useSocketIO } from '../hooks/useSocketIO';
 import { ChannelIcon } from './ChannelIcon';
 
 export const TreeContainer = styled.ul`
@@ -62,7 +62,11 @@ export function TreeNode({ channel, ...props }: TreeNodeProps) {
   );
 }
 
-export function TreeBar({ onClick }: { onClick: (channel: Channel) => void }) {
+interface TreeBarProps {
+  onClick: (channel: Channel, ev: React.MouseEvent) => void;
+}
+
+export function TreeBar({ onClick }: TreeBarProps) {
   const [channels, setChannels] = useState<Channel[]>([]);
   const mikoto = useMikoto();
 
@@ -84,7 +88,7 @@ export function TreeBar({ onClick }: { onClick: (channel: Channel) => void }) {
   return (
     <TreeContainer onContextMenu={contextMenu}>
       {channels.map((x) => (
-        <TreeNode channel={x} key={x.id} onClick={() => onClick(x)} />
+        <TreeNode channel={x} key={x.id} onClick={(ev) => onClick(x, ev)} />
       ))}
     </TreeContainer>
   );

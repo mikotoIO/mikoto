@@ -61,8 +61,8 @@ interface TabItemProps {
   channel: Channel;
   active: boolean;
   index: number;
-  onClick: (channel: Channel) => void;
-  onClose: (channel: Channel) => void;
+  onClick: (channel: Channel, index: number) => void;
+  onClose: (channel: Channel, index: number) => void;
   onReorder: (channel: Channel, dragIndex: number, dropIndex: number) => void;
 }
 
@@ -98,7 +98,7 @@ function TabItem({
       key={channel.id}
       active={active}
       onClick={() => {
-        onClick(channel);
+        onClick(channel, index);
       }}
     >
       <ChannelIcon size={20} />
@@ -107,7 +107,7 @@ function TabItem({
         active={active}
         onClick={(ev) => {
           ev.stopPropagation();
-          onClose(channel);
+          onClose(channel, index);
         }}
       >
         <FontAwesomeIcon icon={faX} />
@@ -118,16 +118,17 @@ function TabItem({
 
 interface TabbedViewProps {
   channels: Channel[];
-  activeChannelId?: string;
+  index: number | null;
   children: React.ReactNode;
 
-  onClick?: (channel: Channel) => void;
-  onClose?: (channel: Channel) => void;
+  onClick?: (channel: Channel, index: number) => void;
+  onClose?: (channel: Channel, index: number) => void;
   onReorder?: (channel: Channel, dragIndex: number, dropIndex: number) => void;
 }
 
 const DropRest = styled.div`
   flex-grow: 1;
+  -webkit-app-region: drag;
 `;
 
 const WelcomeContainer = styled.div`
@@ -154,7 +155,7 @@ function WelcomeToMikoto() {
 export function TabbedView({
   children,
   channels,
-  activeChannelId,
+  index,
   onClick,
   onClose,
   onReorder,
@@ -173,14 +174,14 @@ export function TabbedView({
   return (
     <TabbedViewContainer>
       <TabBar>
-        {channels.map((channel, index) => (
+        {channels.map((channel, idx) => (
           <TabItem
             channel={channel}
-            active={activeChannelId === channel.id}
+            active={idx === index}
             onClick={clickFn}
             onClose={closeFn}
             onReorder={reorderFn}
-            index={index}
+            index={idx}
             key={channel.id}
           />
         ))}

@@ -5,7 +5,7 @@ import { Channel, Message } from '../models';
 import MessageItem from '../components/Message';
 import { TreeBar } from '../components/TreeBar';
 import { MessageInput } from '../components/MessageInput';
-import { useSocketIO } from '../hooks/UseSocketIO';
+import { useSocketIO } from '../hooks/useSocketIO';
 import { TabbedView } from '../components/TabBar';
 
 const AppContainer = styled.div`
@@ -104,49 +104,76 @@ function MessageView({ channel }: MessageViewProps) {
 }
 
 function AppView() {
-  const [currentChannel, setCurrentChannel] = useState<Channel | null>(null);
+  const [tabIndex, setTabIndex] = useState<number>(0);
   const [tabbedChannels, setTabbedChannels] = useState<Channel[]>([]);
+
+  function openNewChannel(ch: Channel) {
+    if (!tabbedChannels.some((x) => x.id === ch.id)) {
+      setTabbedChannels((xs) => [...xs, ch]);
+    }
+    setTabIndex(tabbedChannels.length);
+  }
 
   return (
     <AppContainer>
       <Sidebar>
         <TreeBar
-          onClick={(ch) => {
-            if (!tabbedChannels.some((x) => x.id === ch.id)) {
-              setTabbedChannels((xs) => [...xs, ch]);
+          onClick={(ch, ev) => {
+            if (tabbedChannels.length === 0) {
+              openNewChannel(ch);
+              return;
             }
-            setCurrentChannel(ch);
+
+            const idx = tabbedChannels.findIndex((x) => x.id === ch.id);
+            if (idx !== -1) {
+              setTabIndex(idx);
+            } else if (ev.ctrlKey) {
+              openNewChannel(ch);
+            } else {
+              setTabbedChannels((xs) => {
+                xs[tabIndex] = ch;
+                return [...xs];
+              });
+            }
           }}
         />
       </Sidebar>
       <TabbedView
         channels={tabbedChannels}
-        activeChannelId={currentChannel?.id}
-        onClick={(channel) => {
-          setCurrentChannel(channel);
+        index={tabIndex}
+        onClick={(channel, idx) => {
+          setTabIndex(idx);
         }}
-        onClose={(channel) => {
-          const filteredTabs = tabbedChannels.filter(
-            (x) => channel.id !== x.id,
-          );
-          setTabbedChannels(filteredTabs);
-          setCurrentChannel(filteredTabs[0] ? filteredTabs[0] : null);
+        onClose={(ch, idx) => {
+          setTabbedChannels((xs) => {
+            xs.splice(idx, 1);
+            return [...xs]; // React optimizes by comparing reference
+          });
+          if (idx <= tabIndex) {
+            setTabIndex(Math.max(0, idx - 1));
+          }
         }}
         onReorder={(channel, dragIndex, dropIndex) => {
           if (dragIndex === dropIndex) return;
+
           const filteredTabs = tabbedChannels.filter(
             (x) => channel.id !== x.id,
           );
+
           if (dropIndex === -1) {
             setTabbedChannels([...filteredTabs, channel]);
+            setTabIndex(tabbedChannels.length - 1);
           } else {
             const na = [...filteredTabs];
             na.splice(dropIndex, 0, channel);
             setTabbedChannels(na);
+            setTabIndex(dropIndex);
           }
         }}
       >
-        {currentChannel && <MessageView channel={currentChannel} />}
+        {tabIndex !== null && tabIndex < tabbedChannels.length && (
+          <MessageView channel={tabbedChannels[tabIndex]} />
+        )}
       </TabbedView>
     </AppContainer>
   );

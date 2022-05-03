@@ -1,3 +1,8 @@
+export interface AppError {
+  name: string;
+  message: string;
+}
+
 export interface Message {
   id: string;
   content: string;

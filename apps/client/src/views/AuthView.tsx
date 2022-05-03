@@ -1,10 +1,13 @@
-import { Button, Input } from '@mantine/core';
+import { Button, Input, Notification } from '@mantine/core';
 import axios from 'axios';
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import constants from '../constants';
+import { AppError } from '../models';
+import { useRecoilState } from 'recoil';
+import { authTokenState } from '../components/AuthHandler';
 
 const AuthViewContainer = styled.div`
   height: 100vh;
@@ -55,17 +58,28 @@ export function AuthView({ children }: { children: React.ReactNode }) {
 
 export function LoginView() {
   const { register, handleSubmit } = useForm();
+  const [error, setError] = useState<AppError | null>(null);
   const navigate = useNavigate();
+  const [authToken, setAuthToken] = useRecoilState(authTokenState);
 
   return (
     <AuthView>
       <Form
         onSubmit={handleSubmit(async (formData) => {
-          const { data } = await authAxios.post('/account/login', formData);
-          console.log(data);
-          navigate('/');
+          try {
+            const { data } = await authAxios.post('/account/login', formData);
+            setAuthToken(data);
+            navigate('/');
+          } catch (e) {
+            setError((e as any)?.response?.data);
+          }
         })}
       >
+        {error && (
+          <Notification color="red" onClose={() => setError(null)}>
+            {error.message}
+          </Notification>
+        )}
         <Input size="md" placeholder="Email" {...register('email')} />
         <Input
           size="md"

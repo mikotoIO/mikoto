@@ -1,6 +1,8 @@
 import styled from 'styled-components';
-import { Channel } from '../models';
 import React, { useState } from 'react';
+import { atom, useRecoilValue } from 'recoil';
+
+import { Channel } from '../models';
 import {
   ContextMenuBase,
   ContextMenuLink,
@@ -10,12 +12,14 @@ import {
 import { useMikoto } from '../api';
 import { useSocketIO } from '../hooks/useSocketIO';
 import { ChannelIcon } from './ChannelIcon';
+import constants from '../constants';
 
 export const TreeContainer = styled.ul`
-  height: 100%;
   list-style: none;
   margin: 0;
   padding: 10px;
+  flex: 1;
+  overflow-y: auto;
   box-sizing: border-box;
 `;
 
@@ -39,20 +43,18 @@ interface TreeNodeProps extends React.HTMLAttributes<HTMLLIElement> {
 
 export function TreeNode({ channel, ...props }: TreeNodeProps) {
   const mikoto = useMikoto();
-  const menu = useContextMenu(({ destroy }) => {
-    return (
-      <ContextMenuBase>
-        <ContextMenuLink
-          onClick={async () => {
-            destroy();
-            await mikoto.deleteChannel(channel.id);
-          }}
-        >
-          Delete Channel
-        </ContextMenuLink>
-      </ContextMenuBase>
-    );
-  });
+  const menu = useContextMenu(({ destroy }) => (
+    <ContextMenuBase>
+      <ContextMenuLink
+        onClick={async () => {
+          destroy();
+          await mikoto.deleteChannel(channel.id);
+        }}
+      >
+        Delete Channel
+      </ContextMenuLink>
+    </ContextMenuBase>
+  ));
 
   return (
     <TreeNodeElement {...props} onContextMenu={menu}>
@@ -66,12 +68,18 @@ interface TreeBarProps {
   onClick: (channel: Channel, ev: React.MouseEvent) => void;
 }
 
+const treebarSpaceIdState = atom<string | null>({
+  key: 'treebarSpaceId',
+  default: constants.defaultSpace,
+});
+
 export function TreeBar({ onClick }: TreeBarProps) {
   const [channels, setChannels] = useState<Channel[]>([]);
+  const spaceId = useRecoilValue(treebarSpaceIdState);
   const mikoto = useMikoto();
 
   React.useEffect(() => {
-    mikoto.getChannels().then(setChannels);
+    mikoto.getChannels(spaceId!).then(setChannels);
   }, [mikoto]);
 
   useSocketIO<Channel>(mikoto.io, 'channelCreate', (channel) => {
@@ -81,9 +89,7 @@ export function TreeBar({ onClick }: TreeBarProps) {
   useSocketIO<Channel>(mikoto.io, 'channelDelete', (channel) => {
     setChannels((xs) => xs.filter((x) => x.id !== channel.id));
   });
-  const contextMenu = useContextMenu(() => {
-    return <TreebarContext />;
-  });
+  const contextMenu = useContextMenu(() => <TreebarContext />);
 
   return (
     <TreeContainer onContextMenu={contextMenu}>

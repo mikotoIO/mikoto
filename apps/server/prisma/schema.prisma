@@ -5,55 +5,52 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// generator typegraphql {
-//   provider = "typegraphql-prisma"
-//   output = "../../../node_modules/@generated/type-graphql"
-// }
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Account {
+model User {
   id           String         @id @default(uuid()) @db.Uuid
   email        String         @unique
+  name         String
+  avatar       String?
   passhash     String
-  User         User[]
+  SpaceUser    SpaceUser[]
   RefreshToken RefreshToken[]
+  Message      Message[]
 }
 
 model RefreshToken {
   id        String   @id @default(uuid()) @db.Uuid
   token     String   @unique
   expiresAt DateTime
-  accountId String   @db.Uuid
-  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([accountId])
+  @@index([userId])
 }
 
-model User {
-  id      String @id @default(uuid()) @db.Uuid
-  name    String
-  spaceId String @db.Uuid
-  space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+model SpaceUser {
+  id      String  @id @default(uuid()) @db.Uuid
+  name    String?
+  spaceId String  @db.Uuid
+  space   Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 
-  accountId String    @db.Uuid
-  account   Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  roles     Role[]
-  Message   Message[]
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roles  Role[]
 
-  @@unique([accountId, spaceId])
+  @@unique([userId, spaceId])
   @@index([spaceId])
 }
 
 model Role {
-  id          String @id @default(uuid()) @db.Uuid
+  id          String      @id @default(uuid()) @db.Uuid
   name        String
   color       String
   permissions String
-  users       User[]
+  users       SpaceUser[]
 
   spaceId String @db.Uuid
   space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
@@ -61,21 +58,34 @@ model Role {
 }
 
 model Space {
-  id      String    @id @default(uuid()) @db.Uuid
+  id      String      @id @default(uuid()) @db.Uuid
   name    String
-  User    User[]
+  User    SpaceUser[]
   Channel Channel[]
   Role    Role[]
 }
 
 model Channel {
-  id      String    @id @default(uuid()) @db.Uuid
+  id   String      @id @default(uuid()) @db.Uuid
+  type ChannelType @default(TEXT)
+
+  parentId String?   @db.Uuid
+  parent   Channel?  @relation("NestedChannel", fields: [parentId], references: [id], onDelete: Cascade)
+  children Channel[] @relation("NestedChannel")
+
   name    String
   spaceId String    @db.Uuid
   space   Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   Message Message[]
 
   @@index([spaceId])
+}
+
+enum ChannelType {
+  TEXT
+  VOICE
+  THREAD
+  CATEGORY
 }
 
 model Message {

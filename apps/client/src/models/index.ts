@@ -3,6 +3,16 @@ export interface AppError {
   message: string;
 }
 
+export interface TokenPair {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface Space {
+  id: string;
+  name: string;
+}
+
 export interface Message {
   id: string;
   content: string;
@@ -10,12 +20,18 @@ export interface Message {
   authorId: string | null;
   channelId: string;
 
-  author: SimpleUser | null;
+  author?: User;
+}
+
+export interface User {
+  name: string;
+  avatar: string;
 }
 
 export interface SimpleUser {
   id: string;
   name: string;
+  user: User;
 }
 
 export interface Channel {

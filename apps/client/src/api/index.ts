@@ -1,12 +1,13 @@
 import axios, { AxiosInstance } from 'axios';
 import { Socket, io } from 'socket.io-client';
-import { Channel, Message } from '../models';
 import React, { useContext } from 'react';
-import constants from '../constants';
+import { Channel, Message, Space, User } from '../models';
 
 export default class MikotoApi {
   axios: AxiosInstance;
+
   io!: Socket;
+
   constructor(url: string) {
     this.axios = axios.create({
       baseURL: url,
@@ -17,10 +18,14 @@ export default class MikotoApi {
     });
   }
 
-  //region Channels
-  async getChannels(): Promise<Channel[]> {
+  updateAccessToken(token: string) {
+    this.axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+  }
+
+  // region Channels
+  async getChannels(spaceId: string): Promise<Channel[]> {
     const { data } = await this.axios.get<Channel[]>(
-      `/spaces/${constants.defaultSpace}/channels`,
+      `/spaces/${spaceId}/channels`,
     );
     return data;
   }
@@ -37,9 +42,9 @@ export default class MikotoApi {
     const { data } = await this.axios.delete<Channel>(`/channels/${channelId}`);
     return data;
   }
-  //endregion
+  // endregion
 
-  //region Messages
+  // region Messages
   async getMessages(channelId: string): Promise<Message[]> {
     const { data } = await this.axios.get<Message[]>(
       `/channels/${channelId}/messages`,
@@ -63,7 +68,17 @@ export default class MikotoApi {
     );
     return data;
   }
-  //endregion
+  // endregion
+
+  async getCurrentUser(): Promise<User> {
+    const { data } = await this.axios.get<User>('/users/me');
+    return data;
+  }
+
+  async getSpaces(): Promise<Space[]> {
+    const { data } = await this.axios.get<Space[]>('/spaces');
+    return data;
+  }
 }
 
 export const MikotoContext = React.createContext<MikotoApi>(undefined!);

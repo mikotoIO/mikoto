@@ -18,6 +18,15 @@ export class MessageController {
     socket.join(constants.defaultSpace); // TODO: Add a socket endpoint for space joins
   }
 
+  // start subscribing to a new room
+  @OnMessage('subscribe')
+  subscribe(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() body: { space: string },
+  ) {
+    socket.join(body.space);
+  }
+
   @OnMessage('message-send')
   save(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
     console.log('received message:', message);

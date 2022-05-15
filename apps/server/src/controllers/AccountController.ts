@@ -1,4 +1,4 @@
-import { Account, PrismaClient } from '@prisma/client';
+import { User, PrismaClient } from '@prisma/client';
 import {
   Body,
   JsonController,
@@ -19,6 +19,7 @@ async function generateRandomToken() {
 
 interface RegisterPayload {
   email: string;
+  name: string;
   password: string;
 }
 
@@ -32,7 +33,7 @@ interface LoginPayload {
 export class AccountController {
   constructor(private prisma: PrismaClient) {}
 
-  private async createTokenPair(account: Account, oldToken?: string) {
+  private async createTokenPair(account: User, oldToken?: string) {
     const accessToken = jwt.sign({}, process.env.SECRET!, {
       expiresIn: '1d',
       subject: account.id,
@@ -53,7 +54,7 @@ export class AccountController {
     }
     await this.prisma.refreshToken.create({
       data: {
-        accountId: account.id,
+        userId: account.id,
         token: refreshToken,
         expiresAt,
       },
@@ -63,8 +64,9 @@ export class AccountController {
 
   @Post('/account/register')
   async register(@Body() body: RegisterPayload) {
-    return this.prisma.account.create({
+    return this.prisma.user.create({
       data: {
+        name: body.name,
         email: body.email,
         passhash: await bcrypt.hash(body.password, 10),
       },
@@ -73,7 +75,7 @@ export class AccountController {
 
   @Post('/account/login')
   async login(@Body() body: LoginPayload) {
-    const account = await this.prisma.account.findUnique({
+    const account = await this.prisma.user.findUnique({
       where: { email: body.email },
     });
     if (account && (await bcrypt.compare(body.password, account.passhash))) {
@@ -84,9 +86,10 @@ export class AccountController {
 
   @Post('/account/refresh')
   async refresh(@Body() body: { refreshToken: string }) {
+    await this.prisma;
     const account = await this.prisma.refreshToken
       .findUnique({ where: { token: body.refreshToken } })
-      .account();
+      .user();
     if (account === null) {
       throw new UnauthorizedError('Invalid Token');
     }

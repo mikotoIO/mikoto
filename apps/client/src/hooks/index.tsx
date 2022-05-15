@@ -1,3 +1,3 @@
-import { useInterval } from '@mantine/hooks';
+import { useInterval } from './useInterval';
 
 export { useInterval };

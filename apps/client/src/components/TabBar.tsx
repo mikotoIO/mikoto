@@ -1,15 +1,15 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
-import { Channel } from '../models';
-import { ChannelIcon } from './ChannelIcon';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faX } from '@fortawesome/free-solid-svg-icons';
+import { ChannelIcon } from './ChannelIcon';
+import { Channel } from '../models';
 
 const TabbedViewContainer = styled.div`
+  flex: 1;
   background-color: ${(p) => p.theme.colors.N1000};
-  grid-area: main;
   display: grid;
   grid-template-rows: 40px calc(100vh - 40px);
 `;

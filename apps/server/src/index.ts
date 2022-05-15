@@ -1,7 +1,11 @@
 import 'reflect-metadata';
 import 'dotenv/config';
 
-import { useContainer, useExpressServer } from 'routing-controllers';
+import {
+  UnauthorizedError,
+  useContainer,
+  useExpressServer,
+} from 'routing-controllers';
 import * as path from 'path';
 import socketio from 'socket.io';
 import {
@@ -13,6 +17,7 @@ import * as http from 'http';
 import cors from 'cors';
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
 import constants from './constants';
 
 const app = express();
@@ -21,7 +26,9 @@ const io = new socketio.Server(server, {
   cors: { origin: '*' },
 });
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  // log: ['error'],
+});
 Container.set(PrismaClient, prisma);
 Container.set(socketio.Server, io);
 
@@ -32,6 +39,15 @@ useSocketContainer(Container);
 
 useExpressServer(app, {
   controllers: [path.join(`${__dirname}/controllers/*.js`)],
+  currentUserChecker: (action) => {
+    let authHeader = action.request.headers.authorization as string;
+    if (!authHeader) throw new UnauthorizedError('No Header');
+    if (!authHeader.startsWith('Bearer ')) {
+      throw new UnauthorizedError('Invalid Header');
+    }
+    authHeader = authHeader.slice(7);
+    return jwt.verify(authHeader, process.env.SECRET!);
+  },
 });
 
 useSocketServer(io, {

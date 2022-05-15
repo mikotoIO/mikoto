@@ -4,15 +4,15 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import { RecoilRoot } from 'recoil';
 import { ThemeProvider } from 'styled-components';
+import { MantineProvider } from '@mantine/core';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 import { theme } from './themes';
-import { MantineProvider } from '@mantine/core';
 import MikotoApi, { MikotoContext } from './api';
 import constants from './constants';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const SilentRecoilRoot = RecoilRoot as any;
 

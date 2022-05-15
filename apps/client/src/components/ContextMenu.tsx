@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import useEventListener from '@use-it/event-listener';
 import { Button, Modal, TextInput } from '@mantine/core';
 import React, { useEffect, useRef } from 'react';
-import { useMikoto } from '../api';
 import { useForm } from '@mantine/form';
+import { useMikoto } from '../api';
 import constants from '../constants';
 
 interface ContextMenuData {
@@ -15,8 +15,18 @@ interface ContextMenuData {
   elem: React.ReactNode;
 }
 
+interface ModalData {
+  title: string;
+  elem: React.ReactNode;
+}
+
 export const contextMenuState = atom<ContextMenuData | null>({
   key: 'contextComponent',
+  default: null,
+});
+
+export const modalState = atom<ModalData | null>({
+  key: 'modal',
   default: null,
 });
 
@@ -50,16 +60,9 @@ export const ContextMenuLink = styled.a`
   }
 `;
 
-type ModalStates = { kind: 'createChannel' } | null;
-
-const modalState = atom<ModalStates>({
-  key: 'modal',
-  default: null,
-});
-
 function CreateChannelModal() {
   const mikoto = useMikoto();
-  const [modal, setModal] = useRecoilState(modalState);
+  const setModal = useSetRecoilState(modalState);
   const form = useForm({
     initialValues: {
       channelName: '',
@@ -67,41 +70,58 @@ function CreateChannelModal() {
   });
 
   return (
-    <Modal
-      opened={!!(modal && modal.kind === 'createChannel')}
-      onClose={() => setModal(null)}
-      title="Create Channel"
+    <form
+      onSubmit={form.onSubmit(async () => {
+        await mikoto.createChannel(
+          constants.defaultSpace,
+          form.values.channelName,
+        );
+        setModal(null);
+        form.reset();
+      })}
     >
-      <form
-        onSubmit={form.onSubmit(async () => {
-          await mikoto.createChannel(
-            constants.defaultSpace,
-            form.values.channelName,
-          );
-          setModal(null);
-          form.reset();
-        })}
-      >
-        <TextInput
-          label="Channel Name"
-          placeholder="New Channel"
-          {...form.getInputProps('channelName')}
-        />
-        <Button mt={16} fullWidth type="submit">
-          Create Channel
-        </Button>
-      </form>
-    </Modal>
+      <TextInput
+        label="Channel Name"
+        placeholder="New Channel"
+        {...form.getInputProps('channelName')}
+      />
+      <Button mt={16} fullWidth type="submit">
+        Create Channel
+      </Button>
+    </form>
   );
 }
 
 export function TreebarContext() {
-  const [, setModal] = useRecoilState(modalState);
+  const setModal = useSetRecoilState(modalState);
   return (
     <ContextMenuBase>
       <ContextMenuLink
         onClick={() => {
-          setModal({ kind: 'createChannel' });
+          setModal({
+            title: 'Create Channel',
+            elem: <CreateChannelModal />,
+          });
+        }}
+      >
+        Create Space
+      </ContextMenuLink>
+      <ContextMenuLink
+        onClick={() => {
+          setModal({
+            title: 'Create Channel',
+            elem: <CreateChannelModal />,
+          });
+        }}
+      >
+        Join Space
+      </ContextMenuLink>
+      <ContextMenuLink
+        onClick={() => {
+          setModal({
+            title: 'Create Channel',
+            elem: <CreateChannelModal />,
+          });
         }}
       >
         Create Channel
@@ -134,6 +154,7 @@ function useOutsideAlerter(
 
 export function ContextMenuKit() {
   const [context, setContext] = useRecoilState(contextMenuState);
+  const [modal, setModal] = useRecoilState(modalState);
 
   const ref = useRef<HTMLDivElement>(null);
   useOutsideAlerter(ref, (ev) => {
@@ -150,7 +171,13 @@ export function ContextMenuKit() {
 
   return (
     <ContextMenuOverlay tabIndex={0}>
-      <CreateChannelModal />
+      <Modal
+        opened={modal !== null}
+        onClose={() => setModal(null)}
+        title={modal?.title}
+      >
+        {modal?.elem}
+      </Modal>
       {context && (
         <ContextWrapper ref={ref} style={{ ...context.position }}>
           {context.elem}

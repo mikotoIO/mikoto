@@ -1,107 +1,28 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useMikoto } from '../api';
-import { Channel, Message } from '../models';
-import MessageItem from '../components/Message';
+import { Channel } from '../models';
 import { TreeBar } from '../components/TreeBar';
-import { MessageInput } from '../components/MessageInput';
-import { useSocketIO } from '../hooks/useSocketIO';
 import { TabbedView } from '../components/TabBar';
+import { AuthRefresher } from '../components/AuthHandler';
+import { UserArea } from '../components/UserArea';
+import { ServerSidebar } from '../components/ServerSidebar';
+import { MessageView } from './MessageView';
 
 const AppContainer = styled.div`
   overflow: hidden;
   background-color: ${(p) => p.theme.colors.N900};
   color: white;
-  display: grid;
-  grid-template-rows: 100vh;
-  grid-template-columns: 300px calc(100vw - 300px);
-  grid-template-areas: 'sidebar main';
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
 `;
 
 const Sidebar = styled.div`
-  width: 300px;
-  height: 100%;
-  position: absolute;
-`;
-
-const MessageViewContainer = styled.div`
-  background-color: ${(p) => p.theme.colors.N800};
-  height: 100%;
   display: flex;
   flex-direction: column;
+  width: 270px;
+  height: 100%;
 `;
-
-const Messages = styled.div`
-  overflow-y: auto;
-  flex-grow: 1;
-`;
-
-interface MessageViewProps {
-  channel: Channel;
-}
-
-function MessageView({ channel }: MessageViewProps) {
-  const mikoto = useMikoto();
-
-  const [messages, setMessages] = useState<Message[]>([]);
-  const ref = React.useRef<HTMLDivElement>(null);
-  React.useEffect(() => {
-    if (ref.current) {
-      ref.current.scrollTop = ref.current.scrollHeight;
-    }
-  });
-
-  React.useEffect(() => {
-    mikoto.getMessages(channel.id).then(setMessages);
-  }, [mikoto, channel.id]);
-
-  useSocketIO<Message>(
-    mikoto.io,
-    'messageCreate',
-    (x) => {
-      if (x.channelId === channel.id) {
-        setMessages((xs) => [...xs, x]);
-      }
-    },
-    [channel.id],
-  );
-
-  useSocketIO<Message>(
-    mikoto.io,
-    'messageDelete',
-    (msg) => {
-      if (msg.channelId === channel.id) {
-        setMessages((xs) => xs.filter((x) => msg.id !== x.id));
-      }
-    },
-    [channel.id],
-  );
-
-  return (
-    <MessageViewContainer>
-      <Messages ref={ref}>
-        {messages.map((msg, idx) => {
-          const prevMsg = messages[idx - 1];
-          const simpleMessage =
-            prevMsg &&
-            prevMsg.authorId === msg.authorId &&
-            new Date(msg.timestamp).getTime() -
-              new Date(prevMsg.timestamp).getTime() <
-              5 * 60 * 1000;
-          return (
-            <MessageItem key={msg.id} message={msg} isSimple={simpleMessage} />
-          );
-        })}
-      </Messages>
-      <MessageInput
-        channelName={channel.name}
-        onMessageSend={async (msg) => {
-          await mikoto.sendMessage(channel.id, msg);
-        }}
-      />
-    </MessageViewContainer>
-  );
-}
 
 function AppView() {
   const [tabIndex, setTabIndex] = useState<number>(0);
@@ -116,7 +37,9 @@ function AppView() {
 
   return (
     <AppContainer>
+      <ServerSidebar />
       <Sidebar>
+        <UserArea />
         <TreeBar
           onClick={(ch, ev) => {
             if (tabbedChannels.length === 0) {
@@ -180,5 +103,9 @@ function AppView() {
 }
 
 export default function MainView() {
-  return <AppView />;
+  return (
+    <AuthRefresher>
+      <AppView />
+    </AuthRefresher>
+  );
 }

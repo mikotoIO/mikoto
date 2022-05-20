@@ -1,14 +1,11 @@
 import styled from 'styled-components';
 import React, { useState } from 'react';
-import { atom, useRecoilValue } from 'recoil';
+import { atom, useRecoilValue, useSetRecoilState } from 'recoil';
 
+import { useForm } from '@mantine/form';
+import { Button, TextInput } from '@mantine/core';
 import { Channel } from '../models';
-import {
-  ContextMenuBase,
-  ContextMenuLink,
-  TreebarContext,
-  useContextMenu,
-} from './ContextMenu';
+import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { useMikoto } from '../api';
 import { useSocketIO } from '../hooks/useSocketIO';
 import { ChannelIcon } from './ChannelIcon';
@@ -44,16 +41,16 @@ interface TreeNodeProps extends React.HTMLAttributes<HTMLLIElement> {
 export function TreeNode({ channel, ...props }: TreeNodeProps) {
   const mikoto = useMikoto();
   const menu = useContextMenu(({ destroy }) => (
-    <ContextMenuBase>
-      <ContextMenuLink
+    <ContextMenu>
+      <ContextMenu.Link
         onClick={async () => {
           destroy();
           await mikoto.deleteChannel(channel.id);
         }}
       >
         Delete Channel
-      </ContextMenuLink>
-    </ContextMenuBase>
+      </ContextMenu.Link>
+    </ContextMenu>
   ));
 
   return (
@@ -61,6 +58,54 @@ export function TreeNode({ channel, ...props }: TreeNodeProps) {
       <ChannelIcon />
       {channel.name}
     </TreeNodeElement>
+  );
+}
+
+function CreateChannelModal() {
+  const mikoto = useMikoto();
+  const setModal = useSetRecoilState(modalState);
+  const form = useForm({
+    initialValues: {
+      channelName: '',
+    },
+  });
+
+  return (
+    <form
+      onSubmit={form.onSubmit(async () => {
+        await mikoto.createChannel(
+          constants.defaultSpace,
+          form.values.channelName,
+        );
+        setModal(null);
+        form.reset();
+      })}
+    >
+      <TextInput
+        label="Channel Name"
+        placeholder="New Channel"
+        {...form.getInputProps('channelName')}
+      />
+      <Button mt={16} fullWidth type="submit">
+        Create Channel
+      </Button>
+    </form>
+  );
+}
+
+function TreebarContextMenu() {
+  const setModal = useSetRecoilState(modalState);
+  return (
+    <ContextMenu>
+      <ContextMenu.Link
+        onClick={() => {
+          setModal({ title: 'Create Channel', elem: <CreateChannelModal /> });
+        }}
+      >
+        Create Channel
+      </ContextMenu.Link>
+      <ContextMenu.Link>Invite People</ContextMenu.Link>
+    </ContextMenu>
   );
 }
 
@@ -89,7 +134,7 @@ export function TreeBar({ onClick }: TreeBarProps) {
   useSocketIO<Channel>(mikoto.io, 'channelDelete', (channel) => {
     setChannels((xs) => xs.filter((x) => x.id !== channel.id));
   });
-  const contextMenu = useContextMenu(() => <TreebarContext />);
+  const contextMenu = useContextMenu(() => <TreebarContextMenu />);
 
   return (
     <TreeContainer onContextMenu={contextMenu}>

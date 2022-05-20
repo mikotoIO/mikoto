@@ -70,15 +70,25 @@ export default class MikotoApi {
   }
   // endregion
 
+  // region Users
   async getCurrentUser(): Promise<User> {
     const { data } = await this.axios.get<User>('/users/me');
     return data;
   }
+  // endregion
 
+  // region Spaces
   async getSpaces(): Promise<Space[]> {
     const { data } = await this.axios.get<Space[]>('/spaces');
     return data;
   }
+
+  async createSpace(name: string): Promise<void> {
+    await this.axios.post<Space[]>('/spaces', {
+      name,
+    });
+  }
+  // endregion
 }
 
 export const MikotoContext = React.createContext<MikotoApi>(undefined!);

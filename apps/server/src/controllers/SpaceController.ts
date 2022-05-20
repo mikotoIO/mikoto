@@ -26,14 +26,15 @@ export class SpaceController {
     };
   }
 
-  @Post('/join/:id/')
-  async join(@CurrentUser() user: AccountJwt, @Param('id') id: string) {
+  async join(userId: string, spaceId: string) {
     await this.prisma.spaceUser.create({
-      data: {
-        userId: user.sub,
-        spaceId: id,
-      },
+      data: { userId, spaceId },
     });
+  }
+
+  @Post('/join/:id/')
+  async joinUser(@CurrentUser() user: AccountJwt, @Param('id') id: string) {
+    await this.join(user.sub, id);
   }
 
   @Get('/spaces')
@@ -51,12 +52,17 @@ export class SpaceController {
   }
 
   @Post('/spaces')
-  async create(@Body() body: SpaceCreationPayload) {
-    return this.prisma.space.create({
+  async create(
+    @CurrentUser() jwt: AccountJwt,
+    @Body() body: SpaceCreationPayload,
+  ) {
+    const space = await this.prisma.space.create({
       data: {
         name: body.name,
       },
     });
+    await this.join(jwt.sub, space.id);
+    return space;
   }
 
   @Get('/spaces/:spaceId/channels')

@@ -1,11 +1,8 @@
 import { atom, useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 import useEventListener from '@use-it/event-listener';
-import { Button, Modal, TextInput } from '@mantine/core';
+import { Modal } from '@mantine/core';
 import React, { useEffect, useRef } from 'react';
-import { useForm } from '@mantine/form';
-import { useMikoto } from '../api';
-import constants from '../constants';
 
 interface ContextMenuData {
   position: {
@@ -39,7 +36,7 @@ const ContextMenuOverlay = styled.div`
   height: 100vh;
 `;
 
-export const ContextMenuBase = styled.div`
+const ContextMenuBase = styled.div`
   color: white;
   pointer-events: all;
   width: 160px;
@@ -49,7 +46,7 @@ export const ContextMenuBase = styled.div`
   background-color: ${(p) => p.theme.colors.N1100};
 `;
 
-export const ContextMenuLink = styled.a`
+const ContextMenuLink = styled.a`
   display: block;
   padding: 6px 8px;
   box-sizing: border-box;
@@ -59,77 +56,6 @@ export const ContextMenuLink = styled.a`
     background-color: ${(p) => p.theme.colors.N800};
   }
 `;
-
-function CreateChannelModal() {
-  const mikoto = useMikoto();
-  const setModal = useSetRecoilState(modalState);
-  const form = useForm({
-    initialValues: {
-      channelName: '',
-    },
-  });
-
-  return (
-    <form
-      onSubmit={form.onSubmit(async () => {
-        await mikoto.createChannel(
-          constants.defaultSpace,
-          form.values.channelName,
-        );
-        setModal(null);
-        form.reset();
-      })}
-    >
-      <TextInput
-        label="Channel Name"
-        placeholder="New Channel"
-        {...form.getInputProps('channelName')}
-      />
-      <Button mt={16} fullWidth type="submit">
-        Create Channel
-      </Button>
-    </form>
-  );
-}
-
-export function TreebarContext() {
-  const setModal = useSetRecoilState(modalState);
-  return (
-    <ContextMenuBase>
-      <ContextMenuLink
-        onClick={() => {
-          setModal({
-            title: 'Create Channel',
-            elem: <CreateChannelModal />,
-          });
-        }}
-      >
-        Create Space
-      </ContextMenuLink>
-      <ContextMenuLink
-        onClick={() => {
-          setModal({
-            title: 'Create Channel',
-            elem: <CreateChannelModal />,
-          });
-        }}
-      >
-        Join Space
-      </ContextMenuLink>
-      <ContextMenuLink
-        onClick={() => {
-          setModal({
-            title: 'Create Channel',
-            elem: <CreateChannelModal />,
-          });
-        }}
-      >
-        Create Channel
-      </ContextMenuLink>
-      <ContextMenuLink>Invite People</ContextMenuLink>
-    </ContextMenuBase>
-  );
-}
 
 const ContextWrapper = styled.div`
   position: absolute;
@@ -190,6 +116,10 @@ export function ContextMenuKit() {
 interface ContextMenuFns {
   destroy(): void;
 }
+
+export const ContextMenu = Object.assign(ContextMenuBase, {
+  Link: ContextMenuLink,
+});
 
 export function useContextMenu(fn: (fns: ContextMenuFns) => React.ReactNode) {
   const setContextMenu = useSetRecoilState(contextMenuState);

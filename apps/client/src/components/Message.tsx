@@ -10,11 +10,7 @@ import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { SpecialComponents } from 'react-markdown/lib/ast-to-react';
 import { NormalComponents } from 'react-markdown/lib/complex-types';
 
-import {
-  ContextMenuBase,
-  ContextMenuLink,
-  useContextMenu,
-} from './ContextMenu';
+import { ContextMenu, useContextMenu } from './ContextMenu';
 import { Message } from '../models';
 import { useMikoto } from '../api';
 import { Avatar } from './Avatar';
@@ -232,16 +228,16 @@ export default function MessageItem({ message, isSimple }: MessageProps) {
   const mikoto = useMikoto();
 
   const menu = useContextMenu(({ destroy }) => (
-    <ContextMenuBase>
-      <ContextMenuLink
+    <ContextMenu>
+      <ContextMenu.Link
         onClick={async () => {
           destroy();
           await mikoto.deleteMessage(message.channelId, message.id);
         }}
       >
         Delete Message
-      </ContextMenuLink>
-    </ContextMenuBase>
+      </ContextMenu.Link>
+    </ContextMenu>
   ));
 
   const time = new Date(message.timestamp);

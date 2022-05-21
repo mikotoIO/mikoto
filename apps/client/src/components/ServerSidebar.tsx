@@ -1,12 +1,14 @@
 import styled from 'styled-components';
 import { useHover } from 'usehooks-ts';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Button, TextInput, Tooltip } from '@mantine/core';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useForm } from '@mantine/form';
 import { useMikoto } from '../api';
 import { Space } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
+import { useDelta } from '../hooks';
+import { treebarSpaceIdState } from './TreeBar';
 
 const ServerSidebarBase = styled.div`
   display: flex;
@@ -30,6 +32,8 @@ const ServerIconBase = styled.div`
 `;
 
 function ServerIcon({ space }: { space: Space }) {
+  const [, setSpaceId] = useRecoilState(treebarSpaceIdState);
+
   const ref = useRef<HTMLDivElement>(null);
   const isHover = useHover(ref);
   return (
@@ -37,7 +41,7 @@ function ServerIcon({ space }: { space: Space }) {
       <ServerIconBase
         ref={ref}
         onClick={() => {
-          console.log(space);
+          setSpaceId(space.id);
         }}
       >
         {space.name[0]}
@@ -97,10 +101,16 @@ function ServerSidebarContextMenu() {
 
 export function ServerSidebar() {
   const mikoto = useMikoto();
-  const [spaces, setSpaces] = useState<Space[]>([]);
-  useEffect(() => {
-    mikoto.getSpaces().then(setSpaces);
-  }, []);
+
+  const spaceDelta = useDelta(
+    {
+      initializer: () => mikoto.getSpaces(),
+      predicate: () => true,
+    },
+    [],
+  );
+
+  const spaces = spaceDelta.data;
   const contextMenu = useContextMenu(() => <ServerSidebarContextMenu />);
 
   return (

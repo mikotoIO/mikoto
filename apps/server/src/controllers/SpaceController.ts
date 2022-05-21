@@ -8,6 +8,7 @@ import {
 } from 'routing-controllers';
 import { PrismaClient } from '@prisma/client';
 import { Service } from 'typedi';
+import { Server } from 'socket.io';
 import { AccountJwt } from '../auth';
 
 interface SpaceCreationPayload {
@@ -17,7 +18,7 @@ interface SpaceCreationPayload {
 @JsonController()
 @Service()
 export class SpaceController {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private prisma: PrismaClient, private io: Server) {}
 
   @Get('/hello')
   hello() {
@@ -32,7 +33,7 @@ export class SpaceController {
     });
   }
 
-  @Post('/join/:id/')
+  @Post('/join/:id')
   async joinUser(@CurrentUser() user: AccountJwt, @Param('id') id: string) {
     await this.join(user.sub, id);
   }
@@ -57,11 +58,11 @@ export class SpaceController {
     @Body() body: SpaceCreationPayload,
   ) {
     const space = await this.prisma.space.create({
-      data: {
-        name: body.name,
-      },
+      data: { name: body.name },
     });
     await this.join(jwt.sub, space.id);
+    this.io.to(`user/${jwt.sub}`);
+
     return space;
   }
 

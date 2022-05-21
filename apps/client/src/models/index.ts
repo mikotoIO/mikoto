@@ -36,5 +36,6 @@ export interface SimpleUser {
 
 export interface Channel {
   id: string;
+  spaceId: string;
   name: string;
 }

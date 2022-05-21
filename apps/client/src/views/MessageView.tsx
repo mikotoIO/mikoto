@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useMikoto } from '../api';
 import { Channel, Message } from '../models';
 import { useSocketIO } from '../hooks/useSocketIO';
 import MessageItem from '../components/Message';
 import { MessageInput } from '../components/MessageInput';
+import { useDelta } from '../hooks';
 
 const MessageViewContainer = styled.div`
   flex: 1;
@@ -26,7 +27,6 @@ interface MessageViewProps {
 export function MessageView({ channel }: MessageViewProps) {
   const mikoto = useMikoto();
 
-  const [messages, setMessages] = useState<Message[]>([]);
   const ref = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     if (ref.current) {
@@ -34,31 +34,21 @@ export function MessageView({ channel }: MessageViewProps) {
     }
   });
 
-  React.useEffect(() => {
-    mikoto.getMessages(channel.id).then(setMessages);
-  }, [mikoto, channel.id]);
-
-  useSocketIO<Message>(
-    mikoto.io,
-    'messageCreate',
-    (x) => {
-      if (x.channelId === channel.id) {
-        setMessages((xs) => [...xs, x]);
-      }
+  const messageDelta = useDelta<Message>(
+    {
+      initializer: () => mikoto.getMessages(channel.id),
+      predicate: (x) => x.channelId === channel.id,
     },
     [channel.id],
   );
+  useSocketIO<Message>(mikoto.io, 'messageCreate', messageDelta.create, [
+    channel.id,
+  ]);
+  useSocketIO<Message>(mikoto.io, 'messageDelete', messageDelta.delete, [
+    channel.id,
+  ]);
 
-  useSocketIO<Message>(
-    mikoto.io,
-    'messageDelete',
-    (msg) => {
-      if (msg.channelId === channel.id) {
-        setMessages((xs) => xs.filter((x) => msg.id !== x.id));
-      }
-    },
-    [channel.id],
-  );
+  const messages = messageDelta.data;
 
   return (
     <MessageViewContainer>

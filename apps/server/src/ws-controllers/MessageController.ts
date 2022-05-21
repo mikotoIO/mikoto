@@ -1,7 +1,6 @@
 import {
   ConnectedSocket,
   MessageBody,
-  OnConnect,
   OnMessage,
   SocketController,
 } from 'socket-controllers';
@@ -15,10 +14,9 @@ import jwt from 'jsonwebtoken';
 export class MessageController {
   constructor(private prisma: PrismaClient) {}
 
-  @OnConnect()
-  connection() {
-    // console.log("client connected");
-  }
+  // @OnConnect()
+  // connection() {
+  // }
 
   // start subscribing to a new room
   @OnMessage('subscribe')
@@ -37,6 +35,8 @@ export class MessageController {
     socket.data.token = jwt.verify(body.token, process.env.SECRET!);
 
     if (!socket.data.calibrated) {
+      socket.join(`user/${socket.data.token.sub}`);
+
       const spaces = await this.prisma.spaceUser.findMany({
         where: { userId: socket.data.token.sub },
       });

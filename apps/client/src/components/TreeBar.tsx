@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import React, { useState } from 'react';
+import React from 'react';
 import { atom, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { useForm } from '@mantine/form';
@@ -10,6 +10,7 @@ import { useMikoto } from '../api';
 import { useSocketIO } from '../hooks/useSocketIO';
 import { ChannelIcon } from './ChannelIcon';
 import constants from '../constants';
+import { useDelta } from '../hooks';
 
 export const TreeContainer = styled.ul`
   list-style: none;
@@ -38,6 +39,11 @@ interface TreeNodeProps extends React.HTMLAttributes<HTMLLIElement> {
   channel: Channel;
 }
 
+export const treebarSpaceIdState = atom<string | null>({
+  key: 'treebarSpaceId',
+  default: constants.defaultSpace,
+});
+
 export function TreeNode({ channel, ...props }: TreeNodeProps) {
   const mikoto = useMikoto();
   const menu = useContextMenu(({ destroy }) => (
@@ -64,6 +70,7 @@ export function TreeNode({ channel, ...props }: TreeNodeProps) {
 function CreateChannelModal() {
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
+  const spaceId = useRecoilValue(treebarSpaceIdState);
   const form = useForm({
     initialValues: {
       channelName: '',
@@ -73,10 +80,7 @@ function CreateChannelModal() {
   return (
     <form
       onSubmit={form.onSubmit(async () => {
-        await mikoto.createChannel(
-          constants.defaultSpace,
-          form.values.channelName,
-        );
+        await mikoto.createChannel(spaceId!, form.values.channelName);
         setModal(null);
         form.reset();
       })}
@@ -113,32 +117,29 @@ interface TreeBarProps {
   onClick: (channel: Channel, ev: React.MouseEvent) => void;
 }
 
-const treebarSpaceIdState = atom<string | null>({
-  key: 'treebarSpaceId',
-  default: constants.defaultSpace,
-});
-
 export function TreeBar({ onClick }: TreeBarProps) {
-  const [channels, setChannels] = useState<Channel[]>([]);
   const spaceId = useRecoilValue(treebarSpaceIdState);
   const mikoto = useMikoto();
 
-  React.useEffect(() => {
-    mikoto.getChannels(spaceId!).then(setChannels);
-  }, [mikoto]);
+  const channelDelta = useDelta<Channel>(
+    {
+      initializer: () => mikoto.getChannels(spaceId!),
+      predicate: (x) => x.spaceId === spaceId,
+    },
+    [spaceId],
+  );
+  useSocketIO<Channel>(mikoto.io, 'channelCreate', channelDelta.create, [
+    spaceId,
+  ]);
+  useSocketIO<Channel>(mikoto.io, 'channelDelete', channelDelta.delete, [
+    spaceId,
+  ]);
 
-  useSocketIO<Channel>(mikoto.io, 'channelCreate', (channel) => {
-    setChannels((xs) => [...xs, channel]);
-  });
-
-  useSocketIO<Channel>(mikoto.io, 'channelDelete', (channel) => {
-    setChannels((xs) => xs.filter((x) => x.id !== channel.id));
-  });
   const contextMenu = useContextMenu(() => <TreebarContextMenu />);
 
   return (
     <TreeContainer onContextMenu={contextMenu}>
-      {channels.map((x) => (
+      {channelDelta.data.map((x) => (
         <TreeNode channel={x} key={x.id} onClick={(ev) => onClick(x, ev)} />
       ))}
     </TreeContainer>

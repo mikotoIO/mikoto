@@ -20,6 +20,9 @@ export default class MikotoApi {
 
   updateAccessToken(token: string) {
     this.axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+    this.io.emit('identify', {
+      token,
+    });
   }
 
   // region Channels

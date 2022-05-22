@@ -1,12 +1,14 @@
 import {
   Body,
   CurrentUser,
+  Delete,
   Get,
   JsonController,
+  NotFoundError,
   Param,
   Post,
 } from 'routing-controllers';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Space } from '@prisma/client';
 import { Service } from 'typedi';
 import { Server } from 'socket.io';
 import { AccountJwt } from '../auth';
@@ -27,15 +29,25 @@ export class SpaceController {
     };
   }
 
-  async join(userId: string, spaceId: string) {
+  async join(userId: string, space: Space) {
     await this.prisma.spaceUser.create({
-      data: { userId, spaceId },
+      data: { userId, spaceId: space.id },
     });
+    const socketIds = await this.io.in(`user/${userId}`).allSockets();
+    socketIds.forEach((socketId) => {
+      this.io.sockets.sockets.get(socketId)?.join(space.id);
+    });
+
+    this.io.to(`user/${userId}`).emit('spaceCreate', space);
   }
 
   @Post('/join/:id')
   async joinUser(@CurrentUser() user: AccountJwt, @Param('id') id: string) {
-    await this.join(user.sub, id);
+    const space = await this.prisma.space.findUnique({ where: { id } });
+    if (space === null) {
+      throw new NotFoundError();
+    }
+    return this.join(user.sub, space);
   }
 
   @Get('/spaces')
@@ -60,9 +72,19 @@ export class SpaceController {
     const space = await this.prisma.space.create({
       data: { name: body.name },
     });
-    await this.join(jwt.sub, space.id);
-    this.io.to(`user/${jwt.sub}`);
+    await this.join(jwt.sub, space);
+    return space;
+  }
 
+  @Delete('/spaces/:id')
+  async delete(
+    @Param('id') id: string,
+    // @CurrentUser() jwt: AccountJwt,
+  ) {
+    const space = await this.prisma.space.delete({
+      where: { id },
+    });
+    this.io.to(space.id).emit('spaceDelete', space);
     return space;
   }
 

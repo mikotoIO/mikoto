@@ -1,11 +1,12 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { useDrag, useDrop } from 'react-dnd';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faX } from '@fortawesome/free-solid-svg-icons';
+import { useRecoilState } from 'recoil';
+
 import { ChannelIcon } from './ChannelIcon';
-import { Channel } from '../models';
+import { Tabable, tabbedChannelState, tabIndexState } from '../store';
 
 const TabbedViewContainer = styled.div`
   flex: 1;
@@ -58,56 +59,81 @@ const TabItemElement = styled.div<{ active?: boolean }>`
 `;
 
 interface TabItemProps {
-  channel: Channel;
-  active: boolean;
+  tab: Tabable;
   index: number;
-  onClick: (channel: Channel, index: number) => void;
-  onClose: (channel: Channel, index: number) => void;
-  onReorder: (channel: Channel, dragIndex: number, dropIndex: number) => void;
 }
 
 interface TabDndItem {
-  channel: Channel;
+  tab: Tabable;
   dragIndex: number;
 }
 
-function TabItem({
-  channel,
-  active,
-  onClick,
-  onClose,
-  onReorder,
-  index,
-}: TabItemProps) {
+function useReorderable() {
+  const [, setTabIndex] = useRecoilState(tabIndexState);
+  const [tabbedChannels, setTabbedChannels] =
+    useRecoilState(tabbedChannelState);
+
+  return (dragIndex: number, dropIndex: number) => {
+    if (dragIndex === dropIndex) return;
+
+    const filteredTabs = [...tabbedChannels];
+    const nt = filteredTabs.splice(dragIndex, 1)[0];
+
+    if (dropIndex === -1) {
+      setTabbedChannels([...filteredTabs, nt]);
+      setTabIndex(tabbedChannels.length - 1);
+    } else {
+      filteredTabs.splice(dropIndex, 0, nt);
+      setTabbedChannels(filteredTabs);
+      setTabIndex(dropIndex);
+    }
+  };
+}
+
+function TabItem({ tab, index }: TabItemProps) {
+  const [tabIndex, setTabIndex] = useRecoilState(tabIndexState);
+  const [, setTabbedChannels] = useRecoilState(tabbedChannelState);
+
+  const reorderFn = useReorderable();
+
   const ref = useRef<HTMLDivElement>(null);
   const [, drag] = useDrag<TabDndItem>({
     type: 'CHANNEL',
-    item: { channel, dragIndex: index },
+    item: { tab, dragIndex: index },
   });
   const [, drop] = useDrop<TabDndItem>({
     accept: 'CHANNEL',
     drop(item) {
-      onReorder(item.channel, item.dragIndex, index);
+      reorderFn(item.dragIndex, index);
     },
   });
   drag(drop(ref));
 
+  const active = index === tabIndex;
+
   return (
     <TabItemElement
       ref={ref}
-      key={channel.id}
+      key={tab.key}
       active={active}
       onClick={() => {
-        onClick(channel, index);
+        setTabIndex(index);
       }}
     >
       <ChannelIcon size={20} />
-      <div>{channel.name}</div>
+      <div>{tab.name}</div>
       <CloseButton
         active={active}
         onClick={(ev) => {
-          ev.stopPropagation();
-          onClose(channel, index);
+          ev.stopPropagation(); // close button shouldn't reset tab index
+          setTabbedChannels((xs) => {
+            const xsc = [...xs];
+            xsc.splice(index, 1);
+            return xsc; // React optimizes by comparing reference
+          });
+          if (index <= tabIndex) {
+            setTabIndex(Math.max(0, index - 1));
+          }
         }}
       >
         <FontAwesomeIcon icon={faX} />
@@ -117,15 +143,11 @@ function TabItem({
 }
 
 interface TabbedViewProps {
-  channels: Channel[];
-  index: number | null;
+  channels: Tabable[];
   children: React.ReactNode;
-
-  onClick?: (channel: Channel, index: number) => void;
-  onClose?: (channel: Channel, index: number) => void;
-  onReorder?: (channel: Channel, dragIndex: number, dropIndex: number) => void;
 }
 
+// noinspection CssUnknownProperty
 const DropRest = styled.div`
   flex-grow: 1;
   -webkit-app-region: drag;
@@ -152,38 +174,21 @@ function WelcomeToMikoto() {
   );
 }
 
-export function TabbedView({
-  children,
-  channels,
-  index,
-  onClick,
-  onClose,
-  onReorder,
-}: TabbedViewProps) {
-  const clickFn = onClick ?? (() => {});
-  const closeFn = onClose ?? (() => {});
-  const reorderFn = onReorder ?? (() => {});
+export function TabbedView({ children, channels }: TabbedViewProps) {
+  const reorderFn = useReorderable();
 
   const [, drop] = useDrop<TabDndItem>({
     accept: 'CHANNEL',
     drop(item) {
-      reorderFn(item.channel, 0, -1);
+      reorderFn(item.dragIndex, -1);
     },
   });
 
   return (
     <TabbedViewContainer>
       <TabBar>
-        {channels.map((channel, idx) => (
-          <TabItem
-            channel={channel}
-            active={idx === index}
-            onClick={clickFn}
-            onClose={closeFn}
-            onReorder={reorderFn}
-            index={idx}
-            key={channel.id}
-          />
+        {channels.map((channel, index) => (
+          <TabItem tab={channel} index={index} key={channel.key} />
         ))}
         <DropRest ref={drop} />
       </TabBar>

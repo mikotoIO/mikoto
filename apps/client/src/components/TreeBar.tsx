@@ -1,19 +1,23 @@
 import styled from 'styled-components';
 import React from 'react';
-import { atom, useRecoilValue, useSetRecoilState } from 'recoil';
-
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useForm } from '@mantine/form';
 import { Button, TextInput } from '@mantine/core';
+
 import { Channel } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { useMikoto } from '../api';
 import { useSocketIO } from '../hooks/useSocketIO';
 import { ChannelIcon } from './ChannelIcon';
-import constants from '../constants';
 import { useDelta } from '../hooks';
+import {
+  Tabable,
+  tabbedChannelState,
+  tabIndexState,
+  treebarSpaceIdState,
+} from '../store';
 
-export const TreeContainer = styled.ul`
-  list-style: none;
+export const TreeContainer = styled.div`
   margin: 0;
   padding: 10px;
   flex: 1;
@@ -21,7 +25,7 @@ export const TreeContainer = styled.ul`
   box-sizing: border-box;
 `;
 
-const TreeNodeElement = styled.li`
+const TreeNodeElement = styled.a`
   font-size: 14px;
   height: 20px;
   padding: 6px 10px;
@@ -29,20 +33,16 @@ const TreeNodeElement = styled.li`
   display: flex;
   align-items: center;
   color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
 
   &:hover {
     background-color: ${(p) => p.theme.colors.N700};
   }
 `;
 
-interface TreeNodeProps extends React.HTMLAttributes<HTMLLIElement> {
+interface TreeNodeProps extends React.HTMLAttributes<HTMLAnchorElement> {
   channel: Channel;
 }
-
-export const treebarSpaceIdState = atom<string | null>({
-  key: 'treebarSpaceId',
-  default: constants.defaultSpace,
-});
 
 export function TreeNode({ channel, ...props }: TreeNodeProps) {
   const mikoto = useMikoto();
@@ -113,12 +113,21 @@ function TreebarContextMenu() {
   );
 }
 
-interface TreeBarProps {
-  onClick: (channel: Channel, ev: React.MouseEvent) => void;
+function channelToTab(channel: Channel): Tabable {
+  return {
+    key: `textChannel/${channel.id}`,
+    kind: 'textChannel',
+    name: channel.name,
+    channel,
+  };
 }
 
-export function TreeBar({ onClick }: TreeBarProps) {
+export function TreeBar() {
   const spaceId = useRecoilValue(treebarSpaceIdState);
+  const [tabIndex, setTabIndex] = useRecoilState(tabIndexState);
+  const [tabbedChannels, setTabbedChannels] =
+    useRecoilState(tabbedChannelState);
+
   const mikoto = useMikoto();
 
   const channelDelta = useDelta<Channel>(
@@ -137,10 +146,45 @@ export function TreeBar({ onClick }: TreeBarProps) {
 
   const contextMenu = useContextMenu(() => <TreebarContextMenu />);
 
+  function openNewChannel(ch: Channel) {
+    if (
+      !tabbedChannels.some((x) =>
+        x.kind === 'textChannel' ? x.channel.id === ch.id : false,
+      )
+    ) {
+      setTabbedChannels((xs) => [...xs, channelToTab(ch)]);
+    }
+    setTabIndex(tabbedChannels.length);
+  }
+
   return (
     <TreeContainer onContextMenu={contextMenu}>
-      {channelDelta.data.map((x) => (
-        <TreeNode channel={x} key={x.id} onClick={(ev) => onClick(x, ev)} />
+      {channelDelta.data.map((channel) => (
+        <TreeNode
+          channel={channel}
+          key={channel.id}
+          onClick={(ev) => {
+            if (tabbedChannels.length === 0) {
+              openNewChannel(channel);
+              return;
+            }
+
+            const idx = tabbedChannels.findIndex((n) =>
+              n.kind === 'textChannel' ? n.channel.id === channel.id : false,
+            );
+            if (idx !== -1) {
+              setTabIndex(idx);
+            } else if (ev.ctrlKey) {
+              openNewChannel(channel);
+            } else {
+              setTabbedChannels((xs) => {
+                const xsn = [...xs];
+                xsn[tabIndex] = channelToTab(channel);
+                return xsn;
+              });
+            }
+          }}
+        />
       ))}
     </TreeContainer>
   );

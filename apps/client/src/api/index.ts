@@ -87,9 +87,13 @@ export default class MikotoApi {
   }
 
   async createSpace(name: string): Promise<void> {
-    await this.axios.post<Space[]>('/spaces', {
+    await this.axios.post<Space>('/spaces', {
       name,
     });
+  }
+
+  async deleteSpace(id: string): Promise<void> {
+    await this.axios.delete<Space>(`/spaces/${id}`);
   }
   // endregion
 }

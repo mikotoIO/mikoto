@@ -13,7 +13,7 @@ import { NormalComponents } from 'react-markdown/lib/complex-types';
 import { ContextMenu, useContextMenu } from './ContextMenu';
 import { Message } from '../models';
 import { useMikoto } from '../api';
-import { Avatar } from './Avatar';
+import { MessageAvatar } from './Avatar';
 
 interface DeferredHighlighterProps {
   inline?: boolean;
@@ -252,7 +252,7 @@ export default function MessageItem({ message, isSimple }: MessageProps) {
       {isSimple ? (
         <div style={{ width: '40px' }} />
       ) : (
-        <Avatar src={message.author?.avatar} />
+        <MessageAvatar src={message.author?.avatar} user={message.author} />
       )}
       <MessageInner>
         {!isSimple && (

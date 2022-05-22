@@ -7,7 +7,7 @@ import MessageItem from '../components/Message';
 import { MessageInput } from '../components/MessageInput';
 import { useDelta } from '../hooks';
 
-const MessageViewContainer = styled.div`
+const ViewContainer = styled.div`
   flex: 1;
   background-color: ${(p) => p.theme.colors.N800};
   height: 100%;
@@ -22,6 +22,16 @@ const Messages = styled.div`
 
 interface MessageViewProps {
   channel: Channel;
+}
+
+function isMessageSimple(message: Message, prevMessage: Message) {
+  return (
+    prevMessage &&
+    prevMessage.authorId === message.authorId &&
+    new Date(message.timestamp).getTime() -
+      new Date(prevMessage.timestamp).getTime() <
+      5 * 60 * 1000
+  );
 }
 
 export function MessageView({ channel }: MessageViewProps) {
@@ -51,20 +61,15 @@ export function MessageView({ channel }: MessageViewProps) {
   const messages = messageDelta.data;
 
   return (
-    <MessageViewContainer>
+    <ViewContainer>
       <Messages ref={ref}>
-        {messages.map((msg, idx) => {
-          const prevMsg = messages[idx - 1];
-          const simpleMessage =
-            prevMsg &&
-            prevMsg.authorId === msg.authorId &&
-            new Date(msg.timestamp).getTime() -
-              new Date(prevMsg.timestamp).getTime() <
-              5 * 60 * 1000;
-          return (
-            <MessageItem key={msg.id} message={msg} isSimple={simpleMessage} />
-          );
-        })}
+        {messages.map((msg, idx) => (
+          <MessageItem
+            key={msg.id}
+            message={msg}
+            isSimple={isMessageSimple(msg, messages[idx - 1])}
+          />
+        ))}
       </Messages>
       <MessageInput
         channelName={channel.name}
@@ -72,6 +77,6 @@ export function MessageView({ channel }: MessageViewProps) {
           await mikoto.sendMessage(channel.id, msg);
         }}
       />
-    </MessageViewContainer>
+    </ViewContainer>
   );
 }

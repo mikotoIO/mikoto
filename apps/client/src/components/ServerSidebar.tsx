@@ -8,7 +8,8 @@ import { useMikoto } from '../api';
 import { Space } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { useDelta } from '../hooks';
-import { treebarSpaceIdState } from './TreeBar';
+import { useSocketIO } from '../hooks/useSocketIO';
+import { treebarSpaceIdState } from '../store';
 
 const ServerSidebarBase = styled.div`
   display: flex;
@@ -31,14 +32,41 @@ const ServerIconBase = styled.div`
   background-color: ${(p) => p.theme.colors.N800};
 `;
 
+function ServerIconContextMenu({
+  space,
+  destroy,
+}: {
+  space: Space;
+  destroy: () => void;
+}) {
+  const mikoto = useMikoto();
+  return (
+    <ContextMenu>
+      <ContextMenu.Link
+        onClick={async () => {
+          destroy();
+          await mikoto.deleteSpace(space.id);
+        }}
+      >
+        Delete Space
+      </ContextMenu.Link>
+    </ContextMenu>
+  );
+}
+
 function ServerIcon({ space }: { space: Space }) {
   const [, setSpaceId] = useRecoilState(treebarSpaceIdState);
 
   const ref = useRef<HTMLDivElement>(null);
   const isHover = useHover(ref);
+  const contextMenu = useContextMenu(({ destroy }) => (
+    <ServerIconContextMenu space={space} destroy={destroy} />
+  ));
+
   return (
     <Tooltip label={space.name} opened={isHover} position="right" withArrow>
       <ServerIconBase
+        onContextMenu={contextMenu}
         ref={ref}
         onClick={() => {
           setSpaceId(space.id);
@@ -109,6 +137,9 @@ export function ServerSidebar() {
     },
     [],
   );
+
+  useSocketIO<Space>(mikoto.io, 'spaceCreate', spaceDelta.create, []);
+  useSocketIO<Space>(mikoto.io, 'spaceDelete', spaceDelta.delete, []);
 
   const spaces = spaceDelta.data;
   const contextMenu = useContextMenu(() => <ServerSidebarContextMenu />);

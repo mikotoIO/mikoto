@@ -38,7 +38,6 @@ const ContextMenuOverlay = styled.div`
 
 const ContextMenuBase = styled.div`
   color: white;
-  pointer-events: all;
   width: 160px;
   padding: 8px;
   font-size: 14px;
@@ -58,6 +57,7 @@ const ContextMenuLink = styled.a`
 `;
 
 const ContextWrapper = styled.div`
+  pointer-events: all;
   position: absolute;
   &:focus {
     outline: none;

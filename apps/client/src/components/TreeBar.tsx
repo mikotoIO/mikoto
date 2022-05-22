@@ -10,7 +10,7 @@ import { useMikoto } from '../api';
 import { useSocketIO } from '../hooks/useSocketIO';
 import { ChannelIcon } from './ChannelIcon';
 import { useDelta } from '../hooks';
-import { Tabable, tabbedChannelState, treebarSpaceIdState } from '../store';
+import { Tabable, tabbedState, treebarSpaceIdState } from '../store';
 
 export const TreeContainer = styled.div`
   margin: 0;
@@ -110,8 +110,8 @@ function TreebarContextMenu() {
 
 function channelToTab(channel: Channel): Tabable {
   return {
-    key: `textChannel/${channel.id}`,
     kind: 'textChannel',
+    key: channel.id,
     name: channel.name,
     channel,
   };
@@ -119,8 +119,7 @@ function channelToTab(channel: Channel): Tabable {
 
 export function TreeBar() {
   const spaceId = useRecoilValue(treebarSpaceIdState);
-  const [tabbedChannels, setTabbedChannels] =
-    useRecoilState(tabbedChannelState);
+  const [tabbed, setTabbed] = useRecoilState(tabbedState);
 
   const mikoto = useMikoto();
 
@@ -142,17 +141,17 @@ export function TreeBar() {
 
   function openNewChannel(ch: Channel) {
     if (
-      !tabbedChannels.tabs.some((x) =>
+      !tabbed.tabs.some((x) =>
         x.kind === 'textChannel' ? x.channel.id === ch.id : false,
       )
     ) {
-      setTabbedChannels(({ index, tabs }) => ({
+      setTabbed(({ index, tabs }) => ({
         index,
         tabs: [...tabs, channelToTab(ch)],
       }));
     }
-    setTabbedChannels(({ tabs }) => ({
-      index: tabbedChannels.tabs.length,
+    setTabbed(({ tabs }) => ({
+      index: tabbed.tabs.length,
       tabs,
     }));
   }
@@ -164,23 +163,23 @@ export function TreeBar() {
           channel={channel}
           key={channel.id}
           onClick={(ev) => {
-            if (tabbedChannels.tabs.length === 0) {
+            if (tabbed.tabs.length === 0) {
               openNewChannel(channel);
               return;
             }
 
-            const idx = tabbedChannels.tabs.findIndex((n) =>
+            const idx = tabbed.tabs.findIndex((n) =>
               n.kind === 'textChannel' ? n.channel.id === channel.id : false,
             );
             if (idx !== -1) {
-              setTabbedChannels(({ tabs }) => ({
+              setTabbed(({ tabs }) => ({
                 index: idx,
                 tabs,
               }));
             } else if (ev.ctrlKey) {
               openNewChannel(channel);
             } else {
-              setTabbedChannels(({ tabs, index }) => {
+              setTabbed(({ tabs, index }) => {
                 const xsn = [...tabs];
                 xsn[index] = channelToTab(channel);
                 return {

@@ -16,7 +16,7 @@ export type Tabable = TabBaseType & {
   name: string;
 };
 
-export const tabbedChannelState = atom<{
+export const tabbedState = atom<{
   index: number;
   tabs: Tabable[];
 }>({

@@ -6,7 +6,7 @@ import { faX } from '@fortawesome/free-solid-svg-icons';
 import { useRecoilState } from 'recoil';
 
 import { ChannelIcon } from './ChannelIcon';
-import { Tabable, tabbedChannelState } from '../store';
+import { Tabable, tabbedState } from '../store';
 
 const TabbedViewContainer = styled.div`
   flex: 1;
@@ -69,8 +69,7 @@ interface TabDndItem {
 }
 
 function useReorderable() {
-  const [tabbedChannels, setTabbedChannels] =
-    useRecoilState(tabbedChannelState);
+  const [tabbedChannels, setTabbedChannels] = useRecoilState(tabbedState);
 
   return (dragIndex: number, dropIndex: number) => {
     if (dragIndex === dropIndex) return;
@@ -94,8 +93,7 @@ function useReorderable() {
 }
 
 function TabItem({ tab, index }: TabItemProps) {
-  const [tabbedChannels, setTabbedChannels] =
-    useRecoilState(tabbedChannelState);
+  const [tabbedChannels, setTabbedChannels] = useRecoilState(tabbedState);
 
   const reorderFn = useReorderable();
 
@@ -152,7 +150,7 @@ function TabItem({ tab, index }: TabItemProps) {
 }
 
 interface TabbedViewProps {
-  channels: Tabable[];
+  tabs: Tabable[];
   children: React.ReactNode;
 }
 
@@ -183,7 +181,7 @@ function WelcomeToMikoto() {
   );
 }
 
-export function TabbedView({ children, channels }: TabbedViewProps) {
+export function TabbedView({ children, tabs }: TabbedViewProps) {
   const reorderFn = useReorderable();
 
   const [, drop] = useDrop<TabDndItem>({
@@ -196,12 +194,12 @@ export function TabbedView({ children, channels }: TabbedViewProps) {
   return (
     <TabbedViewContainer>
       <TabBar>
-        {channels.map((channel, index) => (
-          <TabItem tab={channel} index={index} key={channel.key} />
+        {tabs.map((tab, index) => (
+          <TabItem tab={tab} index={index} key={`${tab.kind}/${tab.key}`} />
         ))}
         <DropRest ref={drop} />
       </TabBar>
-      {channels.length ? children : <WelcomeToMikoto />}
+      {tabs.length ? children : <WelcomeToMikoto />}
     </TabbedViewContainer>
   );
 }

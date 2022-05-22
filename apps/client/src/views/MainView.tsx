@@ -1,13 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { TreeBar } from '../components/TreeBar';
 import { TabbedView } from '../components/TabBar';
 import { AuthRefresher } from '../components/AuthHandler';
 import { UserArea } from '../components/UserArea';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { MessageView } from './MessageView';
-import { Tabable, tabbedChannelState } from '../store';
+import { Tabable, tabbedState } from '../store';
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -35,7 +35,7 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
 }
 
 function AppView() {
-  const [tabbedChannels] = useRecoilState(tabbedChannelState);
+  const tabbed = useRecoilValue(tabbedState);
 
   return (
     <AppContainer>
@@ -44,11 +44,10 @@ function AppView() {
         <UserArea />
         <TreeBar />
       </SidebarElement>
-      <TabbedView channels={tabbedChannels.tabs}>
-        {tabbedChannels.index !== null &&
-          tabbedChannels.index < tabbedChannels.tabs.length && (
-            <TabViewSwitch tab={tabbedChannels.tabs[tabbedChannels.index]} />
-          )}
+      <TabbedView tabs={tabbed.tabs}>
+        {tabbed.index !== null && tabbed.index < tabbed.tabs.length && (
+          <TabViewSwitch tab={tabbed.tabs[tabbed.index]} />
+        )}
       </TabbedView>
     </AppContainer>
   );

@@ -10,12 +10,7 @@ import { useMikoto } from '../api';
 import { useSocketIO } from '../hooks/useSocketIO';
 import { ChannelIcon } from './ChannelIcon';
 import { useDelta } from '../hooks';
-import {
-  Tabable,
-  tabbedChannelState,
-  tabIndexState,
-  treebarSpaceIdState,
-} from '../store';
+import { Tabable, tabbedChannelState, treebarSpaceIdState } from '../store';
 
 export const TreeContainer = styled.div`
   margin: 0;
@@ -124,7 +119,6 @@ function channelToTab(channel: Channel): Tabable {
 
 export function TreeBar() {
   const spaceId = useRecoilValue(treebarSpaceIdState);
-  const [tabIndex, setTabIndex] = useRecoilState(tabIndexState);
   const [tabbedChannels, setTabbedChannels] =
     useRecoilState(tabbedChannelState);
 
@@ -148,13 +142,19 @@ export function TreeBar() {
 
   function openNewChannel(ch: Channel) {
     if (
-      !tabbedChannels.some((x) =>
+      !tabbedChannels.tabs.some((x) =>
         x.kind === 'textChannel' ? x.channel.id === ch.id : false,
       )
     ) {
-      setTabbedChannels((xs) => [...xs, channelToTab(ch)]);
+      setTabbedChannels(({ index, tabs }) => ({
+        index,
+        tabs: [...tabs, channelToTab(ch)],
+      }));
     }
-    setTabIndex(tabbedChannels.length);
+    setTabbedChannels(({ tabs }) => ({
+      index: tabbedChannels.tabs.length,
+      tabs,
+    }));
   }
 
   return (
@@ -164,23 +164,29 @@ export function TreeBar() {
           channel={channel}
           key={channel.id}
           onClick={(ev) => {
-            if (tabbedChannels.length === 0) {
+            if (tabbedChannels.tabs.length === 0) {
               openNewChannel(channel);
               return;
             }
 
-            const idx = tabbedChannels.findIndex((n) =>
+            const idx = tabbedChannels.tabs.findIndex((n) =>
               n.kind === 'textChannel' ? n.channel.id === channel.id : false,
             );
             if (idx !== -1) {
-              setTabIndex(idx);
+              setTabbedChannels(({ tabs }) => ({
+                index: idx,
+                tabs,
+              }));
             } else if (ev.ctrlKey) {
               openNewChannel(channel);
             } else {
-              setTabbedChannels((xs) => {
-                const xsn = [...xs];
-                xsn[tabIndex] = channelToTab(channel);
-                return xsn;
+              setTabbedChannels(({ tabs, index }) => {
+                const xsn = [...tabs];
+                xsn[index] = channelToTab(channel);
+                return {
+                  index,
+                  tabs: xsn,
+                };
               });
             }
           }}

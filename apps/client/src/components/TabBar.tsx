@@ -6,7 +6,7 @@ import { faX } from '@fortawesome/free-solid-svg-icons';
 import { useRecoilState } from 'recoil';
 
 import { ChannelIcon } from './ChannelIcon';
-import { Tabable, tabbedChannelState, tabIndexState } from '../store';
+import { Tabable, tabbedChannelState } from '../store';
 
 const TabbedViewContainer = styled.div`
   flex: 1;
@@ -69,30 +69,33 @@ interface TabDndItem {
 }
 
 function useReorderable() {
-  const [, setTabIndex] = useRecoilState(tabIndexState);
   const [tabbedChannels, setTabbedChannels] =
     useRecoilState(tabbedChannelState);
 
   return (dragIndex: number, dropIndex: number) => {
     if (dragIndex === dropIndex) return;
 
-    const filteredTabs = [...tabbedChannels];
+    const filteredTabs = [...tabbedChannels.tabs];
     const nt = filteredTabs.splice(dragIndex, 1)[0];
 
     if (dropIndex === -1) {
-      setTabbedChannels([...filteredTabs, nt]);
-      setTabIndex(tabbedChannels.length - 1);
+      setTabbedChannels(({ tabs }) => ({
+        index: tabs.length - 1,
+        tabs: [...filteredTabs, nt],
+      }));
     } else {
       filteredTabs.splice(dropIndex, 0, nt);
-      setTabbedChannels(filteredTabs);
-      setTabIndex(dropIndex);
+      setTabbedChannels({
+        index: dropIndex,
+        tabs: filteredTabs,
+      });
     }
   };
 }
 
 function TabItem({ tab, index }: TabItemProps) {
-  const [tabIndex, setTabIndex] = useRecoilState(tabIndexState);
-  const [, setTabbedChannels] = useRecoilState(tabbedChannelState);
+  const [tabbedChannels, setTabbedChannels] =
+    useRecoilState(tabbedChannelState);
 
   const reorderFn = useReorderable();
 
@@ -109,7 +112,7 @@ function TabItem({ tab, index }: TabItemProps) {
   });
   drag(drop(ref));
 
-  const active = index === tabIndex;
+  const active = index === tabbedChannels.index;
 
   return (
     <TabItemElement
@@ -117,7 +120,7 @@ function TabItem({ tab, index }: TabItemProps) {
       key={tab.key}
       active={active}
       onClick={() => {
-        setTabIndex(index);
+        setTabbedChannels(({ tabs }) => ({ index, tabs }));
       }}
     >
       <ChannelIcon size={20} />
@@ -126,13 +129,19 @@ function TabItem({ tab, index }: TabItemProps) {
         active={active}
         onClick={(ev) => {
           ev.stopPropagation(); // close button shouldn't reset tab index
-          setTabbedChannels((xs) => {
-            const xsc = [...xs];
+          setTabbedChannels(({ tabs, index: idx }) => {
+            const xsc = [...tabs];
             xsc.splice(index, 1);
-            return xsc; // React optimizes by comparing reference
+            return {
+              index: idx,
+              tabs: xsc,
+            };
           });
-          if (index <= tabIndex) {
-            setTabIndex(Math.max(0, index - 1));
+          if (index <= tabbedChannels.index) {
+            setTabbedChannels(({ tabs }) => ({
+              index: Math.max(0, index - 1),
+              tabs,
+            }));
           }
         }}
       >

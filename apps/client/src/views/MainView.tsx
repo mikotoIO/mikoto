@@ -7,7 +7,7 @@ import { AuthRefresher } from '../components/AuthHandler';
 import { UserArea } from '../components/UserArea';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { MessageView } from './MessageView';
-import { Tabable, tabbedChannelState, tabIndexState } from '../store';
+import { Tabable, tabbedChannelState } from '../store';
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -35,7 +35,6 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
 }
 
 function AppView() {
-  const [tabIndex] = useRecoilState(tabIndexState);
   const [tabbedChannels] = useRecoilState(tabbedChannelState);
 
   return (
@@ -45,10 +44,11 @@ function AppView() {
         <UserArea />
         <TreeBar />
       </SidebarElement>
-      <TabbedView channels={tabbedChannels}>
-        {tabIndex !== null && tabIndex < tabbedChannels.length && (
-          <TabViewSwitch tab={tabbedChannels[tabIndex]} />
-        )}
+      <TabbedView channels={tabbedChannels.tabs}>
+        {tabbedChannels.index !== null &&
+          tabbedChannels.index < tabbedChannels.tabs.length && (
+            <TabViewSwitch tab={tabbedChannels.tabs[tabbedChannels.index]} />
+          )}
       </TabbedView>
     </AppContainer>
   );

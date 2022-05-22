@@ -7,11 +7,6 @@ export const treebarSpaceIdState = atom<string | null>({
   default: constants.defaultSpace,
 });
 
-export const tabIndexState = atom<number>({
-  key: 'tabIndex',
-  default: 0,
-});
-
 type TabBaseType =
   | { kind: 'textChannel'; channel: Channel }
   | { kind: 'unknown' };
@@ -21,7 +16,13 @@ export type Tabable = TabBaseType & {
   name: string;
 };
 
-export const tabbedChannelState = atom<Tabable[]>({
+export const tabbedChannelState = atom<{
+  index: number;
+  tabs: Tabable[];
+}>({
   key: 'tabbedChannels',
-  default: [],
+  default: {
+    index: 0,
+    tabs: [],
+  },
 });

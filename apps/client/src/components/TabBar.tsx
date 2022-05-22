@@ -69,22 +69,22 @@ interface TabDndItem {
 }
 
 function useReorderable() {
-  const [tabbedChannels, setTabbedChannels] = useRecoilState(tabbedState);
+  const [tabbed, setTabbed] = useRecoilState(tabbedState);
 
   return (dragIndex: number, dropIndex: number) => {
     if (dragIndex === dropIndex) return;
 
-    const filteredTabs = [...tabbedChannels.tabs];
+    const filteredTabs = [...tabbed.tabs];
     const nt = filteredTabs.splice(dragIndex, 1)[0];
 
     if (dropIndex === -1) {
-      setTabbedChannels(({ tabs }) => ({
+      setTabbed(({ tabs }) => ({
         index: tabs.length - 1,
         tabs: [...filteredTabs, nt],
       }));
     } else {
       filteredTabs.splice(dropIndex, 0, nt);
-      setTabbedChannels({
+      setTabbed({
         index: dropIndex,
         tabs: filteredTabs,
       });
@@ -93,7 +93,7 @@ function useReorderable() {
 }
 
 function TabItem({ tab, index }: TabItemProps) {
-  const [tabbedChannels, setTabbedChannels] = useRecoilState(tabbedState);
+  const [tabbed, setTabbed] = useRecoilState(tabbedState);
 
   const reorderFn = useReorderable();
 
@@ -110,7 +110,7 @@ function TabItem({ tab, index }: TabItemProps) {
   });
   drag(drop(ref));
 
-  const active = index === tabbedChannels.index;
+  const active = index === tabbed.index;
 
   return (
     <TabItemElement
@@ -118,7 +118,7 @@ function TabItem({ tab, index }: TabItemProps) {
       key={tab.key}
       active={active}
       onClick={() => {
-        setTabbedChannels(({ tabs }) => ({ index, tabs }));
+        setTabbed(({ tabs }) => ({ index, tabs }));
       }}
     >
       <ChannelIcon size={20} />
@@ -127,7 +127,7 @@ function TabItem({ tab, index }: TabItemProps) {
         active={active}
         onClick={(ev) => {
           ev.stopPropagation(); // close button shouldn't reset tab index
-          setTabbedChannels(({ tabs, index: idx }) => {
+          setTabbed(({ tabs, index: idx }) => {
             const xsc = [...tabs];
             xsc.splice(index, 1);
             return {
@@ -135,8 +135,8 @@ function TabItem({ tab, index }: TabItemProps) {
               tabs: xsc,
             };
           });
-          if (index <= tabbedChannels.index) {
-            setTabbedChannels(({ tabs }) => ({
+          if (index <= tabbed.index) {
+            setTabbed(({ tabs }) => ({
               index: Math.max(0, index - 1),
               tabs,
             }));

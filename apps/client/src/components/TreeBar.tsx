@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import React from 'react';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useForm } from '@mantine/form';
 import { Button, TextInput } from '@mantine/core';
 
@@ -10,7 +10,7 @@ import { useMikoto } from '../api';
 import { useSocketIO } from '../hooks/useSocketIO';
 import { ChannelIcon } from './ChannelIcon';
 import { useDelta } from '../hooks';
-import { Tabable, tabbedState, treebarSpaceIdState } from '../store';
+import { Tabable, treebarSpaceIdState, useTabkit } from '../store';
 
 export const TreeContainer = styled.div`
   margin: 0;
@@ -119,7 +119,7 @@ function channelToTab(channel: Channel): Tabable {
 
 export function TreeBar() {
   const spaceId = useRecoilValue(treebarSpaceIdState);
-  const [tabbed, setTabbed] = useRecoilState(tabbedState);
+  const tabkit = useTabkit();
 
   const mikoto = useMikoto();
 
@@ -139,23 +139,6 @@ export function TreeBar() {
 
   const contextMenu = useContextMenu(() => <TreebarContextMenu />);
 
-  function openNewChannel(ch: Channel) {
-    if (
-      !tabbed.tabs.some((x) =>
-        x.kind === 'textChannel' ? x.channel.id === ch.id : false,
-      )
-    ) {
-      setTabbed(({ index, tabs }) => ({
-        index,
-        tabs: [...tabs, channelToTab(ch)],
-      }));
-    }
-    setTabbed(({ tabs }) => ({
-      index: tabbed.tabs.length,
-      tabs,
-    }));
-  }
-
   return (
     <TreeContainer onContextMenu={contextMenu}>
       {channelDelta.data.map((channel) => (
@@ -163,31 +146,7 @@ export function TreeBar() {
           channel={channel}
           key={channel.id}
           onClick={(ev) => {
-            if (tabbed.tabs.length === 0) {
-              openNewChannel(channel);
-              return;
-            }
-
-            const idx = tabbed.tabs.findIndex((n) =>
-              n.kind === 'textChannel' ? n.channel.id === channel.id : false,
-            );
-            if (idx !== -1) {
-              setTabbed(({ tabs }) => ({
-                index: idx,
-                tabs,
-              }));
-            } else if (ev.ctrlKey) {
-              openNewChannel(channel);
-            } else {
-              setTabbed(({ tabs, index }) => {
-                const xsn = [...tabs];
-                xsn[index] = channelToTab(channel);
-                return {
-                  index,
-                  tabs: xsn,
-                };
-              });
-            }
+            tabkit.openTab(channelToTab(channel), ev.ctrlKey);
           }}
         />
       ))}

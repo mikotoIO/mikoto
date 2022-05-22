@@ -1,4 +1,4 @@
-import { atom } from 'recoil';
+import { atom, useRecoilState } from 'recoil';
 import constants from '../constants';
 import { Channel } from '../models';
 
@@ -26,3 +26,51 @@ export const tabbedState = atom<{
     tabs: [],
   },
 });
+
+export function useTabkit() {
+  const [tabbed, setTabbed] = useRecoilState(tabbedState);
+
+  function openNewChannel(ch: Tabable) {
+    if (!tabbed.tabs.some((x) => x.kind === ch.kind && x.key === ch.key)) {
+      setTabbed(({ index, tabs }) => ({
+        index,
+        tabs: [...tabs, ch],
+      }));
+    }
+    setTabbed(({ tabs }) => ({
+      index: tabbed.tabs.length,
+      tabs,
+    }));
+  }
+
+  return {
+    openNewChannel,
+    openTab(tab: Tabable, openNew: boolean) {
+      if (tabbed.tabs.length === 0) {
+        openNewChannel(tab);
+        return;
+      }
+
+      const idx = tabbed.tabs.findIndex(
+        (n) => n.kind === tab.kind && n.key === tab.key,
+      );
+      if (idx !== -1) {
+        setTabbed(({ tabs }) => ({
+          index: idx,
+          tabs,
+        }));
+      } else if (openNew) {
+        openNewChannel(tab);
+      } else {
+        setTabbed(({ tabs, index }) => {
+          const xsn = [...tabs];
+          xsn[index] = tab;
+          return {
+            index,
+            tabs: xsn,
+          };
+        });
+      }
+    },
+  };
+}

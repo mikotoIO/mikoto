@@ -8,6 +8,7 @@ import { UserArea } from '../components/UserArea';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { MessageView } from './MessageView';
 import { Tabable, tabbedState } from '../store';
+import { SpaceSettingsView } from './SpaceSettingsView';
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -29,6 +30,8 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
   switch (tab.kind) {
     case 'textChannel':
       return <MessageView channel={tab.channel} />;
+    case 'spaceSettings':
+      return <SpaceSettingsView space={tab.space} />;
     default:
       return null;
   }

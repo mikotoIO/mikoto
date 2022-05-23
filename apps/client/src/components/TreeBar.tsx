@@ -8,7 +8,7 @@ import { Channel } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { useMikoto } from '../api';
 import { useSocketIO } from '../hooks/useSocketIO';
-import { ChannelIcon } from './ChannelIcon';
+import { TabIcon } from './TabIcon';
 import { useDelta } from '../hooks';
 import { Tabable, treebarSpaceIdState, useTabkit } from '../store';
 
@@ -56,7 +56,7 @@ export function TreeNode({ channel, ...props }: TreeNodeProps) {
 
   return (
     <TreeNodeElement {...props} onContextMenu={menu}>
-      <ChannelIcon />
+      <TabIcon />
       {channel.name}
     </TreeNodeElement>
   );

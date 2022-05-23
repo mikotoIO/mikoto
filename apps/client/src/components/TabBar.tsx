@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faX } from '@fortawesome/free-solid-svg-icons';
 import { useRecoilState } from 'recoil';
 
-import { ChannelIcon } from './ChannelIcon';
+import { getTabIcon, TabIcon } from './TabIcon';
 import { Tabable, tabbedState } from '../store';
 
 const TabbedViewContainer = styled.div`
@@ -121,7 +121,7 @@ function TabItem({ tab, index }: TabItemProps) {
         setTabbed(({ tabs }) => ({ index, tabs }));
       }}
     >
-      <ChannelIcon size={20} />
+      <TabIcon size={20} icon={getTabIcon(tab)} />
       <div>{tab.name}</div>
       <CloseButton
         active={active}

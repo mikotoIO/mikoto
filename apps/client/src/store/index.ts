@@ -1,6 +1,6 @@
 import { atom, useRecoilState } from 'recoil';
 import constants from '../constants';
-import { Channel } from '../models';
+import { Channel, Space } from '../models';
 
 export const treebarSpaceIdState = atom<string | null>({
   key: 'treebarSpaceId',
@@ -9,6 +9,7 @@ export const treebarSpaceIdState = atom<string | null>({
 
 type TabBaseType =
   | { kind: 'textChannel'; channel: Channel }
+  | { kind: 'spaceSettings'; space: Space }
   | { kind: 'unknown' };
 
 export type Tabable = TabBaseType & {

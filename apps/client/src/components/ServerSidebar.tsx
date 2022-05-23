@@ -9,7 +9,7 @@ import { Space } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { useDelta } from '../hooks';
 import { useSocketIO } from '../hooks/useSocketIO';
-import { treebarSpaceIdState } from '../store';
+import { treebarSpaceIdState, useTabkit } from '../store';
 
 const ServerSidebarBase = styled.div`
   display: flex;
@@ -40,8 +40,25 @@ function ServerIconContextMenu({
   destroy: () => void;
 }) {
   const mikoto = useMikoto();
+  const tabkit = useTabkit();
   return (
     <ContextMenu>
+      <ContextMenu.Link
+        onClick={async () => {
+          tabkit.openTab(
+            {
+              kind: 'spaceSettings',
+              name: `Settings: ${space.name}`,
+              key: space.id,
+              space,
+            },
+            true,
+          );
+          destroy();
+        }}
+      >
+        Space Settings
+      </ContextMenu.Link>
       <ContextMenu.Link
         onClick={async () => {
           destroy();

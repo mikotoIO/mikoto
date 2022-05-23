@@ -1,19 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
+
 import { useMikoto } from '../api';
 import { Channel, Message } from '../models';
 import { useSocketIO } from '../hooks/useSocketIO';
 import MessageItem from '../components/Message';
 import { MessageInput } from '../components/MessageInput';
 import { useDelta } from '../hooks';
-
-const ViewContainer = styled.div`
-  flex: 1;
-  background-color: ${(p) => p.theme.colors.N800};
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-`;
+import { ViewContainer } from '../components/ViewContainer';
 
 const Messages = styled.div`
   overflow-y: auto;

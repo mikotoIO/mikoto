@@ -35,7 +35,7 @@ export class AccountController {
 
   private async createTokenPair(account: User, oldToken?: string) {
     const accessToken = jwt.sign({}, process.env.SECRET!, {
-      expiresIn: '1d',
+      expiresIn: '1h',
       subject: account.id,
     });
     const refreshToken = await generateRandomToken();

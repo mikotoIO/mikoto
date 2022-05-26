@@ -9,7 +9,7 @@ import { Space } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { useDelta } from '../hooks';
 import { useSocketIO } from '../hooks/useSocketIO';
-import { treebarSpaceIdState, useTabkit } from '../store';
+import { treebarSpaceState, useTabkit } from '../store';
 
 const ServerSidebarBase = styled.div`
   display: flex;
@@ -72,7 +72,7 @@ function ServerIconContextMenu({
 }
 
 function ServerIcon({ space }: { space: Space }) {
-  const [, setSpaceId] = useRecoilState(treebarSpaceIdState);
+  const [, setSpace] = useRecoilState(treebarSpaceState);
 
   const ref = useRef<HTMLDivElement>(null);
   const isHover = useHover(ref);
@@ -86,7 +86,7 @@ function ServerIcon({ space }: { space: Space }) {
         onContextMenu={contextMenu}
         ref={ref}
         onClick={() => {
-          setSpaceId(space.id);
+          setSpace(space);
         }}
       >
         {space.name[0]}

@@ -6,11 +6,10 @@ import { Button, TextInput } from '@mantine/core';
 
 import { Channel } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
-import { useMikoto } from '../api';
-import { useSocketIO } from '../hooks/useSocketIO';
+import { ClientSpace, useMikoto } from '../api';
 import { TabIcon } from './TabIcon';
-import { useDelta } from '../hooks';
-import { Tabable, treebarSpaceIdState, useTabkit } from '../store';
+import { useDeltaEngine } from '../hooks';
+import { Tabable, treebarSpaceState, useTabkit } from '../store';
 
 export const TreeContainer = styled.div`
   margin: 0;
@@ -65,7 +64,7 @@ export function TreeNode({ channel, ...props }: TreeNodeProps) {
 function CreateChannelModal() {
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
-  const spaceId = useRecoilValue(treebarSpaceIdState);
+  const space = useRecoilValue(treebarSpaceState);
   const form = useForm({
     initialValues: {
       channelName: '',
@@ -75,7 +74,7 @@ function CreateChannelModal() {
   return (
     <form
       onSubmit={form.onSubmit(async () => {
-        await mikoto.createChannel(spaceId!, form.values.channelName);
+        await mikoto.createChannel(space?.id!, form.values.channelName);
         setModal(null);
         form.reset();
       })}
@@ -118,24 +117,13 @@ function channelToTab(channel: Channel): Tabable {
 }
 
 export function TreeBar() {
-  const spaceId = useRecoilValue(treebarSpaceIdState);
+  const space = useRecoilValue(treebarSpaceState);
   const tabkit = useTabkit();
-
   const mikoto = useMikoto();
 
-  const channelDelta = useDelta<Channel>(
-    {
-      initializer: () => mikoto.getChannels(spaceId!),
-      predicate: (x) => x.spaceId === spaceId,
-    },
-    [spaceId],
-  );
-  useSocketIO<Channel>(mikoto.io, 'channelCreate', channelDelta.create, [
-    spaceId,
-  ]);
-  useSocketIO<Channel>(mikoto.io, 'channelDelete', channelDelta.delete, [
-    spaceId,
-  ]);
+  const mSpace = new ClientSpace(mikoto, space!);
+
+  const channelDelta = useDeltaEngine(mSpace.channels, [space?.id!]);
 
   const contextMenu = useContextMenu(() => <TreebarContextMenu />);
 

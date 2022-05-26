@@ -4,6 +4,40 @@ import React, { useContext } from 'react';
 import { Channel, Message, Space, User } from '../models';
 import { DeltaEngine } from './deltaEngine';
 
+export class ChannelEngine implements DeltaEngine<Channel> {
+  constructor(private client: MikotoApi, private spaceId: string) {}
+
+  async fetch(): Promise<Channel[]> {
+    return this.client.getChannels(this.spaceId);
+  }
+
+  offCreate(fn: (item: Channel) => void): void {
+    this.client.io.off('channelCreate', fn);
+  }
+
+  offDelete(fn: (item: Channel) => void): void {
+    this.client.io.off('channelCreate', fn);
+  }
+
+  onCreate(fn: (item: Channel) => void): (item: Channel) => void {
+    const fnx = (item: Channel) => {
+      if (item.spaceId !== this.spaceId) return;
+      fn(item);
+    };
+    this.client.io.on('channelCreate', fnx);
+    return fnx;
+  }
+
+  onDelete(fn: (item: Channel) => void): (item: Channel) => void {
+    const fnx = (item: Channel) => {
+      if (item.spaceId !== this.spaceId) return;
+      fn(item);
+    };
+    this.client.io.on('channelDelete', fnx);
+    return fnx;
+  }
+}
+
 export class MessageEngine implements DeltaEngine<Message> {
   constructor(private client: MikotoApi, private channelId: string) {}
 
@@ -35,6 +69,18 @@ export class MessageEngine implements DeltaEngine<Message> {
     };
     this.client.io.on('messageDelete', fnx);
     return fnx;
+  }
+}
+
+export class ClientSpace implements Space {
+  id: string;
+  name: string;
+  channels: ChannelEngine;
+
+  constructor(private client: MikotoApi, base: Space) {
+    this.id = base.id;
+    this.name = base.name;
+    this.channels = new ChannelEngine(client, this.id);
   }
 }
 

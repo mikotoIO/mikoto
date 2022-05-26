@@ -1,12 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { useMikoto } from '../api';
+import { ClientChannel, useMikoto } from '../api';
 import { Channel, Message } from '../models';
-import { useSocketIO } from '../hooks/useSocketIO';
 import MessageItem from '../components/Message';
 import { MessageInput } from '../components/MessageInput';
-import { useDelta } from '../hooks';
+import { useDeltaEngine } from '../hooks';
 import { ViewContainer } from '../components/ViewContainer';
 
 const Messages = styled.div`
@@ -38,19 +37,8 @@ export function MessageView({ channel }: MessageViewProps) {
     }
   });
 
-  const messageDelta = useDelta<Message>(
-    {
-      initializer: () => mikoto.getMessages(channel.id),
-      predicate: (x) => x.channelId === channel.id,
-    },
-    [channel.id],
-  );
-  useSocketIO<Message>(mikoto.io, 'messageCreate', messageDelta.create, [
-    channel.id,
-  ]);
-  useSocketIO<Message>(mikoto.io, 'messageDelete', messageDelta.delete, [
-    channel.id,
-  ]);
+  const mChannel = new ClientChannel(mikoto, channel);
+  const messageDelta = useDeltaEngine(mChannel.messages, [channel.id]);
 
   const messages = messageDelta.data;
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DeltaEngine } from '../api/deltaEngine';
 
 interface ObjectWithId {
   id: string;
@@ -7,6 +8,33 @@ interface ObjectWithId {
 interface UseDelta<T extends ObjectWithId> {
   initializer(): Promise<T[]>;
   predicate(x: T): boolean;
+}
+
+export function useDeltaEngine<T extends ObjectWithId>(
+  engine: DeltaEngine<T>,
+  deps: React.DependencyList,
+) {
+  const [data, setData] = useState<T[]>([]);
+  React.useEffect(() => {
+    engine.fetch().then(setData);
+  }, deps);
+
+  React.useEffect(() => {
+    const createFn = engine.onCreate((x) => {
+      setData((xs) => [...xs, x]);
+    });
+    const deleteFn = engine.onDelete((y) => {
+      setData((xs) => xs.filter((x) => x.id !== y.id));
+    });
+    return () => {
+      engine.offCreate(createFn);
+      engine.offDelete(deleteFn);
+    };
+  }, deps);
+
+  return {
+    data,
+  };
 }
 
 export function useDelta<T extends ObjectWithId>(

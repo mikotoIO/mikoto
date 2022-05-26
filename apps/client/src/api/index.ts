@@ -2,6 +2,55 @@ import axios, { AxiosInstance } from 'axios';
 import { Socket, io } from 'socket.io-client';
 import React, { useContext } from 'react';
 import { Channel, Message, Space, User } from '../models';
+import { DeltaEngine } from './deltaEngine';
+
+export class MessageEngine implements DeltaEngine<Message> {
+  constructor(private client: MikotoApi, private channelId: string) {}
+
+  async fetch(): Promise<Message[]> {
+    return this.client.getMessages(this.channelId);
+  }
+
+  offCreate(fn: (item: Message) => void): void {
+    this.client.io.off('messageCreate', fn);
+  }
+
+  offDelete(fn: (item: Message) => void): void {
+    this.client.io.off('messageDelete', fn);
+  }
+
+  onCreate(fn: (item: Message) => void): (item: Message) => void {
+    const fnx = (item: Message) => {
+      if (item.channelId !== this.channelId) return;
+      fn(item);
+    };
+    this.client.io.on('messageCreate', fnx);
+    return fnx;
+  }
+
+  onDelete(fn: (item: Message) => void): (item: Message) => void {
+    const fnx = (item: Message) => {
+      if (item.channelId !== this.channelId) return;
+      fn(item);
+    };
+    this.client.io.on('messageDelete', fnx);
+    return fnx;
+  }
+}
+
+export class ClientChannel implements Channel {
+  id: string;
+  name: string;
+  spaceId: string;
+  messages: MessageEngine;
+
+  constructor(private client: MikotoApi, base: Channel) {
+    this.id = base.id;
+    this.name = base.name;
+    this.spaceId = base.spaceId;
+    this.messages = new MessageEngine(client, this.id);
+  }
+}
 
 export default class MikotoApi {
   axios: AxiosInstance;

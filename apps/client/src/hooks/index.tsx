@@ -1,4 +1,4 @@
-import { useDelta } from './useDelta';
+import { useDelta, useDeltaEngine } from './useDelta';
 import { useInterval } from './useInterval';
 
-export { useInterval, useDelta };
+export { useInterval, useDelta, useDeltaEngine };

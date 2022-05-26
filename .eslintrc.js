@@ -4,6 +4,8 @@ module.exports = {
     project: './tsconfig.json',
   },
   rules: {
+    'max-classes-per-file': 0,
+    '@typescript-eslint/lines-between-class-members': 'off',
     'react/react-in-jsx-scope': 'off',
     'react/jsx-no-constructed-context-values': 'off',
     'react/no-unstable-nested-components': 'off',

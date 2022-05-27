@@ -8,7 +8,6 @@ import { useMikoto } from '../api';
 import { Space } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { useDelta } from '../hooks';
-import { useSocketIO } from '../hooks/useSocketIO';
 import { treebarSpaceState, useTabkit } from '../store';
 
 const ServerSidebarBase = styled.div`
@@ -86,6 +85,8 @@ function ServerIcon({ space }: { space: Space }) {
         onContextMenu={contextMenu}
         ref={ref}
         onClick={() => {
+          console.log('what breaks setspace lmao');
+          console.log(space);
           setSpace(space);
         }}
       >
@@ -155,8 +156,8 @@ export function ServerSidebar() {
     [],
   );
 
-  useSocketIO<Space>(mikoto.io, 'spaceCreate', spaceDelta.create, []);
-  useSocketIO<Space>(mikoto.io, 'spaceDelete', spaceDelta.delete, []);
+  // useSocketIO<Space>(mikoto.io, 'spaceCreate', spaceDelta.create, []);
+  // useSocketIO<Space>(mikoto.io, 'spaceDelete', spaceDelta.delete, []);
 
   const spaces = spaceDelta.data;
   const contextMenu = useContextMenu(() => <ServerSidebarContextMenu />);

@@ -6,7 +6,7 @@ import { Button, TextInput } from '@mantine/core';
 
 import { Channel } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
-import { ClientSpace, useMikoto } from '../api';
+import { ClientChannel, ClientSpace, useMikoto } from '../api';
 import { TabIcon } from './TabIcon';
 import { useDeltaEngine } from '../hooks';
 import { Tabable, treebarSpaceState, useTabkit } from '../store';
@@ -112,7 +112,7 @@ function channelToTab(channel: Channel): Tabable {
     kind: 'textChannel',
     key: channel.id,
     name: channel.name,
-    channel,
+    channel: channel instanceof ClientChannel ? channel.simplify() : channel,
   };
 }
 

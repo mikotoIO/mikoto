@@ -59,7 +59,6 @@ export function AuthRefresher({ children }: { children?: React.ReactNode }) {
     }
     const r = jwtDecode<{ exp: number }>(authToken.accessToken);
     const secondsUntilExpiry = r.exp - Date.now() / 1000;
-    console.log(secondsUntilExpiry);
 
     if (secondsUntilExpiry <= 6000) {
       const newToken = await refresh(authToken);

@@ -2,7 +2,8 @@ import axios, { AxiosInstance } from 'axios';
 import { Socket, io } from 'socket.io-client';
 import React, { useContext } from 'react';
 import { Channel, Message, Space, User } from '../models';
-import { DeltaEngine } from './deltaEngine';
+import { DeltaEngine, DeltaEngineX } from './deltaEngine';
+import { MikotoCache } from './cache';
 
 export class ChannelEngine implements DeltaEngine<Channel> {
   constructor(private client: MikotoApi, private spaceId: string) {}
@@ -38,37 +39,13 @@ export class ChannelEngine implements DeltaEngine<Channel> {
   }
 }
 
-export class MessageEngine implements DeltaEngine<Message> {
-  constructor(private client: MikotoApi, private channelId: string) {}
+export class MessageEngine extends DeltaEngineX<Message> {
+  constructor(private client: MikotoApi, private channelId: string) {
+    super();
+  }
 
   async fetch(): Promise<Message[]> {
     return this.client.getMessages(this.channelId);
-  }
-
-  offCreate(fn: (item: Message) => void): void {
-    this.client.io.off('messageCreate', fn);
-  }
-
-  offDelete(fn: (item: Message) => void): void {
-    this.client.io.off('messageDelete', fn);
-  }
-
-  onCreate(fn: (item: Message) => void): (item: Message) => void {
-    const fnx = (item: Message) => {
-      if (item.channelId !== this.channelId) return;
-      fn(item);
-    };
-    this.client.io.on('messageCreate', fnx);
-    return fnx;
-  }
-
-  onDelete(fn: (item: Message) => void): (item: Message) => void {
-    const fnx = (item: Message) => {
-      if (item.channelId !== this.channelId) return;
-      fn(item);
-    };
-    this.client.io.on('messageDelete', fnx);
-    return fnx;
   }
 }
 
@@ -96,12 +73,23 @@ export class ClientChannel implements Channel {
     this.spaceId = base.spaceId;
     this.messages = new MessageEngine(client, this.id);
   }
+
+  simplify(): Channel {
+    return {
+      id: this.id,
+      name: this.name,
+      spaceId: this.spaceId,
+    };
+  }
 }
 
 export default class MikotoApi {
   axios: AxiosInstance;
-
   io!: Socket;
+
+  // cache everything
+  spaceCache: MikotoCache<Space> = new MikotoCache<Space>();
+  channelCache: MikotoCache<ClientChannel> = new MikotoCache<ClientChannel>();
 
   constructor(url: string) {
     this.axios = axios.create({
@@ -110,6 +98,20 @@ export default class MikotoApi {
     this.io = io(url);
     this.io.on('connect', () => {
       console.log('socket live!');
+    });
+
+    this.io.on('messageCreate', (message: Message) => {
+      const ch = this.channelCache.get(message.channelId);
+      if (ch) {
+        ch.messages.emit('create', message);
+      }
+    });
+
+    this.io.on('messageDelete', (message: Message) => {
+      const ch = this.channelCache.get(message.channelId);
+      if (ch) {
+        ch.messages.emit('delete', message);
+      }
     });
   }
 
@@ -121,11 +123,21 @@ export default class MikotoApi {
   }
 
   // region Channels
-  async getChannels(spaceId: string): Promise<Channel[]> {
+
+  // TODO: this is to be removed at a later point, use suspense
+  getChannel_CACHED(channelId: string): ClientChannel {
+    const channel = this.channelCache.get(channelId);
+    if (!channel) throw new Error('derp');
+    return channel;
+  }
+
+  async getChannels(spaceId: string): Promise<ClientChannel[]> {
     const { data } = await this.axios.get<Channel[]>(
       `/spaces/${spaceId}/channels`,
     );
-    return data;
+    const channels = data.map((x) => new ClientChannel(this, x));
+    channels.forEach((x) => this.channelCache.set(x));
+    return channels;
   }
 
   async createChannel(spaceId: string, name: string): Promise<Channel> {

@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { ClientChannel, useMikoto } from '../api';
+import { useMikoto } from '../api';
 import { Channel, Message } from '../models';
 import MessageItem from '../components/Message';
 import { MessageInput } from '../components/MessageInput';
 import { ViewContainer } from '../components/ViewContainer';
-import { useDeltaX } from '../hooks/useDelta';
+import { useDelta } from '../hooks/useDelta';
 
 const Messages = styled.div`
   overflow-y: auto;
@@ -38,7 +38,7 @@ export function MessageView({ channel }: MessageViewProps) {
   });
 
   const mChannel = mikoto.getChannel_CACHED(channel.id);
-  const messageDelta = useDeltaX(mChannel.messages, [channel.id]);
+  const messageDelta = useDelta(mChannel.messages, [channel.id]);
 
   const messages = messageDelta.data;
 

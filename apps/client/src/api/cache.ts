@@ -29,4 +29,8 @@ export class MikotoCache<T extends ObjectWithID> {
   first(): string {
     return this.cache.keys().next().value;
   }
+
+  delete(key: string) {
+    this.cache.delete(key);
+  }
 }

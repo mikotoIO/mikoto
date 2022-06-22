@@ -9567,6 +9567,11 @@ react-aspect-ratio@^1.0.50, react-aspect-ratio@^1.1.2:
   resolved "https://registry.yarnpkg.com/react-aspect-ratio/-/react-aspect-ratio-1.1.2.tgz#a65c7ba9862dc31fcd7b6ac33f1c70beb53b8bad"
   integrity sha512-76dAnSGn00jV2uOVOr2CPgAIgMyRv272qXwQ3JRR6Mt1qkeKSCax9nE19lx3tMTVgKQARHm6pXL7BcUg7cBQbw==
 
+react-async-hook@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/react-async-hook/-/react-async-hook-4.0.0.tgz#1f0467586654e1f33b7433bd98c300a0c5f9b3d0"
+  integrity sha512-97lgjFkOcHCTYSrsKBpsXg3iVWM0LnzedB749iP76sb3/8Ouu4nHIkCLEOrQWHVYqrYxjF05NN6GHoXWFkB3Kw==
+
 react-autosize-textarea@^7.1.0:
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/react-autosize-textarea/-/react-autosize-textarea-7.1.0.tgz#902c84fc395a689ca3a484dfb6bc2be9ba3694d1"
@@ -9631,6 +9636,13 @@ react-dom@^18.0.0:
   dependencies:
     loose-envify "^1.1.0"
     scheduler "^0.21.0"
+
+react-error-boundary@^3.1.4:
+  version "3.1.4"
+  resolved "https://registry.yarnpkg.com/react-error-boundary/-/react-error-boundary-3.1.4.tgz#255db92b23197108757a888b01e5b729919abde0"
+  integrity sha512-uM9uPzZJTF6wRQORmSrvOIgt4lJ9MC1sNgEOj2XGsDTRE4kmpWxg7ENK9EWNKJRMAOY9z0MuF4yIfl6gp4sotA==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
 
 react-error-overlay@^6.0.11:
   version "6.0.11"

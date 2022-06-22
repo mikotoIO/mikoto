@@ -80,6 +80,23 @@ export default class MikotoApi {
         ch.messages.emit('delete', message);
       }
     });
+
+    this.io.on('channelCreate', (data: Channel) => {
+      console.log(this.spaceCache);
+      const sp = this.spaceCache.get(data.spaceId);
+      if (sp) {
+        console.log('chantest2');
+        sp.channels.emit('create', this.newChannel(data));
+      }
+    });
+
+    this.io.on('channelDelete', (data: Channel) => {
+      const sp = this.spaceCache.get(data.spaceId);
+      if (sp) {
+        this.channelCache.delete(data.id);
+        sp.channels.emit('delete', new ClientChannel(this, data));
+      }
+    });
   }
 
   updateAccessToken(token: string) {
@@ -89,22 +106,32 @@ export default class MikotoApi {
     });
   }
 
-  // region Channels
+  newChannel(data: Channel): ClientChannel {
+    const ch = new ClientChannel(this, data);
+    this.channelCache.set(ch);
+    return ch;
+  }
 
-  // TODO: this is to be removed at a later point, use suspense
-  getChannel_CACHED(channelId: string): ClientChannel {
-    const channel = this.channelCache.get(channelId);
-    if (!channel) throw new Error('derp');
-    return channel;
+  newSpace(data: Space): ClientSpace {
+    const o = new ClientSpace(this, data);
+    this.spaceCache.set(o);
+    return o;
+  }
+
+  // region Channels
+  async getChannel(channelId: string): Promise<ClientChannel> {
+    const cached = this.channelCache.get(channelId);
+    if (cached) return cached;
+
+    const { data } = await this.axios.get<Channel>(`/channels/${channelId}`);
+    return this.newChannel(data);
   }
 
   async getChannels(spaceId: string): Promise<ClientChannel[]> {
     const { data } = await this.axios.get<Channel[]>(
       `/spaces/${spaceId}/channels`,
     );
-    const channels = data.map((x) => new ClientChannel(this, x));
-    channels.forEach((x) => this.channelCache.set(x));
-    return channels;
+    return data.map((x) => this.newChannel(x));
   }
 
   async createChannel(spaceId: string, name: string): Promise<ClientChannel> {
@@ -112,9 +139,7 @@ export default class MikotoApi {
       spaceId,
       name,
     });
-    const channel = new ClientChannel(this, data);
-    this.channelCache.set(channel);
-    return channel;
+    return this.newChannel(data);
   }
 
   async deleteChannel(channelId: string): Promise<ClientChannel> {
@@ -158,6 +183,13 @@ export default class MikotoApi {
   // endregion
 
   // region Spaces
+  async getSpace(spaceId: string) {
+    const cached = this.spaceCache.get(spaceId);
+    if (cached) return cached;
+    const { data } = await this.axios.get<Space>(`/spaces/${spaceId}`);
+    return this.newSpace(data);
+  }
+
   getSpace_CACHED(spaceId: string): ClientSpace {
     const space = this.spaceCache.get(spaceId);
     if (!space) throw new Error('derp');

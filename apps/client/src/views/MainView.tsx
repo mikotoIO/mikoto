@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useRecoilValue } from 'recoil';
+import { ErrorBoundary } from 'react-error-boundary';
 import { TreeBar } from '../components/TreeBar';
 import { TabbedView } from '../components/TabBar';
 import { AuthRefresher } from '../components/AuthHandler';
 import { UserArea } from '../components/UserArea';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { MessageView } from './MessageView';
-import { Tabable, tabbedState } from '../store';
+import { Tabable, tabbedState, treebarSpaceState } from '../store';
 import { SpaceSettingsView } from './SpaceSettingsView';
+import { ClientSpace, useMikoto } from '../api';
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -26,6 +28,12 @@ const SidebarElement = styled.div`
   height: 100%;
 `;
 
+function ErrorBoundaryPage({ children }: { children: React.ReactNode }) {
+  return (
+    <ErrorBoundary fallback={<div>lol error</div>}>{children}</ErrorBoundary>
+  );
+}
+
 function TabViewSwitch({ tab }: { tab: Tabable }) {
   switch (tab.kind) {
     case 'textChannel':
@@ -40,17 +48,28 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
 function AppView() {
   const tabbed = useRecoilValue(tabbedState);
 
+  const spaceVal = useRecoilValue(treebarSpaceState);
+  const [space, setSpace] = useState<ClientSpace | null>(null);
+  const mikoto = useMikoto();
+  useEffect(() => {
+    if (spaceVal) {
+      mikoto.getSpace(spaceVal.id).then((x) => setSpace(x));
+    }
+  }, [spaceVal?.id]);
+
   return (
     <AppContainer>
       <ServerSidebar />
       <SidebarElement>
         <UserArea />
-        <TreeBar />
+        {space && <TreeBar space={space} />}
       </SidebarElement>
       <TabbedView tabs={tabbed.tabs}>
-        {tabbed.index !== null && tabbed.index < tabbed.tabs.length && (
-          <TabViewSwitch tab={tabbed.tabs[tabbed.index]} />
-        )}
+        <ErrorBoundaryPage>
+          {tabbed.index !== null && tabbed.index < tabbed.tabs.length && (
+            <TabViewSwitch tab={tabbed.tabs[tabbed.index]} />
+          )}
+        </ErrorBoundaryPage>
       </TabbedView>
     </AppContainer>
   );

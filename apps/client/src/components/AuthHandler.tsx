@@ -61,6 +61,7 @@ export function AuthRefresher({ children }: { children?: React.ReactNode }) {
     const secondsUntilExpiry = r.exp - Date.now() / 1000;
 
     if (secondsUntilExpiry <= 6000) {
+      console.log('refreshing...');
       const newToken = await refresh(authToken);
       setAuthToken(newToken);
       mikoto.updateAccessToken(newToken.accessToken);

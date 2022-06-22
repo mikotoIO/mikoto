@@ -116,15 +116,10 @@ function channelToTab(channel: Channel): Tabable {
   };
 }
 
-export function TreeBar() {
-  const space = useRecoilValue(treebarSpaceState);
+export function TreeBar({ space }: { space: ClientSpace }) {
   const tabkit = useTabkit();
-  const mikoto = useMikoto();
 
-  const mSpace = new ClientSpace(mikoto, space!);
-
-  const channelDelta = useDelta(mSpace.channels, [space?.id!]);
-
+  const channelDelta = useDelta(space.channels, [space?.id!]);
   const contextMenu = useContextMenu(() => <TreebarContextMenu />);
 
   return (

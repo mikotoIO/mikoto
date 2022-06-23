@@ -7,4 +7,7 @@ COPY ["package.json", "yarn.lock", "./"]
 RUN yarn
 
 COPY . .
-CMD ["yarn", "start"]
+RUN prisma generate
+RUN tsc
+
+CMD ["node", "./dist"]

@@ -11,7 +11,7 @@ on:
 
 env:
   # Use docker.io for Docker Hub if empty
-  REGISTRY: ghcr.io
+  REGISTRY: ghcr.io/mikotoIO
   # github.repository as <account>/<repo>
   IMAGE_NAME: mikoto-server
 

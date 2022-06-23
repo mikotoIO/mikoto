@@ -1,12 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useAsync } from 'react-async-hook';
 
 import { ClientChannel, useMikoto } from '../api';
 import { Channel, Message } from '../models';
 import MessageItem from '../components/Message';
 import { MessageInput } from '../components/MessageInput';
 import { ViewContainer } from '../components/ViewContainer';
-import { useDeltaX } from '../hooks/useDelta';
+import { useDelta } from '../hooks/useDelta';
 
 const Messages = styled.div`
   overflow-y: auto;
@@ -27,18 +28,16 @@ function isMessageSimple(message: Message, prevMessage: Message) {
   );
 }
 
-export function MessageView({ channel }: MessageViewProps) {
-  const mikoto = useMikoto();
-
+function RealMessageView({ channel }: { channel: ClientChannel }) {
   const ref = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     if (ref.current) {
       ref.current.scrollTop = ref.current.scrollHeight;
     }
   });
+  const mikoto = useMikoto();
 
-  const mChannel = mikoto.getChannel_CACHED(channel.id);
-  const messageDelta = useDeltaX(mChannel.messages, [channel.id]);
+  const messageDelta = useDelta(channel.messages, [channel.id]);
 
   const messages = messageDelta.data;
 
@@ -61,4 +60,16 @@ export function MessageView({ channel }: MessageViewProps) {
       />
     </ViewContainer>
   );
+}
+
+export function MessageView({ channel }: MessageViewProps) {
+  const mikoto = useMikoto();
+  const { result: mChannel, error } = useAsync(
+    (id: string) => mikoto.getChannel(id),
+    [channel.id],
+  );
+  if (error) throw error;
+  if (!mChannel) return <div>loading</div>;
+
+  return <RealMessageView channel={mChannel} />;
 }

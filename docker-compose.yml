@@ -1,4 +1,12 @@
 services:
+  crdb:
+    image: cockroachdb/cockroach:v22.1.2
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+    command: start-single-node --insecure
+    volumes:
+      - "./data/cockroach:/cockroach/cockroach-data"
   minio:
     image: minio/minio
     command: server --console-address ":9001" /data

@@ -32,7 +32,7 @@ To browse/edit the Database run the following command:
 
 ```
 cd apps/server
-yarn studio
+prisma studio
 ```
 
 ### Build

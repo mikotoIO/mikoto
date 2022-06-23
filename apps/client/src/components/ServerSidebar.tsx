@@ -4,11 +4,11 @@ import React, { useRef } from 'react';
 import { Button, TextInput, Tooltip } from '@mantine/core';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useForm } from '@mantine/form';
-import { useMikoto } from '../api';
+import { ClientSpace, useMikoto } from '../api';
 import { Space } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
-import { useDelta } from '../hooks';
 import { treebarSpaceState, useTabkit } from '../store';
+import { useDelta } from '../hooks/useDelta';
 
 const ServerSidebarBase = styled.div`
   display: flex;
@@ -85,9 +85,7 @@ function ServerIcon({ space }: { space: Space }) {
         onContextMenu={contextMenu}
         ref={ref}
         onClick={() => {
-          console.log('what breaks setspace lmao');
-          console.log(space);
-          setSpace(space);
+          setSpace(space instanceof ClientSpace ? space.simplify() : space);
         }}
       >
         {space.name[0]}
@@ -147,17 +145,7 @@ function ServerSidebarContextMenu() {
 
 export function ServerSidebar() {
   const mikoto = useMikoto();
-
-  const spaceDelta = useDelta(
-    {
-      initializer: () => mikoto.getSpaces(),
-      predicate: () => true,
-    },
-    [],
-  );
-
-  // useSocketIO<Space>(mikoto.io, 'spaceCreate', spaceDelta.create, []);
-  // useSocketIO<Space>(mikoto.io, 'spaceDelete', spaceDelta.delete, []);
+  const spaceDelta = useDelta(mikoto.spaces, []);
 
   const spaces = spaceDelta.data;
   const contextMenu = useContextMenu(() => <ServerSidebarContextMenu />);

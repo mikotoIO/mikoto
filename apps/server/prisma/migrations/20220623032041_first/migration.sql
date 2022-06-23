@@ -1,10 +1,13 @@
+-- CreateEnum
+CREATE TYPE "ChannelType" AS ENUM ('TEXT', 'VOICE', 'THREAD', 'CATEGORY');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" UUID NOT NULL,
-    "email" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "avatar" TEXT,
-    "passhash" TEXT NOT NULL,
+    "email" STRING NOT NULL,
+    "name" STRING NOT NULL,
+    "avatar" STRING,
+    "passhash" STRING NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -12,7 +15,7 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "RefreshToken" (
     "id" UUID NOT NULL,
-    "token" TEXT NOT NULL,
+    "token" STRING NOT NULL,
     "expiresAt" TIMESTAMP(3) NOT NULL,
     "userId" UUID NOT NULL,
 
@@ -22,7 +25,7 @@ CREATE TABLE "RefreshToken" (
 -- CreateTable
 CREATE TABLE "SpaceUser" (
     "id" UUID NOT NULL,
-    "name" TEXT,
+    "name" STRING,
     "spaceId" UUID NOT NULL,
     "userId" UUID NOT NULL,
 
@@ -32,9 +35,9 @@ CREATE TABLE "SpaceUser" (
 -- CreateTable
 CREATE TABLE "Role" (
     "id" UUID NOT NULL,
-    "name" TEXT NOT NULL,
-    "color" TEXT NOT NULL,
-    "permissions" TEXT NOT NULL,
+    "name" STRING NOT NULL,
+    "color" STRING NOT NULL,
+    "permissions" STRING NOT NULL,
     "spaceId" UUID NOT NULL,
 
     CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
@@ -43,7 +46,7 @@ CREATE TABLE "Role" (
 -- CreateTable
 CREATE TABLE "Space" (
     "id" UUID NOT NULL,
-    "name" TEXT NOT NULL,
+    "name" STRING NOT NULL,
 
     CONSTRAINT "Space_pkey" PRIMARY KEY ("id")
 );
@@ -51,7 +54,9 @@ CREATE TABLE "Space" (
 -- CreateTable
 CREATE TABLE "Channel" (
     "id" UUID NOT NULL,
-    "name" TEXT NOT NULL,
+    "type" "ChannelType" NOT NULL DEFAULT E'TEXT',
+    "parentId" UUID,
+    "name" STRING NOT NULL,
     "spaceId" UUID NOT NULL,
 
     CONSTRAINT "Channel_pkey" PRIMARY KEY ("id")
@@ -60,7 +65,7 @@ CREATE TABLE "Channel" (
 -- CreateTable
 CREATE TABLE "Message" (
     "id" UUID NOT NULL,
-    "content" TEXT NOT NULL,
+    "content" STRING NOT NULL,
     "timestamp" TIMESTAMP(3) NOT NULL,
     "authorId" UUID,
     "channelId" UUID NOT NULL,
@@ -123,13 +128,16 @@ ALTER TABLE "Role" ADD CONSTRAINT "Role_spaceId_fkey" FOREIGN KEY ("spaceId") RE
 ALTER TABLE "Channel" ADD CONSTRAINT "Channel_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES "Space"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Channel" ADD CONSTRAINT "Channel_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "Channel"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Message" ADD CONSTRAINT "Message_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Message" ADD CONSTRAINT "Message_channelId_fkey" FOREIGN KEY ("channelId") REFERENCES "Channel"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_RoleToSpaceUser" ADD FOREIGN KEY ("A") REFERENCES "Role"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_RoleToSpaceUser" ADD CONSTRAINT "_RoleToSpaceUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Role"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_RoleToSpaceUser" ADD FOREIGN KEY ("B") REFERENCES "SpaceUser"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_RoleToSpaceUser" ADD CONSTRAINT "_RoleToSpaceUser_B_fkey" FOREIGN KEY ("B") REFERENCES "SpaceUser"("id") ON DELETE CASCADE ON UPDATE CASCADE;

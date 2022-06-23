@@ -1,13 +1,9 @@
 import { atom, useRecoilState } from 'recoil';
-import constants from '../constants';
 import { Channel, Space } from '../models';
 
 export const treebarSpaceState = atom<Space | null>({
   key: 'treebarSpace',
-  default: {
-    id: constants.defaultSpace,
-    name: 'CactusSpace',
-  },
+  default: null,
 });
 
 type TabBaseType =

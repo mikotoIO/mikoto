@@ -13,7 +13,7 @@
     "@types/multer": "^1.4.7",
     "jest": "^27.5.1",
     "prettier": "^2.5.1",
-    "prisma": "^3.10.0",
+    "prisma": "^3.15.0",
     "ts-jest": "^27.1.4",
     "typescript": "^4.5.5"
   },
@@ -23,7 +23,7 @@
     "studio": "prisma studio"
   },
   "dependencies": {
-    "@prisma/client": "^3.10.0",
+    "@prisma/client": "^3.15.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.2",
     "class-transformer": "^0.5.1",

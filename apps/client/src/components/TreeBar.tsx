@@ -8,8 +8,8 @@ import { Channel } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { ClientChannel, ClientSpace, useMikoto } from '../api';
 import { TabIcon } from './TabIcon';
-import { useDeltaEngine } from '../hooks';
 import { Tabable, treebarSpaceState, useTabkit } from '../store';
+import { useDelta } from '../hooks/useDelta';
 
 export const TreeContainer = styled.div`
   margin: 0;
@@ -116,15 +116,10 @@ function channelToTab(channel: Channel): Tabable {
   };
 }
 
-export function TreeBar() {
-  const space = useRecoilValue(treebarSpaceState);
+export function TreeBar({ space }: { space: ClientSpace }) {
   const tabkit = useTabkit();
-  const mikoto = useMikoto();
 
-  const mSpace = new ClientSpace(mikoto, space!);
-
-  const channelDelta = useDeltaEngine(mSpace.channels, [space?.id!]);
-
+  const channelDelta = useDelta(space.channels, [space?.id!]);
   const contextMenu = useContextMenu(() => <TreebarContextMenu />);
 
   return (

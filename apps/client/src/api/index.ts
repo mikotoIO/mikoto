@@ -1,53 +1,11 @@
 import axios, { AxiosInstance } from 'axios';
-import { Socket, io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import React, { useContext } from 'react';
 import { Channel, Message, Space, User } from '../models';
-import { DeltaEngine, DeltaEngineX } from './deltaEngine';
 import { MikotoCache } from './cache';
-
-export class ChannelEngine implements DeltaEngine<Channel> {
-  constructor(private client: MikotoApi, private spaceId: string) {}
-
-  async fetch(): Promise<Channel[]> {
-    return this.client.getChannels(this.spaceId);
-  }
-
-  offCreate(fn: (item: Channel) => void): void {
-    this.client.io.off('channelCreate', fn);
-  }
-
-  offDelete(fn: (item: Channel) => void): void {
-    this.client.io.off('channelCreate', fn);
-  }
-
-  onCreate(fn: (item: Channel) => void): (item: Channel) => void {
-    const fnx = (item: Channel) => {
-      if (item.spaceId !== this.spaceId) return;
-      fn(item);
-    };
-    this.client.io.on('channelCreate', fnx);
-    return fnx;
-  }
-
-  onDelete(fn: (item: Channel) => void): (item: Channel) => void {
-    const fnx = (item: Channel) => {
-      if (item.spaceId !== this.spaceId) return;
-      fn(item);
-    };
-    this.client.io.on('channelDelete', fnx);
-    return fnx;
-  }
-}
-
-export class MessageEngine extends DeltaEngineX<Message> {
-  constructor(private client: MikotoApi, private channelId: string) {
-    super();
-  }
-
-  async fetch(): Promise<Message[]> {
-    return this.client.getMessages(this.channelId);
-  }
-}
+import { MessageEngine } from './engines/MessageEngine';
+import { SpaceEngine } from './engines/SpaceEngine';
+import { ChannelEngine } from './engines/ChannelEngine';
 
 export class ClientSpace implements Space {
   id: string;
@@ -58,6 +16,13 @@ export class ClientSpace implements Space {
     this.id = base.id;
     this.name = base.name;
     this.channels = new ChannelEngine(client, this.id);
+  }
+
+  simplify(): Space {
+    return {
+      id: this.id,
+      name: this.name,
+    };
   }
 }
 
@@ -88,8 +53,10 @@ export default class MikotoApi {
   io!: Socket;
 
   // cache everything
-  spaceCache: MikotoCache<Space> = new MikotoCache<Space>();
+  spaceCache: MikotoCache<ClientSpace> = new MikotoCache<ClientSpace>();
   channelCache: MikotoCache<ClientChannel> = new MikotoCache<ClientChannel>();
+
+  spaces: SpaceEngine = new SpaceEngine(this);
 
   constructor(url: string) {
     this.axios = axios.create({
@@ -113,6 +80,23 @@ export default class MikotoApi {
         ch.messages.emit('delete', message);
       }
     });
+
+    this.io.on('channelCreate', (data: Channel) => {
+      console.log(this.spaceCache);
+      const sp = this.spaceCache.get(data.spaceId);
+      if (sp) {
+        console.log('chantest2');
+        sp.channels.emit('create', this.newChannel(data));
+      }
+    });
+
+    this.io.on('channelDelete', (data: Channel) => {
+      const sp = this.spaceCache.get(data.spaceId);
+      if (sp) {
+        this.channelCache.delete(data.id);
+        sp.channels.emit('delete', new ClientChannel(this, data));
+      }
+    });
   }
 
   updateAccessToken(token: string) {
@@ -122,35 +106,46 @@ export default class MikotoApi {
     });
   }
 
-  // region Channels
+  newChannel(data: Channel): ClientChannel {
+    const ch = new ClientChannel(this, data);
+    this.channelCache.set(ch);
+    return ch;
+  }
 
-  // TODO: this is to be removed at a later point, use suspense
-  getChannel_CACHED(channelId: string): ClientChannel {
-    const channel = this.channelCache.get(channelId);
-    if (!channel) throw new Error('derp');
-    return channel;
+  newSpace(data: Space): ClientSpace {
+    const o = new ClientSpace(this, data);
+    this.spaceCache.set(o);
+    return o;
+  }
+
+  // region Channels
+  async getChannel(channelId: string): Promise<ClientChannel> {
+    const cached = this.channelCache.get(channelId);
+    if (cached) return cached;
+
+    const { data } = await this.axios.get<Channel>(`/channels/${channelId}`);
+    return this.newChannel(data);
   }
 
   async getChannels(spaceId: string): Promise<ClientChannel[]> {
     const { data } = await this.axios.get<Channel[]>(
       `/spaces/${spaceId}/channels`,
     );
-    const channels = data.map((x) => new ClientChannel(this, x));
-    channels.forEach((x) => this.channelCache.set(x));
-    return channels;
+    return data.map((x) => this.newChannel(x));
   }
 
-  async createChannel(spaceId: string, name: string): Promise<Channel> {
+  async createChannel(spaceId: string, name: string): Promise<ClientChannel> {
     const { data } = await this.axios.post<Channel>('/channels', {
       spaceId,
       name,
     });
-    return data;
+    return this.newChannel(data);
   }
 
-  async deleteChannel(channelId: string): Promise<Channel> {
+  async deleteChannel(channelId: string): Promise<ClientChannel> {
     const { data } = await this.axios.delete<Channel>(`/channels/${channelId}`);
-    return data;
+    this.channelCache.delete(data.id);
+    return new ClientChannel(this, data);
   }
   // endregion
 
@@ -188,9 +183,24 @@ export default class MikotoApi {
   // endregion
 
   // region Spaces
-  async getSpaces(): Promise<Space[]> {
+  async getSpace(spaceId: string) {
+    const cached = this.spaceCache.get(spaceId);
+    if (cached) return cached;
+    const { data } = await this.axios.get<Space>(`/spaces/${spaceId}`);
+    return this.newSpace(data);
+  }
+
+  getSpace_CACHED(spaceId: string): ClientSpace {
+    const space = this.spaceCache.get(spaceId);
+    if (!space) throw new Error('derp');
+    return space;
+  }
+
+  async getSpaces(): Promise<ClientSpace[]> {
     const { data } = await this.axios.get<Space[]>('/spaces');
-    return data;
+    const spaces = data.map((x) => new ClientSpace(this, x));
+    spaces.forEach((x) => this.spaceCache.set(x));
+    return spaces;
   }
 
   async createSpace(name: string): Promise<void> {

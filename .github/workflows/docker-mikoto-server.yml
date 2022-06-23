@@ -18,9 +18,9 @@ env:
 
 jobs:
   build:
-    defaults:
-      run:
-        working-directory: ./apps/server
+    # defaults:
+    #   run:
+    #     working-directory: ./apps/server
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -70,7 +70,7 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
         with:
-          context: .
+          context: ./apps/server
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

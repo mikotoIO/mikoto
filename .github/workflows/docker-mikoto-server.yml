@@ -1,9 +1,8 @@
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
+name: Build Docker for Mikoto Server
 on:
   push:
+    paths:
+      - apps/server/**
     branches: [ "main" ]
     tags: [ 'v*.*.*' ]
   pull_request:
@@ -11,9 +10,9 @@ on:
 
 env:
   # Use docker.io for Docker Hub if empty
-  REGISTRY: ghcr.io/mikotoIO
+  REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
-  IMAGE_NAME: mikoto-server
+  IMAGE_NAME: mikotoIO/mikoto-server
 
 
 jobs:

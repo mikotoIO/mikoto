@@ -8,6 +8,6 @@ RUN yarn
 
 COPY . .
 RUN npx prisma generate
-RUN tsc
+RUN npx tsc
 
 CMD ["node", "./dist"]

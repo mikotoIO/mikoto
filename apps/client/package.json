@@ -40,6 +40,7 @@
     "react-virtuoso": "^2.12.0",
     "recoil": "^0.6.1",
     "remark-gfm": "^3.0.1",
+    "serve": "^13.0.2",
     "socket.io-client": "^4.4.1",
     "styled-components": "^5.3.3",
     "typed-emitter": "^2.1.0",

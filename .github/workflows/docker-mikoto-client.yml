@@ -1,8 +1,8 @@
-name: Build Docker for Mikoto Server
+name: Build Docker for Mikoto Client
 on:
   push:
     paths:
-      - apps/server/**
+      - apps/client/**
     branches: [ "main" ]
     tags: [ 'v*.*.*' ]
   pull_request:
@@ -12,14 +12,11 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
-  IMAGE_NAME: mikotoIO/mikoto-server
+  IMAGE_NAME: mikotoIO/mikoto-client
 
 
 jobs:
   build:
-    # defaults:
-    #   run:
-    #     working-directory: ./apps/server
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -69,7 +66,7 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
         with:
-          context: ./apps/server
+          context: ./apps/client
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

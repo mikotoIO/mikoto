@@ -6,5 +6,7 @@ RUN corepack enable
 COPY ["package.json", "./"]
 RUN yarn
 
+COPY . .
+
 RUN ["yarn", "build"]
 CMD ["npx", "serve", "-s", "build"]

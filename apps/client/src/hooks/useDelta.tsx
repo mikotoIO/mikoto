@@ -10,8 +10,15 @@ export function useDelta<T extends ObjectWithId>(
   deps: React.DependencyList,
 ) {
   const [data, setData] = useState<T[]>([]);
+  const [loading, setLoading] = useState(false);
+
   React.useEffect(() => {
-    engine.fetch().then(setData);
+    setLoading(true);
+    console.log('start fetching');
+    engine.fetch().then((d) => {
+      setLoading(false);
+      setData(d);
+    });
   }, deps);
 
   const createFn = (x: T) => {
@@ -33,5 +40,6 @@ export function useDelta<T extends ObjectWithId>(
 
   return {
     data,
+    loading,
   };
 }

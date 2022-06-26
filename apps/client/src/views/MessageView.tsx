@@ -8,10 +8,19 @@ import MessageItem from '../components/Message';
 import { MessageInput } from '../components/MessageInput';
 import { ViewContainer } from '../components/ViewContainer';
 import { useDelta } from '../hooks/useDelta';
+import { Spinner } from '../components/Spinner';
 
 const Messages = styled.div`
   overflow-y: auto;
   flex-grow: 1;
+`;
+
+const MessagesLoading = styled.div`
+  overflow-y: auto;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 interface MessageViewProps {
@@ -36,22 +45,27 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
     }
   });
   const mikoto = useMikoto();
-
   const messageDelta = useDelta(channel.messages, [channel.id]);
 
   const messages = messageDelta.data;
 
   return (
     <ViewContainer>
-      <Messages ref={ref}>
-        {messages.map((msg, idx) => (
-          <MessageItem
-            key={msg.id}
-            message={msg}
-            isSimple={isMessageSimple(msg, messages[idx - 1])}
-          />
-        ))}
-      </Messages>
+      {messageDelta.loading ? (
+        <MessagesLoading>
+          <Spinner />
+        </MessagesLoading>
+      ) : (
+        <Messages ref={ref}>
+          {messages.map((msg, idx) => (
+            <MessageItem
+              key={msg.id}
+              message={msg}
+              isSimple={isMessageSimple(msg, messages[idx - 1])}
+            />
+          ))}
+        </Messages>
+      )}
       <MessageInput
         channelName={channel.name}
         onMessageSend={async (msg) => {

@@ -14,7 +14,6 @@ export function useDelta<T extends ObjectWithId>(
 
   React.useEffect(() => {
     setLoading(true);
-    console.log('start fetching');
     engine.fetch().then((d) => {
       setLoading(false);
       setData(d);

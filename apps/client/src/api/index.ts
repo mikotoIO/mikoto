@@ -82,10 +82,8 @@ export default class MikotoApi {
     });
 
     this.io.on('channelCreate', (data: Channel) => {
-      console.log(this.spaceCache);
       const sp = this.spaceCache.get(data.spaceId);
       if (sp) {
-        console.log('chantest2');
         sp.channels.emit('create', this.newChannel(data));
       }
     });
@@ -96,6 +94,15 @@ export default class MikotoApi {
         this.channelCache.delete(data.id);
         sp.channels.emit('delete', new ClientChannel(this, data));
       }
+    });
+
+    this.io.on('spaceCreate', (data: Space) => {
+      this.spaces.emit('create', this.newSpace(data));
+    });
+
+    this.io.on('spaceDelete', (data: Space) => {
+      this.spaceCache.delete(data.id);
+      this.spaces.emit('delete', new ClientSpace(this, data));
     });
   }
 

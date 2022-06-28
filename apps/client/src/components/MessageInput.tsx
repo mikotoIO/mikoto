@@ -43,7 +43,7 @@ const Typing = styled.div`
 const MessageInputBox = styled.textarea`
   ${sharedCss};
   color: white; // #dcddde
-  background-color: ${(p) => p.theme.colors.N700}; ;
+  background-color: ${(p) => p.theme.colors.N700};
 `;
 
 interface MessageProps {

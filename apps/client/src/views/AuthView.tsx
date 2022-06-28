@@ -1,7 +1,7 @@
-import { Button, Input, Notification } from '@mantine/core';
+import { Anchor, Button, Input, Notification } from '@mantine/core';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import { AppError } from '../models';
@@ -97,6 +97,9 @@ export function LoginView() {
           {...register('password')}
         />
         <Button type="submit">Log In</Button>
+        <Anchor to="/register" component={Link}>
+          Register
+        </Anchor>
       </Form>
     </AuthView>
   );
@@ -131,6 +134,9 @@ export function RegisterView() {
           {...register('password')}
         />
         <Button type="submit">Register</Button>
+        <Anchor to="/login" component={Link}>
+          Log In
+        </Anchor>
       </Form>
     </AuthView>
   );

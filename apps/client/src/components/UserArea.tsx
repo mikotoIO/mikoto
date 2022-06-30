@@ -4,6 +4,13 @@ import { Avatar } from './Avatar';
 import { useMikoto } from '../api';
 import { User } from '../models';
 
+const SidebarElement = styled.div`
+  display: grid;
+  grid-template-rows: 1fr 64px;
+  width: 270px;
+  height: 100%;
+`;
+
 const UserAreaItem = styled.div`
   padding-left: 16px;
   display: flex;
@@ -46,5 +53,14 @@ export function UserArea() {
         </>
       )}
     </UserAreaItem>
+  );
+}
+
+export function Sidebar({ children }: { children: React.ReactNode }) {
+  return (
+    <SidebarElement>
+      {children}
+      <UserArea />
+    </SidebarElement>
   );
 }

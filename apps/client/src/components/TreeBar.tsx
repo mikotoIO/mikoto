@@ -11,9 +11,16 @@ import { TabIcon } from './TabIcon';
 import { Tabable, treebarSpaceState, useTabkit } from '../store';
 import { useDelta } from '../hooks/useDelta';
 
-export const TreeContainer = styled.div`
+const TreeContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+`;
+
+export const TreeBody = styled.div`
   margin: 0;
   padding: 10px;
+  min-height: min-content;
   flex: 1;
   overflow-y: auto;
   box-sizing: border-box;
@@ -116,6 +123,15 @@ function channelToTab(channel: Channel): Tabable {
   };
 }
 
+const TreeHead = styled.div`
+  padding: 4px 16px;
+  background-color: ${(p) => p.theme.colors.N1000};
+
+  h1 {
+    font-size: 16px;
+  }
+`;
+
 export function TreeBar({ space }: { space: ClientSpace }) {
   const tabkit = useTabkit();
 
@@ -123,16 +139,21 @@ export function TreeBar({ space }: { space: ClientSpace }) {
   const contextMenu = useContextMenu(() => <TreebarContextMenu />);
 
   return (
-    <TreeContainer onContextMenu={contextMenu}>
-      {channelDelta.data.map((channel) => (
-        <TreeNode
-          channel={channel}
-          key={channel.id}
-          onClick={(ev) => {
-            tabkit.openTab(channelToTab(channel), ev.ctrlKey);
-          }}
-        />
-      ))}
+    <TreeContainer>
+      <TreeHead>
+        <h1>{space.name}</h1>
+      </TreeHead>
+      <TreeBody onContextMenu={contextMenu}>
+        {channelDelta.data.map((channel) => (
+          <TreeNode
+            channel={channel}
+            key={channel.id}
+            onClick={(ev) => {
+              tabkit.openTab(channelToTab(channel), ev.ctrlKey);
+            }}
+          />
+        ))}
+      </TreeBody>
     </TreeContainer>
   );
 }

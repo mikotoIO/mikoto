@@ -28,6 +28,12 @@ interface LoginPayload {
   password: string;
 }
 
+interface ChangePasswordPayload {
+  id: string;
+  oldPassword: string;
+  newPassword: string;
+}
+
 @JsonController()
 @Service()
 export class AccountController {
@@ -94,5 +100,19 @@ export class AccountController {
       throw new UnauthorizedError('Invalid Token');
     }
     return this.createTokenPair(account, body.refreshToken);
+  }
+
+  @Post('/account/change_pasword')
+  async changePassword(@Body() body: ChangePasswordPayload) {
+    const account = await this.prisma.user.findUnique({
+      where: { id: body.id },
+    });
+
+    if (account && (await bcrypt.compare(body.oldPassword, account.passhash))) {
+      await this.prisma.user.update({
+        where: { id: account.id },
+        data: { passhash: await bcrypt.hash(body.newPassword, 10) },
+      });
+    }
   }
 }

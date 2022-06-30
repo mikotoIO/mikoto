@@ -31,7 +31,6 @@ export const authTokenState = atom<TokenPair | null>({
       window.addEventListener('storage', storageFn);
 
       onSet((newValue, _, isReset) => {
-        console.log('lolwut');
         if (isReset) {
           localStorage.removeItem(TOKEN_PAIR);
         } else {
@@ -44,6 +43,8 @@ export const authTokenState = atom<TokenPair | null>({
     },
   ],
 });
+
+let init = false;
 
 // TODO: this is effectful. make this less effectful.
 export function AuthRefresher({ children }: { children?: React.ReactNode }) {
@@ -73,7 +74,10 @@ export function AuthRefresher({ children }: { children?: React.ReactNode }) {
   };
 
   useEffect(() => {
-    updateTokenLogic().then();
+    if (!init) {
+      init = true;
+      updateTokenLogic().then();
+    }
   }, []);
 
   useInterval(async () => {

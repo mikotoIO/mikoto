@@ -5,7 +5,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { TreeBar } from '../components/TreeBar';
 import { TabbedView } from '../components/TabBar';
 import { AuthRefresher } from '../components/AuthHandler';
-import { UserArea } from '../components/UserArea';
+import { Sidebar } from '../components/UserArea';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { MessageView } from './MessageView';
 import { Tabable, tabbedState, treebarSpaceState } from '../store';
@@ -19,13 +19,6 @@ const AppContainer = styled.div`
   display: flex;
   flex-direction: row;
   height: 100vh;
-`;
-
-const SidebarElement = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 270px;
-  height: 100%;
 `;
 
 function ErrorBoundaryPage({ children }: { children: React.ReactNode }) {
@@ -60,10 +53,7 @@ function AppView() {
   return (
     <AppContainer>
       <ServerSidebar />
-      <SidebarElement>
-        <UserArea />
-        {space && <TreeBar space={space} />}
-      </SidebarElement>
+      <Sidebar>{space && <TreeBar space={space} />}</Sidebar>
       <TabbedView tabs={tabbed.tabs}>
         <ErrorBoundaryPage>
           {tabbed.index !== null && tabbed.index < tabbed.tabs.length && (

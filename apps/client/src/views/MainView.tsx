@@ -11,6 +11,7 @@ import { MessageView } from './MessageView';
 import { Tabable, tabbedState, treebarSpaceState } from '../store';
 import { SpaceSettingsView } from './SpaceSettingsView';
 import { ClientSpace, useMikoto } from '../api';
+import { AccountSettingsView } from './AccountSettingsView';
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -33,6 +34,8 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
       return <MessageView channel={tab.channel} />;
     case 'spaceSettings':
       return <SpaceSettingsView space={tab.space} />;
+    case 'accountSettings':
+      return <AccountSettingsView />;
     default:
       return null;
   }

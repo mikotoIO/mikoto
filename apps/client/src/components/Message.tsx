@@ -5,8 +5,7 @@ import styled from 'styled-components';
 import { Modal } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+// import SyntaxHighlighter from 'react-syntax-highlighter';
 import { SpecialComponents } from 'react-markdown/lib/ast-to-react';
 import { NormalComponents } from 'react-markdown/lib/complex-types';
 
@@ -16,15 +15,13 @@ import { useMikoto } from '../api';
 import { MessageAvatar } from './Avatar';
 
 interface DeferredHighlighterProps {
-  inline?: boolean;
   children: React.ReactNode & React.ReactNode[];
-  className?: string;
 }
 
 // renders unhighlighted codeblock first, then rerenders highlighted.
 function DeferredHighlighter({
-  inline,
-  className,
+  // inline,
+  // className,
   children,
 }: DeferredHighlighterProps) {
   const [rendered, setRendered] = useState(false);
@@ -34,16 +31,18 @@ function DeferredHighlighter({
     }
   });
 
-  if (!rendered) return <code>{children}</code>;
+  // code highlighting has been disabled for now, due to bundles
+  return <code>{children}</code>;
 
-  const match = /language-(\w+)/.exec(className || '');
-  return !inline && match ? (
-    <SyntaxHighlighter language={match[1]} PreTag="div" style={atomOneDark}>
-      {String(children).replace(/\n$/, '')}
-    </SyntaxHighlighter>
-  ) : (
-    <code>{children}</code>
-  );
+  // if (!rendered) return <code>{children}</code>;
+  // const match = /language-(\w+)/.exec(className || '');
+  // return !inline && match ? (
+  //   <SyntaxHighlighter language={match[1]} PreTag="div" style={atomOneDark}>
+  //     {String(children).replace(/\n$/, '')}
+  //   </SyntaxHighlighter>
+  // ) : (
+  //   <code>{children}</code>
+  // );
 }
 
 const dateFormat = new Intl.DateTimeFormat('en', {
@@ -215,12 +214,8 @@ const markdownComponents: Partial<
   img({ src, alt }) {
     return <MessageImage src={src} alt={alt} />;
   },
-  code({ inline, className, children }) {
-    return (
-      <DeferredHighlighter inline={inline} className={className}>
-        {children}
-      </DeferredHighlighter>
-    );
+  code({ children }) {
+    return <DeferredHighlighter>{children}</DeferredHighlighter>;
   },
 };
 

@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
+import { atom, useRecoilState } from 'recoil';
 import { Avatar } from './Avatar';
 import { useMikoto } from '../api';
 import { User } from '../models';
+import { useTabkit } from '../store';
 
 const SidebarElement = styled.div`
   display: grid;
@@ -34,15 +36,33 @@ const UserInfo = styled.div`
   }
 `;
 
+export const userState = atom<User | null>({
+  default: null,
+  key: 'user',
+});
+
 export function UserArea() {
   const mikoto = useMikoto();
-  const [user, setUser] = useState<User | null>();
+  const tabkit = useTabkit();
+  const [user, setUser] = useRecoilState(userState);
   useEffect(() => {
     mikoto.getCurrentUser().then(setUser);
   }, []);
 
   return (
-    <UserAreaItem>
+    <UserAreaItem
+      onClick={() => {
+        tabkit.openTab(
+          {
+            kind: 'accountSettings',
+            name: 'User Settings',
+            key: 'accountSettings',
+          },
+          true,
+        );
+        console.log('userarea click');
+      }}
+    >
       {user && (
         <>
           <Avatar src={user.avatar} />

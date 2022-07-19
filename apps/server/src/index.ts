@@ -18,7 +18,9 @@ import cors from 'cors';
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
-import constants from './constants';
+import * as minio from 'minio';
+import { logger } from './functions/logger';
+import { minioFromURL } from './functions/minioFromURL';
 
 const app = express();
 const server = new http.Server(app);
@@ -31,6 +33,7 @@ const prisma = new PrismaClient({
 });
 Container.set(PrismaClient, prisma);
 Container.set(socketio.Server, io);
+Container.set(minio.Client, minioFromURL(process.env.MINIO!));
 
 app.use(cors());
 
@@ -39,6 +42,8 @@ useSocketContainer(Container);
 
 useExpressServer(app, {
   controllers: [path.join(`${__dirname}/controllers/*.js`)],
+  middlewares: [path.join(`${__dirname}/middlewares/*.js`)],
+  defaultErrorHandler: false,
   currentUserChecker: (action) => {
     let authHeader = action.request.headers.authorization as string;
     if (!authHeader) throw new UnauthorizedError('No Header');
@@ -54,6 +59,6 @@ useSocketServer(io, {
   controllers: [path.join(`${__dirname}/ws-controllers/*.js`)],
 });
 
-server.listen(constants.apiPort, () => {
-  console.log(`Mikoto server started! listening on ${constants.getApiPath()}`);
+server.listen(process.env.PORT || 9500, () => {
+  logger.info(`Mikoto server listening on port ${process.env.PORT || 9500}`);
 });

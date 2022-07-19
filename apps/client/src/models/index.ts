@@ -39,3 +39,5 @@ export interface Channel {
   spaceId: string;
   name: string;
 }
+
+export interface Role {}

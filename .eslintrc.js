@@ -14,11 +14,12 @@ module.exports = {
     'react/destructuring-assignment': 'off',
     'react/require-default-props': 'off',
     'react/jsx-props-no-spreading': 'off',
-    'react-hooks/exhaustive-deps': 'off',
+    // 'react-hooks/exhaustive-deps': 'off',
     'class-methods-use-this': 'off',
     'import/prefer-default-export': 'off',
     'no-param-reassign': 'off',
     'no-console': 'off',
     'object-curly-spacing': ['error', 'always'],
+    '@typescript-eslint/return-await': 'off',
   },
 };

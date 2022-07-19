@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 import './index.css';
+import 'react-loading-skeleton/dist/skeleton.css';
+
 import { RecoilRoot } from 'recoil';
 import { ThemeProvider } from 'styled-components';
 import { MantineProvider } from '@mantine/core';
@@ -13,6 +15,11 @@ import reportWebVitals from './reportWebVitals';
 import { theme } from './themes';
 import MikotoApi, { MikotoContext } from './api';
 import constants from './constants';
+
+/// global polyfill
+if (typeof (window as any).global === 'undefined') {
+  (window as any).global = window;
+}
 
 const SilentRecoilRoot = RecoilRoot as any;
 

@@ -17,3 +17,15 @@ export const ScrollingViewContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
+
+export const ViewContainerWithSidebar = styled.div`
+  display: grid;
+  background-color: ${(p) => p.theme.colors.N800};
+  grid-template-columns: 200px auto;
+  height: 100%;
+  flex-direction: column;
+`;
+
+export const SidebarContainerArea = styled.div`
+  padding: 32px;
+`;

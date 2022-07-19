@@ -5,6 +5,7 @@ import { contextMenuState } from './ContextMenu';
 import { User } from '../models';
 
 const AvatarImg = styled.img<{ size: number }>`
+  user-select: none;
   margin-top: 4px;
   width: ${(p) => p.size}px;
   height: ${(p) => p.size}px;

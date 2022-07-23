@@ -1,15 +1,21 @@
 import { User, PrismaClient } from '@prisma/client';
 import {
   Body,
+  CurrentUser,
   JsonController,
   Post,
   UnauthorizedError,
+  UploadedFile,
 } from 'routing-controllers';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Service } from 'typedi';
 import crypto from 'crypto';
 import { promisify } from 'util';
+import { Client } from 'minio';
+import { v4 as uuid } from 'uuid';
+import { mimeImageExtension } from '../functions/checkMimetype';
+import { AccountJwt } from '../auth';
 
 const randomBytes = promisify(crypto.randomBytes);
 async function generateRandomToken() {
@@ -37,7 +43,7 @@ interface ChangePasswordPayload {
 @JsonController()
 @Service()
 export class AccountController {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private prisma: PrismaClient, private minio: Client) {}
 
   private async createTokenPair(account: User, oldToken?: string) {
     const accessToken = jwt.sign({}, process.env.SECRET!, {
@@ -114,5 +120,23 @@ export class AccountController {
         data: { passhash: await bcrypt.hash(body.newPassword, 10) },
       });
     }
+  }
+
+  @Post('/account/avatar')
+  async uploadAvatar(
+    @CurrentUser() account: AccountJwt,
+    @UploadedFile('avatar') avatar: Express.Multer.File,
+  ) {
+    const id = uuid();
+    const fileName = `${id}.${mimeImageExtension(avatar.mimetype)}`;
+    await this.minio.putObject('avatar', fileName, avatar.buffer);
+    await this.prisma.user.update({
+      where: { id: account.sub },
+      data: { avatar: `http://localhost:9000/avatar/${fileName}` },
+    });
+
+    return {
+      status: 'ok',
+    };
   }
 }

@@ -210,6 +210,10 @@ export default class MikotoApi {
     return spaces;
   }
 
+  async joinSpace(id: string): Promise<void> {
+    await this.axios.post<Space>(`/join/${id}`);
+  }
+
   async createSpace(name: string): Promise<void> {
     await this.axios.post<Space>('/spaces', {
       name,
@@ -220,6 +224,16 @@ export default class MikotoApi {
     await this.axios.delete<Space>(`/spaces/${id}`);
   }
   // endregion
+
+  async uploadAvatar(file: File) {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    await this.axios.post('/account/avatar', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
 }
 
 export const MikotoContext = React.createContext<MikotoApi>(undefined!);

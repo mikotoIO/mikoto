@@ -7,6 +7,7 @@ import {
   NotFoundError,
   Param,
   Post,
+  UnauthorizedError,
 } from 'routing-controllers';
 import { PrismaClient, Space } from '@prisma/client';
 import { Service } from 'typedi';
@@ -70,17 +71,28 @@ export class SpaceController {
     @Body() body: SpaceCreationPayload,
   ) {
     const space = await this.prisma.space.create({
-      data: { name: body.name },
+      data: {
+        name: body.name,
+        channels: { create: [{ name: 'general', order: 0 }] },
+        roles: {
+          create: [{ name: '@everyone', position: 0, permissions: '0' }],
+        },
+      },
     });
     await this.join(jwt.sub, space);
     return space;
   }
 
   @Delete('/spaces/:id')
-  async delete(
-    @Param('id') id: string,
-    // @CurrentUser() jwt: AccountJwt,
-  ) {
+  async delete(@CurrentUser() account: AccountJwt, @Param('id') id: string) {
+    // MUST BE A SPACE OWNER TO DELETE
+    const spaceData = await this.prisma.space.findUnique({
+      where: { id },
+    });
+    if (spaceData && spaceData.ownerId !== account.sub) {
+      throw new UnauthorizedError('Only the owner may delete the space');
+    }
+
     const space = await this.prisma.space.delete({
       where: { id },
     });

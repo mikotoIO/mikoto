@@ -4,7 +4,6 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { LoginView, RegisterView } from './views/AuthView';
 import MainView from './views/MainView';
 import { ContextMenuKit } from './components/ContextMenu';
-import { RoomPage } from './components/LiveKitPlayground';
 import { SpaceInviteView } from './views/SpaceInviteView';
 
 function App() {
@@ -15,7 +14,6 @@ function App() {
         <Route path="/login" element={<LoginView />} />
         <Route path="/register" element={<RegisterView />} />
         <Route path="/invite" element={<SpaceInviteView />} />
-        <Route path="/livekit" element={<RoomPage />} />
       </Routes>
       <ContextMenuKit />
     </BrowserRouter>

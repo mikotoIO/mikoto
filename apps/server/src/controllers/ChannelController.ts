@@ -41,6 +41,7 @@ export class ChannelController {
       data: {
         name: body.name,
         spaceId: body.spaceId,
+        order: 0,
       },
     });
     this.io.in(channel.spaceId).emit('channelCreate', channel);

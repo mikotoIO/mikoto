@@ -9,6 +9,7 @@ export const treebarSpaceState = atom<Space | null>({
 type TabBaseType =
   | { kind: 'textChannel'; channel: Channel }
   | { kind: 'spaceSettings'; space: Space }
+  | { kind: 'accountSettings' }
   | { kind: 'unknown' };
 
 export type Tabable = TabBaseType & {

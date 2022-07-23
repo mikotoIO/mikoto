@@ -2,8 +2,8 @@
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
     /* Language and Environment */
-    "target": "es2018",
-    "lib": ["es2018", "esnext.asynciterable"],
+    "target": "es2020",
+    "lib": ["es2020", "esnext.asynciterable"],
     "module": "commonjs",                                /* Specify what module code is generated. */
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */

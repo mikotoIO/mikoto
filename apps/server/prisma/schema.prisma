@@ -19,6 +19,7 @@ model User {
   SpaceUser    SpaceUser[]
   RefreshToken RefreshToken[]
   Message      Message[]
+  Space        Space[]
 }
 
 model RefreshToken {
@@ -48,8 +49,9 @@ model SpaceUser {
 model Role {
   id          String      @id @default(uuid()) @db.Uuid
   name        String
-  color       String
+  color       String? // hex color
   permissions String
+  position    Int
   users       SpaceUser[]
 
   spaceId String @db.Uuid
@@ -58,11 +60,14 @@ model Role {
 }
 
 model Space {
-  id      String      @id @default(uuid()) @db.Uuid
+  id      String  @id @default(uuid()) @db.Uuid
   name    String
-  User    SpaceUser[]
-  Channel Channel[]
-  Role    Role[]
+  ownerId String? @db.Uuid
+  owner   User?   @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+
+  users    SpaceUser[]
+  channels Channel[]
+  roles    Role[]
 }
 
 model Channel {
@@ -72,6 +77,7 @@ model Channel {
   parentId String?   @db.Uuid
   parent   Channel?  @relation("NestedChannel", fields: [parentId], references: [id], onDelete: Cascade)
   children Channel[] @relation("NestedChannel")
+  order    Int       @default(0)
 
   name    String
   spaceId String    @db.Uuid

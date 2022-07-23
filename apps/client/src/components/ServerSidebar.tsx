@@ -60,6 +60,14 @@ function ServerIconContextMenu({
       </ContextMenu.Link>
       <ContextMenu.Link
         onClick={async () => {
+          await navigator.clipboard.writeText(space.id);
+          destroy();
+        }}
+      >
+        Copy ID
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={async () => {
           destroy();
           await mikoto.deleteSpace(space.id);
         }}
@@ -143,7 +151,38 @@ function ServerSidebarContextMenu() {
   );
 }
 
+export function SpaceJoinModal() {
+  const mikoto = useMikoto();
+  const setModal = useSetRecoilState(modalState);
+
+  const form = useForm({
+    initialValues: {
+      spaceId: '',
+    },
+  });
+  return (
+    <form
+      onSubmit={form.onSubmit(async () => {
+        await mikoto.joinSpace(form.values.spaceId);
+        setModal(null);
+        form.reset();
+      })}
+    >
+      <TextInput
+        label="Space ID"
+        placeholder="XXXXXXXX"
+        {...form.getInputProps('spaceId')}
+      />
+      <Button mt={16} fullWidth type="submit">
+        Join Space
+      </Button>
+    </form>
+  );
+}
+
 export function ServerSidebar() {
+  const setModal = useSetRecoilState(modalState);
+
   const mikoto = useMikoto();
   const spaceDelta = useDelta(mikoto.spaces, []);
 
@@ -155,6 +194,16 @@ export function ServerSidebar() {
       {spaces.map((space) => (
         <ServerIcon space={space} key={space.id} />
       ))}
+      <ServerIconBase
+        onClick={() => {
+          setModal({
+            title: 'Join Space',
+            elem: <SpaceJoinModal />,
+          });
+        }}
+      >
+        +
+      </ServerIconBase>
     </ServerSidebarBase>
   );
 }

@@ -12,7 +12,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-import { theme } from './themes';
+import { theme } from './components/themes';
 import MikotoApi, { MikotoContext } from './api';
 import constants from './constants';
 

@@ -7,6 +7,7 @@ import { useInterval } from '../hooks';
 import { TokenPair } from '../models';
 import { useMikoto } from '../api';
 import { refresh } from '../api/auth';
+import axios from 'axios';
 
 const TOKEN_PAIR = 'token_pair';
 
@@ -63,9 +64,16 @@ export function AuthRefresher({ children }: { children?: React.ReactNode }) {
 
     if (secondsUntilExpiry <= 6000) {
       console.log('refreshing...');
-      const newToken = await refresh(authToken);
-      setAuthToken(newToken);
-      mikoto.updateAccessToken(newToken.accessToken);
+      // BUG: Refresh gets stuck
+      try {
+        const newToken = await refresh(authToken);
+        setAuthToken(newToken);
+        mikoto.updateAccessToken(newToken.accessToken);
+      } catch (ex) {
+        if (!axios.isAxiosError(ex)) throw ex;
+        if (ex.response?.status !== 401) throw ex;
+        navigate('/login');
+      }
     } else {
       mikoto.updateAccessToken(authToken.accessToken);
     }
@@ -84,5 +92,5 @@ export function AuthRefresher({ children }: { children?: React.ReactNode }) {
     await updateTokenLogic();
   }, 5 * 60 * 1000);
   // eslint-disable-next-line react/jsx-no-useless-fragment
-  return <>{completed && children}</>;
+  return completed && children;
 }

@@ -4,11 +4,11 @@ import { useAsync } from 'react-async-hook';
 
 import { ClientChannel, useMikoto } from '../api';
 import { Channel, Message } from '../models';
-import MessageItem from '../components/Message';
+import MessageItem from '../components/molecules/Message';
 import { ViewContainer } from '../components/ViewContainer';
 import { useDelta } from '../hooks/useDelta';
 import { Spinner } from '../components/Spinner';
-import { MessageEditor } from '../components/MessageEditor';
+import { MessageEditor } from '../components/molecules/MessageEditor';
 
 const Messages = styled.div`
   overflow-y: auto;

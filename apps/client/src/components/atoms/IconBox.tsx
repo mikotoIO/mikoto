@@ -7,19 +7,18 @@ import {
 import React from 'react';
 import styled from 'styled-components';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { Tabable } from '../store';
+import { Tabable } from '../../store';
+import { centerFlex } from '../themes';
 
 const IconContainer = styled.span<{ size?: number }>`
   background-color: #3b83ff;
   color: white;
   border-radius: 3px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   text-align: center;
-  margin-right: 8px;
+  margin-right: 6px;
   width: ${(p) => p.size ?? 24}px;
   height: ${(p) => p.size ?? 24}px;
+  ${centerFlex}
 `;
 
 interface TabIconProps {
@@ -38,7 +37,7 @@ export function getTabIcon(tab: Tabable): IconDefinition {
   }
 }
 
-export function TabIcon({ size, icon }: TabIconProps) {
+export function IconBox({ size, icon }: TabIconProps) {
   return (
     <IconContainer size={size}>
       <FontAwesomeIcon icon={icon ?? faHashtag} />

@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faX } from '@fortawesome/free-solid-svg-icons';
 import { useRecoilState } from 'recoil';
 
-import { getTabIcon, TabIcon } from './TabIcon';
+import { getTabIcon, IconBox } from './atoms/IconBox';
 import { Tabable, tabbedState } from '../store';
 
 const TabbedViewContainer = styled.div`
@@ -121,7 +121,7 @@ function TabItem({ tab, index }: TabItemProps) {
         setTabbed(({ tabs }) => ({ index, tabs }));
       }}
     >
-      <TabIcon size={20} icon={getTabIcon(tab)} />
+      <IconBox size={20} icon={getTabIcon(tab)} />
       <div>{tab.name}</div>
       <CloseButton
         active={active}

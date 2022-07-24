@@ -1,12 +1,11 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { useSetRecoilState } from 'recoil';
-import { contextMenuState } from './ContextMenu';
-import { User } from '../models';
+import { contextMenuState } from '../ContextMenu';
+import { User } from '../../models';
 
 const AvatarImg = styled.img<{ size: number }>`
   user-select: none;
-  margin-top: 4px;
   width: ${(p) => p.size}px;
   height: ${(p) => p.size}px;
   border-radius: 8px;

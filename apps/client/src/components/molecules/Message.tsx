@@ -1,49 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import styled from 'styled-components';
 import { Modal } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
-// import SyntaxHighlighter from 'react-syntax-highlighter';
 import { SpecialComponents } from 'react-markdown/lib/ast-to-react';
 import { NormalComponents } from 'react-markdown/lib/complex-types';
 
-import { ContextMenu, useContextMenu } from './ContextMenu';
-import { Message } from '../models';
-import { useMikoto } from '../api';
-import { MessageAvatar } from './Avatar';
-
-interface DeferredHighlighterProps {
-  children: React.ReactNode & React.ReactNode[];
-}
-
-// renders unhighlighted codeblock first, then rerenders highlighted.
-function DeferredHighlighter({
-  // inline,
-  // className,
-  children,
-}: DeferredHighlighterProps) {
-  const [rendered, setRendered] = useState(false);
-  useEffect(() => {
-    if (!rendered) {
-      setRendered(true);
-    }
-  });
-
-  // code highlighting has been disabled for now, due to bundles
-  return <code>{children}</code>;
-
-  // if (!rendered) return <code>{children}</code>;
-  // const match = /language-(\w+)/.exec(className || '');
-  // return !inline && match ? (
-  //   <SyntaxHighlighter language={match[1]} PreTag="div" style={atomOneDark}>
-  //     {String(children).replace(/\n$/, '')}
-  //   </SyntaxHighlighter>
-  // ) : (
-  //   <code>{children}</code>
-  // );
-}
+import { ContextMenu, useContextMenu } from '../ContextMenu';
+import { Message } from '../../models';
+import { useMikoto } from '../../api';
+import { MessageAvatar } from '../atoms/Avatar';
 
 const dateFormat = new Intl.DateTimeFormat('en', {
   day: 'numeric',
@@ -135,10 +103,19 @@ const Name = styled.div<{ color?: string }>`
   color: ${(p) => p.color ?? 'currentColor'};
 `;
 
-const Timestamp = styled.div`
+const TimestampElement = styled.div`
   color: #9f9e9e;
   font-size: 12px;
 `;
+
+function Timestamp({ time }: { time: Date }) {
+  return (
+    <TimestampElement>
+      {isToday(time) ? 'Today at ' : dateFormat.format(time)}{' '}
+      {padTime(time.getHours())}:{padTime(time.getMinutes())}
+    </TimestampElement>
+  );
+}
 
 const NameBox = styled.div`
   display: flex;
@@ -214,10 +191,20 @@ const markdownComponents: Partial<
   img({ src, alt }) {
     return <MessageImage src={src} alt={alt} />;
   },
-  code({ children }) {
-    return <DeferredHighlighter>{children}</DeferredHighlighter>;
-  },
 };
+
+function Markdown({ content }: { content: string }) {
+  const co =
+    isUrl(content) && isUrlImage(content)
+      ? `![Image Embed](${content})`
+      : content;
+
+  return (
+    <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
+      {co}
+    </ReactMarkdown>
+  );
+}
 
 export default function MessageItem({ message, isSimple }: MessageProps) {
   const mikoto = useMikoto();
@@ -235,13 +222,6 @@ export default function MessageItem({ message, isSimple }: MessageProps) {
     </ContextMenu>
   ));
 
-  const time = new Date(message.timestamp);
-
-  const content =
-    isUrl(message.content) && isUrlImage(message.content)
-      ? `![Image Embed](${message.content})`
-      : message.content;
-
   return (
     <MessageContainer isSimple={isSimple} onContextMenu={menu}>
       {isSimple ? (
@@ -253,18 +233,10 @@ export default function MessageItem({ message, isSimple }: MessageProps) {
         {!isSimple && (
           <NameBox>
             <Name color="white">{message.author?.name ?? 'Ghost'}</Name>
-            <Timestamp>
-              {isToday(time) ? 'Today at ' : dateFormat.format(time)}{' '}
-              {padTime(time.getHours())}:{padTime(time.getMinutes())}
-            </Timestamp>
+            <Timestamp time={new Date(message.timestamp)} />
           </NameBox>
         )}
-        <ReactMarkdown
-          components={markdownComponents}
-          remarkPlugins={[remarkGfm]}
-        >
-          {content}
-        </ReactMarkdown>
+        <Markdown content={message.content} />
       </MessageInner>
     </MessageContainer>
   );

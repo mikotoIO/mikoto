@@ -7,7 +7,7 @@ import { Button, TextInput } from '@mantine/core';
 import { Channel } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { ClientChannel, ClientSpace, useMikoto } from '../api';
-import { TabIcon } from './TabIcon';
+import { IconBox } from './atoms/IconBox';
 import { Tabable, treebarSpaceState, useTabkit } from '../store';
 import { useDelta } from '../hooks/useDelta';
 
@@ -62,7 +62,7 @@ export function TreeNode({ channel, ...props }: TreeNodeProps) {
 
   return (
     <TreeNodeElement {...props} onContextMenu={menu}>
-      <TabIcon />
+      <IconBox />
       {channel.name}
     </TreeNodeElement>
   );

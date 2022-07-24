@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { atom, useRecoilState } from 'recoil';
-import { Avatar } from './Avatar';
+import { Avatar } from './atoms/Avatar';
 import { useMikoto } from '../api';
 import { User } from '../models';
 import { useTabkit } from '../store';

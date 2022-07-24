@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { useDropzone } from 'react-dropzone';
 import { useRecoilState } from 'recoil';
 import { SettingsView } from './SettingsViewTemplate';
-import { Avatar } from '../components/Avatar';
+import { Avatar } from '../components/atoms/Avatar';
 import { useMikoto } from '../api';
 import { userState } from '../components/UserArea';
 

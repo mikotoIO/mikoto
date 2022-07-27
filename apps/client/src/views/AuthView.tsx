@@ -88,6 +88,7 @@ export function LoginView() {
           }
         })}
       >
+        <h1>Log In</h1>
         {errorEl}
         <Input size="md" placeholder="Email" {...register('email')} />
         <Input
@@ -125,6 +126,7 @@ export function RegisterView() {
           }
         })}
       >
+        <h1>Register</h1>
         <Input size="md" placeholder="Username" {...register('name')} />
         <Input size="md" placeholder="Email" {...register('email')} />
         <Input

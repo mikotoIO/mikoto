@@ -28,12 +28,14 @@ const io = new socketio.Server(server, {
   cors: { origin: '*' },
 });
 
+const minioClient = minioFromURL(process.env.MINIO!);
+
 const prisma = new PrismaClient({
   // log: ['error'],
 });
 Container.set(PrismaClient, prisma);
 Container.set(socketio.Server, io);
-Container.set(minio.Client, minioFromURL(process.env.MINIO!));
+Container.set(minio.Client, minioClient);
 
 app.use(cors());
 

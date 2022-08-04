@@ -104,4 +104,20 @@ export class SpaceController {
   async getChannels(@Param('spaceId') spaceId: string) {
     return this.prisma.channel.findMany({ where: { spaceId } });
   }
+
+  @Get('/spaces/:spaceId/unreads')
+  async getUnreads(
+    @CurrentUser() account: AccountJwt,
+    @Param('spaceId') spaceId: string,
+  ) {
+    const channels = await this.prisma.channel.findMany({
+      where: { spaceId },
+      select: {
+        channelUnread: {
+          where: { userId: account.sub },
+        },
+      },
+    });
+    return channels.flatMap((x) => x.channelUnread);
+  }
 }

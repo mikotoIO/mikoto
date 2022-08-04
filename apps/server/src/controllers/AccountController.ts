@@ -14,6 +14,7 @@ import crypto from 'crypto';
 import { promisify } from 'util';
 import { Client } from 'minio';
 import { v4 as uuid } from 'uuid';
+import sharp from 'sharp';
 import { mimeImageExtension } from '../functions/checkMimetype';
 import { AccountJwt } from '../auth';
 
@@ -128,8 +129,16 @@ export class AccountController {
     @UploadedFile('avatar') avatar: Express.Multer.File,
   ) {
     const id = uuid();
-    const fileName = `${id}.${mimeImageExtension(avatar.mimetype)}`;
-    await this.minio.putObject('avatar', fileName, avatar.buffer);
+    mimeImageExtension(avatar.mimetype);
+    const fileName = `${id}.png`;
+    const resized = await sharp(avatar.buffer)
+      .resize({
+        width: 128,
+        height: 128,
+      })
+      .png()
+      .toBuffer();
+    await this.minio.putObject('avatar', fileName, resized);
     await this.prisma.user.update({
       where: { id: account.sub },
       data: { avatar: `http://localhost:9000/avatar/${fileName}` },

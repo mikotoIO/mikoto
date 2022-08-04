@@ -90,15 +90,23 @@ export class ChannelController {
       throw new UnauthorizedError('Not part of the space!');
     }
 
-    const message = await this.prisma.message.create({
-      data: {
-        channelId: id,
-        timestamp: new Date(),
-        authorId: account.sub,
-        content: body.content,
-      },
-      include: { author: authorInclude },
-    });
+    const now = new Date();
+
+    const [message] = await Promise.all([
+      this.prisma.message.create({
+        data: {
+          channelId: id,
+          timestamp: now,
+          authorId: account.sub,
+          content: body.content,
+        },
+        include: { author: authorInclude },
+      }),
+      this.prisma.channel.update({
+        where: { id },
+        data: { lastUpdated: now },
+      }),
+    ]);
     this.io.in(channel.spaceId).emit('messageCreate', message);
     return message;
   }
@@ -120,6 +128,24 @@ export class ChannelController {
     });
     this.io.in(channel.spaceId).emit('messageDelete', message);
     return message;
+  }
+
+  @Post('/channels/:channelId/ack')
+  async ack(
+    @CurrentUser() account: AccountJwt,
+    @Param('channelId') channelId: string,
+  ) {
+    const now = new Date();
+    this.prisma.channelUnread.upsert({
+      where: { channelId_userId: { channelId, userId: account.sub } },
+      create: {
+        channelId,
+        userId: account.sub,
+        timestamp: new Date(),
+      },
+      update: { timestamp: now },
+    });
+    return {};
   }
 
   // @Post('/channels/:id/thread')

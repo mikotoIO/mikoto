@@ -11,15 +11,16 @@ datasource db {
 }
 
 model User {
-  id           String         @id @default(uuid()) @db.Uuid
-  email        String         @unique
-  name         String
-  avatar       String?
-  passhash     String
-  SpaceUser    SpaceUser[]
-  RefreshToken RefreshToken[]
-  Message      Message[]
-  Space        Space[]
+  id            String          @id @default(uuid()) @db.Uuid
+  email         String          @unique
+  name          String
+  avatar        String?
+  passhash      String
+  SpaceUser     SpaceUser[]
+  RefreshToken  RefreshToken[]
+  Message       Message[]
+  Space         Space[]
+  ChannelUnread ChannelUnread[]
 }
 
 model RefreshToken {
@@ -79,12 +80,24 @@ model Channel {
   children Channel[] @relation("NestedChannel")
   order    Int       @default(0)
 
-  name    String
-  spaceId String    @db.Uuid
-  space   Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  Message Message[]
+  name        String
+  spaceId     String    @db.Uuid
+  space       Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  Message     Message[]
+  lastUpdated DateTime?
 
+  channelUnread ChannelUnread[]
   @@index([spaceId])
+}
+
+model ChannelUnread {
+  channelId String   @db.Uuid
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  timestamp DateTime
+
+  @@id([channelId, userId])
 }
 
 enum ChannelType {

@@ -60,9 +60,12 @@ export function MessageEditor({ placeholder, onSubmit }: MessageEditorProps) {
         onKeyDown={(ev) => {
           if (ev.key === 'Enter' && !ev.shiftKey) {
             ev.preventDefault();
-            submitFn(serialize(editorValue));
-            setEditorValue(initialEditorValue);
-            resetEditor(editor);
+            const text = serialize(editorValue).trim();
+            if (text.length !== 0) {
+              submitFn(text);
+              setEditorValue(initialEditorValue);
+              resetEditor(editor);
+            }
           }
         }}
       />

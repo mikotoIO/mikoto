@@ -1,6 +1,9 @@
-# Mikoto
+<h1 align="center">
+  Mikoto
+</h1>
 
-This is the Turborepo setup for Mikoto.
+
+<p align="center">Turbocharge Your Community.</p>
 
 ## What's inside?
 
@@ -9,7 +12,7 @@ This turborepo uses [Yarn](https://classic.yarnpkg.com/lang/en/) as a package ma
 - `apps/client`: the Mikoto front-end
 - `apps/server`: the Mikoto back-end and API
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+We use TypeScript and Rust.
 
 ## Setup
 

@@ -147,9 +147,4 @@ export class ChannelController {
     });
     return {};
   }
-
-  // @Post('/channels/:id/thread')
-  // createThread(@Body body: { name: string }) {
-  //
-  // }
 }

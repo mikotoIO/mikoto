@@ -170,7 +170,7 @@ export function SpaceJoinModal() {
     >
       <TextInput
         label="Space ID"
-        placeholder="XXXXXXXX"
+        placeholder="9a807e83-15db-4267-9940-cdda7cb696fd"
         {...form.getInputProps('spaceId')}
       />
       <Button mt={16} fullWidth type="submit">

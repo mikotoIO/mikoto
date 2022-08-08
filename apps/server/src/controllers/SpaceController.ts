@@ -74,6 +74,7 @@ export class SpaceController {
       data: {
         name: body.name,
         channels: { create: [{ name: 'general', order: 0 }] },
+        ownerId: jwt.sub,
         roles: {
           create: [{ name: '@everyone', position: 0, permissions: '0' }],
         },

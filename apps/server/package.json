@@ -16,7 +16,7 @@
     "@types/uuid": "^8.3.4",
     "jest": "^27.5.1",
     "prettier": "^2.5.1",
-    "prisma": "^3.15.0",
+    "prisma": "^4.1.1",
     "ts-jest": "^27.1.4",
     "typescript": "^4.5.5"
   },
@@ -26,7 +26,7 @@
     "studio": "prisma studio"
   },
   "dependencies": {
-    "@prisma/client": "^3.15.0",
+    "@prisma/client": "^4.1.1",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.2",
     "class-transformer": "^0.5.1",

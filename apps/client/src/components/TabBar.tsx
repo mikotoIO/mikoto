@@ -8,20 +8,20 @@ import { useRecoilState } from 'recoil';
 import { getTabIcon, IconBox } from './atoms/IconBox';
 import { Tabable, tabbedState } from '../store';
 
-const TabbedViewContainer = styled.div`
+const StyledTabbedView = styled.div`
   flex: 1;
   background-color: ${(p) => p.theme.colors.N1000};
   display: grid;
   grid-template-rows: 40px calc(100vh - 40px);
 `;
 
-const TabBar = styled.div`
+const StyledTabBar = styled.div`
   font-size: 14px;
   height: 40px;
   display: flex;
 `;
 
-const CloseButton = styled.div<{ active?: boolean }>`
+const StyledCloseButton = styled.div<{ active?: boolean }>`
   margin-left: 4px;
   display: flex;
   align-items: center;
@@ -38,7 +38,7 @@ const CloseButton = styled.div<{ active?: boolean }>`
   }
 `;
 
-const TabItemElement = styled.div<{ active?: boolean }>`
+const StyledTabItem = styled.div<{ active?: boolean }>`
   user-select: none;
   cursor: pointer;
   height: 100%;
@@ -113,7 +113,7 @@ function TabItem({ tab, index }: TabItemProps) {
   const active = index === tabbed.index;
 
   return (
-    <TabItemElement
+    <StyledTabItem
       ref={ref}
       key={tab.key}
       active={active}
@@ -123,7 +123,7 @@ function TabItem({ tab, index }: TabItemProps) {
     >
       <IconBox size={20} icon={getTabIcon(tab)} />
       <div>{tab.name}</div>
-      <CloseButton
+      <StyledCloseButton
         active={active}
         onClick={(ev) => {
           ev.stopPropagation(); // close button shouldn't reset tab index
@@ -144,8 +144,8 @@ function TabItem({ tab, index }: TabItemProps) {
         }}
       >
         <FontAwesomeIcon icon={faX} />
-      </CloseButton>
-    </TabItemElement>
+      </StyledCloseButton>
+    </StyledTabItem>
   );
 }
 
@@ -155,7 +155,7 @@ interface TabbedViewProps {
 }
 
 // noinspection CssUnknownProperty
-const DropRest = styled.div`
+const StyledRest = styled.div`
   flex-grow: 1;
   -webkit-app-region: drag;
 `;
@@ -192,14 +192,14 @@ export function TabbedView({ children, tabs }: TabbedViewProps) {
   });
 
   return (
-    <TabbedViewContainer>
-      <TabBar>
+    <StyledTabbedView>
+      <StyledTabBar>
         {tabs.map((tab, index) => (
           <TabItem tab={tab} index={index} key={`${tab.kind}/${tab.key}`} />
         ))}
-        <DropRest ref={drop} />
-      </TabBar>
+        <StyledRest ref={drop} />
+      </StyledTabBar>
       {tabs.length ? children : <WelcomeToMikoto />}
-    </TabbedViewContainer>
+    </StyledTabbedView>
   );
 }

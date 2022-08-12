@@ -11,13 +11,13 @@ import { IconBox } from './atoms/IconBox';
 import { Tabable, treebarSpaceState, useTabkit } from '../store';
 import { useDelta } from '../hooks/useDelta';
 
-const TreeContainer = styled.div`
+const StyledTree = styled.div`
   display: flex;
   flex-direction: column;
   overflow-y: auto;
 `;
 
-export const TreeBody = styled.div`
+export const StyledTreeBody = styled.div`
   margin: 0;
   padding: 10px;
   min-height: min-content;
@@ -26,7 +26,7 @@ export const TreeBody = styled.div`
   box-sizing: border-box;
 `;
 
-const TreeNodeElement = styled.a`
+const StyledTreeNode = styled.a`
   font-size: 14px;
   height: 20px;
   padding: 6px 10px;
@@ -35,6 +35,7 @@ const TreeNodeElement = styled.a`
   align-items: center;
   color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
+  user-select: none;
 
   &:hover {
     background-color: ${(p) => p.theme.colors.N700};
@@ -61,10 +62,10 @@ export function TreeNode({ channel, ...props }: TreeNodeProps) {
   ));
 
   return (
-    <TreeNodeElement {...props} onContextMenu={menu}>
+    <StyledTreeNode {...props} onContextMenu={menu}>
       <IconBox />
       {channel.name}
-    </TreeNodeElement>
+    </StyledTreeNode>
   );
 }
 
@@ -139,11 +140,11 @@ export function TreeBar({ space }: { space: ClientSpace }) {
   const contextMenu = useContextMenu(() => <TreebarContextMenu />);
 
   return (
-    <TreeContainer>
+    <StyledTree>
       <TreeHead>
         <h1>{space.name}</h1>
       </TreeHead>
-      <TreeBody onContextMenu={contextMenu}>
+      <StyledTreeBody onContextMenu={contextMenu}>
         {channelDelta.data.map((channel) => (
           <TreeNode
             channel={channel}
@@ -153,7 +154,7 @@ export function TreeBar({ space }: { space: ClientSpace }) {
             }}
           />
         ))}
-      </TreeBody>
-    </TreeContainer>
+      </StyledTreeBody>
+    </StyledTree>
   );
 }

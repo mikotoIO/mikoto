@@ -20,14 +20,14 @@ const ServerSidebarBase = styled.div`
   padding-top: 10px;
 `;
 
-const ServerIconBase = styled.div`
+const ServerIconBase = styled.div<{ active?: boolean }>`
   margin-bottom: 8px;
   width: 48px;
   height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: ${(p) => (p.active ? 16 : 100)}px;
   background-color: ${(p) => p.theme.colors.N800};
 `;
 
@@ -79,7 +79,8 @@ function ServerIconContextMenu({
 }
 
 function ServerIcon({ space }: { space: Space }) {
-  const [, setSpace] = useRecoilState(treebarSpaceState);
+  const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
+  const isActive = stateSpace?.id === space.id;
 
   const ref = useRef<HTMLDivElement>(null);
   const isHover = useHover(ref);
@@ -90,6 +91,7 @@ function ServerIcon({ space }: { space: Space }) {
   return (
     <Tooltip label={space.name} opened={isHover} position="right" withArrow>
       <ServerIconBase
+        active={isActive}
         onContextMenu={contextMenu}
         ref={ref}
         onClick={() => {

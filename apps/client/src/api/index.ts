@@ -31,11 +31,13 @@ export class ClientChannel implements Channel {
   name: string;
   spaceId: string;
   messages: MessageEngine;
+  order: number;
 
   constructor(private client: MikotoApi, base: Channel) {
     this.id = base.id;
     this.name = base.name;
     this.spaceId = base.spaceId;
+    this.order = base.order;
     this.messages = new MessageEngine(client, this.id);
   }
 
@@ -43,6 +45,7 @@ export class ClientChannel implements Channel {
     return {
       id: this.id,
       name: this.name,
+      order: this.order,
       spaceId: this.spaceId,
     };
   }
@@ -138,7 +141,9 @@ export default class MikotoApi {
     const { data } = await this.axios.get<Channel[]>(
       `/spaces/${spaceId}/channels`,
     );
-    return data.map((x) => this.newChannel(x));
+    const res = data.map((x) => this.newChannel(x));
+    res.sort((a, b) => a.order - b.order);
+    return res;
   }
 
   async createChannel(spaceId: string, name: string): Promise<ClientChannel> {

@@ -121,4 +121,13 @@ export class SpaceController {
     });
     return channels.flatMap((x) => x.channelUnread);
   }
+
+  @Get('/spaces/:spaceId/member')
+  async getSpaceMembers(@Param('spaceId') spaceId: string) {
+    return await this.prisma.spaceUser.findMany({
+      where: {
+        spaceId,
+      },
+    });
+  }
 }

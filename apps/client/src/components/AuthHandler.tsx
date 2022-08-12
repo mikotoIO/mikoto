@@ -2,12 +2,12 @@ import { atom, useRecoilState } from 'recoil';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import jwtDecode from 'jwt-decode';
+import axios from 'axios';
 
 import { useInterval } from '../hooks';
 import { TokenPair } from '../models';
 import { useMikoto } from '../api';
 import { refresh } from '../api/auth';
-import axios from 'axios';
 
 const TOKEN_PAIR = 'token_pair';
 

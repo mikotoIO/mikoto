@@ -37,11 +37,14 @@ export class ChannelController {
 
   @Post('/channels')
   async createChannel(@Body() body: ChannelPayload) {
+    const channelCount = await this.prisma.channel.count({
+      where: { spaceId: body.spaceId },
+    });
     const channel = await this.prisma.channel.create({
       data: {
         name: body.name,
         spaceId: body.spaceId,
-        order: 0,
+        order: channelCount,
       },
     });
     this.io.in(channel.spaceId).emit('channelCreate', channel);
@@ -128,6 +131,53 @@ export class ChannelController {
     });
     this.io.in(channel.spaceId).emit('messageDelete', message);
     return message;
+  }
+
+  @Post('/channels/:channelId/move')
+  async move(
+    @CurrentUser() account: AccountJwt,
+    @Param('channelId') channelId: string,
+    @Body() body: { order: number },
+  ) {
+    const channel = await this.prisma.channel.findUnique({
+      where: { id: channelId },
+    });
+    if (channel === null) throw new NotFoundError();
+    if (channel.order === body.order) return {};
+    // if channel is moved up from x (8) to y (2), (x > y)
+    // move previous y and everything under until x down by 1
+    // y <= T < x
+
+    // y >= T > x
+    const updater = this.prisma.channel.update({
+      where: { id: channel.id },
+      data: { order: body.order },
+    });
+    if (channel.order > body.order) {
+      await this.prisma.$transaction([
+        this.prisma.channel.updateMany({
+          where: {
+            spaceId: channel.spaceId,
+            order: { gte: body.order, lt: channel.order },
+          },
+          data: { order: { increment: 1 } },
+        }),
+        updater,
+      ]);
+    } else {
+      await this.prisma.$transaction([
+        this.prisma.channel.updateMany({
+          where: {
+            spaceId: channel.spaceId,
+            order: { lte: body.order, gt: channel.order },
+          },
+          data: { order: { increment: -1 } },
+        }),
+        updater,
+      ]);
+    }
+
+    return {};
   }
 
   @Post('/channels/:channelId/ack')

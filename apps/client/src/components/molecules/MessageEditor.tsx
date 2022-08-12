@@ -12,24 +12,14 @@ const StyledEditable = styled(Editable)`
   border-radius: 4px;
 `;
 
-const initialEditorValue = [
-  {
-    children: [{ text: '' }],
-  },
-];
+const initialEditorValue = [{ children: [{ text: '' }] }];
 
 function resetEditor(editor: ReactEditor) {
   Transforms.setSelection(editor, {
-    anchor: {
-      path: [0, 0],
-      offset: 0,
-    },
-    focus: {
-      path: [0, 0],
-      offset: 0,
-    },
+    anchor: { path: [0, 0], offset: 0 },
+    focus: { path: [0, 0], offset: 0 },
   });
-  editor.children = [{ children: [{ text: '' }] }];
+  editor.children = initialEditorValue;
 }
 
 function serialize(nodes: Node[]) {
@@ -38,17 +28,15 @@ function serialize(nodes: Node[]) {
 
 interface MessageEditorProps {
   placeholder: string;
-  onSubmit?: (content: string) => void;
+  onSubmit: (content: string) => void;
 }
 
 export function MessageEditor({ placeholder, onSubmit }: MessageEditorProps) {
-  const submitFn = onSubmit ?? (() => {});
   const editor = useMemo(
     () => withHistory(withReact(createEditor() as ReactEditor)),
     [],
   );
   const [editorValue, setEditorValue] = useState<Node[]>(initialEditorValue);
-  // const [editor] = useState(() => withReact(createEditor() as ReactEditor));
   return (
     <Slate
       editor={editor}
@@ -58,15 +46,15 @@ export function MessageEditor({ placeholder, onSubmit }: MessageEditorProps) {
       <StyledEditable
         placeholder={placeholder}
         onKeyDown={(ev) => {
-          if (ev.key === 'Enter' && !ev.shiftKey) {
-            ev.preventDefault();
-            const text = serialize(editorValue).trim();
-            if (text.length !== 0) {
-              submitFn(text);
-              setEditorValue(initialEditorValue);
-              resetEditor(editor);
-            }
-          }
+          if (ev.key !== 'Enter' || ev.shiftKey) return;
+
+          ev.preventDefault();
+          const text = serialize(editorValue).trim();
+          if (text.length === 0) return;
+
+          onSubmit(text);
+          setEditorValue(initialEditorValue);
+          resetEditor(editor);
         }}
       />
     </Slate>

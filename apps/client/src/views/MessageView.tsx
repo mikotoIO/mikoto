@@ -7,7 +7,7 @@ import { Channel, Message } from '../models';
 import MessageItem from '../components/molecules/Message';
 import { ViewContainer } from '../components/ViewContainer';
 import { useDelta } from '../hooks/useDelta';
-import { Spinner } from '../components/Spinner';
+import { Spinner } from '../components/atoms/Spinner';
 import { MessageEditor } from '../components/molecules/MessageEditor';
 
 const Messages = styled.div`

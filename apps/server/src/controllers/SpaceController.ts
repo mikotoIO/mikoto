@@ -119,7 +119,8 @@ export class SpaceController {
         },
       },
     });
-    return channels.flatMap((x) => x.channelUnread);
+    const unreads = channels.flatMap((x) => x.channelUnread);
+    return Object.fromEntries(unreads.map((x) => [x.channelId, x.timestamp]));
   }
 
   @Get('/spaces/:spaceId/member')

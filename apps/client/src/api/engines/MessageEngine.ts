@@ -1,4 +1,4 @@
-import { DeltaEngine } from '../deltaEngine';
+import { DeltaEngine } from './DeltaEngine';
 import { Message } from '../../models';
 import type MikotoApi from '../index';
 

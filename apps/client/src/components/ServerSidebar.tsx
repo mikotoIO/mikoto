@@ -4,24 +4,23 @@ import React, { useRef } from 'react';
 import { Button, TextInput, Tooltip } from '@mantine/core';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useForm } from '@mantine/form';
-import { ClientSpace, useMikoto } from '../api';
+import { useMikoto } from '../api';
 import { Space } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { treebarSpaceState, useTabkit } from '../store';
 import { useDelta } from '../hooks/useDelta';
+import { Pill } from './atoms/Pill';
+import { ClientSpace } from '../api/entities/ClientSpace';
 
-const ServerSidebarBase = styled.div`
-  display: flex;
-  flex-direction: column;
+const StyledServerSidebar = styled.div`
   background-color: ${(p) => p.theme.colors.N1000};
   align-items: center;
-  width: 64px;
+  width: 68px;
   height: 100%;
   padding-top: 10px;
 `;
 
-const ServerIconBase = styled.div<{ active?: boolean }>`
-  margin-bottom: 8px;
+const StyledServerIcon = styled.div<{ active?: boolean }>`
   width: 48px;
   height: 48px;
   display: flex;
@@ -29,6 +28,7 @@ const ServerIconBase = styled.div<{ active?: boolean }>`
   justify-content: center;
   border-radius: ${(p) => (p.active ? 16 : 100)}px;
   background-color: ${(p) => p.theme.colors.N800};
+  transition-duration: 100ms;
 `;
 
 function ServerIconContextMenu({
@@ -78,6 +78,15 @@ function ServerIconContextMenu({
   );
 }
 
+const StyledIconWrapper = styled.div`
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 8px;
+  width: 68px;
+`;
+
 function ServerIcon({ space }: { space: Space }) {
   const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
   const isActive = stateSpace?.id === space.id;
@@ -90,16 +99,19 @@ function ServerIcon({ space }: { space: Space }) {
 
   return (
     <Tooltip label={space.name} opened={isHover} position="right" withArrow>
-      <ServerIconBase
-        active={isActive}
-        onContextMenu={contextMenu}
-        ref={ref}
-        onClick={() => {
-          setSpace(space instanceof ClientSpace ? space.simplify() : space);
-        }}
-      >
-        {space.name[0]}
-      </ServerIconBase>
+      <StyledIconWrapper>
+        <Pill h={isActive ? 32 : 8} />
+        <StyledServerIcon
+          active={isActive}
+          onContextMenu={contextMenu}
+          ref={ref}
+          onClick={() => {
+            setSpace(space instanceof ClientSpace ? space.simplify() : space);
+          }}
+        >
+          {space.name[0]}
+        </StyledServerIcon>
+      </StyledIconWrapper>
     </Tooltip>
   );
 }
@@ -192,20 +204,22 @@ export function ServerSidebar() {
   const contextMenu = useContextMenu(() => <ServerSidebarContextMenu />);
 
   return (
-    <ServerSidebarBase onContextMenu={contextMenu}>
+    <StyledServerSidebar onContextMenu={contextMenu}>
       {spaces.map((space) => (
         <ServerIcon space={space} key={space.id} />
       ))}
-      <ServerIconBase
-        onClick={() => {
-          setModal({
-            title: 'Join Space',
-            elem: <SpaceJoinModal />,
-          });
-        }}
-      >
-        +
-      </ServerIconBase>
-    </ServerSidebarBase>
+      <StyledIconWrapper>
+        <StyledServerIcon
+          onClick={() => {
+            setModal({
+              title: 'Join Space',
+              elem: <SpaceJoinModal />,
+            });
+          }}
+        >
+          +
+        </StyledServerIcon>
+      </StyledIconWrapper>
+    </StyledServerSidebar>
   );
 }

@@ -38,7 +38,7 @@ const StyledCloseButton = styled.div<{ active?: boolean }>`
   }
 `;
 
-const StyledTabItem = styled.div<{ active?: boolean }>`
+const StyledTab = styled.div<{ active?: boolean }>`
   user-select: none;
   cursor: pointer;
   height: 100%;
@@ -58,12 +58,12 @@ const StyledTabItem = styled.div<{ active?: boolean }>`
   border-right: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
-interface TabItemProps {
+interface TabProps {
   tab: Tabable;
   index: number;
 }
 
-interface TabDndItem {
+interface TabDnd {
   tab: Tabable;
   dragIndex: number;
 }
@@ -92,18 +92,18 @@ function useReorderable() {
   };
 }
 
-function TabItem({ tab, index }: TabItemProps) {
+function Tab({ tab, index }: TabProps) {
   const [tabbed, setTabbed] = useRecoilState(tabbedState);
 
   const reorderFn = useReorderable();
 
   const ref = useRef<HTMLDivElement>(null);
-  const [, drag] = useDrag<TabDndItem>({
-    type: 'CHANNEL',
+  const [, drag] = useDrag<TabDnd>({
+    type: 'TAB',
     item: { tab, dragIndex: index },
   });
-  const [, drop] = useDrop<TabDndItem>({
-    accept: 'CHANNEL',
+  const [, drop] = useDrop<TabDnd>({
+    accept: 'TAB',
     drop(item) {
       reorderFn(item.dragIndex, index);
     },
@@ -113,7 +113,7 @@ function TabItem({ tab, index }: TabItemProps) {
   const active = index === tabbed.index;
 
   return (
-    <StyledTabItem
+    <StyledTab
       ref={ref}
       key={tab.key}
       active={active}
@@ -145,7 +145,7 @@ function TabItem({ tab, index }: TabItemProps) {
       >
         <FontAwesomeIcon icon={faX} />
       </StyledCloseButton>
-    </StyledTabItem>
+    </StyledTab>
   );
 }
 
@@ -160,7 +160,7 @@ const StyledRest = styled.div`
   -webkit-app-region: drag;
 `;
 
-const WelcomeContainer = styled.div`
+const StyledWelcome = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -174,18 +174,18 @@ const MikotoLogo = styled.img`
 
 function WelcomeToMikoto() {
   return (
-    <WelcomeContainer>
+    <StyledWelcome>
       <MikotoLogo src="/logo.svg" />
       <h1>Welcome to Mikoto!</h1>
-    </WelcomeContainer>
+    </StyledWelcome>
   );
 }
 
 export function TabbedView({ children, tabs }: TabbedViewProps) {
   const reorderFn = useReorderable();
 
-  const [, drop] = useDrop<TabDndItem>({
-    accept: 'CHANNEL',
+  const [, drop] = useDrop<TabDnd>({
+    accept: 'TAB',
     drop(item) {
       reorderFn(item.dragIndex, -1);
     },
@@ -195,7 +195,7 @@ export function TabbedView({ children, tabs }: TabbedViewProps) {
     <StyledTabbedView>
       <StyledTabBar>
         {tabs.map((tab, index) => (
-          <TabItem tab={tab} index={index} key={`${tab.kind}/${tab.key}`} />
+          <Tab tab={tab} index={index} key={`${tab.kind}/${tab.key}`} />
         ))}
         <StyledRest ref={drop} />
       </StyledTabBar>

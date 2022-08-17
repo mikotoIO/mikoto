@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useRecoilValue } from 'recoil';
 import { ErrorBoundary } from 'react-error-boundary';
-import { TreeBar } from '../components/TreeBar';
+import { ChannelSidebar } from '../components/ChannelSidebar';
 import { TabbedView } from '../components/TabBar';
 import { AuthRefresher } from '../components/AuthHandler';
 import { Sidebar } from '../components/UserArea';
@@ -10,8 +10,9 @@ import { ServerSidebar } from '../components/ServerSidebar';
 import { MessageView } from './MessageView';
 import { Tabable, tabbedState, treebarSpaceState } from '../store';
 import { SpaceSettingsView } from './SpaceSettingsView';
-import { ClientSpace, useMikoto } from '../api';
+import { useMikoto } from '../api';
 import { AccountSettingsView } from './AccountSettingsView';
+import { ClientSpace } from '../api/entities/ClientSpace';
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -56,7 +57,7 @@ function AppView() {
   return (
     <AppContainer>
       <ServerSidebar />
-      <Sidebar>{space && <TreeBar space={space} />}</Sidebar>
+      <Sidebar>{space && <ChannelSidebar space={space} />}</Sidebar>
       <TabbedView tabs={tabbed.tabs}>
         <ErrorBoundaryPage>
           {tabbed.index !== null && tabbed.index < tabbed.tabs.length && (

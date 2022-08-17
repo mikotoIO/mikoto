@@ -186,7 +186,7 @@ export class ChannelController {
     @Param('channelId') channelId: string,
   ) {
     const now = new Date();
-    this.prisma.channelUnread.upsert({
+    await this.prisma.channelUnread.upsert({
       where: { channelId_userId: { channelId, userId: account.sub } },
       create: {
         channelId,

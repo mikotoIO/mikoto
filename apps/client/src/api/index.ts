@@ -3,53 +3,9 @@ import { io, Socket } from 'socket.io-client';
 import React, { useContext } from 'react';
 import { Channel, Message, Space, User } from '../models';
 import { MikotoCache } from './cache';
-import { MessageEngine } from './engines/MessageEngine';
 import { SpaceEngine } from './engines/SpaceEngine';
-import { ChannelEngine } from './engines/ChannelEngine';
-
-export class ClientSpace implements Space {
-  id: string;
-  name: string;
-  channels: ChannelEngine;
-
-  constructor(private client: MikotoApi, base: Space) {
-    this.id = base.id;
-    this.name = base.name;
-    this.channels = new ChannelEngine(client, this.id);
-  }
-
-  simplify(): Space {
-    return {
-      id: this.id,
-      name: this.name,
-    };
-  }
-}
-
-export class ClientChannel implements Channel {
-  id: string;
-  name: string;
-  spaceId: string;
-  messages: MessageEngine;
-  order: number;
-
-  constructor(private client: MikotoApi, base: Channel) {
-    this.id = base.id;
-    this.name = base.name;
-    this.spaceId = base.spaceId;
-    this.order = base.order;
-    this.messages = new MessageEngine(client, this.id);
-  }
-
-  simplify(): Channel {
-    return {
-      id: this.id,
-      name: this.name,
-      order: this.order,
-      spaceId: this.spaceId,
-    };
-  }
-}
+import { ClientSpace } from './entities/ClientSpace';
+import { ClientChannel } from './entities/ClientChannel';
 
 export default class MikotoApi {
   axios: AxiosInstance;
@@ -141,9 +97,7 @@ export default class MikotoApi {
     const { data } = await this.axios.get<Channel[]>(
       `/spaces/${spaceId}/channels`,
     );
-    const res = data.map((x) => this.newChannel(x));
-    res.sort((a, b) => a.order - b.order);
-    return res;
+    return data.map((x) => this.newChannel(x));
   }
 
   async createChannel(spaceId: string, name: string): Promise<ClientChannel> {
@@ -158,6 +112,19 @@ export default class MikotoApi {
     const { data } = await this.axios.delete<Channel>(`/channels/${channelId}`);
     this.channelCache.delete(data.id);
     return new ClientChannel(this, data);
+  }
+
+  async moveChannel(channelId: string, order: number): Promise<void> {
+    await this.axios.post(`/channels/${channelId}/move`, { order });
+  }
+
+  async ack(channelId: string): Promise<void> {
+    await this.axios.post(`/channels/${channelId}/ack`);
+  }
+
+  async unreads(spaceId: string): Promise<{ [key: string]: string }> {
+    const { data } = await this.axios.get(`/spaces/${spaceId}/unreads`);
+    return data;
   }
   // endregion
 

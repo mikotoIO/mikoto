@@ -19,8 +19,12 @@ export class MikotoCache<T extends ObjectWithID> {
   }
 
   set(item: T) {
-    this.cache.set(item.id, item);
+    // refresh key
+    if (this.cache.has(item.id)) return item;
+    // evict oldest
     if (this.cache.size === this.max) this.cache.delete(this.first());
+    this.cache.set(item.id, item);
+    return item;
   }
 
   first(): string {

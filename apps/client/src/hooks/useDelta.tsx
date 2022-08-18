@@ -59,9 +59,8 @@ export function useDelta<T extends ObjectWithId>(
 export function useDeltaInstance<T>(
   instance: DeltaInstance<T>,
   deps: React.DependencyList,
-  initialValue: T,
 ) {
-  const [data, setData] = useState<T>(initialValue);
+  const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

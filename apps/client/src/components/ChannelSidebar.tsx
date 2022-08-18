@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useForm } from '@mantine/form';
 import { Button, TextInput } from '@mantine/core';
@@ -10,7 +10,7 @@ import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { useMikoto } from '../api';
 import { IconBox } from './atoms/IconBox';
 import { Tabable, treebarSpaceState, useTabkit } from '../store';
-import { useDelta } from '../hooks/useDelta';
+import { useDelta, useDeltaInstance } from '../hooks/useDelta';
 import { Pill } from './atoms/Pill';
 import { ClientSpace } from '../api/entities/ClientSpace';
 import { ClientChannel } from '../api/entities/ClientChannel';
@@ -50,7 +50,7 @@ const StyledChannelNode = styled.a<{ unread?: boolean }>`
 
 interface ChanelNodeProps extends React.HTMLAttributes<HTMLAnchorElement> {
   channel: ClientChannel;
-  unread?: boolean;
+  unread?: Date;
   onReorder?(): void;
 }
 
@@ -73,6 +73,7 @@ export function ChannelNode({
       </ContextMenu.Link>
     </ContextMenu>
   ));
+  const instance = useDeltaInstance(channel.instance, [channel.id]);
 
   const ref = useRef<HTMLAnchorElement>(null);
   const [, drag] = useDrag<ClientChannel>({
@@ -90,14 +91,19 @@ export function ChannelNode({
 
   drag(drop(ref));
 
+  const isUnread =
+    instance.data === null
+      ? false
+      : unread === undefined || unread < new Date(instance.data.lastUpdated);
+
   return (
     <StyledChannelNode
       {...props}
-      unread={unread}
+      unread={isUnread}
       onContextMenu={menu}
       ref={ref}
     >
-      {unread && <Pill />}
+      {isUnread && <Pill />}
       <IconBox />
       {channel.name}
     </StyledChannelNode>
@@ -175,14 +181,8 @@ export function ChannelSidebar({ space }: { space: ClientSpace }) {
   const contextMenu = useContextMenu(() => <TreebarContextMenu />);
 
   const channels = [...channelDelta.data].sort((a, b) => a.order - b.order);
-  const mikoto = useMikoto();
-
-  const [unreads, setUnreads] = useState<{ [key: string]: string }>({});
-  useEffect(() => {
-    mikoto.unreads(space.id).then((x) => {
-      setUnreads(x);
-    });
-  }, [space.id]);
+  const unreadDelta = useDeltaInstance(space.unreads, [space.id]);
+  const unreadInstance = unreadDelta.data || {};
 
   return (
     <StyledTree>
@@ -192,7 +192,7 @@ export function ChannelSidebar({ space }: { space: ClientSpace }) {
       <StyledTreeBody onContextMenu={contextMenu}>
         {channels.map((channel) => (
           <ChannelNode
-            unread={unreads[channel.id] === undefined}
+            unread={unreadInstance[channel.id]}
             channel={channel}
             key={channel.id}
             onClick={(ev) => {

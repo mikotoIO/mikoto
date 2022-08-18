@@ -39,6 +39,7 @@ export interface Channel {
   spaceId: string;
   name: string;
   order: number;
+  lastUpdated: string;
 }
 
 export interface Role {}

@@ -6,6 +6,7 @@ import { MikotoCache } from './cache';
 import { SpaceEngine } from './engines/SpaceEngine';
 import { ClientSpace } from './entities/ClientSpace';
 import { ClientChannel } from './entities/ClientChannel';
+import { patch } from './util';
 
 export default class MikotoApi {
   axios: AxiosInstance;
@@ -30,6 +31,11 @@ export default class MikotoApi {
       const ch = this.channelCache.get(message.channelId);
       if (ch) {
         ch.messages.emit('create', message);
+        // ch.instance.emit('update', {
+        //   ...ch.simplify(),
+        //   lastUpdated: new Date().toDateString(),
+        // });
+        // ch.space.channels.emit('update', ch);
       }
     });
 
@@ -73,15 +79,21 @@ export default class MikotoApi {
   }
 
   newChannel(data: Channel): ClientChannel {
-    const ch = new ClientChannel(this, data);
-    this.channelCache.set(ch);
-    return ch;
+    const channel = this.channelCache.get(data.id);
+    if (channel === undefined)
+      return this.channelCache.set(new ClientChannel(this, data));
+
+    patch(channel, data);
+    return channel;
   }
 
   newSpace(data: Space): ClientSpace {
-    const o = new ClientSpace(this, data);
-    this.spaceCache.set(o);
-    return o;
+    const space = this.spaceCache.get(data.id);
+    if (space === undefined)
+      return this.spaceCache.set(new ClientSpace(this, data));
+
+    patch(space, data);
+    return space;
   }
 
   // region Channels

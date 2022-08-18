@@ -31,11 +31,10 @@ export default class MikotoApi {
       const ch = this.channelCache.get(message.channelId);
       if (ch) {
         ch.messages.emit('create', message);
-        // ch.instance.emit('update', {
-        //   ...ch.simplify(),
-        //   lastUpdated: new Date().toDateString(),
-        // });
-        // ch.space.channels.emit('update', ch);
+        ch.instance.emit('update', {
+          ...ch.simplify(),
+          lastUpdated: new Date().toJSON(),
+        });
       }
     });
 

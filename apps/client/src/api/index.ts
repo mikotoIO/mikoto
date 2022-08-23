@@ -3,50 +3,10 @@ import { io, Socket } from 'socket.io-client';
 import React, { useContext } from 'react';
 import { Channel, Message, Space, User } from '../models';
 import { MikotoCache } from './cache';
-import { MessageEngine } from './engines/MessageEngine';
 import { SpaceEngine } from './engines/SpaceEngine';
-import { ChannelEngine } from './engines/ChannelEngine';
-
-export class ClientSpace implements Space {
-  id: string;
-  name: string;
-  channels: ChannelEngine;
-
-  constructor(private client: MikotoApi, base: Space) {
-    this.id = base.id;
-    this.name = base.name;
-    this.channels = new ChannelEngine(client, this.id);
-  }
-
-  simplify(): Space {
-    return {
-      id: this.id,
-      name: this.name,
-    };
-  }
-}
-
-export class ClientChannel implements Channel {
-  id: string;
-  name: string;
-  spaceId: string;
-  messages: MessageEngine;
-
-  constructor(private client: MikotoApi, base: Channel) {
-    this.id = base.id;
-    this.name = base.name;
-    this.spaceId = base.spaceId;
-    this.messages = new MessageEngine(client, this.id);
-  }
-
-  simplify(): Channel {
-    return {
-      id: this.id,
-      name: this.name,
-      spaceId: this.spaceId,
-    };
-  }
-}
+import { ClientSpace } from './entities/ClientSpace';
+import { ClientChannel } from './entities/ClientChannel';
+import { patch } from './util';
 
 export default class MikotoApi {
   axios: AxiosInstance;
@@ -71,6 +31,10 @@ export default class MikotoApi {
       const ch = this.channelCache.get(message.channelId);
       if (ch) {
         ch.messages.emit('create', message);
+        ch.instance.emit('update', {
+          ...ch.simplify(),
+          lastUpdated: new Date().toJSON(),
+        });
       }
     });
 
@@ -114,15 +78,21 @@ export default class MikotoApi {
   }
 
   newChannel(data: Channel): ClientChannel {
-    const ch = new ClientChannel(this, data);
-    this.channelCache.set(ch);
-    return ch;
+    const channel = this.channelCache.get(data.id);
+    if (channel === undefined)
+      return this.channelCache.set(new ClientChannel(this, data));
+
+    patch(channel, data);
+    return channel;
   }
 
   newSpace(data: Space): ClientSpace {
-    const o = new ClientSpace(this, data);
-    this.spaceCache.set(o);
-    return o;
+    const space = this.spaceCache.get(data.id);
+    if (space === undefined)
+      return this.spaceCache.set(new ClientSpace(this, data));
+
+    patch(space, data);
+    return space;
   }
 
   // region Channels
@@ -153,6 +123,19 @@ export default class MikotoApi {
     const { data } = await this.axios.delete<Channel>(`/channels/${channelId}`);
     this.channelCache.delete(data.id);
     return new ClientChannel(this, data);
+  }
+
+  async moveChannel(channelId: string, order: number): Promise<void> {
+    await this.axios.post(`/channels/${channelId}/move`, { order });
+  }
+
+  async ack(channelId: string): Promise<void> {
+    await this.axios.post(`/channels/${channelId}/ack`);
+  }
+
+  async unreads(spaceId: string): Promise<{ [key: string]: string }> {
+    const { data } = await this.axios.get(`/spaces/${spaceId}/unreads`);
+    return data;
   }
   // endregion
 
@@ -212,6 +195,10 @@ export default class MikotoApi {
 
   async joinSpace(id: string): Promise<void> {
     await this.axios.post<Space>(`/join/${id}`);
+  }
+
+  async leaveSpace(id: string): Promise<void> {
+    await this.axios.post<Space>(`/leave/${id}`);
   }
 
   async createSpace(name: string): Promise<void> {

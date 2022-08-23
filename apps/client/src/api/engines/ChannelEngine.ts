@@ -1,6 +1,6 @@
-import { DeltaEngine } from '../deltaEngine';
+import { DeltaEngine } from './DeltaEngine';
 import type MikotoApi from '../index';
-import type { ClientChannel } from '../index';
+import { ClientChannel } from '../entities/ClientChannel';
 
 export class ChannelEngine extends DeltaEngine<ClientChannel> {
   constructor(private client: MikotoApi, private spaceId: string) {

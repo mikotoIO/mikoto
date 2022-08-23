@@ -79,6 +79,7 @@ export function LoginView() {
       <Form
         onSubmit={handleSubmit(async (formData) => {
           try {
+            await authAPI.login(formData.email, formData.password);
             setAuthToken(
               await authAPI.login(formData.email, formData.password),
             );

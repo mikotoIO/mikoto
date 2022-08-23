@@ -2,12 +2,12 @@ import { atom, useRecoilState } from 'recoil';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import jwtDecode from 'jwt-decode';
+import axios from 'axios';
 
 import { useInterval } from '../hooks';
 import { TokenPair } from '../models';
 import { useMikoto } from '../api';
 import { refresh } from '../api/auth';
-import axios from 'axios';
 
 const TOKEN_PAIR = 'token_pair';
 
@@ -48,7 +48,7 @@ export const authTokenState = atom<TokenPair | null>({
 let init = false;
 
 // TODO: this is effectful. make this less effectful.
-export function AuthRefresher({ children }: { children?: React.ReactNode }) {
+export function AuthRefresher({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const [authToken, setAuthToken] = useRecoilState(authTokenState);
   const [completed, setCompleted] = useState(false);
@@ -72,7 +72,9 @@ export function AuthRefresher({ children }: { children?: React.ReactNode }) {
       } catch (ex) {
         if (!axios.isAxiosError(ex)) throw ex;
         if (ex.response?.status !== 401) throw ex;
-        navigate('/login');
+        // navigate('/login');
+        // Screw SPAs, why not just force an actual reload at this point?
+        window.location.href = '/';
       }
     } else {
       mikoto.updateAccessToken(authToken.accessToken);
@@ -91,6 +93,7 @@ export function AuthRefresher({ children }: { children?: React.ReactNode }) {
   useInterval(async () => {
     await updateTokenLogic();
   }, 5 * 60 * 1000);
+
   // eslint-disable-next-line react/jsx-no-useless-fragment
-  return completed && children;
+  return <>{completed ? children : <div />}</>;
 }

@@ -6,14 +6,14 @@ import { useMikoto } from '../api';
 import { User } from '../models';
 import { useTabkit } from '../store';
 
-const SidebarElement = styled.div`
+const StyledSidebar = styled.div`
   display: grid;
   grid-template-rows: 1fr 64px;
   width: 270px;
   height: 100%;
 `;
 
-const UserAreaItem = styled.div`
+const StyledUserArea = styled.div`
   padding-left: 16px;
   display: flex;
   align-items: center;
@@ -21,7 +21,7 @@ const UserAreaItem = styled.div`
   background-color: ${(p) => p.theme.colors.N1000};
 `;
 
-const UserInfo = styled.div`
+const StyledUserInfo = styled.div`
   margin-left: 10px;
   h1,
   h2 {
@@ -50,7 +50,7 @@ export function UserArea() {
   }, []);
 
   return (
-    <UserAreaItem
+    <StyledUserArea
       onClick={() => {
         tabkit.openTab(
           {
@@ -66,21 +66,21 @@ export function UserArea() {
       {user && (
         <>
           <Avatar src={user.avatar} />
-          <UserInfo>
+          <StyledUserInfo>
             <h1>{user.name}</h1>
             <h2>Tinkering on stuff</h2>
-          </UserInfo>
+          </StyledUserInfo>
         </>
       )}
-    </UserAreaItem>
+    </StyledUserArea>
   );
 }
 
 export function Sidebar({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarElement>
+    <StyledSidebar>
       {children}
       <UserArea />
-    </SidebarElement>
+    </StyledSidebar>
   );
 }

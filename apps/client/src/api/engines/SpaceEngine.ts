@@ -1,4 +1,4 @@
-import { DeltaEngine } from '../deltaEngine';
+import { DeltaEngine } from './DeltaEngine';
 import { Space } from '../../models';
 import type MikotoApi from '../index';
 

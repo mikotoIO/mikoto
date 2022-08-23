@@ -10,7 +10,7 @@ import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { Tabable } from '../../store';
 import { centerFlex } from '../themes';
 
-const IconContainer = styled.span<{ size?: number }>`
+const StyledIcon = styled.span<{ size?: number }>`
   background-color: #3b83ff;
   color: white;
   border-radius: 3px;
@@ -39,8 +39,8 @@ export function getTabIcon(tab: Tabable): IconDefinition {
 
 export function IconBox({ size, icon }: TabIconProps) {
   return (
-    <IconContainer size={size}>
+    <StyledIcon size={size}>
       <FontAwesomeIcon icon={icon ?? faHashtag} />
-    </IconContainer>
+    </StyledIcon>
   );
 }

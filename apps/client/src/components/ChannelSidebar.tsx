@@ -1,23 +1,27 @@
 import styled from 'styled-components';
-import React from 'react';
+import React, { useRef } from 'react';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useForm } from '@mantine/form';
 import { Button, TextInput } from '@mantine/core';
 
+import { useDrag, useDrop } from 'react-dnd';
 import { Channel } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
-import { ClientChannel, ClientSpace, useMikoto } from '../api';
+import { useMikoto } from '../api';
 import { IconBox } from './atoms/IconBox';
 import { Tabable, treebarSpaceState, useTabkit } from '../store';
-import { useDelta } from '../hooks/useDelta';
+import { useDelta, useDeltaInstance } from '../hooks/useDelta';
+import { Pill } from './atoms/Pill';
+import { ClientSpace } from '../api/entities/ClientSpace';
+import { ClientChannel } from '../api/entities/ClientChannel';
 
-const TreeContainer = styled.div`
+const StyledTree = styled.div`
   display: flex;
   flex-direction: column;
   overflow-y: auto;
 `;
 
-export const TreeBody = styled.div`
+export const StyledTreeBody = styled.div`
   margin: 0;
   padding: 10px;
   min-height: min-content;
@@ -26,26 +30,36 @@ export const TreeBody = styled.div`
   box-sizing: border-box;
 `;
 
-const TreeNodeElement = styled.a`
+const StyledChannelNode = styled.a<{ unread?: boolean }>`
+  position: relative;
   font-size: 14px;
   height: 20px;
   padding: 6px 10px;
   border-radius: 4px;
   display: flex;
   align-items: center;
-  color: rgba(255, 255, 255, 0.8);
+  font-weight: ${(p) => (p.unread ? '600' : 'inherit')};
+  color: ${(p) => (p.unread ? 'white' : 'rgba(255, 255, 255, 0.8)')};
   cursor: pointer;
+  user-select: none;
 
   &:hover {
     background-color: ${(p) => p.theme.colors.N700};
   }
 `;
 
-interface TreeNodeProps extends React.HTMLAttributes<HTMLAnchorElement> {
-  channel: Channel;
+interface ChanelNodeProps extends React.HTMLAttributes<HTMLAnchorElement> {
+  channel: ClientChannel;
+  unread?: Date;
+  onReorder?(): void;
 }
 
-export function TreeNode({ channel, ...props }: TreeNodeProps) {
+export function ChannelNode({
+  channel,
+  onReorder,
+  unread,
+  ...props
+}: ChanelNodeProps) {
   const mikoto = useMikoto();
   const menu = useContextMenu(({ destroy }) => (
     <ContextMenu>
@@ -59,12 +73,40 @@ export function TreeNode({ channel, ...props }: TreeNodeProps) {
       </ContextMenu.Link>
     </ContextMenu>
   ));
+  const instance = useDeltaInstance(channel.instance, [channel.id]);
+
+  const ref = useRef<HTMLAnchorElement>(null);
+  const [, drag] = useDrag<ClientChannel>({
+    type: 'CHANNEL',
+    item: channel,
+  });
+  const [, drop] = useDrop<ClientChannel>({
+    accept: 'CHANNEL',
+    async drop(item) {
+      await mikoto.moveChannel(item.id, channel.order);
+      console.log(`channel: ${item.name}, target: ${channel.order}`);
+      onReorder?.();
+    },
+  });
+
+  drag(drop(ref));
+
+  const isUnread =
+    instance.data === null
+      ? false
+      : unread === undefined || unread < new Date(instance.data.lastUpdated);
 
   return (
-    <TreeNodeElement {...props} onContextMenu={menu}>
+    <StyledChannelNode
+      {...props}
+      unread={isUnread}
+      onContextMenu={menu}
+      ref={ref}
+    >
+      {isUnread && <Pill />}
       <IconBox />
       {channel.name}
-    </TreeNodeElement>
+    </StyledChannelNode>
   );
 }
 
@@ -132,28 +174,36 @@ const TreeHead = styled.div`
   }
 `;
 
-export function TreeBar({ space }: { space: ClientSpace }) {
+export function ChannelSidebar({ space }: { space: ClientSpace }) {
   const tabkit = useTabkit();
 
   const channelDelta = useDelta(space.channels, [space?.id!]);
   const contextMenu = useContextMenu(() => <TreebarContextMenu />);
 
+  const channels = [...channelDelta.data].sort((a, b) => a.order - b.order);
+  const unreadDelta = useDeltaInstance(space.unreads, [space.id]);
+  const unreadInstance = unreadDelta.data || {};
+
   return (
-    <TreeContainer>
+    <StyledTree>
       <TreeHead>
         <h1>{space.name}</h1>
       </TreeHead>
-      <TreeBody onContextMenu={contextMenu}>
-        {channelDelta.data.map((channel) => (
-          <TreeNode
+      <StyledTreeBody onContextMenu={contextMenu}>
+        {channels.map((channel) => (
+          <ChannelNode
+            unread={unreadInstance[channel.id]}
             channel={channel}
             key={channel.id}
             onClick={(ev) => {
               tabkit.openTab(channelToTab(channel), ev.ctrlKey);
             }}
+            onReorder={async () => {
+              await channelDelta.refetch();
+            }}
           />
         ))}
-      </TreeBody>
-    </TreeContainer>
+      </StyledTreeBody>
+    </StyledTree>
   );
 }

@@ -8,20 +8,20 @@ import { useRecoilState } from 'recoil';
 import { getTabIcon, IconBox } from './atoms/IconBox';
 import { Tabable, tabbedState } from '../store';
 
-const TabbedViewContainer = styled.div`
+const StyledTabbedView = styled.div`
   flex: 1;
   background-color: ${(p) => p.theme.colors.N1000};
   display: grid;
   grid-template-rows: 40px calc(100vh - 40px);
 `;
 
-const TabBar = styled.div`
+const StyledTabBar = styled.div`
   font-size: 14px;
   height: 40px;
   display: flex;
 `;
 
-const CloseButton = styled.div<{ active?: boolean }>`
+const StyledCloseButton = styled.div<{ active?: boolean }>`
   margin-left: 4px;
   display: flex;
   align-items: center;
@@ -38,7 +38,7 @@ const CloseButton = styled.div<{ active?: boolean }>`
   }
 `;
 
-const TabItemElement = styled.div<{ active?: boolean }>`
+const StyledTab = styled.div<{ active?: boolean }>`
   user-select: none;
   cursor: pointer;
   height: 100%;
@@ -58,12 +58,12 @@ const TabItemElement = styled.div<{ active?: boolean }>`
   border-right: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
-interface TabItemProps {
+interface TabProps {
   tab: Tabable;
   index: number;
 }
 
-interface TabDndItem {
+interface TabDnd {
   tab: Tabable;
   dragIndex: number;
 }
@@ -92,18 +92,18 @@ function useReorderable() {
   };
 }
 
-function TabItem({ tab, index }: TabItemProps) {
+function Tab({ tab, index }: TabProps) {
   const [tabbed, setTabbed] = useRecoilState(tabbedState);
 
   const reorderFn = useReorderable();
 
   const ref = useRef<HTMLDivElement>(null);
-  const [, drag] = useDrag<TabDndItem>({
-    type: 'CHANNEL',
+  const [, drag] = useDrag<TabDnd>({
+    type: 'TAB',
     item: { tab, dragIndex: index },
   });
-  const [, drop] = useDrop<TabDndItem>({
-    accept: 'CHANNEL',
+  const [, drop] = useDrop<TabDnd>({
+    accept: 'TAB',
     drop(item) {
       reorderFn(item.dragIndex, index);
     },
@@ -112,40 +112,47 @@ function TabItem({ tab, index }: TabItemProps) {
 
   const active = index === tabbed.index;
 
+  const closeTab = () => {
+    setTabbed(({ tabs, index: idx }) => {
+      const xsc = [...tabs];
+      xsc.splice(index, 1);
+      return {
+        index: idx,
+        tabs: xsc,
+      };
+    });
+    if (index <= tabbed.index) {
+      setTabbed(({ tabs }) => ({
+        index: Math.max(0, index - 1),
+        tabs,
+      }));
+    }
+  };
+
   return (
-    <TabItemElement
+    <StyledTab
       ref={ref}
       key={tab.key}
       active={active}
       onClick={() => {
         setTabbed(({ tabs }) => ({ index, tabs }));
       }}
+      onAuxClick={() => {
+        closeTab();
+      }}
     >
       <IconBox size={20} icon={getTabIcon(tab)} />
       <div>{tab.name}</div>
-      <CloseButton
+      <StyledCloseButton
         active={active}
         onClick={(ev) => {
           ev.stopPropagation(); // close button shouldn't reset tab index
-          setTabbed(({ tabs, index: idx }) => {
-            const xsc = [...tabs];
-            xsc.splice(index, 1);
-            return {
-              index: idx,
-              tabs: xsc,
-            };
-          });
-          if (index <= tabbed.index) {
-            setTabbed(({ tabs }) => ({
-              index: Math.max(0, index - 1),
-              tabs,
-            }));
-          }
+          closeTab();
         }}
       >
         <FontAwesomeIcon icon={faX} />
-      </CloseButton>
-    </TabItemElement>
+      </StyledCloseButton>
+    </StyledTab>
   );
 }
 
@@ -155,12 +162,12 @@ interface TabbedViewProps {
 }
 
 // noinspection CssUnknownProperty
-const DropRest = styled.div`
+const StyledRest = styled.div`
   flex-grow: 1;
   -webkit-app-region: drag;
 `;
 
-const WelcomeContainer = styled.div`
+const StyledWelcome = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -174,32 +181,32 @@ const MikotoLogo = styled.img`
 
 function WelcomeToMikoto() {
   return (
-    <WelcomeContainer>
+    <StyledWelcome>
       <MikotoLogo src="/logo.svg" />
       <h1>Welcome to Mikoto!</h1>
-    </WelcomeContainer>
+    </StyledWelcome>
   );
 }
 
 export function TabbedView({ children, tabs }: TabbedViewProps) {
   const reorderFn = useReorderable();
 
-  const [, drop] = useDrop<TabDndItem>({
-    accept: 'CHANNEL',
+  const [, drop] = useDrop<TabDnd>({
+    accept: 'TAB',
     drop(item) {
       reorderFn(item.dragIndex, -1);
     },
   });
 
   return (
-    <TabbedViewContainer>
-      <TabBar>
+    <StyledTabbedView>
+      <StyledTabBar>
         {tabs.map((tab, index) => (
-          <TabItem tab={tab} index={index} key={`${tab.kind}/${tab.key}`} />
+          <Tab tab={tab} index={index} key={`${tab.kind}/${tab.key}`} />
         ))}
-        <DropRest ref={drop} />
-      </TabBar>
+        <StyledRest ref={drop} />
+      </StyledTabBar>
       {tabs.length ? children : <WelcomeToMikoto />}
-    </TabbedViewContainer>
+    </StyledTabbedView>
   );
 }

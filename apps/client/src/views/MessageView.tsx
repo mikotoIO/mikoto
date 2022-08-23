@@ -2,13 +2,14 @@ import React from 'react';
 import styled from 'styled-components';
 import { useAsync } from 'react-async-hook';
 
-import { ClientChannel, useMikoto } from '../api';
+import { useMikoto } from '../api';
 import { Channel, Message } from '../models';
 import MessageItem from '../components/molecules/Message';
 import { ViewContainer } from '../components/ViewContainer';
 import { useDelta } from '../hooks/useDelta';
-import { Spinner } from '../components/Spinner';
+import { Spinner } from '../components/atoms/Spinner';
 import { MessageEditor } from '../components/molecules/MessageEditor';
+import { ClientChannel } from '../api/entities/ClientChannel';
 
 const Messages = styled.div`
   overflow-y: auto;
@@ -45,6 +46,10 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
     }
   });
   const mikoto = useMikoto();
+
+  React.useEffect(() => {
+    mikoto.ack(channel.id).then();
+  }, [channel.id]);
   const messageDelta = useDelta(channel.messages, [channel.id]);
 
   const messages = messageDelta.data;

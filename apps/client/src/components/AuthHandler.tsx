@@ -72,9 +72,7 @@ export function AuthRefresher({ children }: { children: React.ReactNode }) {
       } catch (ex) {
         if (!axios.isAxiosError(ex)) throw ex;
         if (ex.response?.status !== 401) throw ex;
-        // navigate('/login');
-        // Screw SPAs, why not just force an actual reload at this point?
-        window.location.href = '/';
+        navigate('/login');
       }
     } else {
       mikoto.updateAccessToken(authToken.accessToken);

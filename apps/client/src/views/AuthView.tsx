@@ -71,7 +71,6 @@ function useErrorElement(): [
 export function LoginView() {
   const { register, handleSubmit } = useForm();
   const [errorEl, , setError] = useErrorElement();
-  const navigate = useNavigate();
   const [, setAuthToken] = useRecoilState(authTokenState);
 
   return (
@@ -83,7 +82,8 @@ export function LoginView() {
             setAuthToken(
               await authAPI.login(formData.email, formData.password),
             );
-            navigate('/');
+            // Screw SPAs, why not just force an actual reload at this point?
+            window.location.href = '/';
           } catch (e) {
             setError((e as any)?.response?.data);
           }

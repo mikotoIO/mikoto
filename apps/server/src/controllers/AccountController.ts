@@ -139,9 +139,12 @@ export class AccountController {
       .png()
       .toBuffer();
     await this.minio.putObject('avatar', fileName, resized);
+    const minioCdn = new URL(process.env.MINIO!);
     await this.prisma.user.update({
       where: { id: account.sub },
-      data: { avatar: `http://localhost:9000/avatar/${fileName}` },
+      data: {
+        avatar: `${minioCdn.protocol}//${minioCdn.host}/avatar/${fileName}`,
+      },
     });
 
     return {

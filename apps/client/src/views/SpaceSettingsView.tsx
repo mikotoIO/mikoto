@@ -1,4 +1,4 @@
-import { InputWrapper, TextInput } from '@mantine/core';
+import { TextInput } from '@mantine/core';
 import { useState } from 'react';
 import styled from 'styled-components';
 import {
@@ -30,12 +30,10 @@ function Overview({ space }: { space: Space }) {
   return (
     <SidebarContainerArea>
       <h1>Space Overview</h1>
-      <InputWrapper label="Space Name">
-        <TextInput
-          value={spaceName}
-          onChange={(x) => setSpaceName(x.target.value)}
-        />
-      </InputWrapper>
+      <TextInput
+        value={spaceName}
+        onChange={(x) => setSpaceName(x.target.value)}
+      />
     </SidebarContainerArea>
   );
 }

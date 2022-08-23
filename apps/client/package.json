@@ -103,7 +103,6 @@
     "eslint-plugin-jsx-a11y": "6.5.1",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "4.3.0",
-    "react-scripts": "^5.0.1",
     "rollup-plugin-analyzer": "^4.0.0",
     "source-map-explorer": "^2.5.2",
     "vitest": "^0.18.0"

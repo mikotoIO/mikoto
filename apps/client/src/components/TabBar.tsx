@@ -112,6 +112,23 @@ function Tab({ tab, index }: TabProps) {
 
   const active = index === tabbed.index;
 
+  const closeTab = () => {
+    setTabbed(({ tabs, index: idx }) => {
+      const xsc = [...tabs];
+      xsc.splice(index, 1);
+      return {
+        index: idx,
+        tabs: xsc,
+      };
+    });
+    if (index <= tabbed.index) {
+      setTabbed(({ tabs }) => ({
+        index: Math.max(0, index - 1),
+        tabs,
+      }));
+    }
+  };
+
   return (
     <StyledTab
       ref={ref}
@@ -120,6 +137,9 @@ function Tab({ tab, index }: TabProps) {
       onClick={() => {
         setTabbed(({ tabs }) => ({ index, tabs }));
       }}
+      onAuxClick={() => {
+        closeTab();
+      }}
     >
       <IconBox size={20} icon={getTabIcon(tab)} />
       <div>{tab.name}</div>
@@ -127,20 +147,7 @@ function Tab({ tab, index }: TabProps) {
         active={active}
         onClick={(ev) => {
           ev.stopPropagation(); // close button shouldn't reset tab index
-          setTabbed(({ tabs, index: idx }) => {
-            const xsc = [...tabs];
-            xsc.splice(index, 1);
-            return {
-              index: idx,
-              tabs: xsc,
-            };
-          });
-          if (index <= tabbed.index) {
-            setTabbed(({ tabs }) => ({
-              index: Math.max(0, index - 1),
-              tabs,
-            }));
-          }
+          closeTab();
         }}
       >
         <FontAwesomeIcon icon={faX} />

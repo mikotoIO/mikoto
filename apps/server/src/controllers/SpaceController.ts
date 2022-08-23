@@ -42,13 +42,46 @@ export class SpaceController {
     this.io.to(`user/${userId}`).emit('spaceCreate', space);
   }
 
+  async leave(userId: string, space: Space) {
+    await this.prisma.spaceUser.delete({
+      where: {
+        userId_spaceId: {
+          userId,
+          spaceId: space.id,
+        },
+      },
+    });
+    const socketIds = await this.io.in(`user/${userId}`).allSockets();
+    socketIds.forEach((socketId) => {
+      this.io.sockets.sockets.get(socketId)?.leave(space.id);
+    });
+
+    this.io.to(`user/${userId}`).emit('spaceDelete', space);
+  }
+
   @Post('/join/:id')
   async joinUser(@CurrentUser() user: AccountJwt, @Param('id') id: string) {
     const space = await this.prisma.space.findUnique({ where: { id } });
     if (space === null) {
       throw new NotFoundError();
     }
-    return this.join(user.sub, space);
+    await this.join(user.sub, space);
+    return {};
+  }
+
+  @Post('/leave/:spaceId')
+  async leaveSpace(
+    @CurrentUser() user: AccountJwt,
+    @Param('spaceId') spaceId: string,
+  ) {
+    const space = await this.prisma.space.findUnique({
+      where: { id: spaceId },
+    });
+    if (space === null) {
+      throw new NotFoundError();
+    }
+    await this.leave(user.sub, space);
+    return {};
   }
 
   @Get('/spaces')

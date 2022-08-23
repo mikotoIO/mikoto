@@ -69,10 +69,10 @@ function ServerIconContextMenu({
       <ContextMenu.Link
         onClick={async () => {
           destroy();
-          await mikoto.deleteSpace(space.id);
+          await mikoto.leaveSpace(space.id);
         }}
       >
-        Delete Space
+        Leave Space
       </ContextMenu.Link>
     </ContextMenu>
   );
@@ -145,26 +145,6 @@ function CreateSpaceModal() {
   );
 }
 
-function ServerSidebarContextMenu() {
-  const setModal = useSetRecoilState(modalState);
-
-  return (
-    <ContextMenu>
-      <ContextMenu.Link
-        onClick={() => {
-          setModal({
-            title: 'Create Space',
-            elem: <CreateSpaceModal />,
-          });
-        }}
-      >
-        Create Space
-      </ContextMenu.Link>
-      <ContextMenu.Link>Join Space</ContextMenu.Link>
-    </ContextMenu>
-  );
-}
-
 export function SpaceJoinModal() {
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
@@ -191,6 +171,35 @@ export function SpaceJoinModal() {
         Join Space
       </Button>
     </form>
+  );
+}
+
+function ServerSidebarContextMenu() {
+  const setModal = useSetRecoilState(modalState);
+
+  return (
+    <ContextMenu>
+      <ContextMenu.Link
+        onClick={() => {
+          setModal({
+            title: 'Create Space',
+            elem: <CreateSpaceModal />,
+          });
+        }}
+      >
+        Create Space
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          setModal({
+            title: 'Join Space',
+            elem: <SpaceJoinModal />,
+          });
+        }}
+      >
+        Join Space
+      </ContextMenu.Link>
+    </ContextMenu>
   );
 }
 

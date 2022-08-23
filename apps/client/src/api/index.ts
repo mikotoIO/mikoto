@@ -197,6 +197,10 @@ export default class MikotoApi {
     await this.axios.post<Space>(`/join/${id}`);
   }
 
+  async leaveSpace(id: string): Promise<void> {
+    await this.axios.post<Space>(`/leave/${id}`);
+  }
+
   async createSpace(name: string): Promise<void> {
     await this.axios.post<Space>('/spaces', {
       name,

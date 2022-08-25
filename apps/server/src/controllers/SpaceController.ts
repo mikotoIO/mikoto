@@ -63,7 +63,7 @@ export class SpaceController {
   async joinUser(@CurrentUser() user: AccountJwt, @Param('id') id: string) {
     const space = await this.prisma.space.findUnique({ where: { id } });
     if (space === null) {
-      throw new NotFoundError();
+      throw new NotFoundError('Space cannot be found');
     }
     await this.join(user.sub, space);
     return {};

@@ -12,6 +12,7 @@ import { useDelta } from '../hooks/useDelta';
 import { Pill } from './atoms/Pill';
 import { ClientSpace } from '../api/entities/ClientSpace';
 import { useErrorElement } from '../hooks/useErrorElement';
+import { AxiosError } from 'axios';
 
 const StyledServerSidebar = styled.div`
   background-color: ${(p) => p.theme.colors.N1000};
@@ -157,8 +158,7 @@ export function SpaceJoinModal() {
           setModal(null);
           reset();
         } catch (e) {
-          console.log('err?');
-          error.setError(e as any);
+          error.setError((e as AxiosError).response?.data as any);
         }
       })}
     >

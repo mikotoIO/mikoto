@@ -3,7 +3,7 @@ import { useHover } from 'usehooks-ts';
 import React, { useRef } from 'react';
 import { Button, TextInput, Tooltip } from '@mantine/core';
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import { useForm } from '@mantine/form';
+import { useForm } from 'react-hook-form';
 import { useMikoto } from '../api';
 import { Space } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
@@ -11,6 +11,7 @@ import { treebarSpaceState, useTabkit } from '../store';
 import { useDelta } from '../hooks/useDelta';
 import { Pill } from './atoms/Pill';
 import { ClientSpace } from '../api/entities/ClientSpace';
+import { useErrorElement } from '../hooks/useErrorElement';
 
 const StyledServerSidebar = styled.div`
   background-color: ${(p) => p.theme.colors.N1000};
@@ -119,16 +120,12 @@ function ServerIcon({ space }: { space: Space }) {
 function CreateSpaceModal() {
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
-  const form = useForm({
-    initialValues: {
-      spaceName: '',
-    },
-  });
+  const form = useForm();
 
   return (
     <form
-      onSubmit={form.onSubmit(async () => {
-        await mikoto.createSpace(form.values.spaceName);
+      onSubmit={form.handleSubmit(async (data) => {
+        await mikoto.createSpace(data.spaceName);
         setModal(null);
         form.reset();
       })}
@@ -136,7 +133,7 @@ function CreateSpaceModal() {
       <TextInput
         label="Space Name"
         placeholder="Awesomerino Space"
-        {...form.getInputProps('spaceName')}
+        {...form.register('spaceName')}
       />
       <Button mt={16} fullWidth type="submit">
         Create Space
@@ -149,25 +146,29 @@ export function SpaceJoinModal() {
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
 
-  const form = useForm({
-    initialValues: {
-      spaceId: '',
-    },
-  });
+  const { register, formState, handleSubmit, reset } = useForm({});
+  const error = useErrorElement();
+
   return (
     <form
-      onSubmit={form.onSubmit(async () => {
-        await mikoto.joinSpace(form.values.spaceId);
-        setModal(null);
-        form.reset();
+      onSubmit={handleSubmit(async (data) => {
+        try {
+          await mikoto.joinSpace(data.spaceId);
+          setModal(null);
+          reset();
+        } catch (e) {
+          console.log('err?');
+          error.setError(e as any);
+        }
       })}
     >
+      {error.el}
       <TextInput
         label="Space ID"
         placeholder="9a807e83-15db-4267-9940-cdda7cb696fd"
-        {...form.getInputProps('spaceId')}
+        {...register('spaceId')}
       />
-      <Button mt={16} fullWidth type="submit">
+      <Button mt={16} fullWidth type="submit" loading={formState.isSubmitting}>
         Join Space
       </Button>
     </form>

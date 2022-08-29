@@ -8,11 +8,14 @@ import {
   Param,
   Post,
   UnauthorizedError,
+  UploadedFile,
 } from 'routing-controllers';
 import { PrismaClient, Space } from '@prisma/client';
 import { Service } from 'typedi';
 import { Server } from 'socket.io';
+import { Client } from 'minio';
 import { AccountJwt } from '../auth';
+import { uploadImage } from '../functions/uploadImage';
 
 interface SpaceCreationPayload {
   name: string;
@@ -21,7 +24,11 @@ interface SpaceCreationPayload {
 @JsonController()
 @Service()
 export class SpaceController {
-  constructor(private prisma: PrismaClient, private io: Server) {}
+  constructor(
+    private prisma: PrismaClient,
+    private io: Server,
+    private minio: Client,
+  ) {}
 
   @Get('/hello')
   hello() {
@@ -163,5 +170,21 @@ export class SpaceController {
         spaceId,
       },
     });
+  }
+
+  @Post('/spaces/:spaceId/icon')
+  async uploadAvatar(
+    @Param('spaceId') spaceId: string,
+    @UploadedFile('avatar') icon: Express.Multer.File,
+  ) {
+    const uploaded = await uploadImage(this.minio, 'icon', icon);
+    await this.prisma.space.update({
+      where: { id: spaceId },
+      data: { icon: uploaded.url },
+    });
+
+    return {
+      status: 'ok',
+    };
   }
 }

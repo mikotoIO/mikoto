@@ -13,9 +13,6 @@ import { Service } from 'typedi';
 import crypto from 'crypto';
 import { promisify } from 'util';
 import { Client } from 'minio';
-import { v4 as uuid } from 'uuid';
-import sharp from 'sharp';
-import { mimeImageExtension } from '../functions/checkMimetype';
 import { AccountJwt } from '../auth';
 import { uploadImage } from '../functions/uploadImage';
 

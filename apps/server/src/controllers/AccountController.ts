@@ -17,6 +17,7 @@ import { v4 as uuid } from 'uuid';
 import sharp from 'sharp';
 import { mimeImageExtension } from '../functions/checkMimetype';
 import { AccountJwt } from '../auth';
+import { uploadImage } from '../functions/uploadImage';
 
 const randomBytes = promisify(crypto.randomBytes);
 async function generateRandomToken() {
@@ -128,23 +129,10 @@ export class AccountController {
     @CurrentUser() account: AccountJwt,
     @UploadedFile('avatar') avatar: Express.Multer.File,
   ) {
-    const id = uuid();
-    mimeImageExtension(avatar.mimetype);
-    const fileName = `${id}.png`;
-    const resized = await sharp(avatar.buffer)
-      .resize({
-        width: 128,
-        height: 128,
-      })
-      .png()
-      .toBuffer();
-    await this.minio.putObject('avatar', fileName, resized);
-    const minioCdn = new URL(process.env.MINIO!);
+    const uploaded = await uploadImage(this.minio, 'avatar', avatar);
     await this.prisma.user.update({
       where: { id: account.sub },
-      data: {
-        avatar: `${minioCdn.protocol}//${minioCdn.host}/avatar/${fileName}`,
-      },
+      data: { avatar: uploaded.url },
     });
 
     return {

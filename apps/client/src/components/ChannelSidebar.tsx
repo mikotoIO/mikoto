@@ -63,6 +63,7 @@ export function ChannelNode({
   const mikoto = useMikoto();
   const menu = useContextMenu(({ destroy }) => (
     <ContextMenu>
+      <ContextMenu.Link>Mark as Read</ContextMenu.Link>
       <ContextMenu.Link
         onClick={async () => {
           destroy();

@@ -4,6 +4,7 @@ import React, { useRef } from 'react';
 import { Button, TextInput, Tooltip } from '@mantine/core';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useForm } from 'react-hook-form';
+import { AxiosError } from 'axios';
 import { useMikoto } from '../api';
 import { Space } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
@@ -12,7 +13,6 @@ import { useDelta } from '../hooks/useDelta';
 import { Pill } from './atoms/Pill';
 import { ClientSpace } from '../api/entities/ClientSpace';
 import { useErrorElement } from '../hooks/useErrorElement';
-import { AxiosError } from 'axios';
 
 const StyledServerSidebar = styled.div`
   background-color: ${(p) => p.theme.colors.N1000};
@@ -33,19 +33,13 @@ const StyledServerIcon = styled.div<{ active?: boolean }>`
   transition-duration: 100ms;
 `;
 
-function ServerIconContextMenu({
-  space,
-  destroy,
-}: {
-  space: Space;
-  destroy: () => void;
-}) {
+function ServerIconContextMenu({ space }: { space: Space }) {
   const mikoto = useMikoto();
   const tabkit = useTabkit();
   return (
     <ContextMenu>
       <ContextMenu.Link
-        onClick={async () => {
+        onClick={async () =>
           tabkit.openTab(
             {
               kind: 'spaceSettings',
@@ -54,26 +48,17 @@ function ServerIconContextMenu({
               space,
             },
             true,
-          );
-          destroy();
-        }}
+          )
+        }
       >
         Space Settings
       </ContextMenu.Link>
       <ContextMenu.Link
-        onClick={async () => {
-          await navigator.clipboard.writeText(space.id);
-          destroy();
-        }}
+        onClick={async () => await navigator.clipboard.writeText(space.id)}
       >
         Copy ID
       </ContextMenu.Link>
-      <ContextMenu.Link
-        onClick={async () => {
-          destroy();
-          await mikoto.leaveSpace(space.id);
-        }}
-      >
+      <ContextMenu.Link onClick={async () => await mikoto.leaveSpace(space.id)}>
         Leave Space
       </ContextMenu.Link>
     </ContextMenu>
@@ -95,8 +80,8 @@ function ServerIcon({ space }: { space: Space }) {
 
   const ref = useRef<HTMLDivElement>(null);
   const isHover = useHover(ref);
-  const contextMenu = useContextMenu(({ destroy }) => (
-    <ServerIconContextMenu space={space} destroy={destroy} />
+  const contextMenu = useContextMenu(() => (
+    <ServerIconContextMenu space={space} />
   ));
 
   return (

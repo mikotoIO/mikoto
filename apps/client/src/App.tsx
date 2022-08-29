@@ -13,7 +13,7 @@ function App() {
         <Route path="/" element={<MainView />} />
         <Route path="/login" element={<LoginView />} />
         <Route path="/register" element={<RegisterView />} />
-        <Route path="/invite" element={<SpaceInviteView />} />
+        <Route path="/invite/:id" element={<SpaceInviteView />} />
       </Routes>
       <ContextMenuKit />
       <ModalKit />

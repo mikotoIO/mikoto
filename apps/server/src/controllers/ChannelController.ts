@@ -7,6 +7,7 @@ import {
   NotFoundError,
   Param,
   Post,
+  QueryParam,
   UnauthorizedError,
 } from 'routing-controllers';
 import { PrismaClient } from '@prisma/client';
@@ -66,12 +67,24 @@ export class ChannelController {
   }
 
   @Get('/channels/:id/messages')
-  async getMessages(@Param('id') channelId: string) {
+  async getMessages(
+    @Param('id') channelId: string,
+    @QueryParam('cursor') cursor?: string,
+  ) {
     const messages = await this.prisma.message.findMany({
       where: { channelId },
+
       include: { author: authorInclude },
       orderBy: { timestamp: 'desc' },
       take: 50,
+
+      // cursor pagination
+      ...(cursor !== undefined && {
+        skip: 1,
+        cursor: {
+          id: cursor,
+        },
+      }),
     });
     return messages.reverse();
   }

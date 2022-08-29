@@ -12,9 +12,8 @@ import jwt from 'jsonwebtoken';
 import { Service } from 'typedi';
 import crypto from 'crypto';
 import { promisify } from 'util';
-import { Client } from 'minio';
 import { AccountJwt } from '../auth';
-import { uploadImage } from '../functions/uploadImage';
+import Minio from '../functions/Minio';
 
 const randomBytes = promisify(crypto.randomBytes);
 async function generateRandomToken() {
@@ -42,7 +41,7 @@ interface ChangePasswordPayload {
 @JsonController()
 @Service()
 export class AccountController {
-  constructor(private prisma: PrismaClient, private minio: Client) {}
+  constructor(private prisma: PrismaClient, private minio: Minio) {}
 
   private async createTokenPair(account: User, oldToken?: string) {
     const accessToken = jwt.sign({}, process.env.SECRET!, {
@@ -126,7 +125,7 @@ export class AccountController {
     @CurrentUser() account: AccountJwt,
     @UploadedFile('avatar') avatar: Express.Multer.File,
   ) {
-    const uploaded = await uploadImage(this.minio, 'avatar', avatar);
+    const uploaded = await this.minio.uploadImage('avatar', avatar);
     await this.prisma.user.update({
       where: { id: account.sub },
       data: { avatar: uploaded.url },

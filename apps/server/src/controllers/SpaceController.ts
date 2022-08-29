@@ -13,9 +13,8 @@ import {
 import { PrismaClient, Space } from '@prisma/client';
 import { Service } from 'typedi';
 import { Server } from 'socket.io';
-import { Client } from 'minio';
 import { AccountJwt } from '../auth';
-import { uploadImage } from '../functions/uploadImage';
+import Minio from '../functions/Minio';
 
 interface SpaceCreationPayload {
   name: string;
@@ -27,7 +26,7 @@ export class SpaceController {
   constructor(
     private prisma: PrismaClient,
     private io: Server,
-    private minio: Client,
+    private minio: Minio,
   ) {}
 
   @Get('/hello')
@@ -177,7 +176,7 @@ export class SpaceController {
     @Param('spaceId') spaceId: string,
     @UploadedFile('avatar') icon: Express.Multer.File,
   ) {
-    const uploaded = await uploadImage(this.minio, 'icon', icon);
+    const uploaded = await this.minio.uploadImage('icon', icon);
     await this.prisma.space.update({
       where: { id: spaceId },
       data: { icon: uploaded.url },

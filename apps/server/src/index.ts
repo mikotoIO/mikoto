@@ -22,6 +22,7 @@ import { logger } from './functions/logger';
 import Minio from './functions/Minio';
 
 const app = express();
+
 const server = new http.Server(app);
 const io = new socketio.Server(server, {
   cors: { origin: '*' },

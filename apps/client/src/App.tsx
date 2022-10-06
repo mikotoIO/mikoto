@@ -5,6 +5,7 @@ import { LoginView, RegisterView } from './views/AuthView';
 import MainView from './views/MainView';
 import { ContextMenuKit, ModalKit } from './components/ContextMenu';
 import { SpaceInviteView } from './views/SpaceInviteView';
+import { RoomPage } from './components/LiveKitPlayground';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/login" element={<LoginView />} />
         <Route path="/register" element={<RegisterView />} />
         <Route path="/invite/:id" element={<SpaceInviteView />} />
+        <Route path="/livekit" element={<RoomPage />} />
       </Routes>
       <ContextMenuKit />
       <ModalKit />

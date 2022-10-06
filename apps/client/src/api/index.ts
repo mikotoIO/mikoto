@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { io, Socket } from 'socket.io-client';
 import React, { useContext } from 'react';
-import { Channel, Message, Space, User } from '../models';
+import { Channel, Message, Space, User, VoiceResponse } from '../models';
 import { MikotoCache } from './cache';
 import { SpaceEngine } from './engines/SpaceEngine';
 import { ClientSpace } from './entities/ClientSpace';
@@ -220,6 +220,11 @@ export default class MikotoApi {
         'Content-Type': 'multipart/form-data',
       },
     });
+  }
+
+  async getVoice() {
+    const { data } = await this.axios.get<VoiceResponse>('/voice');
+    return data;
   }
 }
 

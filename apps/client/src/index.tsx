@@ -24,19 +24,17 @@ if (typeof (window as any).global === 'undefined') {
 const SilentRecoilRoot = RecoilRoot as any;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <SilentRecoilRoot>
-      <ThemeProvider theme={theme}>
-        <MantineProvider theme={{ colorScheme: 'dark' }}>
-          <DndProvider backend={HTML5Backend}>
-            <MikotoContext.Provider value={new MikotoApi(constants.apiPath)}>
-              <App />
-            </MikotoContext.Provider>
-          </DndProvider>
-        </MantineProvider>
-      </ThemeProvider>
-    </SilentRecoilRoot>
-  </React.StrictMode>,
+  <SilentRecoilRoot>
+    <ThemeProvider theme={theme}>
+      <MantineProvider theme={{ colorScheme: 'dark' }}>
+        <DndProvider backend={HTML5Backend}>
+          <MikotoContext.Provider value={new MikotoApi(constants.apiPath)}>
+            <App />
+          </MikotoContext.Provider>
+        </DndProvider>
+      </MantineProvider>
+    </ThemeProvider>
+  </SilentRecoilRoot>,
 );
 
 // If you want to start measuring performance in your app, pass a function

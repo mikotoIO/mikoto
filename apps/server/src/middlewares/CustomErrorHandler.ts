@@ -4,8 +4,8 @@ import {
   HttpError,
 } from 'routing-controllers';
 import { Service } from 'typedi';
-import { logger } from '../functions/logger';
 import express from 'express';
+import { logger } from '../functions/logger';
 
 @Service()
 @Middleware({ type: 'after' })

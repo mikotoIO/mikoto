@@ -3,6 +3,7 @@ import {
   faCog,
   faHashtag,
   faQuestion,
+  faHeadphones,
 } from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
 import styled from 'styled-components';
@@ -30,6 +31,8 @@ export function getTabIcon(tab: Tabable): IconDefinition {
   switch (tab.kind) {
     case 'textChannel':
       return faHashtag;
+    case 'voiceChannel':
+      return faHeadphones;
     case 'spaceSettings':
       return faCog;
     default:

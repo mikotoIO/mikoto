@@ -18,24 +18,22 @@ import cors from 'cors';
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
-import * as minio from 'minio';
 import { logger } from './functions/logger';
-import { minioFromURL } from './functions/minioFromURL';
+import Minio from './functions/Minio';
 
 const app = express();
+
 const server = new http.Server(app);
 const io = new socketio.Server(server, {
   cors: { origin: '*' },
 });
-
-const minioClient = minioFromURL(process.env.MINIO!);
 
 const prisma = new PrismaClient({
   // log: ['error'],
 });
 Container.set(PrismaClient, prisma);
 Container.set(socketio.Server, io);
-Container.set(minio.Client, minioClient);
+Container.set(Minio, new Minio(process.env.MINIO!));
 
 app.use(cors());
 

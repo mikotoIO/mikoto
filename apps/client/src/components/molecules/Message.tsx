@@ -103,17 +103,17 @@ const Name = styled.div<{ color?: string }>`
   color: ${(p) => p.color ?? 'currentColor'};
 `;
 
-const TimestampElement = styled.div`
+const StyledTimestamp = styled.div`
   color: #9f9e9e;
   font-size: 12px;
 `;
 
 function Timestamp({ time }: { time: Date }) {
   return (
-    <TimestampElement>
+    <StyledTimestamp>
       {isToday(time) ? 'Today at ' : dateFormat.format(time)}{' '}
       {padTime(time.getHours())}:{padTime(time.getMinutes())}
-    </TimestampElement>
+    </StyledTimestamp>
   );
 }
 
@@ -209,13 +209,12 @@ function Markdown({ content }: { content: string }) {
 export default function MessageItem({ message, isSimple }: MessageProps) {
   const mikoto = useMikoto();
 
-  const menu = useContextMenu(({ destroy }) => (
+  const menu = useContextMenu(() => (
     <ContextMenu>
       <ContextMenu.Link
-        onClick={async () => {
-          destroy();
-          await mikoto.deleteMessage(message.channelId, message.id);
-        }}
+        onClick={async () =>
+          await mikoto.deleteMessage(message.channelId, message.id)
+        }
       >
         Delete Message
       </ContextMenu.Link>

@@ -3,7 +3,8 @@ import { useHover } from 'usehooks-ts';
 import React, { useRef } from 'react';
 import { Button, TextInput, Tooltip } from '@mantine/core';
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import { useForm } from '@mantine/form';
+import { useForm } from 'react-hook-form';
+import { AxiosError } from 'axios';
 import { useMikoto } from '../api';
 import { Space } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
@@ -11,6 +12,7 @@ import { treebarSpaceState, useTabkit } from '../store';
 import { useDelta } from '../hooks/useDelta';
 import { Pill } from './atoms/Pill';
 import { ClientSpace } from '../api/entities/ClientSpace';
+import { useErrorElement } from '../hooks/useErrorElement';
 
 const StyledServerSidebar = styled.div`
   background-color: ${(p) => p.theme.colors.N1000};
@@ -31,19 +33,13 @@ const StyledServerIcon = styled.div<{ active?: boolean }>`
   transition-duration: 100ms;
 `;
 
-function ServerIconContextMenu({
-  space,
-  destroy,
-}: {
-  space: Space;
-  destroy: () => void;
-}) {
+function ServerIconContextMenu({ space }: { space: Space }) {
   const mikoto = useMikoto();
   const tabkit = useTabkit();
   return (
     <ContextMenu>
       <ContextMenu.Link
-        onClick={async () => {
+        onClick={async () =>
           tabkit.openTab(
             {
               kind: 'spaceSettings',
@@ -52,26 +48,17 @@ function ServerIconContextMenu({
               space,
             },
             true,
-          );
-          destroy();
-        }}
+          )
+        }
       >
         Space Settings
       </ContextMenu.Link>
       <ContextMenu.Link
-        onClick={async () => {
-          await navigator.clipboard.writeText(space.id);
-          destroy();
-        }}
+        onClick={async () => await navigator.clipboard.writeText(space.id)}
       >
         Copy ID
       </ContextMenu.Link>
-      <ContextMenu.Link
-        onClick={async () => {
-          destroy();
-          await mikoto.leaveSpace(space.id);
-        }}
-      >
+      <ContextMenu.Link onClick={async () => await mikoto.leaveSpace(space.id)}>
         Leave Space
       </ContextMenu.Link>
     </ContextMenu>
@@ -93,8 +80,8 @@ function ServerIcon({ space }: { space: Space }) {
 
   const ref = useRef<HTMLDivElement>(null);
   const isHover = useHover(ref);
-  const contextMenu = useContextMenu(({ destroy }) => (
-    <ServerIconContextMenu space={space} destroy={destroy} />
+  const contextMenu = useContextMenu(() => (
+    <ServerIconContextMenu space={space} />
   ));
 
   return (
@@ -119,16 +106,12 @@ function ServerIcon({ space }: { space: Space }) {
 function CreateSpaceModal() {
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
-  const form = useForm({
-    initialValues: {
-      spaceName: '',
-    },
-  });
+  const form = useForm();
 
   return (
     <form
-      onSubmit={form.onSubmit(async () => {
-        await mikoto.createSpace(form.values.spaceName);
+      onSubmit={form.handleSubmit(async (data) => {
+        await mikoto.createSpace(data.spaceName);
         setModal(null);
         form.reset();
       })}
@@ -136,7 +119,7 @@ function CreateSpaceModal() {
       <TextInput
         label="Space Name"
         placeholder="Awesomerino Space"
-        {...form.getInputProps('spaceName')}
+        {...form.register('spaceName')}
       />
       <Button mt={16} fullWidth type="submit">
         Create Space
@@ -149,25 +132,28 @@ export function SpaceJoinModal() {
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
 
-  const form = useForm({
-    initialValues: {
-      spaceId: '',
-    },
-  });
+  const { register, formState, handleSubmit, reset } = useForm({});
+  const error = useErrorElement();
+
   return (
     <form
-      onSubmit={form.onSubmit(async () => {
-        await mikoto.joinSpace(form.values.spaceId);
-        setModal(null);
-        form.reset();
+      onSubmit={handleSubmit(async (data) => {
+        try {
+          await mikoto.joinSpace(data.spaceId);
+          setModal(null);
+          reset();
+        } catch (e) {
+          error.setError((e as AxiosError).response?.data as any);
+        }
       })}
     >
+      {error.el}
       <TextInput
         label="Space ID"
         placeholder="9a807e83-15db-4267-9940-cdda7cb696fd"
-        {...form.getInputProps('spaceId')}
+        {...register('spaceId')}
       />
-      <Button mt={16} fullWidth type="submit">
+      <Button mt={16} fullWidth type="submit" loading={formState.isSubmitting}>
         Join Space
       </Button>
     </form>

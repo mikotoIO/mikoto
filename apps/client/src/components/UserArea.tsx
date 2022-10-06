@@ -5,6 +5,7 @@ import { Avatar } from './atoms/Avatar';
 import { useMikoto } from '../api';
 import { User } from '../models';
 import { useTabkit } from '../store';
+import { ContextMenu, useContextMenu } from './ContextMenu';
 
 const StyledSidebar = styled.div`
   display: grid;
@@ -41,28 +42,56 @@ export const userState = atom<User | null>({
   key: 'user',
 });
 
+function UserAreaMenu() {
+  const tabkit = useTabkit();
+
+  return (
+    <ContextMenu>
+      <ContextMenu.Link
+        onClick={() => {
+          tabkit.openTab(
+            {
+              kind: 'accountSettings',
+              name: 'Account Settings',
+              key: 'accountSettings',
+            },
+            false,
+          );
+        }}
+      >
+        User Settings
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          tabkit.openTab(
+            {
+              kind: 'voiceChannel',
+              name: 'Voice Call',
+              key: 'voice',
+            },
+            false,
+          );
+        }}
+      >
+        Start Voice Call
+      </ContextMenu.Link>
+    </ContextMenu>
+  );
+}
+
 export function UserArea() {
   const mikoto = useMikoto();
-  const tabkit = useTabkit();
   const [user, setUser] = useRecoilState(userState);
+  const contextMenu = useContextMenu(() => <UserAreaMenu />, {
+    bottom: 72,
+    left: 80,
+  });
   useEffect(() => {
     mikoto.getCurrentUser().then(setUser);
   }, []);
 
   return (
-    <StyledUserArea
-      onClick={() => {
-        tabkit.openTab(
-          {
-            kind: 'accountSettings',
-            name: 'User Settings',
-            key: 'accountSettings',
-          },
-          true,
-        );
-        console.log('userarea click');
-      }}
-    >
+    <StyledUserArea onClick={contextMenu}>
       {user && (
         <>
           <Avatar src={user.avatar} />

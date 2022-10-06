@@ -4,11 +4,15 @@ import useEventListener from '@use-it/event-listener';
 import { Modal } from '@mantine/core';
 import React, { useRef } from 'react';
 
+interface Positions {
+  top?: number;
+  left?: number;
+  right?: number;
+  bottom?: number;
+}
+
 interface ContextMenuData {
-  position: {
-    top: number;
-    left: number;
-  };
+  position: Positions;
   elem: React.ReactNode;
 }
 
@@ -33,17 +37,7 @@ const ContextMenuBase = styled.div`
   font-size: 14px;
   border-radius: 4px;
   background-color: ${(p) => p.theme.colors.N1100};
-`;
-
-const ContextMenuLink = styled.a`
-  display: block;
-  padding: 6px 8px;
-  box-sizing: border-box;
-  border-radius: 4px;
-  width: 100%;
-  &:hover {
-    background-color: ${(p) => p.theme.colors.N800};
-  }
+  box-shadow: rgba(0, 0, 0, 0.1) 0 8px 24px;
 `;
 
 const StyledContextMenu = styled.div`
@@ -85,17 +79,47 @@ interface ContextMenuFns {
   destroy(): void;
 }
 
+function ContextMenuLink({ onClick, ...props }: JSX.IntrinsicElements['a']) {
+  const setContextMenu = useSetRecoilState(contextMenuState);
+
+  return (
+    // eslint-disable-next-line jsx-a11y/anchor-has-content,jsx-a11y/no-static-element-interactions
+    <a
+      {...props}
+      onClick={(e) => {
+        onClick?.(e);
+        setContextMenu(null);
+      }}
+    />
+  );
+}
+
+const StyledContextMenuLink = styled(ContextMenuLink)`
+  display: block;
+  padding: 6px 8px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  width: 100%;
+
+  &:hover {
+    background-color: ${(p) => p.theme.colors.N800};
+  }
+`;
+
 export const ContextMenu = Object.assign(ContextMenuBase, {
-  Link: ContextMenuLink,
+  Link: StyledContextMenuLink,
 });
 
-export function useContextMenu(fn: (fns: ContextMenuFns) => React.ReactNode) {
+export function useContextMenu(
+  fn: (fns: ContextMenuFns) => React.ReactNode,
+  position?: Positions,
+) {
   const setContextMenu = useSetRecoilState(contextMenuState);
   return (ev: React.MouseEvent) => {
     ev.preventDefault();
     ev.stopPropagation();
     setContextMenu({
-      position: { top: ev.clientY, left: ev.clientX },
+      position: position ?? { top: ev.clientY, left: ev.clientX },
       elem: fn({
         destroy() {
           setContextMenu(null);

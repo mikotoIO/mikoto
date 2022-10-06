@@ -13,6 +13,7 @@ import { SpaceSettingsView } from './SpaceSettingsView';
 import { useMikoto } from '../api';
 import { AccountSettingsView } from './AccountSettingsView';
 import { ClientSpace } from '../api/entities/ClientSpace';
+import { VoiceView } from './VoiceView';
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -33,6 +34,8 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
   switch (tab.kind) {
     case 'textChannel':
       return <MessageView channel={tab.channel} />;
+    case 'voiceChannel':
+      return <VoiceView />;
     case 'spaceSettings':
       return <SpaceSettingsView space={tab.space} />;
     case 'accountSettings':
@@ -60,9 +63,14 @@ function AppView() {
       <Sidebar>{space && <ChannelSidebar space={space} />}</Sidebar>
       <TabbedView tabs={tabbed.tabs}>
         <ErrorBoundaryPage>
-          {tabbed.index !== null && tabbed.index < tabbed.tabs.length && (
-            <TabViewSwitch tab={tabbed.tabs[tabbed.index]} />
-          )}
+          {tabbed.tabs.map((tab, idx) => (
+            <div
+              style={idx !== tabbed.index ? { display: 'none' } : undefined}
+              key={`${tab.kind}/${tab.key}`}
+            >
+              <TabViewSwitch tab={tab} />
+            </div>
+          ))}
         </ErrorBoundaryPage>
       </TabbedView>
     </AppContainer>

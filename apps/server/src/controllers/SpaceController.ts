@@ -8,11 +8,13 @@ import {
   Param,
   Post,
   UnauthorizedError,
+  UploadedFile,
 } from 'routing-controllers';
 import { PrismaClient, Space } from '@prisma/client';
 import { Service } from 'typedi';
 import { Server } from 'socket.io';
 import { AccountJwt } from '../auth';
+import Minio from '../functions/Minio';
 
 interface SpaceCreationPayload {
   name: string;
@@ -21,7 +23,11 @@ interface SpaceCreationPayload {
 @JsonController()
 @Service()
 export class SpaceController {
-  constructor(private prisma: PrismaClient, private io: Server) {}
+  constructor(
+    private prisma: PrismaClient,
+    private io: Server,
+    private minio: Minio,
+  ) {}
 
   @Get('/hello')
   hello() {
@@ -63,7 +69,7 @@ export class SpaceController {
   async joinUser(@CurrentUser() user: AccountJwt, @Param('id') id: string) {
     const space = await this.prisma.space.findUnique({ where: { id } });
     if (space === null) {
-      throw new NotFoundError();
+      throw new NotFoundError('Space cannot be found');
     }
     await this.join(user.sub, space);
     return {};
@@ -163,5 +169,21 @@ export class SpaceController {
         spaceId,
       },
     });
+  }
+
+  @Post('/spaces/:spaceId/icon')
+  async uploadAvatar(
+    @Param('spaceId') spaceId: string,
+    @UploadedFile('avatar') icon: Express.Multer.File,
+  ) {
+    const uploaded = await this.minio.uploadImage('icon', icon);
+    await this.prisma.space.update({
+      where: { id: spaceId },
+      data: { icon: uploaded.url },
+    });
+
+    return {
+      status: 'ok',
+    };
   }
 }

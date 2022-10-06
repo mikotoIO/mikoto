@@ -43,3 +43,8 @@ export interface Channel {
 }
 
 export interface Role {}
+
+export interface VoiceResponse {
+  url: string;
+  token: string;
+}

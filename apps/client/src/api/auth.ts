@@ -29,3 +29,7 @@ export async function refresh(pair: TokenPair) {
   });
   return data;
 }
+
+export async function resetPassword(email: string) {
+  await authAxios.post('/account/reset_password', { email });
+}

@@ -111,10 +111,17 @@ export default class MikotoApi {
     return data.map((x) => this.newChannel(x));
   }
 
-  async createChannel(spaceId: string, name: string): Promise<ClientChannel> {
+  async createChannel(
+    spaceId: string,
+    options: {
+      name: string;
+      type: string;
+    },
+  ): Promise<ClientChannel> {
     const { data } = await this.axios.post<Channel>('/channels', {
       spaceId,
-      name,
+      name: options.name,
+      type: options.type,
     });
     return this.newChannel(data);
   }
@@ -222,8 +229,8 @@ export default class MikotoApi {
     });
   }
 
-  async getVoice() {
-    const { data } = await this.axios.get<VoiceResponse>('/voice');
+  async getVoice(channelId: string) {
+    const { data } = await this.axios.get<VoiceResponse>(`/voice/${channelId}`);
     return data;
   }
 }

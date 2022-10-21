@@ -61,20 +61,6 @@ function UserAreaMenu() {
       >
         User Settings
       </ContextMenu.Link>
-      <ContextMenu.Link
-        onClick={() => {
-          tabkit.openTab(
-            {
-              kind: 'voiceChannel',
-              name: 'Voice Call',
-              key: 'voice',
-            },
-            false,
-          );
-        }}
-      >
-        Start Voice Call
-      </ContextMenu.Link>
     </ContextMenu>
   );
 }

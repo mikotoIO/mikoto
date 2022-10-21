@@ -20,6 +20,7 @@ import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import { logger } from './functions/logger';
 import Minio from './functions/Minio';
+import Mailer from './services/Mailer';
 
 const app = express();
 
@@ -34,6 +35,7 @@ const prisma = new PrismaClient({
 Container.set(PrismaClient, prisma);
 Container.set(socketio.Server, io);
 Container.set(Minio, new Minio(process.env.MINIO!));
+Container.set(Mailer, new Mailer());
 
 app.use(cors());
 
@@ -60,5 +62,6 @@ useSocketServer(io, {
 });
 
 server.listen(process.env.PORT || 9500, () => {
+  
   logger.info(`Mikoto server listening on port ${process.env.PORT || 9500}`);
 });

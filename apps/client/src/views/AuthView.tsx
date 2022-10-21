@@ -85,6 +85,9 @@ export function LoginView() {
         <Anchor to="/register" component={Link}>
           Register
         </Anchor>
+        <Anchor to="/forgotpassword" component={Link}>
+          Forgot Password?
+        </Anchor>
       </Form>
     </AuthView>
   );
@@ -123,6 +126,35 @@ export function RegisterView() {
         <Anchor to="/login" component={Link}>
           Log In
         </Anchor>
+      </Form>
+    </AuthView>
+  );
+}
+
+export function ResetPasswordView() {
+  const { register, handleSubmit } = useForm();
+  const [sent, setSent] = React.useState(false);
+
+  return (
+    <AuthView>
+      <Form
+        onSubmit={handleSubmit(async (data) => {
+          await authAPI.resetPassword(data.email);
+          setSent(true);
+        })}
+      >
+        {sent ? (
+          <div>
+            <h1>Instructions sent</h1>
+            <p>Check your inbox for instructions to reset your password.</p>
+          </div>
+        ) : (
+          <>
+            <h1>Reset Password</h1>
+            <Input size="md" placeholder="Email" {...register('email')} />
+            <Button type="submit">Send Password Reset Email</Button>
+          </>
+        )}
       </Form>
     </AuthView>
   );

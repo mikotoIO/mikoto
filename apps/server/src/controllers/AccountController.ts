@@ -14,6 +14,7 @@ import crypto from 'crypto';
 import { promisify } from 'util';
 import { AccountJwt } from '../auth';
 import Minio from '../functions/Minio';
+import Mailer from '../services/Mailer';
 
 const randomBytes = promisify(crypto.randomBytes);
 async function generateRandomToken() {
@@ -41,7 +42,11 @@ interface ChangePasswordPayload {
 @JsonController()
 @Service()
 export class AccountController {
-  constructor(private prisma: PrismaClient, private minio: Minio) {}
+  constructor(
+    private prisma: PrismaClient,
+    private minio: Minio,
+    private mailer: Mailer,
+  ) {}
 
   private async createTokenPair(account: User, oldToken?: string) {
     const accessToken = jwt.sign({}, process.env.SECRET!, {
@@ -118,6 +123,36 @@ export class AccountController {
         data: { passhash: await bcrypt.hash(body.newPassword, 10) },
       });
     }
+  }
+
+  @Post('/account/reset_password')
+  async resetPassword(@Body() body: { email: string }) {
+    const account = await this.prisma.user.findUnique({
+      where: { email: body.email },
+    });
+    if (account === null) {
+      throw new UnauthorizedError('Invalid Email');
+    }
+
+    const verification = await this.prisma.verification.create({
+      data: {
+        userId: account.id,
+        token: await generateRandomToken(),
+        category: 'PASSWORD_RESET',
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+      },
+    });
+
+    await this.mailer.sendMail(
+      body.email,
+      'Reset Password',
+      'reset-password.ejs',
+      {
+        name: account.name,
+        token: verification.token,
+      },
+    );
+    return {};
   }
 
   @Post('/account/avatar')

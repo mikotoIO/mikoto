@@ -10,7 +10,7 @@ import {
   QueryParam,
   UnauthorizedError,
 } from 'routing-controllers';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, ChannelType } from '@prisma/client';
 import { Server } from 'socket.io';
 import { Service } from 'typedi';
 import { AccountJwt } from '../auth';
@@ -22,6 +22,7 @@ interface MessagePayload {
 interface ChannelPayload {
   spaceId: string;
   name: string;
+  type: ChannelType;
 }
 
 const authorInclude = {
@@ -45,6 +46,7 @@ export class ChannelController {
       data: {
         name: body.name,
         spaceId: body.spaceId,
+        type: body.type,
         order: channelCount,
       },
     });

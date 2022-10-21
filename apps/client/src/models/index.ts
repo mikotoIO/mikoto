@@ -40,6 +40,7 @@ export interface Channel {
   name: string;
   order: number;
   lastUpdated: string;
+  type: string;
 }
 
 export interface Role {}

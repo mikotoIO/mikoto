@@ -2,9 +2,10 @@ import styled from 'styled-components';
 import React, { useRef } from 'react';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useForm } from '@mantine/form';
-import { Button, TextInput } from '@mantine/core';
+import { Button, Select, TextInput } from '@mantine/core';
 
 import { useDrag, useDrop } from 'react-dnd';
+import { faHashtag, faVolumeLow } from '@fortawesome/free-solid-svg-icons';
 import { Channel } from '../models';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { useMikoto } from '../api';
@@ -54,6 +55,40 @@ interface ChanelNodeProps extends React.HTMLAttributes<HTMLAnchorElement> {
   onReorder?(): void;
 }
 
+function calculateChannelIcon(type: string) {
+  switch (type) {
+    case 'TEXT':
+      return faHashtag;
+    case 'VOICE':
+      return faVolumeLow;
+    default:
+      return faHashtag;
+  }
+}
+
+function channelToTab(channel: Channel): Tabable {
+  switch (channel.type) {
+    case 'TEXT':
+      return {
+        kind: 'textChannel',
+        key: channel.id,
+        name: channel.name,
+        channel:
+          channel instanceof ClientChannel ? channel.simplify() : channel,
+      };
+    case 'VOICE':
+      return {
+        kind: 'voiceChannel',
+        key: channel.id,
+        name: channel.name,
+        channel:
+          channel instanceof ClientChannel ? channel.simplify() : channel,
+      };
+    default:
+      throw new Error('Unknown channel type');
+  }
+}
+
 export function ChannelNode({
   channel,
   onReorder,
@@ -61,8 +96,25 @@ export function ChannelNode({
   ...props
 }: ChanelNodeProps) {
   const mikoto = useMikoto();
+  const tabkit = useTabkit();
   const menu = useContextMenu(({ destroy }) => (
     <ContextMenu>
+      <ContextMenu.Link>Open in new tab</ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          tabkit.openTab(
+            {
+              kind: 'voiceChannel',
+              channel,
+              name: `Call: #${channel.name}`,
+              key: 'voice',
+            },
+            false,
+          );
+        }}
+      >
+        Start Voice Call
+      </ContextMenu.Link>
       <ContextMenu.Link>Mark as Read</ContextMenu.Link>
       <ContextMenu.Link
         onClick={async () => {
@@ -100,12 +152,15 @@ export function ChannelNode({
   return (
     <StyledChannelNode
       {...props}
+      onClick={(ev) => {
+        tabkit.openTab(channelToTab(channel), ev.ctrlKey);
+      }}
       unread={isUnread}
       onContextMenu={menu}
       ref={ref}
     >
       {isUnread && <Pill />}
-      <IconBox />
+      <IconBox icon={calculateChannelIcon(channel.type)} />
       {channel.name}
     </StyledChannelNode>
   );
@@ -117,22 +172,34 @@ function CreateChannelModal() {
   const space = useRecoilValue(treebarSpaceState);
   const form = useForm({
     initialValues: {
-      channelName: '',
+      name: '',
+      type: 'TEXT',
     },
   });
 
   return (
     <form
       onSubmit={form.onSubmit(async () => {
-        await mikoto.createChannel(space?.id!, form.values.channelName);
+        await mikoto.createChannel(space?.id!, {
+          name: form.values.name,
+          type: form.values.type,
+        });
         setModal(null);
         form.reset();
       })}
     >
+      <Select
+        label="Channel Type"
+        data={[
+          { label: 'Text Channel', value: 'TEXT' },
+          { label: 'Voice Channel', value: 'VOICE' },
+        ]}
+        {...form.getInputProps('type')}
+      />
       <TextInput
         label="Channel Name"
         placeholder="New Channel"
-        {...form.getInputProps('channelName')}
+        {...form.getInputProps('name')}
       />
       <Button mt={16} fullWidth type="submit">
         Create Channel
@@ -157,15 +224,6 @@ function TreebarContextMenu() {
   );
 }
 
-function channelToTab(channel: Channel): Tabable {
-  return {
-    kind: 'textChannel',
-    key: channel.id,
-    name: channel.name,
-    channel: channel instanceof ClientChannel ? channel.simplify() : channel,
-  };
-}
-
 const TreeHead = styled.div`
   padding: 4px 16px;
   background-color: ${(p) => p.theme.colors.N1000};
@@ -175,9 +233,7 @@ const TreeHead = styled.div`
   }
 `;
 
-export function ChannelSidebar({ space }: { space: ClientSpace }) {
-  const tabkit = useTabkit();
-
+export function Explorer({ space }: { space: ClientSpace }) {
   const channelDelta = useDelta(space.channels, [space?.id!]);
   const contextMenu = useContextMenu(() => <TreebarContextMenu />);
 
@@ -196,9 +252,6 @@ export function ChannelSidebar({ space }: { space: ClientSpace }) {
             unread={unreadInstance[channel.id]}
             channel={channel}
             key={channel.id}
-            onClick={(ev) => {
-              tabkit.openTab(channelToTab(channel), ev.ctrlKey);
-            }}
             onReorder={async () => {
               await channelDelta.refetch();
             }}

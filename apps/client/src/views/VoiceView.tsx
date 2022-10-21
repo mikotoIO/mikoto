@@ -2,14 +2,14 @@ import { LiveKitRoom } from '@livekit/react-components';
 import React, { useEffect, useState } from 'react';
 import { ViewContainer } from '../components/ViewContainer';
 import { useMikoto } from '../api';
-import { VoiceResponse } from '../models';
+import { Channel, VoiceResponse } from '../models';
 
-export function VoiceView() {
+export function VoiceView({ channel }: { channel: Channel }) {
   const mikoto = useMikoto();
 
   const [voiceConfig, setVoiceConfig] = useState<VoiceResponse | null>(null);
   useEffect(() => {
-    mikoto.getVoice().then((x) => {
+    mikoto.getVoice(channel.id).then((x) => {
       setVoiceConfig(x);
     });
   }, []);

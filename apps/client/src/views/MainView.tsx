@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useRecoilValue } from 'recoil';
 import { ErrorBoundary } from 'react-error-boundary';
-import { ChannelSidebar } from '../components/ChannelSidebar';
+import { Explorer } from '../components/Explorer';
 import { TabbedView } from '../components/TabBar';
 import { AuthRefresher } from '../components/AuthHandler';
 import { Sidebar } from '../components/UserArea';
@@ -35,7 +35,7 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
     case 'textChannel':
       return <MessageView channel={tab.channel} />;
     case 'voiceChannel':
-      return <VoiceView />;
+      return <VoiceView channel={tab.channel} />;
     case 'spaceSettings':
       return <SpaceSettingsView space={tab.space} />;
     case 'accountSettings':
@@ -60,7 +60,7 @@ function AppView() {
   return (
     <AppContainer>
       <ServerSidebar />
-      <Sidebar>{space && <ChannelSidebar space={space} />}</Sidebar>
+      <Sidebar>{space && <Explorer space={space} />}</Sidebar>
       <TabbedView tabs={tabbed.tabs}>
         <ErrorBoundaryPage>
           {tabbed.tabs.map((tab, idx) => (

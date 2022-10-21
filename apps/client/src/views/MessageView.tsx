@@ -10,6 +10,7 @@ import { useDelta } from '../hooks/useDelta';
 import { Spinner } from '../components/atoms/Spinner';
 import { MessageEditor } from '../components/molecules/MessageEditor';
 import { ClientChannel } from '../api/entities/ClientChannel';
+import { TabName } from '../components/TabBar';
 
 const Messages = styled.div`
   overflow-y: auto;
@@ -55,6 +56,7 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
   const messages = messageDelta.data;
   return (
     <ViewContainer key={channel.id}>
+      <TabName name={channel.name} />
       {messageDelta.loading ? (
         <MessagesLoading>
           <Spinner />

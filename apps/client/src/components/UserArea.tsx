@@ -49,14 +49,7 @@ function UserAreaMenu() {
     <ContextMenu>
       <ContextMenu.Link
         onClick={() => {
-          tabkit.openTab(
-            {
-              kind: 'accountSettings',
-              name: 'Account Settings',
-              key: 'accountSettings',
-            },
-            false,
-          );
+          tabkit.openTab({ kind: 'accountSettings', key: 'main' }, false);
         }}
       >
         User Settings

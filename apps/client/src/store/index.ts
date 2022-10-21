@@ -1,5 +1,6 @@
-import { atom, useRecoilState } from 'recoil';
+import { atom, atomFamily, useRecoilState } from 'recoil';
 import { Channel, Space } from '../models';
+import { createContext } from 'react';
 
 export const treebarSpaceState = atom<Space | null>({
   key: 'treebarSpace',
@@ -15,7 +16,6 @@ type TabBaseType =
 
 export type Tabable = TabBaseType & {
   key: string;
-  name: string;
 };
 
 export const tabbedState = atom<{
@@ -27,6 +27,15 @@ export const tabbedState = atom<{
     index: 0,
     tabs: [],
   },
+});
+
+export const tabNameFamily = atomFamily({
+  key: 'tabName',
+  default: '',
+});
+
+export const TabContext = createContext<{ key: string }>({
+  key: '',
 });
 
 export function useTabkit() {

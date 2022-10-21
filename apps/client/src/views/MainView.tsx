@@ -8,7 +8,7 @@ import { AuthRefresher } from '../components/AuthHandler';
 import { Sidebar } from '../components/UserArea';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { MessageView } from './MessageView';
-import { Tabable, tabbedState, treebarSpaceState } from '../store';
+import { Tabable, tabbedState, TabContext, treebarSpaceState } from '../store';
 import { SpaceSettingsView } from './SpaceSettingsView';
 import { useMikoto } from '../api';
 import { AccountSettingsView } from './AccountSettingsView';
@@ -64,12 +64,16 @@ function AppView() {
       <TabbedView tabs={tabbed.tabs}>
         <ErrorBoundaryPage>
           {tabbed.tabs.map((tab, idx) => (
-            <div
-              style={idx !== tabbed.index ? { display: 'none' } : undefined}
+            <TabContext.Provider
+              value={{ key: `${tab.kind}/${tab.key}` }}
               key={`${tab.kind}/${tab.key}`}
             >
-              <TabViewSwitch tab={tab} />
-            </div>
+              <div
+                style={idx !== tabbed.index ? { display: 'none' } : undefined}
+              >
+                <TabViewSwitch tab={tab} />
+              </div>
+            </TabContext.Provider>
           ))}
         </ErrorBoundaryPage>
       </TabbedView>

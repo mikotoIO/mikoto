@@ -6,6 +6,7 @@ import {
   ViewContainerWithSidebar,
 } from '../components/ViewContainer';
 import { Space } from '../models';
+import { TabName } from '../components/TabBar';
 
 const Sidebar = styled.div`
   padding: 16px;
@@ -29,6 +30,7 @@ function Overview({ space }: { space: Space }) {
 
   return (
     <SidebarContainerArea>
+      <TabName name={`Settings for ${space.name}`} />
       <h1>Space Overview</h1>
       <TextInput
         value={spaceName}

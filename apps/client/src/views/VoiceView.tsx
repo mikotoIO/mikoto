@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { ViewContainer } from '../components/ViewContainer';
 import { useMikoto } from '../api';
 import { Channel, VoiceResponse } from '../models';
+import { TabName } from '../components/TabBar';
 
 export function VoiceView({ channel }: { channel: Channel }) {
   const mikoto = useMikoto();
@@ -16,6 +17,7 @@ export function VoiceView({ channel }: { channel: Channel }) {
 
   return (
     <ViewContainer>
+      <TabName name={`Voice: ${channel.name}`} />
       {voiceConfig && (
         <LiveKitRoom
           url={voiceConfig.url}

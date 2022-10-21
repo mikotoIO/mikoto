@@ -72,7 +72,6 @@ function channelToTab(channel: Channel): Tabable {
       return {
         kind: 'textChannel',
         key: channel.id,
-        name: channel.name,
         channel:
           channel instanceof ClientChannel ? channel.simplify() : channel,
       };
@@ -80,7 +79,6 @@ function channelToTab(channel: Channel): Tabable {
       return {
         kind: 'voiceChannel',
         key: channel.id,
-        name: channel.name,
         channel:
           channel instanceof ClientChannel ? channel.simplify() : channel,
       };
@@ -106,7 +104,6 @@ export function ChannelNode({
             {
               kind: 'voiceChannel',
               channel,
-              name: `Call: #${channel.name}`,
               key: 'voice',
             },
             false,

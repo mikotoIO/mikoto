@@ -5,6 +5,7 @@ import { SettingsView } from './SettingsViewTemplate';
 import { Avatar } from '../components/atoms/Avatar';
 import { useMikoto } from '../api';
 import { userState } from '../components/UserArea';
+import { TabName } from '../components/TabBar';
 
 const bgUrl = 'https://i1.sndcdn.com/visuals-000328863415-MJdwB0-t2480x520.jpg';
 
@@ -48,6 +49,7 @@ export function AccountSettingsView() {
 
   return (
     <SettingsView>
+      <TabName name="Account Settings" />
       <h1>My Account</h1>
       <AccountInfo>
         <Banner />

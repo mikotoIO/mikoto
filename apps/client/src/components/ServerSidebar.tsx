@@ -43,7 +43,6 @@ function ServerIconContextMenu({ space }: { space: Space }) {
           tabkit.openTab(
             {
               kind: 'spaceSettings',
-              name: `Settings: ${space.name}`,
               key: space.id,
               space,
             },

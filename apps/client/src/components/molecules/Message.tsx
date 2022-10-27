@@ -99,6 +99,7 @@ const MessageInner = styled.div`
 
 const Name = styled.div<{ color?: string }>`
   font-size: 14px;
+  font-weight: 600;
   margin: 0 8px 0 0;
   color: ${(p) => p.color ?? 'currentColor'};
 `;
@@ -231,7 +232,7 @@ export default function MessageItem({ message, isSimple }: MessageProps) {
       <MessageInner>
         {!isSimple && (
           <NameBox>
-            <Name color="white">{message.author?.name ?? 'Ghost'}</Name>
+            <Name color="#20BBD2">{message.author?.name ?? 'Ghost'}</Name>
             <Timestamp time={new Date(message.timestamp)} />
           </NameBox>
         )}

@@ -27,6 +27,7 @@ interface ChannelPayload {
 
 const authorInclude = {
   select: {
+    id: true,
     avatar: true,
     name: true,
   },

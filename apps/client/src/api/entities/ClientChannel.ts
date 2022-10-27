@@ -1,6 +1,5 @@
 import { Channel } from '../../models';
 import { MessageEngine } from '../engines/MessageEngine';
-import type { ClientSpace } from './ClientSpace';
 import type MikotoApi from '../index';
 import { ChannelInstance } from '../instances/ChannelInstance';
 
@@ -23,10 +22,6 @@ export class ClientChannel implements Channel {
     this.type = base.type;
     this.messages = new MessageEngine(client, this.id);
     this.instance = new ChannelInstance(client, this.id);
-  }
-
-  get space(): ClientSpace {
-    return this.client.spaceCache.get(this.spaceId)!;
   }
 
   simplify(): Channel {

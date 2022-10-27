@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useDrag, useDrop } from 'react-dnd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -95,9 +95,12 @@ function useReorderable() {
 export function TabName({ name }: { name: string }) {
   const tabInfo = useContext(TabContext);
   const [tabName, setTabName] = useRecoilState(tabNameFamily(tabInfo.key));
-  if (tabName !== name) {
-    setTabName(name);
-  }
+  useEffect(() => {
+    if (tabName !== name) {
+      setTabName(name);
+    }
+  }, [name]);
+
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return <></>;
 }

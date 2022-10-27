@@ -1,12 +1,20 @@
 import axios, { AxiosInstance } from 'axios';
 import { io, Socket } from 'socket.io-client';
 import React, { useContext } from 'react';
-import { Channel, Message, Space, User, VoiceResponse } from '../models';
+import {
+  Channel,
+  Member,
+  Message,
+  Space,
+  User,
+  VoiceResponse,
+} from '../models';
 import { MikotoCache } from './cache';
 import { SpaceEngine } from './engines/SpaceEngine';
 import { ClientSpace } from './entities/ClientSpace';
 import { ClientChannel } from './entities/ClientChannel';
 import { patch } from './util';
+import { ClientMember } from './entities/ClientMember';
 
 export default class MikotoApi {
   axios: AxiosInstance;
@@ -15,6 +23,7 @@ export default class MikotoApi {
   // cache everything
   spaceCache: MikotoCache<ClientSpace> = new MikotoCache<ClientSpace>();
   channelCache: MikotoCache<ClientChannel> = new MikotoCache<ClientChannel>();
+  memberCache: MikotoCache<ClientMember> = new MikotoCache<ClientMember>();
 
   spaces: SpaceEngine = new SpaceEngine(this);
 
@@ -93,6 +102,15 @@ export default class MikotoApi {
 
     patch(space, data);
     return space;
+  }
+
+  newMember(data: Member): ClientMember {
+    const member = this.memberCache.get(data.id);
+    if (member === undefined)
+      return this.memberCache.set(new ClientMember(this, data));
+
+    patch(member, data);
+    return member;
   }
 
   // region Channels
@@ -177,6 +195,14 @@ export default class MikotoApi {
     const { data } = await this.axios.get<User>('/users/me');
     return data;
   }
+
+  async getMembers(spaceId: string): Promise<ClientMember[]> {
+    const { data } = await this.axios.get<Member[]>(
+      `/spaces/${spaceId}/members`,
+    );
+    return data.map((x) => this.newMember(x));
+  }
+
   // endregion
 
   // region Spaces

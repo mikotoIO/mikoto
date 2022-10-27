@@ -4,7 +4,7 @@ export interface ObjectWithID {
 
 export class MikotoCache<T extends ObjectWithID> {
   private cache: Map<string, T>;
-  constructor(private max = 200) {
+  constructor(private max = 100000) {
     this.cache = new Map<string, T>();
   }
 
@@ -27,11 +27,11 @@ export class MikotoCache<T extends ObjectWithID> {
     return item;
   }
 
-  first(): string {
-    return this.cache.keys().next().value;
-  }
-
   delete(key: string) {
     this.cache.delete(key);
+  }
+
+  private first(): string {
+    return this.cache.keys().next().value;
   }
 }

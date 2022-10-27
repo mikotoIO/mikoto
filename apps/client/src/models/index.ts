@@ -23,15 +23,17 @@ export interface Message {
   author?: User;
 }
 
-export interface User {
-  name: string;
-  avatar: string;
+export interface Member {
+  id: string;
+  spaceId: string;
+  user: User;
+  roleIds: string[];
 }
 
-export interface SimpleUser {
+export interface User {
   id: string;
   name: string;
-  user: User;
+  avatar: string;
 }
 
 export interface Channel {

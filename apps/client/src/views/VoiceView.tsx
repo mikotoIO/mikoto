@@ -23,7 +23,6 @@ export function VoiceView({ channel }: { channel: Channel }) {
           url={voiceConfig.url}
           token={voiceConfig.token}
           onConnected={async (room) => {
-            await room.localParticipant.setCameraEnabled(true);
             await room.localParticipant.setMicrophoneEnabled(true);
           }}
         />

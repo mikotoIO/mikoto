@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useForm } from '@mantine/form';
 import { Button, Select, TextInput } from '@mantine/core';
@@ -232,6 +232,11 @@ const TreeHead = styled.div`
 
 export function Explorer({ space }: { space: ClientSpace }) {
   const channelDelta = useDelta(space.channels, [space?.id!]);
+
+  // const mikoto = useMikoto();
+  // useEffect(() => {
+  //   mikoto.getRoles(space.id).then((x) => console.log(x));
+  // }, [space?.id!]);
   const contextMenu = useContextMenu(() => <TreebarContextMenu />);
 
   const channels = [...channelDelta.data].sort((a, b) => a.order - b.order);

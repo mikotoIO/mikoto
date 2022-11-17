@@ -16,15 +16,17 @@ import { ClientSpace } from './entities/ClientSpace';
 import { ClientChannel } from './entities/ClientChannel';
 import { patch } from './util';
 import { ClientMember } from './entities/ClientMember';
+import { ClientRole } from './entities/ClientRole';
 
-function createNewCreator<D extends ObjectWithID, C extends D & ObjectWithID>(
+function createNewCreator<D extends ObjectWithID, C extends D>(
   api: MikotoApi,
   cache: MikotoCache<C>,
   Construct: new (api: MikotoApi, data: D) => C,
 ) {
-  return (data: D) => {
+  return (data: D, forceRefresh: boolean = false) => {
     const space = cache.get(data.id);
-    if (space === undefined) return cache.set(new Construct(api, data));
+    if (forceRefresh || space === undefined)
+      return cache.set(new Construct(api, data));
 
     patch(space, data as any);
     return space;
@@ -37,12 +39,13 @@ export default class MikotoApi {
 
   // cache everything
   spaceCache = new MikotoCache<ClientSpace>();
-  channelCache = new MikotoCache<ClientChannel>();
-  memberCache = new MikotoCache<ClientMember>();
-
-  newChannel = createNewCreator(this, this.channelCache, ClientChannel);
   newSpace = createNewCreator(this, this.spaceCache, ClientSpace);
+  channelCache = new MikotoCache<ClientChannel>();
+  newChannel = createNewCreator(this, this.channelCache, ClientChannel);
+  memberCache = new MikotoCache<ClientMember>();
   newMember = createNewCreator(this, this.memberCache, ClientMember);
+  roleCache = new MikotoCache<ClientRole>();
+  newRole = createNewCreator(this, this.roleCache, ClientRole);
 
   spaces: SpaceEngine = new SpaceEngine(this);
 
@@ -118,7 +121,7 @@ export default class MikotoApi {
     const { data } = await this.axios.get<Channel[]>(
       `/spaces/${spaceId}/channels`,
     );
-    return data.map((x) => this.newChannel(x));
+    return data.map((x) => this.newChannel(x, true));
   }
 
   async createChannel(
@@ -207,9 +210,7 @@ export default class MikotoApi {
 
   async getSpaces(): Promise<ClientSpace[]> {
     const { data } = await this.axios.get<Space[]>('/spaces');
-    const spaces = data.map((x) => new ClientSpace(this, x));
-    spaces.forEach((x) => this.spaceCache.set(x));
-    return spaces;
+    return data.map((x) => this.newSpace(x, true));
   }
 
   async joinSpace(id: string): Promise<void> {
@@ -233,9 +234,9 @@ export default class MikotoApi {
 
   // region Roles
 
-  async getRoles(spaceId: string): Promise<Role[]> {
+  async getRoles(spaceId: string): Promise<ClientRole[]> {
     const { data } = await this.axios.get<Role[]>(`/spaces/${spaceId}/roles`);
-    return data;
+    return data.map((x) => this.newRole(x, true));
   }
 
   // endregion

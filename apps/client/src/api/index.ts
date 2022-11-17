@@ -5,25 +5,44 @@ import {
   Channel,
   Member,
   Message,
+  Role,
   Space,
   User,
   VoiceResponse,
 } from '../models';
-import { MikotoCache } from './cache';
+import { MikotoCache, ObjectWithID } from './cache';
 import { SpaceEngine } from './engines/SpaceEngine';
 import { ClientSpace } from './entities/ClientSpace';
 import { ClientChannel } from './entities/ClientChannel';
 import { patch } from './util';
 import { ClientMember } from './entities/ClientMember';
 
+function createNewCreator<D extends ObjectWithID, C extends D & ObjectWithID>(
+  api: MikotoApi,
+  cache: MikotoCache<C>,
+  Construct: new (api: MikotoApi, data: D) => C,
+) {
+  return (data: D) => {
+    const space = cache.get(data.id);
+    if (space === undefined) return cache.set(new Construct(api, data));
+
+    patch(space, data as any);
+    return space;
+  };
+}
+
 export default class MikotoApi {
   axios: AxiosInstance;
   io!: Socket;
 
   // cache everything
-  spaceCache: MikotoCache<ClientSpace> = new MikotoCache<ClientSpace>();
-  channelCache: MikotoCache<ClientChannel> = new MikotoCache<ClientChannel>();
-  memberCache: MikotoCache<ClientMember> = new MikotoCache<ClientMember>();
+  spaceCache = new MikotoCache<ClientSpace>();
+  channelCache = new MikotoCache<ClientChannel>();
+  memberCache = new MikotoCache<ClientMember>();
+
+  newChannel = createNewCreator(this, this.channelCache, ClientChannel);
+  newSpace = createNewCreator(this, this.spaceCache, ClientSpace);
+  newMember = createNewCreator(this, this.memberCache, ClientMember);
 
   spaces: SpaceEngine = new SpaceEngine(this);
 
@@ -84,33 +103,6 @@ export default class MikotoApi {
     this.io.emit('identify', {
       token,
     });
-  }
-
-  newChannel(data: Channel): ClientChannel {
-    const channel = this.channelCache.get(data.id);
-    if (channel === undefined)
-      return this.channelCache.set(new ClientChannel(this, data));
-
-    patch(channel, data);
-    return channel;
-  }
-
-  newSpace(data: Space): ClientSpace {
-    const space = this.spaceCache.get(data.id);
-    if (space === undefined)
-      return this.spaceCache.set(new ClientSpace(this, data));
-
-    patch(space, data);
-    return space;
-  }
-
-  newMember(data: Member): ClientMember {
-    const member = this.memberCache.get(data.id);
-    if (member === undefined)
-      return this.memberCache.set(new ClientMember(this, data));
-
-    patch(member, data);
-    return member;
   }
 
   // region Channels
@@ -213,12 +205,6 @@ export default class MikotoApi {
     return this.newSpace(data);
   }
 
-  getSpace_CACHED(spaceId: string): ClientSpace {
-    const space = this.spaceCache.get(spaceId);
-    if (!space) throw new Error('derp');
-    return space;
-  }
-
   async getSpaces(): Promise<ClientSpace[]> {
     const { data } = await this.axios.get<Space[]>('/spaces');
     const spaces = data.map((x) => new ClientSpace(this, x));
@@ -243,6 +229,15 @@ export default class MikotoApi {
   async deleteSpace(id: string): Promise<void> {
     await this.axios.delete<Space>(`/spaces/${id}`);
   }
+  // endregion
+
+  // region Roles
+
+  async getRoles(spaceId: string): Promise<Role[]> {
+    const { data } = await this.axios.get<Role[]>(`/spaces/${spaceId}/roles`);
+    return data;
+  }
+
   // endregion
 
   async uploadAvatar(file: File) {

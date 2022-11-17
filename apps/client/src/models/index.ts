@@ -45,7 +45,13 @@ export interface Channel {
   type: string;
 }
 
-export interface Role {}
+export interface Role {
+  id: string;
+  name: string;
+  color?: string;
+  permissions: string;
+  position: number;
+}
 
 export interface VoiceResponse {
   url: string;

@@ -33,7 +33,7 @@ const StyledServerIcon = styled.div<{ active?: boolean }>`
   transition-duration: 100ms;
 `;
 
-function ServerIconContextMenu({ space }: { space: Space }) {
+function ServerIconContextMenu({ space }: { space: ClientSpace }) {
   const mikoto = useMikoto();
   const tabkit = useTabkit();
   return (
@@ -73,7 +73,7 @@ const StyledIconWrapper = styled.div`
   width: 68px;
 `;
 
-function ServerIcon({ space }: { space: Space }) {
+function ServerIcon({ space }: { space: ClientSpace }) {
   const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
   const isActive = stateSpace?.id === space.id;
 
@@ -92,7 +92,7 @@ function ServerIcon({ space }: { space: Space }) {
           onContextMenu={contextMenu}
           ref={ref}
           onClick={() => {
-            setSpace(space instanceof ClientSpace ? space.simplify() : space);
+            setSpace(space);
           }}
         >
           {space.name[0]}

@@ -62,6 +62,7 @@
     "start": "vite",
     "build": "vite build",
     "test": "vitest",
+    "typecheck": "tsc --noEmit",
     "analyze": "source-map-explorer ./build/static/js/*.js",
     "eject": "react-scripts eject"
   },

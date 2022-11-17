@@ -66,21 +66,19 @@ function calculateChannelIcon(type: string) {
   }
 }
 
-function channelToTab(channel: Channel): Tabable {
+function channelToTab(channel: ClientChannel): Tabable {
   switch (channel.type) {
     case 'TEXT':
       return {
         kind: 'textChannel',
         key: channel.id,
-        channel:
-          channel instanceof ClientChannel ? channel.simplify() : channel,
+        channel,
       };
     case 'VOICE':
       return {
         kind: 'voiceChannel',
         key: channel.id,
-        channel:
-          channel instanceof ClientChannel ? channel.simplify() : channel,
+        channel,
       };
     default:
       throw new Error('Unknown channel type');

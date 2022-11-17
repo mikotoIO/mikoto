@@ -5,8 +5,9 @@ import {
   SidebarContainerArea,
   ViewContainerWithSidebar,
 } from '../components/ViewContainer';
-import { Space } from '../models';
 import { TabName } from '../components/TabBar';
+import { ClientSpace } from '../api/entities/ClientSpace';
+import { useDelta } from '../hooks/useDelta';
 
 const Sidebar = styled.div`
   padding: 16px;
@@ -25,7 +26,7 @@ const SidebarButton = styled.a<{ selected?: boolean }>`
   user-select: none;
 `;
 
-function Overview({ space }: { space: Space }) {
+function Overview({ space }: { space: ClientSpace }) {
   const [spaceName, setSpaceName] = useState(space.name);
 
   return (
@@ -57,43 +58,34 @@ const RoleEditorGrid = styled.div`
 
 const RoleList = styled.div``;
 
-function Roles() {
+function Roles({ space }: { space: ClientSpace }) {
+  const rolesDelta = useDelta(space.roles, [space.id]);
   return (
     <RoleEditorGrid>
       <RoleList>
-        <SidebarButton selected>
-          <ColorDot color="#e24ca5" />
-          Role 1
-        </SidebarButton>
-        <SidebarButton>
-          <ColorDot color="#27c0a0" />
-          Role 2
-        </SidebarButton>
-        <SidebarButton>
-          <ColorDot color="#5498ef" />
-          Role 3
-        </SidebarButton>
-        <SidebarButton>
-          <ColorDot />
-          @everyone
-        </SidebarButton>
+        {rolesDelta.data.map((role) => (
+          <SidebarButton key={role.id}>
+            <ColorDot />
+            {role.name}
+          </SidebarButton>
+        ))}
       </RoleList>
     </RoleEditorGrid>
   );
 }
 
-function SettingSwitch({ tab, space }: { tab: string; space: Space }) {
+function SettingSwitch({ tab, space }: { tab: string; space: ClientSpace }) {
   switch (tab) {
     case 'Overview':
       return <Overview space={space} />;
     case 'Roles':
-      return <Roles />;
+      return <Roles space={space} />;
     default:
       return null;
   }
 }
 
-export function SpaceSettingsView({ space }: { space: Space }) {
+export function SpaceSettingsView({ space }: { space: ClientSpace }) {
   const [tab, setTab] = useState('Overview');
   return (
     <ViewContainerWithSidebar>

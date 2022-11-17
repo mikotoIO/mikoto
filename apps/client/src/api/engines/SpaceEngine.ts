@@ -1,13 +1,13 @@
 import { DeltaEngine } from './DeltaEngine';
-import { Space } from '../../models';
 import type MikotoApi from '../index';
+import { ClientSpace } from '../entities/ClientSpace';
 
-export class SpaceEngine extends DeltaEngine<Space> {
+export class SpaceEngine extends DeltaEngine<ClientSpace> {
   constructor(private client: MikotoApi) {
     super();
   }
 
-  fetch(): Promise<Space[]> {
+  fetch(): Promise<ClientSpace[]> {
     return this.client.getSpaces();
   }
 }

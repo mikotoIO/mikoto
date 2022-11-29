@@ -49,13 +49,13 @@ export default class MikotoApi {
 
   spaces: SpaceEngine = new SpaceEngine(this);
 
-  constructor(url: string) {
+  constructor(url: string, onready?: (self: MikotoApi) => void) {
     this.axios = axios.create({
       baseURL: url,
     });
     this.io = io(url);
     this.io.on('connect', () => {
-      console.log('socket live!');
+      onready?.(this);
     });
 
     this.io.on('messageCreate', (message: Message) => {
@@ -297,4 +297,17 @@ export const MikotoContext = React.createContext<MikotoApi>(undefined!);
 
 export function useMikoto() {
   return useContext(MikotoContext);
+}
+
+export function constructMikoto(url: string) {
+  return new Promise<MikotoApi>((resolve, reject) => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const mikotoApi = new MikotoApi(url, (m) => {
+        resolve(m);
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
 }

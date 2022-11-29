@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 
 import './index.css';
@@ -13,7 +13,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 import { theme } from './components/themes';
-import MikotoApi, { MikotoContext } from './api';
+import MikotoApi, { constructMikoto, MikotoContext } from './api';
 import constants from './constants';
 
 /// global polyfill
@@ -23,14 +23,26 @@ if (typeof (window as any).global === 'undefined') {
 
 const SilentRecoilRoot = RecoilRoot as any;
 
+function MikotoApiLoader() {
+  const [mikoto, setMikoto] = React.useState<MikotoApi | null>(null);
+  useEffect(() => {
+    constructMikoto(constants.apiPath).then((x) => setMikoto(x));
+  }, []);
+
+  if (mikoto === null) return null;
+  return (
+    <MikotoContext.Provider value={mikoto}>
+      <App />
+    </MikotoContext.Provider>
+  );
+}
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <SilentRecoilRoot>
     <ThemeProvider theme={theme}>
       <MantineProvider theme={{ colorScheme: 'dark' }}>
         <DndProvider backend={HTML5Backend}>
-          <MikotoContext.Provider value={new MikotoApi(constants.apiPath)}>
-            <App />
-          </MikotoContext.Provider>
+          <MikotoApiLoader />
         </DndProvider>
       </MantineProvider>
     </ThemeProvider>

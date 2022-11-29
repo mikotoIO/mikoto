@@ -20,6 +20,19 @@ interface SpaceCreationPayload {
   name: string;
 }
 
+const memberInclude = {
+  roles: {
+    select: { id: true },
+  },
+  user: {
+    select: {
+      id: true,
+      name: true,
+      avatar: true,
+    },
+  },
+};
+
 @JsonController()
 @Service()
 export class SpaceController {
@@ -162,13 +175,38 @@ export class SpaceController {
     return Object.fromEntries(unreads.map((x) => [x.channelId, x.timestamp]));
   }
 
-  @Get('/spaces/:spaceId/member')
+  @Get('/spaces/:spaceId/members')
   async getSpaceMembers(@Param('spaceId') spaceId: string) {
-    return await this.prisma.spaceUser.findMany({
+    const members = await this.prisma.spaceUser.findMany({
       where: {
         spaceId,
       },
+      include: memberInclude,
     });
+
+    return members.map(({ roles, ...rest }) => ({
+      roleIds: roles.map((x) => x.id),
+      ...rest,
+    }));
+  }
+
+  @Get('/spaces/:spaceId/members/:userId')
+  async getSpaceMember(
+    @Param('spaceId') spaceId: string,
+    @Param('userId') userId: string,
+  ) {
+    const members = await this.prisma.spaceUser.findUnique({
+      where: { userId_spaceId: { userId, spaceId } },
+      include: memberInclude,
+    });
+    if (!members) {
+      throw new NotFoundError();
+    }
+    const { roles, ...rest } = members;
+    return {
+      roleIds: roles.map((x) => x.id),
+      ...rest,
+    };
   }
 
   @Post('/spaces/:spaceId/icon')

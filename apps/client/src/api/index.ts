@@ -191,6 +191,13 @@ export default class MikotoApi {
     return data;
   }
 
+  async getMember(spaceId: string, userId: string): Promise<ClientMember> {
+    const { data } = await this.axios.get<Member>(
+      `/spaces/${spaceId}/members/${userId}`,
+    );
+    return this.newMember(data);
+  }
+
   async getMembers(spaceId: string): Promise<ClientMember[]> {
     const { data } = await this.axios.get<Member[]>(
       `/spaces/${spaceId}/members`,
@@ -237,6 +244,35 @@ export default class MikotoApi {
   async getRoles(spaceId: string): Promise<ClientRole[]> {
     const { data } = await this.axios.get<Role[]>(`/spaces/${spaceId}/roles`);
     return data.map((x) => this.newRole(x, true));
+  }
+
+  async createRole(spaceId: string, name: string): Promise<ClientRole> {
+    const { data } = await this.axios.post<Role>(`/spaces/${spaceId}/roles`, {
+      name,
+      position: 0,
+      spacePermissions: '0',
+    });
+    return this.newRole(data);
+  }
+
+  async editRole(
+    spaceId: string,
+    roleId: string,
+    options: {
+      name?: string;
+      spacePermissions?: string;
+      position?: number;
+    },
+  ): Promise<ClientRole> {
+    const { data } = await this.axios.patch<Role>(
+      `/spaces/${spaceId}/roles/${roleId}`,
+      options,
+    );
+    return this.newRole(data);
+  }
+
+  async deleteRole(spaceId: string, roleId: string): Promise<void> {
+    await this.axios.delete<Role>(`/spaces/${spaceId}/roles/${roleId}`);
   }
 
   // endregion

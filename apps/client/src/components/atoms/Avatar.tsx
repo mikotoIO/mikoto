@@ -1,8 +1,10 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useSetRecoilState } from 'recoil';
 import { contextMenuState } from '../ContextMenu';
 import { User } from '../../models';
+import { useMikoto } from '../../api';
+import { ClientMember } from '../../api/entities/ClientMember';
 
 const AvatarImg = styled.img<{ size: number }>`
   user-select: none;
@@ -42,22 +44,40 @@ const AvatarContextWrapper = styled.div`
   }
 `;
 
-function AvatarContextMenu({ user }: { user: User }) {
+function AvatarContextMenu({ user, spaceId }: { user: User; spaceId: string }) {
+  const mikoto = useMikoto();
+  const [member, setMember] = useState<ClientMember | null>(null);
+  React.useEffect(() => {
+    mikoto.getMember(spaceId, user.id).then((m) => setMember(m));
+  }, [user.id]);
   return (
     <AvatarContextWrapper>
-      <Avatar src={user.avatar} size={80} />
-      <h1>{user.name}</h1>
-      <hr />
-      <h2>Roles</h2>
+      {member === null ? (
+        'loading'
+      ) : (
+        <div>
+          <Avatar src={user.avatar} size={80} />
+          <h1>{user.name}</h1>
+          <hr />
+          <h2>Roles</h2>
+          <div>{JSON.stringify(member.roleIds)}</div>
+        </div>
+      )}
     </AvatarContextWrapper>
   );
 }
 
 interface MessageAvatarProps extends AvatarProps {
   user?: User;
+  spaceId: string;
 }
 
-export function MessageAvatar({ src, user, size }: MessageAvatarProps) {
+export function MessageAvatar({
+  src,
+  user,
+  size,
+  spaceId,
+}: MessageAvatarProps) {
   const setContextMenu = useSetRecoilState(contextMenuState);
   const avatarRef = useRef<HTMLImageElement>(null);
 
@@ -75,7 +95,7 @@ export function MessageAvatar({ src, user, size }: MessageAvatarProps) {
 
         setContextMenu({
           position: { top, left: right + 8 },
-          elem: <AvatarContextMenu user={user} />,
+          elem: <AvatarContextMenu user={user} spaceId={spaceId} />,
         });
       }}
     />

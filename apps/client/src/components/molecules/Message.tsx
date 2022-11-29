@@ -207,6 +207,10 @@ function Markdown({ content }: { content: string }) {
   );
 }
 
+const AvatarFiller = styled.div`
+  width: 40px;
+`;
+
 export default function MessageItem({ message, isSimple }: MessageProps) {
   const mikoto = useMikoto();
 
@@ -225,9 +229,13 @@ export default function MessageItem({ message, isSimple }: MessageProps) {
   return (
     <MessageContainer isSimple={isSimple} onContextMenu={menu}>
       {isSimple ? (
-        <div style={{ width: '40px' }} />
+        <AvatarFiller />
       ) : (
-        <MessageAvatar src={message.author?.avatar} user={message.author} />
+        <MessageAvatar
+          src={message.author?.avatar}
+          user={message.author}
+          spaceId={mikoto.channelCache.get(message.channelId)!.spaceId}
+        />
       )}
       <MessageInner>
         {!isSimple && (

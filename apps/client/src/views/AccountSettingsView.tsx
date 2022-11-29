@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { useDropzone } from 'react-dropzone';
 import { useRecoilState } from 'recoil';
+import { Button } from '@mantine/core';
 import { SettingsView } from './SettingsViewTemplate';
 import { Avatar } from '../components/atoms/Avatar';
 import { useMikoto } from '../api';
@@ -64,6 +65,8 @@ export function AccountSettingsView() {
           <h2>{user?.name}</h2>
         </Content>
       </AccountInfo>
+      <h2>Authentication</h2>
+      <Button>Change Password</Button>
     </SettingsView>
   );
 }

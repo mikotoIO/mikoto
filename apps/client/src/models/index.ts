@@ -11,6 +11,8 @@ export interface TokenPair {
 export interface Space {
   id: string;
   name: string;
+  channels: Channel[];
+  roles: Role[];
 }
 
 export interface Message {

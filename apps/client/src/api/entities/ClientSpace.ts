@@ -4,7 +4,7 @@ import { ChannelEngine } from '../engines/ChannelEngine';
 import { ChannelUnreadInstance } from '../instances/ChannelUnreadInstance';
 import { RoleEngine } from '../engines/RoleEngine';
 
-export class ClientSpace implements Space {
+export class ClientSpace {
   id: string;
   name: string;
 
@@ -19,12 +19,5 @@ export class ClientSpace implements Space {
     this.channels = new ChannelEngine(client, this.id);
     this.unreads = new ChannelUnreadInstance(client, this.id);
     this.roles = new RoleEngine(client, this.id);
-  }
-
-  simplify(): Space {
-    return {
-      id: this.id,
-      name: this.name,
-    };
   }
 }

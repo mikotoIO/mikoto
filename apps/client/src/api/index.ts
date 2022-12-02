@@ -18,12 +18,12 @@ import { patch } from './util';
 import { ClientMember } from './entities/ClientMember';
 import { ClientRole } from './entities/ClientRole';
 
-function createNewCreator<D extends ObjectWithID, C extends D>(
+function createNewCreator<D extends ObjectWithID, C extends ObjectWithID>(
   api: MikotoApi,
   cache: MikotoCache<C>,
   Construct: new (api: MikotoApi, data: D) => C,
 ) {
-  return (data: D, forceRefresh: boolean = false) => {
+  return (data: D, forceRefresh: boolean = false): C => {
     const space = cache.get(data.id);
     if (forceRefresh || space === undefined)
       return cache.set(new Construct(api, data));
@@ -217,6 +217,7 @@ export default class MikotoApi {
 
   async getSpaces(): Promise<ClientSpace[]> {
     const { data } = await this.axios.get<Space[]>('/spaces');
+    console.log(data);
     return data.map((x) => this.newSpace(x, true));
   }
 

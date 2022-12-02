@@ -5,6 +5,7 @@ import { contextMenuState } from '../ContextMenu';
 import { User } from '../../models';
 import { useMikoto } from '../../api';
 import { ClientMember } from '../../api/entities/ClientMember';
+import { useDelta } from '../../hooks/useDelta';
 
 const AvatarImg = styled.img<{ size: number }>`
   user-select: none;
@@ -50,6 +51,7 @@ function AvatarContextMenu({ user, spaceId }: { user: User; spaceId: string }) {
   React.useEffect(() => {
     mikoto.getMember(spaceId, user.id).then((m) => setMember(m));
   }, [user.id]);
+
   return (
     <AvatarContextWrapper>
       {member === null ? (

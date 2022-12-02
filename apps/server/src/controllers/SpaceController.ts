@@ -107,14 +107,27 @@ export class SpaceController {
   async getList(@CurrentUser() jwt: AccountJwt) {
     const list = await this.prisma.spaceUser.findMany({
       where: { userId: jwt.sub },
-      include: { space: true },
+      include: {
+        space: {
+          include: {
+            channels: true,
+            roles: true,
+          },
+        },
+      },
     });
     return list.map((x) => x.space);
   }
 
   @Get('/spaces/:id')
   async getOne(@Param('id') id: string) {
-    return this.prisma.space.findUnique({ where: { id } });
+    return this.prisma.space.findUnique({
+      where: { id },
+      include: {
+        channels: true,
+        roles: true,
+      },
+    });
   }
 
   @Post('/spaces')
@@ -130,6 +143,10 @@ export class SpaceController {
         roles: {
           create: [{ name: '@everyone', position: 0, permissions: '0' }],
         },
+      },
+      include: {
+        channels: true,
+        roles: true,
       },
     });
     await this.join(jwt.sub, space);

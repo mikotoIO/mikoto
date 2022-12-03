@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import { Button } from '@mantine/core';
 import { useAsync } from 'react-async-hook';
 import { useParams } from 'react-router-dom';
-import { AuthRefresher } from '../components/AuthHandler';
 import { useMikoto } from '../api';
 import { Spinner } from '../components/atoms/Spinner';
 
@@ -63,9 +62,5 @@ export function SpaceInviteViewInner() {
 }
 
 export function SpaceInviteView() {
-  return (
-    <AuthRefresher>
-      <SpaceInviteViewInner />
-    </AuthRefresher>
-  );
+  return <SpaceInviteViewInner />;
 }

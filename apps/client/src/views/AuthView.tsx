@@ -3,8 +3,6 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { useRecoilState } from 'recoil';
-import { authTokenState } from '../components/AuthHandler';
 import * as authAPI from '../api/auth';
 import { useErrorElement } from '../hooks/useErrorElement';
 
@@ -54,17 +52,14 @@ export function AuthView({ children }: { children: React.ReactNode }) {
 export function LoginView() {
   const { register, handleSubmit } = useForm();
   const error = useErrorElement();
-  const [, setAuthToken] = useRecoilState(authTokenState);
 
   return (
     <AuthView>
       <Form
         onSubmit={handleSubmit(async (formData) => {
           try {
-            await authAPI.login(formData.email, formData.password);
-            setAuthToken(
-              await authAPI.login(formData.email, formData.password),
-            );
+            const tk = await authAPI.login(formData.email, formData.password);
+            localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
             // Screw SPAs, why not just force an actual reload at this point?
             window.location.href = '/';
           } catch (e) {

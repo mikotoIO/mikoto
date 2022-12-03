@@ -4,16 +4,16 @@ import { useRecoilValue } from 'recoil';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Explorer } from '../components/Explorer';
 import { TabbedView } from '../components/TabBar';
-import { AuthRefresher } from '../components/AuthHandler';
 import { Sidebar } from '../components/UserArea';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { MessageView } from './MessageView';
 import { Tabable, tabbedState, TabContext, treebarSpaceState } from '../store';
 import { SpaceSettingsView } from './SpaceSettingsView';
-import { useMikoto } from '../api';
+import MikotoApi, { constructMikoto, MikotoContext, useMikoto } from '../api';
 import { AccountSettingsView } from './AccountSettingsView';
 import { ClientSpace } from '../api/entities/ClientSpace';
 import { VoiceView } from './VoiceView';
+import constants from '../constants';
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -81,10 +81,22 @@ function AppView() {
   );
 }
 
+function MikotoApiLoader({ children }: { children: React.ReactNode }) {
+  const [mikoto, setMikoto] = React.useState<MikotoApi | null>(null);
+  useEffect(() => {
+    constructMikoto(constants.apiPath).then((x) => setMikoto(x));
+  }, []);
+
+  if (mikoto === null) return null;
+  return (
+    <MikotoContext.Provider value={mikoto}>{children}</MikotoContext.Provider>
+  );
+}
+
 export default function MainView() {
   return (
-    <AuthRefresher>
+    <MikotoApiLoader>
       <AppView />
-    </AuthRefresher>
+    </MikotoApiLoader>
   );
 }

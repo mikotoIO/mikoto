@@ -17,6 +17,7 @@ import { ClientChannel } from './entities/ClientChannel';
 import { patch } from './util';
 import { ClientMember } from './entities/ClientMember';
 import { ClientRole } from './entities/ClientRole';
+import * as authAPI from '../api/auth';
 
 function createNewCreator<D extends ObjectWithID, C extends ObjectWithID>(
   api: MikotoApi,
@@ -300,7 +301,7 @@ export function useMikoto() {
   return useContext(MikotoContext);
 }
 
-export function constructMikoto(url: string) {
+function constructMikotoSimple(url: string) {
   return new Promise<MikotoApi>((resolve, reject) => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -311,4 +312,26 @@ export function constructMikoto(url: string) {
       reject(e);
     }
   });
+}
+
+async function refreshAccess(mikoto: MikotoApi) {
+  const t = await authAPI.refresh({
+    accessToken: '',
+    refreshToken: localStorage.getItem('REFRESH_TOKEN')!,
+  });
+  localStorage.setItem('REFRESH_TOKEN', t.refreshToken);
+  mikoto.updateAccessToken(t.accessToken);
+}
+
+export async function constructMikoto(url: string) {
+  const mikoto = await constructMikotoSimple(url);
+
+  await refreshAccess(mikoto);
+  setInterval(() => {
+    refreshAccess(mikoto).then(() => {
+      console.log('refreshed');
+    });
+  }, 10 * 60 * 1000);
+
+  return mikoto;
 }

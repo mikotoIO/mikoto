@@ -5,7 +5,6 @@ import { contextMenuState } from '../ContextMenu';
 import { User } from '../../models';
 import { useMikoto } from '../../api';
 import { ClientMember } from '../../api/entities/ClientMember';
-import { useDelta } from '../../hooks/useDelta';
 
 const AvatarImg = styled.img<{ size: number }>`
   user-select: none;

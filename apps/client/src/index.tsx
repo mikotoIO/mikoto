@@ -23,26 +23,12 @@ if (typeof (window as any).global === 'undefined') {
 
 const SilentRecoilRoot = RecoilRoot as any;
 
-function MikotoApiLoader() {
-  const [mikoto, setMikoto] = React.useState<MikotoApi | null>(null);
-  useEffect(() => {
-    constructMikoto(constants.apiPath).then((x) => setMikoto(x));
-  }, []);
-
-  if (mikoto === null) return null;
-  return (
-    <MikotoContext.Provider value={mikoto}>
-      <App />
-    </MikotoContext.Provider>
-  );
-}
-
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <SilentRecoilRoot>
     <ThemeProvider theme={theme}>
       <MantineProvider theme={{ colorScheme: 'dark' }}>
         <DndProvider backend={HTML5Backend}>
-          <MikotoApiLoader />
+          <App />
         </DndProvider>
       </MantineProvider>
     </ThemeProvider>

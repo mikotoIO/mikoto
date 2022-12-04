@@ -14,6 +14,7 @@ import { AccountSettingsView } from './AccountSettingsView';
 import { ClientSpace } from '../api/entities/ClientSpace';
 import { VoiceView } from './VoiceView';
 import constants from '../constants';
+import { ContextMenuKit } from '../components/ContextMenu';
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -97,6 +98,7 @@ export default function MainView() {
   return (
     <MikotoApiLoader>
       <AppView />
+      <ContextMenuKit />
     </MikotoApiLoader>
   );
 }

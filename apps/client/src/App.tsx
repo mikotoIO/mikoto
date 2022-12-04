@@ -18,7 +18,6 @@ function App() {
         <Route path="/invite/:id" element={<SpaceInviteView />} />
         <Route path="/livekit" element={<RoomPage />} />
       </Routes>
-      <ContextMenuKit />
       <ModalKit />
     </BrowserRouter>
   );

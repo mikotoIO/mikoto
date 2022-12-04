@@ -10,19 +10,19 @@ import {
   User,
   VoiceResponse,
 } from '../models';
-import { MikotoCache, ObjectWithID } from './cache';
+import { ICache, InfiniteCache, MikotoCache, ObjectWithID } from './cache';
 import { SpaceEngine } from './engines/SpaceEngine';
 import { ClientSpace } from './entities/ClientSpace';
 import { ClientChannel } from './entities/ClientChannel';
 import { patch } from './util';
 import { ClientMember } from './entities/ClientMember';
 import { ClientRole } from './entities/ClientRole';
-import * as authAPI from '../api/auth';
+import * as authAPI from './auth';
 
 function createNewCreator<D extends ObjectWithID, C extends ObjectWithID>(
-  api: MikotoApi,
-  cache: MikotoCache<C>,
-  Construct: new (api: MikotoApi, data: D) => C,
+  api: MikotoClient,
+  cache: ICache<C>,
+  Construct: new (api: MikotoClient, data: D) => C,
 ) {
   return (data: D, forceRefresh: boolean = false): C => {
     const space = cache.get(data.id);
@@ -34,23 +34,24 @@ function createNewCreator<D extends ObjectWithID, C extends ObjectWithID>(
   };
 }
 
-export default class MikotoApi {
+export default class MikotoClient {
   axios: AxiosInstance;
   io!: Socket;
 
   // cache everything
-  spaceCache = new MikotoCache<ClientSpace>();
+  spaceCache = new InfiniteCache<ClientSpace>();
   newSpace = createNewCreator(this, this.spaceCache, ClientSpace);
-  channelCache = new MikotoCache<ClientChannel>();
-  newChannel = createNewCreator(this, this.channelCache, ClientChannel);
+  channelCache = new InfiniteCache<ClientChannel>();
+  // newChannel = createNewCreator(this, this.channelCache, ClientChannel);
+
   memberCache = new MikotoCache<ClientMember>();
   newMember = createNewCreator(this, this.memberCache, ClientMember);
-  roleCache = new MikotoCache<ClientRole>();
+  roleCache = new MikotoCache<ClientRole>(Infinity);
   newRole = createNewCreator(this, this.roleCache, ClientRole);
 
   spaces: SpaceEngine = new SpaceEngine(this);
 
-  constructor(url: string, onready?: (self: MikotoApi) => void) {
+  constructor(url: string, onready?: (self: MikotoClient) => void) {
     this.axios = axios.create({
       baseURL: url,
     });
@@ -80,7 +81,7 @@ export default class MikotoApi {
     this.io.on('channelCreate', (data: Channel) => {
       const sp = this.spaceCache.get(data.spaceId);
       if (sp) {
-        sp.channels.emit('create', this.newChannel(data));
+        sp.channels.emit('create', new ClientChannel(this, data, sp));
       }
     });
 
@@ -88,7 +89,7 @@ export default class MikotoApi {
       const sp = this.spaceCache.get(data.spaceId);
       if (sp) {
         this.channelCache.delete(data.id);
-        sp.channels.emit('delete', new ClientChannel(this, data));
+        sp.channels.emit('delete', new ClientChannel(this, data, sp));
       }
     });
 
@@ -115,14 +116,23 @@ export default class MikotoApi {
     if (cached) return cached;
 
     const { data } = await this.axios.get<Channel>(`/channels/${channelId}`);
-    return this.newChannel(data);
+    return this.spaceCache
+      .get(data.spaceId)!
+      .channels.cache.set(
+        new ClientChannel(this, data, this.spaceCache.get(data.spaceId)!),
+      );
   }
 
   async getChannels(spaceId: string): Promise<ClientChannel[]> {
     const { data } = await this.axios.get<Channel[]>(
       `/spaces/${spaceId}/channels`,
     );
-    return data.map((x) => this.newChannel(x, true));
+    const channelCache = this.spaceCache.get(spaceId)!.channels.cache;
+    return data.map((x) =>
+      channelCache.set(
+        new ClientChannel(this, x, this.spaceCache.get(spaceId)!),
+      ),
+    );
   }
 
   async createChannel(
@@ -137,13 +147,13 @@ export default class MikotoApi {
       name: options.name,
       type: options.type,
     });
-    return this.newChannel(data);
+    return new ClientChannel(this, data, this.spaceCache.get(spaceId)!);
   }
 
   async deleteChannel(channelId: string): Promise<ClientChannel> {
     const { data } = await this.axios.delete<Channel>(`/channels/${channelId}`);
     this.channelCache.delete(data.id);
-    return new ClientChannel(this, data);
+    return new ClientChannel(this, data, this.spaceCache.get(data.spaceId)!);
   }
 
   async moveChannel(channelId: string, order: number): Promise<void> {
@@ -218,7 +228,6 @@ export default class MikotoApi {
 
   async getSpaces(): Promise<ClientSpace[]> {
     const { data } = await this.axios.get<Space[]>('/spaces');
-    console.log(data);
     return data.map((x) => this.newSpace(x, true));
   }
 
@@ -295,17 +304,17 @@ export default class MikotoApi {
   }
 }
 
-export const MikotoContext = React.createContext<MikotoApi>(undefined!);
+export const MikotoContext = React.createContext<MikotoClient>(undefined!);
 
 export function useMikoto() {
   return useContext(MikotoContext);
 }
 
 function constructMikotoSimple(url: string) {
-  return new Promise<MikotoApi>((resolve, reject) => {
+  return new Promise<MikotoClient>((resolve, reject) => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const mikotoApi = new MikotoApi(url, (m) => {
+      const mikotoApi = new MikotoClient(url, (m) => {
         resolve(m);
       });
     } catch (e) {
@@ -314,7 +323,7 @@ function constructMikotoSimple(url: string) {
   });
 }
 
-async function refreshAccess(mikoto: MikotoApi) {
+async function refreshAccess(mikoto: MikotoClient) {
   const t = await authAPI.refresh({
     accessToken: '',
     refreshToken: localStorage.getItem('REFRESH_TOKEN')!,
@@ -333,5 +342,6 @@ export async function constructMikoto(url: string) {
     });
   }, 10 * 60 * 1000);
 
+  await mikoto.getSpaces();
   return mikoto;
 }

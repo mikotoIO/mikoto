@@ -1,7 +1,8 @@
 import { Channel } from '../../models';
 import { MessageEngine } from '../engines/MessageEngine';
-import type MikotoApi from '../index';
+import type MikotoClient from '../index';
 import { ChannelInstance } from '../instances/ChannelInstance';
+import type { ClientSpace } from './ClientSpace';
 
 export class ClientChannel implements Channel {
   id: string;
@@ -12,8 +13,9 @@ export class ClientChannel implements Channel {
   lastUpdated: string;
   type: string;
   instance: ChannelInstance;
+  space: ClientSpace;
 
-  constructor(private client: MikotoApi, base: Channel) {
+  constructor(private client: MikotoClient, base: Channel, space: ClientSpace) {
     this.id = base.id;
     this.name = base.name;
     this.spaceId = base.spaceId;
@@ -22,6 +24,7 @@ export class ClientChannel implements Channel {
     this.type = base.type;
     this.messages = new MessageEngine(client, this.id);
     this.instance = new ChannelInstance(client, this.id);
+    this.space = space;
   }
 
   simplify(): Channel {

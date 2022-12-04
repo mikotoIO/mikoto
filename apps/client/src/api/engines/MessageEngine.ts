@@ -1,9 +1,9 @@
 import { DeltaEngine } from './DeltaEngine';
 import { Message } from '../../models';
-import type MikotoApi from '../index';
+import type MikotoClient from '../index';
 
 export class MessageEngine extends DeltaEngine<Message> {
-  constructor(private client: MikotoApi, private channelId: string) {
+  constructor(private client: MikotoClient, private channelId: string) {
     super();
   }
 

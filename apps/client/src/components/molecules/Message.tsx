@@ -234,7 +234,7 @@ export default function MessageItem({ message, isSimple }: MessageProps) {
         <MessageAvatar
           src={message.author?.avatar}
           user={message.author}
-          spaceId={mikoto.channelCache.get(message.channelId)!.spaceId}
+          spaceId=""
         />
       )}
       <MessageInner>

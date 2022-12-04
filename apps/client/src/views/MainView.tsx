@@ -9,7 +9,11 @@ import { ServerSidebar } from '../components/ServerSidebar';
 import { MessageView } from './MessageView';
 import { Tabable, tabbedState, TabContext, treebarSpaceState } from '../store';
 import { SpaceSettingsView } from './SpaceSettingsView';
-import MikotoApi, { constructMikoto, MikotoContext, useMikoto } from '../api';
+import MikotoClient, {
+  constructMikoto,
+  MikotoContext,
+  useMikoto,
+} from '../api';
 import { AccountSettingsView } from './AccountSettingsView';
 import { ClientSpace } from '../api/entities/ClientSpace';
 import { VoiceView } from './VoiceView';
@@ -83,7 +87,7 @@ function AppView() {
 }
 
 function MikotoApiLoader({ children }: { children: React.ReactNode }) {
-  const [mikoto, setMikoto] = React.useState<MikotoApi | null>(null);
+  const [mikoto, setMikoto] = React.useState<MikotoClient | null>(null);
   useEffect(() => {
     constructMikoto(constants.apiPath).then((x) => setMikoto(x));
   }, []);

@@ -1,5 +1,5 @@
 import { Role } from '../../models';
-import type MikotoApi from '../index';
+import type MikotoClient from '../index';
 
 export class ClientRole implements Role {
   id: string;
@@ -8,7 +8,7 @@ export class ClientRole implements Role {
   permissions: string;
   position: number;
 
-  constructor(private client: MikotoApi, base: Role) {
+  constructor(private client: MikotoClient, base: Role) {
     this.id = base.id;
     this.name = base.name;
     this.color = base.color;

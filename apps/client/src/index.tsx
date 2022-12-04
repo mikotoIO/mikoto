@@ -13,7 +13,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 import { theme } from './components/themes';
-import MikotoApi, { constructMikoto, MikotoContext } from './api';
+import MikotoClient, { constructMikoto, MikotoContext } from './api';
 import constants from './constants';
 
 /// global polyfill

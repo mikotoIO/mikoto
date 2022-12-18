@@ -1,7 +1,7 @@
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Modal } from '@mantine/core';
-import { ClientMessage, useMikoto } from 'mikotojs';
+import { ClientMessage } from 'mikotojs';
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { SpecialComponents } from 'react-markdown/lib/ast-to-react';
@@ -9,6 +9,7 @@ import { NormalComponents } from 'react-markdown/lib/complex-types';
 import remarkGfm from 'remark-gfm';
 import styled from 'styled-components';
 
+import { useMikoto } from '../../hooks';
 import { ContextMenu, useContextMenu } from '../ContextMenu';
 import { MessageAvatar } from '../atoms/Avatar';
 

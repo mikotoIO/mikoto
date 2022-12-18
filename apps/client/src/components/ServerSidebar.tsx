@@ -1,12 +1,13 @@
 import { Button, TextInput, Tooltip } from '@mantine/core';
 import { AxiosError } from 'axios';
-import { useMikoto, ClientSpace } from 'mikotojs';
+import { ClientSpace } from 'mikotojs';
 import React, { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 import { useHover } from 'usehooks-ts';
 
+import { useMikoto } from '../hooks';
 import { useDelta } from '../hooks/useDelta';
 import { useErrorElement } from '../hooks/useErrorElement';
 import { treebarSpaceState, useTabkit } from '../store';

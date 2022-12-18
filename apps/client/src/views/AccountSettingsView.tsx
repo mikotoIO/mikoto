@@ -1,5 +1,4 @@
 import { Button } from '@mantine/core';
-import { useMikoto } from 'mikotojs';
 import { useDropzone } from 'react-dropzone';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -7,6 +6,7 @@ import styled from 'styled-components';
 import { TabName } from '../components/TabBar';
 import { userState } from '../components/UserArea';
 import { Avatar } from '../components/atoms/Avatar';
+import { useMikoto } from '../hooks';
 import { SettingsView } from './SettingsViewTemplate';
 
 const bgUrl = 'https://i1.sndcdn.com/visuals-000328863415-MJdwB0-t2480x520.jpg';

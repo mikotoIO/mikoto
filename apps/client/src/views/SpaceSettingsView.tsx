@@ -13,7 +13,7 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { ClientRole, ClientSpace, useMikoto } from 'mikotojs';
+import { ClientRole, ClientSpace } from 'mikotojs';
 import { useState } from 'react';
 import styled from 'styled-components';
 
@@ -22,6 +22,7 @@ import {
   SidebarContainerArea,
   ViewContainerWithSidebar,
 } from '../components/ViewContainer';
+import { useMikoto } from '../hooks';
 import { useDelta } from '../hooks/useDelta';
 import { checkPermission, spacePermissions } from '../models/permissions';
 

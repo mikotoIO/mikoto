@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import './App.css';
-import { ContextMenuKit, ModalKit } from './components/ContextMenu';
+import { ModalKit } from './components/ContextMenu';
 import { RoomPage } from './components/LiveKitPlayground';
 import { LoginView, RegisterView, ResetPasswordView } from './views/AuthView';
 import MainView from './views/MainView';

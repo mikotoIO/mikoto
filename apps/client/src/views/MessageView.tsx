@@ -1,4 +1,4 @@
-import { ClientChannel, ClientMessage, useMikoto } from 'mikotojs';
+import { ClientChannel, ClientMessage } from 'mikotojs';
 import React from 'react';
 import { useAsync } from 'react-async-hook';
 import styled from 'styled-components';
@@ -8,8 +8,9 @@ import { ViewContainer } from '../components/ViewContainer';
 import { Spinner } from '../components/atoms/Spinner';
 import MessageItem from '../components/molecules/Message';
 import { MessageEditor } from '../components/molecules/MessageEditor';
+import { useMikoto } from '../hooks';
 import { useDelta } from '../hooks/useDelta';
-import { Channel, Message } from '../models';
+import { Channel } from '../models';
 
 const Messages = styled.div`
   overflow-y: auto;

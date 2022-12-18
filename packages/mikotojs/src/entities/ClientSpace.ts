@@ -1,5 +1,5 @@
+import type { MikotoClient } from '../MikotoClient';
 import { ChannelEngine, RoleEngine } from '../engines';
-import type MikotoClient from '../index';
 import { ChannelUnreadInstance } from '../instances';
 import { Space } from '../models';
 import { ClientChannel } from './ClientChannel';

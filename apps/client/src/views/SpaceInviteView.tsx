@@ -1,10 +1,10 @@
 import { Button } from '@mantine/core';
-import { useMikoto } from 'mikotojs';
 import { useAsync } from 'react-async-hook';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { Spinner } from '../components/atoms/Spinner';
+import { useMikoto } from '../hooks';
 
 const bgUrl = 'https://mikoto.io/images/hero-placeholder.jpg';
 

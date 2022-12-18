@@ -1,10 +1,4 @@
-import {
-  MikotoClient,
-  ClientSpace,
-  constructMikoto,
-  MikotoContext,
-  useMikoto,
-} from 'mikotojs';
+import { MikotoClient, ClientSpace, constructMikoto } from 'mikotojs';
 import React, { useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilValue } from 'recoil';
@@ -16,6 +10,7 @@ import { ServerSidebar } from '../components/ServerSidebar';
 import { TabbedView } from '../components/TabBar';
 import { Sidebar } from '../components/UserArea';
 import constants from '../constants';
+import { MikotoContext, useMikoto } from '../hooks';
 import { Tabable, tabbedState, TabContext, treebarSpaceState } from '../store';
 import { AccountSettingsView } from './AccountSettingsView';
 import { MessageView } from './MessageView';

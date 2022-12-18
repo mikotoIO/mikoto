@@ -1,13 +1,5 @@
-import React, { useContext } from 'react';
-
 import { MikotoClient } from './MikotoClient';
 import * as authAPI from './auth';
-
-export const MikotoContext = React.createContext<MikotoClient>(undefined!);
-
-export function useMikoto() {
-  return useContext(MikotoContext);
-}
 
 function constructMikotoSimple(url: string) {
   return new Promise<MikotoClient>((resolve, reject) => {

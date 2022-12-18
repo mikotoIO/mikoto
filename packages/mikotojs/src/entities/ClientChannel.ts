@@ -1,5 +1,5 @@
+import type { MikotoClient } from '../MikotoClient';
 import { MessageEngine } from '../engines';
-import type MikotoClient from '../index';
 import { ChannelInstance } from '../instances';
 import { Channel } from '../models';
 import { ClientMessage } from './ClientMessage';

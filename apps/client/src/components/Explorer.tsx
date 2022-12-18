@@ -1,12 +1,13 @@
 import { faHashtag, faVolumeLow } from '@fortawesome/free-solid-svg-icons';
 import { Button, Select, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useMikoto, ClientSpace, ClientChannel } from 'mikotojs';
+import { ClientSpace, ClientChannel } from 'mikotojs';
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
+import { useMikoto } from '../hooks';
 import { useDelta, useDeltaInstance } from '../hooks/useDelta';
 import { Tabable, treebarSpaceState, useTabkit } from '../store';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';

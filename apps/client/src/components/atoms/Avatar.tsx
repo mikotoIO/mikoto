@@ -1,8 +1,9 @@
-import { ClientMember, useMikoto } from 'mikotojs';
+import { ClientMember } from 'mikotojs';
 import React, { useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
+import { useMikoto } from '../../hooks';
 import { User } from '../../models';
 import { contextMenuState } from '../ContextMenu';
 

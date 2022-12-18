@@ -1,4 +1,4 @@
-import type MikotoClient from '..';
+import type { MikotoClient } from '../MikotoClient';
 import { Message, User } from '../models';
 import type { ClientChannel } from './ClientChannel';
 

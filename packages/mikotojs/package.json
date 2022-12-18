@@ -6,6 +6,7 @@
   "dependencies": {
     "axios": "^0.27.2",
     "react": "^18.2.0",
-    "socket.io-client": "^4.5.1"
+    "socket.io-client": "^4.5.1",
+    "typed-emitter": "^2.1.0"
   }
 }

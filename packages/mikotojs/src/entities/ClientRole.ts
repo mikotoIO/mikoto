@@ -1,5 +1,5 @@
+import type { MikotoClient } from '../MikotoClient';
 import { Role } from '../models';
-import type MikotoClient from '../index';
 
 export class ClientRole implements Role {
   id: string;

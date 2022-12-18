@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 import { TokenPair } from './models';
 
 const authAxios = axios.create({

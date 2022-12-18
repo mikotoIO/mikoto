@@ -1,7 +1,7 @@
-import { DeltaEngine } from './DeltaEngine';
-import type MikotoClient from '../index';
-import { ClientChannel } from '../entities/ClientChannel';
+import type { MikotoClient } from '../MikotoClient';
 import { InfiniteCache } from '../cache';
+import { ClientChannel } from '../entities';
+import { DeltaEngine } from './DeltaEngine';
 
 export class ChannelEngine extends DeltaEngine<ClientChannel> {
   cache = new InfiniteCache<ClientChannel>();

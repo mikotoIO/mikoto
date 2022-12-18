@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+
 import { Channel, Message, Space } from './models';
 
 export class MikotoApi {

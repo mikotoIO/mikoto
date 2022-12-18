@@ -1,5 +1,5 @@
+import type { MikotoClient } from '../MikotoClient';
 import { DeltaInstance } from './DeltaInstance';
-import type MikotoClient from '../index';
 
 export class ChannelUnreadInstance extends DeltaInstance<{
   [channelId: string]: Date;

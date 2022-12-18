@@ -1,5 +1,6 @@
 import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
+
 import { ObjectWithID } from '../cache';
 
 type EngineEvents<T extends ObjectWithID> = {

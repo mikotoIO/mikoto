@@ -1,4 +1,4 @@
-import type MikotoApi from '..';
+import type { MikotoClient } from '../MikotoClient';
 import { Member, User } from '../models';
 
 export class ClientMember implements Member {
@@ -7,7 +7,7 @@ export class ClientMember implements Member {
   user: User;
   roleIds: string[];
 
-  constructor(private client: MikotoApi, base: Member) {
+  constructor(private client: MikotoClient, base: Member) {
     this.id = base.id;
     this.spaceId = base.spaceId;
     this.user = base.user;

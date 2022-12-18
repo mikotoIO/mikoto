@@ -1,9 +1,9 @@
-import { Channel } from '../models';
-import { MessageEngine } from '../engines/MessageEngine';
+import { MessageEngine } from '../engines';
 import type MikotoClient from '../index';
-import { ChannelInstance } from '../instances/ChannelInstance';
-import type { ClientSpace } from './ClientSpace';
+import { ChannelInstance } from '../instances';
+import { Channel } from '../models';
 import { ClientMessage } from './ClientMessage';
+import type { ClientSpace } from './ClientSpace';
 
 export class ClientChannel implements Channel {
   id: string;

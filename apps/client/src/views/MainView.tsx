@@ -1,4 +1,5 @@
-import MikotoClient, {
+import {
+  MikotoClient,
   ClientSpace,
   constructMikoto,
   MikotoContext,

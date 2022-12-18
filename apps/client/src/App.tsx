@@ -1,11 +1,12 @@
 import React from 'react';
-import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
+import './App.css';
+import { ContextMenuKit, ModalKit } from './components/ContextMenu';
+import { RoomPage } from './components/LiveKitPlayground';
 import { LoginView, RegisterView, ResetPasswordView } from './views/AuthView';
 import MainView from './views/MainView';
-import { ContextMenuKit, ModalKit } from './components/ContextMenu';
 import { SpaceInviteView } from './views/SpaceInviteView';
-import { RoomPage } from './components/LiveKitPlayground';
 
 function App() {
   return (

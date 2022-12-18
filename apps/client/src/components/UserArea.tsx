@@ -1,11 +1,12 @@
+import { useMikoto } from 'mikotojs';
 import React, { useEffect } from 'react';
-import styled from 'styled-components';
 import { atom, useRecoilState } from 'recoil';
-import { Avatar } from './atoms/Avatar';
-import { useMikoto } from '../api';
+import styled from 'styled-components';
+
 import { User } from '../models';
 import { useTabkit } from '../store';
 import { ContextMenu, useContextMenu } from './ContextMenu';
+import { Avatar } from './atoms/Avatar';
 
 const StyledSidebar = styled.div`
   display: grid;

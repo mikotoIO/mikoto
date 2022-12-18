@@ -1,7 +1,6 @@
-import { atom, atomFamily, useRecoilState } from 'recoil';
+import { ClientChannel, ClientSpace } from 'mikotojs';
 import { createContext } from 'react';
-import { ClientSpace } from '../api/entities/ClientSpace';
-import { ClientChannel } from '../api/entities/ClientChannel';
+import { atom, atomFamily, useRecoilState } from 'recoil';
 
 export const treebarSpaceState = atom<ClientSpace | null>({
   key: 'treebarSpace',

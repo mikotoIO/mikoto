@@ -1,4 +1,4 @@
-import { Role } from '../../models';
+import { Role } from '../models';
 import type MikotoClient from '../index';
 
 export class ClientRole implements Role {

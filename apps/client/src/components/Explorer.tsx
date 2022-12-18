@@ -1,20 +1,17 @@
-import styled from 'styled-components';
-import React, { useEffect, useRef } from 'react';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { useForm } from '@mantine/form';
-import { Button, Select, TextInput } from '@mantine/core';
-
-import { useDrag, useDrop } from 'react-dnd';
 import { faHashtag, faVolumeLow } from '@fortawesome/free-solid-svg-icons';
-import { Channel } from '../models';
-import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
-import { useMikoto } from '../api';
-import { IconBox } from './atoms/IconBox';
-import { Tabable, treebarSpaceState, useTabkit } from '../store';
+import { Button, Select, TextInput } from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { useMikoto, ClientSpace, ClientChannel } from 'mikotojs';
+import React, { useRef } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import styled from 'styled-components';
+
 import { useDelta, useDeltaInstance } from '../hooks/useDelta';
+import { Tabable, treebarSpaceState, useTabkit } from '../store';
+import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
+import { IconBox } from './atoms/IconBox';
 import { Pill } from './atoms/Pill';
-import { ClientSpace } from '../api/entities/ClientSpace';
-import { ClientChannel } from '../api/entities/ClientChannel';
 
 const StyledTree = styled.div`
   display: flex;
@@ -114,7 +111,7 @@ export function ChannelNode({
       <ContextMenu.Link
         onClick={async () => {
           destroy();
-          await mikoto.deleteChannel(channel.id);
+          await channel.delete();
         }}
       >
         Delete Channel
@@ -175,12 +172,7 @@ function CreateChannelModal() {
   return (
     <form
       onSubmit={form.onSubmit(async () => {
-        await mikoto.createChannel(space?.id!, {
-          name: form.values.name,
-          type: form.values.type,
-        });
-        setModal(null);
-        form.reset();
+        await space!.createChannel(form.values.name, form.values.type);
       })}
     >
       <Select

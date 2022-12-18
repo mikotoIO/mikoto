@@ -1,8 +1,8 @@
+import { Modal } from '@mantine/core';
+import useEventListener from '@use-it/event-listener';
+import React, { useRef } from 'react';
 import { atom, useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
-import useEventListener from '@use-it/event-listener';
-import { Modal } from '@mantine/core';
-import React, { useRef } from 'react';
 
 interface Positions {
   top?: number;

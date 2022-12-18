@@ -1,3 +1,4 @@
+import { PrismaClient } from '@prisma/client';
 import {
   Body,
   Delete,
@@ -8,7 +9,6 @@ import {
   Post,
 } from 'routing-controllers';
 import { Service } from 'typedi';
-import { PrismaClient } from '@prisma/client';
 
 interface RoleCreatePayload {
   name: string;

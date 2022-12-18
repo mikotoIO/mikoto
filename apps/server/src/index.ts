@@ -1,25 +1,26 @@
-import 'reflect-metadata';
 import 'dotenv/config';
+import 'reflect-metadata';
 
+import { PrismaClient } from '@prisma/client';
+import cors from 'cors';
+import express from 'express';
+import * as http from 'http';
+import jwt from 'jsonwebtoken';
+import * as path from 'path';
 import {
   UnauthorizedError,
   useContainer,
   useExpressServer,
 } from 'routing-controllers';
-import * as path from 'path';
-import socketio from 'socket.io';
 import {
   useContainer as useSocketContainer,
   useSocketServer,
 } from 'socket-controllers';
+import socketio from 'socket.io';
 import { Container } from 'typedi';
-import * as http from 'http';
-import cors from 'cors';
-import express from 'express';
-import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
-import { logger } from './functions/logger';
+
 import Minio from './functions/Minio';
+import { logger } from './functions/logger';
 import Mailer from './services/Mailer';
 
 const app = express();
@@ -62,6 +63,5 @@ useSocketServer(io, {
 });
 
 server.listen(process.env.PORT || 9500, () => {
-  
   logger.info(`Mikoto server listening on port ${process.env.PORT || 9500}`);
 });

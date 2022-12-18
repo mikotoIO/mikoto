@@ -1,3 +1,6 @@
+import { PrismaClient } from '@prisma/client';
+import { AccessToken } from 'livekit-server-sdk';
+import * as process from 'process';
 import {
   CurrentUser,
   Get,
@@ -6,9 +9,7 @@ import {
   Param,
 } from 'routing-controllers';
 import { Service } from 'typedi';
-import { AccessToken } from 'livekit-server-sdk';
-import * as process from 'process';
-import { PrismaClient } from '@prisma/client';
+
 import { AccountJwt } from '../auth';
 
 @JsonController()

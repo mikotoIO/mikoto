@@ -1,4 +1,10 @@
 import {
+  faCheck,
+  faGripLinesVertical,
+  faX,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
   Button,
   ColorPicker,
   NumberInput,
@@ -6,24 +12,17 @@ import {
   Switch,
   TextInput,
 } from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { ClientRole, ClientSpace, useMikoto } from 'mikotojs';
 import { useState } from 'react';
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faCheck,
-  faGripLinesVertical,
-  faX,
-} from '@fortawesome/free-solid-svg-icons';
-import { useForm } from '@mantine/form';
+
+import { TabName } from '../components/TabBar';
 import {
   SidebarContainerArea,
   ViewContainerWithSidebar,
 } from '../components/ViewContainer';
-import { TabName } from '../components/TabBar';
-import { ClientSpace } from '../api/entities/ClientSpace';
 import { useDelta } from '../hooks/useDelta';
-import { useMikoto } from '../api';
-import { ClientRole } from '../api/entities/ClientRole';
 import { checkPermission, spacePermissions } from '../models/permissions';
 
 const Sidebar = styled.div`

@@ -1,7 +1,8 @@
 import * as minio from 'minio';
 import { Client } from 'minio';
-import { v4 as uuid } from 'uuid';
 import sharp from 'sharp';
+import { v4 as uuid } from 'uuid';
+
 import { mimeImageExtension } from './checkMimetype';
 
 export default class Minio {

@@ -1,24 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { useRecoilValue } from 'recoil';
-import { ErrorBoundary } from 'react-error-boundary';
-import { Explorer } from '../components/Explorer';
-import { TabbedView } from '../components/TabBar';
-import { Sidebar } from '../components/UserArea';
-import { ServerSidebar } from '../components/ServerSidebar';
-import { MessageView } from './MessageView';
-import { Tabable, tabbedState, TabContext, treebarSpaceState } from '../store';
-import { SpaceSettingsView } from './SpaceSettingsView';
 import MikotoClient, {
+  ClientSpace,
   constructMikoto,
   MikotoContext,
   useMikoto,
-} from '../api';
-import { AccountSettingsView } from './AccountSettingsView';
-import { ClientSpace } from '../api/entities/ClientSpace';
-import { VoiceView } from './VoiceView';
-import constants from '../constants';
+} from 'mikotojs';
+import React, { useEffect, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { useRecoilValue } from 'recoil';
+import styled from 'styled-components';
+
 import { ContextMenuKit } from '../components/ContextMenu';
+import { Explorer } from '../components/Explorer';
+import { ServerSidebar } from '../components/ServerSidebar';
+import { TabbedView } from '../components/TabBar';
+import { Sidebar } from '../components/UserArea';
+import constants from '../constants';
+import { Tabable, tabbedState, TabContext, treebarSpaceState } from '../store';
+import { AccountSettingsView } from './AccountSettingsView';
+import { MessageView } from './MessageView';
+import { SpaceSettingsView } from './SpaceSettingsView';
+import { VoiceView } from './VoiceView';
 
 const AppContainer = styled.div`
   overflow: hidden;

@@ -1,3 +1,4 @@
+import { PrismaClient, Space } from '@prisma/client';
 import {
   Body,
   CurrentUser,
@@ -10,9 +11,9 @@ import {
   UnauthorizedError,
   UploadedFile,
 } from 'routing-controllers';
-import { PrismaClient, Space } from '@prisma/client';
-import { Service } from 'typedi';
 import { Server } from 'socket.io';
+import { Service } from 'typedi';
+
 import { AccountJwt } from '../auth';
 import Minio from '../functions/Minio';
 

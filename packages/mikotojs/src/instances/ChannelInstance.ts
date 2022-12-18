@@ -1,6 +1,6 @@
 import { DeltaInstance } from './DeltaInstance';
 import type MikotoClient from '../index';
-import { Channel } from '../../models';
+import { Channel } from '../models';
 
 export class ChannelInstance extends DeltaInstance<Channel> {
   constructor(private mikoto: MikotoClient, private channelId: string) {

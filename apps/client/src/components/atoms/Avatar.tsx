@@ -1,10 +1,10 @@
+import { ClientMember, useMikoto } from 'mikotojs';
 import React, { useRef, useState } from 'react';
-import styled from 'styled-components';
 import { useSetRecoilState } from 'recoil';
-import { contextMenuState } from '../ContextMenu';
+import styled from 'styled-components';
+
 import { User } from '../../models';
-import { useMikoto } from '../../api';
-import { ClientMember } from '../../api/entities/ClientMember';
+import { contextMenuState } from '../ContextMenu';
 
 const AvatarImg = styled.img<{ size: number }>`
   user-select: none;

@@ -1,9 +1,8 @@
 import axios from 'axios';
-import constants from '../constants';
-import { TokenPair } from '../models';
+import { TokenPair } from './models';
 
 const authAxios = axios.create({
-  baseURL: constants.apiPath,
+  baseURL: 'http://localhost:9500',
 });
 
 export async function register(name: string, email: string, password: string) {

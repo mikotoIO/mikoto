@@ -1,8 +1,9 @@
-import { Channel } from '../../models';
+import { Channel } from '../models';
 import { MessageEngine } from '../engines/MessageEngine';
 import type MikotoClient from '../index';
 import { ChannelInstance } from '../instances/ChannelInstance';
 import type { ClientSpace } from './ClientSpace';
+import { ClientMessage } from './ClientMessage';
 
 export class ClientChannel implements Channel {
   id: string;
@@ -22,9 +23,28 @@ export class ClientChannel implements Channel {
     this.order = base.order;
     this.lastUpdated = base.lastUpdated;
     this.type = base.type;
-    this.messages = new MessageEngine(client, this.id);
+    this.messages = new MessageEngine(client, this);
     this.instance = new ChannelInstance(client, this.id);
     this.space = space;
+
+    client.channelWeakMap.set(this.id, this);
+  }
+
+  async getMessages() {
+    const data = await this.client.api.getMessages(this.id);
+    return data.map((x) => new ClientMessage(this.client, x, this));
+  }
+
+  sendMessage(content: string) {
+    return this.client.api.sendMessage(this.id, content);
+  }
+
+  deleteMessage(messageId: string) {
+    return this.client.api.deleteMessage(this.id, messageId);
+  }
+
+  delete() {
+    return this.client.api.deleteChannel(this.id);
   }
 
   simplify(): Channel {

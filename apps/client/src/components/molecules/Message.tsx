@@ -1,16 +1,15 @@
+import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Modal } from '@mantine/core';
+import { ClientMessage, useMikoto } from 'mikotojs';
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import styled from 'styled-components';
-import { Modal } from '@mantine/core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { SpecialComponents } from 'react-markdown/lib/ast-to-react';
 import { NormalComponents } from 'react-markdown/lib/complex-types';
+import remarkGfm from 'remark-gfm';
+import styled from 'styled-components';
 
 import { ContextMenu, useContextMenu } from '../ContextMenu';
-import { Message } from '../../models';
-import { useMikoto } from '../../api';
 import { MessageAvatar } from '../atoms/Avatar';
 
 const dateFormat = new Intl.DateTimeFormat('en', {
@@ -182,7 +181,7 @@ function MessageImage({ src, alt }: MessageImageProps) {
 }
 
 interface MessageProps {
-  message: Message;
+  message: ClientMessage;
   isSimple?: boolean;
 }
 
@@ -217,9 +216,9 @@ export default function MessageItem({ message, isSimple }: MessageProps) {
   const menu = useContextMenu(() => (
     <ContextMenu>
       <ContextMenu.Link
-        onClick={async () =>
-          await mikoto.deleteMessage(message.channelId, message.id)
-        }
+        onClick={async () => {
+          await mikoto.deleteMessage(message.channel.id, message.id);
+        }}
       >
         Delete Message
       </ContextMenu.Link>
@@ -234,7 +233,7 @@ export default function MessageItem({ message, isSimple }: MessageProps) {
         <MessageAvatar
           src={message.author?.avatar}
           user={message.author}
-          spaceId=""
+          spaceId={message.channel.spaceId}
         />
       )}
       <MessageInner>

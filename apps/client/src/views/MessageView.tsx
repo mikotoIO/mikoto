@@ -1,16 +1,15 @@
+import { ClientChannel, ClientMessage, useMikoto } from 'mikotojs';
 import React from 'react';
-import styled from 'styled-components';
 import { useAsync } from 'react-async-hook';
+import styled from 'styled-components';
 
-import { useMikoto } from '../api';
-import { Channel, Message } from '../models';
-import MessageItem from '../components/molecules/Message';
-import { ViewContainer } from '../components/ViewContainer';
-import { useDelta } from '../hooks/useDelta';
-import { Spinner } from '../components/atoms/Spinner';
-import { MessageEditor } from '../components/molecules/MessageEditor';
-import { ClientChannel } from '../api/entities/ClientChannel';
 import { TabName } from '../components/TabBar';
+import { ViewContainer } from '../components/ViewContainer';
+import { Spinner } from '../components/atoms/Spinner';
+import MessageItem from '../components/molecules/Message';
+import { MessageEditor } from '../components/molecules/MessageEditor';
+import { useDelta } from '../hooks/useDelta';
+import { Channel, Message } from '../models';
 
 const Messages = styled.div`
   overflow-y: auto;
@@ -29,10 +28,10 @@ interface MessageViewProps {
   channel: Channel;
 }
 
-function isMessageSimple(message: Message, prevMessage: Message) {
+function isMessageSimple(message: ClientMessage, prevMessage: ClientMessage) {
   return (
     prevMessage &&
-    prevMessage.authorId === message.authorId &&
+    prevMessage.author?.id === message.author?.id &&
     new Date(message.timestamp).getTime() -
       new Date(prevMessage.timestamp).getTime() <
       5 * 60 * 1000
@@ -75,7 +74,7 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
       <MessageEditor
         placeholder={`Message #${channel.name}`}
         onSubmit={async (msg) => {
-          await mikoto.sendMessage(channel.id, msg);
+          await channel.sendMessage(msg);
         }}
       />
     </ViewContainer>

@@ -1,9 +1,10 @@
 import { Anchor, Button, Input } from '@mantine/core';
+import { authAPI } from 'mikotojs';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import * as authAPI from '../api/auth';
+
 import { useErrorElement } from '../hooks/useErrorElement';
 
 const AuthViewContainer = styled.div`

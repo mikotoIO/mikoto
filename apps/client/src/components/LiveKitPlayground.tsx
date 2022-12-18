@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
 import { LiveKitRoom } from '@livekit/react-components';
-
 import '@livekit/react-components/dist/index.css';
+import React, { useState } from 'react';
 import 'react-aspect-ratio/aspect-ratio.css';
 
 export function RoomPage() {

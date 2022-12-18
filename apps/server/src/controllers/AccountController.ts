@@ -1,4 +1,7 @@
 import { User, PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import {
   Body,
   CurrentUser,
@@ -7,11 +10,9 @@ import {
   UnauthorizedError,
   UploadedFile,
 } from 'routing-controllers';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { Service } from 'typedi';
-import crypto from 'crypto';
 import { promisify } from 'util';
+
 import { AccountJwt } from '../auth';
 import Minio from '../functions/Minio';
 import Mailer from '../services/Mailer';

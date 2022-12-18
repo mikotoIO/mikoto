@@ -1,10 +1,11 @@
+import express from 'express';
 import {
   Middleware,
   ExpressErrorMiddlewareInterface,
   HttpError,
 } from 'routing-controllers';
 import { Service } from 'typedi';
-import express from 'express';
+
 import { logger } from '../functions/logger';
 
 @Service()

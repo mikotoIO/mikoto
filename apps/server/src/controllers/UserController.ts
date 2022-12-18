@@ -1,6 +1,7 @@
+import { PrismaClient } from '@prisma/client';
 import { CurrentUser, Get, JsonController } from 'routing-controllers';
 import { Service } from 'typedi';
-import { PrismaClient } from '@prisma/client';
+
 import { AccountJwt } from '../auth';
 
 @JsonController()

@@ -1,3 +1,4 @@
+import { PrismaClient, ChannelType } from '@prisma/client';
 import {
   Body,
   CurrentUser,
@@ -10,9 +11,9 @@ import {
   QueryParam,
   UnauthorizedError,
 } from 'routing-controllers';
-import { PrismaClient, ChannelType } from '@prisma/client';
 import { Server } from 'socket.io';
 import { Service } from 'typedi';
+
 import { AccountJwt } from '../auth';
 
 interface MessagePayload {

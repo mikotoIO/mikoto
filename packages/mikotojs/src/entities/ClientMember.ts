@@ -1,5 +1,5 @@
 import type MikotoApi from '..';
-import { Member, User } from '../../models';
+import { Member, User } from '../models';
 
 export class ClientMember implements Member {
   id: string;

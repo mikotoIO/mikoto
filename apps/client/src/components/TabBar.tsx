@@ -1,12 +1,12 @@
-import React, { useContext, useEffect, useRef } from 'react';
-import styled from 'styled-components';
-import { useDrag, useDrop } from 'react-dnd';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faX } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useContext, useEffect, useRef } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import styled from 'styled-components';
 
-import { getTabIcon, IconBox } from './atoms/IconBox';
 import { Tabable, tabbedState, TabContext, tabNameFamily } from '../store';
+import { getTabIcon, IconBox } from './atoms/IconBox';
 
 const StyledTabbedView = styled.div`
   flex: 1;

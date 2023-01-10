@@ -9,7 +9,6 @@ import { Explorer } from '../components/Explorer';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { TabbedView } from '../components/TabBar';
 import { Sidebar } from '../components/UserArea';
-import constants from '../constants';
 import { MikotoContext, useMikoto } from '../hooks';
 import { Tabable, tabbedState, TabContext, treebarSpaceState } from '../store';
 import { AccountSettingsView } from './AccountSettingsView';
@@ -86,7 +85,7 @@ function AppView() {
 function MikotoApiLoader({ children }: { children: React.ReactNode }) {
   const [mikoto, setMikoto] = React.useState<MikotoClient | null>(null);
   useEffect(() => {
-    constructMikoto(constants.apiPath).then((x) => setMikoto(x));
+    constructMikoto(import.meta.env.MIKOTO_API ?? 'http://localhost:9500').then((x) => setMikoto(x));
   }, []);
 
   if (mikoto === null) return null;

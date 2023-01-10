@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { io, Socket } from 'socket.io-client';
 
+import { AuthClient } from './AuthClient';
 import { MikotoApi } from './MikotoApi';
 import { ICache, InfiniteCache, MikotoCache, ObjectWithID } from './cache';
 import { SpaceEngine } from './engines';
@@ -55,8 +56,11 @@ export class MikotoClient {
 
   spaces: SpaceEngine = new SpaceEngine(this);
   api: MikotoApi;
+  authAPI: AuthClient;
 
   constructor(url: string, onready?: (self: MikotoClient) => void) {
+    this.authAPI = new AuthClient(url);
+
     this.axios = axios.create({
       baseURL: url,
     });

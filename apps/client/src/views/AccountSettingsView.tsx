@@ -1,8 +1,9 @@
-import { Button } from '@mantine/core';
+import { Button, TextInput } from '@mantine/core';
 import { useDropzone } from 'react-dropzone';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
+import { modalState } from '../components/ContextMenu';
 import { TabName } from '../components/TabBar';
 import { userState } from '../components/UserArea';
 import { Avatar } from '../components/atoms/Avatar';
@@ -37,7 +38,19 @@ const Content = styled.div`
 
 const AvatarWrapper = styled.a``;
 
+export function PasswordChangeModal() {
+  return (
+    <div>
+      <TextInput label="Current Password" type="password" />
+      <TextInput label="New Password" type="password" />
+      <TextInput label="Confirm New Password" type="password" />
+    </div>
+  );
+}
+
 export function AccountSettingsView() {
+  const setModal = useSetRecoilState(modalState);
+
   const mikoto = useMikoto();
   const [user] = useRecoilState(userState);
 
@@ -67,7 +80,16 @@ export function AccountSettingsView() {
         </Content>
       </AccountInfo>
       <h2>Authentication</h2>
-      <Button>Change Password</Button>
+      <Button
+        onClick={() => {
+          setModal({
+            title: 'Change Password',
+            elem: <PasswordChangeModal />,
+          });
+        }}
+      >
+        Change Password
+      </Button>
     </SettingsView>
   );
 }

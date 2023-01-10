@@ -1,5 +1,4 @@
 import { MikotoClient } from './MikotoClient';
-import * as authAPI from './auth';
 
 function constructMikotoSimple(url: string) {
   return new Promise<MikotoClient>((resolve, reject) => {
@@ -15,7 +14,7 @@ function constructMikotoSimple(url: string) {
 }
 
 async function refreshAccess(mikoto: MikotoClient) {
-  const t = await authAPI.refresh({
+  const t = await mikoto.authAPI.refresh({
     accessToken: '',
     refreshToken: localStorage.getItem('REFRESH_TOKEN')!,
   });
@@ -40,5 +39,5 @@ export async function constructMikoto(url: string) {
 export * from './entities';
 export * from './instances';
 export * from './engines';
-export * as authAPI from './auth';
+export * from './AuthClient';
 export * from './MikotoClient';

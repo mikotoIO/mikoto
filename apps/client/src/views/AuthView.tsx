@@ -1,11 +1,11 @@
 import { Anchor, Button, Input } from '@mantine/core';
-import { authAPI } from 'mikotojs';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { useErrorElement } from '../hooks/useErrorElement';
+import { authClient } from '../store/authClient';
 
 const AuthViewContainer = styled.div`
   height: 100vh;
@@ -59,7 +59,7 @@ export function LoginView() {
       <Form
         onSubmit={handleSubmit(async (formData) => {
           try {
-            const tk = await authAPI.login(formData.email, formData.password);
+            const tk = await authClient.login(formData.email, formData.password);
             localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
             // Screw SPAs, why not just force an actual reload at this point?
             window.location.href = '/';
@@ -102,7 +102,7 @@ export function RegisterView() {
         onSubmit={handleSubmit(async (data) => {
           navigate('/login');
           try {
-            await authAPI.register(data.name, data.email, data.password);
+            await authClient.register(data.name, data.email, data.password);
             navigate('/login');
           } catch (e) {
             error.setError((e as any)?.response?.data);
@@ -135,7 +135,7 @@ export function ResetPasswordView() {
     <AuthView>
       <Form
         onSubmit={handleSubmit(async (data) => {
-          await authAPI.resetPassword(data.email);
+          await authClient.resetPassword(data.email);
           setSent(true);
         })}
       >

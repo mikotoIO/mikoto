@@ -1,5 +1,5 @@
 import { ClientChannel, ClientSpace } from 'mikotojs';
-import { createContext } from 'react';
+import React, { createContext } from 'react';
 import { atom, atomFamily, useRecoilState } from 'recoil';
 
 export const treebarSpaceState = atom<ClientSpace | null>({
@@ -87,3 +87,6 @@ export function useTabkit() {
     },
   };
 }
+
+// some local contexts
+export const CurrentSpaceContext = React.createContext<ClientSpace | undefined>(undefined);

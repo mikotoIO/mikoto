@@ -187,6 +187,7 @@ export class MikotoClient {
   }
 
   async joinSpace(id: string): Promise<void> {
+    console.log('does this not work');
     await this.api.joinSpace(id);
   }
 
@@ -226,6 +227,7 @@ export class MikotoClient {
       name?: string;
       spacePermissions?: string;
       position?: number;
+      color?: string;
     },
   ): Promise<ClientRole> {
     const { data } = await this.axios.patch<Role>(

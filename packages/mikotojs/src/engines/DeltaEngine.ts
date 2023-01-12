@@ -15,4 +15,7 @@ export abstract class DeltaEngine<
   new <U extends ObjectWithID>(): TypedEmitter<EngineEvents<U>>;
 })<T> {
   abstract fetch(): Promise<T[]>;
+  get(id: string): T | undefined {
+    return undefined;
+  }
 }

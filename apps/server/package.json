@@ -20,11 +20,12 @@
     "prettier": "^2.7.1",
     "prisma": "^4.2.1",
     "ts-jest": "^28.0.8",
-    "typescript": "^4.7.4"
+    "typescript": "^4.9.4"
   },
   "scripts": {
     "start": "tsc && node ./dist",
     "test": "jest",
+    "typecheck": "tsc --noEmit",
     "studio": "prisma studio"
   },
   "dependencies": {

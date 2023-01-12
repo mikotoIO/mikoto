@@ -11,6 +11,7 @@ import { MessageEditor } from '../components/molecules/MessageEditor';
 import { useMikoto } from '../hooks';
 import { useDelta } from '../hooks/useDelta';
 import { Channel } from '../models';
+import {CurrentSpaceContext} from "../store";
 
 const Messages = styled.div`
   overflow-y: auto;
@@ -91,5 +92,7 @@ export function MessageView({ channel }: MessageViewProps) {
   if (error) throw error;
   if (!mChannel) return <div>loading</div>;
 
-  return <RealMessageView channel={mChannel} />;
+  return <CurrentSpaceContext.Provider value={mChannel.space}>
+    <RealMessageView channel={mChannel} />
+  </CurrentSpaceContext.Provider>;
 }

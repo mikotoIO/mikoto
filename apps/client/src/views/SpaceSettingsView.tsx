@@ -15,6 +15,7 @@ import {
 import { useForm } from '@mantine/form';
 import { ClientRole, ClientSpace } from 'mikotojs';
 import { useState } from 'react';
+import { get } from 'react-hook-form';
 import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';
@@ -174,7 +175,7 @@ function RoleEditor({ role, space }: { space: ClientSpace; role: ClientRole }) {
           <h2>Edit Role</h2>
           <TextInput label="Role Name" {...getInputProps('name')} />
           <NumberInput label="Role Priority" {...getInputProps('position')} />
-          <ColorPicker />
+          <ColorPicker {...getInputProps('color')} />
         </div>
       )}
 
@@ -191,6 +192,7 @@ function RoleEditor({ role, space }: { space: ClientSpace; role: ClientRole }) {
               name: values.name,
               position: values.position,
               spacePermissions: values.permissions,
+              color: values.color,
             })
             .then(() => console.log('updated'));
         }}
@@ -225,7 +227,7 @@ function Roles({ space }: { space: ClientSpace }) {
             selected={selectedRoleId === r.id}
             onClick={() => setSelectedRoleId(r.id)}
           >
-            <ColorDot />
+            <ColorDot color={r.color} />
             {r.name}
           </SidebarButton>
         ))}

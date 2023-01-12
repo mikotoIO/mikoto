@@ -12,6 +12,7 @@ import { Service } from 'typedi';
 
 interface RoleCreatePayload {
   name: string;
+  color?: string;
   spacePermissions: string;
   position: number;
 }
@@ -58,6 +59,7 @@ export class RoleController {
           ? BigInt(body.spacePermissions).toString()
           : undefined,
         position: body.position,
+        color: body.color,
       },
     });
   }

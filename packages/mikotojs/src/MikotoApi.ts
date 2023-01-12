@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 
-import { Channel, Message, Space } from './models';
+import { Channel, Member, Message, Space } from './models';
 
 export class MikotoApi {
   public axios: AxiosInstance;
@@ -37,6 +37,24 @@ export class MikotoApi {
   }
   // endregion
 
+  // region member
+  async getMember(spaceId: string, userId: string) {
+    return await this.axios
+      .get<Member>(`/spaces/${spaceId}/members/${userId}`)
+      .then((x) => x.data);
+  }
+
+  async updateMember(
+    spaceId: string,
+    userId: string,
+    options: { roleIds: string[] },
+  ) {
+    return await this.axios
+      .patch(`/spaces/${spaceId}/members/${userId}`, options)
+      .then((x) => x.data);
+  }
+  // endregion
+
   // region Channel
   async getChannels(spaceId: string) {
     return await this.axios
@@ -58,7 +76,8 @@ export class MikotoApi {
     },
   ) {
     return await this.axios
-      .post<Channel>(`/spaces/${spaceId}/channels`, {
+      .post<Channel>(`/channels`, {
+        spaceId,
         name: options.name,
         type: options.type,
       })

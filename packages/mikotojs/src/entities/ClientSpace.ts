@@ -4,6 +4,7 @@ import { ChannelUnreadInstance } from '../instances';
 import { Space } from '../models';
 import { ClientChannel } from './ClientChannel';
 import { ClientRole } from './ClientRole';
+import {ClientMember} from "./ClientMember";
 
 export class ClientSpace {
   id: string;
@@ -22,12 +23,19 @@ export class ClientSpace {
       this.id,
       base.channels.map((x) => new ClientChannel(client, x, this)),
     );
+
     this.unreads = new ChannelUnreadInstance(client, this.id);
-    this.roles = new RoleEngine(client, this.id);
+    this.roles = new RoleEngine(client, this.id,
+      base.roles.map(x => new ClientRole(client, x)));
     base.roles.map((x) => new ClientRole(client, x));
   }
 
   createChannel(name: string, type: string) {
     return this.client.api.createChannel(this.id, { name, type });
+  }
+
+  async getMember(userId: string) {
+    const base = await this.client.api.getMember(this.id, userId);
+    return new ClientMember(this.client, base)
   }
 }

@@ -7,6 +7,7 @@ import {
   JsonController,
   NotFoundError,
   Param,
+  Patch,
   Post,
   UnauthorizedError,
   UploadedFile,
@@ -81,7 +82,10 @@ export class SpaceController {
 
   @Post('/join/:id')
   async joinUser(@CurrentUser() user: AccountJwt, @Param('id') id: string) {
-    const space = await this.prisma.space.findUnique({ where: { id } });
+    const space = await this.prisma.space.findUnique({
+      where: { id },
+      include: { roles: true, channels: true },
+    });
     if (space === null) {
       throw new NotFoundError('Space cannot be found');
     }
@@ -213,17 +217,56 @@ export class SpaceController {
     @Param('spaceId') spaceId: string,
     @Param('userId') userId: string,
   ) {
-    const members = await this.prisma.spaceUser.findUnique({
+    const member = await this.prisma.spaceUser.findUnique({
       where: { userId_spaceId: { userId, spaceId } },
       include: memberInclude,
     });
-    if (!members) {
+    if (!member) {
       throw new NotFoundError();
     }
-    const { roles, ...rest } = members;
+    const { roles, ...rest } = member;
     return {
       roleIds: roles.map((x) => x.id),
       ...rest,
+    };
+  }
+
+  @Patch('/spaces/:spaceId/members/:userId')
+  async updateSpaceMember(
+    @Param('spaceId') spaceId: string,
+    @Param('userId') userId: string,
+    @Body()
+    body: {
+      roleIds?: string[];
+    },
+  ) {
+    // todo: probably a cleaner method to do this
+
+    const roleIds = new Set(body.roleIds);
+    const roles =
+      (await this.prisma.spaceUser
+        .findUnique({
+          where: { userId_spaceId: { userId, spaceId } },
+        })
+        .roles()) ?? [];
+
+    const oldRoleIds = new Set(roles.map((x) => x.id));
+    const roleIdsToCreate = [...roleIds].filter((x) => !oldRoleIds.has(x));
+    const roleIdsToDelete = [...oldRoleIds].filter((x) => !roleIds.has(x));
+
+    const member = await this.prisma.spaceUser.update({
+      where: { userId_spaceId: { userId, spaceId } },
+      data: {
+        roles: {
+          connect: roleIdsToCreate.map((x) => ({ id: x })),
+          disconnect: roleIdsToDelete.map((x) => ({ id: x })),
+        },
+      },
+      include: memberInclude,
+    });
+    return {
+      roleIds: member.roles.map((x) => x.id),
+      ...member,
     };
   }
 

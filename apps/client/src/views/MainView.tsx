@@ -4,7 +4,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 
-import { ContextMenuKit } from '../components/ContextMenu';
+import {ContextMenuKit, ModalKit} from '../components/ContextMenu';
 import { Explorer } from '../components/Explorer';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { TabbedView } from '../components/TabBar';
@@ -99,6 +99,7 @@ export default function MainView() {
     <MikotoApiLoader>
       <AppView />
       <ContextMenuKit />
+      <ModalKit />
     </MikotoApiLoader>
   );
 }

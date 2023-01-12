@@ -81,7 +81,6 @@ export class ChannelController {
       include: { author: authorInclude },
       orderBy: { timestamp: 'desc' },
       take: 50,
-
       // cursor pagination
       ...(cursor !== undefined && {
         skip: 1,

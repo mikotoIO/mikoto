@@ -96,9 +96,14 @@ export class MikotoApi {
   // endregion
 
   // Message
-  async getMessages(channelId: string) {
+  async getMessages(
+    channelId: string,
+    params: { cursor?: string; limit?: number } = {},
+  ) {
     return await this.axios
-      .get<Message[]>(`/channels/${channelId}/messages`)
+      .get<Message[]>(`/channels/${channelId}/messages`, {
+        params,
+      })
       .then((x) => x.data);
   }
 

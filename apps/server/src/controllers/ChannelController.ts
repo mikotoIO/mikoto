@@ -73,6 +73,7 @@ export class ChannelController {
   @Get('/channels/:id/messages')
   async getMessages(
     @Param('id') channelId: string,
+    @QueryParam('limit') limit: number = 50,
     @QueryParam('cursor') cursor?: string,
   ) {
     const messages = await this.prisma.message.findMany({
@@ -80,7 +81,7 @@ export class ChannelController {
 
       include: { author: authorInclude },
       orderBy: { timestamp: 'desc' },
-      take: 50,
+      take: limit,
       // cursor pagination
       ...(cursor !== undefined && {
         skip: 1,

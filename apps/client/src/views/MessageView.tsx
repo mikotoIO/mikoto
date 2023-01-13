@@ -1,5 +1,6 @@
+import { Button } from '@mantine/core';
 import { ClientChannel, ClientMessage } from 'mikotojs';
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAsync } from 'react-async-hook';
 import styled from 'styled-components';
 
@@ -9,9 +10,8 @@ import { Spinner } from '../components/atoms/Spinner';
 import MessageItem from '../components/molecules/Message';
 import { MessageEditor } from '../components/molecules/MessageEditor';
 import { useMikoto } from '../hooks';
-import { useDelta } from '../hooks/useDelta';
 import { Channel } from '../models';
-import {CurrentSpaceContext} from "../store";
+import { CurrentSpaceContext } from '../store';
 
 const Messages = styled.div`
   overflow-y: auto;
@@ -40,35 +40,123 @@ function isMessageSimple(message: ClientMessage, prevMessage: ClientMessage) {
   );
 }
 
+function useOnScreen(ref: React.RefObject<HTMLElement>) {
+  const [isIntersecting, setIntersecting] = useState(false);
+  const observer = new IntersectionObserver(([entry]) =>
+    setIntersecting(entry.isIntersecting),
+  );
+  useEffect(() => {
+    observer.observe(ref.current!);
+    // Remove the observer as soon as the component is unmounted
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  return isIntersecting;
+}
+
+function Paginator({ paginate }: { paginate: () => Promise<boolean> }) {
+  const paginationRef = useRef<HTMLButtonElement>(null);
+  const toPaginate = useOnScreen(paginationRef);
+  // const [isPaginating, setIsPaginating] = useState(false);
+  const [paginationState, setPaginationState] = useState<
+    'WAITING' | 'PAGINATING' | 'COMPLETED'
+  >('WAITING');
+
+  useEffect(() => {
+    if (toPaginate && paginationState === 'WAITING') {
+      setPaginationState('PAGINATING');
+      console.log('lol');
+      paginate().then((x) => {
+        setPaginationState(x ? 'COMPLETED' : 'WAITING');
+      });
+    }
+  }, [toPaginate, paginationState]);
+
+  return (
+    <>
+      {paginationState !== 'COMPLETED' && (
+        <Button ref={paginationRef} onClick={paginate}>
+          {toPaginate ? 'On Screen' : 'Load More'}
+        </Button>
+      )}
+    </>
+  );
+}
+
 function RealMessageView({ channel }: { channel: ClientChannel }) {
   const ref = React.useRef<HTMLDivElement>(null);
-  React.useEffect(() => {
-    if (ref.current) {
+  const [scrollBottom, setScrollBottom] = useState(false);
+  useEffect(() => {
+    if (scrollBottom && ref.current) {
       ref.current.scrollTop = ref.current.scrollHeight;
+      setScrollBottom(false);
     }
   });
   const mikoto = useMikoto();
 
-  React.useEffect(() => {
+  useEffect(() => {
     mikoto.ack(channel.id).then();
   }, [channel.id]);
-  const messageDelta = useDelta(channel.messages, [channel.id]);
 
-  const messages = messageDelta.data;
+  const [msgs, setMsgs] = useState<ClientMessage[] | null>(null);
+  useEffect(() => {
+    channel.messages.fetch().then(setMsgs);
+  }, [channel.id]);
+
+  const createFn = (x: ClientMessage) => {
+    setMsgs((xs) => {
+      if (xs === null) return null;
+      return [...xs, x];
+    });
+    setScrollBottom(true);
+  };
+
+  const deleteFn = (x: ClientMessage) => {
+    setMsgs((xs) => {
+      if (xs === null) return null;
+      return xs.filter((y) => y.id !== x.id);
+    });
+  };
+
+  useEffect(() => {
+    channel.messages.on('create', createFn);
+    channel.messages.on('delete', deleteFn);
+    return () => {
+      channel.messages.off('create', createFn);
+      channel.messages.off('delete', deleteFn);
+    };
+  }, [channel.id]);
+
+  // const messageDelta = useDelta(channel.messages, [channel.id]);
+  // // messages really do not fit the delta model, so just write it raw
+  //
+  // const messages = messageDelta.data;
   return (
     <ViewContainer key={channel.id}>
       <TabName name={channel.name} />
-      {messageDelta.loading ? (
+      {msgs === null ? (
         <MessagesLoading>
           <Spinner />
         </MessagesLoading>
       ) : (
         <Messages ref={ref}>
-          {messages.map((msg, idx) => (
+          <Paginator
+            paginate={async () => {
+              if (msgs.length > 0) {
+                const m = await channel.getMessages(msgs[0].id);
+                setMsgs([...m, ...msgs]);
+                return m.length === 0; // it's time to stop
+              }
+              return true;
+            }}
+          />
+          {msgs.map((msg, idx) => (
             <MessageItem
               key={msg.id}
               message={msg}
-              isSimple={isMessageSimple(msg, messages[idx - 1])}
+              isSimple={isMessageSimple(msg, msgs[idx - 1])}
             />
           ))}
         </Messages>
@@ -92,7 +180,9 @@ export function MessageView({ channel }: MessageViewProps) {
   if (error) throw error;
   if (!mChannel) return <div>loading</div>;
 
-  return <CurrentSpaceContext.Provider value={mChannel.space}>
-    <RealMessageView channel={mChannel} />
-  </CurrentSpaceContext.Provider>;
+  return (
+    <CurrentSpaceContext.Provider value={mChannel.space}>
+      <RealMessageView channel={mChannel} />
+    </CurrentSpaceContext.Provider>
+  );
 }

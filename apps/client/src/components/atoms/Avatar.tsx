@@ -111,6 +111,17 @@ function RoleSetter({
   );
 }
 
+const StyledPlusBadge = styled.div`
+  display: inline-block;
+  padding: 4px 8px;
+  border: 1px solid ${(p) => p.theme.colors.N0};
+  background-color: ${(p) => p.theme.colors.N800};
+  color: ${(p) => p.theme.colors.N0};
+  border-radius: 4px;
+
+  font-size: 12px;
+`;
+
 function AvatarContextMenu({
   user,
   space,
@@ -138,17 +149,20 @@ function AvatarContextMenu({
             <Avatar src={user.avatar} size={80} />
             <h1>{user.name}</h1>
             <hr />
-            <h2
-              onClick={() => {
-                setRoleEditorOpen((x) => !x);
-              }}
-            >
-              Roles
-            </h2>
-            {member.roleIds.map((r) => {
-              const role = space?.roles.get(r);
-              return role && <RoleBadge key={r} role={role} />;
-            })}
+            <h2>Roles</h2>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {member.roleIds.map((r) => {
+                const role = space?.roles.get(r);
+                return role && <RoleBadge key={r} role={role} />;
+              })}
+              <StyledPlusBadge
+                onClick={() => {
+                  setRoleEditorOpen((x) => !x);
+                }}
+              >
+                +
+              </StyledPlusBadge>
+            </div>
           </div>
         )}
       </AvatarContextWrapper>

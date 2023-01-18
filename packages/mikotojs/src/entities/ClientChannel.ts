@@ -30,7 +30,7 @@ export class ClientChannel implements Channel {
     client.channelWeakMap.set(this.id, this);
   }
 
-  async getMessages(cursor?: string, limit = 20) {
+  async getMessages(cursor?: string, limit = 50) {
     const data = await this.client.api.getMessages(this.id, { cursor, limit });
     return data.map((x) => new ClientMessage(this.client, x, this));
   }

@@ -49,10 +49,12 @@ function padTime(n: number): string {
 }
 
 const MessageContainer = styled.div<{ isSimple?: boolean }>`
+  margin: 0;
   display: grid;
   grid-template-columns: min-content auto;
+  min-height: 20px;
   grid-gap: 16px;
-  padding: ${(p) => (p.isSimple ? '0' : '8px')} 20px 4px;
+  padding: 2px 20px 6px;
   &:hover {
     background-color: rgba(0, 0, 0, 0.06);
   }
@@ -60,15 +62,20 @@ const MessageContainer = styled.div<{ isSimple?: boolean }>`
   p {
     margin: 0;
   }
+
+  .avatar {
+    margin-top: 4px;
+  }
 `;
 
 const MessageInner = styled.div`
+  margin: 0;
   padding-top: 4px;
   font-size: 14px;
 
   pre {
     padding: 16px;
-    margin: 0 4px;
+    margin: 0;
     background-color: #282c34;
     color: #abb2bf;
     border-radius: 4px;
@@ -100,7 +107,7 @@ const MessageInner = styled.div`
 const Name = styled.div<{ color?: string }>`
   font-size: 14px;
   font-weight: 600;
-  margin: 0 8px 0 0;
+  margin: 0;
   color: ${(p) => p.color ?? 'currentColor'};
 `;
 
@@ -208,10 +215,11 @@ function Markdown({ content }: { content: string }) {
 }
 
 const AvatarFiller = styled.div`
+  margin: 0;
   width: 40px;
 `;
 
-export default function MessageItem({ message, isSimple }: MessageProps) {
+export function MessageItem({ message, isSimple }: MessageProps) {
   const mikoto = useMikoto();
 
   const menu = useContextMenu(() => (
@@ -231,10 +239,7 @@ export default function MessageItem({ message, isSimple }: MessageProps) {
       {isSimple ? (
         <AvatarFiller />
       ) : (
-        <MessageAvatar
-          src={message.author?.avatar}
-          user={message.author}
-        />
+        <MessageAvatar src={message.author?.avatar} user={message.author} />
       )}
       <MessageInner>
         {!isSimple && (

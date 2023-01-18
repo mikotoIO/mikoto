@@ -6,10 +6,11 @@ import styled from 'styled-components';
 
 const StyledEditable = styled(Editable)`
   background-color: ${(p) => p.theme.colors.N700};
-  margin: 16px;
   font-size: 14px;
+  margin: 16px;
   padding: 16px;
   border-radius: 4px;
+  min-height: 20px !important;
 `;
 
 const initialEditorValue = [{ children: [{ text: '' }] }];

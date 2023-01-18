@@ -184,6 +184,7 @@ export function MessageAvatar({ src, user, size }: MessageAvatarProps) {
 
   return (
     <AvatarImg
+      className="avatar"
       src={src ?? '/images/default_avatar.png'}
       size={size ?? 40}
       ref={avatarRef}

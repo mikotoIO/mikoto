@@ -2,12 +2,13 @@ import { Button } from '@mantine/core';
 import { ClientChannel, ClientMessage } from 'mikotojs';
 import React, { useEffect, useRef, useState } from 'react';
 import { useAsync } from 'react-async-hook';
+import { LogLevel, Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';
 import { ViewContainer } from '../components/ViewContainer';
 import { Spinner } from '../components/atoms/Spinner';
-import MessageItem from '../components/molecules/Message';
+import { MessageItem } from '../components/molecules/Message';
 import { MessageEditor } from '../components/molecules/MessageEditor';
 import { useMikoto } from '../hooks';
 import { Channel } from '../models';
@@ -18,13 +19,22 @@ const Messages = styled.div`
   flex-grow: 1;
 `;
 
-const MessagesLoading = styled.div`
+const StyledMessagesLoading = styled.div`
+  padding: 40px;
   overflow-y: auto;
   flex-grow: 1;
   display: flex;
   align-items: center;
   justify-content: center;
 `;
+
+function MessagesLoading() {
+  return (
+    <StyledMessagesLoading>
+      <Spinner />
+    </StyledMessagesLoading>
+  );
+}
 
 interface MessageViewProps {
   channel: Channel;
@@ -85,16 +95,30 @@ function Paginator({ paginate }: { paginate: () => Promise<boolean> }) {
   );
 }
 
+const StyledChannelHead = styled.div`
+  padding: 8px 32px;
+  h1 {
+    font-size: 24px;
+  }
+`;
+
+function ChannelHead({ channel }: { channel: ClientChannel }) {
+  return (
+    <StyledChannelHead>
+      <h1>Welcome to #{channel.name}!</h1>
+    </StyledChannelHead>
+  );
+}
+
+// Please laugh
+const FUNNY_NUMBER = 69_420_000;
+
 function RealMessageView({ channel }: { channel: ClientChannel }) {
-  const ref = React.useRef<HTMLDivElement>(null);
-  const [scrollBottom, setScrollBottom] = useState(false);
-  useEffect(() => {
-    if (scrollBottom && ref.current) {
-      ref.current.scrollTop = ref.current.scrollHeight;
-      setScrollBottom(false);
-    }
-  });
+  const virtuosoRef = React.useRef<VirtuosoHandle>(null);
   const mikoto = useMikoto();
+  // you will probably run out of memory before this number
+  const [firstItemIndex, setFirstItemIndex] = useState(FUNNY_NUMBER);
+  const [topLoaded, setTopLoaded] = useState(false);
 
   useEffect(() => {
     mikoto.ack(channel.id).then();
@@ -105,12 +129,21 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
     channel.messages.fetch().then(setMsgs);
   }, [channel.id]);
 
+  const [scrollToBottom, setScrollToBottom] = useState(false);
+  useEffect(() => {
+    if (virtuosoRef.current && scrollToBottom) {
+      virtuosoRef.current.autoscrollToBottom();
+      virtuosoRef.current.scrollToIndex({ index: msgs!.length - 1 });
+      setScrollToBottom(false);
+    }
+  });
+
   const createFn = (x: ClientMessage) => {
     setMsgs((xs) => {
       if (xs === null) return null;
+      setScrollToBottom(true);
       return [...xs, x];
     });
-    setScrollBottom(true);
   };
 
   const deleteFn = (x: ClientMessage) => {
@@ -129,37 +162,51 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
     };
   }, [channel.id]);
 
-  // const messageDelta = useDelta(channel.messages, [channel.id]);
-  // // messages really do not fit the delta model, so just write it raw
-  //
-  // const messages = messageDelta.data;
   return (
     <ViewContainer key={channel.id}>
       <TabName name={channel.name} />
       {msgs === null ? (
-        <MessagesLoading>
-          <Spinner />
-        </MessagesLoading>
+        <MessagesLoading />
       ) : (
-        <Messages ref={ref}>
-          <Paginator
-            paginate={async () => {
-              if (msgs.length > 0) {
-                const m = await channel.getMessages(msgs[0].id);
-                setMsgs([...m, ...msgs]);
-                return m.length === 0; // it's time to stop
-              }
-              return true;
-            }}
-          />
-          {msgs.map((msg, idx) => (
-            <MessageItem
-              key={msg.id}
-              message={msg}
-              isSimple={isMessageSimple(msg, msgs[idx - 1])}
-            />
-          ))}
-        </Messages>
+        <Virtuoso
+          ref={virtuosoRef}
+          followOutput="auto"
+          defaultItemHeight={28}
+          style={{ flexGrow: 1 }}
+          initialTopMostItemIndex={msgs.length - 1}
+          data={msgs}
+          components={{
+            Header: () =>
+              topLoaded ? (
+                <ChannelHead channel={channel} />
+              ) : (
+                <MessagesLoading />
+              ),
+          }}
+          firstItemIndex={firstItemIndex}
+          startReached={async (idx) => {
+            if (!msgs) return;
+            if (msgs.length === 0) return;
+            const m = await channel.getMessages(msgs[0].id);
+            if (m.length === 0) {
+              setTopLoaded(true);
+              return;
+            }
+            setMsgs((xs) => (xs ? [...m, ...xs] : null));
+            setFirstItemIndex((x) => x - m.length);
+          }}
+          itemContent={(index, msg) => {
+            return (
+              <MessageItem
+                message={msg}
+                isSimple={isMessageSimple(
+                  msg,
+                  msgs[index - firstItemIndex - 1],
+                )}
+              />
+            );
+          }}
+        />
       )}
       <MessageEditor
         placeholder={`Message #${channel.name}`}

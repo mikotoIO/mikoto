@@ -1,8 +1,7 @@
-import { Button } from '@mantine/core';
 import { ClientChannel, ClientMessage } from 'mikotojs';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAsync } from 'react-async-hook';
-import { LogLevel, Virtuoso, VirtuosoHandle } from 'react-virtuoso';
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';
@@ -13,11 +12,6 @@ import { MessageEditor } from '../components/molecules/MessageEditor';
 import { useMikoto } from '../hooks';
 import { Channel } from '../models';
 import { CurrentSpaceContext } from '../store';
-
-const Messages = styled.div`
-  overflow-y: auto;
-  flex-grow: 1;
-`;
 
 const StyledMessagesLoading = styled.div`
   padding: 40px;
@@ -47,51 +41,6 @@ function isMessageSimple(message: ClientMessage, prevMessage: ClientMessage) {
     new Date(message.timestamp).getTime() -
       new Date(prevMessage.timestamp).getTime() <
       5 * 60 * 1000
-  );
-}
-
-function useOnScreen(ref: React.RefObject<HTMLElement>) {
-  const [isIntersecting, setIntersecting] = useState(false);
-  const observer = new IntersectionObserver(([entry]) =>
-    setIntersecting(entry.isIntersecting),
-  );
-  useEffect(() => {
-    observer.observe(ref.current!);
-    // Remove the observer as soon as the component is unmounted
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
-  return isIntersecting;
-}
-
-function Paginator({ paginate }: { paginate: () => Promise<boolean> }) {
-  const paginationRef = useRef<HTMLButtonElement>(null);
-  const toPaginate = useOnScreen(paginationRef);
-  // const [isPaginating, setIsPaginating] = useState(false);
-  const [paginationState, setPaginationState] = useState<
-    'WAITING' | 'PAGINATING' | 'COMPLETED'
-  >('WAITING');
-
-  useEffect(() => {
-    if (toPaginate && paginationState === 'WAITING') {
-      setPaginationState('PAGINATING');
-      console.log('lol');
-      paginate().then((x) => {
-        setPaginationState(x ? 'COMPLETED' : 'WAITING');
-      });
-    }
-  }, [toPaginate, paginationState]);
-
-  return (
-    <>
-      {paginationState !== 'COMPLETED' && (
-        <Button ref={paginationRef} onClick={paginate}>
-          {toPaginate ? 'On Screen' : 'Load More'}
-        </Button>
-      )}
-    </>
   );
 }
 
@@ -176,15 +125,16 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
           initialTopMostItemIndex={msgs.length - 1}
           data={msgs}
           components={{
-            Header: () =>
-              topLoaded ? (
+            Header() {
+              return topLoaded ? (
                 <ChannelHead channel={channel} />
               ) : (
                 <MessagesLoading />
-              ),
+              );
+            },
           }}
           firstItemIndex={firstItemIndex}
-          startReached={async (idx) => {
+          startReached={async () => {
             if (!msgs) return;
             if (msgs.length === 0) return;
             const m = await channel.getMessages(msgs[0].id);

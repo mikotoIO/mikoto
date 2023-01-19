@@ -3,10 +3,9 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { useRecoilState } from 'recoil';
-import { authTokenState } from '../components/AuthHandler';
-import * as authAPI from '../api/auth';
+
 import { useErrorElement } from '../hooks/useErrorElement';
+import { authClient } from '../store/authClient';
 
 const AuthViewContainer = styled.div`
   height: 100vh;
@@ -54,17 +53,14 @@ export function AuthView({ children }: { children: React.ReactNode }) {
 export function LoginView() {
   const { register, handleSubmit } = useForm();
   const error = useErrorElement();
-  const [, setAuthToken] = useRecoilState(authTokenState);
 
   return (
     <AuthView>
       <Form
         onSubmit={handleSubmit(async (formData) => {
           try {
-            await authAPI.login(formData.email, formData.password);
-            setAuthToken(
-              await authAPI.login(formData.email, formData.password),
-            );
+            const tk = await authClient.login(formData.email, formData.password);
+            localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
             // Screw SPAs, why not just force an actual reload at this point?
             window.location.href = '/';
           } catch (e) {
@@ -85,6 +81,9 @@ export function LoginView() {
         <Anchor to="/register" component={Link}>
           Register
         </Anchor>
+        <Anchor to="/forgotpassword" component={Link}>
+          Forgot Password?
+        </Anchor>
       </Form>
     </AuthView>
   );
@@ -103,7 +102,7 @@ export function RegisterView() {
         onSubmit={handleSubmit(async (data) => {
           navigate('/login');
           try {
-            await authAPI.register(data.name, data.email, data.password);
+            await authClient.register(data.name, data.email, data.password);
             navigate('/login');
           } catch (e) {
             error.setError((e as any)?.response?.data);
@@ -123,6 +122,35 @@ export function RegisterView() {
         <Anchor to="/login" component={Link}>
           Log In
         </Anchor>
+      </Form>
+    </AuthView>
+  );
+}
+
+export function ResetPasswordView() {
+  const { register, handleSubmit } = useForm();
+  const [sent, setSent] = React.useState(false);
+
+  return (
+    <AuthView>
+      <Form
+        onSubmit={handleSubmit(async (data) => {
+          await authClient.resetPassword(data.email);
+          setSent(true);
+        })}
+      >
+        {sent ? (
+          <div>
+            <h1>Instructions sent</h1>
+            <p>Check your inbox for instructions to reset your password.</p>
+          </div>
+        ) : (
+          <>
+            <h1>Reset Password</h1>
+            <Input size="md" placeholder="Email" {...register('email')} />
+            <Button type="submit">Send Password Reset Email</Button>
+          </>
+        )}
       </Form>
     </AuthView>
   );

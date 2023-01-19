@@ -1,21 +1,22 @@
-import { atom, useRecoilState } from 'recoil';
-import { Channel, Space } from '../models';
+import { ClientChannel, ClientSpace } from 'mikotojs';
+import React, { createContext } from 'react';
+import { atom, atomFamily, useRecoilState } from 'recoil';
 
-export const treebarSpaceState = atom<Space | null>({
+export const treebarSpaceState = atom<ClientSpace | null>({
   key: 'treebarSpace',
   default: null,
+  dangerouslyAllowMutability: true, // we like to live dangerously
 });
 
 type TabBaseType =
-  | { kind: 'textChannel'; channel: Channel }
-  | { kind: 'voiceChannel' }
-  | { kind: 'spaceSettings'; space: Space }
+  | { kind: 'textChannel'; channel: ClientChannel }
+  | { kind: 'voiceChannel'; channel: ClientChannel }
+  | { kind: 'spaceSettings'; space: ClientSpace }
   | { kind: 'accountSettings' }
   | { kind: 'unknown' };
 
 export type Tabable = TabBaseType & {
   key: string;
-  name: string;
 };
 
 export const tabbedState = atom<{
@@ -27,6 +28,16 @@ export const tabbedState = atom<{
     index: 0,
     tabs: [],
   },
+  dangerouslyAllowMutability: true, // we like to live dangerously
+});
+
+export const tabNameFamily = atomFamily({
+  key: 'tabName',
+  default: '',
+});
+
+export const TabContext = createContext<{ key: string }>({
+  key: '',
 });
 
 export function useTabkit() {
@@ -76,3 +87,6 @@ export function useTabkit() {
     },
   };
 }
+
+// some local contexts
+export const CurrentSpaceContext = React.createContext<ClientSpace | undefined>(undefined);

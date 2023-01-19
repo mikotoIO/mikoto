@@ -1,15 +1,16 @@
-import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
+import { useMemo, useState } from 'react';
 import { createEditor, Transforms, Node } from 'slate';
 import { withHistory } from 'slate-history';
-import { useMemo, useState } from 'react';
+import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import styled from 'styled-components';
 
 const StyledEditable = styled(Editable)`
   background-color: ${(p) => p.theme.colors.N700};
-  margin: 16px;
   font-size: 14px;
+  margin: 16px;
   padding: 16px;
   border-radius: 4px;
+  min-height: 20px !important;
 `;
 
 const initialEditorValue = [{ children: [{ text: '' }] }];

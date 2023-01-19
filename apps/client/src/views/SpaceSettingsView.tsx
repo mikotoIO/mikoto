@@ -1,11 +1,31 @@
-import { TextInput } from '@mantine/core';
+import {
+  faCheck,
+  faGripLinesVertical,
+  faX,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  Button,
+  ColorPicker,
+  NumberInput,
+  SegmentedControl,
+  Switch,
+  TextInput,
+} from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { ClientRole, ClientSpace } from 'mikotojs';
 import { useState } from 'react';
+import { get } from 'react-hook-form';
 import styled from 'styled-components';
+
+import { TabName } from '../components/TabBar';
 import {
   SidebarContainerArea,
   ViewContainerWithSidebar,
 } from '../components/ViewContainer';
-import { Space } from '../models';
+import { useMikoto } from '../hooks';
+import { useDelta } from '../hooks/useDelta';
+import { checkPermission, spacePermissions } from '../models/permissions';
 
 const Sidebar = styled.div`
   padding: 16px;
@@ -24,11 +44,12 @@ const SidebarButton = styled.a<{ selected?: boolean }>`
   user-select: none;
 `;
 
-function Overview({ space }: { space: Space }) {
+function Overview({ space }: { space: ClientSpace }) {
   const [spaceName, setSpaceName] = useState(space.name);
 
   return (
     <SidebarContainerArea>
+      <TabName name={`Settings for ${space.name}`} />
       <h1>Space Overview</h1>
       <TextInput
         value={spaceName}
@@ -48,50 +69,186 @@ const ColorDot = styled.span<{ color?: string }>`
 `;
 
 const RoleEditorGrid = styled.div`
-  padding: 16px;
   display: grid;
+  width: 100%;
   grid-template-columns: 200px auto;
+  height: 100%;
 `;
 
 const RoleList = styled.div``;
 
-function Roles() {
+function TriStateSelector() {
+  const [value, setValue] = useState<string>('U');
+
+  return (
+    <SegmentedControl
+      value={value}
+      onChange={setValue}
+      color={
+        {
+          Y: 'green',
+          U: 'gray',
+          N: 'red',
+        }[value]
+      }
+      data={[
+        {
+          value: 'Y',
+          label: <FontAwesomeIcon icon={faCheck} width={32} />,
+        },
+        {
+          value: 'U',
+          label: <FontAwesomeIcon icon={faGripLinesVertical} width={32} />,
+        },
+        {
+          value: 'N',
+          label: <FontAwesomeIcon icon={faX} width={32} />,
+        },
+      ]}
+    />
+  );
+}
+
+const PermissionBox = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const rolePermissionData = [
+  { name: 'Superuser', permission: spacePermissions.superuser },
+  { name: 'Manage Space', permission: spacePermissions.manageSpace },
+  { name: 'Manage Channel', permission: spacePermissions.manageChannels },
+  { name: 'Manage Roles', permission: spacePermissions.manageRoles },
+];
+
+function RolePermissionEditor({
+  permissions,
+  onChange,
+}: {
+  permissions: string;
+  onChange?: (x: string) => void;
+}) {
+  const [roleInt, setRoleInt] = useState(BigInt(permissions));
+
+  return (
+    <div>
+      {rolePermissionData.map((x) => (
+        <PermissionBox key={x.permission.toString()}>
+          <h3>{x.name}</h3>
+          <Switch
+            size="lg"
+            checked={checkPermission(x.permission, roleInt)}
+            onChange={() => {
+              // eslint-disable-next-line no-bitwise
+              const newVal = x.permission ^ roleInt;
+              setRoleInt(newVal);
+              onChange?.(newVal.toString());
+            }}
+          />
+        </PermissionBox>
+      ))}
+    </div>
+  );
+}
+
+const StyledRoleEditor = styled.div`
+  overflow-y: scroll;
+  height: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+`;
+
+function RoleEditor({ role, space }: { space: ClientSpace; role: ClientRole }) {
+  const mikoto = useMikoto();
+  const { getInputProps, values, setFieldValue } = useForm({
+    initialValues: {
+      name: role.name,
+      color: role.color,
+      position: role.position,
+      permissions: role.permissions,
+    },
+  });
+  return (
+    <StyledRoleEditor>
+      {role.name !== '@everyone' && (
+        <div>
+          <h2>Edit Role</h2>
+          <TextInput label="Role Name" {...getInputProps('name')} />
+          <NumberInput label="Role Priority" {...getInputProps('position')} />
+          <ColorPicker {...getInputProps('color')} />
+        </div>
+      )}
+
+      <RolePermissionEditor
+        permissions={role.permissions}
+        onChange={(perm) => {
+          setFieldValue('permissions', perm);
+        }}
+      />
+      <Button
+        onClick={() => {
+          mikoto
+            .editRole(space.id, role.id, {
+              name: values.name,
+              position: values.position,
+              spacePermissions: values.permissions,
+              color: values.color,
+            })
+            .then(() => console.log('updated'));
+        }}
+      >
+        Save Changes
+      </Button>
+    </StyledRoleEditor>
+  );
+}
+
+function Roles({ space }: { space: ClientSpace }) {
+  const rolesDelta = useDelta(space.roles, [space.id]);
+  const mikoto = useMikoto();
+
+  const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
+  const role = rolesDelta.data.find((x) => x.id === selectedRoleId);
   return (
     <RoleEditorGrid>
       <RoleList>
-        <SidebarButton selected>
-          <ColorDot color="#e24ca5" />
-          Role 1
-        </SidebarButton>
-        <SidebarButton>
-          <ColorDot color="#27c0a0" />
-          Role 2
-        </SidebarButton>
-        <SidebarButton>
-          <ColorDot color="#5498ef" />
-          Role 3
-        </SidebarButton>
-        <SidebarButton>
-          <ColorDot />
-          @everyone
-        </SidebarButton>
+        <Button
+          onClick={() => {
+            mikoto.createRole(space.id, 'New Role').then(() => {
+              console.log('role created');
+            });
+          }}
+        >
+          New Role
+        </Button>
+        {rolesDelta.data.map((r) => (
+          <SidebarButton
+            key={r.id}
+            selected={selectedRoleId === r.id}
+            onClick={() => setSelectedRoleId(r.id)}
+          >
+            <ColorDot color={r.color} />
+            {r.name}
+          </SidebarButton>
+        ))}
       </RoleList>
+      {role && <RoleEditor role={role} space={space} key={role.id} />}
     </RoleEditorGrid>
   );
 }
 
-function SettingSwitch({ tab, space }: { tab: string; space: Space }) {
+function SettingSwitch({ tab, space }: { tab: string; space: ClientSpace }) {
   switch (tab) {
     case 'Overview':
       return <Overview space={space} />;
     case 'Roles':
-      return <Roles />;
+      return <Roles space={space} />;
     default:
       return null;
   }
 }
 
-export function SpaceSettingsView({ space }: { space: Space }) {
+export function SpaceSettingsView({ space }: { space: ClientSpace }) {
   const [tab, setTab] = useState('Overview');
   return (
     <ViewContainerWithSidebar>

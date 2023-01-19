@@ -1,3 +1,5 @@
+import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
 import {
   ConnectedSocket,
   MessageBody,
@@ -6,8 +8,6 @@ import {
 } from 'socket-controllers';
 import { Socket } from 'socket.io';
 import { Service } from 'typedi';
-import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
 
 @SocketController()
 @Service()

@@ -1,5 +1,6 @@
 import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
+
 import { ObjectWithID } from '../cache';
 
 type EngineEvents<T extends ObjectWithID> = {
@@ -14,4 +15,7 @@ export abstract class DeltaEngine<
   new <U extends ObjectWithID>(): TypedEmitter<EngineEvents<U>>;
 })<T> {
   abstract fetch(): Promise<T[]>;
+  get(id: string): T | undefined {
+    return undefined;
+  }
 }

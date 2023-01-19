@@ -1,3 +1,4 @@
+import { PrismaClient, ChannelType } from '@prisma/client';
 import {
   Body,
   CurrentUser,
@@ -10,9 +11,9 @@ import {
   QueryParam,
   UnauthorizedError,
 } from 'routing-controllers';
-import { PrismaClient } from '@prisma/client';
 import { Server } from 'socket.io';
 import { Service } from 'typedi';
+
 import { AccountJwt } from '../auth';
 
 interface MessagePayload {
@@ -22,10 +23,12 @@ interface MessagePayload {
 interface ChannelPayload {
   spaceId: string;
   name: string;
+  type: ChannelType;
 }
 
 const authorInclude = {
   select: {
+    id: true,
     avatar: true,
     name: true,
   },
@@ -45,6 +48,7 @@ export class ChannelController {
       data: {
         name: body.name,
         spaceId: body.spaceId,
+        type: body.type,
         order: channelCount,
       },
     });
@@ -69,6 +73,7 @@ export class ChannelController {
   @Get('/channels/:id/messages')
   async getMessages(
     @Param('id') channelId: string,
+    @QueryParam('limit') limit: number = 50,
     @QueryParam('cursor') cursor?: string,
   ) {
     const messages = await this.prisma.message.findMany({
@@ -76,8 +81,7 @@ export class ChannelController {
 
       include: { author: authorInclude },
       orderBy: { timestamp: 'desc' },
-      take: 50,
-
+      take: limit,
       // cursor pagination
       ...(cursor !== undefined && {
         skip: 1,

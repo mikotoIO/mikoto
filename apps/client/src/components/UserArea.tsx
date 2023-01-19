@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import styled from 'styled-components';
 import { atom, useRecoilState } from 'recoil';
-import { Avatar } from './atoms/Avatar';
-import { useMikoto } from '../api';
+import styled from 'styled-components';
+
+import { useMikoto } from '../hooks';
 import { User } from '../models';
 import { useTabkit } from '../store';
 import { ContextMenu, useContextMenu } from './ContextMenu';
+import { Avatar } from './atoms/Avatar';
 
 const StyledSidebar = styled.div`
   display: grid;
@@ -49,31 +50,10 @@ function UserAreaMenu() {
     <ContextMenu>
       <ContextMenu.Link
         onClick={() => {
-          tabkit.openTab(
-            {
-              kind: 'accountSettings',
-              name: 'Account Settings',
-              key: 'accountSettings',
-            },
-            false,
-          );
+          tabkit.openTab({ kind: 'accountSettings', key: 'main' }, false);
         }}
       >
         User Settings
-      </ContextMenu.Link>
-      <ContextMenu.Link
-        onClick={() => {
-          tabkit.openTab(
-            {
-              kind: 'voiceChannel',
-              name: 'Voice Call',
-              key: 'voice',
-            },
-            false,
-          );
-        }}
-      >
-        Start Voice Call
       </ContextMenu.Link>
     </ContextMenu>
   );

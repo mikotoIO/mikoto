@@ -4,7 +4,7 @@ use image::ImageOutputFormat;
 use reqwest::header::CONTENT_TYPE;
 use rocket::http::ContentType;
 
-use crate::util::error::Error;
+use crate::util::{error::Error, resize_image};
 
 #[get("/proxy?<url>&<w>&<h>")]
 pub async fn proxy(
@@ -33,28 +33,16 @@ pub async fn proxy(
     let bytevec = if w.is_none() && h.is_none() {
         res_data.to_vec()
     } else {
-        let img = image::io::Reader::new(Cursor::new(res_data))
-            .with_guessed_format()
-            .map_err(|_| Error::ImageDecodeError)?
-            .decode()
-            .map_err(|_| Error::ImageDecodeError)?;
-
-        let img = img.resize(
-            w.unwrap_or(img.width()),
-            h.unwrap_or(img.height()),
-            image::imageops::FilterType::CatmullRom,
-        );
-        let mut resulting = Cursor::new(Vec::<u8>::new());
-        img.write_to(
-            &mut resulting,
+        resize_image(
+            res_data,
+            w.unwrap_or(256),
+            h.unwrap_or(256),
             match content_type.to_string().as_str() {
                 "image/png" => ImageOutputFormat::Png,
                 "image/jpeg" => ImageOutputFormat::Jpeg(255),
                 _ => ImageOutputFormat::Unsupported("Unsupported encode target".to_owned()),
             },
-        )
-        .map_err(|_| Error::ImageEncodeError)?;
-        resulting.into_inner()
+        )?
     };
 
     Ok((content_type, bytevec))

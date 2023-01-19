@@ -1,0 +1,11 @@
+{
+  "name": "mikotojs",
+  "version": "0.0.0",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "socket.io-client": "^4.5.1",
+    "typed-emitter": "^2.1.0"
+  }
+}

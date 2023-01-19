@@ -1,20 +1,15 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-
-import './index.css';
-import 'react-loading-skeleton/dist/skeleton.css';
-
-import { RecoilRoot } from 'recoil';
-import { ThemeProvider } from 'styled-components';
 import { MantineProvider } from '@mantine/core';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import ReactDOM from 'react-dom/client';
+import 'react-loading-skeleton/dist/skeleton.css';
+import { RecoilRoot } from 'recoil';
+import { ThemeProvider } from 'styled-components';
 
+import App from './App';
 import { theme } from './components/themes';
-import MikotoApi, { MikotoContext } from './api';
-import constants from './constants';
+import './index.css';
+import reportWebVitals from './reportWebVitals';
 
 /// global polyfill
 if (typeof (window as any).global === 'undefined') {
@@ -28,9 +23,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>
       <MantineProvider theme={{ colorScheme: 'dark' }}>
         <DndProvider backend={HTML5Backend}>
-          <MikotoContext.Provider value={new MikotoApi(constants.apiPath)}>
-            <App />
-          </MikotoContext.Provider>
+          <App />
         </DndProvider>
       </MantineProvider>
     </ThemeProvider>

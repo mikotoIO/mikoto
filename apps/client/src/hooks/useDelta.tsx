@@ -1,6 +1,5 @@
+import { DeltaEngine, DeltaInstance } from 'mikotojs';
 import React, { useState, useEffect } from 'react';
-import { DeltaEngine } from '../api/engines/DeltaEngine';
-import { DeltaInstance } from '../api/instances/DeltaInstance';
 
 interface ObjectWithId {
   id: string;

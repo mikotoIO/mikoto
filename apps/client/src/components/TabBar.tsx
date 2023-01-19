@@ -1,12 +1,12 @@
-import React, { useRef } from 'react';
-import styled from 'styled-components';
-import { useDrag, useDrop } from 'react-dnd';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faX } from '@fortawesome/free-solid-svg-icons';
-import { useRecoilState } from 'recoil';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useContext, useEffect, useRef } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import styled from 'styled-components';
 
+import { Tabable, tabbedState, TabContext, tabNameFamily } from '../store';
 import { getTabIcon, IconBox } from './atoms/IconBox';
-import { Tabable, tabbedState } from '../store';
 
 const StyledTabbedView = styled.div`
   flex: 1;
@@ -92,10 +92,23 @@ function useReorderable() {
   };
 }
 
+export function TabName({ name }: { name: string }) {
+  const tabInfo = useContext(TabContext);
+  const [tabName, setTabName] = useRecoilState(tabNameFamily(tabInfo.key));
+  useEffect(() => {
+    if (tabName !== name) {
+      setTabName(name);
+    }
+  }, [name]);
+
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  return <></>;
+}
+
 function Tab({ tab, index }: TabProps) {
   const [tabbed, setTabbed] = useRecoilState(tabbedState);
-
   const reorderFn = useReorderable();
+  const tabName = useRecoilValue(tabNameFamily(`${tab.kind}/${tab.key}`));
 
   const ref = useRef<HTMLDivElement>(null);
   const [, drag] = useDrag<TabDnd>({
@@ -142,7 +155,7 @@ function Tab({ tab, index }: TabProps) {
       }}
     >
       <IconBox size={20} icon={getTabIcon(tab)} />
-      <div>{tab.name}</div>
+      <div>{tabName}</div>
       <StyledCloseButton
         active={active}
         onClick={(ev) => {

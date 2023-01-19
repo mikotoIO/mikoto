@@ -1,10 +1,14 @@
-import styled from 'styled-components';
+import { Button, TextInput } from '@mantine/core';
 import { useDropzone } from 'react-dropzone';
-import { useRecoilState } from 'recoil';
-import { SettingsView } from './SettingsViewTemplate';
-import { Avatar } from '../components/atoms/Avatar';
-import { useMikoto } from '../api';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import styled from 'styled-components';
+
+import { modalState } from '../components/ContextMenu';
+import { TabName } from '../components/TabBar';
 import { userState } from '../components/UserArea';
+import { Avatar } from '../components/atoms/Avatar';
+import { useMikoto } from '../hooks';
+import { SettingsView } from './SettingsViewTemplate';
 
 const bgUrl = 'https://i1.sndcdn.com/visuals-000328863415-MJdwB0-t2480x520.jpg';
 
@@ -34,7 +38,19 @@ const Content = styled.div`
 
 const AvatarWrapper = styled.a``;
 
+export function PasswordChangeModal() {
+  return (
+    <div>
+      <TextInput label="Current Password" type="password" />
+      <TextInput label="New Password" type="password" />
+      <TextInput label="Confirm New Password" type="password" />
+    </div>
+  );
+}
+
 export function AccountSettingsView() {
+  const setModal = useSetRecoilState(modalState);
+
   const mikoto = useMikoto();
   const [user] = useRecoilState(userState);
 
@@ -48,6 +64,7 @@ export function AccountSettingsView() {
 
   return (
     <SettingsView>
+      <TabName name="Account Settings" />
       <h1>My Account</h1>
       <AccountInfo>
         <Banner />
@@ -62,6 +79,17 @@ export function AccountSettingsView() {
           <h2>{user?.name}</h2>
         </Content>
       </AccountInfo>
+      <h2>Authentication</h2>
+      <Button
+        onClick={() => {
+          setModal({
+            title: 'Change Password',
+            elem: <PasswordChangeModal />,
+          });
+        }}
+      >
+        Change Password
+      </Button>
     </SettingsView>
   );
 }

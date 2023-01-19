@@ -1,9 +1,9 @@
+import type { MikotoClient } from '../MikotoClient';
+import { Channel } from '../models';
 import { DeltaInstance } from './DeltaInstance';
-import type MikotoApi from '../index';
-import { Channel } from '../../models';
 
 export class ChannelInstance extends DeltaInstance<Channel> {
-  constructor(private mikoto: MikotoApi, private channelId: string) {
+  constructor(private mikoto: MikotoClient, private channelId: string) {
     super();
   }
   async fetch(): Promise<Channel> {

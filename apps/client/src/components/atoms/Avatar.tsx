@@ -1,8 +1,14 @@
-import React, { useRef } from 'react';
-import styled from 'styled-components';
+import { Button, Checkbox } from '@mantine/core';
+import { ClientMember, ClientRole, ClientSpace } from 'mikotojs';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
-import { contextMenuState } from '../ContextMenu';
+import styled from 'styled-components';
+
+import { useMikoto } from '../../hooks';
 import { User } from '../../models';
+import { CurrentSpaceContext } from '../../store';
+import { contextMenuState } from '../ContextMenu';
+import { RoleBadge } from './RoleBadge';
 
 const AvatarImg = styled.img<{ size: number }>`
   user-select: none;
@@ -34,22 +40,136 @@ const AvatarContextWrapper = styled.div`
     font-size: 20px;
     margin-top: 0;
   }
+
   hr {
     opacity: 0.1;
   }
+
   h2 {
     font-size: 16px;
   }
 `;
 
-function AvatarContextMenu({ user }: { user: User }) {
+const StyledRoleBadge = styled.div`
+  display: inline-block;
+  padding: 4px 8px;
+  background: ${(p) => p.theme.colors.B800};
+  color: ${(p) => p.theme.colors.N0};
+  border-radius: 4px;
+
+  font-size: 12px;
+`;
+
+function RoleSetter({
+  roles,
+  member,
+}: {
+  roles: ClientRole[];
+  member: ClientMember;
+}) {
+  const [selectedRoles, setSelectedRoles] = useState<Record<string, boolean>>(
+    () => {
+      const o: Record<string, boolean> = {};
+      for (const role of roles) {
+        if (role.name === '@everyone') continue;
+        o[role.id] = false;
+      }
+      return o;
+    },
+  );
+
   return (
     <AvatarContextWrapper>
-      <Avatar src={user.avatar} size={80} />
-      <h1>{user.name}</h1>
-      <hr />
-      <h2>Roles</h2>
+      {roles.map((x) => {
+        if (x.name === '@everyone') return null;
+        return (
+          <Checkbox
+            label={x.name}
+            key={x.id}
+            checked={selectedRoles[x.id]}
+            onChange={(e) => {
+              setSelectedRoles({
+                ...selectedRoles,
+                [x.id]: e.currentTarget.checked,
+              });
+            }}
+          />
+        );
+      })}
+      <Button
+        onClick={() => {
+          member.update({
+            roleIds: Object.keys(selectedRoles).filter(
+              (id) => selectedRoles[id],
+            ),
+          });
+        }}
+      >
+        Set Roles
+      </Button>
     </AvatarContextWrapper>
+  );
+}
+
+const StyledPlusBadge = styled.div`
+  display: inline-block;
+  padding: 4px 8px;
+  border: 1px solid ${(p) => p.theme.colors.N0};
+  background-color: ${(p) => p.theme.colors.N800};
+  color: ${(p) => p.theme.colors.N0};
+  border-radius: 4px;
+
+  font-size: 12px;
+`;
+
+function AvatarContextMenu({
+  user,
+  space,
+}: {
+  user: User;
+  space?: ClientSpace;
+}) {
+  const mikoto = useMikoto();
+  const [member, setMember] = useState<ClientMember | null>(null);
+  React.useEffect(() => {
+    if (space) {
+      mikoto.getMember(space.id, user.id).then(setMember);
+    }
+  }, [user.id]);
+
+  const [roleEditorOpen, setRoleEditorOpen] = useState(false);
+
+  return (
+    <div style={{ display: 'grid', gridGap: '8px' }}>
+      <AvatarContextWrapper>
+        {member === null ? (
+          'loading'
+        ) : (
+          <div>
+            <Avatar src={user.avatar} size={80} />
+            <h1>{user.name}</h1>
+            <hr />
+            <h2>Roles</h2>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {member.roleIds.map((r) => {
+                const role = space?.roles.get(r);
+                return role && <RoleBadge key={r} role={role} />;
+              })}
+              <StyledPlusBadge
+                onClick={() => {
+                  setRoleEditorOpen((x) => !x);
+                }}
+              >
+                +
+              </StyledPlusBadge>
+            </div>
+          </div>
+        )}
+      </AvatarContextWrapper>
+      {roleEditorOpen && (
+        <RoleSetter roles={space!.roles.list()} member={member!} />
+      )}
+    </div>
   );
 }
 
@@ -60,9 +180,11 @@ interface MessageAvatarProps extends AvatarProps {
 export function MessageAvatar({ src, user, size }: MessageAvatarProps) {
   const setContextMenu = useSetRecoilState(contextMenuState);
   const avatarRef = useRef<HTMLImageElement>(null);
+  const space = useContext(CurrentSpaceContext);
 
   return (
     <AvatarImg
+      className="avatar"
       src={src ?? '/images/default_avatar.png'}
       size={size ?? 40}
       ref={avatarRef}
@@ -75,7 +197,7 @@ export function MessageAvatar({ src, user, size }: MessageAvatarProps) {
 
         setContextMenu({
           position: { top, left: right + 8 },
-          elem: <AvatarContextMenu user={user} />,
+          elem: <AvatarContextMenu user={user} space={space} />,
         });
       }}
     />

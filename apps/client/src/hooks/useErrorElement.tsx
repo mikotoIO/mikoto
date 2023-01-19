@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
 import { Notification } from '@mantine/core';
+import React, { useState } from 'react';
+
 import { AppError } from '../models';
 
 export function useErrorElement() {

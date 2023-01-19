@@ -1,13 +1,14 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import {
   faCog,
   faHashtag,
   faQuestion,
   faHeadphones,
 } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import styled from 'styled-components';
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+
 import { Tabable } from '../../store';
 import { centerFlex } from '../themes';
 

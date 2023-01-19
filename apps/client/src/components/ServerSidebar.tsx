@@ -1,18 +1,18 @@
+import { Button, TextInput, Tooltip } from '@mantine/core';
+import { AxiosError } from 'axios';
+import { ClientSpace } from 'mikotojs';
+import React, { useRef } from 'react';
+import { useForm } from 'react-hook-form';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 import { useHover } from 'usehooks-ts';
-import React, { useRef } from 'react';
-import { Button, TextInput, Tooltip } from '@mantine/core';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { useForm } from 'react-hook-form';
-import { AxiosError } from 'axios';
-import { useMikoto } from '../api';
-import { Space } from '../models';
-import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
-import { treebarSpaceState, useTabkit } from '../store';
+
+import { useMikoto } from '../hooks';
 import { useDelta } from '../hooks/useDelta';
-import { Pill } from './atoms/Pill';
-import { ClientSpace } from '../api/entities/ClientSpace';
 import { useErrorElement } from '../hooks/useErrorElement';
+import { treebarSpaceState, useTabkit } from '../store';
+import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
+import { Pill } from './atoms/Pill';
 
 const StyledServerSidebar = styled.div`
   background-color: ${(p) => p.theme.colors.N1000};
@@ -33,7 +33,7 @@ const StyledServerIcon = styled.div<{ active?: boolean }>`
   transition-duration: 100ms;
 `;
 
-function ServerIconContextMenu({ space }: { space: Space }) {
+function ServerIconContextMenu({ space }: { space: ClientSpace }) {
   const mikoto = useMikoto();
   const tabkit = useTabkit();
   return (
@@ -43,7 +43,6 @@ function ServerIconContextMenu({ space }: { space: Space }) {
           tabkit.openTab(
             {
               kind: 'spaceSettings',
-              name: `Settings: ${space.name}`,
               key: space.id,
               space,
             },
@@ -74,7 +73,7 @@ const StyledIconWrapper = styled.div`
   width: 68px;
 `;
 
-function ServerIcon({ space }: { space: Space }) {
+function ServerIcon({ space }: { space: ClientSpace }) {
   const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
   const isActive = stateSpace?.id === space.id;
 
@@ -93,7 +92,7 @@ function ServerIcon({ space }: { space: Space }) {
           onContextMenu={contextMenu}
           ref={ref}
           onClick={() => {
-            setSpace(space instanceof ClientSpace ? space.simplify() : space);
+            setSpace(space);
           }}
         >
           {space.name[0]}

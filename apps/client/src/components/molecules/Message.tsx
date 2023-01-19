@@ -1,16 +1,16 @@
+import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Modal } from '@mantine/core';
+import { ClientMessage } from 'mikotojs';
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import styled from 'styled-components';
-import { Modal } from '@mantine/core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { SpecialComponents } from 'react-markdown/lib/ast-to-react';
 import { NormalComponents } from 'react-markdown/lib/complex-types';
+import remarkGfm from 'remark-gfm';
+import styled from 'styled-components';
 
+import { useMikoto } from '../../hooks';
 import { ContextMenu, useContextMenu } from '../ContextMenu';
-import { Message } from '../../models';
-import { useMikoto } from '../../api';
 import { MessageAvatar } from '../atoms/Avatar';
 
 const dateFormat = new Intl.DateTimeFormat('en', {
@@ -49,10 +49,12 @@ function padTime(n: number): string {
 }
 
 const MessageContainer = styled.div<{ isSimple?: boolean }>`
+  margin: 0;
   display: grid;
   grid-template-columns: min-content auto;
+  min-height: 20px;
   grid-gap: 16px;
-  padding: ${(p) => (p.isSimple ? '0' : '8px')} 20px 4px;
+  padding: 2px 20px 6px;
   &:hover {
     background-color: rgba(0, 0, 0, 0.06);
   }
@@ -60,15 +62,20 @@ const MessageContainer = styled.div<{ isSimple?: boolean }>`
   p {
     margin: 0;
   }
+
+  .avatar {
+    margin-top: 4px;
+  }
 `;
 
 const MessageInner = styled.div`
+  margin: 0;
   padding-top: 4px;
   font-size: 14px;
 
   pre {
     padding: 16px;
-    margin: 0 4px;
+    margin: 0;
     background-color: #282c34;
     color: #abb2bf;
     border-radius: 4px;
@@ -99,7 +106,8 @@ const MessageInner = styled.div`
 
 const Name = styled.div<{ color?: string }>`
   font-size: 14px;
-  margin: 0 8px 0 0;
+  font-weight: 600;
+  margin: 0;
   color: ${(p) => p.color ?? 'currentColor'};
 `;
 
@@ -181,7 +189,7 @@ function MessageImage({ src, alt }: MessageImageProps) {
 }
 
 interface MessageProps {
-  message: Message;
+  message: ClientMessage;
   isSimple?: boolean;
 }
 
@@ -206,15 +214,20 @@ function Markdown({ content }: { content: string }) {
   );
 }
 
-export default function MessageItem({ message, isSimple }: MessageProps) {
+const AvatarFiller = styled.div`
+  margin: 0;
+  width: 40px;
+`;
+
+export function MessageItem({ message, isSimple }: MessageProps) {
   const mikoto = useMikoto();
 
   const menu = useContextMenu(() => (
     <ContextMenu>
       <ContextMenu.Link
-        onClick={async () =>
-          await mikoto.deleteMessage(message.channelId, message.id)
-        }
+        onClick={async () => {
+          await mikoto.deleteMessage(message.channel.id, message.id);
+        }}
       >
         Delete Message
       </ContextMenu.Link>
@@ -224,14 +237,14 @@ export default function MessageItem({ message, isSimple }: MessageProps) {
   return (
     <MessageContainer isSimple={isSimple} onContextMenu={menu}>
       {isSimple ? (
-        <div style={{ width: '40px' }} />
+        <AvatarFiller />
       ) : (
         <MessageAvatar src={message.author?.avatar} user={message.author} />
       )}
       <MessageInner>
         {!isSimple && (
           <NameBox>
-            <Name color="white">{message.author?.name ?? 'Ghost'}</Name>
+            <Name color="#20BBD2">{message.author?.name ?? 'Ghost'}</Name>
             <Timestamp time={new Date(message.timestamp)} />
           </NameBox>
         )}

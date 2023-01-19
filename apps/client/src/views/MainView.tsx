@@ -1,18 +1,19 @@
+import { MikotoClient, ClientSpace, constructMikoto } from 'mikotojs';
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { useRecoilValue } from 'recoil';
 import { ErrorBoundary } from 'react-error-boundary';
-import { ChannelSidebar } from '../components/ChannelSidebar';
-import { TabbedView } from '../components/TabBar';
-import { AuthRefresher } from '../components/AuthHandler';
-import { Sidebar } from '../components/UserArea';
+import { useRecoilValue } from 'recoil';
+import styled from 'styled-components';
+
+import {ContextMenuKit, ModalKit} from '../components/ContextMenu';
+import { Explorer } from '../components/Explorer';
 import { ServerSidebar } from '../components/ServerSidebar';
-import { MessageView } from './MessageView';
-import { Tabable, tabbedState, treebarSpaceState } from '../store';
-import { SpaceSettingsView } from './SpaceSettingsView';
-import { useMikoto } from '../api';
+import { TabbedView } from '../components/TabBar';
+import { Sidebar } from '../components/UserArea';
+import { MikotoContext, useMikoto } from '../hooks';
+import { Tabable, tabbedState, TabContext, treebarSpaceState } from '../store';
 import { AccountSettingsView } from './AccountSettingsView';
-import { ClientSpace } from '../api/entities/ClientSpace';
+import { MessageView } from './MessageView';
+import { SpaceSettingsView } from './SpaceSettingsView';
 import { VoiceView } from './VoiceView';
 
 const AppContainer = styled.div`
@@ -35,7 +36,7 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
     case 'textChannel':
       return <MessageView channel={tab.channel} />;
     case 'voiceChannel':
-      return <VoiceView />;
+      return <VoiceView channel={tab.channel} />;
     case 'spaceSettings':
       return <SpaceSettingsView space={tab.space} />;
     case 'accountSettings':
@@ -60,16 +61,20 @@ function AppView() {
   return (
     <AppContainer>
       <ServerSidebar />
-      <Sidebar>{space && <ChannelSidebar space={space} />}</Sidebar>
+      <Sidebar>{space && <Explorer space={space} />}</Sidebar>
       <TabbedView tabs={tabbed.tabs}>
         <ErrorBoundaryPage>
           {tabbed.tabs.map((tab, idx) => (
-            <div
-              style={idx !== tabbed.index ? { display: 'none' } : undefined}
+            <TabContext.Provider
+              value={{ key: `${tab.kind}/${tab.key}` }}
               key={`${tab.kind}/${tab.key}`}
             >
-              <TabViewSwitch tab={tab} />
-            </div>
+              <div
+                style={idx !== tabbed.index ? { display: 'none' } : undefined}
+              >
+                <TabViewSwitch tab={tab} />
+              </div>
+            </TabContext.Provider>
           ))}
         </ErrorBoundaryPage>
       </TabbedView>
@@ -77,10 +82,24 @@ function AppView() {
   );
 }
 
+function MikotoApiLoader({ children }: { children: React.ReactNode }) {
+  const [mikoto, setMikoto] = React.useState<MikotoClient | null>(null);
+  useEffect(() => {
+    constructMikoto(import.meta.env.MIKOTO_API ?? 'http://localhost:9500').then((x) => setMikoto(x));
+  }, []);
+
+  if (mikoto === null) return null;
+  return (
+    <MikotoContext.Provider value={mikoto}>{children}</MikotoContext.Provider>
+  );
+}
+
 export default function MainView() {
   return (
-    <AuthRefresher>
+    <MikotoApiLoader>
       <AppView />
-    </AuthRefresher>
+      <ContextMenuKit />
+      <ModalKit />
+    </MikotoApiLoader>
   );
 }

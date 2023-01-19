@@ -21,5 +21,6 @@ module.exports = {
     'no-console': 'off',
     'object-curly-spacing': ['error', 'always'],
     '@typescript-eslint/return-await': 'off',
+    '@typescript-eslint/no-unused-vars': 'warn',
   },
 };

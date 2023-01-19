@@ -1,3 +1,4 @@
+import { PrismaClient } from '@prisma/client';
 import {
   Body,
   Delete,
@@ -8,10 +9,10 @@ import {
   Post,
 } from 'routing-controllers';
 import { Service } from 'typedi';
-import { PrismaClient } from '@prisma/client';
 
 interface RoleCreatePayload {
   name: string;
+  color?: string;
   spacePermissions: string;
   position: number;
 }
@@ -52,7 +53,14 @@ export class RoleController {
   ) {
     return await this.prisma.role.update({
       where: { id: roleId },
-      data: body,
+      data: {
+        name: body.name,
+        permissions: body.spacePermissions
+          ? BigInt(body.spacePermissions).toString()
+          : undefined,
+        position: body.position,
+        color: body.color,
+      },
     });
   }
 

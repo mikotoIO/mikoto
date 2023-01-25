@@ -1,7 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import './App.css';
-import { ModalKit } from './components/ContextMenu';
 import { RoomPage } from './components/LiveKitPlayground';
 import { LoginView, RegisterView, ResetPasswordView } from './views/AuthView';
 import MainView from './views/MainView';

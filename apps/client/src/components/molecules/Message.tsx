@@ -157,6 +157,10 @@ const ImageModalTitleLink = styled.a`
   outline: none;
 `;
 
+const StyledMessageImage = styled.img`
+  max-width: 100%;
+`;
+
 function MessageImage({ src, alt }: MessageImageProps) {
   const [opened, setOpened] = useState(false);
 
@@ -174,7 +178,7 @@ function MessageImage({ src, alt }: MessageImageProps) {
           </ImageModalTitleLink>
         }
       >
-        <img src={src} alt={alt} style={{ maxWidth: '100%' }} />
+        <StyledMessageImage src={src} alt={alt} />
       </ImageModal>
       <img
         src={src}

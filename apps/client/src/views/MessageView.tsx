@@ -45,7 +45,7 @@ function isMessageSimple(message: ClientMessage, prevMessage: ClientMessage) {
 }
 
 const StyledChannelHead = styled.div`
-  padding: 8px 32px;
+  padding: 8px 64px;
   h1 {
     font-size: 24px;
   }
@@ -55,6 +55,7 @@ function ChannelHead({ channel }: { channel: ClientChannel }) {
   return (
     <StyledChannelHead>
       <h1>Welcome to #{channel.name}!</h1>
+      <p>This is the start of the channel.</p>
     </StyledChannelHead>
   );
 }

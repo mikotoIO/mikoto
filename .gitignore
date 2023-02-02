@@ -3,9 +3,15 @@
 # dependencies
 node_modules
 dist
+
+# yarn
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
 .pnp
-.pnp.js
-.yarn/
+.pnp.*
 
 # testing
 coverage

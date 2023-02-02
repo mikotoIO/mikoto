@@ -61,6 +61,7 @@
   },
   "scripts": {
     "start": "vite",
+    "dev": "yarn start",
     "build": "vite build",
     "test": "vitest",
     "typecheck": "tsc --noEmit",

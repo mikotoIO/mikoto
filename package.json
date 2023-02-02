@@ -7,13 +7,13 @@
     "packages/*"
   ],
   "scripts": {
-    "compose": "docker-compose up",
+    "compose": "docker compose up",
     "build": "turbo run build",
     "start": "turbo run start --parallel",
     "lint": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "setup:server": "node .scripts/setup-env.js node .scripts/setup-minio.js && yarn workspace server prisma migrate dev",
-    "dev": "yarn workspaces foreach -ptRvi --from '{server,client}' run start"
+    "dev": "yarn compose && yarn workspaces foreach -ptRvi --from '{server,client}' run dev"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.0.0",

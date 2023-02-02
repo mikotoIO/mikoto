@@ -40,7 +40,7 @@
     "react-loading-skeleton": "^3.1.0",
     "react-markdown": "^8.0.3",
     "react-query": "^3.39.2",
-    "react-router-dom": "^6.2.2",
+    "react-router-dom": "^6.8.0",
     "react-syntax-highlighter": "^15.5.0",
     "react-virtuoso": "^4.0.3",
     "reactjs-popup": "^2.0.5",
@@ -48,9 +48,9 @@
     "remark-gfm": "^3.0.1",
     "rollup-plugin-visualizer": "^5.8.0",
     "serve": "^14.0.1",
-    "slate": "^0.82.1",
-    "slate-history": "^0.66.0",
-    "slate-react": "^0.82.1",
+    "slate": "^0.88.1",
+    "slate-history": "^0.86.0",
+    "slate-react": "^0.88.2",
     "socket.io-client": "^4.5.1",
     "styled-components": "^5.3.3",
     "typed-emitter": "^2.1.0",
@@ -65,7 +65,9 @@
     "test": "vitest",
     "typecheck": "tsc --noEmit",
     "analyze": "source-map-explorer ./build/static/js/*.js",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "eslintConfig": {
     "extends": [
@@ -85,6 +87,16 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.20.12",
+    "@mdx-js/react": "^1.6.22",
+    "@storybook/addon-actions": "^6.5.16",
+    "@storybook/addon-docs": "^6.5.16",
+    "@storybook/addon-essentials": "^6.5.16",
+    "@storybook/addon-interactions": "^6.5.16",
+    "@storybook/addon-links": "^6.5.16",
+    "@storybook/builder-vite": "^0.3.0",
+    "@storybook/react": "^6.5.16",
+    "@storybook/testing-library": "^0.0.13",
     "@types/draft-js": "^0.11.9",
     "@types/events": "^3.0.0",
     "@types/jest": "^27.4.1",
@@ -97,6 +109,7 @@
     "@types/styled-components": "^5.1.23",
     "@typescript-eslint/eslint-plugin": "^5.9.0",
     "@typescript-eslint/parser": "^5.9.0",
+    "babel-loader": "^8.3.0",
     "babel-plugin-styled-components": "^2.0.7",
     "eslint": "^8.6.0",
     "eslint-config-airbnb": "^19.0.4",

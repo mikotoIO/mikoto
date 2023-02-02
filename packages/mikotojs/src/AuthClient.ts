@@ -1,4 +1,5 @@
 import axios, { Axios } from 'axios';
+
 import { TokenPair } from './models';
 
 export class AuthClient {
@@ -6,28 +7,34 @@ export class AuthClient {
   constructor(baseUrl: string) {
     this.axios = axios.create({
       baseURL: baseUrl,
-    })
+    });
   }
 
   register(name: string, email: string, password: string) {
-    return this.axios.post<TokenPair>('/account/register', {
-      name,
-      email,
-      password,
-    }).then(x => x.data);
+    return this.axios
+      .post<TokenPair>('/account/register', {
+        name,
+        email,
+        password,
+      })
+      .then((x) => x.data);
   }
 
   login(email: string, password: string) {
-    return this.axios.post<TokenPair>('/account/login', {
-      email,
-      password,
-    }).then(x => x.data);
+    return this.axios
+      .post<TokenPair>('/account/login', {
+        email,
+        password,
+      })
+      .then((x) => x.data);
   }
 
   refresh(pair: TokenPair) {
-    return this.axios.post<TokenPair>('/account/refresh', {
-      refreshToken: pair.refreshToken,
-    }).then(x => x.data);
+    return this.axios
+      .post<TokenPair>('/account/refresh', {
+        refreshToken: pair.refreshToken,
+      })
+      .then((x) => x.data);
   }
 
   resetPassword(email: string) {

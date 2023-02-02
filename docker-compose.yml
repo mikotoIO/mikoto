@@ -26,3 +26,11 @@ services:
       - "7880:7880"
       - "7881:7881"
       - "7882:7882"
+
+  mailhog:
+    image: mailhog/mailhog
+    environment:
+      MH_HOSTNAME: localhost
+    ports:
+      - "3030:8025"
+      - "1025:1025"

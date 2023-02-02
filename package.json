@@ -7,12 +7,12 @@
     "packages/*"
   ],
   "scripts": {
-    "compose": "docker compose up",
+    "compose": "docker compose up -d",
     "build": "turbo run build",
     "start": "turbo run start --parallel",
     "lint": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "setup:server": "node .scripts/setup-env.js node .scripts/setup-minio.js && yarn workspace server prisma migrate dev",
+    "setup:server": "node .scripts/setup-env.js --force && node .scripts/setup-minio.js && yarn compose && yarn workspace server prisma migrate dev",
     "dev": "yarn compose && yarn workspaces foreach -ptRvi --from '{server,client}' run dev"
   },
   "devDependencies": {

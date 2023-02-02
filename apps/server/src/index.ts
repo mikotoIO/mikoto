@@ -44,8 +44,8 @@ useContainer(Container);
 useSocketContainer(Container);
 
 useExpressServer(app, {
-  controllers: [path.join(`${__dirname}/controllers/*.js`)],
-  middlewares: [path.join(`${__dirname}/middlewares/*.js`)],
+  controllers: [path.join(`${__dirname}/controllers/*.{js,ts}`)],
+  middlewares: [path.join(`${__dirname}/middlewares/*.{js,ts}`)],
   defaultErrorHandler: false,
   currentUserChecker: (action) => {
     let authHeader = action.request.headers.authorization as string;
@@ -59,7 +59,7 @@ useExpressServer(app, {
 });
 
 useSocketServer(io, {
-  controllers: [path.join(`${__dirname}/ws-controllers/*.js`)],
+  controllers: [path.join(`${__dirname}/ws-controllers/*.{js,ts}`)],
 });
 
 server.listen(process.env.PORT || 9500, () => {

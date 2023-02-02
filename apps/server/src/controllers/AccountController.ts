@@ -14,6 +14,7 @@ import { Service } from 'typedi';
 import { promisify } from 'util';
 
 import { AccountJwt } from '../auth';
+import { logger } from '../functions/logger';
 import Minio from '../functions/Minio';
 import Mailer from '../services/Mailer';
 
@@ -139,10 +140,12 @@ export class AccountController {
       data: {
         userId: account.id,
         token: await generateRandomToken(),
-        category: 'PASSWORD_RESET',
+        category: 'PASSWORD_RESET', // FIXME make this an enum
         expiresAt: new Date(Date.now() + 1000 * 60 * 60),
       },
     });
+
+    const resetLink = `${process.env.MIKOTO_HOSTNAME!}/forgotpassword/${verification.token}`;
 
     await this.mailer.sendMail(
       body.email,
@@ -150,10 +153,50 @@ export class AccountController {
       'reset-password.ejs',
       {
         name: account.name,
-        token: verification.token,
+        // token: verification.token,
+        link: resetLink,
+        expiry: verification.expiresAt.toISOString(),
       },
     );
+    logger.info(`Sent password reset to ${body.email}`);
     return {};
+  }
+
+  @Post('/account/reset_password/submit')
+  async resetPasswordVerify(@Body() body: {
+    token: string,
+    newPassword: string,
+  }) {
+    const verification = await this.prisma.verification.findUnique({
+      where: { token: body.token },
+    });
+    if (verification === null) {
+      throw new UnauthorizedError('Invalid Token');
+    }
+    if(verification.expiresAt < new Date()) {
+      throw new UnauthorizedError('Token Expired');
+    }
+
+    if(verification.category !== 'PASSWORD_RESET') {
+      throw new UnauthorizedError('Invalid Token');
+    }
+
+    const account = await this.prisma.user.findUnique({
+      where: { id: verification.userId! },
+    });
+
+    if(account === null) {
+      throw new UnauthorizedError('Account does not exist');
+    }
+
+    await this.prisma.user.update({
+      where: { id: account.id },
+      data: { passhash: await bcrypt.hash(body.newPassword, 10) },
+    });
+
+    return {
+      status: 'ok',
+    };
   }
 
   @Post('/account/avatar')

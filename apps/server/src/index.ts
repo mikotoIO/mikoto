@@ -62,6 +62,9 @@ useSocketServer(io, {
   controllers: [path.join(`${__dirname}/ws-controllers/*.{js,ts}`)],
 });
 
-server.listen(process.env.PORT || 9500, () => {
-  logger.info(`Mikoto server listening on port ${process.env.PORT || 9500}`);
+const port = parseInt(process.env.PORT || '', 10) || 9500;
+const host = process.env.HOST || 'localhost';
+
+server.listen(port, host, () => {
+  logger.info(`Mikoto server started on http://${host}:${port}`);
 });

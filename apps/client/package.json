@@ -19,6 +19,7 @@
     "@use-it/event-listener": "^0.1.7",
     "@vitejs/plugin-react": "^2.0.1",
     "axios": "^0.27.2",
+    "dotenv": "^16.0.3",
     "draft-js": "^0.11.7",
     "draftjs-utils": "^0.10.2",
     "events": "^3.3.0",

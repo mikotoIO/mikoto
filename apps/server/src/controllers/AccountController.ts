@@ -14,8 +14,8 @@ import { Service } from 'typedi';
 import { promisify } from 'util';
 
 import { AccountJwt } from '../auth';
-import { logger } from '../functions/logger';
 import Minio from '../functions/Minio';
+import { logger } from '../functions/logger';
 import Mailer from '../services/Mailer';
 
 const randomBytes = promisify(crypto.randomBytes);
@@ -145,7 +145,9 @@ export class AccountController {
       },
     });
 
-    const resetLink = `${process.env.MIKOTO_HOSTNAME!}/forgotpassword/${verification.token}`;
+    const resetLink = `${process.env.MIKOTO_HOSTNAME!}/forgotpassword/${
+      verification.token
+    }`;
 
     await this.mailer.sendMail(
       body.email,
@@ -163,21 +165,20 @@ export class AccountController {
   }
 
   @Post('/account/reset_password/submit')
-  async resetPasswordVerify(@Body() body: {
-    token: string,
-    newPassword: string,
-  }) {
+  async resetPasswordVerify(
+    @Body() body: { token: string; newPassword: string },
+  ) {
     const verification = await this.prisma.verification.findUnique({
       where: { token: body.token },
     });
     if (verification === null) {
       throw new UnauthorizedError('Invalid Token');
     }
-    if(verification.expiresAt < new Date()) {
+    if (verification.expiresAt < new Date()) {
       throw new UnauthorizedError('Token Expired');
     }
 
-    if(verification.category !== 'PASSWORD_RESET') {
+    if (verification.category !== 'PASSWORD_RESET') {
       throw new UnauthorizedError('Invalid Token');
     }
 
@@ -185,7 +186,7 @@ export class AccountController {
       where: { id: verification.userId! },
     });
 
-    if(account === null) {
+    if (account === null) {
       throw new UnauthorizedError('Account does not exist');
     }
 

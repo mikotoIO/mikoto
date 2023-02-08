@@ -34,3 +34,5 @@ services:
     ports:
       - "3030:8025"
       - "1025:1025"
+    logging:
+      driver: none

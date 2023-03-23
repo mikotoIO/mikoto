@@ -74,7 +74,7 @@ export function UserArea() {
     <StyledUserArea onClick={contextMenu}>
       {user && (
         <>
-          <Avatar src={user.avatar} />
+          <Avatar src={user.avatar ?? undefined} />
           <StyledUserInfo>
             <h1>{user.name}</h1>
             <h2>Tinkering on stuff</h2>

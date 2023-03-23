@@ -22,7 +22,7 @@ export interface Message {
   authorId: string | null;
   channelId: string;
 
-  author?: User;
+  author: User | null;
 }
 
 export interface Member {
@@ -35,7 +35,7 @@ export interface Member {
 export interface User {
   id: string;
   name: string;
-  avatar: string;
+  avatar: string | null;
 }
 
 export interface Channel {
@@ -43,14 +43,14 @@ export interface Channel {
   spaceId: string;
   name: string;
   order: number;
-  lastUpdated: string;
+  lastUpdated: string | null;
   type: string;
 }
 
 export interface Role {
   id: string;
   name: string;
-  color?: string;
+  color: string | null;
   permissions: string;
   position: number;
 }

@@ -192,7 +192,7 @@ function RoleEditor({ role, space }: { space: ClientSpace; role: ClientRole }) {
               name: values.name,
               position: values.position,
               spacePermissions: values.permissions,
-              color: values.color,
+              color: values.color ?? undefined,
             })
             .then(() => console.log('updated'));
         }}
@@ -227,7 +227,7 @@ function Roles({ space }: { space: ClientSpace }) {
             selected={selectedRoleId === r.id}
             onClick={() => setSelectedRoleId(r.id)}
           >
-            <ColorDot color={r.color} />
+            <ColorDot color={r.color ?? undefined} />
             {r.name}
           </SidebarButton>
         ))}

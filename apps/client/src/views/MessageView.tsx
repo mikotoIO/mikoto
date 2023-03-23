@@ -96,10 +96,10 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
     });
   };
 
-  const deleteFn = (x: ClientMessage) => {
+  const deleteFn = (id: string) => {
     setMsgs((xs) => {
       if (xs === null) return null;
-      return xs.filter((y) => y.id !== x.id);
+      return xs.filter((y) => y.id !== id);
     });
   };
 

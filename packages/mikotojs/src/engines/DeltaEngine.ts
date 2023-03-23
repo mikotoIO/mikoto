@@ -5,7 +5,7 @@ import { ObjectWithID } from '../cache';
 
 type EngineEvents<T extends ObjectWithID> = {
   create: (item: T) => void;
-  delete: (item: T) => void;
+  delete: (id: string) => void;
   update: (item: T) => void;
 };
 

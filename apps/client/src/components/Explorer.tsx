@@ -137,10 +137,7 @@ export function ChannelNode({
 
   drag(drop(ref));
 
-  const isUnread =
-    instance.data === null
-      ? false
-      : unread === undefined || unread < new Date(instance.data.lastUpdated);
+  const isUnread = false;
 
   return (
     <StyledChannelNode

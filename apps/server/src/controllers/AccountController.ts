@@ -14,9 +14,9 @@ import { Service } from 'typedi';
 import { promisify } from 'util';
 
 import { AccountJwt } from '../auth';
+import Mailer from '../functions/Mailer';
 import Minio from '../functions/Minio';
 import { logger } from '../functions/logger';
-import Mailer from '../services/Mailer';
 
 const randomBytes = promisify(crypto.randomBytes);
 async function generateRandomToken() {

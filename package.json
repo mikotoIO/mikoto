@@ -10,6 +10,7 @@
     "compose": "docker compose up -d",
     "build": "turbo run build",
     "start": "turbo run start --parallel",
+    "typecheck": "turbo run typecheck --parallel",
     "lint": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "setup:server": "node .scripts/setup-env.js --force && node .scripts/setup-minio.js && yarn compose && yarn workspace server prisma migrate dev",

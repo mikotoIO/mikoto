@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 import express from 'express';
 import * as http from 'http';
+import { createServer } from 'http';
 import jwt from 'jsonwebtoken';
 import * as path from 'path';
 import {
@@ -16,12 +17,14 @@ import {
   useContainer as useSocketContainer,
   useSocketServer,
 } from 'socket-controllers';
-import socketio from 'socket.io';
+import socketio, { Server } from 'socket.io';
 import { Container } from 'typedi';
 
+import Mailer from './functions/Mailer';
 import Minio from './functions/Minio';
 import { logger } from './functions/logger';
-import Mailer from './services/Mailer';
+import { mainService } from './services';
+import { sophon } from './services/sophon';
 
 const app = express();
 
@@ -67,4 +70,16 @@ const host = process.env.HOST || 'localhost';
 
 server.listen(port, host, () => {
   logger.info(`Mikoto server started on http://${host}:${port}`);
+});
+
+// set up a sophon server as well
+const httpServer = createServer();
+const sophonIO = new Server(httpServer, {
+  cors: {
+    origin: '*',
+  },
+});
+sophon.mount(sophonIO, mainService);
+httpServer.listen(3510, () => {
+  console.log('Sophon on *:3510');
 });

@@ -146,7 +146,7 @@ function AvatarContextMenu({
           'loading'
         ) : (
           <div>
-            <Avatar src={user.avatar} size={80} />
+            <Avatar src={user.avatar ?? undefined} size={80} />
             <h1>{user.name}</h1>
             <hr />
             <h2>Roles</h2>

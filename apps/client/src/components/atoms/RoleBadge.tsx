@@ -23,7 +23,7 @@ const StyledRoleBadge = styled.div<{ color?: string }>`
 
 export function RoleBadge({ role }: { role: ClientRole }) {
   return (
-    <StyledRoleBadge color={role.color}>
+    <StyledRoleBadge color={role.color ?? undefined}>
       <span className="circle" />
       {role.name}
     </StyledRoleBadge>

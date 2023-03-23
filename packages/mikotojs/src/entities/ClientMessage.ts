@@ -7,7 +7,7 @@ export class ClientMessage {
   public content: string;
   public channel: ClientChannel;
   public timestamp: Date;
-  public author: User | undefined;
+  public author: User | null;
 
   constructor(
     private client: MikotoClient,

@@ -2,6 +2,7 @@ import type { MikotoClient } from '../MikotoClient';
 import { MessageEngine } from '../engines';
 import { ChannelInstance } from '../instances';
 import { Channel } from '../models';
+import { patch } from '../util';
 import { ClientMessage } from './ClientMessage';
 import type { ClientSpace } from './ClientSpace';
 
@@ -11,7 +12,7 @@ export class ClientChannel implements Channel {
   spaceId: string;
   messages: MessageEngine;
   order: number;
-  lastUpdated: string;
+  lastUpdated: string | null;
   type: string;
   instance: ChannelInstance;
   space: ClientSpace;
@@ -26,25 +27,27 @@ export class ClientChannel implements Channel {
     this.messages = new MessageEngine(client, this);
     this.instance = new ChannelInstance(client, this.id);
     this.space = space;
-
     client.channelWeakMap.set(this.id, this);
   }
 
   async getMessages(cursor?: string, limit = 50) {
-    const data = await this.client.api.getMessages(this.id, { cursor, limit });
+    const data = await this.client.client.messages.list(this.id, {
+      cursor: cursor ?? null,
+      limit,
+    });
     return data.map((x) => new ClientMessage(this.client, x, this));
   }
 
   sendMessage(content: string) {
-    return this.client.api.sendMessage(this.id, content);
+    return this.client.client.messages.send(this.id, content);
   }
 
   deleteMessage(messageId: string) {
-    return this.client.api.deleteMessage(this.id, messageId);
+    return this.client.client.messages.delete(this.id, messageId);
   }
 
   delete() {
-    return this.client.api.deleteChannel(this.id);
+    return this.client.client.channels.delete(this.id);
   }
 
   simplify(): Channel {

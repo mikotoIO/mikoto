@@ -33,8 +33,8 @@ export function useDelta<T extends ObjectWithId>(
     setData((xs) => xs.map((orig) => (x.id === orig.id ? x : orig)));
   };
 
-  const deleteFn = (y: T) => {
-    setData((xs) => xs.filter((x) => x.id !== y.id));
+  const deleteFn = (id: string) => {
+    setData((xs) => xs.filter((x) => x.id !== id));
   };
 
   useEffect(() => {

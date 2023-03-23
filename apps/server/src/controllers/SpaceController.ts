@@ -55,6 +55,8 @@ export class SpaceController {
     await this.prisma.spaceUser.create({
       data: { userId, spaceId: space.id },
     });
+
+    // explain what the following lines do.
     const socketIds = await this.io.in(`user/${userId}`).allSockets();
     socketIds.forEach((socketId) => {
       this.io.sockets.sockets.get(socketId)?.join(space.id);

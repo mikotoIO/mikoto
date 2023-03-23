@@ -104,7 +104,7 @@ const MessageInner = styled.div`
   }
 `;
 
-const Name = styled.div<{ color?: string }>`
+const Name = styled.div<{ color: string | null }>`
   font-size: 14px;
   font-weight: 600;
   margin: 0;
@@ -243,7 +243,10 @@ export function MessageItem({ message, isSimple }: MessageProps) {
       {isSimple ? (
         <AvatarFiller />
       ) : (
-        <MessageAvatar src={message.author?.avatar} user={message.author} />
+        <MessageAvatar
+          src={message.author?.avatar ?? undefined}
+          user={message.author ?? undefined}
+        />
       )}
       <MessageInner>
         {!isSimple && (

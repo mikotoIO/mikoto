@@ -1,4 +1,4 @@
-import { User, PrismaClient } from '@prisma/client';
+import { Account, User, PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
@@ -50,7 +50,7 @@ export class AccountController {
     private mailer: Mailer,
   ) {}
 
-  private async createTokenPair(account: User, oldToken?: string) {
+  private async createTokenPair(account: Account, oldToken?: string) {
     const accessToken = jwt.sign({}, process.env.SECRET!, {
       expiresIn: '1h',
       subject: account.id,
@@ -69,9 +69,10 @@ export class AccountController {
 
       return { accessToken, refreshToken };
     }
+
     await this.prisma.refreshToken.create({
       data: {
-        userId: account.id,
+        accountId: account.id,
         token: refreshToken,
         expiresAt,
       },
@@ -84,15 +85,19 @@ export class AccountController {
     return this.prisma.user.create({
       data: {
         name: body.name,
-        email: body.email,
-        passhash: await bcrypt.hash(body.password, 10),
+        Account: {
+          create: {
+            email: body.email,
+            passhash: await bcrypt.hash(body.password, 10),
+          },
+        },
       },
     });
   }
 
   @Post('/account/login')
   async login(@Body() body: LoginPayload) {
-    const account = await this.prisma.user.findUnique({
+    const account = await this.prisma.account.findUnique({
       where: { email: body.email },
     });
     if (account && (await bcrypt.compare(body.password, account.passhash))) {
@@ -106,7 +111,7 @@ export class AccountController {
     await this.prisma;
     const account = await this.prisma.refreshToken
       .findUnique({ where: { token: body.refreshToken } })
-      .user();
+      .account();
     if (account === null) {
       throw new UnauthorizedError('Invalid Token');
     }
@@ -115,12 +120,12 @@ export class AccountController {
 
   @Post('/account/change_pasword')
   async changePassword(@Body() body: ChangePasswordPayload) {
-    const account = await this.prisma.user.findUnique({
+    const account = await this.prisma.account.findUnique({
       where: { id: body.id },
     });
 
     if (account && (await bcrypt.compare(body.oldPassword, account.passhash))) {
-      await this.prisma.user.update({
+      await this.prisma.account.update({
         where: { id: account.id },
         data: { passhash: await bcrypt.hash(body.newPassword, 10) },
       });
@@ -129,8 +134,9 @@ export class AccountController {
 
   @Post('/account/reset_password')
   async resetPassword(@Body() body: { email: string }) {
-    const account = await this.prisma.user.findUnique({
+    const account = await this.prisma.account.findUnique({
       where: { email: body.email },
+      include: { user: true },
     });
     if (account === null) {
       throw new UnauthorizedError('Invalid Email');
@@ -154,8 +160,7 @@ export class AccountController {
       'Reset Password',
       'reset-password.ejs',
       {
-        name: account.name,
-        // token: verification.token,
+        name: account.user.name,
         link: resetLink,
         expiry: verification.expiresAt.toISOString(),
       },
@@ -190,7 +195,7 @@ export class AccountController {
       throw new UnauthorizedError('Account does not exist');
     }
 
-    await this.prisma.user.update({
+    await this.prisma.account.update({
       where: { id: account.id },
       data: { passhash: await bcrypt.hash(body.newPassword, 10) },
     });

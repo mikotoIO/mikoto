@@ -1,16 +1,13 @@
 import type { MikotoClient } from '../MikotoClient';
-import { MessageEngine } from '../engines';
 import { ChannelInstance } from '../instances';
 import { Channel } from '../models';
-import { patch } from '../util';
-import { ClientMessage } from './ClientMessage';
 import type { ClientSpace } from './ClientSpace';
 
 export class ClientChannel implements Channel {
   id: string;
   name: string;
   spaceId: string;
-  messages: MessageEngine;
+  // messages: MessageEngine;
   order: number;
   lastUpdated: string | null;
   type: string;
@@ -24,7 +21,7 @@ export class ClientChannel implements Channel {
     this.order = base.order;
     this.lastUpdated = base.lastUpdated;
     this.type = base.type;
-    this.messages = new MessageEngine(client, this);
+    // this.messages = new MessageEngine(client, this);
     this.instance = new ChannelInstance(client, this.id);
     this.space = space;
     client.channelWeakMap.set(this.id, this);
@@ -35,7 +32,7 @@ export class ClientChannel implements Channel {
       cursor: cursor ?? null,
       limit,
     });
-    return data.map((x) => new ClientMessage(this.client, x, this));
+    // return data.map((x) => new ClientMessage(this.client, x, this));
   }
 
   sendMessage(content: string) {

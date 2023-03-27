@@ -1,20 +1,12 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import {
-  faBarsStaggered,
   faChevronDown,
   faChevronRight,
-  faHeadset,
   faHashtag,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 import styled from 'styled-components';
-
-const StyledTree = styled.div`
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-`;
 
 export const StyledTreeBody = styled.div`
   margin: 0;

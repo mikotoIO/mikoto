@@ -3,11 +3,11 @@ import axios, { AxiosInstance } from 'axios';
 import { AuthClient } from './AuthClient';
 import { MikotoApi } from './MikotoApi';
 import { ICache, InfiniteCache, MikotoCache, ObjectWithID } from './cache';
+import { MessageEmitter } from './emitters/MessageEmitter';
 import { SpaceEngine } from './engines';
 import {
   ClientChannel,
   ClientMember,
-  ClientMessage,
   ClientRole,
   ClientSpace,
 } from './entities';
@@ -50,6 +50,9 @@ export class MikotoClient {
   authAPI: AuthClient;
   client!: MainServiceClient;
 
+  // screw all of the above, we're rewriting the entire thing
+  messageEmitter = new MessageEmitter();
+
   constructor(
     url: string,
     accessToken: string,
@@ -81,21 +84,22 @@ export class MikotoClient {
   setupClient(client: MainServiceClient) {
     // rewrite io to use sophon
     this.client.messages.onCreate((message) => {
-      const ch = this.channelWeakMap.get(message.channelId);
-      if (ch) {
-        ch.messages.emit('create', new ClientMessage(this, message, ch));
-        ch.instance.emit('update', {
-          ...ch.simplify(),
-          lastUpdated: new Date().toJSON(),
-        });
-      }
+      this.messageEmitter.emit(`create/${message.channelId}`, message);
+      // const ch = this.channelWeakMap.get(message.channelId);
+      // if (ch) {
+      //   ch.instance.emit('update', {
+      //     ...ch.simplify(),
+      //     lastUpdated: new Date().toJSON(),
+      //   });
+      // }
     });
 
     this.client.messages.onDelete(({ messageId, channelId }) => {
-      const ch = this.channelWeakMap.get(channelId);
-      if (ch) {
-        ch.messages.emit('delete', messageId);
-      }
+      this.messageEmitter.emit(`delete/${channelId}`, messageId);
+      // const ch = this.channelWeakMap.get(channelId);
+      // if (ch) {
+      //   ch.messages.emit('delete', messageId);
+      // }
     });
 
     this.client.channels.onCreate((channel) => {

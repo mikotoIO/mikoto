@@ -1,4 +1,4 @@
-import { ClientChannel, ClientMessage } from 'mikotojs';
+import { ClientChannel } from 'mikotojs';
 import React, { useEffect, useState } from 'react';
 import { useAsync } from 'react-async-hook';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
@@ -10,7 +10,7 @@ import { Spinner } from '../components/atoms/Spinner';
 import { MessageItem } from '../components/molecules/Message';
 import { MessageEditor } from '../components/molecules/MessageEditor';
 import { useMikoto } from '../hooks';
-import { Channel } from '../models';
+import { Channel, Message } from '../models';
 import { CurrentSpaceContext } from '../store';
 
 const StyledMessagesLoading = styled.div`
@@ -34,7 +34,7 @@ interface MessageViewProps {
   channel: Channel;
 }
 
-function isMessageSimple(message: ClientMessage, prevMessage: ClientMessage) {
+function isMessageSimple(message: Message, prevMessage: Message) {
   return (
     prevMessage &&
     prevMessage.author?.id === message.author?.id &&
@@ -74,9 +74,14 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
     mikoto.ack(channel.id).then();
   }, [channel.id]);
 
-  const [msgs, setMsgs] = useState<ClientMessage[] | null>(null);
+  const [msgs, setMsgs] = useState<Message[] | null>(null);
   useEffect(() => {
-    channel.messages.fetch().then(setMsgs);
+    mikoto.client.messages
+      .list(channel.id, {
+        limit: 50,
+        cursor: null,
+      })
+      .then(setMsgs);
   }, [channel.id]);
 
   const [scrollToBottom, setScrollToBottom] = useState(false);
@@ -88,7 +93,7 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
     }
   });
 
-  const createFn = (x: ClientMessage) => {
+  const createFn = (x: Message) => {
     setMsgs((xs) => {
       if (xs === null) return null;
       setScrollToBottom(true);
@@ -104,11 +109,11 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
   };
 
   useEffect(() => {
-    channel.messages.on('create', createFn);
-    channel.messages.on('delete', deleteFn);
+    mikoto.messageEmitter.on(`create/${channel.id}`, createFn);
+    mikoto.messageEmitter.on(`delete/${channel.id}`, deleteFn);
     return () => {
-      channel.messages.off('create', createFn);
-      channel.messages.off('delete', deleteFn);
+      mikoto.messageEmitter.off(`create/${channel.id}`, createFn);
+      mikoto.messageEmitter.off(`delete/${channel.id}`, deleteFn);
     };
   }, [channel.id]);
 
@@ -138,7 +143,10 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
           startReached={async () => {
             if (!msgs) return;
             if (msgs.length === 0) return;
-            const m = await channel.getMessages(msgs[0].id);
+            const m = await mikoto.client.messages.list(channel.id, {
+              limit: 50,
+              cursor: msgs[0].id,
+            });
             if (m.length === 0) {
               setTopLoaded(true);
               return;

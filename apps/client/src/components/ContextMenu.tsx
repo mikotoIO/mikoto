@@ -110,6 +110,18 @@ export const ContextMenu = Object.assign(ContextMenuBase, {
   Link: StyledContextMenuLink,
 });
 
+export function useContextMenuX(position?: Positions) {
+  const setContextMenu = useSetRecoilState(contextMenuState);
+  return (elem: React.ReactNode) => (ev: React.MouseEvent) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    setContextMenu({
+      position: position ?? { top: ev.clientY, left: ev.clientX },
+      elem,
+    });
+  };
+}
+
 export function useContextMenu(
   fn: (fns: ContextMenuFns) => React.ReactNode,
   position?: Positions,

@@ -10,6 +10,7 @@ import remarkGfm from 'remark-gfm';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../hooks';
+import { Message } from '../../models';
 import { ContextMenu, useContextMenu } from '../ContextMenu';
 import { MessageAvatar } from '../atoms/Avatar';
 
@@ -193,7 +194,7 @@ function MessageImage({ src, alt }: MessageImageProps) {
 }
 
 interface MessageProps {
-  message: ClientMessage;
+  message: Message;
   isSimple?: boolean;
 }
 
@@ -230,7 +231,7 @@ export function MessageItem({ message, isSimple }: MessageProps) {
     <ContextMenu>
       <ContextMenu.Link
         onClick={async () => {
-          await mikoto.deleteMessage(message.channel.id, message.id);
+          await mikoto.deleteMessage(message.channelId, message.id);
         }}
       >
         Delete Message

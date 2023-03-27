@@ -10,7 +10,13 @@ import styled from 'styled-components';
 import { useMikoto } from '../hooks';
 import { useDelta, useDeltaInstance } from '../hooks/useDelta';
 import { Tabable, treebarSpaceState, useTabkit } from '../store';
-import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
+import {
+  ContextMenu,
+  modalState,
+  useContextMenu,
+  useContextMenuX,
+} from './ContextMenu';
+import { ExplorerNext } from './ExplorerNext';
 import { IconBox } from './atoms/IconBox';
 import { Pill } from './atoms/Pill';
 
@@ -18,15 +24,6 @@ const StyledTree = styled.div`
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-`;
-
-export const StyledTreeBody = styled.div`
-  margin: 0;
-  padding: 10px;
-  min-height: min-content;
-  flex: 1;
-  overflow-y: auto;
-  box-sizing: border-box;
 `;
 
 const StyledChannelNode = styled.a<{ unread?: boolean }>`
@@ -94,20 +91,6 @@ export function ChannelNode({
   const menu = useContextMenu(({ destroy }) => (
     <ContextMenu>
       <ContextMenu.Link>Open in new tab</ContextMenu.Link>
-      <ContextMenu.Link
-        onClick={() => {
-          tabkit.openTab(
-            {
-              kind: 'voiceChannel',
-              channel,
-              key: 'voice',
-            },
-            false,
-          );
-        }}
-      >
-        Start Voice Call
-      </ContextMenu.Link>
       <ContextMenu.Link>Mark as Read</ContextMenu.Link>
       <ContextMenu.Link
         onClick={async () => {
@@ -219,6 +202,7 @@ const TreeHead = styled.div`
 `;
 
 export function Explorer({ space }: { space: ClientSpace }) {
+  const tabkit = useTabkit();
   const channelDelta = useDelta(space.channels, [space?.id!]);
 
   // const mikoto = useMikoto();
@@ -226,6 +210,7 @@ export function Explorer({ space }: { space: ClientSpace }) {
   //   mikoto.getRoles(space.id).then((x) => console.log(x));
   // }, [space?.id!]);
   const contextMenu = useContextMenu(() => <TreebarContextMenu />);
+  const nodeContextMenu = useContextMenuX();
 
   const channels = [...channelDelta.data].sort((a, b) => a.order - b.order);
   const unreadDelta = useDeltaInstance(space.unreads, [space.id]);
@@ -236,18 +221,29 @@ export function Explorer({ space }: { space: ClientSpace }) {
       <TreeHead>
         <h1>{space.name}</h1>
       </TreeHead>
-      <StyledTreeBody onContextMenu={contextMenu}>
-        {channels.map((channel) => (
-          <ChannelNode
-            unread={unreadInstance[channel.id]}
-            channel={channel}
-            key={channel.id}
-            onReorder={async () => {
-              await channelDelta.refetch();
-            }}
-          />
-        ))}
-      </StyledTreeBody>
+      <ExplorerNext
+        nodes={channels.map((channel) => ({
+          id: channel.id,
+          text: channel.name,
+          onClick(ev) {
+            tabkit.openTab(channelToTab(channel), ev.ctrlKey);
+          },
+          onContextMenu: nodeContextMenu(
+            <ContextMenu>
+              <ContextMenu.Link>Open in new tab</ContextMenu.Link>
+              <ContextMenu.Link>Mark as Read</ContextMenu.Link>
+              <ContextMenu.Link
+                onClick={async () => {
+                  // destroy();
+                  await channel.delete();
+                }}
+              >
+                Delete Channel
+              </ContextMenu.Link>
+            </ContextMenu>,
+          ),
+        }))}
+      />
     </StyledTree>
   );
 }

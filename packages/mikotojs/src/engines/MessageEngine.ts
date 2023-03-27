@@ -4,7 +4,6 @@ import { DeltaEngine } from './DeltaEngine';
 
 export class MessageEngine extends DeltaEngine<ClientMessage> {
   constructor(private client: MikotoClient, private channel: ClientChannel) {
-    console.log('messageengine constructed with ID ' + channel.id);
     super();
   }
 

@@ -1,9 +1,9 @@
+import { User } from 'mikotojs';
 import React, { useEffect } from 'react';
 import { atom, useRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../hooks';
-import { User } from '../models';
 import { useTabkit } from '../store';
 import { ContextMenu, useContextMenu } from './ContextMenu';
 import { Avatar } from './atoms/Avatar';

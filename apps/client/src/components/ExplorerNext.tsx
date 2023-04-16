@@ -5,7 +5,8 @@ import {
   faHashtag,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
 import styled from 'styled-components';
 
 export const StyledTreeBody = styled.div`
@@ -17,7 +18,7 @@ export const StyledTreeBody = styled.div`
   box-sizing: border-box;
 `;
 
-const StyledNode = styled.a<{ unread?: boolean }>`
+const StyledNode = styled.a<{ unread?: boolean; isDndHover?: boolean }>`
   position: relative;
   font-size: 14px;
   height: 20px;
@@ -33,13 +34,14 @@ const StyledNode = styled.a<{ unread?: boolean }>`
   &:hover {
     background-color: ${(p) => p.theme.colors.N700};
   }
+  ${(p) => p.isDndHover && `color: ${p.theme.colors.B800}`}
 `;
 
-interface NodeProps {
+export interface NodeObject {
   id: string;
   text: string;
   icon?: IconDefinition;
-  descendant?: NodeProps[];
+  descendant?: NodeObject[];
   onClick?(ev: React.MouseEvent): void;
   onContextMenu?(ev: React.MouseEvent): void;
 }
@@ -58,21 +60,52 @@ export const StyledSubtree = styled.div`
   border-left: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
+interface NodeProps extends NodeObject {
+  path: string[];
+}
+
 function Node(props: NodeProps) {
   const [open, setOpen] = useState(false);
   const isLeaf = props.descendant === undefined;
+
+  const ref = useRef<HTMLAnchorElement>(null);
+  const [, drag] = useDrag<NodeObject>({
+    type: 'CHANNEL',
+    item: props,
+  });
+  const [{ isOver }, drop] = useDrop<NodeObject, any, { isOver: boolean }>({
+    accept: 'CHANNEL',
+    async drop(item) {
+      console.log(`Dropped ${item.text} on ${props.text}`);
+    },
+
+    canDrop(item) {
+      return !props.path.includes(item.id);
+    },
+
+    collect(monitor) {
+      return {
+        isOver: monitor.isOver() && monitor.canDrop(),
+      };
+    },
+  });
+  drag(drop(ref));
+
   return (
     <div>
       <StyledNode
+        ref={ref}
         onClick={(ev) => {
           props.onClick?.(ev);
         }}
         onContextMenu={(ev) => {
           props.onContextMenu?.(ev);
         }}
+        isDndHover={isOver}
       >
         <ChevronWrapper
-          onClick={() => {
+          onClick={(ev) => {
+            ev.stopPropagation();
             if (!isLeaf) setOpen(!open);
           }}
         >
@@ -87,33 +120,24 @@ function Node(props: NodeProps) {
       <StyledSubtree>
         {open &&
           !isLeaf &&
-          props.descendant?.map((x) => <Node {...x} key={x.id} />)}
+          props.descendant?.map((x) => (
+            <Node {...x} path={[...props.path, x.id]} key={x.id} />
+          ))}
       </StyledSubtree>
     </div>
   );
 }
 
-interface ExplorerNextProps {
-  nodes: NodeProps[];
+interface ExplorerNextProps extends React.HTMLAttributes<HTMLDivElement> {
+  nodes: NodeObject[];
 }
 
-export function ExplorerNext(props: ExplorerNextProps) {
+export function ExplorerNext({ nodes, ...props }: ExplorerNextProps) {
   return (
-    <StyledTreeBody>
-      {props.nodes.map((x) => (
-        <Node {...x} key={x.id} />
+    <StyledTreeBody {...props}>
+      {nodes.map((x) => (
+        <Node {...x} path={[x.id]} key={x.id} />
       ))}
-      {/*        <Node
-          text="General"
-          descendant={[
-            { text: '🗒️ Thread 1', descendant: [{ text: 'Subthread 1' }] },
-            { text: '🗒️ Thread 2' },
-          ]}
-        />
-        <Node text="Memes" />
-        <Node text="🌸 Anime" />
-        <Node text="Voice" icon={faHeadset} />
-        <Node text="Document" icon={faBarsStaggered} />*/}
     </StyledTreeBody>
   );
 }

@@ -1,12 +1,32 @@
-import { DeltaEngine, DeltaInstance } from 'mikotojs';
+import { EmitterEvents } from 'mikotojs';
 import React, { useState, useEffect } from 'react';
+import { RecoilState, useRecoilState } from 'recoil';
+import TypedEmitter from 'typed-emitter';
 
 interface ObjectWithId {
   id: string;
 }
 
-export function useDelta<T extends ObjectWithId>(
-  engine: DeltaEngine<T>,
+function getMutationFunctions<T extends ObjectWithId>(
+  setData: React.Dispatch<React.SetStateAction<T[]>>,
+) {
+  return {
+    createFn: (x: T) => {
+      setData((xs) => [...xs, x]);
+    },
+    updateFn: (x: T) => {
+      setData((xs) => xs.map((orig) => (x.id === orig.id ? x : orig)));
+    },
+    deleteFn: (id: string) => {
+      setData((xs) => xs.filter((x) => x.id !== id));
+    },
+  };
+}
+
+export function useDeltaNext<T extends ObjectWithId>(
+  emitter: TypedEmitter<EmitterEvents<T>>,
+  parentId: string,
+  fetch: () => Promise<T[]>,
   deps: React.DependencyList,
 ) {
   const [data, setData] = useState<T[]>([]);
@@ -14,70 +34,59 @@ export function useDelta<T extends ObjectWithId>(
 
   useEffect(() => {
     setLoading(true);
-    engine.fetch().then((d) => {
+    fetch().then((d) => {
       setLoading(false);
       setData(d);
     });
   }, deps);
 
-  const refetch = async () => {
-    const xs = await engine.fetch();
-    setData(xs);
-  };
-
-  const createFn = (x: T) => {
-    setData((xs) => [...xs, x]);
-  };
-
-  const updateFn = (x: T) => {
-    setData((xs) => xs.map((orig) => (x.id === orig.id ? x : orig)));
-  };
-
-  const deleteFn = (id: string) => {
-    setData((xs) => xs.filter((x) => x.id !== id));
-  };
+  const { createFn, updateFn, deleteFn } = getMutationFunctions(setData);
 
   useEffect(() => {
-    engine.on('create', createFn);
-    engine.on('update', updateFn);
-    engine.on('delete', deleteFn);
+    emitter.on(`create/${parentId}`, createFn);
+    emitter.on(`update/${parentId}`, updateFn);
+    emitter.on(`delete/${parentId}`, deleteFn);
     return () => {
-      engine.off('create', createFn);
-      engine.off('update', updateFn);
-      engine.off('delete', deleteFn);
+      emitter.off(`create/${parentId}`, createFn);
+      emitter.off(`update/${parentId}`, updateFn);
+      emitter.off(`delete/${parentId}`, deleteFn);
     };
   }, deps);
 
   return {
     data,
     loading,
-    refetch,
   };
 }
 
-export function useDeltaInstance<T>(
-  instance: DeltaInstance<T>,
+export function useDeltaWithRecoil<T extends ObjectWithId>(
+  recoilState: RecoilState<T[]>,
+  emitter: TypedEmitter<EmitterEvents<T>>,
+  parentId: string,
+  fetch: () => Promise<T[]>,
   deps: React.DependencyList,
 ) {
-  const [data, setData] = useState<T | null>(null);
+  const [data, setData] = useRecoilState<T[]>(recoilState);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
-    instance.fetch().then((x) => {
+    fetch().then((d) => {
       setLoading(false);
-      setData(x);
+      setData(d);
     });
   }, deps);
 
-  const updateFn = (x: T) => {
-    setData(x);
-  };
+  const { createFn, updateFn, deleteFn } = getMutationFunctions(setData);
 
   useEffect(() => {
-    instance.on('update', updateFn);
+    emitter.on(`create/${parentId}`, createFn);
+    emitter.on(`update/${parentId}`, updateFn);
+    emitter.on(`delete/${parentId}`, deleteFn);
     return () => {
-      instance.off('update', updateFn);
+      emitter.off(`create/${parentId}`, createFn);
+      emitter.off(`update/${parentId}`, updateFn);
+      emitter.off(`delete/${parentId}`, deleteFn);
     };
   }, deps);
 

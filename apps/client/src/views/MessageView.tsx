@@ -1,7 +1,8 @@
-import { ClientChannel } from 'mikotojs';
+import { Channel, Message } from 'mikotojs';
 import React, { useEffect, useState } from 'react';
 import { useAsync } from 'react-async-hook';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
+import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';
@@ -10,8 +11,8 @@ import { Spinner } from '../components/atoms/Spinner';
 import { MessageItem } from '../components/molecules/Message';
 import { MessageEditor } from '../components/molecules/MessageEditor';
 import { useMikoto } from '../hooks';
-import { Channel, Message } from '../models';
 import { CurrentSpaceContext } from '../store';
+import { spacesState } from '../store/cache';
 
 const StyledMessagesLoading = styled.div`
   padding: 40px;
@@ -51,7 +52,7 @@ const StyledChannelHead = styled.div`
   }
 `;
 
-function ChannelHead({ channel }: { channel: ClientChannel }) {
+function ChannelHead({ channel }: { channel: Channel }) {
   return (
     <StyledChannelHead>
       <h1>Welcome to #{channel.name}!</h1>
@@ -63,7 +64,7 @@ function ChannelHead({ channel }: { channel: ClientChannel }) {
 // Please laugh
 const FUNNY_NUMBER = 69_420_000;
 
-function RealMessageView({ channel }: { channel: ClientChannel }) {
+function RealMessageView({ channel }: { channel: Channel }) {
   const virtuosoRef = React.useRef<VirtuosoHandle>(null);
   const mikoto = useMikoto();
   // you will probably run out of memory before this number
@@ -170,7 +171,7 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
       <MessageEditor
         placeholder={`Message #${channel.name}`}
         onSubmit={async (msg) => {
-          await channel.sendMessage(msg);
+          await mikoto.channel(channel).sendMessage(msg);
         }}
       />
     </ViewContainer>
@@ -179,15 +180,19 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
 
 export function MessageView({ channel }: MessageViewProps) {
   const mikoto = useMikoto();
+  const space = useRecoilValue(spacesState).find(
+    (x) => x.id === channel.spaceId,
+  );
+
   const { result: mChannel, error } = useAsync(
-    (id: string) => mikoto.getChannel(id),
+    (id: string) => mikoto.client.channels.get(id),
     [channel.id],
   );
   if (error) throw error;
   if (!mChannel) return <div>loading</div>;
 
   return (
-    <CurrentSpaceContext.Provider value={mChannel.space}>
+    <CurrentSpaceContext.Provider value={space}>
       <RealMessageView channel={mChannel} />
     </CurrentSpaceContext.Provider>
   );

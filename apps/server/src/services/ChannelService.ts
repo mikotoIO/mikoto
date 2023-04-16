@@ -46,7 +46,9 @@ export const channelService = sophon.create(ChannelService, {
     const channel = await prisma.channel.findUnique({ where: { id } });
     if (channel === null) throw new NotFoundError();
     await prisma.channel.delete({ where: { id } });
-    channelService.$(`space/${channel.spaceId}`).onDelete(id);
+    channelService
+      .$(`space/${channel.spaceId}`)
+      .onDelete(serializeDates(channel));
     return;
   },
 

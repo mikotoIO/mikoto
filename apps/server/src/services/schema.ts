@@ -7,6 +7,7 @@ export interface SophonContext {}
 export interface Channel {
   id: string;
   spaceId: string;
+  parentId: string | null;
   name: string;
   order: number;
   lastUpdated: string | null;
@@ -116,8 +117,8 @@ export class SpaceServiceSender {
   onUpdate(space: Space) {
     this.sender.emit(this.room, 'spaces/onUpdate', space);
   }
-  onDelete(spaceId: string) {
-    this.sender.emit(this.room, 'spaces/onDelete', spaceId);
+  onDelete(space: Space) {
+    this.sender.emit(this.room, 'spaces/onDelete', space);
   }
 }
 
@@ -205,8 +206,8 @@ export class ChannelServiceSender {
   onUpdate(channel: Channel) {
     this.sender.emit(this.room, 'channels/onUpdate', channel);
   }
-  onDelete(channelId: string) {
-    this.sender.emit(this.room, 'channels/onDelete', channelId);
+  onDelete(channel: Channel) {
+    this.sender.emit(this.room, 'channels/onDelete', channel);
   }
 }
 

@@ -3,15 +3,9 @@ import axios, { AxiosInstance } from 'axios';
 import { AuthClient } from './AuthClient';
 import { MikotoApi } from './MikotoApi';
 import { ICache, InfiniteCache, MikotoCache, ObjectWithID } from './cache';
-import { MessageEmitter } from './emitters/MessageEmitter';
-import { SpaceEngine } from './engines';
-import {
-  ClientChannel,
-  ClientMember,
-  ClientRole,
-  ClientSpace,
-} from './entities';
-import { Channel, Member, Role, User } from './models';
+import { ChannelEmitter, MessageEmitter, SpaceEmitter } from './emitters';
+import { ClientMember, ClientRole, ClientSpace } from './entities';
+import { Channel, Member, Role, Space, User } from './models';
 import { createClient, MainServiceClient } from './schema';
 import { patch } from './util';
 import WeakValueMap from './util/WeakValueMap';
@@ -37,7 +31,7 @@ export class MikotoClient {
   // cache everything
   spaceCache = new InfiniteCache<ClientSpace>();
   newSpace = createNewCreator(this, this.spaceCache, ClientSpace);
-  channelWeakMap = new WeakValueMap<string, ClientChannel>();
+  channelWeakMap = new WeakValueMap<string, Channel>();
   // newChannel = createNewCreator(this, this.channelCache, ClientChannel);
 
   memberCache = new MikotoCache<ClientMember>();
@@ -45,13 +39,15 @@ export class MikotoClient {
   roleCache = new MikotoCache<ClientRole>();
   newRole = createNewCreator(this, this.roleCache, ClientRole);
 
-  spaces: SpaceEngine = new SpaceEngine(this);
+  // spaces: SpaceEngine = new SpaceEngine(this);
   api: MikotoApi;
   authAPI: AuthClient;
   client!: MainServiceClient;
 
   // screw all of the above, we're rewriting the entire thing
   messageEmitter = new MessageEmitter();
+  channelEmitter = new ChannelEmitter();
+  spaceEmitter = new SpaceEmitter();
 
   constructor(
     url: string,
@@ -64,6 +60,7 @@ export class MikotoClient {
       baseURL: url,
     });
     this.api = new MikotoApi(url);
+    this.axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
     createClient(
       {
@@ -85,44 +82,34 @@ export class MikotoClient {
     // rewrite io to use sophon
     this.client.messages.onCreate((message) => {
       this.messageEmitter.emit(`create/${message.channelId}`, message);
-      // const ch = this.channelWeakMap.get(message.channelId);
-      // if (ch) {
-      //   ch.instance.emit('update', {
-      //     ...ch.simplify(),
-      //     lastUpdated: new Date().toJSON(),
-      //   });
-      // }
     });
 
     this.client.messages.onDelete(({ messageId, channelId }) => {
       this.messageEmitter.emit(`delete/${channelId}`, messageId);
-      // const ch = this.channelWeakMap.get(channelId);
-      // if (ch) {
-      //   ch.messages.emit('delete', messageId);
-      // }
     });
 
     this.client.channels.onCreate((channel) => {
-      const sp = this.spaceCache.get(channel.spaceId);
-      if (sp) {
-        sp.channels.emit('create', new ClientChannel(this, channel, sp));
-      }
+      this.channelEmitter.emit(`create/${channel.spaceId}`, channel);
     });
 
-    this.client.channels.onDelete((id) => {
-      const sp = this.spaceCache.get(id);
-      if (sp) {
-        sp.channels.emit('delete', id);
-      }
+    this.client.channels.onUpdate((channel) => {
+      this.channelEmitter.emit(`update/${channel.spaceId}`, channel);
+    });
+
+    this.client.channels.onDelete((channel) => {
+      this.channelEmitter.emit(`delete/${channel.spaceId}`, channel.id);
     });
 
     this.client.spaces.onCreate((space) => {
-      this.spaces.emit('create', this.newSpace(space));
+      this.spaceEmitter.emit('create/@', space);
     });
 
-    this.client.spaces.onDelete((id) => {
-      this.spaceCache.delete(id);
-      this.spaces.emit('delete', id);
+    this.client.spaces.onUpdate((space) => {
+      this.spaceEmitter.emit('update/@', space);
+    });
+
+    this.client.spaces.onDelete((space) => {
+      this.spaceEmitter.emit('delete/@', space.id);
     });
   }
 
@@ -131,16 +118,22 @@ export class MikotoClient {
     this.api.axios.defaults.headers.common.Authorization = `Bearer ${token}`;
   }
 
-  // region Channels
-  async getChannel(channelId: string): Promise<ClientChannel> {
-    const { data } = await this.axios.get<Channel>(`/channels/${channelId}`);
-    return this.spaceCache
-      .get(data.spaceId)!
-      .channels.cache.set(
-        new ClientChannel(this, data, this.spaceCache.get(data.spaceId)!),
-      );
-  }
+  space = Object.assign((space: Space) => ({}), {});
 
+  channel = Object.assign(
+    (channel: Channel) => ({
+      sendMessage: async (content: string) => {
+        return await this.client.messages.send(channel.id, content);
+      },
+
+      delete: async () => {
+        return await this.client.channels.delete(channel.id);
+      },
+    }),
+    {},
+  );
+
+  // region Channels
   async moveChannel(channelId: string, order: number): Promise<void> {
     await this.axios.post(`/channels/${channelId}/move`, { order });
   }

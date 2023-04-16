@@ -1,6 +1,7 @@
 struct Channel {
   id: string;
   spaceId: string;
+  parentId: string?;
   name: string;
   order: int;
   lastUpdated: string?;
@@ -62,7 +63,7 @@ service SpaceService {
 
   ~onCreate(space: Space);
   ~onUpdate(space: Space);
-  ~onDelete(spaceId: string);
+  ~onDelete(space: Space);
 
   join(id: string): void;
   leave(id: string): void;
@@ -95,7 +96,7 @@ service ChannelService {
 
   ~onCreate(channel: Channel);
   ~onUpdate(channel: Channel);
-  ~onDelete(channelId: string);
+  ~onDelete(channel: Channel);
 }
 
 struct ListMessageOptions {

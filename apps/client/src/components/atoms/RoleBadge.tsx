@@ -1,4 +1,4 @@
-import { ClientRole } from 'mikotojs';
+import { Role } from 'mikotojs';
 import styled from 'styled-components';
 
 const StyledRoleBadge = styled.div<{ color?: string }>`
@@ -21,7 +21,7 @@ const StyledRoleBadge = styled.div<{ color?: string }>`
   }
 `;
 
-export function RoleBadge({ role }: { role: ClientRole }) {
+export function RoleBadge({ role }: { role: Role }) {
   return (
     <StyledRoleBadge color={role.color ?? undefined}>
       <span className="circle" />

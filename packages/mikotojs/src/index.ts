@@ -44,7 +44,7 @@ export async function constructMikoto(url: string) {
 }
 
 export * from './entities';
-export * from './instances';
-export * from './engines';
+export * from './models';
+export * from './emitters';
 export * from './AuthClient';
 export * from './MikotoClient';

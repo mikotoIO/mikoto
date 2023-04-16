@@ -5,6 +5,7 @@ import io, { Socket } from 'socket.io-client';
 export interface Channel {
   id: string;
   spaceId: string;
+  parentId: string | null;
   name: string;
   order: number;
   lastUpdated: string | null;
@@ -146,7 +147,7 @@ export class SpaceServiceClient {
   onUpdate(handler: (space: Space) => void) {
     return this.socket.subscribe('spaces/onUpdate', handler);
   }
-  onDelete(handler: (spaceId: string) => void) {
+  onDelete(handler: (space: Space) => void) {
     return this.socket.subscribe('spaces/onDelete', handler);
   }
 }
@@ -205,7 +206,7 @@ export class ChannelServiceClient {
   onUpdate(handler: (channel: Channel) => void) {
     return this.socket.subscribe('channels/onUpdate', handler);
   }
-  onDelete(handler: (channelId: string) => void) {
+  onDelete(handler: (channel: Channel) => void) {
     return this.socket.subscribe('channels/onDelete', handler);
   }
 }

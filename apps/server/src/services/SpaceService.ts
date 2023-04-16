@@ -61,7 +61,7 @@ export const spaceService = sophon.create(SpaceService, {
       throw new ForbiddenError();
     }
     await prisma.space.delete({ where: { id } });
-    await spaceService.$(`space/${id}`).onDelete(id);
+    await spaceService.$(`space/${id}`).onDelete(serializeDates(space));
   },
 
   async join(ctx, id: string) {
@@ -98,5 +98,5 @@ async function leaveSpace(userId: string, space: Space) {
   });
   await sophon.leaveAll(`user/${userId}`, `space/${space.id}`);
 
-  spaceService.$(`user/${userId}`).onDelete(space.id);
+  spaceService.$(`user/${userId}`).onDelete(space);
 }

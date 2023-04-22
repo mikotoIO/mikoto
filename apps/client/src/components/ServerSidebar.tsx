@@ -1,14 +1,14 @@
 import { Button, TextInput, Tooltip } from '@mantine/core';
 import { AxiosError } from 'axios';
 import { Space } from 'mikotojs';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 import { useHover } from 'usehooks-ts';
 
 import { useMikoto } from '../hooks';
-import { useDeltaNext, useDeltaWithRecoil } from '../hooks/useDelta';
+import { useDeltaWithRecoil } from '../hooks/useDelta';
 import { useErrorElement } from '../hooks/useErrorElement';
 import { treebarSpaceState, useTabkit } from '../store';
 import { spacesState } from '../store/cache';
@@ -197,9 +197,7 @@ export function ServerSidebar() {
     spacesState,
     mikoto.spaceEmitter,
     '@',
-    () => {
-      return mikoto.client.spaces.list();
-    },
+    () => mikoto.client.spaces.list(),
     [],
   );
   // const spaceDelta = useDelta(mikoto.spaces, []);

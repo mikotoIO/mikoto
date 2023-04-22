@@ -59,7 +59,10 @@ export function LoginView() {
       <Form
         onSubmit={handleSubmit(async (formData) => {
           try {
-            const tk = await authClient.login(formData.email, formData.password);
+            const tk = await authClient.login(
+              formData.email,
+              formData.password,
+            );
             localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
             // Screw SPAs, why not just force an actual reload at this point?
             window.location.href = '/';
@@ -164,14 +167,14 @@ export function ResetChangePasswordView() {
   const navigate = useNavigate();
 
   // TODO better error screen
-  if(!params.token) return (<div>Invalid token</div>);
+  if (!params.token) return <div>Invalid token</div>;
 
   return (
     <AuthView>
       {error.el}
       <Form
         onSubmit={handleSubmit(async (data) => {
-          if(data.password !== data.passwordConfirm) {
+          if (data.password !== data.passwordConfirm) {
             // TODO checkother password conditions
             error.setError({
               name: 'ValidatePasswordsMatch',
@@ -187,7 +190,7 @@ export function ResetChangePasswordView() {
             }, 1400);
             authClient.resetPasswordSubmit(data.password, params.token!); // TODO error handling
           } catch (e) {
-            if(timeout) clearTimeout(timeout);
+            if (timeout) clearTimeout(timeout);
             error.setError((e as any)?.response?.data);
             setSent(false);
           }
@@ -201,8 +204,16 @@ export function ResetChangePasswordView() {
         ) : (
           <>
             <h1>Reset Password</h1>
-            <Input placeholder="New Password" type="password" {...register('password')} />
-            <Input placeholder="Confirm New Password" type="password" {...register('passwordConfirm')} />
+            <Input
+              placeholder="New Password"
+              type="password"
+              {...register('password')}
+            />
+            <Input
+              placeholder="Confirm New Password"
+              type="password"
+              {...register('passwordConfirm')}
+            />
             <Button type="submit">Confirm new password</Button>
           </>
         )}

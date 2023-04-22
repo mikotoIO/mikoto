@@ -66,7 +66,7 @@ export class MikotoClient {
       {
         url: 'http://localhost:3510',
         params: {
-          accessToken: accessToken,
+          accessToken,
         },
       },
       (client) => {
@@ -122,13 +122,9 @@ export class MikotoClient {
 
   channel = Object.assign(
     (channel: Channel) => ({
-      sendMessage: async (content: string) => {
-        return await this.client.messages.send(channel.id, content);
-      },
+      sendMessage: async (content: string) => await this.client.messages.send(channel.id, content),
 
-      delete: async () => {
-        return await this.client.channels.delete(channel.id);
-      },
+      delete: async () => await this.client.channels.delete(channel.id),
     }),
     {},
   );

@@ -42,6 +42,9 @@ export class AuthClient {
   }
 
   async resetPasswordSubmit(newPassword: string, token: string) {
-    return this.axios.post('/account/reset_password/submit', { newPassword, token });
+    return this.axios.post('/account/reset_password/submit', {
+      newPassword,
+      token,
+    });
   }
 }

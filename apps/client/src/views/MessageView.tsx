@@ -155,8 +155,7 @@ function RealMessageView({ channel }: { channel: Channel }) {
             setMsgs((xs) => (xs ? [...m, ...xs] : null));
             setFirstItemIndex((x) => x - m.length);
           }}
-          itemContent={(index, msg) => {
-            return (
+          itemContent={(index, msg) => (
               <MessageItem
                 message={msg}
                 isSimple={isMessageSimple(
@@ -164,8 +163,7 @@ function RealMessageView({ channel }: { channel: Channel }) {
                   msgs[index - firstItemIndex - 1],
                 )}
               />
-            );
-          }}
+            )}
         />
       )}
       <MessageEditor

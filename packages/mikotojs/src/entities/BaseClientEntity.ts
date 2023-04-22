@@ -4,11 +4,11 @@ interface ID {
 
 export class BaseClientEntity<T extends ID> {
   constructor(base: T) {
-    for (const key in base) {
-      if (base.hasOwnProperty(key)) {
-        (this as any)[key] = base[key];
+    Object.keys(base).forEach((key) => {
+      if (Object.prototype.hasOwnProperty.call(base, key)) {
+        (this as any)[key] = (base as any)[key];
       }
-    }
+    });
   }
 }
 

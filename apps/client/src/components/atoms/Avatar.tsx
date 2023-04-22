@@ -69,10 +69,10 @@ function RoleSetter({
   const [selectedRoles, setSelectedRoles] = useState<Record<string, boolean>>(
     () => {
       const o: Record<string, boolean> = {};
-      for (const role of roles) {
-        if (role.name === '@everyone') continue;
+      roles.forEach((role) => {
+        if (role.name === '@everyone') return;
         o[role.id] = false;
-      }
+      });
       return o;
     },
   );

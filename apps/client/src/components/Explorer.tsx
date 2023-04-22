@@ -117,7 +117,7 @@ function channelToStructuredTree(
   const map = new Map<string, NodeObject>();
   map.set(root.id, root);
 
-  for (const channel of channels) {
+  channels.forEach(channel => {
     const node: NodeObject = {
       id: channel.id,
       text: channel.name,
@@ -135,7 +135,7 @@ function channelToStructuredTree(
     } else {
       root.descendant!.push(node);
     }
-  }
+  })
 
   return root;
 }
@@ -146,9 +146,7 @@ export function Explorer({ space }: { space: ClientSpace }) {
   const channelDelta = useDeltaNext<Channel>(
     mikoto.channelEmitter,
     space.id,
-    async () => {
-      return await mikoto.client.channels.list(space.id);
-    },
+    async () => await mikoto.client.channels.list(space.id),
     [space.id!],
   );
   // const channelDelta = useDelta(space.channels, [space?.id!]);

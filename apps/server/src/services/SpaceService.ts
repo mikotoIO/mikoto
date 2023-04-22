@@ -35,7 +35,7 @@ export const spaceService = sophon.create(SpaceService, {
   async create(ctx, name) {
     const space = await prisma.space.create({
       data: {
-        name: name,
+        name,
         channels: { create: [{ name: 'general', order: 0 }] },
         ownerId: ctx.data.user.sub,
         roles: {

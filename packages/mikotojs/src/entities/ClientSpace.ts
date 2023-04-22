@@ -1,4 +1,4 @@
-import { Space } from 'mikotojs';
+import { Space } from '../schema';
 
 import type { MikotoClient } from '../MikotoClient';
 import { ClientMember } from './ClientMember';

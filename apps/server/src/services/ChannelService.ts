@@ -28,7 +28,7 @@ export const channelService = sophon.create(ChannelService, {
 
   async create(ctx, spaceId, { name, type }) {
     const channelCount = await prisma.channel.count({
-      where: { spaceId: spaceId },
+      where: { spaceId },
     });
     const channel = await prisma.channel.create({
       data: {
@@ -49,7 +49,7 @@ export const channelService = sophon.create(ChannelService, {
     channelService
       .$(`space/${channel.spaceId}`)
       .onDelete(serializeDates(channel));
-    return;
+    
   },
 
   async move(ctx, id: string, order) {
@@ -164,6 +164,6 @@ export const messageService = sophon.create(MessageService, {
     messageService
       .$(`space/${channel.spaceId}`)
       .onDelete({ messageId, channelId });
-    return;
+    
   },
 });

@@ -85,6 +85,7 @@ service UserService {
 struct ChannelCreateOptions {
   name: string;
   type: string;
+  parentId: string?;
 }
 
 service ChannelService {

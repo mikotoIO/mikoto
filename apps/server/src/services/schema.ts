@@ -58,6 +58,7 @@ export interface MemberUpdateOptions {
 export interface ChannelCreateOptions {
   name: string;
   type: string;
+  parentId: string | null;
 }
 
 export interface ListMessageOptions {
@@ -80,6 +81,7 @@ export interface VoiceToken {
 
 export class MainServiceSender {
   constructor(private sender: SenderCore, private room: string) {}
+  
 }
 
 export interface IMainService {
@@ -90,11 +92,14 @@ export interface IMainService {
   messages: IMessageService;
   roles: IRoleService;
   voice: IVoiceService;
+  
 }
 
 function fnMainService(
-  fn: (props: { $: (room: string) => MainServiceSender }) => IMainService,
-  meta: { senderFn: (room: string) => MainServiceSender },
+  fn: (props: {
+    $: (room: string) => MainServiceSender,
+  }) => IMainService,
+    meta: { senderFn: (room: string) => MainServiceSender },
 ) {
   const obj = fn({ $: meta.senderFn });
   return Object.assign(obj, { $: meta.senderFn });
@@ -103,6 +108,7 @@ function fnMainService(
 export const MainService = Object.assign(fnMainService, {
   SENDER: MainServiceSender,
 });
+
 
 export class SpaceServiceSender {
   constructor(private sender: SenderCore, private room: string) {}
@@ -118,6 +124,7 @@ export class SpaceServiceSender {
 }
 
 export interface ISpaceService {
+  
   get(ctx: SophonInstance<SophonContext>, id: string): Promise<Space>;
   list(ctx: SophonInstance<SophonContext>): Promise<Space[]>;
   create(ctx: SophonInstance<SophonContext>, name: string): Promise<Space>;
@@ -127,8 +134,10 @@ export interface ISpaceService {
 }
 
 function fnSpaceService(
-  fn: (props: { $: (room: string) => SpaceServiceSender }) => ISpaceService,
-  meta: { senderFn: (room: string) => SpaceServiceSender },
+  fn: (props: {
+    $: (room: string) => SpaceServiceSender,
+  }) => ISpaceService,
+    meta: { senderFn: (room: string) => SpaceServiceSender },
 ) {
   const obj = fn({ $: meta.senderFn });
   return Object.assign(obj, { $: meta.senderFn });
@@ -138,27 +147,23 @@ export const SpaceService = Object.assign(fnSpaceService, {
   SENDER: SpaceServiceSender,
 });
 
+
 export class MemberServiceSender {
   constructor(private sender: SenderCore, private room: string) {}
+  
 }
 
 export interface IMemberService {
-  get(
-    ctx: SophonInstance<SophonContext>,
-    spaceId: string,
-    userId: string,
-  ): Promise<Member>;
-  update(
-    ctx: SophonInstance<SophonContext>,
-    spaceId: string,
-    userId: string,
-    roleIds: MemberUpdateOptions,
-  ): Promise<Member>;
+  
+  get(ctx: SophonInstance<SophonContext>, spaceId: string, userId: string): Promise<Member>;
+  update(ctx: SophonInstance<SophonContext>, spaceId: string, userId: string, roleIds: MemberUpdateOptions): Promise<Member>;
 }
 
 function fnMemberService(
-  fn: (props: { $: (room: string) => MemberServiceSender }) => IMemberService,
-  meta: { senderFn: (room: string) => MemberServiceSender },
+  fn: (props: {
+    $: (room: string) => MemberServiceSender,
+  }) => IMemberService,
+    meta: { senderFn: (room: string) => MemberServiceSender },
 ) {
   const obj = fn({ $: meta.senderFn });
   return Object.assign(obj, { $: meta.senderFn });
@@ -168,17 +173,22 @@ export const MemberService = Object.assign(fnMemberService, {
   SENDER: MemberServiceSender,
 });
 
+
 export class UserServiceSender {
   constructor(private sender: SenderCore, private room: string) {}
+  
 }
 
 export interface IUserService {
+  
   me(ctx: SophonInstance<SophonContext>): Promise<User>;
 }
 
 function fnUserService(
-  fn: (props: { $: (room: string) => UserServiceSender }) => IUserService,
-  meta: { senderFn: (room: string) => UserServiceSender },
+  fn: (props: {
+    $: (room: string) => UserServiceSender,
+  }) => IUserService,
+    meta: { senderFn: (room: string) => UserServiceSender },
 ) {
   const obj = fn({ $: meta.senderFn });
   return Object.assign(obj, { $: meta.senderFn });
@@ -187,6 +197,7 @@ function fnUserService(
 export const UserService = Object.assign(fnUserService, {
   SENDER: UserServiceSender,
 });
+
 
 export class ChannelServiceSender {
   constructor(private sender: SenderCore, private room: string) {}
@@ -202,24 +213,19 @@ export class ChannelServiceSender {
 }
 
 export interface IChannelService {
+  
   get(ctx: SophonInstance<SophonContext>, id: string): Promise<Channel>;
   list(ctx: SophonInstance<SophonContext>, spaceId: string): Promise<Channel[]>;
-  create(
-    ctx: SophonInstance<SophonContext>,
-    spaceId: string,
-    options: ChannelCreateOptions,
-  ): Promise<Channel>;
+  create(ctx: SophonInstance<SophonContext>, spaceId: string, options: ChannelCreateOptions): Promise<Channel>;
   delete(ctx: SophonInstance<SophonContext>, id: string): Promise<void>;
-  move(
-    ctx: SophonInstance<SophonContext>,
-    id: string,
-    order: number,
-  ): Promise<void>;
+  move(ctx: SophonInstance<SophonContext>, id: string, order: number): Promise<void>;
 }
 
 function fnChannelService(
-  fn: (props: { $: (room: string) => ChannelServiceSender }) => IChannelService,
-  meta: { senderFn: (room: string) => ChannelServiceSender },
+  fn: (props: {
+    $: (room: string) => ChannelServiceSender,
+  }) => IChannelService,
+    meta: { senderFn: (room: string) => ChannelServiceSender },
 ) {
   const obj = fn({ $: meta.senderFn });
   return Object.assign(obj, { $: meta.senderFn });
@@ -228,6 +234,7 @@ function fnChannelService(
 export const ChannelService = Object.assign(fnChannelService, {
   SENDER: ChannelServiceSender,
 });
+
 
 export class MessageServiceSender {
   constructor(private sender: SenderCore, private room: string) {}
@@ -243,26 +250,17 @@ export class MessageServiceSender {
 }
 
 export interface IMessageService {
-  list(
-    ctx: SophonInstance<SophonContext>,
-    channelId: string,
-    options: ListMessageOptions,
-  ): Promise<Message[]>;
-  send(
-    ctx: SophonInstance<SophonContext>,
-    channelId: string,
-    content: string,
-  ): Promise<Message>;
-  delete(
-    ctx: SophonInstance<SophonContext>,
-    channelId: string,
-    messageId: string,
-  ): Promise<void>;
+  
+  list(ctx: SophonInstance<SophonContext>, channelId: string, options: ListMessageOptions): Promise<Message[]>;
+  send(ctx: SophonInstance<SophonContext>, channelId: string, content: string): Promise<Message>;
+  delete(ctx: SophonInstance<SophonContext>, channelId: string, messageId: string): Promise<void>;
 }
 
 function fnMessageService(
-  fn: (props: { $: (room: string) => MessageServiceSender }) => IMessageService,
-  meta: { senderFn: (room: string) => MessageServiceSender },
+  fn: (props: {
+    $: (room: string) => MessageServiceSender,
+  }) => IMessageService,
+    meta: { senderFn: (room: string) => MessageServiceSender },
 ) {
   const obj = fn({ $: meta.senderFn });
   return Object.assign(obj, { $: meta.senderFn });
@@ -272,15 +270,22 @@ export const MessageService = Object.assign(fnMessageService, {
   SENDER: MessageServiceSender,
 });
 
+
 export class RoleServiceSender {
   constructor(private sender: SenderCore, private room: string) {}
+  
 }
 
-export interface IRoleService {}
+export interface IRoleService {
+  
+  
+}
 
 function fnRoleService(
-  fn: (props: { $: (room: string) => RoleServiceSender }) => IRoleService,
-  meta: { senderFn: (room: string) => RoleServiceSender },
+  fn: (props: {
+    $: (room: string) => RoleServiceSender,
+  }) => IRoleService,
+    meta: { senderFn: (room: string) => RoleServiceSender },
 ) {
   const obj = fn({ $: meta.senderFn });
   return Object.assign(obj, { $: meta.senderFn });
@@ -290,20 +295,22 @@ export const RoleService = Object.assign(fnRoleService, {
   SENDER: RoleServiceSender,
 });
 
+
 export class VoiceServiceSender {
   constructor(private sender: SenderCore, private room: string) {}
+  
 }
 
 export interface IVoiceService {
-  join(
-    ctx: SophonInstance<SophonContext>,
-    channelId: string,
-  ): Promise<VoiceToken>;
+  
+  join(ctx: SophonInstance<SophonContext>, channelId: string): Promise<VoiceToken>;
 }
 
 function fnVoiceService(
-  fn: (props: { $: (room: string) => VoiceServiceSender }) => IVoiceService,
-  meta: { senderFn: (room: string) => VoiceServiceSender },
+  fn: (props: {
+    $: (room: string) => VoiceServiceSender,
+  }) => IVoiceService,
+    meta: { senderFn: (room: string) => VoiceServiceSender },
 ) {
   const obj = fn({ $: meta.senderFn });
   return Object.assign(obj, { $: meta.senderFn });
@@ -312,3 +319,4 @@ function fnVoiceService(
 export const VoiceService = Object.assign(fnVoiceService, {
   SENDER: VoiceServiceSender,
 });
+

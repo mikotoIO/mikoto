@@ -82,7 +82,10 @@ function RealMessageView({ channel }: { channel: Channel }) {
         limit: 50,
         cursor: null,
       })
-      .then(setMsgs);
+      .then((m) => {
+        setMsgs(m);
+        if (m.length === 0) setTopLoaded(true);
+      });
   }, [channel.id]);
 
   const [scrollToBottom, setScrollToBottom] = useState(false);
@@ -156,14 +159,11 @@ function RealMessageView({ channel }: { channel: Channel }) {
             setFirstItemIndex((x) => x - m.length);
           }}
           itemContent={(index, msg) => (
-              <MessageItem
-                message={msg}
-                isSimple={isMessageSimple(
-                  msg,
-                  msgs[index - firstItemIndex - 1],
-                )}
-              />
-            )}
+            <MessageItem
+              message={msg}
+              isSimple={isMessageSimple(msg, msgs[index - firstItemIndex - 1])}
+            />
+          )}
         />
       )}
       <MessageEditor

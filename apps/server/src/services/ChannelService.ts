@@ -26,7 +26,7 @@ export const channelService = sophon.create(ChannelService, {
     return serializeDates(channels);
   },
 
-  async create(ctx, spaceId, { name, type }) {
+  async create(ctx, spaceId, { name, type, parentId }) {
     const channelCount = await prisma.channel.count({
       where: { spaceId },
     });
@@ -34,6 +34,7 @@ export const channelService = sophon.create(ChannelService, {
       data: {
         name,
         spaceId,
+        parentId,
         type: type as ChannelType,
         order: channelCount,
       },

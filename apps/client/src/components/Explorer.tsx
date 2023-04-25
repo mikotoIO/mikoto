@@ -36,7 +36,7 @@ function channelToTab(channel: Channel): Tabable {
   }
 }
 
-function CreateChannelModal() {
+function CreateChannelModal({ parentId }: { parentId?: string }) {
   const mikoto = useMikoto();
   // const setModal = useSetRecoilState(modalState);
   const space = useRecoilValue(treebarSpaceState);
@@ -53,6 +53,7 @@ function CreateChannelModal() {
         await mikoto.client.channels.create(space!.id, {
           name: form.values.name,
           type: form.values.type,
+          parentId: parentId ?? null,
         });
       })}
     >
@@ -117,7 +118,7 @@ function channelToStructuredTree(
   const map = new Map<string, NodeObject>();
   map.set(root.id, root);
 
-  channels.forEach(channel => {
+  channels.forEach((channel) => {
     const node: NodeObject = {
       id: channel.id,
       text: channel.name,
@@ -135,7 +136,7 @@ function channelToStructuredTree(
     } else {
       root.descendant!.push(node);
     }
-  })
+  });
 
   return root;
 }
@@ -143,6 +144,8 @@ function channelToStructuredTree(
 export function Explorer({ space }: { space: ClientSpace }) {
   const tabkit = useTabkit();
   const mikoto = useMikoto();
+  const setModal = useSetRecoilState(modalState);
+
   const channelDelta = useDeltaNext<Channel>(
     mikoto.channelEmitter,
     space.id,
@@ -163,6 +166,16 @@ export function Explorer({ space }: { space: ClientSpace }) {
         <ContextMenu>
           <ContextMenu.Link>Open in new tab</ContextMenu.Link>
           <ContextMenu.Link>Mark as Read</ContextMenu.Link>
+          <ContextMenu.Link
+            onClick={() => {
+              setModal({
+                title: `Create Subchannel for #${channel.name}`,
+                elem: <CreateChannelModal parentId={channel.id} />,
+              });
+            }}
+          >
+            Create Subchannel
+          </ContextMenu.Link>
           <ContextMenu.Link
             onClick={async () => {
               await mikoto.channel(channel).delete();

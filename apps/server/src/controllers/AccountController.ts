@@ -151,7 +151,7 @@ export class AccountController {
       },
     });
 
-    const resetLink = `${process.env.MIKOTO_HOSTNAME!}/forgotpassword/${
+    const resetLink = `${process.env.WEB_CLIENT!}/forgotpassword/${
       verification.token
     }`;
 

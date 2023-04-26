@@ -50,21 +50,22 @@ export class MikotoClient {
   spaceEmitter = new SpaceEmitter();
 
   constructor(
-    url: string,
+    authUrl: string,
+    sophonUrl: string,
     accessToken: string,
     onready?: (self: MikotoClient) => void,
   ) {
-    this.authAPI = new AuthClient(url);
+    this.authAPI = new AuthClient(authUrl);
 
     this.axios = axios.create({
-      baseURL: url,
+      baseURL: authUrl,
     });
-    this.api = new MikotoApi(url);
+    this.api = new MikotoApi(authUrl);
     this.axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
     createClient(
       {
-        url: 'http://localhost:3510',
+        url: sophonUrl,
         params: {
           accessToken,
         },

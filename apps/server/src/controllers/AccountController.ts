@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import {
   Body,
   CurrentUser,
+  Get,
   JsonController,
   Post,
   UnauthorizedError,
@@ -49,6 +50,13 @@ export class AccountController {
     private minio: Minio,
     private mailer: Mailer,
   ) {}
+
+  @Get('/')
+  async index() {
+    return {
+      name: 'MikotoAuth',
+    }
+  }
 
   private async createTokenPair(account: Account, oldToken?: string) {
     const accessToken = jwt.sign({}, process.env.SECRET!, {

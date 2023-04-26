@@ -74,7 +74,13 @@ server.listen(port, host, () => {
 });
 
 // set up a sophon server as well
-const httpServer = createServer();
+const healthCheckApp = express();
+healthCheckApp.get('/', (req, res) => {
+  res.json({ name: 'Mikoto' });
+});
+
+const httpServer = createServer(healthCheckApp);
+
 const sophonIO = new Server(httpServer, {
   cors: {
     origin: '*',

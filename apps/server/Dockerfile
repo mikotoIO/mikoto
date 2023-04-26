@@ -4,7 +4,7 @@ WORKDIR /mikoto
 RUN corepack enable
 
 COPY package.json ./
-COPY package-lock.json ./
+COPY yarn.lock ./
 RUN yarn
 
 COPY . .

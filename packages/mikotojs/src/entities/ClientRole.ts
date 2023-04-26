@@ -4,7 +4,7 @@ import { Role } from '../models';
 export class ClientRole implements Role {
   id: string;
   name: string;
-  color?: string;
+  color: string | null;
   permissions: string;
   position: number;
 

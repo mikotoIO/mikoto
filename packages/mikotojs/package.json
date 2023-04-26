@@ -3,6 +3,16 @@
   "version": "0.0.0",
   "main": "src/index.ts",
   "license": "MIT",
+  "scripts": {
+    "generate:server": "sophon generate ./schema.sophon -t ts-socketio-server -o ../../apps/server/src/services/schema.ts",
+    "generate:client": "sophon generate ./schema.sophon -t ts-socketio-client -o ./src/schema.ts",
+    "generate": "npm run generate:server && npm run generate:client",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@sophon-js/cli": "^0.0.2",
+    "typescript": "^5.0.4"
+  },
   "dependencies": {
     "axios": "^0.27.2",
     "socket.io-client": "^4.5.1",

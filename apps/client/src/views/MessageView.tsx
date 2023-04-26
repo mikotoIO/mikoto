@@ -1,7 +1,8 @@
-import { ClientChannel, ClientMessage } from 'mikotojs';
+import { Channel, Message } from 'mikotojs';
 import React, { useEffect, useState } from 'react';
 import { useAsync } from 'react-async-hook';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
+import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';
@@ -10,8 +11,8 @@ import { Spinner } from '../components/atoms/Spinner';
 import { MessageItem } from '../components/molecules/Message';
 import { MessageEditor } from '../components/molecules/MessageEditor';
 import { useMikoto } from '../hooks';
-import { Channel } from '../models';
 import { CurrentSpaceContext } from '../store';
+import { spacesState } from '../store/cache';
 
 const StyledMessagesLoading = styled.div`
   padding: 40px;
@@ -34,7 +35,7 @@ interface MessageViewProps {
   channel: Channel;
 }
 
-function isMessageSimple(message: ClientMessage, prevMessage: ClientMessage) {
+function isMessageSimple(message: Message, prevMessage: Message) {
   return (
     prevMessage &&
     prevMessage.author?.id === message.author?.id &&
@@ -51,7 +52,7 @@ const StyledChannelHead = styled.div`
   }
 `;
 
-function ChannelHead({ channel }: { channel: ClientChannel }) {
+function ChannelHead({ channel }: { channel: Channel }) {
   return (
     <StyledChannelHead>
       <h1>Welcome to #{channel.name}!</h1>
@@ -63,7 +64,7 @@ function ChannelHead({ channel }: { channel: ClientChannel }) {
 // Please laugh
 const FUNNY_NUMBER = 69_420_000;
 
-function RealMessageView({ channel }: { channel: ClientChannel }) {
+function RealMessageView({ channel }: { channel: Channel }) {
   const virtuosoRef = React.useRef<VirtuosoHandle>(null);
   const mikoto = useMikoto();
   // you will probably run out of memory before this number
@@ -74,9 +75,17 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
     mikoto.ack(channel.id).then();
   }, [channel.id]);
 
-  const [msgs, setMsgs] = useState<ClientMessage[] | null>(null);
+  const [msgs, setMsgs] = useState<Message[] | null>(null);
   useEffect(() => {
-    channel.messages.fetch().then(setMsgs);
+    mikoto.client.messages
+      .list(channel.id, {
+        limit: 50,
+        cursor: null,
+      })
+      .then((m) => {
+        setMsgs(m);
+        if (m.length === 0) setTopLoaded(true);
+      });
   }, [channel.id]);
 
   const [scrollToBottom, setScrollToBottom] = useState(false);
@@ -88,7 +97,7 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
     }
   });
 
-  const createFn = (x: ClientMessage) => {
+  const createFn = (x: Message) => {
     setMsgs((xs) => {
       if (xs === null) return null;
       setScrollToBottom(true);
@@ -96,19 +105,19 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
     });
   };
 
-  const deleteFn = (x: ClientMessage) => {
+  const deleteFn = (id: string) => {
     setMsgs((xs) => {
       if (xs === null) return null;
-      return xs.filter((y) => y.id !== x.id);
+      return xs.filter((y) => y.id !== id);
     });
   };
 
   useEffect(() => {
-    channel.messages.on('create', createFn);
-    channel.messages.on('delete', deleteFn);
+    mikoto.messageEmitter.on(`create/${channel.id}`, createFn);
+    mikoto.messageEmitter.on(`delete/${channel.id}`, deleteFn);
     return () => {
-      channel.messages.off('create', createFn);
-      channel.messages.off('delete', deleteFn);
+      mikoto.messageEmitter.off(`create/${channel.id}`, createFn);
+      mikoto.messageEmitter.off(`delete/${channel.id}`, deleteFn);
     };
   }, [channel.id]);
 
@@ -138,7 +147,10 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
           startReached={async () => {
             if (!msgs) return;
             if (msgs.length === 0) return;
-            const m = await channel.getMessages(msgs[0].id);
+            const m = await mikoto.client.messages.list(channel.id, {
+              limit: 50,
+              cursor: msgs[0].id,
+            });
             if (m.length === 0) {
               setTopLoaded(true);
               return;
@@ -146,23 +158,18 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
             setMsgs((xs) => (xs ? [...m, ...xs] : null));
             setFirstItemIndex((x) => x - m.length);
           }}
-          itemContent={(index, msg) => {
-            return (
-              <MessageItem
-                message={msg}
-                isSimple={isMessageSimple(
-                  msg,
-                  msgs[index - firstItemIndex - 1],
-                )}
-              />
-            );
-          }}
+          itemContent={(index, msg) => (
+            <MessageItem
+              message={msg}
+              isSimple={isMessageSimple(msg, msgs[index - firstItemIndex - 1])}
+            />
+          )}
         />
       )}
       <MessageEditor
         placeholder={`Message #${channel.name}`}
         onSubmit={async (msg) => {
-          await channel.sendMessage(msg);
+          await mikoto.channel(channel).sendMessage(msg);
         }}
       />
     </ViewContainer>
@@ -171,15 +178,19 @@ function RealMessageView({ channel }: { channel: ClientChannel }) {
 
 export function MessageView({ channel }: MessageViewProps) {
   const mikoto = useMikoto();
+  const space = useRecoilValue(spacesState).find(
+    (x) => x.id === channel.spaceId,
+  );
+
   const { result: mChannel, error } = useAsync(
-    (id: string) => mikoto.getChannel(id),
+    (id: string) => mikoto.client.channels.get(id),
     [channel.id],
   );
   if (error) throw error;
   if (!mChannel) return <div>loading</div>;
 
   return (
-    <CurrentSpaceContext.Provider value={mChannel.space}>
+    <CurrentSpaceContext.Provider value={space}>
       <RealMessageView channel={mChannel} />
     </CurrentSpaceContext.Provider>
   );

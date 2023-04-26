@@ -1,10 +1,11 @@
 import { MikotoClient, ClientSpace, constructMikoto } from 'mikotojs';
 import React, { useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import { Navigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 
-import {ContextMenuKit, ModalKit} from '../components/ContextMenu';
+import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
 import { Explorer } from '../components/Explorer';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { TabbedView } from '../components/TabBar';
@@ -84,10 +85,22 @@ function AppView() {
 
 function MikotoApiLoader({ children }: { children: React.ReactNode }) {
   const [mikoto, setMikoto] = React.useState<MikotoClient | null>(null);
+  const [err, setErr] = React.useState<unknown>(null);
+
+  // TODO: Try suspense
   useEffect(() => {
-    constructMikoto(import.meta.env.MIKOTO_API ?? 'http://localhost:9500').then((x) => setMikoto(x));
+    constructMikoto(
+      import.meta.env.MIKOTO_AUTH ?? 'http://localhost:9500',
+      import.meta.env.MIKOTO_API ?? 'http://localhost:3510',
+    )
+      .then((x) => setMikoto(x))
+      .catch((x) => setErr(x));
   }, []);
 
+  if (err !== null) {
+    console.log(err);
+    return <Navigate to="/login" />;
+  }
   if (mikoto === null) return null;
   return (
     <MikotoContext.Provider value={mikoto}>{children}</MikotoContext.Provider>

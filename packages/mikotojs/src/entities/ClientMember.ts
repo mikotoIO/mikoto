@@ -15,7 +15,11 @@ export class ClientMember implements Member {
   }
 
   async update(options: { roleIds: string[] }) {
-    return this.client.api.updateMember(this.spaceId, this.user.id, options);
+    return this.client.client.members.update(
+      this.spaceId,
+      this.user.id,
+      options,
+    );
   }
 
   simplify(): Member {

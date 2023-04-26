@@ -1,11 +1,10 @@
 import { Button, Checkbox } from '@mantine/core';
-import { ClientMember, ClientRole, ClientSpace } from 'mikotojs';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import { ClientMember, Role, Space, User } from 'mikotojs';
+import React, { useContext, useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../hooks';
-import { User } from '../../models';
 import { CurrentSpaceContext } from '../../store';
 import { contextMenuState } from '../ContextMenu';
 import { RoleBadge } from './RoleBadge';
@@ -64,16 +63,16 @@ function RoleSetter({
   roles,
   member,
 }: {
-  roles: ClientRole[];
+  roles: Role[];
   member: ClientMember;
 }) {
   const [selectedRoles, setSelectedRoles] = useState<Record<string, boolean>>(
     () => {
       const o: Record<string, boolean> = {};
-      for (const role of roles) {
-        if (role.name === '@everyone') continue;
+      roles.forEach((role) => {
+        if (role.name === '@everyone') return;
         o[role.id] = false;
-      }
+      });
       return o;
     },
   );
@@ -122,13 +121,7 @@ const StyledPlusBadge = styled.div`
   font-size: 12px;
 `;
 
-function AvatarContextMenu({
-  user,
-  space,
-}: {
-  user: User;
-  space?: ClientSpace;
-}) {
+function AvatarContextMenu({ user, space }: { user: User; space?: Space }) {
   const mikoto = useMikoto();
   const [member, setMember] = useState<ClientMember | null>(null);
   React.useEffect(() => {
@@ -146,13 +139,13 @@ function AvatarContextMenu({
           'loading'
         ) : (
           <div>
-            <Avatar src={user.avatar} size={80} />
+            <Avatar src={user.avatar ?? undefined} size={80} />
             <h1>{user.name}</h1>
             <hr />
             <h2>Roles</h2>
             <div style={{ display: 'flex', gap: '8px' }}>
               {member.roleIds.map((r) => {
-                const role = space?.roles.get(r);
+                const role = space?.roles.find((x) => x.id === r);
                 return role && <RoleBadge key={r} role={role} />;
               })}
               <StyledPlusBadge
@@ -166,9 +159,7 @@ function AvatarContextMenu({
           </div>
         )}
       </AvatarContextWrapper>
-      {roleEditorOpen && (
-        <RoleSetter roles={space!.roles.list()} member={member!} />
-      )}
+      {roleEditorOpen && <RoleSetter roles={space?.roles!} member={member!} />}
     </div>
   );
 }

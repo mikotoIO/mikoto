@@ -1,13 +1,17 @@
 FROM node:16-alpine
 
-WORKDIR /app
+WORKDIR /mikoto
 RUN corepack enable
 
-COPY ["package.json", "yarn.lock", "./"]
+COPY package.json ./
+COPY yarn.lock ./
 RUN yarn
 
 COPY . .
+
+WORKDIR /mikoto/apps/server
+
 RUN npx prisma generate
-RUN npx tsc
+RUN yarn build
 
 CMD ["node", "./dist"]

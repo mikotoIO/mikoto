@@ -17,7 +17,7 @@ Mikoto is an messaging service designed for building online communities. It uses
 
 ### Development
 
-Use Docker Compose to run the ncessary services.
+Use Docker Compose to run the necessary services.
 
 To develop all apps and packages, run the following command:
 

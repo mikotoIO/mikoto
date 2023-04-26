@@ -1,17 +1,17 @@
-import { ClientChannel, ClientSpace } from 'mikotojs';
+import { Channel, Space } from 'mikotojs';
 import React, { createContext } from 'react';
 import { atom, atomFamily, useRecoilState } from 'recoil';
 
-export const treebarSpaceState = atom<ClientSpace | null>({
+export const treebarSpaceState = atom<Space | null>({
   key: 'treebarSpace',
   default: null,
   dangerouslyAllowMutability: true, // we like to live dangerously
 });
 
 type TabBaseType =
-  | { kind: 'textChannel'; channel: ClientChannel }
-  | { kind: 'voiceChannel'; channel: ClientChannel }
-  | { kind: 'spaceSettings'; space: ClientSpace }
+  | { kind: 'textChannel'; channel: Channel }
+  | { kind: 'voiceChannel'; channel: Channel }
+  | { kind: 'spaceSettings'; space: Space }
   | { kind: 'accountSettings' }
   | { kind: 'unknown' };
 
@@ -89,4 +89,6 @@ export function useTabkit() {
 }
 
 // some local contexts
-export const CurrentSpaceContext = React.createContext<ClientSpace | undefined>(undefined);
+export const CurrentSpaceContext = React.createContext<Space | undefined>(
+  undefined,
+);

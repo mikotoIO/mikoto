@@ -4,23 +4,29 @@
   "private": true,
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "docs/*"
   ],
   "scripts": {
-    "compose": "docker-compose up",
+    "compose": "docker compose up -d",
     "build": "turbo run build",
     "start": "turbo run start --parallel",
+    "typecheck": "turbo run typecheck --parallel",
     "lint": "eslint . --ext .ts,.tsx --fix",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"{apps,packages,docs}/**/*.{ts,tsx,md}\"",
+    "setup:server": "node .scripts/setup-env.js --force && node .scripts/setup-minio.js && yarn compose && yarn workspace server prisma migrate dev",
+    "dev": "yarn compose && yarn workspaces foreach -ptRvi --from '{server,client}' run dev"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.0.0",
-    "prettier": "^2.5.1",
+    "eslint": "^8.39.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "prettier": "^2.8.7",
     "turbo": "latest"
   },
   "engines": {
     "npm": ">=7.0.0",
     "node": ">=14.0.0"
   },
-  "packageManager": "yarn@1.22.15"
+  "packageManager": "yarn@3.3.1"
 }

@@ -1,1 +1,4 @@
-/data
+node_modules/
+data/
+docs/
+schema.ts

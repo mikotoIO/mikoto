@@ -13,9 +13,8 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { ClientRole, ClientSpace } from 'mikotojs';
+import { Role, Space, Permissions } from 'mikotojs';
 import { useState } from 'react';
-import { get } from 'react-hook-form';
 import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';
@@ -24,8 +23,6 @@ import {
   ViewContainerWithSidebar,
 } from '../components/ViewContainer';
 import { useMikoto } from '../hooks';
-import { useDelta } from '../hooks/useDelta';
-import { checkPermission, spacePermissions } from '../models/permissions';
 
 const Sidebar = styled.div`
   padding: 16px;
@@ -44,7 +41,7 @@ const SidebarButton = styled.a<{ selected?: boolean }>`
   user-select: none;
 `;
 
-function Overview({ space }: { space: ClientSpace }) {
+function Overview({ space }: { space: Space }) {
   const [spaceName, setSpaceName] = useState(space.name);
 
   return (
@@ -115,10 +112,10 @@ const PermissionBox = styled.div`
 `;
 
 const rolePermissionData = [
-  { name: 'Superuser', permission: spacePermissions.superuser },
-  { name: 'Manage Space', permission: spacePermissions.manageSpace },
-  { name: 'Manage Channel', permission: spacePermissions.manageChannels },
-  { name: 'Manage Roles', permission: spacePermissions.manageRoles },
+  { name: 'Superuser', permission: Permissions.space.superuser },
+  { name: 'Manage Space', permission: Permissions.space.manageSpace },
+  { name: 'Manage Channel', permission: Permissions.space.manageChannels },
+  { name: 'Manage Roles', permission: Permissions.space.manageRoles },
 ];
 
 function RolePermissionEditor({
@@ -137,7 +134,7 @@ function RolePermissionEditor({
           <h3>{x.name}</h3>
           <Switch
             size="lg"
-            checked={checkPermission(x.permission, roleInt)}
+            checked={Permissions.check(x.permission, roleInt)}
             onChange={() => {
               // eslint-disable-next-line no-bitwise
               const newVal = x.permission ^ roleInt;
@@ -158,7 +155,7 @@ const StyledRoleEditor = styled.div`
   box-sizing: border-box;
 `;
 
-function RoleEditor({ role, space }: { space: ClientSpace; role: ClientRole }) {
+function RoleEditor({ role, space }: { space: Space; role: Role }) {
   const mikoto = useMikoto();
   const { getInputProps, values, setFieldValue } = useForm({
     initialValues: {
@@ -192,7 +189,7 @@ function RoleEditor({ role, space }: { space: ClientSpace; role: ClientRole }) {
               name: values.name,
               position: values.position,
               spacePermissions: values.permissions,
-              color: values.color,
+              color: values.color ?? undefined,
             })
             .then(() => console.log('updated'));
         }}
@@ -203,12 +200,13 @@ function RoleEditor({ role, space }: { space: ClientSpace; role: ClientRole }) {
   );
 }
 
-function Roles({ space }: { space: ClientSpace }) {
-  const rolesDelta = useDelta(space.roles, [space.id]);
+function Roles({ space }: { space: Space }) {
+  // const rolesDelta = useDelta(space.roles, [space.id]);
   const mikoto = useMikoto();
 
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
-  const role = rolesDelta.data.find((x) => x.id === selectedRoleId);
+  const role = space.roles.find((x) => x.id === selectedRoleId);
+  // const role = rolesDelta.data.find((x) => x.id === selectedRoleId);
   return (
     <RoleEditorGrid>
       <RoleList>
@@ -221,13 +219,13 @@ function Roles({ space }: { space: ClientSpace }) {
         >
           New Role
         </Button>
-        {rolesDelta.data.map((r) => (
+        {space.roles.map((r) => (
           <SidebarButton
             key={r.id}
             selected={selectedRoleId === r.id}
             onClick={() => setSelectedRoleId(r.id)}
           >
-            <ColorDot color={r.color} />
+            <ColorDot color={r.color ?? undefined} />
             {r.name}
           </SidebarButton>
         ))}
@@ -237,7 +235,7 @@ function Roles({ space }: { space: ClientSpace }) {
   );
 }
 
-function SettingSwitch({ tab, space }: { tab: string; space: ClientSpace }) {
+function SettingSwitch({ tab, space }: { tab: string; space: Space }) {
   switch (tab) {
     case 'Overview':
       return <Overview space={space} />;
@@ -248,7 +246,7 @@ function SettingSwitch({ tab, space }: { tab: string; space: ClientSpace }) {
   }
 }
 
-export function SpaceSettingsView({ space }: { space: ClientSpace }) {
+export function SpaceSettingsView({ space }: { space: Space }) {
   const [tab, setTab] = useState('Overview');
   return (
     <ViewContainerWithSidebar>

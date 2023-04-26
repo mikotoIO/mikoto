@@ -4,13 +4,13 @@ import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import styled from 'styled-components';
 
+// TODO: Fix the two-pixel snap
 const StyledEditable = styled(Editable)`
   background-color: ${(p) => p.theme.colors.N700};
   font-size: 14px;
   margin: 16px;
   padding: 16px;
   border-radius: 4px;
-  min-height: 20px !important;
 `;
 
 const initialEditorValue = [{ children: [{ text: '' }] }];

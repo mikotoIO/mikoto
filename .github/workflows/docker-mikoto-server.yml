@@ -3,17 +3,16 @@ on:
   push:
     paths:
       - apps/server/**
-    branches: [ "main" ]
-    tags: [ 'v*.*.*' ]
+    branches: ['main']
+    tags: ['v*.*.*']
   pull_request:
-    branches: [ "main" ]
+    branches: ['main']
 
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: mikotoIO/mikoto-server
-
 
 jobs:
   build:
@@ -39,7 +38,6 @@ jobs:
         uses: sigstore/cosign-installer@7e0881f8fe90b25e305bbf0309761e9314607e25
         with:
           cosign-release: 'v1.9.0'
-
 
       # Workaround: https://github.com/docker/build-push-action/issues/461
       - name: Setup Docker buildx
@@ -69,7 +67,8 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
         with:
-          context: ./apps/server
+          # context: ./apps/server
+          file: ./apps/server/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

@@ -15,3 +15,9 @@ export function checkPermission(rule: bigint, perms: bigint | string) {
   const p = typeof perms === 'string' ? BigInt(perms) : perms;
   return (rule & p) !== 0n;
 }
+
+export const Permissions = {
+  space: spacePermissions,
+  channel: channelPermissions,
+  check: checkPermission,
+};

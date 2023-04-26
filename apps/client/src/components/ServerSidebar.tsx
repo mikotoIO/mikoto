@@ -1,16 +1,17 @@
 import { Button, TextInput, Tooltip } from '@mantine/core';
 import { AxiosError } from 'axios';
-import { ClientSpace } from 'mikotojs';
-import React, { useRef } from 'react';
+import { Space } from 'mikotojs';
+import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 import { useHover } from 'usehooks-ts';
 
 import { useMikoto } from '../hooks';
-import { useDelta } from '../hooks/useDelta';
+import { useDeltaWithRecoil } from '../hooks/useDelta';
 import { useErrorElement } from '../hooks/useErrorElement';
 import { treebarSpaceState, useTabkit } from '../store';
+import { spacesState } from '../store/cache';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { Pill } from './atoms/Pill';
 
@@ -33,7 +34,7 @@ const StyledServerIcon = styled.div<{ active?: boolean }>`
   transition-duration: 100ms;
 `;
 
-function ServerIconContextMenu({ space }: { space: ClientSpace }) {
+function ServerIconContextMenu({ space }: { space: Space }) {
   const mikoto = useMikoto();
   const tabkit = useTabkit();
   return (
@@ -73,7 +74,7 @@ const StyledIconWrapper = styled.div`
   width: 68px;
 `;
 
-function ServerIcon({ space }: { space: ClientSpace }) {
+function ServerIcon({ space }: { space: Space }) {
   const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
   const isActive = stateSpace?.id === space.id;
 
@@ -192,7 +193,14 @@ export function ServerSidebar() {
   const setModal = useSetRecoilState(modalState);
 
   const mikoto = useMikoto();
-  const spaceDelta = useDelta(mikoto.spaces, []);
+  const spaceDelta = useDeltaWithRecoil<Space>(
+    spacesState,
+    mikoto.spaceEmitter,
+    '@',
+    () => mikoto.client.spaces.list(),
+    [],
+  );
+  // const spaceDelta = useDelta(mikoto.spaces, []);
 
   const spaces = spaceDelta.data;
   const contextMenu = useContextMenu(() => <ServerSidebarContextMenu />);

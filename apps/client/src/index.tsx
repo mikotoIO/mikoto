@@ -7,8 +7,8 @@ import { RecoilRoot } from 'recoil';
 import { ThemeProvider } from 'styled-components';
 
 import App from './App';
+import { GlobalStyle } from './components/GlobalStyle';
 import { theme } from './components/themes';
-import './index.css';
 import reportWebVitals from './reportWebVitals';
 
 /// global polyfill
@@ -23,7 +23,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>
       <MantineProvider theme={{ colorScheme: 'dark' }}>
         <DndProvider backend={HTML5Backend}>
-          <App />
+          <>
+            <GlobalStyle />
+            <App />
+          </>
         </DndProvider>
       </MantineProvider>
     </ThemeProvider>

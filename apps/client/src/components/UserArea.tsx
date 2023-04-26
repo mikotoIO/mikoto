@@ -1,9 +1,9 @@
+import { User } from 'mikotojs';
 import React, { useEffect } from 'react';
 import { atom, useRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../hooks';
-import { User } from '../models';
 import { useTabkit } from '../store';
 import { ContextMenu, useContextMenu } from './ContextMenu';
 import { Avatar } from './atoms/Avatar';
@@ -74,7 +74,7 @@ export function UserArea() {
     <StyledUserArea onClick={contextMenu}>
       {user && (
         <>
-          <Avatar src={user.avatar} />
+          <Avatar src={user.avatar ?? undefined} />
           <StyledUserInfo>
             <h1>{user.name}</h1>
             <h2>Tinkering on stuff</h2>

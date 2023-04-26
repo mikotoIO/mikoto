@@ -1,0 +1,134 @@
+struct Channel {
+  id: string;
+  spaceId: string;
+  parentId: string?;
+  name: string;
+  order: int;
+  lastUpdated: string?;
+  type: string;
+}
+
+struct Space {
+  id: string;
+  name: string;
+  channels: Channel[];
+  roles: Role[];
+}
+
+struct Role {
+  id: string;
+  name: string;
+  color: string?;
+  permissions: string;
+  position: int;
+}
+
+struct Member {
+  id: string;
+  spaceId: string;
+  user: User;
+  roleIds: string[];
+}
+
+struct User {
+  id: string;
+  name: string;
+  avatar: string?;
+}
+
+struct Message {
+  id: string;
+  content: string;
+  timestamp: string;
+  authorId: string?;
+  author: User?;
+  channelId: string;
+}
+
+service MainService {
+  spaces: SpaceService;
+  channels: ChannelService;
+  members: MemberService;
+  users: UserService;
+  messages: MessageService;
+  roles: RoleService;
+  voice: VoiceService;
+}
+
+service SpaceService {
+  get(id: string): Space;
+  list(): Space[];
+  create(name: string): Space;
+  delete(id: string): void;
+
+  ~onCreate(space: Space);
+  ~onUpdate(space: Space);
+  ~onDelete(space: Space);
+
+  join(id: string): void;
+  leave(id: string): void;
+}
+
+struct MemberUpdateOptions {
+  roleIds: string[];
+}
+
+service MemberService {
+  get(spaceId: string, userId: string): Member;
+  update(spaceId: string, userId: string, roleIds: MemberUpdateOptions): Member;
+}
+
+service UserService {
+  me(): User;
+}
+
+struct ChannelCreateOptions {
+  name: string;
+  type: string;
+  parentId: string?;
+}
+
+service ChannelService {
+  get(id: string): Channel;
+  list(spaceId: string): Channel[];
+  create(spaceId: string, options: ChannelCreateOptions): Channel;
+  delete(id: string): void;
+  move(id: string, order: int): void;
+
+  ~onCreate(channel: Channel);
+  ~onUpdate(channel: Channel);
+  ~onDelete(channel: Channel);
+}
+
+struct ListMessageOptions {
+  cursor: string?;
+  limit: int;
+}
+
+struct MessageDeleteEvent {
+  messageId: string;
+  channelId: string;
+}
+
+service MessageService {
+  list(channelId: string, options: ListMessageOptions): Message[];
+  send(channelId: string, content: string): Message;
+  delete(channelId: string, messageId: string): void;
+
+  ~onCreate(message: Message);
+  ~onUpdate(message: Message);
+  ~onDelete(event: MessageDeleteEvent);
+}
+
+service RoleService {
+}
+
+struct VoiceToken {
+  url: string;
+  channelId: string;
+  token: string;
+}
+
+service VoiceService {
+  join(channelId: string): VoiceToken;
+}

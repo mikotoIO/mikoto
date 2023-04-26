@@ -1,7 +1,7 @@
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Modal } from '@mantine/core';
-import { ClientMessage } from 'mikotojs';
+import { Message } from 'mikotojs';
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { SpecialComponents } from 'react-markdown/lib/ast-to-react';
@@ -104,7 +104,7 @@ const MessageInner = styled.div`
   }
 `;
 
-const Name = styled.div<{ color?: string }>`
+const Name = styled.div<{ color: string | null }>`
   font-size: 14px;
   font-weight: 600;
   margin: 0;
@@ -193,7 +193,7 @@ function MessageImage({ src, alt }: MessageImageProps) {
 }
 
 interface MessageProps {
-  message: ClientMessage;
+  message: Message;
   isSimple?: boolean;
 }
 
@@ -230,7 +230,7 @@ export function MessageItem({ message, isSimple }: MessageProps) {
     <ContextMenu>
       <ContextMenu.Link
         onClick={async () => {
-          await mikoto.deleteMessage(message.channel.id, message.id);
+          await mikoto.deleteMessage(message.channelId, message.id);
         }}
       >
         Delete Message
@@ -243,7 +243,10 @@ export function MessageItem({ message, isSimple }: MessageProps) {
       {isSimple ? (
         <AvatarFiller />
       ) : (
-        <MessageAvatar src={message.author?.avatar} user={message.author} />
+        <MessageAvatar
+          src={message.author?.avatar ?? undefined}
+          user={message.author ?? undefined}
+        />
       )}
       <MessageInner>
         {!isSimple && (

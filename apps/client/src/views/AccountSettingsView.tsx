@@ -36,7 +36,28 @@ const Content = styled.div`
   }
 `;
 
-const AvatarWrapper = styled.a``;
+const AvatarWrapper = styled.a`
+  position: relative;
+`;
+const AvatarHover = styled.div`
+  position: absolute;
+  top: 0;
+  border-radius: 7px;
+  text-align: center;
+  width: 64px;
+  height: 64px;
+  opacity: 0;
+  font-size: 10px;
+  font-weight: bold;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  :hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+`;
 
 export function PasswordChangeModal() {
   return (
@@ -74,7 +95,8 @@ export function AccountSettingsView() {
               avatarUpload.open();
             }}
           >
-            <Avatar size={64} src={user?.avatar} />
+            <Avatar size={64} src={user?.avatar ?? undefined} />
+            <AvatarHover>CHANGE{'\n'}AVATAR</AvatarHover>
           </AvatarWrapper>
           <h2>{user?.name}</h2>
         </Content>

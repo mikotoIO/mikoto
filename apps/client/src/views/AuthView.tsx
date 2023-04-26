@@ -1,7 +1,7 @@
 import { Anchor, Button, Input } from '@mantine/core';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { useErrorElement } from '../hooks/useErrorElement';
@@ -59,7 +59,10 @@ export function LoginView() {
       <Form
         onSubmit={handleSubmit(async (formData) => {
           try {
-            const tk = await authClient.login(formData.email, formData.password);
+            const tk = await authClient.login(
+              formData.email,
+              formData.password,
+            );
             localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
             // Screw SPAs, why not just force an actual reload at this point?
             window.location.href = '/';
@@ -149,6 +152,69 @@ export function ResetPasswordView() {
             <h1>Reset Password</h1>
             <Input size="md" placeholder="Email" {...register('email')} />
             <Button type="submit">Send Password Reset Email</Button>
+          </>
+        )}
+      </Form>
+    </AuthView>
+  );
+}
+
+export function ResetChangePasswordView() {
+  const params = useParams<{ token: string }>();
+  const { register, handleSubmit } = useForm();
+  const [sent, setSent] = React.useState(false);
+  const error = useErrorElement();
+  const navigate = useNavigate();
+
+  // TODO better error screen
+  if (!params.token) return <div>Invalid token</div>;
+
+  return (
+    <AuthView>
+      {error.el}
+      <Form
+        onSubmit={handleSubmit(async (data) => {
+          if (data.password !== data.passwordConfirm) {
+            // TODO checkother password conditions
+            error.setError({
+              name: 'ValidatePasswordsMatch',
+              message: 'Passwords do not match',
+            });
+            return;
+          }
+          setSent(true);
+          let timeout: NodeJS.Timeout | undefined;
+          try {
+            timeout = setTimeout(() => {
+              navigate('/login');
+            }, 1400);
+            authClient.resetPasswordSubmit(data.password, params.token!); // TODO error handling
+          } catch (e) {
+            if (timeout) clearTimeout(timeout);
+            error.setError((e as any)?.response?.data);
+            setSent(false);
+          }
+        })}
+      >
+        {sent ? (
+          <div>
+            <h1>Password changed successfully!</h1>
+            <p>Returning to login page...</p>
+          </div>
+        ) : (
+          <>
+            <h1>Reset Password</h1>
+            <Input
+              placeholder="New Password"
+              type="password"
+              {...register('password')}
+            />
+            <Input
+              placeholder="Confirm New Password"
+              type="password"
+              {...register('passwordConfirm')}
+            />
+            <Button type="submit">Confirm new password</Button>
           </>
         )}
       </Form>

@@ -4,7 +4,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import ReactDOM from 'react-dom/client';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { RecoilRoot } from 'recoil';
-import { ThemeProvider } from 'styled-components';
+import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
 import App from './App';
 import { GlobalStyle } from './components/GlobalStyle';
@@ -20,16 +20,18 @@ const SilentRecoilRoot = RecoilRoot as any;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <SilentRecoilRoot>
-    <ThemeProvider theme={theme}>
-      <MantineProvider theme={{ colorScheme: 'dark' }}>
-        <DndProvider backend={HTML5Backend}>
-          <>
-            <GlobalStyle />
-            <App />
-          </>
-        </DndProvider>
-      </MantineProvider>
-    </ThemeProvider>
+    <StyleSheetManager disableCSSOMInjection>
+      <ThemeProvider theme={theme}>
+        <MantineProvider theme={{ colorScheme: 'dark' }}>
+          <DndProvider backend={HTML5Backend}>
+            <>
+              <GlobalStyle />
+              <App />
+            </>
+          </DndProvider>
+        </MantineProvider>
+      </ThemeProvider>
+    </StyleSheetManager>
   </SilentRecoilRoot>,
 );
 

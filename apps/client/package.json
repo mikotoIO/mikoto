@@ -66,6 +66,7 @@
     "dev": "yarn start",
     "build": "vite build",
     "test": "jest",
+    "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "analyze": "source-map-explorer ./build/static/js/*.js",
     "eject": "react-scripts eject",

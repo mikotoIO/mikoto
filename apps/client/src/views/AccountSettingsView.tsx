@@ -91,10 +91,13 @@ export function AccountSettingsView() {
         <Banner />
         <Content>
           <AvatarWrapper
-            onClick={() => {
-              avatarUpload.open();
-            }}
+            {...avatarUpload.getRootProps({ className: 'dropzone' })}
+            // onClick={() => {
+            //   avatarUpload.open();
+            //   console.log('why doesnt this work');
+            // }}
           >
+            <input {...avatarUpload.getInputProps()} />
             <Avatar size={64} src={user?.avatar ?? undefined} />
             <AvatarHover>CHANGE{'\n'}AVATAR</AvatarHover>
           </AvatarWrapper>

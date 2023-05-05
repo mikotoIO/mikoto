@@ -26,6 +26,7 @@ RUN yarn build
 
 FROM node:16-alpine AS runner
 COPY --from=installer /mikoto/apps/server /mikoto/apps/server
+COPY --from=installer /mikoto/node_modules /mikoto/node_modules
 WORKDIR /mikoto/apps/server
 
 CMD ["node", "./dist"]

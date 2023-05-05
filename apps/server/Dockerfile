@@ -5,7 +5,7 @@ RUN apk update
 WORKDIR /mikoto
 RUN yarn global add turbo
 COPY . .
-RUN turbo prune --scope=web --docker
+RUN turbo prune --scope=server --docker
 
 FROM node:alpine AS installer
 RUN apk add --no-cache libc6-compat

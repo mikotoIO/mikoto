@@ -25,6 +25,7 @@ RUN npx prisma generate
 RUN yarn build
 
 FROM node:alpine AS runner
+COPY --from=installer /mikoto/apps/server .
 WORKDIR /mikoto/apps/server
 
 CMD ["node", "./dist"]

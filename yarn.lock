@@ -14280,6 +14280,7 @@ __metadata:
     react-virtuoso: ^4.0.3
     reactjs-popup: ^2.0.5
     recoil: ^0.7.5
+    remark-breaks: ^3.0.2
     remark-gfm: ^3.0.1
     rollup-plugin-analyzer: ^4.0.0
     rollup-plugin-visualizer: ^5.8.0
@@ -30198,6 +30199,17 @@ __metadata:
   version: 0.2.7
   resolution: "relateurl@npm:0.2.7"
   checksum: 5891e792eae1dfc3da91c6fda76d6c3de0333a60aa5ad848982ebb6dccaa06e86385fb1235a1582c680a3d445d31be01c6bfc0804ebbcab5aaf53fa856fde6b6
+  languageName: node
+  linkType: hard
+
+"remark-breaks@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "remark-breaks@npm:3.0.2"
+  dependencies:
+    "@types/mdast": ^3.0.0
+    unified: ^10.0.0
+    unist-util-visit: ^4.0.0
+  checksum: 5f46b18818f8a77e4fbc607c99736eedbe1f8cbad3d7390ce8359f08e3b749de8778ec8812287a41f51ffef2524b0be0dd623fcdbcda5de7f13f9902851f80b3
   languageName: node
   linkType: hard
 

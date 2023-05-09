@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { SpecialComponents } from 'react-markdown/lib/ast-to-react';
 import { NormalComponents } from 'react-markdown/lib/complex-types';
+import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 import styled from 'styled-components';
 
@@ -212,7 +213,10 @@ function Markdown({ content }: { content: string }) {
       : content;
 
   return (
-    <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
+    <ReactMarkdown
+      components={markdownComponents}
+      remarkPlugins={[remarkGfm, remarkBreaks]}
+    >
       {co}
     </ReactMarkdown>
   );

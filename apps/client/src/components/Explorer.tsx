@@ -38,7 +38,7 @@ function channelToTab(channel: Channel): Tabable {
 
 function CreateChannelModal({ parentId }: { parentId?: string }) {
   const mikoto = useMikoto();
-  // const setModal = useSetRecoilState(modalState);
+  const setModal = useSetRecoilState(modalState);
   const space = useRecoilValue(treebarSpaceState);
   const form = useForm({
     initialValues: {
@@ -55,6 +55,7 @@ function CreateChannelModal({ parentId }: { parentId?: string }) {
           type: form.values.type,
           parentId: parentId ?? null,
         });
+        setModal(null);
       })}
     >
       <Select

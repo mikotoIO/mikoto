@@ -115,6 +115,7 @@ const Name = styled.div<{ color: string | null }>`
 const StyledTimestamp = styled.div`
   color: #9f9e9e;
   font-size: 12px;
+  padding-left: 8px;
 `;
 
 function Timestamp({ time }: { time: Date }) {

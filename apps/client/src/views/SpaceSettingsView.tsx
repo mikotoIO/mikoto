@@ -184,14 +184,14 @@ function RoleEditor({ role, space }: { space: Space; role: Role }) {
       />
       <Button
         onClick={() => {
-          mikoto
-            .editRole(space.id, role.id, {
-              name: values.name,
-              position: values.position,
-              spacePermissions: values.permissions,
-              color: values.color ?? undefined,
-            })
-            .then(() => console.log('updated'));
+          // mikoto
+          //   .editRole(space.id, role.id, {
+          //     name: values.name,
+          //     position: values.position,
+          //     spacePermissions: values.permissions,
+          //     color: values.color ?? undefined,
+          //   })
+          //   .then(() => console.log('updated'));
         }}
       >
         Save Changes
@@ -212,9 +212,9 @@ function Roles({ space }: { space: Space }) {
       <RoleList>
         <Button
           onClick={() => {
-            mikoto.createRole(space.id, 'New Role').then(() => {
-              console.log('role created');
-            });
+            // mikoto.client.roles.create(space.id, 'New Role').then(() => {
+            //   console.log('role created');
+            // });
           }}
         >
           New Role

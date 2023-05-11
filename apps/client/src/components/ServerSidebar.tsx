@@ -8,10 +8,11 @@ import styled from 'styled-components';
 import { useHover } from 'usehooks-ts';
 
 import { useMikoto } from '../hooks';
-import { useDeltaWithRecoil } from '../hooks/useDelta';
+import { useDeltaWithRedux } from '../hooks/useDelta';
 import { useErrorElement } from '../hooks/useErrorElement';
+import { useMikotoSelector } from '../redux';
+import { spaceActions } from '../redux/mikoto';
 import { treebarSpaceState, useTabkit } from '../store';
-import { spacesState } from '../store/cache';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { Pill } from './atoms/Pill';
 
@@ -58,7 +59,7 @@ function ServerIconContextMenu({ space }: { space: Space }) {
       >
         Copy ID
       </ContextMenu.Link>
-      <ContextMenu.Link onClick={async () => await mikoto.leaveSpace(space.id)}>
+      <ContextMenu.Link onClick={async () => await mikoto.client.spaces.leave(space.id)}>
         Leave Space
       </ContextMenu.Link>
     </ContextMenu>
@@ -111,7 +112,7 @@ function CreateSpaceModal() {
   return (
     <form
       onSubmit={form.handleSubmit(async (data) => {
-        await mikoto.createSpace(data.spaceName);
+        await mikoto.client.spaces.create(data.spaceName);
         setModal(null);
         form.reset();
       })}
@@ -139,7 +140,7 @@ export function SpaceJoinModal() {
     <form
       onSubmit={handleSubmit(async (data) => {
         try {
-          await mikoto.joinSpace(data.spaceId);
+          await mikoto.client.spaces.join(data.spaceId);
           setModal(null);
           reset();
         } catch (e) {
@@ -193,16 +194,14 @@ export function ServerSidebar() {
   const setModal = useSetRecoilState(modalState);
 
   const mikoto = useMikoto();
-  const spaceDelta = useDeltaWithRecoil<Space>(
-    spacesState,
+  useDeltaWithRedux<Space>(
+    spaceActions,
     mikoto.spaceEmitter,
     '@',
     () => mikoto.client.spaces.list(),
     [],
   );
-  // const spaceDelta = useDelta(mikoto.spaces, []);
-
-  const spaces = spaceDelta.data;
+  const spaces = Object.values(useMikotoSelector((x) => x.spaces));
   const contextMenu = useContextMenu(() => <ServerSidebarContextMenu />);
 
   return (

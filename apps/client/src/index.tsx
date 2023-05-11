@@ -4,12 +4,14 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import ReactDOM from 'react-dom/client';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { Provider } from 'react-redux';
 import { RecoilRoot } from 'recoil';
 import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
 import App from './App';
 import { GlobalStyle } from './components/GlobalStyle';
 import { theme } from './components/themes';
+import { store } from './redux';
 import reportWebVitals from './reportWebVitals';
 
 /// global polyfill
@@ -31,18 +33,20 @@ const SilentRecoilRoot = RecoilRoot as any;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <SilentRecoilRoot>
-    <StyleSheetManager disableCSSOMInjection>
-      <ThemeProvider theme={theme}>
-        <MantineProvider theme={{ colorScheme: 'dark' }}>
-          <DndProvider backend={HTML5Backend}>
-            <>
-              <GlobalStyle />
-              <App />
-            </>
-          </DndProvider>
-        </MantineProvider>
-      </ThemeProvider>
-    </StyleSheetManager>
+    <Provider store={store}>
+      <StyleSheetManager disableCSSOMInjection>
+        <ThemeProvider theme={theme}>
+          <MantineProvider theme={{ colorScheme: 'dark' }}>
+            <DndProvider backend={HTML5Backend}>
+              <>
+                <GlobalStyle />
+                <App />
+              </>
+            </DndProvider>
+          </MantineProvider>
+        </ThemeProvider>
+      </StyleSheetManager>
+    </Provider>
   </SilentRecoilRoot>,
 );
 

@@ -8,7 +8,7 @@ import styled from 'styled-components';
 const StyledEditable = styled(Editable)`
   background-color: ${(p) => p.theme.colors.N700};
   font-size: 14px;
-  margin: 16px;
+  margin: 4px 16px;
   padding: 16px;
   border-radius: 4px;
 `;

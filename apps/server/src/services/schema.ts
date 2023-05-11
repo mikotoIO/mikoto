@@ -61,6 +61,11 @@ export interface ChannelCreateOptions {
   parentId: string | null;
 }
 
+export interface TypingEvent {
+  channelId: string;
+  userId: string;
+}
+
 export interface ListMessageOptions {
   cursor: string | null;
   limit: number;
@@ -210,6 +215,12 @@ export class ChannelServiceSender {
   onDelete(channel: Channel) {
     this.sender.emit(this.room, 'channels/onDelete', channel);
   }
+  onTypingStart(event: TypingEvent) {
+    this.sender.emit(this.room, 'channels/onTypingStart', event);
+  }
+  onTypingStop(event: TypingEvent) {
+    this.sender.emit(this.room, 'channels/onTypingStop', event);
+  }
 }
 
 export interface IChannelService {
@@ -219,6 +230,8 @@ export interface IChannelService {
   create(ctx: SophonInstance<SophonContext>, spaceId: string, options: ChannelCreateOptions): Promise<Channel>;
   delete(ctx: SophonInstance<SophonContext>, id: string): Promise<void>;
   move(ctx: SophonInstance<SophonContext>, id: string, order: number): Promise<void>;
+  startTyping(ctx: SophonInstance<SophonContext>, channelId: string, duration: number): Promise<void>;
+  stopTyping(ctx: SophonInstance<SophonContext>, channelId: string): Promise<void>;
 }
 
 function fnChannelService(

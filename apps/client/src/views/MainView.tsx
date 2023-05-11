@@ -1,4 +1,4 @@
-import { MikotoClient, ClientSpace, constructMikoto } from 'mikotojs';
+import { MikotoClient, Space, constructMikoto } from 'mikotojs';
 import React, { useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Navigate } from 'react-router-dom';
@@ -51,11 +51,11 @@ function AppView() {
   const tabbed = useRecoilValue(tabbedState);
 
   const spaceVal = useRecoilValue(treebarSpaceState);
-  const [space, setSpace] = useState<ClientSpace | null>(null);
+  const [space, setSpace] = useState<Space | null>(null);
   const mikoto = useMikoto();
   useEffect(() => {
     if (spaceVal) {
-      mikoto.getSpace(spaceVal.id).then((x) => setSpace(x));
+      mikoto.client.spaces.get(spaceVal.id).then((x) => setSpace(x));
     }
   }, [spaceVal?.id]);
 

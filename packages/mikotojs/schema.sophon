@@ -88,6 +88,11 @@ struct ChannelCreateOptions {
   parentId: string?;
 }
 
+struct TypingEvent {
+  channelId: string;
+  userId: string;
+}
+
 service ChannelService {
   get(id: string): Channel;
   list(spaceId: string): Channel[];
@@ -98,6 +103,12 @@ service ChannelService {
   ~onCreate(channel: Channel);
   ~onUpdate(channel: Channel);
   ~onDelete(channel: Channel);
+
+  startTyping(channelId: string, duration: int): void;
+  stopTyping(channelId: string): void;
+
+  ~onTypingStart(event: TypingEvent);
+  ~onTypingStop(event: TypingEvent);
 }
 
 struct ListMessageOptions {

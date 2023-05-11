@@ -59,6 +59,11 @@ export interface ChannelCreateOptions {
   parentId: string | null;
 }
 
+export interface TypingEvent {
+  channelId: string;
+  userId: string;
+}
+
 export interface ListMessageOptions {
   cursor: string | null;
   limit: number;
@@ -200,6 +205,12 @@ export class ChannelServiceClient {
   move(id: string, order: number): Promise<void> {
     return this.socket.call('channels/move', id, order);
   }
+  startTyping(channelId: string, duration: number): Promise<void> {
+    return this.socket.call('channels/startTyping', channelId, duration);
+  }
+  stopTyping(channelId: string): Promise<void> {
+    return this.socket.call('channels/stopTyping', channelId);
+  }
 
   onCreate(handler: (channel: Channel) => void) {
     return this.socket.subscribe('channels/onCreate', handler);
@@ -209,6 +220,12 @@ export class ChannelServiceClient {
   }
   onDelete(handler: (channel: Channel) => void) {
     return this.socket.subscribe('channels/onDelete', handler);
+  }
+  onTypingStart(handler: (event: TypingEvent) => void) {
+    return this.socket.subscribe('channels/onTypingStart', handler);
+  }
+  onTypingStop(handler: (event: TypingEvent) => void) {
+    return this.socket.subscribe('channels/onTypingStop', handler);
   }
 }
 

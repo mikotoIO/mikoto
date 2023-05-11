@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { RecoilState, useRecoilState } from 'recoil';
 import TypedEmitter from 'typed-emitter';
 
+import { useMikotoDispatch } from '../redux';
+import { DeltaReducerActions } from '../redux/mikoto';
+
 interface ObjectWithId {
   id: string;
 }
@@ -59,25 +62,33 @@ export function useDeltaNext<T extends ObjectWithId>(
   };
 }
 
-export function useDeltaWithRecoil<T extends ObjectWithId>(
-  recoilState: RecoilState<T[]>,
+export function useDeltaWithRedux<T extends ObjectWithId>(
+  reduxActions: DeltaReducerActions<T>,
   emitter: TypedEmitter<EmitterEvents<T>>,
   parentId: string,
   fetch: () => Promise<T[]>,
   deps: React.DependencyList,
 ) {
-  const [data, setData] = useRecoilState<T[]>(recoilState);
+  const dispatch = useMikotoDispatch();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
     fetch().then((d) => {
       setLoading(false);
-      setData(d);
+      dispatch(reduxActions.initialize(d));
     });
   }, deps);
 
-  const { createFn, updateFn, deleteFn } = getMutationFunctions(setData);
+  const createFn = (x: T) => {
+    dispatch(reduxActions.create(x));
+  };
+  const updateFn = (x: T) => {
+    dispatch(reduxActions.update(x));
+  };
+  const deleteFn = (id: string) => {
+    dispatch(reduxActions.delete(id));
+  };
 
   useEffect(() => {
     emitter.on(`create/${parentId}`, createFn);
@@ -91,7 +102,6 @@ export function useDeltaWithRecoil<T extends ObjectWithId>(
   }, deps);
 
   return {
-    data,
     loading,
   };
 }

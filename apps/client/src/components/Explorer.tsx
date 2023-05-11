@@ -1,6 +1,6 @@
 import { Button, Select, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { Channel, ClientSpace } from 'mikotojs';
+import { Channel, Space } from 'mikotojs';
 import React from 'react';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -142,7 +142,7 @@ function channelToStructuredTree(
   return root;
 }
 
-export function Explorer({ space }: { space: ClientSpace }) {
+export function Explorer({ space }: { space: Space }) {
   const tabkit = useTabkit();
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
@@ -179,7 +179,7 @@ export function Explorer({ space }: { space: ClientSpace }) {
           </ContextMenu.Link>
           <ContextMenu.Link
             onClick={async () => {
-              await mikoto.channel(channel).delete();
+              await mikoto.client.channels.delete(channel.id);
             }}
           >
             Delete Channel

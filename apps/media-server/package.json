@@ -18,6 +18,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
+    "@fastify/cors": "^8.2.1",
     "@fastify/multipart": "^7.6.0",
     "fastify": "^4.17.0",
     "mime-types": "^2.1.35",

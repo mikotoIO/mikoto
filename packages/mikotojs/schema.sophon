@@ -78,8 +78,14 @@ service MemberService {
   update(spaceId: string, userId: string, roleIds: MemberUpdateOptions): Member;
 }
 
+struct UserUpdateOptions {
+  name: string?;
+  avatar: string?;
+}
+
 service UserService {
   me(): User;
+  update(options: UserUpdateOptions): User;
 }
 
 struct ChannelCreateOptions {

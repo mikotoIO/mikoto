@@ -53,6 +53,11 @@ export interface MemberUpdateOptions {
   roleIds: string[];
 }
 
+export interface UserUpdateOptions {
+  name: string | null;
+  avatar: string | null;
+}
+
 export interface ChannelCreateOptions {
   name: string;
   type: string;
@@ -180,6 +185,9 @@ export class UserServiceClient {
   }
   me(): Promise<User> {
     return this.socket.call('users/me', );
+  }
+  update(options: UserUpdateOptions): Promise<User> {
+    return this.socket.call('users/update', options);
   }
 
   

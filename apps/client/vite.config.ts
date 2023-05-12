@@ -34,5 +34,5 @@ export default ({ mode }: { mode: string }) =>
     define: {
       'process.env.NODE_ENV': `"${mode}"`,
     },
-    envPrefix: 'MIKOTO_',
+    envPrefix: ['MIKOTO_', 'PUBLIC_'],
   });

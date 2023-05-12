@@ -1,4 +1,5 @@
 // set up fastify
+import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
 import Fastify from 'fastify';
 
@@ -8,6 +9,7 @@ import { upload } from './routes/upload';
 
 const server = Fastify({ logger: true });
 server.register(multipart);
+server.register(cors, { origin: '*' });
 
 server.get('/', async () => ({ hello: 'world' }));
 

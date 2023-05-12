@@ -1,4 +1,5 @@
 import { Button, TextInput } from '@mantine/core';
+import axios, { AxiosInstance } from 'axios';
 import { useDropzone } from 'react-dropzone';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -7,6 +8,7 @@ import { modalState } from '../components/ContextMenu';
 import { TabName } from '../components/TabBar';
 import { userState } from '../components/UserArea';
 import { Avatar } from '../components/atoms/Avatar';
+import { env } from '../env';
 import { useMikoto } from '../hooks';
 import { SettingsView } from './SettingsViewTemplate';
 
@@ -69,6 +71,20 @@ export function PasswordChangeModal() {
   );
 }
 
+const mediaServerAxios = axios.create({
+  baseURL: env.PUBLIC_MEDIASERVER_URL,
+});
+
+function uploadFileWithAxios<T>(ax: AxiosInstance, file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  return ax.post<T>('/avatar', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+}
+
 export function AccountSettingsView() {
   const setModal = useSetRecoilState(modalState);
 
@@ -76,10 +92,12 @@ export function AccountSettingsView() {
   const [user] = useRecoilState(userState);
 
   const avatarUpload = useDropzone({
-    onDrop: (files) => {
-      mikoto.uploadAvatar(files[0]).then(() => {
-        console.log('nice');
-      });
+    onDrop: async (files) => {
+      const { data } = await uploadFileWithAxios<{ url: string }>(
+        mediaServerAxios,
+        files[0],
+      );
+      await mikoto.client.users.update({ avatar: data.url, name: null });
     },
   });
 

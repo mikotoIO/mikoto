@@ -5361,6 +5361,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fastify/cors@npm:^8.2.1":
+  version: 8.2.1
+  resolution: "@fastify/cors@npm:8.2.1"
+  dependencies:
+    fastify-plugin: ^4.0.0
+    mnemonist: 0.39.5
+  checksum: 219edf11ad8397c7c00ac605c2c084f7dd929a13d95255013612275d195971bd23de1a8cf23304ded8bbe0066e2ea3c7f3c5b7ee0b14af2daed2071f0ed5609a
+  languageName: node
+  linkType: hard
+
 "@fastify/deepmerge@npm:^1.0.0":
   version: 1.3.0
   resolution: "@fastify/deepmerge@npm:1.3.0"
@@ -24855,6 +24865,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "media-server@workspace:apps/media-server"
   dependencies:
+    "@fastify/cors": ^8.2.1
     "@fastify/multipart": ^7.6.0
     "@types/mime-types": ^2.1.1
     "@types/minio": ^7.0.18
@@ -26100,6 +26111,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mnemonist@npm:0.39.5":
+  version: 0.39.5
+  resolution: "mnemonist@npm:0.39.5"
+  dependencies:
+    obliterator: ^2.0.1
+  checksum: 6669d687a434226924b2c84ee6eb7ce7d0f83dfc5caad8bcc164c73c0c11fb6d43cbe32636e710f068046f4b40a56c3032532554e93e02640aafc6ca3dd222e6
+  languageName: node
+  linkType: hard
+
 "mobile@workspace:apps/mobile":
   version: 0.0.0-use.local
   resolution: "mobile@workspace:apps/mobile"
@@ -26919,6 +26939,13 @@ __metadata:
   version: 1.0.5
   resolution: "objectorarray@npm:1.0.5"
   checksum: 8fd776aa495d113e217837f4adc1d53e63f656498237094d25f84c3e2c038b34b71d6fd85c4b60c7ae5f558790e5042426a400fae3eac35f297e11be12643a78
+  languageName: node
+  linkType: hard
+
+"obliterator@npm:^2.0.1":
+  version: 2.0.4
+  resolution: "obliterator@npm:2.0.4"
+  checksum: f28ad35b6d812089315f375dc3e6e5f9bebf958ebe4b10ccd471c7115cbcf595e74bdac4783ae758e5b1f47e3096427fdb37cfa7bed566b132df92ff317b9a7c
   languageName: node
   linkType: hard
 

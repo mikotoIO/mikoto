@@ -79,4 +79,14 @@ export const userService = sophon.create(UserService, {
     }
     return user;
   },
+  async update(ctx, options) {
+    const user = await prisma.user.update({
+      where: { id: ctx.data.user.sub },
+      data: {
+        name: options.name ?? undefined,
+        avatar: options.avatar ?? undefined,
+      },
+    });
+    return user;
+  },
 });

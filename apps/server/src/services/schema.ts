@@ -55,6 +55,11 @@ export interface MemberUpdateOptions {
   roleIds: string[];
 }
 
+export interface UserUpdateOptions {
+  name: string | null;
+  avatar: string | null;
+}
+
 export interface ChannelCreateOptions {
   name: string;
   type: string;
@@ -187,6 +192,7 @@ export class UserServiceSender {
 export interface IUserService {
   
   me(ctx: SophonInstance<SophonContext>): Promise<User>;
+  update(ctx: SophonInstance<SophonContext>, options: UserUpdateOptions): Promise<User>;
 }
 
 function fnUserService(

@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { modalState } from '../components/ContextMenu';
 import { TabName } from '../components/TabBar';
 import { userState } from '../components/UserArea';
-import { Avatar } from '../components/atoms/Avatar';
+import { AvatarEditor } from '../components/molecules/AvatarEditor';
 import { env } from '../env';
 import { useMikoto } from '../hooks';
 import { SettingsView } from './SettingsViewTemplate';
@@ -35,30 +35,6 @@ const Content = styled.div`
   align-items: center;
   h2 {
     margin-left: 32px;
-  }
-`;
-
-const AvatarWrapper = styled.a`
-  position: relative;
-`;
-
-const AvatarHover = styled.div`
-  position: absolute;
-  top: 0;
-  border-radius: 7px;
-  text-align: center;
-  width: 64px;
-  height: 64px;
-  opacity: 0;
-  font-size: 10px;
-  font-weight: bold;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  :hover {
-    opacity: 1;
-    background-color: rgba(0, 0, 0, 0.6);
   }
 `;
 
@@ -109,13 +85,19 @@ export function AccountSettingsView() {
       <AccountInfo>
         <Banner />
         <Content>
-          <AvatarWrapper
-            {...avatarUpload.getRootProps({ className: 'dropzone' })}
-          >
-            <input {...avatarUpload.getInputProps()} />
-            <Avatar size={64} src={user?.avatar ?? undefined} />
-            <AvatarHover>CHANGE{'\n'}AVATAR</AvatarHover>
-          </AvatarWrapper>
+          <AvatarEditor
+            avatar={user?.avatar ?? undefined}
+            onDrop={async (file) => {
+              const { data } = await uploadFileWithAxios<{ url: string }>(
+                mediaServerAxios,
+                file,
+              );
+              await mikoto.client.users.update({
+                avatar: data.url,
+                name: null,
+              });
+            }}
+          />
           <h2>{user?.name}</h2>
         </Content>
       </AccountInfo>

@@ -22,6 +22,7 @@ import {
   SidebarContainerArea,
   ViewContainerWithSidebar,
 } from '../components/ViewContainer';
+import { AvatarEditor } from '../components/molecules/AvatarEditor';
 import { useMikoto } from '../hooks';
 
 const Sidebar = styled.div`
@@ -48,10 +49,13 @@ function Overview({ space }: { space: Space }) {
     <SidebarContainerArea>
       <TabName name={`Settings for ${space.name}`} />
       <h1>Space Overview</h1>
+      <AvatarEditor />
+      
       <TextInput
         value={spaceName}
         onChange={(x) => setSpaceName(x.target.value)}
       />
+      <Button>Update</Button>
     </SidebarContainerArea>
   );
 }

@@ -41,6 +41,7 @@ const Content = styled.div`
 const AvatarWrapper = styled.a`
   position: relative;
 `;
+
 const AvatarHover = styled.div`
   position: absolute;
   top: 0;
@@ -110,10 +111,6 @@ export function AccountSettingsView() {
         <Content>
           <AvatarWrapper
             {...avatarUpload.getRootProps({ className: 'dropzone' })}
-            // onClick={() => {
-            //   avatarUpload.open();
-            //   console.log('why doesnt this work');
-            // }}
           >
             <input {...avatarUpload.getInputProps()} />
             <Avatar size={64} src={user?.avatar ?? undefined} />

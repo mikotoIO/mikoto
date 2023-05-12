@@ -14,4 +14,8 @@ export const storeConfig: Record<string, Store> = {
     restrictions: [{ id: 'IS_FILETYPE', type: 'image' }],
     transformations: [{ id: 'RESIZE', width: 512, height: 512 }],
   },
+  spaceicon: {
+    restrictions: [{ id: 'IS_FILETYPE', type: 'image' }],
+    transformations: [{ id: 'RESIZE', width: 512, height: 512 }],
+  },
 };

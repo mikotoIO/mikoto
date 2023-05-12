@@ -5,6 +5,7 @@ import { NotFoundError } from 'routing-controllers';
 import { prisma } from '../functions/prisma';
 import { VoiceService } from './schema';
 import { sophon } from './sophon';
+import { env } from '../env';
 
 export const voiceService = sophon.create(VoiceService, {
   async join(ctx, id: string) {
@@ -20,7 +21,7 @@ export const voiceService = sophon.create(VoiceService, {
     });
     token.addGrant({ roomJoin: true, room: id });
     return {
-      url: process.env.LIVEKIT_SERVER!,
+      url: env.LIVEKIT_SERVER,
       channelId: id,
       token: token.toJwt(),
     };

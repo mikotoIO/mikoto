@@ -18,6 +18,7 @@ import { AccountJwt } from '../auth';
 import Mailer from '../functions/Mailer';
 import Minio from '../functions/Minio';
 import { logger } from '../functions/logger';
+import { env } from '../env';
 
 const randomBytes = promisify(crypto.randomBytes);
 async function generateRandomToken() {
@@ -55,11 +56,11 @@ export class AccountController {
   async index() {
     return {
       name: 'MikotoAuth',
-    }
+    };
   }
 
   private async createTokenPair(account: Account, oldToken?: string) {
-    const accessToken = jwt.sign({}, process.env.SECRET!, {
+    const accessToken = jwt.sign({}, env.SECRET, {
       expiresIn: '1h',
       subject: account.id,
     });

@@ -59,6 +59,7 @@
     "sharp": "^0.30.7",
     "socket-controllers": "^0.0.5",
     "socket.io": "^4.5.1",
+    "ts-dotenv": "^0.9.1",
     "tslib": "^2.4.0",
     "typedi": "^0.10.0",
     "uuid": "^8.3.2",

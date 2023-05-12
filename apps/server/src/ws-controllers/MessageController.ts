@@ -8,6 +8,7 @@ import {
 } from 'socket-controllers';
 import { Socket } from 'socket.io';
 import { Service } from 'typedi';
+import { env } from '../env';
 
 @SocketController()
 @Service()
@@ -32,7 +33,7 @@ export class MessageController {
     @ConnectedSocket() socket: Socket,
     @MessageBody() body: { token: string },
   ) {
-    socket.data.token = jwt.verify(body.token, process.env.SECRET!);
+    socket.data.token = jwt.verify(body.token, env.SECRET);
 
     if (!socket.data.calibrated) {
       socket.join(`user/${socket.data.token.sub}`);

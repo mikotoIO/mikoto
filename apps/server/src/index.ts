@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import 'reflect-metadata';
 
 import { PrismaClient } from '@prisma/client';
@@ -26,6 +25,7 @@ import { logger } from './functions/logger';
 import './functions/prismaRecursive';
 import { mainService } from './services';
 import { sophon } from './services/sophon';
+import { env } from './env';
 
 const app = express();
 
@@ -39,7 +39,7 @@ const prisma = new PrismaClient({
 });
 Container.set(PrismaClient, prisma);
 Container.set(socketio.Server, io);
-Container.set(Minio, new Minio(process.env.MINIO!));
+Container.set(Minio, new Minio(env.MINIO));
 Container.set(Mailer, new Mailer());
 
 app.use(cors());
@@ -58,7 +58,7 @@ useExpressServer(app, {
       throw new UnauthorizedError('Invalid Header');
     }
     authHeader = authHeader.slice(7);
-    return jwt.verify(authHeader, process.env.SECRET!);
+    return jwt.verify(authHeader, env.SECRET);
   },
 });
 
@@ -66,11 +66,8 @@ useSocketServer(io, {
   controllers: [path.join(`${__dirname}/ws-controllers/*.{js,ts}`)],
 });
 
-const port = parseInt(process.env.PORT || '', 10) || 9500;
-const host = process.env.HOST || 'localhost';
-
-server.listen(port, host, () => {
-  logger.info(`Mikoto server started on http://${host}:${port}`);
+server.listen(env.AUTH_PORT, () => {
+  logger.info(`Mikoto server started on http://0.0.0.0:${env.AUTH_PORT}`);
 });
 
 // set up a sophon server as well
@@ -87,6 +84,6 @@ const sophonIO = new Server(httpServer, {
   },
 });
 sophon.mount(sophonIO, mainService);
-httpServer.listen(3510, () => {
-  console.log('Sophon on *:3510');
+httpServer.listen(env.SERVER_PORT, () => {
+  logger.info(`Mikoto Sophon listening on http://0.0.0.0:${env.SERVER_PORT}`);
 });

@@ -1,8 +1,6 @@
 import crypto from 'crypto';
 import * as minio from 'minio';
-import { Client } from 'minio';
 import sharp from 'sharp';
-import { v4 as uuid } from 'uuid';
 
 import { mimeImageExtension } from './checkMimetype';
 

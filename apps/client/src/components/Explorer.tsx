@@ -165,7 +165,13 @@ export function Explorer({ space }: { space: Space }) {
     onContextMenuFactory(channel) {
       return nodeContextMenu(
         <ContextMenu>
-          <ContextMenu.Link>Open in new tab</ContextMenu.Link>
+          <ContextMenu.Link
+            onClick={() => {
+              tabkit.openTab(channelToTab(channel), true);
+            }}
+          >
+            Open in new tab
+          </ContextMenu.Link>
           <ContextMenu.Link>Mark as Read</ContextMenu.Link>
           <ContextMenu.Link
             onClick={() => {

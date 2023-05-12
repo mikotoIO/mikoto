@@ -51,6 +51,11 @@ export interface Message {
   channelId: string;
 }
 
+export interface SpaceUpdateOptions {
+  name: string | null;
+  icon: string | null;
+}
+
 export interface MemberUpdateOptions {
   roleIds: string[];
 }
@@ -138,6 +143,7 @@ export interface ISpaceService {
   get(ctx: SophonInstance<SophonContext>, id: string): Promise<Space>;
   list(ctx: SophonInstance<SophonContext>): Promise<Space[]>;
   create(ctx: SophonInstance<SophonContext>, name: string): Promise<Space>;
+  update(ctx: SophonInstance<SophonContext>, id: string, options: SpaceUpdateOptions): Promise<Space>;
   delete(ctx: SophonInstance<SophonContext>, id: string): Promise<void>;
   join(ctx: SophonInstance<SophonContext>, id: string): Promise<void>;
   leave(ctx: SophonInstance<SophonContext>, id: string): Promise<void>;

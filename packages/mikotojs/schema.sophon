@@ -55,10 +55,16 @@ service MainService {
   voice: VoiceService;
 }
 
+struct SpaceUpdateOptions {
+  name: string?;
+  icon: string?;
+}
+
 service SpaceService {
   get(id: string): Space;
   list(): Space[];
   create(name: string): Space;
+  update(id: string, options: SpaceUpdateOptions): Space;
   delete(id: string): void;
 
   ~onCreate(space: Space);

@@ -49,6 +49,11 @@ export interface Message {
   channelId: string;
 }
 
+export interface SpaceUpdateOptions {
+  name: string | null;
+  icon: string | null;
+}
+
 export interface MemberUpdateOptions {
   roleIds: string[];
 }
@@ -141,6 +146,9 @@ export class SpaceServiceClient {
   }
   create(name: string): Promise<Space> {
     return this.socket.call('spaces/create', name);
+  }
+  update(id: string, options: SpaceUpdateOptions): Promise<Space> {
+    return this.socket.call('spaces/update', id, options);
   }
   delete(id: string): Promise<void> {
     return this.socket.call('spaces/delete', id);

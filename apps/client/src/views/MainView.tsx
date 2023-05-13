@@ -90,7 +90,7 @@ function MikotoApiLoader({ children }: { children: React.ReactNode }) {
 
   // TODO: Try suspense
   useEffect(() => {
-    constructMikoto(env.PUBLIC_AUTH, env.PUBLIC_SERVER)
+    constructMikoto(env.PUBLIC_AUTH_URL, env.PUBLIC_SERVER_URL)
       .then((x) => setMikoto(x))
       .catch((x) => setErr(x));
   }, []);

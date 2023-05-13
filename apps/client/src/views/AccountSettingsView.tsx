@@ -7,7 +7,11 @@ import styled from 'styled-components';
 import { modalState } from '../components/ContextMenu';
 import { TabName } from '../components/TabBar';
 import { userState } from '../components/UserArea';
-import { AvatarEditor } from '../components/molecules/AvatarEditor';
+import {
+  AvatarEditor,
+  mediaServerAxios,
+  uploadFileWithAxios,
+} from '../components/molecules/AvatarEditor';
 import { env } from '../env';
 import { useMikoto } from '../hooks';
 import { SettingsView } from './SettingsViewTemplate';
@@ -48,35 +52,11 @@ export function PasswordChangeModal() {
   );
 }
 
-const mediaServerAxios = axios.create({
-  baseURL: env.PUBLIC_MEDIASERVER_URL,
-});
-
-function uploadFileWithAxios<T>(ax: AxiosInstance, file: File) {
-  const formData = new FormData();
-  formData.append('file', file);
-  return ax.post<T>('/avatar', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-}
-
 export function AccountSettingsView() {
   const setModal = useSetRecoilState(modalState);
 
   const mikoto = useMikoto();
   const [user] = useRecoilState(userState);
-
-  const avatarUpload = useDropzone({
-    onDrop: async (files) => {
-      const { data } = await uploadFileWithAxios<{ url: string }>(
-        mediaServerAxios,
-        files[0],
-      );
-      await mikoto.client.users.update({ avatar: data.url, name: null });
-    },
-  });
 
   return (
     <SettingsView>
@@ -90,6 +70,7 @@ export function AccountSettingsView() {
             onDrop={async (file) => {
               const { data } = await uploadFileWithAxios<{ url: string }>(
                 mediaServerAxios,
+                '/avatar',
                 file,
               );
               await mikoto.client.users.update({

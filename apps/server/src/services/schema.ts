@@ -17,6 +17,7 @@ export interface Channel {
 export interface Space {
   id: string;
   name: string;
+  icon: string | null;
   channels: Channel[];
   roles: Role[];
 }

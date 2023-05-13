@@ -1,5 +1,4 @@
 import { AccessToken } from 'livekit-server-sdk';
-import process from 'process';
 import { NotFoundError } from 'routing-controllers';
 
 import { prisma } from '../functions/prisma';

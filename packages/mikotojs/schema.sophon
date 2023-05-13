@@ -11,6 +11,7 @@ struct Channel {
 struct Space {
   id: string;
   name: string;
+  icon: string?;
   channels: Channel[];
   roles: Role[];
 }

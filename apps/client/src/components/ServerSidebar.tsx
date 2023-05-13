@@ -1,3 +1,4 @@
+import { icon } from '@fortawesome/fontawesome-svg-core';
 import { Button, TextInput, Tooltip } from '@mantine/core';
 import { AxiosError } from 'axios';
 import { Space } from 'mikotojs';
@@ -24,7 +25,7 @@ const StyledServerSidebar = styled.div`
   padding-top: 10px;
 `;
 
-const StyledServerIcon = styled.div<{ active?: boolean }>`
+const StyledServerIcon = styled.div<{ active?: boolean; icon?: string }>`
   width: 48px;
   height: 48px;
   display: flex;
@@ -33,6 +34,8 @@ const StyledServerIcon = styled.div<{ active?: boolean }>`
   border-radius: ${(p) => (p.active ? 16 : 100)}px;
   background-color: ${(p) => p.theme.colors.N800};
   transition-duration: 100ms;
+  background-image: url(${(p) => p.icon ?? 'none'});
+  background-size: cover;
 `;
 
 function ServerIconContextMenu({ space }: { space: Space }) {
@@ -59,7 +62,9 @@ function ServerIconContextMenu({ space }: { space: Space }) {
       >
         Copy ID
       </ContextMenu.Link>
-      <ContextMenu.Link onClick={async () => await mikoto.client.spaces.leave(space.id)}>
+      <ContextMenu.Link
+        onClick={async () => await mikoto.client.spaces.leave(space.id)}
+      >
         Leave Space
       </ContextMenu.Link>
     </ContextMenu>
@@ -93,11 +98,12 @@ function ServerIcon({ space }: { space: Space }) {
           active={isActive}
           onContextMenu={contextMenu}
           ref={ref}
+          icon={space.icon ?? undefined}
           onClick={() => {
             setSpace(space);
           }}
         >
-          {space.name[0]}
+          {icon === null ? space.name[0] : ''}
         </StyledServerIcon>
       </StyledIconWrapper>
     </Tooltip>

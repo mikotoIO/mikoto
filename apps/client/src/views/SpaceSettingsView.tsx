@@ -22,7 +22,11 @@ import {
   SidebarContainerArea,
   ViewContainerWithSidebar,
 } from '../components/ViewContainer';
-import { AvatarEditor } from '../components/molecules/AvatarEditor';
+import {
+  AvatarEditor,
+  mediaServerAxios,
+  uploadFileWithAxios,
+} from '../components/molecules/AvatarEditor';
 import { useMikoto } from '../hooks';
 
 const Sidebar = styled.div`
@@ -44,13 +48,26 @@ const SidebarButton = styled.a<{ selected?: boolean }>`
 
 function Overview({ space }: { space: Space }) {
   const [spaceName, setSpaceName] = useState(space.name);
+  const mikoto = useMikoto();
 
   return (
     <SidebarContainerArea>
       <TabName name={`Settings for ${space.name}`} />
       <h1>Space Overview</h1>
-      <AvatarEditor />
-      
+      <AvatarEditor
+        onDrop={async (file) => {
+          const { data } = await uploadFileWithAxios<{ url: string }>(
+            mediaServerAxios,
+            '/spaceicon',
+            file,
+          );
+          await mikoto.client.spaces.update(space.id, {
+            icon: data.url,
+            name: null,
+          });
+        }}
+      />
+
       <TextInput
         value={spaceName}
         onChange={(x) => setSpaceName(x.target.value)}

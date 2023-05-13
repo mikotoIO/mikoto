@@ -103,7 +103,7 @@ function ServerIcon({ space }: { space: Space }) {
             setSpace(space);
           }}
         >
-          {icon === null ? space.name[0] : ''}
+          {space.icon === null ? space.name[0] : ''}
         </StyledServerIcon>
       </StyledIconWrapper>
     </Tooltip>

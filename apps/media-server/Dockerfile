@@ -21,7 +21,6 @@ RUN yarn install
 # Build the project
 COPY --from=builder /mikoto/out/full/ .
 WORKDIR /mikoto/apps/media-server
-RUN npx prisma generate
 RUN yarn build
 
 FROM node:16-alpine AS runner

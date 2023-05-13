@@ -235,7 +235,7 @@ export function MessageItem({ message, isSimple }: MessageProps) {
     <ContextMenu>
       <ContextMenu.Link
         onClick={async () => {
-          await mikoto.deleteMessage(message.channelId, message.id);
+          await mikoto.client.messages.delete(message.channelId, message.id);
         }}
       >
         Delete Message

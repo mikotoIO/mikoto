@@ -17,6 +17,7 @@ export interface Channel {
 export interface Space {
   id: string;
   name: string;
+  icon: string | null;
   channels: Channel[];
   roles: Role[];
 }
@@ -51,14 +52,29 @@ export interface Message {
   channelId: string;
 }
 
+export interface SpaceUpdateOptions {
+  name: string | null;
+  icon: string | null;
+}
+
 export interface MemberUpdateOptions {
   roleIds: string[];
+}
+
+export interface UserUpdateOptions {
+  name: string | null;
+  avatar: string | null;
 }
 
 export interface ChannelCreateOptions {
   name: string;
   type: string;
   parentId: string | null;
+}
+
+export interface TypingEvent {
+  channelId: string;
+  userId: string;
 }
 
 export interface ListMessageOptions {
@@ -128,6 +144,7 @@ export interface ISpaceService {
   get(ctx: SophonInstance<SophonContext>, id: string): Promise<Space>;
   list(ctx: SophonInstance<SophonContext>): Promise<Space[]>;
   create(ctx: SophonInstance<SophonContext>, name: string): Promise<Space>;
+  update(ctx: SophonInstance<SophonContext>, id: string, options: SpaceUpdateOptions): Promise<Space>;
   delete(ctx: SophonInstance<SophonContext>, id: string): Promise<void>;
   join(ctx: SophonInstance<SophonContext>, id: string): Promise<void>;
   leave(ctx: SophonInstance<SophonContext>, id: string): Promise<void>;
@@ -182,6 +199,7 @@ export class UserServiceSender {
 export interface IUserService {
   
   me(ctx: SophonInstance<SophonContext>): Promise<User>;
+  update(ctx: SophonInstance<SophonContext>, options: UserUpdateOptions): Promise<User>;
 }
 
 function fnUserService(
@@ -210,6 +228,12 @@ export class ChannelServiceSender {
   onDelete(channel: Channel) {
     this.sender.emit(this.room, 'channels/onDelete', channel);
   }
+  onTypingStart(event: TypingEvent) {
+    this.sender.emit(this.room, 'channels/onTypingStart', event);
+  }
+  onTypingStop(event: TypingEvent) {
+    this.sender.emit(this.room, 'channels/onTypingStop', event);
+  }
 }
 
 export interface IChannelService {
@@ -219,6 +243,8 @@ export interface IChannelService {
   create(ctx: SophonInstance<SophonContext>, spaceId: string, options: ChannelCreateOptions): Promise<Channel>;
   delete(ctx: SophonInstance<SophonContext>, id: string): Promise<void>;
   move(ctx: SophonInstance<SophonContext>, id: string, order: number): Promise<void>;
+  startTyping(ctx: SophonInstance<SophonContext>, channelId: string, duration: number): Promise<void>;
+  stopTyping(ctx: SophonInstance<SophonContext>, channelId: string): Promise<void>;
 }
 
 function fnChannelService(

@@ -15,6 +15,7 @@ export interface Channel {
 export interface Space {
   id: string;
   name: string;
+  icon: string | null;
   channels: Channel[];
   roles: Role[];
 }
@@ -49,14 +50,29 @@ export interface Message {
   channelId: string;
 }
 
+export interface SpaceUpdateOptions {
+  name: string | null;
+  icon: string | null;
+}
+
 export interface MemberUpdateOptions {
   roleIds: string[];
+}
+
+export interface UserUpdateOptions {
+  name: string | null;
+  avatar: string | null;
 }
 
 export interface ChannelCreateOptions {
   name: string;
   type: string;
   parentId: string | null;
+}
+
+export interface TypingEvent {
+  channelId: string;
+  userId: string;
 }
 
 export interface ListMessageOptions {
@@ -132,6 +148,9 @@ export class SpaceServiceClient {
   create(name: string): Promise<Space> {
     return this.socket.call('spaces/create', name);
   }
+  update(id: string, options: SpaceUpdateOptions): Promise<Space> {
+    return this.socket.call('spaces/update', id, options);
+  }
   delete(id: string): Promise<void> {
     return this.socket.call('spaces/delete', id);
   }
@@ -176,6 +195,9 @@ export class UserServiceClient {
   me(): Promise<User> {
     return this.socket.call('users/me', );
   }
+  update(options: UserUpdateOptions): Promise<User> {
+    return this.socket.call('users/update', options);
+  }
 
   
 }
@@ -200,6 +222,12 @@ export class ChannelServiceClient {
   move(id: string, order: number): Promise<void> {
     return this.socket.call('channels/move', id, order);
   }
+  startTyping(channelId: string, duration: number): Promise<void> {
+    return this.socket.call('channels/startTyping', channelId, duration);
+  }
+  stopTyping(channelId: string): Promise<void> {
+    return this.socket.call('channels/stopTyping', channelId);
+  }
 
   onCreate(handler: (channel: Channel) => void) {
     return this.socket.subscribe('channels/onCreate', handler);
@@ -209,6 +237,12 @@ export class ChannelServiceClient {
   }
   onDelete(handler: (channel: Channel) => void) {
     return this.socket.subscribe('channels/onDelete', handler);
+  }
+  onTypingStart(handler: (event: TypingEvent) => void) {
+    return this.socket.subscribe('channels/onTypingStart', handler);
+  }
+  onTypingStop(handler: (event: TypingEvent) => void) {
+    return this.socket.subscribe('channels/onTypingStop', handler);
   }
 }
 

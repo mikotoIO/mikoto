@@ -67,7 +67,7 @@ export function UserArea() {
     left: 80,
   });
   useEffect(() => {
-    mikoto.getCurrentUser().then(setUser);
+    mikoto.client.users.me().then(setUser);
   }, []);
 
   return (

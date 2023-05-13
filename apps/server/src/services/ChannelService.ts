@@ -15,18 +15,18 @@ const authorInclude = {
 };
 
 export const channelService = sophon.create(ChannelService, {
-  async get(ctx, id: string) {
+  get: async (ctx, id: string) => {
     const channel = await prisma.channel.findUnique({ where: { id } });
     if (channel === null) throw new NotFoundError();
     return serializeDates(channel);
   },
 
-  async list(ctx, spaceId: string) {
+  list: async (ctx, spaceId: string) => {
     const channels = await prisma.channel.findMany({ where: { spaceId } });
     return serializeDates(channels);
   },
 
-  async create(ctx, spaceId, { name, type, parentId }) {
+  create: async (ctx, spaceId, { name, type, parentId }) => {
     const channelCount = await prisma.channel.count({
       where: { spaceId },
     });
@@ -50,7 +50,6 @@ export const channelService = sophon.create(ChannelService, {
     channelService
       .$(`space/${channel.spaceId}`)
       .onDelete(serializeDates(channel));
-    
   },
 
   async move(ctx, id: string, order) {
@@ -89,6 +88,13 @@ export const channelService = sophon.create(ChannelService, {
         updater,
       ]);
     }
+  },
+  async startTyping(ctx, id) {
+    // channelService.$(id).onTyping({ userId: ctx.data.user.sub });
+    throw new Error('not implemented');
+  },
+  async stopTyping() {
+    throw new Error('not implemented');
   },
 });
 
@@ -165,6 +171,5 @@ export const messageService = sophon.create(MessageService, {
     messageService
       .$(`space/${channel.spaceId}`)
       .onDelete({ messageId, channelId });
-    
   },
 });

@@ -2,7 +2,6 @@ import { Channel, Message } from 'mikotojs';
 import React, { useEffect, useState } from 'react';
 import { useAsync } from 'react-async-hook';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
-import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';
@@ -11,8 +10,8 @@ import { Spinner } from '../components/atoms/Spinner';
 import { MessageItem } from '../components/molecules/Message';
 import { MessageEditor } from '../components/molecules/MessageEditor';
 import { useMikoto } from '../hooks';
+import { useMikotoSelector } from '../redux';
 import { CurrentSpaceContext } from '../store';
-import { spacesState } from '../store/cache';
 
 const StyledMessagesLoading = styled.div`
   padding: 40px;
@@ -52,6 +51,11 @@ const StyledChannelHead = styled.div`
   }
 `;
 
+const StyledTypingIndicatorContainer = styled.div`
+  font-size: 12px;
+  padding: 4px 16px 8px;
+`;
+
 function ChannelHead({ channel }: { channel: Channel }) {
   return (
     <StyledChannelHead>
@@ -72,7 +76,7 @@ function RealMessageView({ channel }: { channel: Channel }) {
   const [topLoaded, setTopLoaded] = useState(false);
 
   useEffect(() => {
-    mikoto.ack(channel.id).then();
+    // mikoto.ack(channel.id).then();
   }, [channel.id]);
 
   const [msgs, setMsgs] = useState<Message[] | null>(null);
@@ -120,6 +124,8 @@ function RealMessageView({ channel }: { channel: Channel }) {
       mikoto.messageEmitter.off(`delete/${channel.id}`, deleteFn);
     };
   }, [channel.id]);
+
+  const isTyping = false;
 
   return (
     <ViewContainer key={channel.id}>
@@ -169,18 +175,23 @@ function RealMessageView({ channel }: { channel: Channel }) {
       <MessageEditor
         placeholder={`Message #${channel.name}`}
         onSubmit={async (msg) => {
-          await mikoto.channel(channel).sendMessage(msg);
+          await mikoto.client.messages.send(channel.id, msg);
         }}
       />
+      <StyledTypingIndicatorContainer>
+        {isTyping && (
+          <div>
+            <strong>CactusBlue</strong> is typing...
+          </div>
+        )}
+      </StyledTypingIndicatorContainer>
     </ViewContainer>
   );
 }
 
 export function MessageView({ channel }: MessageViewProps) {
   const mikoto = useMikoto();
-  const space = useRecoilValue(spacesState).find(
-    (x) => x.id === channel.spaceId,
-  );
+  const space = useMikotoSelector((s) => s.spaces[channel.spaceId]);
 
   const { result: mChannel, error } = useAsync(
     (id: string) => mikoto.client.channels.get(id),

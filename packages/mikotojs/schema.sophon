@@ -11,6 +11,7 @@ struct Channel {
 struct Space {
   id: string;
   name: string;
+  icon: string?;
   channels: Channel[];
   roles: Role[];
 }
@@ -55,10 +56,16 @@ service MainService {
   voice: VoiceService;
 }
 
+struct SpaceUpdateOptions {
+  name: string?;
+  icon: string?;
+}
+
 service SpaceService {
   get(id: string): Space;
   list(): Space[];
   create(name: string): Space;
+  update(id: string, options: SpaceUpdateOptions): Space;
   delete(id: string): void;
 
   ~onCreate(space: Space);
@@ -78,14 +85,25 @@ service MemberService {
   update(spaceId: string, userId: string, roleIds: MemberUpdateOptions): Member;
 }
 
+struct UserUpdateOptions {
+  name: string?;
+  avatar: string?;
+}
+
 service UserService {
   me(): User;
+  update(options: UserUpdateOptions): User;
 }
 
 struct ChannelCreateOptions {
   name: string;
   type: string;
   parentId: string?;
+}
+
+struct TypingEvent {
+  channelId: string;
+  userId: string;
 }
 
 service ChannelService {
@@ -98,6 +116,12 @@ service ChannelService {
   ~onCreate(channel: Channel);
   ~onUpdate(channel: Channel);
   ~onDelete(channel: Channel);
+
+  startTyping(channelId: string, duration: int): void;
+  stopTyping(channelId: string): void;
+
+  ~onTypingStart(event: TypingEvent);
+  ~onTypingStop(event: TypingEvent);
 }
 
 struct ListMessageOptions {

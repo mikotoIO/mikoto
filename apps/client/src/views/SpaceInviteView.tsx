@@ -42,7 +42,7 @@ export function SpaceInviteViewInner() {
   const params = useParams<{ id: string }>();
 
   const { result } = useAsync(
-    async (id: string) => mikoto.getSpace(id),
+    async (id: string) => mikoto.client.spaces.get(id),
     [params.id ?? ''],
   );
 

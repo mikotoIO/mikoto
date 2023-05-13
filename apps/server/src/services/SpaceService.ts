@@ -51,6 +51,20 @@ export const spaceService = sophon.create(SpaceService, {
     return serializeDates(space);
   },
 
+  async update(ctx, id, options) {
+    const space = await prisma.space.update({
+      where: { id },
+      data: {
+        name: options.name ?? undefined,
+        icon: options.icon ?? undefined,
+      },
+      include: spaceInclude,
+    });
+    if (space === null) throw new NotFoundError();
+    spaceService.$(`space/${id}`).onUpdate(serializeDates(space));
+    return serializeDates(space);
+  },
+
   async delete(ctx, id: string) {
     const space = await prisma.space.findUnique({
       where: { id },

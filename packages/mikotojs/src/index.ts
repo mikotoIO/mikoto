@@ -1,7 +1,11 @@
 import { AuthClient } from './AuthClient';
 import { MikotoClient } from './MikotoClient';
 
-function constructMikotoSimple(authUrl: string, sophonUrl: string, token: string) {
+function constructMikotoSimple(
+  authUrl: string,
+  sophonUrl: string,
+  token: string,
+) {
   return new Promise<MikotoClient>((resolve, reject) => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -30,7 +34,11 @@ export async function constructMikoto(authUrl: string, sophonUrl: string) {
     accessToken: '',
   });
   localStorage.setItem('REFRESH_TOKEN', token.refreshToken);
-  const mikoto = await constructMikotoSimple(authUrl, sophonUrl, token.accessToken);
+  const mikoto = await constructMikotoSimple(
+    authUrl,
+    sophonUrl,
+    token.accessToken,
+  );
 
   // await refreshAccess(mikoto);
   // setInterval(() => {
@@ -39,11 +47,10 @@ export async function constructMikoto(authUrl: string, sophonUrl: string) {
   //   });
   // }, 10 * 60 * 1000);
 
-  await mikoto.getSpaces();
+  await mikoto.client.spaces.list();
   return mikoto;
 }
 
-export * from './entities';
 export * from './models';
 export * from './emitters';
 export * from './AuthClient';

@@ -1,5 +1,5 @@
 import { Button, Checkbox } from '@mantine/core';
-import { ClientMember, Role, Space, User } from 'mikotojs';
+import { Member, Role, Space, User } from 'mikotojs';
 import React, { useContext, useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -59,13 +59,9 @@ const StyledRoleBadge = styled.div`
   font-size: 12px;
 `;
 
-function RoleSetter({
-  roles,
-  member,
-}: {
-  roles: Role[];
-  member: ClientMember;
-}) {
+function RoleSetter({ roles, member }: { roles: Role[]; member: Member }) {
+  const mikoto = useMikoto();
+
   const [selectedRoles, setSelectedRoles] = useState<Record<string, boolean>>(
     () => {
       const o: Record<string, boolean> = {};
@@ -96,8 +92,8 @@ function RoleSetter({
         );
       })}
       <Button
-        onClick={() => {
-          member.update({
+        onClick={async () => {
+          await mikoto.client.members.update(member.spaceId, member.user.id, {
             roleIds: Object.keys(selectedRoles).filter(
               (id) => selectedRoles[id],
             ),
@@ -123,10 +119,10 @@ const StyledPlusBadge = styled.div`
 
 function AvatarContextMenu({ user, space }: { user: User; space?: Space }) {
   const mikoto = useMikoto();
-  const [member, setMember] = useState<ClientMember | null>(null);
+  const [member, setMember] = useState<Member | null>(null);
   React.useEffect(() => {
     if (space) {
-      mikoto.getMember(space.id, user.id).then(setMember);
+      mikoto.client.members.get(space.id, user.id).then(setMember);
     }
   }, [user.id]);
 

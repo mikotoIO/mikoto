@@ -11,6 +11,7 @@ import {
 import { Service } from 'typedi';
 
 import { AccountJwt } from '../auth';
+import { env } from '../env';
 
 @JsonController()
 @Service()
@@ -34,7 +35,7 @@ export class VoiceController {
     });
     token.addGrant({ roomJoin: true, room: channelId });
     return {
-      url: process.env.LIVEKIT_SERVER,
+      url: env.LIVEKIT_SERVER,
       channelId,
       token: token.toJwt(),
     };

@@ -22,6 +22,11 @@ import {
   SidebarContainerArea,
   ViewContainerWithSidebar,
 } from '../components/ViewContainer';
+import {
+  AvatarEditor,
+  mediaServerAxios,
+  uploadFileWithAxios,
+} from '../components/molecules/AvatarEditor';
 import { useMikoto } from '../hooks';
 
 const Sidebar = styled.div`
@@ -43,15 +48,31 @@ const SidebarButton = styled.a<{ selected?: boolean }>`
 
 function Overview({ space }: { space: Space }) {
   const [spaceName, setSpaceName] = useState(space.name);
+  const mikoto = useMikoto();
 
   return (
     <SidebarContainerArea>
       <TabName name={`Settings for ${space.name}`} />
       <h1>Space Overview</h1>
+      <AvatarEditor
+        onDrop={async (file) => {
+          const { data } = await uploadFileWithAxios<{ url: string }>(
+            mediaServerAxios,
+            '/spaceicon',
+            file,
+          );
+          await mikoto.client.spaces.update(space.id, {
+            icon: data.url,
+            name: null,
+          });
+        }}
+      />
+
       <TextInput
         value={spaceName}
         onChange={(x) => setSpaceName(x.target.value)}
       />
+      <Button>Update</Button>
     </SidebarContainerArea>
   );
 }
@@ -184,14 +205,14 @@ function RoleEditor({ role, space }: { space: Space; role: Role }) {
       />
       <Button
         onClick={() => {
-          mikoto
-            .editRole(space.id, role.id, {
-              name: values.name,
-              position: values.position,
-              spacePermissions: values.permissions,
-              color: values.color ?? undefined,
-            })
-            .then(() => console.log('updated'));
+          // mikoto
+          //   .editRole(space.id, role.id, {
+          //     name: values.name,
+          //     position: values.position,
+          //     spacePermissions: values.permissions,
+          //     color: values.color ?? undefined,
+          //   })
+          //   .then(() => console.log('updated'));
         }}
       >
         Save Changes
@@ -212,9 +233,9 @@ function Roles({ space }: { space: Space }) {
       <RoleList>
         <Button
           onClick={() => {
-            mikoto.createRole(space.id, 'New Role').then(() => {
-              console.log('role created');
-            });
+            // mikoto.client.roles.create(space.id, 'New Role').then(() => {
+            //   console.log('role created');
+            // });
           }}
         >
           New Role

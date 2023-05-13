@@ -1,4 +1,4 @@
-import { MikotoClient, ClientSpace, constructMikoto } from 'mikotojs';
+import { MikotoClient, Space, constructMikoto } from 'mikotojs';
 import React, { useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Navigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { Explorer } from '../components/Explorer';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { TabbedView } from '../components/TabBar';
 import { Sidebar } from '../components/UserArea';
+import { env } from '../env';
 import { MikotoContext, useMikoto } from '../hooks';
 import { Tabable, tabbedState, TabContext, treebarSpaceState } from '../store';
 import { AccountSettingsView } from './AccountSettingsView';
@@ -51,11 +52,11 @@ function AppView() {
   const tabbed = useRecoilValue(tabbedState);
 
   const spaceVal = useRecoilValue(treebarSpaceState);
-  const [space, setSpace] = useState<ClientSpace | null>(null);
+  const [space, setSpace] = useState<Space | null>(null);
   const mikoto = useMikoto();
   useEffect(() => {
     if (spaceVal) {
-      mikoto.getSpace(spaceVal.id).then((x) => setSpace(x));
+      mikoto.client.spaces.get(spaceVal.id).then((x) => setSpace(x));
     }
   }, [spaceVal?.id]);
 
@@ -89,10 +90,7 @@ function MikotoApiLoader({ children }: { children: React.ReactNode }) {
 
   // TODO: Try suspense
   useEffect(() => {
-    constructMikoto(
-      import.meta.env.MIKOTO_AUTH ?? 'http://localhost:9500',
-      import.meta.env.MIKOTO_API ?? 'http://localhost:3510',
-    )
+    constructMikoto(env.PUBLIC_AUTH, env.PUBLIC_SERVER)
       .then((x) => setMikoto(x))
       .catch((x) => setErr(x));
   }, []);

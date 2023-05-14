@@ -14,7 +14,7 @@ export const voiceService = sophon.create(VoiceService, {
     if (user === null) {
       throw new NotFoundError('User not found');
     }
-    const token = new AccessToken('devkey', 'secret', {
+    const token = new AccessToken(env.LIVEKIT_KEY, env.LIVEKIT_SECRET, {
       identity: ctx.data.user.sub,
       name: user.name,
     });

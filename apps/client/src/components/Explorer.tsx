@@ -1,3 +1,4 @@
+import { faMicrophone } from '@fortawesome/free-solid-svg-icons';
 import { Button, Select, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { Channel, Space } from 'mikotojs';
@@ -103,6 +104,15 @@ const TreeHead = styled.div`
   }
 `;
 
+function getIconFromChannelType(type: Channel['type']) {
+  switch (type) {
+    case 'VOICE':
+      return faMicrophone;
+    default:
+      return undefined;
+  }
+}
+
 function channelToStructuredTree(
   channels: Channel[],
   options: {
@@ -121,6 +131,7 @@ function channelToStructuredTree(
 
   channels.forEach((channel) => {
     const node: NodeObject = {
+      icon: getIconFromChannelType(channel.type),
       id: channel.id,
       text: channel.name,
       onClick: options.onClickFactory(channel),

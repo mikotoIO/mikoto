@@ -6,8 +6,10 @@ import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { SpecialComponents } from 'react-markdown/lib/ast-to-react';
 import { NormalComponents } from 'react-markdown/lib/complex-types';
+import rehypeKatex from 'rehype-katex';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../hooks';
@@ -216,7 +218,8 @@ function Markdown({ content }: { content: string }) {
   return (
     <ReactMarkdown
       components={markdownComponents}
-      remarkPlugins={[remarkGfm, remarkBreaks]}
+      remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
+      rehypePlugins={[rehypeKatex]}
     >
       {co}
     </ReactMarkdown>

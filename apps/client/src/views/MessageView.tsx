@@ -1,15 +1,18 @@
-import { Channel, Message } from 'mikotojs';
-import React, { useEffect, useState } from 'react';
+import { throttle } from 'lodash';
+import { Channel, Member, Message } from 'mikotojs';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAsync } from 'react-async-hook';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
+import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';
+import { userState } from '../components/UserArea';
 import { ViewContainer } from '../components/ViewContainer';
 import { Spinner } from '../components/atoms/Spinner';
 import { MessageItem } from '../components/molecules/Message';
 import { MessageEditor } from '../components/molecules/MessageEditor';
-import { useMikoto } from '../hooks';
+import { useInterval, useMikoto } from '../hooks';
 import { useMikotoSelector } from '../redux';
 import { CurrentSpaceContext } from '../store';
 
@@ -53,6 +56,7 @@ const StyledChannelHead = styled.div`
 
 const StyledTypingIndicatorContainer = styled.div`
   font-size: 12px;
+  height: 12px;
   padding: 4px 16px 8px;
 `;
 
@@ -71,6 +75,7 @@ const FUNNY_NUMBER = 69_420_000;
 function RealMessageView({ channel }: { channel: Channel }) {
   const virtuosoRef = React.useRef<VirtuosoHandle>(null);
   const mikoto = useMikoto();
+  const user = useRecoilValue(userState);
   // you will probably run out of memory before this number
   const [firstItemIndex, setFirstItemIndex] = useState(FUNNY_NUMBER);
   const [topLoaded, setTopLoaded] = useState(false);
@@ -78,6 +83,49 @@ function RealMessageView({ channel }: { channel: Channel }) {
   useEffect(() => {
     // mikoto.ack(channel.id).then();
   }, [channel.id]);
+
+  const [currentTypers, setCurrentTypers] = useState<
+    { timestamp: number; member: Member }[]
+  >([]);
+
+  useInterval(() => {
+    if (currentTypers.length === 0) return;
+    setCurrentTypers(currentTypers.filter((x) => x.timestamp > Date.now()));
+  }, 500);
+
+  useEffect(
+    () =>
+      mikoto.client.channels.onTypingStart((ev) => {
+        if (ev.channelId !== channel.id) return;
+        if (ev.member!.user.id === user?.id) return;
+
+        setCurrentTypers((cts) => {
+          const ct = [...cts];
+          let exists = false;
+          ct.forEach((x) => {
+            if (x.member.id === ev.member!.id) {
+              exists = true;
+              x.timestamp = Date.now() + 5000;
+            }
+          });
+          if (!exists) {
+            ct.push({
+              timestamp: Date.now() + 5000,
+              member: ev.member!,
+            });
+          }
+          return ct;
+        });
+      }),
+    [channel.id],
+  );
+
+  const typing = useCallback(
+    throttle(() => {
+      mikoto.client.channels.startTyping(channel.id, 5000).then();
+    }, 3000),
+    [],
+  );
 
   const [msgs, setMsgs] = useState<Message[] | null>(null);
   useEffect(() => {
@@ -104,6 +152,9 @@ function RealMessageView({ channel }: { channel: Channel }) {
   const createFn = (x: Message) => {
     setMsgs((xs) => {
       if (xs === null) return null;
+      setCurrentTypers((ts) =>
+        ts.filter((y) => y.member.user.id !== x.author?.id),
+      );
       setScrollToBottom(true);
       return [...xs, x];
     });
@@ -124,8 +175,6 @@ function RealMessageView({ channel }: { channel: Channel }) {
       mikoto.messageEmitter.off(`delete/${channel.id}`, deleteFn);
     };
   }, [channel.id]);
-
-  const isTyping = false;
 
   return (
     <ViewContainer key={channel.id}>
@@ -174,14 +223,20 @@ function RealMessageView({ channel }: { channel: Channel }) {
       )}
       <MessageEditor
         placeholder={`Message #${channel.name}`}
+        onTyping={() => {
+          typing();
+        }}
         onSubmit={async (msg) => {
           await mikoto.client.messages.send(channel.id, msg);
         }}
       />
       <StyledTypingIndicatorContainer>
-        {isTyping && (
+        {currentTypers.length > 0 && (
           <div>
-            <strong>CactusBlue</strong> is typing...
+            <strong>
+              {currentTypers.map((x) => x.member.user.name).join(', ')}
+            </strong>{' '}
+            is typing...
           </div>
         )}
       </StyledTypingIndicatorContainer>

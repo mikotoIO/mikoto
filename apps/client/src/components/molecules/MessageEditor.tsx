@@ -1,3 +1,4 @@
+import { on } from 'events';
 import { useMemo, useState } from 'react';
 import { createEditor, Transforms, Node } from 'slate';
 import { withHistory } from 'slate-history';
@@ -30,14 +31,20 @@ function serialize(nodes: Node[]) {
 interface MessageEditorProps {
   placeholder: string;
   onSubmit: (content: string) => void;
+  onTyping?: () => void;
 }
 
-export function MessageEditor({ placeholder, onSubmit }: MessageEditorProps) {
+export function MessageEditor({
+  placeholder,
+  onSubmit,
+  onTyping,
+}: MessageEditorProps) {
   const editor = useMemo(
     () => withHistory(withReact(createEditor() as ReactEditor)),
     [],
   );
   const [editorValue, setEditorValue] = useState<Node[]>(initialEditorValue);
+
   return (
     <Slate
       editor={editor}
@@ -47,11 +54,16 @@ export function MessageEditor({ placeholder, onSubmit }: MessageEditorProps) {
       <StyledEditable
         placeholder={placeholder}
         onKeyDown={(ev) => {
-          if (ev.key !== 'Enter' || ev.shiftKey) return;
+          // submission
+          if (ev.key !== 'Enter' || ev.shiftKey) {
+            onTyping?.();
+            return;
+          }
 
           ev.preventDefault();
           const text = serialize(editorValue).trim();
           if (text.length === 0) return;
+          console.log('submit??');
 
           onSubmit(text);
           setEditorValue(initialEditorValue);

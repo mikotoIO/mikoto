@@ -75,6 +75,7 @@ export interface ChannelCreateOptions {
 export interface TypingEvent {
   channelId: string;
   userId: string;
+  member: Member | null;
 }
 
 export interface ListMessageOptions {

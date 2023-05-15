@@ -5,6 +5,7 @@ import { prisma } from '../functions/prisma';
 import { serializeDates } from '../functions/serializeDate';
 import { ChannelService, MessageService } from './schema';
 import { sophon } from './sophon';
+import { findMember, memberInclude } from '../functions/includes';
 
 const authorInclude = {
   select: {
@@ -89,10 +90,20 @@ export const channelService = sophon.create(ChannelService, {
       ]);
     }
   },
-  async startTyping(ctx, id) {
-    // channelService.$(id).onTyping({ userId: ctx.data.user.sub });
-    throw new Error('not implemented');
+  async startTyping(ctx, channelId) {
+    const channel = await prisma.channel.findUnique({
+      where: { id: channelId },
+    });
+    if (channel === null) throw new NotFoundError();
+    const member = await findMember(channel.spaceId, ctx.data.user.sub);
+
+    channelService.$(`space/${channel.spaceId}`).onTypingStart({
+      channelId,
+      userId: ctx.data.user.sub,
+      member: serializeDates(member),
+    });
   },
+
   async stopTyping() {
     throw new Error('not implemented');
   },

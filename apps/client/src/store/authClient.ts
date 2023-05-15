@@ -1,5 +1,5 @@
 import { AuthClient } from 'mikotojs';
 
-export const authClient = new AuthClient(
-  import.meta.env.MIKOTO_AUTH ?? 'http://localhost:9500',
-);
+import { env } from '../env';
+
+export const authClient = new AuthClient(env.PUBLIC_AUTH_URL);

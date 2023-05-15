@@ -1,6 +1,5 @@
 import { CaseReducerActions, createSlice } from '@reduxjs/toolkit';
-import type { PayloadAction, Reducer } from '@reduxjs/toolkit';
-import { Draft } from 'immer';
+import type { PayloadAction } from '@reduxjs/toolkit';
 import { Space } from 'mikotojs';
 
 export type DeltaReducers<T extends { id: string }> = {
@@ -47,6 +46,17 @@ const spaceSlice = createSlice({
 
 export const spaceActions = spaceSlice.actions;
 export const spaceReducer = spaceSlice.reducer;
+
+const memberSlice = createSlice({
+  name: 'member',
+  initialState: {} as Record<string, Space>,
+  reducers: {
+    ...createDeltaReducers<Space>(),
+  },
+});
+
+export const memberActions = memberSlice.actions;
+export const memberReducer = memberSlice.reducer;
 
 export type DeltaReducerActions<T extends { id: string }> = CaseReducerActions<
   DeltaReducers<T>,

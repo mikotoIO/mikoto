@@ -104,6 +104,7 @@ struct ChannelCreateOptions {
 struct TypingEvent {
   channelId: string;
   userId: string;
+  member: Member?;
 }
 
 service ChannelService {

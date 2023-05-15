@@ -10,3 +10,7 @@ export const MikotoContext = React.createContext<MikotoClient>(undefined!);
 export function useMikoto() {
   return useContext(MikotoContext);
 }
+
+export function useEvent() {
+  
+}

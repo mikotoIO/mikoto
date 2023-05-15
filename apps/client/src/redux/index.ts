@@ -1,11 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
-import { spaceReducer } from './mikoto';
+import { memberReducer, spaceReducer } from './mikoto';
 
 export const store = configureStore({
   reducer: {
     spaces: spaceReducer,
+    members: memberReducer,
   },
 });
 

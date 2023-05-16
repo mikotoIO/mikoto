@@ -1,5 +1,4 @@
-import { on } from 'events';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createEditor, Transforms, Node } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
@@ -45,6 +44,15 @@ export function MessageEditor({
   );
   const [editorValue, setEditorValue] = useState<Node[]>(initialEditorValue);
 
+  useEffect(() => {
+    const fn = (ev: KeyboardEvent) => {
+      // TODO: focus into the editor on text-producing keypress
+    };
+    document.addEventListener('keydown', fn);
+
+    return () => document.removeEventListener('keydown', fn);
+  }, []);
+
   return (
     <Slate
       editor={editor}
@@ -52,6 +60,7 @@ export function MessageEditor({
       onChange={(x) => setEditorValue(x)}
     >
       <StyledEditable
+        autoFocus
         placeholder={placeholder}
         onKeyDown={(ev) => {
           // submission

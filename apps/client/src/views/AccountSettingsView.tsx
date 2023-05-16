@@ -1,7 +1,8 @@
 import { Button, TextInput } from '@mantine/core';
 import axios, { AxiosInstance } from 'axios';
 import { useDropzone } from 'react-dropzone';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useForm } from 'react-hook-form';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { modalState } from '../components/ContextMenu';
@@ -14,6 +15,7 @@ import {
 } from '../components/molecules/AvatarEditor';
 import { env } from '../env';
 import { useMikoto } from '../hooks';
+import { useErrorElement } from '../hooks/useErrorElement';
 import { SettingsView } from './SettingsViewTemplate';
 
 const bgUrl = 'https://i1.sndcdn.com/visuals-000328863415-MJdwB0-t2480x520.jpg';
@@ -43,12 +45,52 @@ const Content = styled.div`
 `;
 
 export function PasswordChangeModal() {
+  const mikoto = useMikoto();
+  const user = useRecoilValue(userState);
+
+  const { register, handleSubmit, getValues } = useForm();
+  const error = useErrorElement();
+
   return (
-    <div>
-      <TextInput label="Current Password" type="password" />
-      <TextInput label="New Password" type="password" />
-      <TextInput label="Confirm New Password" type="password" />
-    </div>
+    <form
+      onSubmit={handleSubmit(async (form) => {
+        try {
+          await mikoto.authAPI.changePassword(
+            user!.id,
+            form.oldPassword,
+            form.newPassword,
+          );
+          window.location.href = '/login';
+        } catch (e) {
+          error.setError((e as any)?.response?.data);
+        }
+      })}
+    >
+      {error.el}
+
+      <TextInput
+        label="Old Password"
+        type="password"
+        {...register('oldPassword', { required: true })}
+      />
+
+      <TextInput
+        label="New Password"
+        type="password"
+        {...register('newPassword', { required: true })}
+      />
+
+      <TextInput
+        label="Confirm New Password"
+        type="password"
+        {...register('confirmNewPassword', {
+          required: true,
+          validate: (value) => value === getValues('newPassword'),
+        })}
+      />
+
+      <Button type="submit">Change Password</Button>
+    </form>
   );
 }
 

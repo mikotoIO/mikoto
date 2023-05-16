@@ -29,6 +29,16 @@ export class AuthClient {
       .then((x) => x.data);
   }
 
+  changePassword(id: string, oldPassword: string, newPassword: string) {
+    return this.axios
+      .post<TokenPair>('/account/change_password', {
+        id,
+        oldPassword,
+        newPassword,
+      })
+      .then((x) => x.data);
+  }
+
   refresh(pair: TokenPair) {
     return this.axios
       .post<TokenPair>('/account/refresh', {

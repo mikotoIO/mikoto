@@ -127,18 +127,26 @@ export class AccountController {
     return this.createTokenPair(account, body.refreshToken);
   }
 
-  @Post('/account/change_pasword')
+  @Post('/account/change_password')
   async changePassword(@Body() body: ChangePasswordPayload) {
     const account = await this.prisma.account.findUnique({
       where: { id: body.id },
     });
 
-    if (account && (await bcrypt.compare(body.oldPassword, account.passhash))) {
-      await this.prisma.account.update({
-        where: { id: account.id },
-        data: { passhash: await bcrypt.hash(body.newPassword, 10) },
-      });
-    }
+    if (!account) throw new UnauthorizedError('Invalid Account');
+    if (!(await bcrypt.compare(body.oldPassword, account.passhash)))
+      throw new UnauthorizedError('Invalid Password');
+
+    // delete all refresh tokens as well
+    await this.prisma.refreshToken.deleteMany({
+      where: { accountId: account.id },
+    });
+
+    await this.prisma.account.update({
+      where: { id: account.id },
+      data: { passhash: await bcrypt.hash(body.newPassword, 10) },
+    });
+    return await this.createTokenPair(account);
   }
 
   @Post('/account/reset_password')

@@ -2,6 +2,7 @@ import { faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import { Helmet } from 'react-helmet';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 
@@ -92,6 +93,7 @@ function useReorderable() {
   };
 }
 
+// TODO: The fuck was I on when I wrote this code?
 export function TabName({ name }: { name: string }) {
   const tabInfo = useContext(TabContext);
   const [tabName, setTabName] = useRecoilState(tabNameFamily(tabInfo.key));
@@ -165,6 +167,7 @@ function Tab({ tab, index }: TabProps) {
       >
         <FontAwesomeIcon icon={faX} />
       </StyledCloseButton>
+      {active && <Helmet title={tabName} />}
     </StyledTab>
   );
 }
@@ -213,6 +216,7 @@ export function TabbedView({ children, tabs }: TabbedViewProps) {
 
   return (
     <StyledTabbedView>
+      <Helmet titleTemplate="Mikoto | %s" defaultTitle="Mikoto" />
       <StyledTabBar>
         {tabs.map((tab, index) => (
           <Tab tab={tab} index={index} key={`${tab.kind}/${tab.key}`} />

@@ -137,6 +137,11 @@ export class AccountController {
     if (!(await bcrypt.compare(body.oldPassword, account.passhash)))
       throw new UnauthorizedError('Invalid Password');
 
+    // delete all refresh tokens as well
+    await this.prisma.refreshToken.deleteMany({
+      where: { accountId: account.id },
+    });
+
     await this.prisma.account.update({
       where: { id: account.id },
       data: { passhash: await bcrypt.hash(body.newPassword, 10) },

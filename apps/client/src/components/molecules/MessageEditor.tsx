@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { createEditor, Transforms, Node } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
@@ -8,7 +8,7 @@ import styled from 'styled-components';
 const StyledEditable = styled(Editable)`
   background-color: ${(p) => p.theme.colors.N700};
   font-size: 14px;
-  margin: 4px 16px;
+  margin: 12px 16px 4px;
   padding: 16px;
   border-radius: 4px;
 `;
@@ -45,6 +45,7 @@ export function MessageEditor({
   const [editorValue, setEditorValue] = useState<Node[]>(initialEditorValue);
 
   useEffect(() => {
+    ReactEditor.focus(editor);
     const fn = (ev: KeyboardEvent) => {
       // TODO: focus into the editor on text-producing keypress
     };
@@ -60,7 +61,6 @@ export function MessageEditor({
       onChange={(x) => setEditorValue(x)}
     >
       <StyledEditable
-        autoFocus
         placeholder={placeholder}
         onKeyDown={(ev) => {
           // submission
@@ -72,7 +72,6 @@ export function MessageEditor({
           ev.preventDefault();
           const text = serialize(editorValue).trim();
           if (text.length === 0) return;
-          console.log('submit??');
 
           onSubmit(text);
           setEditorValue(initialEditorValue);

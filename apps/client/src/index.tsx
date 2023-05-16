@@ -3,6 +3,7 @@ import * as Sentry from '@sentry/react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import ReactDOM from 'react-dom/client';
+import { Helmet } from 'react-helmet';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { Provider } from 'react-redux';
 import { RecoilRoot } from 'recoil';

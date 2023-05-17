@@ -93,7 +93,7 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
       maxWidth="50vw"
       defaultSize={{ width: 240, height: '100%' }}
     >
-      {children}
+      <div>{children}</div>
       <UserArea />
     </StyledSidebar>
   );

@@ -20,6 +20,7 @@ import { Pill } from './atoms/Pill';
 const StyledServerSidebar = styled.div`
   background-color: ${(p) => p.theme.colors.N1000};
   align-items: center;
+  box-sizing: border-box;
   width: 68px;
   height: 100%;
   padding-top: 10px;

@@ -53,6 +53,7 @@ function padTime(n: number): string {
 
 const MessageContainer = styled.div<{ isSimple?: boolean }>`
   margin: 0;
+  margin-top: ${(p) => (p.isSimple ? 0 : '8px')};
   display: grid;
   grid-template-columns: min-content auto;
   min-height: 20px;

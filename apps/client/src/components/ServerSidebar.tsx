@@ -1,4 +1,3 @@
-import { icon } from '@fortawesome/fontawesome-svg-core';
 import { Button, TextInput, Tooltip } from '@mantine/core';
 import { AxiosError } from 'axios';
 import { Space } from 'mikotojs';
@@ -20,6 +19,7 @@ import { Pill } from './atoms/Pill';
 const StyledServerSidebar = styled.div`
   background-color: ${(p) => p.theme.colors.N1000};
   align-items: center;
+  box-sizing: border-box;
   width: 68px;
   height: 100%;
   padding-top: 10px;

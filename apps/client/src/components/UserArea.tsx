@@ -1,4 +1,5 @@
 import { User } from 'mikotojs';
+import { Resizable } from 're-resizable';
 import React, { useEffect } from 'react';
 import { atom, useRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -8,10 +9,9 @@ import { useTabkit } from '../store';
 import { ContextMenu, useContextMenu } from './ContextMenu';
 import { Avatar } from './atoms/Avatar';
 
-const StyledSidebar = styled.div`
+const StyledSidebar = styled(Resizable)`
   display: grid;
   grid-template-rows: 1fr 64px;
-  width: 270px;
   height: 100%;
 `;
 
@@ -87,7 +87,11 @@ export function UserArea() {
 
 export function Sidebar({ children }: { children: React.ReactNode }) {
   return (
-    <StyledSidebar>
+    <StyledSidebar
+      enable={{ right: true }}
+      minWidth={200}
+      size={{ width: 240, height: '100%' }}
+    >
       {children}
       <UserArea />
     </StyledSidebar>

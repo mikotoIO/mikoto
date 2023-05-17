@@ -1,4 +1,3 @@
-import { icon } from '@fortawesome/fontawesome-svg-core';
 import { Button, TextInput, Tooltip } from '@mantine/core';
 import { AxiosError } from 'axios';
 import { Space } from 'mikotojs';

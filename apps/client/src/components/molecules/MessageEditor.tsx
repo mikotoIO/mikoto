@@ -11,6 +11,8 @@ const StyledEditable = styled(Editable)`
   margin: 12px 16px 4px;
   padding: 16px;
   border-radius: 4px;
+  word-wrap: break-word;
+  box-sizing: border-box;
 `;
 
 const initialEditorValue = [{ children: [{ text: '' }] }];

@@ -90,6 +90,7 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
     <StyledSidebar
       enable={{ right: true }}
       minWidth={200}
+      maxWidth="50vw"
       defaultSize={{ width: 240, height: '100%' }}
     >
       {children}

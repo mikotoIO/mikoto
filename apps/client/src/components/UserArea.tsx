@@ -90,7 +90,7 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
     <StyledSidebar
       enable={{ right: true }}
       minWidth={200}
-      size={{ width: 240, height: '100%' }}
+      defaultSize={{ width: 240, height: '100%' }}
     >
       {children}
       <UserArea />

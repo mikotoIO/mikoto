@@ -21,7 +21,6 @@ data/
 .next/
 out/
 build
-apps/server/.env
 
 # misc
 .DS_Store

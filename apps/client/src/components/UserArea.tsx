@@ -55,6 +55,14 @@ function UserAreaMenu() {
       >
         User Settings
       </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          localStorage.removeItem('REFRESH_TOKEN');
+          window.location.reload();
+        }}
+      >
+        Log out
+      </ContextMenu.Link>
     </ContextMenu>
   );
 }

@@ -15,6 +15,7 @@ import { MikotoContext, useMikoto } from '../hooks';
 import { Tabable, tabbedState, TabContext, treebarSpaceState } from '../store';
 import { AccountSettingsView } from './AccountSettingsView';
 import { MessageView } from './MessageView';
+import { DesignStory } from './Palette';
 import { SpaceSettingsView } from './SpaceSettingsView';
 import { VoiceView } from './VoiceView';
 
@@ -43,6 +44,8 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
       return <SpaceSettingsView space={tab.space} />;
     case 'accountSettings':
       return <AccountSettingsView />;
+    case 'palette':
+      return <DesignStory />;
     default:
       return null;
   }

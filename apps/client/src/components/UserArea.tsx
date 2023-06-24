@@ -50,6 +50,13 @@ function UserAreaMenu() {
     <ContextMenu>
       <ContextMenu.Link
         onClick={() => {
+          tabkit.openTab({ kind: 'palette', key: 'main' }, false);
+        }}
+      >
+        Open Palette
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
           tabkit.openTab({ kind: 'accountSettings', key: 'main' }, false);
         }}
       >

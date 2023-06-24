@@ -11,7 +11,7 @@ import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
 import App from './App';
 import { GlobalStyle } from './components/GlobalStyle';
-import { theme } from './components/themes';
+import { theme } from './lucid/theme';
 import { store } from './redux';
 import reportWebVitals from './reportWebVitals';
 

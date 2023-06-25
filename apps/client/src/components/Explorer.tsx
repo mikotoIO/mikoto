@@ -8,6 +8,8 @@ import styled from 'styled-components';
 
 import { useMikoto } from '../hooks';
 import { useDeltaNext } from '../hooks/useDelta';
+import { DialogPanel } from '../lucid/DialogPanel';
+import { Input } from '../lucid/Input';
 import { Tabable, treebarSpaceState, useTabkit } from '../store';
 import { ContextMenu, modalState, useContextMenuX } from './ContextMenu';
 import { ExplorerNext, NodeObject } from './ExplorerNext';
@@ -16,6 +18,7 @@ const StyledTree = styled.div`
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  height: 100%;
 `;
 
 function channelToTab(channel: Channel): Tabable {
@@ -37,7 +40,25 @@ function channelToTab(channel: Channel): Tabable {
   }
 }
 
-function CreateChannelModal({ parentId }: { parentId?: string }) {
+const CreateChannelWrapper = styled.div`
+  min-width: 400px;
+
+  h1 {
+    margin: 0;
+  }
+
+  .subchannelinfo {
+    color: ${(p) => p.theme.colors.N300};
+    margin: 0;
+    font-size: 14px;
+  }
+
+  form {
+    margin-top: 16px;
+  }
+`;
+
+function CreateChannelModal({ channel }: { channel?: Channel }) {
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
   const space = useRecoilValue(treebarSpaceState);
@@ -49,33 +70,39 @@ function CreateChannelModal({ parentId }: { parentId?: string }) {
   });
 
   return (
-    <form
-      onSubmit={form.onSubmit(async () => {
-        await mikoto.client.channels.create(space!.id, {
-          name: form.values.name,
-          type: form.values.type,
-          parentId: parentId ?? null,
-        });
-        setModal(null);
-      })}
-    >
-      <Select
-        label="Channel Type"
-        data={[
-          { label: 'Text Channel', value: 'TEXT' },
-          { label: 'Voice Channel', value: 'VOICE' },
-        ]}
-        {...form.getInputProps('type')}
-      />
-      <TextInput
-        label="Channel Name"
-        placeholder="New Channel"
-        {...form.getInputProps('name')}
-      />
-      <Button mt={16} fullWidth type="submit">
-        Create Channel
-      </Button>
-    </form>
+    <DialogPanel>
+      <CreateChannelWrapper>
+        <h1 style={{ margin: 0 }}>Create Channel</h1>
+        {channel && <p className="subchannelinfo">In #{channel.name}</p>}
+        <form
+          onSubmit={form.onSubmit(async () => {
+            await mikoto.client.channels.create(space!.id, {
+              name: form.values.name,
+              type: form.values.type,
+              parentId: channel?.id ?? null,
+            });
+            setModal(null);
+          })}
+        >
+          <Select
+            label="Channel Type"
+            data={[
+              { label: 'Text Channel', value: 'TEXT' },
+              { label: 'Voice Channel', value: 'VOICE' },
+            ]}
+            {...form.getInputProps('type')}
+          />
+          <Input
+            labelName="Channel Name"
+            placeholder="New Channel"
+            {...form.getInputProps('name')}
+          />
+          <Button mt={16} fullWidth type="submit">
+            Create Channel
+          </Button>
+        </form>
+      </CreateChannelWrapper>
+    </DialogPanel>
   );
 }
 
@@ -188,7 +215,7 @@ export function Explorer({ space }: { space: Space }) {
             onClick={() => {
               setModal({
                 title: `Create Subchannel for #${channel.name}`,
-                elem: <CreateChannelModal parentId={channel.id} />,
+                elem: <CreateChannelModal channel={channel} />,
               });
             }}
           >

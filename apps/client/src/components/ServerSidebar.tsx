@@ -10,6 +10,7 @@ import { useHover } from 'usehooks-ts';
 import { useMikoto } from '../hooks';
 import { useDeltaWithRedux } from '../hooks/useDelta';
 import { useErrorElement } from '../hooks/useErrorElement';
+import { DialogPanel } from '../lucid/DialogPanel';
 import { Input } from '../lucid/Input';
 import { useMikotoSelector } from '../redux';
 import { spaceActions } from '../redux/mikoto';
@@ -187,6 +188,7 @@ function SpaceJoinForm({ closeModal }: { closeModal: () => void }) {
 }
 
 const SpaceJoinModalWrapper = styled.div`
+  min-width: 400px;
   .inviteheader {
     text-align: center;
   }
@@ -196,19 +198,24 @@ export function SpaceJoinModal() {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <SpaceJoinModalWrapper>
-      <SpaceCreateForm
-        closeModal={() => {
-          setModal(null);
-        }}
-      />
-      <h2 className="inviteheader">Have an invite already?</h2>
-      <SpaceJoinForm
-        closeModal={() => {
-          setModal(null);
-        }}
-      />
-    </SpaceJoinModalWrapper>
+    <DialogPanel>
+      <SpaceJoinModalWrapper>
+        <h1 className="inviteheader" style={{ marginTop: 0 }}>
+          Create a Space
+        </h1>
+        <SpaceCreateForm
+          closeModal={() => {
+            setModal(null);
+          }}
+        />
+        <h2 className="inviteheader">Have an invite already?</h2>
+        <SpaceJoinForm
+          closeModal={() => {
+            setModal(null);
+          }}
+        />
+      </SpaceJoinModalWrapper>
+    </DialogPanel>
   );
 }
 

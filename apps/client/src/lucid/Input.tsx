@@ -17,6 +17,7 @@ export const SInput = styled.input`
 
 const Label = styled.label`
   display: block;
+  color: ${(p) => p.theme.colors.N200};
   .label {
     font-weight: bold;
     margin-bottom: 8px;

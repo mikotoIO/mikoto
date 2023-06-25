@@ -1,12 +1,13 @@
 import styled from 'styled-components';
 
-export const ViewContainer = styled.div<{ padded?: boolean }>`
+export const ViewContainer = styled.div<{ padded?: boolean; scroll?: boolean }>`
   flex: 1;
   background-color: ${(p) => p.theme.colors.N800};
   height: 100%;
   display: flex;
   flex-direction: column;
   padding: ${(p) => (p.padded ? '32px' : '0')};
+  overflow-y: ${(p) => (p.scroll ? 'scroll' : 'hidden')};
 `;
 
 export const ScrollingViewContainer = styled.div`

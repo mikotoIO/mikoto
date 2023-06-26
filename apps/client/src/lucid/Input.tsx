@@ -1,4 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
+import React from 'react';
 import styled from 'styled-components';
 
 export const SInput = styled.input`
@@ -24,17 +25,20 @@ const Label = styled.label`
   }
 `;
 
-export function Input({
-  labelName,
-  ...props
-}: { labelName?: string } & React.InputHTMLAttributes<HTMLInputElement>) {
-  if (!labelName) {
-    return <SInput {...props} />;
-  }
-  return (
-    <Label>
-      <div className="label">{labelName}</div>
-      <SInput {...props} />
-    </Label>
-  );
-}
+type InputProps = {
+  labelName?: string;
+} & React.InputHTMLAttributes<HTMLInputElement>;
+
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ labelName, ...props }, ref) => {
+    if (!labelName) {
+      return <SInput {...props} />;
+    }
+    return (
+      <Label>
+        <div className="label">{labelName}</div>
+        <SInput {...props} ref={ref} />
+      </Label>
+    );
+  },
+);

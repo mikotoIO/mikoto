@@ -1,13 +1,19 @@
-import { faMicrophone } from '@fortawesome/free-solid-svg-icons';
-import { Button, Select, TextInput } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import {
+  faFileAlt,
+  faHashtag,
+  faMicrophone,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Button } from '@mantine/core';
 import { Channel, Space } from 'mikotojs';
 import React from 'react';
+import { useForm } from 'react-hook-form';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../hooks';
 import { useDeltaNext } from '../hooks/useDelta';
+import { useErrorElement } from '../hooks/useErrorElement';
 import { DialogPanel } from '../lucid/DialogPanel';
 import { Input } from '../lucid/Input';
 import { Tabable, treebarSpaceState, useTabkit } from '../store';
@@ -58,16 +64,41 @@ const CreateChannelWrapper = styled.div`
   }
 `;
 
+const ChannelTypeButton = styled.button<{ active?: boolean }>`
+  background-color: ${(p) => p.theme.colors.N900};
+  border: 2px solid
+    ${(p) => (p.active ? p.theme.colors.B800 : p.theme.colors.N600)};
+  color: ${(p) => p.theme.colors.N100};
+  font-size: 16px;
+  border-radius: 8px;
+  min-width: 100px;
+  min-height: 100px;
+  margin: 8px;
+  cursor: pointer;
+
+  .icon {
+    margin-bottom: 8px;
+    font-size: 24px;
+    color: ${(p) => p.theme.colors.N400};
+  }
+
+  transition: border-color 0.1s ease-in-out;
+`;
+
+const channelTypes = [
+  { id: 'TEXT', name: 'Text', icon: faHashtag },
+  { id: 'VOICE', name: 'Voice', icon: faMicrophone },
+  { id: 'DOCS', name: 'Docs', icon: faFileAlt },
+];
+
 function CreateChannelModal({ channel }: { channel?: Channel }) {
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
   const space = useRecoilValue(treebarSpaceState);
-  const form = useForm({
-    initialValues: {
-      name: '',
-      type: 'TEXT',
-    },
-  });
+  const { register, handleSubmit } = useForm();
+
+  const [channelType, setChannelType] = React.useState('TEXT');
+  const error = useErrorElement();
 
   return (
     <DialogPanel>
@@ -75,27 +106,39 @@ function CreateChannelModal({ channel }: { channel?: Channel }) {
         <h1 style={{ margin: 0 }}>Create Channel</h1>
         {channel && <p className="subchannelinfo">In #{channel.name}</p>}
         <form
-          onSubmit={form.onSubmit(async () => {
-            await mikoto.client.channels.create(space!.id, {
-              name: form.values.name,
-              type: form.values.type,
-              parentId: channel?.id ?? null,
-            });
-            setModal(null);
+          onSubmit={handleSubmit(async (formData) => {
+            try {
+              await mikoto.client.channels.create(space!.id, {
+                name: formData.name,
+                type: channelType,
+                parentId: channel?.id ?? null,
+              });
+              setModal(null);
+            } catch (e) {
+              console.log(e);
+              error.setError((e as any)?.response?.data);
+            }
           })}
         >
-          <Select
-            label="Channel Type"
-            data={[
-              { label: 'Text Channel', value: 'TEXT' },
-              { label: 'Voice Channel', value: 'VOICE' },
-            ]}
-            {...form.getInputProps('type')}
-          />
+          {error.el}
+          <div>
+            {channelTypes.map((type) => (
+              <ChannelTypeButton
+                key={type.id}
+                type="button"
+                active={channelType === type.id}
+                onClick={() => setChannelType(type.id)}
+              >
+                <FontAwesomeIcon className="icon" icon={type.icon} />
+                <br />
+                {type.name}
+              </ChannelTypeButton>
+            ))}
+          </div>
           <Input
             labelName="Channel Name"
             placeholder="New Channel"
-            {...form.getInputProps('name')}
+            {...register('name')}
           />
           <Button mt={16} fullWidth type="submit">
             Create Channel

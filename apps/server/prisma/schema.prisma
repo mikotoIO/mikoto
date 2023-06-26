@@ -10,10 +10,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserCategory {
+  BOT
+  UNVERIFIED
+}
+
 model User {
-  id            String          @id @default(uuid()) @db.Uuid
-  name          String
-  avatar        String?
+  id       String        @id @default(uuid()) @db.Uuid
+  name     String
+  avatar   String?
+  category UserCategory?
+
   SpaceUser     SpaceUser[]
   RefreshToken  RefreshToken[]
   Message       Message[]
@@ -21,6 +28,8 @@ model User {
   ChannelUnread ChannelUnread[]
   Verification  Verification[]
   Account       Account?
+  Bot           Bot?
+  Bots          Bot[]           @relation("Bots")
 }
 
 // factor out email and password
@@ -30,6 +39,17 @@ model Account {
   passhash     String
   user         User           @relation(fields: [id], references: [id], onDelete: Cascade)
   RefreshToken RefreshToken[]
+}
+
+model Bot {
+  id   String @id @default(uuid()) @db.Uuid
+  name String
+  user User   @relation(fields: [id], references: [id], onDelete: Cascade)
+
+  ownerId String @db.Uuid
+  owner   User   @relation("Bots", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  secret String
 }
 
 model RefreshToken {

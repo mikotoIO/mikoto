@@ -135,6 +135,7 @@ export function AccountSettingsView() {
       >
         Change Password
       </Button>
+      <h2>Bots</h2>
     </SettingsView>
   );
 }

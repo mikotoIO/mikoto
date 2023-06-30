@@ -19,13 +19,13 @@ import {
 import socketio, { Server } from 'socket.io';
 import { Container } from 'typedi';
 
+import { env } from './env';
 import Mailer from './functions/Mailer';
 import Minio from './functions/Minio';
 import { logger } from './functions/logger';
 import './functions/prismaRecursive';
 import { mainService } from './services';
 import { sophon } from './services/sophon';
-import { env } from './env';
 
 const app = express();
 

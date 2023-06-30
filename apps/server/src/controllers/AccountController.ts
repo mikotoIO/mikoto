@@ -15,10 +15,10 @@ import { Service } from 'typedi';
 import { promisify } from 'util';
 
 import { AccountJwt } from '../auth';
+import { env } from '../env';
 import Mailer from '../functions/Mailer';
 import Minio from '../functions/Minio';
 import { logger } from '../functions/logger';
-import { env } from '../env';
 
 const randomBytes = promisify(crypto.randomBytes);
 async function generateRandomToken() {
@@ -236,5 +236,34 @@ export class AccountController {
     return {
       status: 'ok',
     };
+  }
+
+  // Bots
+
+  // show list of bots for user
+  @Get('/bots')
+  async listBots(@CurrentUser() account: AccountJwt) {
+    const bots = await this.prisma.bot.findMany({
+      where: { ownerId: account.sub },
+    });
+    return bots;
+  }
+
+  // create a bot
+  @Post('/bots')
+  async createBot(
+    @CurrentUser() account: AccountJwt,
+    @Body() body: { name: string },
+  ) {
+    const secret = await generateRandomToken();
+
+    const bot = await this.prisma.bot.create({
+      data: {
+        name: body.name,
+        ownerId: account.sub,
+        secret,
+      },
+    });
+    return bot;
   }
 }

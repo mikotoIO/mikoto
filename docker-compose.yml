@@ -27,7 +27,7 @@ services:
       - '9001:9001'
     restart: always
   livekit:
-    image: livekit/livekit-server:latest
+    image: livekit/livekit-server:v1.4.3
     command: '--keys "devkey: secret"'
     ports:
       - '7880:7880'

@@ -40,9 +40,20 @@ const StyledServerIcon = styled.div<{ active?: boolean; icon?: string }>`
   background-size: cover;
 `;
 
+function InviteModal() {
+  return (
+    <DialogPanel>
+      <h1>Your Invite is</h1>
+      <code>https://app.mikoto.io/m/abcdefgh</code>
+    </DialogPanel>
+  );
+}
+
 function ServerIconContextMenu({ space }: { space: Space }) {
   const mikoto = useMikoto();
   const tabkit = useTabkit();
+  const setModal = useSetRecoilState(modalState);
+
   return (
     <ContextMenu>
       <ContextMenu.Link
@@ -63,6 +74,16 @@ function ServerIconContextMenu({ space }: { space: Space }) {
         onClick={async () => await navigator.clipboard.writeText(space.id)}
       >
         Copy ID
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          setModal({
+            title: 'Invite',
+            elem: <InviteModal />,
+          });
+        }}
+      >
+        Generate Invite
       </ContextMenu.Link>
       <ContextMenu.Link
         onClick={async () => await mikoto.client.spaces.leave(space.id)}

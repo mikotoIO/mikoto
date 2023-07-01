@@ -77,6 +77,14 @@ function Overview({ space }: { space: Space }) {
   );
 }
 
+function Invites({ space }: { space: Space }) {
+  return (
+    <SidebarContainerArea>
+      <h1>Invites</h1>
+    </SidebarContainerArea>
+  );
+}
+
 const ColorDot = styled.span<{ color?: string }>`
   display: inline-block;
   width: 12px;
@@ -260,6 +268,8 @@ function SettingSwitch({ tab, space }: { tab: string; space: Space }) {
   switch (tab) {
     case 'Overview':
       return <Overview space={space} />;
+    case 'Invites':
+      return <Invites space={space} />;
     case 'Roles':
       return <Roles space={space} />;
     default:
@@ -272,7 +282,7 @@ export function SpaceSettingsView({ space }: { space: Space }) {
   return (
     <ViewContainerWithSidebar>
       <Sidebar>
-        {['Overview', 'Roles'].map((x) => (
+        {['Overview', 'Invites', 'Roles'].map((x) => (
           <SidebarButton
             selected={tab === x}
             key={x}

@@ -1,6 +1,4 @@
 import { Button, TextInput } from '@mantine/core';
-import axios, { AxiosInstance } from 'axios';
-import { useDropzone } from 'react-dropzone';
 import { useForm } from 'react-hook-form';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -13,7 +11,6 @@ import {
   mediaServerAxios,
   uploadFileWithAxios,
 } from '../components/molecules/AvatarEditor';
-import { env } from '../env';
 import { useMikoto } from '../hooks';
 import { useErrorElement } from '../hooks/useErrorElement';
 import { SettingsView } from './SettingsViewTemplate';
@@ -94,6 +91,10 @@ export function PasswordChangeModal() {
   );
 }
 
+function BotsSegment() {
+  return <div>bots goes here</div>;
+}
+
 export function AccountSettingsView() {
   const setModal = useSetRecoilState(modalState);
 
@@ -136,6 +137,7 @@ export function AccountSettingsView() {
         Change Password
       </Button>
       <h2>Bots</h2>
+      <BotsSegment />
     </SettingsView>
   );
 }

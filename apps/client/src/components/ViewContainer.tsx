@@ -22,7 +22,8 @@ export const ScrollingViewContainer = styled.div`
 
 export const ViewContainerWithSidebar = styled.div`
   background-color: ${(p) => p.theme.colors.N800};
-  display: flex;
+  display: grid;
+  grid-template-columns: 240px 1fr;
   height: 100%;
   overflow-y: scroll;
 `;
@@ -31,4 +32,8 @@ export const SidebarContainerArea = styled.div`
   padding: 32px;
   height: 100%;
   box-sizing: border-box;
+
+  h1 {
+    margin-top: 0;
+  }
 `;

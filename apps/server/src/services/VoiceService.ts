@@ -1,13 +1,13 @@
+import { SophonInstance } from '@sophon-js/server';
 import { AccessToken } from 'livekit-server-sdk';
 import { NotFoundError } from 'routing-controllers';
 
-import { prisma } from '../functions/prisma';
-import { VoiceService } from './schema';
-import { sophon } from './sophon';
 import { env } from '../env';
+import { prisma } from '../functions/prisma';
+import { AbstractVoiceService } from './schema';
 
-export const voiceService = sophon.create(VoiceService, {
-  async join(ctx, id: string) {
+export class VoiceService extends AbstractVoiceService {
+  async join(ctx: SophonInstance, id: string) {
     const user = await prisma.user.findUnique({
       where: { id: ctx.data.user.sub },
     });
@@ -24,5 +24,5 @@ export const voiceService = sophon.create(VoiceService, {
       channelId: id,
       token: token.toJwt(),
     };
-  },
-});
+  }
+}

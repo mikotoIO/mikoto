@@ -1,11 +1,15 @@
 import { ChannelType } from '@prisma/client';
+import { SophonInstance } from '@sophon-js/server';
 import { NotFoundError, UnauthorizedError } from 'routing-controllers';
 
+import { findMember } from '../functions/includes';
 import { prisma } from '../functions/prisma';
 import { serializeDates } from '../functions/serializeDate';
-import { ChannelService, MessageService } from './schema';
-import { sophon } from './sophon';
-import { findMember, memberInclude } from '../functions/includes';
+import {
+  AbstractChannelService,
+  AbstractMessageService,
+  ChannelCreateOptions,
+} from './schema';
 
 const authorInclude = {
   select: {
@@ -15,19 +19,25 @@ const authorInclude = {
   },
 };
 
-export const channelService = sophon.create(ChannelService, {
-  get: async (ctx, id: string) => {
+export class ChannelService extends AbstractChannelService {
+  async get(ctx: SophonInstance, id: string) {
     const channel = await prisma.channel.findUnique({ where: { id } });
     if (channel === null) throw new NotFoundError();
     return serializeDates(channel);
-  },
+  }
 
-  list: async (ctx, spaceId: string) => {
+  // list: async (ctx, spaceId: string) => {
+  async list(ctx: SophonInstance, spaceId: string) {
     const channels = await prisma.channel.findMany({ where: { spaceId } });
     return serializeDates(channels);
-  },
+  }
 
-  create: async (ctx, spaceId, { name, type, parentId }) => {
+  // create: async (ctx, spaceId, { name, type, parentId }) => {
+  async create(
+    ctx: SophonInstance,
+    spaceId: string,
+    { name, type, parentId }: ChannelCreateOptions,
+  ) {
     const channelCount = await prisma.channel.count({
       where: { spaceId },
     });
@@ -40,20 +50,18 @@ export const channelService = sophon.create(ChannelService, {
         order: channelCount,
       },
     });
-    channelService.$(`space/${spaceId}`).onCreate(serializeDates(channel));
+    this.$(`space/${spaceId}`).onCreate(serializeDates(channel));
     return serializeDates(channel);
-  },
+  }
 
-  async delete(ctx, id: string) {
+  async delete(ctx: SophonInstance, id: string) {
     const channel = await prisma.channel.findUnique({ where: { id } });
     if (channel === null) throw new NotFoundError();
     await prisma.channel.delete({ where: { id } });
-    channelService
-      .$(`space/${channel.spaceId}`)
-      .onDelete(serializeDates(channel));
-  },
+    this.$(`space/${channel.spaceId}`).onDelete(serializeDates(channel));
+  }
 
-  async move(ctx, id: string, order) {
+  async move(ctx: SophonInstance, id: string, order: number) {
     const channel = await prisma.channel.findUnique({ where: { id } });
     if (channel === null) throw new NotFoundError();
     if (channel.order === order) return;
@@ -89,28 +97,33 @@ export const channelService = sophon.create(ChannelService, {
         updater,
       ]);
     }
-  },
-  async startTyping(ctx, channelId) {
+  }
+
+  async startTyping(ctx: SophonInstance, channelId: string) {
     const channel = await prisma.channel.findUnique({
       where: { id: channelId },
     });
     if (channel === null) throw new NotFoundError();
     const member = await findMember(channel.spaceId, ctx.data.user.sub);
 
-    channelService.$(`space/${channel.spaceId}`).onTypingStart({
+    this.$(`space/${channel.spaceId}`).onTypingStart({
       channelId,
       userId: ctx.data.user.sub,
       member: serializeDates(member),
     });
-  },
+  }
 
   async stopTyping() {
     throw new Error('not implemented');
-  },
-});
+  }
+}
 
-export const messageService = sophon.create(MessageService, {
-  async list(ctx, channelId: string, { cursor, limit }) {
+export class MessageService extends AbstractMessageService {
+  async list(
+    ctx: SophonInstance,
+    channelId: string,
+    { cursor, limit }: { cursor: string | null; limit: number },
+  ) {
     const messages = await prisma.message.findMany({
       where: { channelId },
 
@@ -127,9 +140,9 @@ export const messageService = sophon.create(MessageService, {
     });
 
     return serializeDates(messages.reverse());
-  },
+  }
 
-  async send(ctx, channelId: string, content: string) {
+  async send(ctx: SophonInstance, channelId: string, content: string) {
     const channel = await prisma.channel.findUnique({
       where: { id: channelId },
     });
@@ -161,13 +174,11 @@ export const messageService = sophon.create(MessageService, {
       }),
     ]);
 
-    messageService
-      .$(`space/${channel.spaceId}`)
-      .onCreate(serializeDates(message));
+    this.$(`space/${channel.spaceId}`).onCreate(serializeDates(message));
     return serializeDates(message);
-  },
+  }
 
-  async delete(ctx, channelId, messageId: string) {
+  async delete(ctx: SophonInstance, channelId: string, messageId: string) {
     const channel = await prisma.channel.findUnique({
       where: { id: channelId },
     });
@@ -179,8 +190,6 @@ export const messageService = sophon.create(MessageService, {
     if (message === null) throw new NotFoundError('MessageNotFound');
     await prisma.message.delete({ where: { id: messageId } });
 
-    messageService
-      .$(`space/${channel.spaceId}`)
-      .onDelete({ messageId, channelId });
-  },
-});
+    this.$(`space/${channel.spaceId}`).onDelete({ messageId, channelId });
+  }
+}

@@ -5773,28 +5773,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sophon-js/cli@npm:^0.0.2":
-  version: 0.0.2
-  resolution: "@sophon-js/cli@npm:0.0.2"
+"@sophon-js/cli@npm:^0.0.4":
+  version: 0.0.4
+  resolution: "@sophon-js/cli@npm:0.0.4"
   dependencies:
     "@oclif/core": ^2
     "@oclif/plugin-help": ^5
     "@oclif/plugin-plugins": ^2.3.0
+    prettier: ^2.8.8
     ts-creator: ^1.2.5
     ts-morph: ^17.0.1
     typescript-parsec: ^0.3.2
   bin:
     sophon: bin/run
-  checksum: b6fcc4e51a3f24a25dac333955969268828c88ba3c64d644124f7ca7da7d4609ead64a4c1b42f41703b9b95376c092449a70f3aa40a8a2cf3426aa2ddd52422d
+  checksum: af5ec72858902c9d69210cad3780effa86df22b8941cea1ba634ec9728d91654463341f1327be72ef4b82a7d55d3014006cf6caa7e520576a458f2b37aba9778
   languageName: node
   linkType: hard
 
-"@sophon-js/server@npm:^0.0.4":
-  version: 0.0.4
-  resolution: "@sophon-js/server@npm:0.0.4"
+"@sophon-js/server@npm:^0.0.5":
+  version: 0.0.5
+  resolution: "@sophon-js/server@npm:0.0.5"
   peerDependencies:
     socket.io: ^4.6.0
-  checksum: 95650f6df4478aad704d9a21e9395b9c15ac490adf03bc61028e2a661252f7f5772a987dae2037b4aca085c84983695b7d140392a31b6231b05ca71cb471606a
+  checksum: a2426b6d0bececdb40a124955491629ce82a88d59a4d4ec5741d6794401796a1385cdcb2436293dc9e8d833bf8fed7b1e0ac237b632d6ebce9a581f20ed00394
   languageName: node
   linkType: hard
 
@@ -23416,7 +23417,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "mikotojs@workspace:packages/mikotojs"
   dependencies:
-    "@sophon-js/cli": ^0.0.2
+    "@sophon-js/cli": ^0.0.4
     axios: ^0.27.2
     socket.io-client: ^4.5.1
     typed-emitter: ^2.1.0
@@ -26112,7 +26113,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^2.7.1, prettier@npm:^2.8.7":
+"prettier@npm:^2.7.1, prettier@npm:^2.8.7, prettier@npm:^2.8.8":
   version: 2.8.8
   resolution: "prettier@npm:2.8.8"
   bin:
@@ -29347,8 +29348,8 @@ __metadata:
   resolution: "server@workspace:apps/server"
   dependencies:
     "@prisma/client": ^4.9.0
-    "@sophon-js/cli": ^0.0.2
-    "@sophon-js/server": ^0.0.4
+    "@sophon-js/cli": ^0.0.4
+    "@sophon-js/server": ^0.0.5
     "@types/bcrypt": ^5.0.0
     "@types/body-parser": ^1.19.2
     "@types/cors": ^2.8.12
@@ -29393,7 +29394,7 @@ __metadata:
     ts-node-dev: ^2.0.0
     tslib: ^2.4.0
     typedi: ^0.10.0
-    typescript: ^4.9.4
+    typescript: ^5.1.6
     uuid: ^8.3.2
     winston: ^3.8.1
   languageName: unknown
@@ -32052,6 +32053,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript@npm:^5.1.6":
+  version: 5.1.6
+  resolution: "typescript@npm:5.1.6"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: b2f2c35096035fe1f5facd1e38922ccb8558996331405eb00a5111cc948b2e733163cc22fab5db46992aba7dd520fff637f2c1df4996ff0e134e77d3249a7350
+  languageName: node
+  linkType: hard
+
 "typescript@patch:typescript@^3.4.0-dev.20190313#~builtin<compat/typescript>":
   version: 3.9.10
   resolution: "typescript@patch:typescript@npm%3A3.9.10#~builtin<compat/typescript>::version=3.9.10&hash=3bd3d3"
@@ -32079,6 +32090,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 32a25b2e128a4616f999d4ee502aabb1525d5647bc8955e6edf05d7fbc53af8aa98252e2f6ba80bcedfc0260c982b885f3c09cfac8bb65d2924f3133ad1e1e62
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@^5.1.6#~builtin<compat/typescript>":
+  version: 5.1.6
+  resolution: "typescript@patch:typescript@npm%3A5.1.6#~builtin<compat/typescript>::version=5.1.6&hash=ad5954"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 21e88b0a0c0226f9cb9fd25b9626fb05b4c0f3fddac521844a13e1f30beb8f14e90bd409a9ac43c812c5946d714d6e0dee12d5d02dfc1c562c5aacfa1f49b606
   languageName: node
   linkType: hard
 

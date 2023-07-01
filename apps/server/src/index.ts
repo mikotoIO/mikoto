@@ -24,8 +24,7 @@ import Mailer from './functions/Mailer';
 import Minio from './functions/Minio';
 import { logger } from './functions/logger';
 import './functions/prismaRecursive';
-import { mainService } from './services';
-import { sophon } from './services/sophon';
+import { boot, sophon } from './services/sophon';
 
 const app = express();
 
@@ -71,19 +70,6 @@ server.listen(env.AUTH_PORT, () => {
 });
 
 // set up a sophon server as well
-const healthCheckApp = express();
-healthCheckApp.get('/', (req, res) => {
-  res.json({ name: 'Mikoto' });
-});
-
-const httpServer = createServer(healthCheckApp);
-
-const sophonIO = new Server(httpServer, {
-  cors: {
-    origin: '*',
-  },
-});
-sophon.mount(sophonIO, mainService);
-httpServer.listen(env.SERVER_PORT, () => {
+boot(env.SERVER_PORT, () => {
   logger.info(`Mikoto Sophon listening on http://0.0.0.0:${env.SERVER_PORT}`);
 });

@@ -1,17 +1,16 @@
-import { channelService, messageService } from './ChannelService';
-import { roleService } from './RoleService';
-import { spaceService } from './SpaceService';
-import { memberService, userService } from './UserService';
-import { voiceService } from './VoiceService';
-import { MainService } from './schema';
-import { sophon } from './sophon';
+import { ChannelService, MessageService } from './ChannelService';
+import { RoleService } from './RoleService';
+import { SpaceService } from './SpaceService';
+import { MemberService, UserService } from './UserService';
+import { VoiceService } from './VoiceService';
+import { AbstractMainService } from './schema';
 
-export const mainService = sophon.create(MainService, {
-  channels: channelService,
-  spaces: spaceService,
-  members: memberService,
-  users: userService,
-  messages: messageService,
-  roles: roleService,
-  voice: voiceService,
-});
+export class MainService extends AbstractMainService {
+  spaces = new SpaceService(this.sophonCore);
+  channels = new ChannelService(this.sophonCore);
+  members = new MemberService(this.sophonCore);
+  users = new UserService(this.sophonCore);
+  messages = new MessageService(this.sophonCore);
+  roles = new RoleService(this.sophonCore);
+  voice = new VoiceService(this.sophonCore);
+}

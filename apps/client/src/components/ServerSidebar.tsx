@@ -40,11 +40,27 @@ const StyledServerIcon = styled.div<{ active?: boolean; icon?: string }>`
   background-size: cover;
 `;
 
+const InviteModalWrapper = styled.div`
+  button {
+    border-radius: 4px;
+    display: block;
+    padding: 16px;
+    margin-bottom: 8px;
+    border: none;
+    color: ${(p) => p.theme.colors.N0};
+    background-color: ${(p) => p.theme.colors.N1000};
+  }
+`;
+
 function InviteModal() {
   return (
     <DialogPanel>
-      <h1>Your Invite is</h1>
-      <code>https://app.mikoto.io/m/abcdefgh</code>
+      <InviteModalWrapper>
+        <h1>Invite Link</h1>
+        <button type="button" onClick={() => {}}>
+          https://app.mikoto.io/m/abcdefgh
+        </button>
+      </InviteModalWrapper>
     </DialogPanel>
   );
 }

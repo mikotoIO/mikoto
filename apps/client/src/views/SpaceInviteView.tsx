@@ -1,16 +1,21 @@
-import { Button } from '@mantine/core';
 import { useAsync } from 'react-async-hook';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { StyledSpaceIcon } from '../components/atoms/SpaceIcon';
 import { Spinner } from '../components/atoms/Spinner';
 import { useMikoto } from '../hooks';
+import { Button } from '../lucid/Button';
 
 const bgUrl = 'https://mikoto.io/images/hero-placeholder.jpg';
 
-const Background = styled.div`
-  width: 100vw;
+const Grid = styled.div`
+  display: grid;
+  grid-template-columns: 400px 1fr;
   height: 100vh;
+`;
+
+const Background = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -27,38 +32,45 @@ const InvitationBox = styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  background-color: ${(p) => p.theme.colors.N900};
-  width: 600px;
+  background-color: var(--N900);
   box-sizing: border-box;
   text-align: center;
   padding: 32px;
   border-radius: 8px;
-  color: white;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 8px 15px;
+  color: var(--N0);
+
+  .information {
+    margin-top: 32px;
+    color: var(--N300);
+  }
 `;
 
 export function SpaceInviteViewInner() {
   const mikoto = useMikoto();
   const params = useParams<{ id: string }>();
 
-  const { result } = useAsync(
+  const { result: space } = useAsync(
     async (id: string) => mikoto.client.spaces.get(id),
     [params.id ?? ''],
   );
 
   return (
-    <Background>
+    <Grid>
       <InvitationBox>
-        {result ? (
-          <div>
-            <h1>{result.name}</h1>
-            <Button>Join Space</Button>
-          </div>
+        {space ? (
+          <>
+            <StyledSpaceIcon size={100} active icon={space.icon ?? undefined}>
+              {space.icon === null ? space.name[0] : ''}
+            </StyledSpaceIcon>
+            <h1>{space.name}</h1>
+            <Button variant="primary">Accept Invite</Button>
+          </>
         ) : (
           <Spinner />
         )}
       </InvitationBox>
-    </Background>
+      <Background />
+    </Grid>
   );
 }
 

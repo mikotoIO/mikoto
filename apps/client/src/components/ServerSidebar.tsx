@@ -1,4 +1,4 @@
-import { Button, TextInput, Tooltip } from '@mantine/core';
+import { TextInput, Tooltip } from '@mantine/core';
 import { AxiosError } from 'axios';
 import { Space } from 'mikotojs';
 import { useRef } from 'react';
@@ -10,13 +10,16 @@ import { useHover } from 'usehooks-ts';
 import { useMikoto } from '../hooks';
 import { useDeltaWithRedux } from '../hooks/useDelta';
 import { useErrorElement } from '../hooks/useErrorElement';
+import { Button } from '../lucid/Button';
 import { DialogPanel } from '../lucid/DialogPanel';
+import { Form } from '../lucid/Form';
 import { Input } from '../lucid/Input';
 import { useMikotoSelector } from '../redux';
 import { spaceActions } from '../redux/mikoto';
 import { treebarSpaceState, useTabkit } from '../store';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { Pill } from './atoms/Pill';
+import { StyledSpaceIcon } from './atoms/SpaceIcon';
 
 const StyledServerSidebar = styled.div`
   background-color: ${(p) => p.theme.colors.N1000};
@@ -27,19 +30,6 @@ const StyledServerSidebar = styled.div`
   padding-top: 10px;
 `;
 
-const StyledServerIcon = styled.div<{ active?: boolean; icon?: string }>`
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: ${(p) => (p.active ? 16 : 100)}px;
-  background-color: ${(p) => p.theme.colors.N800};
-  transition-duration: 100ms;
-  background-image: url(${(p) => p.icon ?? 'none'});
-  background-size: cover;
-`;
-
 const InviteModalWrapper = styled.div`
   button {
     border-radius: 4px;
@@ -48,17 +38,29 @@ const InviteModalWrapper = styled.div`
     margin-bottom: 8px;
     border: none;
     color: ${(p) => p.theme.colors.N0};
-    background-color: ${(p) => p.theme.colors.N1000};
+    background-color: var(--N1000);
+
+    &:hover {
+      background-color: var(--N1100);
+    }
   }
 `;
 
 function InviteModal() {
+  const link = 'https://app.mikoto.io/m/abcdefgh';
+
   return (
     <DialogPanel>
       <InviteModalWrapper>
         <h1>Invite Link</h1>
-        <button type="button" onClick={() => {}}>
-          https://app.mikoto.io/m/abcdefgh
+        <button
+          type="button"
+          onClick={() => {
+            // copy to clipboard
+            navigator.clipboard.writeText(link);
+          }}
+        >
+          {link}
         </button>
       </InviteModalWrapper>
     </DialogPanel>
@@ -119,7 +121,7 @@ const StyledIconWrapper = styled.div`
   width: 68px;
 `;
 
-function ServerIcon({ space }: { space: Space }) {
+function SidebarSpaceIcon({ space }: { space: Space }) {
   const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
   const isActive = stateSpace?.id === space.id;
 
@@ -133,7 +135,7 @@ function ServerIcon({ space }: { space: Space }) {
     <Tooltip label={space.name} opened={isHover} position="right" withArrow>
       <StyledIconWrapper>
         <Pill h={isActive ? 32 : 8} />
-        <StyledServerIcon
+        <StyledSpaceIcon
           active={isActive}
           onContextMenu={contextMenu}
           ref={ref}
@@ -143,7 +145,7 @@ function ServerIcon({ space }: { space: Space }) {
           }}
         >
           {space.icon === null ? space.name[0] : ''}
-        </StyledServerIcon>
+        </StyledSpaceIcon>
       </StyledIconWrapper>
     </Tooltip>
   );
@@ -154,7 +156,7 @@ function SpaceCreateForm({ closeModal }: { closeModal: () => void }) {
   const form = useForm();
 
   return (
-    <form
+    <Form
       onSubmit={form.handleSubmit(async (data) => {
         await mikoto.client.spaces.create(data.spaceName);
         closeModal();
@@ -166,10 +168,10 @@ function SpaceCreateForm({ closeModal }: { closeModal: () => void }) {
         placeholder="Awesomerino Space"
         {...form.register('spaceName')}
       />
-      <Button mt={16} fullWidth type="submit">
+      <Button variant="primary" type="submit">
         Create Space
       </Button>
-    </form>
+    </Form>
   );
 }
 
@@ -191,9 +193,7 @@ function CreateSpaceModal() {
         placeholder="Awesomerino Space"
         {...form.register('spaceName')}
       />
-      <Button mt={16} fullWidth type="submit">
-        Create Space
-      </Button>
+      <Button type="submit">Create Space</Button>
     </form>
   );
 }
@@ -201,10 +201,10 @@ function CreateSpaceModal() {
 function SpaceJoinForm({ closeModal }: { closeModal: () => void }) {
   const mikoto = useMikoto();
 
-  const { register, formState, handleSubmit, reset } = useForm({});
+  const { register, handleSubmit, reset } = useForm({});
   const error = useErrorElement();
   return (
-    <form
+    <Form
       onSubmit={handleSubmit(async (data) => {
         try {
           await mikoto.client.spaces.join(data.spaceId);
@@ -217,10 +217,8 @@ function SpaceJoinForm({ closeModal }: { closeModal: () => void }) {
     >
       {error.el}
       <Input labelName="Space ID" {...register('spaceId')} />
-      <Button mt={16} fullWidth type="submit" loading={formState.isSubmitting}>
-        Join Space
-      </Button>
-    </form>
+      <Button>Join Space</Button>
+    </Form>
   );
 }
 
@@ -264,22 +262,12 @@ function ServerSidebarContextMenu() {
       <ContextMenu.Link
         onClick={() => {
           setModal({
-            title: 'Create Space',
-            elem: <CreateSpaceModal />,
-          });
-        }}
-      >
-        Create Space
-      </ContextMenu.Link>
-      <ContextMenu.Link
-        onClick={() => {
-          setModal({
             title: 'Join Space',
             elem: <SpaceJoinModal />,
           });
         }}
       >
-        Join Space
+        Create / Join Space
       </ContextMenu.Link>
     </ContextMenu>
   );
@@ -302,10 +290,10 @@ export function ServerSidebar() {
   return (
     <StyledServerSidebar onContextMenu={contextMenu}>
       {spaces.map((space) => (
-        <ServerIcon space={space} key={space.id} />
+        <SidebarSpaceIcon space={space} key={space.id} />
       ))}
       <StyledIconWrapper>
-        <StyledServerIcon
+        <StyledSpaceIcon
           onClick={() => {
             setModal({
               title: 'Join Space',
@@ -314,7 +302,7 @@ export function ServerSidebar() {
           }}
         >
           +
-        </StyledServerIcon>
+        </StyledSpaceIcon>
       </StyledIconWrapper>
     </StyledServerSidebar>
   );

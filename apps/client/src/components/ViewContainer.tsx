@@ -8,6 +8,7 @@ export const ViewContainer = styled.div<{ padded?: boolean; scroll?: boolean }>`
   flex-direction: column;
   padding: ${(p) => (p.padded ? '32px' : '0')};
   overflow-y: ${(p) => (p.scroll ? 'scroll' : 'hidden')};
+  box-sizing: border-box;
 `;
 
 export const ScrollingViewContainer = styled.div`
@@ -32,8 +33,4 @@ export const SidebarContainerArea = styled.div`
   padding: 32px;
   height: 100%;
   box-sizing: border-box;
-
-  h1 {
-    margin-top: 0;
-  }
 `;

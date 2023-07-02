@@ -22,7 +22,7 @@
     "eslint": "^8.39.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "prettier": "^2.8.7",
-    "turbo": "latest"
+    "turbo": "^1.10.7"
   },
   "engines": {
     "npm": ">=7.0.0",

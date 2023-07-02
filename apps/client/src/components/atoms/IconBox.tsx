@@ -6,11 +6,9 @@ import {
   faHeadphones,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
 import styled from 'styled-components';
 
 import { Tabable } from '../../store';
-import { centerFlex } from '../themes';
 
 const StyledIcon = styled.span<{ size?: number }>`
   background-color: #3b83ff;
@@ -20,7 +18,8 @@ const StyledIcon = styled.span<{ size?: number }>`
   margin-right: 6px;
   width: ${(p) => p.size ?? 24}px;
   height: ${(p) => p.size ?? 24}px;
-  ${centerFlex}
+  align-items: center;
+  justify-content: center;
 `;
 
 interface TabIconProps {

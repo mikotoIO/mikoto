@@ -5,6 +5,7 @@ export const SettingsSidebar = styled.div`
 `;
 
 export const SettingsView = styled.div`
+  box-sizing: border-box;
   flex: 1;
   background-color: ${(p) => p.theme.colors.N800};
   padding: 8px 32px;

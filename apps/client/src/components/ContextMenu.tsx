@@ -33,12 +33,12 @@ const StyledContextMenuOverlay = styled.div`
 `;
 
 const ContextMenuBase = styled.div`
-  color: white;
+  color: var(--N0);
   width: 160px;
   padding: 8px;
   font-size: 14px;
   border-radius: 4px;
-  background-color: ${(p) => p.theme.colors.N1100};
+  background-color: var(--N1100);
   box-shadow: rgba(0, 0, 0, 0.1) 0 8px 24px;
 `;
 

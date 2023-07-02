@@ -6,15 +6,15 @@ import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 
-import { TabName } from '../components/TabBar';
-import { userState } from '../components/UserArea';
-import { ViewContainer } from '../components/ViewContainer';
-import { Spinner } from '../components/atoms/Spinner';
-import { MessageItem } from '../components/molecules/Message';
-import { MessageEditor } from '../components/molecules/MessageEditor';
-import { useInterval, useMikoto } from '../hooks';
-import { useMikotoSelector } from '../redux';
-import { CurrentSpaceContext } from '../store';
+import { useInterval, useMikoto } from '../../hooks';
+import { useMikotoSelector } from '../../redux';
+import { CurrentSpaceContext } from '../../store';
+import { TabName } from '../TabBar';
+import { userState } from '../UserArea';
+import { ViewContainer } from '../ViewContainer';
+import { Spinner } from '../atoms/Spinner';
+import { MessageItem } from '../molecules/Message';
+import { MessageEditor } from '../molecules/MessageEditor';
 
 const StyledMessagesLoading = styled.div`
   padding: 40px;
@@ -253,6 +253,7 @@ export function MessageView({ channel }: MessageViewProps) {
     [channel.id],
   );
   if (error) throw error;
+  // TODO: better loading
   if (!mChannel) return <div>loading</div>;
 
   return (

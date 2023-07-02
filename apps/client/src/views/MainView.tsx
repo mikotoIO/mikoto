@@ -10,14 +10,15 @@ import { Explorer } from '../components/Explorer';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { TabbedView } from '../components/TabBar';
 import { Sidebar } from '../components/UserArea';
+import { AccountSettingsView } from '../components/surfaces/AccountSettingSurface';
+import { MessageView } from '../components/surfaces/MessageSurface';
+import { VoiceView } from '../components/surfaces/VoiceSurface';
 import { env } from '../env';
 import { MikotoContext, useMikoto } from '../hooks';
 import { Tabable, tabbedState, TabContext, treebarSpaceState } from '../store';
-import { AccountSettingsView } from './AccountSettingsView';
-import { MessageView } from './MessageView';
+import { MikotoApiLoader } from './MikotoApiLoader';
 import { DesignStory } from './Palette';
 import { SpaceSettingsView } from './SpaceSettingsView';
-import { VoiceView } from './VoiceView';
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -84,27 +85,6 @@ function AppView() {
         </ErrorBoundaryPage>
       </TabbedView>
     </AppContainer>
-  );
-}
-
-function MikotoApiLoader({ children }: { children: React.ReactNode }) {
-  const [mikoto, setMikoto] = React.useState<MikotoClient | null>(null);
-  const [err, setErr] = React.useState<unknown>(null);
-
-  // TODO: Try suspense
-  useEffect(() => {
-    constructMikoto(env.PUBLIC_AUTH_URL, env.PUBLIC_SERVER_URL)
-      .then((x) => setMikoto(x))
-      .catch((x) => setErr(x));
-  }, []);
-
-  if (err !== null) {
-    console.log(err);
-    return <Navigate to="/login" />;
-  }
-  if (mikoto === null) return null;
-  return (
-    <MikotoContext.Provider value={mikoto}>{children}</MikotoContext.Provider>
   );
 }
 

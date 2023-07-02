@@ -8,6 +8,7 @@ import {
   ResetChangePasswordView,
 } from './views/AuthView';
 import MainView from './views/MainView';
+import { MikotoApiLoader } from './views/MikotoApiLoader';
 import { SpaceInviteView } from './views/SpaceInviteView';
 
 function App() {
@@ -22,7 +23,14 @@ function App() {
           path="/forgotpassword/:token"
           element={<ResetChangePasswordView />}
         />
-        <Route path="/invite/:id" element={<SpaceInviteView />} />
+        <Route
+          path="/invite/:id"
+          element={
+            <MikotoApiLoader>
+              <SpaceInviteView />
+            </MikotoApiLoader>
+          }
+        />
         <Route path="/livekit" element={<RoomPage />} />
       </Routes>
     </BrowserRouter>

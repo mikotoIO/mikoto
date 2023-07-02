@@ -125,6 +125,10 @@ export const GlobalStyle = createGlobalStyle`
     margin-top: 0;
   }
 
+  button, a {
+    cursor: pointer;
+  }
+
   body {
     overscroll-behavior-y: none;
     height: 100%;

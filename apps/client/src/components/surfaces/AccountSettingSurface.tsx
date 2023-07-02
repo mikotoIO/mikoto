@@ -1,23 +1,22 @@
-import { TextInput } from '@mantine/core';
 import { useForm } from 'react-hook-form';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
-import { modalState } from '../components/ContextMenu';
-import { TabName } from '../components/TabBar';
-import { userState } from '../components/UserArea';
+import { useMikoto } from '../../hooks';
+import { useErrorElement } from '../../hooks/useErrorElement';
+import { Button } from '../../lucid/Button';
+import { DialogPanel } from '../../lucid/DialogPanel';
+import { Form } from '../../lucid/Form';
+import { Input } from '../../lucid/Input';
+import { SettingsView } from '../../views/SettingsViewTemplate';
+import { modalState } from '../ContextMenu';
+import { TabName } from '../TabBar';
+import { userState } from '../UserArea';
 import {
   AvatarEditor,
   mediaServerAxios,
   uploadFileWithAxios,
-} from '../components/molecules/AvatarEditor';
-import { useMikoto } from '../hooks';
-import { useErrorElement } from '../hooks/useErrorElement';
-import { Button } from '../lucid/Button';
-import { DialogPanel } from '../lucid/DialogPanel';
-import { Form } from '../lucid/Form';
-import { Input } from '../lucid/Input';
-import { SettingsView } from './SettingsViewTemplate';
+} from '../molecules/AvatarEditor';
 
 const bgUrl = 'https://i1.sndcdn.com/visuals-000328863415-MJdwB0-t2480x520.jpg';
 
@@ -101,10 +100,69 @@ export function PasswordChangeModal() {
   );
 }
 
+const BotCardContainer = styled.div`
+  background-color: var(--N1000);
+  margin: 16px 0;
+  padding: 16px;
+  border-radius: 8px;
+  height: 100px;
+  width: 800px;
+`;
+
+interface BotProps {
+  id: string;
+  name: string;
+  secret: string;
+}
+
+function BotCard({ id, name, secret }: BotProps) {
+  return (
+    <BotCardContainer>
+      <h2>{name}</h2>
+      <p>Bot ID: {id}</p>
+    </BotCardContainer>
+  );
+}
+
+function BotCreateModal() {
+  const { register, handleSubmit } = useForm();
+  const setModal = useSetRecoilState(modalState);
+
+  return (
+    <DialogPanel>
+      <Form
+        onSubmit={handleSubmit(async (form) => {
+          console.log(form);
+          setModal(null);
+        })}
+      >
+        <h1>Create Bot</h1>
+        <Input labelName="Bot Name" {...register('name', { required: true })} />
+        <Button variant="primary" type="submit">
+          Create Bot
+        </Button>
+      </Form>
+    </DialogPanel>
+  );
+}
+
 function BotsSegment() {
+  const setModal = useSetRecoilState(modalState);
+
   return (
     <div>
-      <Button variant="primary">Create Bot</Button>
+      <Button
+        variant="primary"
+        onClick={() => {
+          setModal({
+            title: 'Create Bot',
+            elem: <BotCreateModal />,
+          });
+        }}
+      >
+        Create Bot
+      </Button>
+      <BotCard id="lol" name="CactusBot" secret="" />
     </div>
   );
 }

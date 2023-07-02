@@ -19,6 +19,7 @@ import { spaceActions } from '../redux/mikoto';
 import { treebarSpaceState, useTabkit } from '../store';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { Pill } from './atoms/Pill';
+import { StyledSpaceIcon } from './atoms/SpaceIcon';
 
 const StyledServerSidebar = styled.div`
   background-color: ${(p) => p.theme.colors.N1000};
@@ -29,20 +30,6 @@ const StyledServerSidebar = styled.div`
   padding-top: 10px;
 `;
 
-const StyledServerIcon = styled.div<{ active?: boolean; icon?: string }>`
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: ${(p) => (p.active ? 16 : 100)}px;
-  background-color: ${(p) => p.theme.colors.N800};
-  transition-duration: 100ms;
-  background-image: url(${(p) => p.icon ?? 'none'});
-  background-size: cover;
-  cursor: pointer;
-`;
-
 const InviteModalWrapper = styled.div`
   button {
     border-radius: 4px;
@@ -51,17 +38,29 @@ const InviteModalWrapper = styled.div`
     margin-bottom: 8px;
     border: none;
     color: ${(p) => p.theme.colors.N0};
-    background-color: ${(p) => p.theme.colors.N1000};
+    background-color: var(--N1000);
+
+    &:hover {
+      background-color: var(--N1100);
+    }
   }
 `;
 
 function InviteModal() {
+  const link = 'https://app.mikoto.io/m/abcdefgh';
+
   return (
     <DialogPanel>
       <InviteModalWrapper>
         <h1>Invite Link</h1>
-        <button type="button" onClick={() => {}}>
-          https://app.mikoto.io/m/abcdefgh
+        <button
+          type="button"
+          onClick={() => {
+            // copy to clipboard
+            navigator.clipboard.writeText(link);
+          }}
+        >
+          {link}
         </button>
       </InviteModalWrapper>
     </DialogPanel>
@@ -122,7 +121,7 @@ const StyledIconWrapper = styled.div`
   width: 68px;
 `;
 
-function ServerIcon({ space }: { space: Space }) {
+function SidebarSpaceIcon({ space }: { space: Space }) {
   const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
   const isActive = stateSpace?.id === space.id;
 
@@ -136,7 +135,7 @@ function ServerIcon({ space }: { space: Space }) {
     <Tooltip label={space.name} opened={isHover} position="right" withArrow>
       <StyledIconWrapper>
         <Pill h={isActive ? 32 : 8} />
-        <StyledServerIcon
+        <StyledSpaceIcon
           active={isActive}
           onContextMenu={contextMenu}
           ref={ref}
@@ -146,7 +145,7 @@ function ServerIcon({ space }: { space: Space }) {
           }}
         >
           {space.icon === null ? space.name[0] : ''}
-        </StyledServerIcon>
+        </StyledSpaceIcon>
       </StyledIconWrapper>
     </Tooltip>
   );
@@ -291,10 +290,10 @@ export function ServerSidebar() {
   return (
     <StyledServerSidebar onContextMenu={contextMenu}>
       {spaces.map((space) => (
-        <ServerIcon space={space} key={space.id} />
+        <SidebarSpaceIcon space={space} key={space.id} />
       ))}
       <StyledIconWrapper>
-        <StyledServerIcon
+        <StyledSpaceIcon
           onClick={() => {
             setModal({
               title: 'Join Space',
@@ -303,7 +302,7 @@ export function ServerSidebar() {
           }}
         >
           +
-        </StyledServerIcon>
+        </StyledSpaceIcon>
       </StyledIconWrapper>
     </StyledServerSidebar>
   );

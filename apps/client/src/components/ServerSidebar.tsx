@@ -1,4 +1,4 @@
-import { Button, TextInput, Tooltip } from '@mantine/core';
+import { TextInput, Tooltip } from '@mantine/core';
 import { AxiosError } from 'axios';
 import { Space } from 'mikotojs';
 import { useRef } from 'react';
@@ -10,7 +10,9 @@ import { useHover } from 'usehooks-ts';
 import { useMikoto } from '../hooks';
 import { useDeltaWithRedux } from '../hooks/useDelta';
 import { useErrorElement } from '../hooks/useErrorElement';
+import { Button } from '../lucid/Button';
 import { DialogPanel } from '../lucid/DialogPanel';
+import { Form } from '../lucid/Form';
 import { Input } from '../lucid/Input';
 import { useMikotoSelector } from '../redux';
 import { spaceActions } from '../redux/mikoto';
@@ -38,6 +40,7 @@ const StyledServerIcon = styled.div<{ active?: boolean; icon?: string }>`
   transition-duration: 100ms;
   background-image: url(${(p) => p.icon ?? 'none'});
   background-size: cover;
+  cursor: pointer;
 `;
 
 const InviteModalWrapper = styled.div`
@@ -154,7 +157,7 @@ function SpaceCreateForm({ closeModal }: { closeModal: () => void }) {
   const form = useForm();
 
   return (
-    <form
+    <Form
       onSubmit={form.handleSubmit(async (data) => {
         await mikoto.client.spaces.create(data.spaceName);
         closeModal();
@@ -166,10 +169,10 @@ function SpaceCreateForm({ closeModal }: { closeModal: () => void }) {
         placeholder="Awesomerino Space"
         {...form.register('spaceName')}
       />
-      <Button mt={16} fullWidth type="submit">
+      <Button variant="primary" type="submit">
         Create Space
       </Button>
-    </form>
+    </Form>
   );
 }
 
@@ -191,9 +194,7 @@ function CreateSpaceModal() {
         placeholder="Awesomerino Space"
         {...form.register('spaceName')}
       />
-      <Button mt={16} fullWidth type="submit">
-        Create Space
-      </Button>
+      <Button type="submit">Create Space</Button>
     </form>
   );
 }
@@ -201,10 +202,10 @@ function CreateSpaceModal() {
 function SpaceJoinForm({ closeModal }: { closeModal: () => void }) {
   const mikoto = useMikoto();
 
-  const { register, formState, handleSubmit, reset } = useForm({});
+  const { register, handleSubmit, reset } = useForm({});
   const error = useErrorElement();
   return (
-    <form
+    <Form
       onSubmit={handleSubmit(async (data) => {
         try {
           await mikoto.client.spaces.join(data.spaceId);
@@ -217,10 +218,8 @@ function SpaceJoinForm({ closeModal }: { closeModal: () => void }) {
     >
       {error.el}
       <Input labelName="Space ID" {...register('spaceId')} />
-      <Button mt={16} fullWidth type="submit" loading={formState.isSubmitting}>
-        Join Space
-      </Button>
-    </form>
+      <Button>Join Space</Button>
+    </Form>
   );
 }
 

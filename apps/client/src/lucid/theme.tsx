@@ -1,3 +1,5 @@
+import { createGlobalStyle } from 'styled-components';
+
 export const neutrals = {
   N1200: 'hsl(220, 4%, 11%)', // darkest
   N1100: 'hsl(220, 4%, 15%)', // darkest
@@ -103,3 +105,50 @@ export const theme = {
     ...pinks,
   },
 };
+
+export const GlobalStyle = createGlobalStyle`
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+  
+  :root {
+    --main-font: 'Open Sans', sans-serif;
+    ${Object.entries(theme.colors)
+      .map(([name, value]) => `--${name}: ${value};`)
+      .join('\n')}
+  }
+
+  h1:first-child,
+  h2:first-child,
+  h3:first-child,
+  h4:first-child,
+  h5:first-child,
+  h6:first-child {
+    margin-top: 0;
+  }
+
+  body {
+    overscroll-behavior-y: none;
+    height: 100%;
+    min-height: 100%;
+    margin: 0;
+    background-color: #2f3237;
+    font-family: var(--main-font);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: hsl(220, 7%, 23%);
+    border-radius: 4px;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: hsl(220, 7%, 17%);
+    border-radius: 4px;
+  }
+`;

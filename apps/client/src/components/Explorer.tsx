@@ -4,7 +4,6 @@ import {
   faMicrophone,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button } from '@mantine/core';
 import { Channel, Space } from 'mikotojs';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -14,7 +13,9 @@ import styled from 'styled-components';
 import { useMikoto } from '../hooks';
 import { useDeltaNext } from '../hooks/useDelta';
 import { useErrorElement } from '../hooks/useErrorElement';
+import { Button } from '../lucid/Button';
 import { DialogPanel } from '../lucid/DialogPanel';
+import { Form } from '../lucid/Form';
 import { Input } from '../lucid/Input';
 import { Tabable, treebarSpaceState, useTabkit } from '../store';
 import { ContextMenu, modalState, useContextMenuX } from './ContextMenu';
@@ -49,12 +50,8 @@ function channelToTab(channel: Channel): Tabable {
 const CreateChannelWrapper = styled.div`
   min-width: 400px;
 
-  h1 {
-    margin: 0;
-  }
-
   .subchannelinfo {
-    color: ${(p) => p.theme.colors.N300};
+    color: var(--N300);
     margin: 0;
     font-size: 14px;
   }
@@ -107,7 +104,7 @@ function CreateChannelModal({ channel }: { channel?: Channel }) {
           {channel ? 'Create Subchannel' : 'Create Channel'}
         </h1>
         {channel && <p className="subchannelinfo">In #{channel.name}</p>}
-        <form
+        <Form
           onSubmit={handleSubmit(async (formData) => {
             try {
               await mikoto.client.channels.create(space!.id, {
@@ -142,10 +139,10 @@ function CreateChannelModal({ channel }: { channel?: Channel }) {
             placeholder="New Channel"
             {...register('name')}
           />
-          <Button mt={16} fullWidth type="submit">
+          <Button variant="primary" type="submit">
             Create Channel
           </Button>
-        </form>
+        </Form>
       </CreateChannelWrapper>
     </DialogPanel>
   );

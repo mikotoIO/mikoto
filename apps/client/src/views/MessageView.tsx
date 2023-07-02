@@ -253,6 +253,7 @@ export function MessageView({ channel }: MessageViewProps) {
     [channel.id],
   );
   if (error) throw error;
+  // TODO: better loading
   if (!mChannel) return <div>loading</div>;
 
   return (

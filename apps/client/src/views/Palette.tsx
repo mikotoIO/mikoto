@@ -2,6 +2,7 @@ import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';
 import { ViewContainer } from '../components/ViewContainer';
+import { Button, Buttons } from '../lucid/Button';
 import { Form } from '../lucid/Form';
 import { Input } from '../lucid/Input';
 import {
@@ -81,6 +82,10 @@ export function DesignStory() {
 
       <Form>
         <Input labelName="Test Input" />
+        <Buttons>
+          <Button variant="primary">Primary Button</Button>
+          <Button>Secondary Button</Button>
+        </Buttons>
       </Form>
     </ViewContainer>
   );

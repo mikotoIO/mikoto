@@ -33,8 +33,4 @@ export const SidebarContainerArea = styled.div`
   padding: 32px;
   height: 100%;
   box-sizing: border-box;
-
-  h1 {
-    margin-top: 0;
-  }
 `;

@@ -34,9 +34,9 @@ const StyledNode = styled.a<{ unread?: boolean; isDndHover?: boolean }>`
   user-select: none;
 
   &:hover {
-    background-color: ${(p) => p.theme.colors.N700};
+    background-color: var(--N700);
   }
-  ${(p) => p.isDndHover && `color: ${p.theme.colors.B700}`}
+  ${(p) => p.isDndHover && `color: var(--B700)`}
 `;
 
 export interface NodeObject {

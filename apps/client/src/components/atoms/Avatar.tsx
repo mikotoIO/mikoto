@@ -52,7 +52,7 @@ const AvatarContextWrapper = styled.div`
 const StyledRoleBadge = styled.div`
   display: inline-block;
   padding: 4px 8px;
-  background: ${(p) => p.theme.colors.B700};
+  background: ${(p) => p.theme.colors.B800};
   color: ${(p) => p.theme.colors.N0};
   border-radius: 4px;
 

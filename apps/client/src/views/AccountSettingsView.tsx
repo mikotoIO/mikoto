@@ -19,7 +19,7 @@ const bgUrl = 'https://i1.sndcdn.com/visuals-000328863415-MJdwB0-t2480x520.jpg';
 
 const Banner = styled.div`
   border-radius: 8px;
-  background-color: ${(p) => p.theme.colors.B800};
+  background-color: ${(p) => p.theme.colors.B700};
   height: 160px;
   background: url('${bgUrl}') no-repeat center center;
   background-size: cover;

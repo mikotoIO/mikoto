@@ -3,7 +3,6 @@ import React from 'react';
 import styled from 'styled-components';
 
 export const SInput = styled.input`
-  border-color: ${(p) => p.theme.colors.B800};
   height: 44px;
   font-size: 16px;
   border: none;

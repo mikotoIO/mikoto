@@ -264,22 +264,12 @@ function ServerSidebarContextMenu() {
       <ContextMenu.Link
         onClick={() => {
           setModal({
-            title: 'Create Space',
-            elem: <CreateSpaceModal />,
-          });
-        }}
-      >
-        Create Space
-      </ContextMenu.Link>
-      <ContextMenu.Link
-        onClick={() => {
-          setModal({
             title: 'Join Space',
             elem: <SpaceJoinModal />,
           });
         }}
       >
-        Join Space
+        Create / Join Space
       </ContextMenu.Link>
     </ContextMenu>
   );

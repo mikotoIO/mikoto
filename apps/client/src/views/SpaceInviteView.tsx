@@ -52,7 +52,7 @@ export function SpaceInviteViewInner() {
         {result ? (
           <div>
             <h1>{result.name}</h1>
-            <Button>Join Space</Button>
+            <Button>Accept Invite</Button>
           </div>
         ) : (
           <Spinner />

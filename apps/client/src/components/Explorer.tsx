@@ -67,7 +67,7 @@ const CreateChannelWrapper = styled.div`
 const ChannelTypeButton = styled.button<{ active?: boolean }>`
   background-color: ${(p) => p.theme.colors.N900};
   border: 2px solid
-    ${(p) => (p.active ? p.theme.colors.B800 : p.theme.colors.N600)};
+    ${(p) => (p.active ? p.theme.colors.B700 : p.theme.colors.N600)};
   color: ${(p) => p.theme.colors.N100};
   font-size: 16px;
   border-radius: 8px;
@@ -103,7 +103,9 @@ function CreateChannelModal({ channel }: { channel?: Channel }) {
   return (
     <DialogPanel>
       <CreateChannelWrapper>
-        <h1 style={{ margin: 0 }}>Create Channel</h1>
+        <h1 style={{ margin: 0 }}>
+          {channel ? 'Create Subchannel' : 'Create Channel'}
+        </h1>
         {channel && <p className="subchannelinfo">In #{channel.name}</p>}
         <form
           onSubmit={handleSubmit(async (formData) => {

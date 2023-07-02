@@ -1,8 +1,13 @@
+import { SophonInstance } from '@sophon-js/server';
 import { NotFoundError } from 'routing-controllers';
 
 import { prisma } from '../functions/prisma';
-import { MemberService, UserService } from './schema';
-import { sophon } from './sophon';
+import {
+  AbstractMemberService,
+  AbstractUserService,
+  MemberUpdateOptions,
+  UserUpdateOptions,
+} from './schema';
 
 const memberInclude = {
   roles: {
@@ -17,8 +22,8 @@ const memberInclude = {
   },
 };
 
-export const memberService = sophon.create(MemberService, {
-  async get(ctx, spaceId, userId) {
+export class MemberService extends AbstractMemberService {
+  async get(ctx: SophonInstance, spaceId: string, userId: string) {
     const member = await prisma.spaceUser.findUnique({
       where: { userId_spaceId: { userId, spaceId } },
       include: memberInclude,
@@ -31,8 +36,13 @@ export const memberService = sophon.create(MemberService, {
       roleIds: roles.map((x) => x.id),
       ...rest,
     };
-  },
-  async update(ctx, spaceId, userId, options) {
+  }
+  async update(
+    ctx: SophonInstance,
+    spaceId: string,
+    userId: string,
+    options: MemberUpdateOptions,
+  ) {
     // TODO: probably a cleaner method to do this
 
     const roleIds = new Set(options.roleIds);
@@ -61,11 +71,11 @@ export const memberService = sophon.create(MemberService, {
       roleIds: member.roles.map((x) => x.id),
       ...member,
     };
-  },
-});
+  }
+}
 
-export const userService = sophon.create(UserService, {
-  async me(ctx) {
+export class UserService extends AbstractUserService {
+  async me(ctx: SophonInstance) {
     const user = await prisma.user.findUnique({
       where: { id: ctx.data.user.sub },
       select: {
@@ -78,8 +88,8 @@ export const userService = sophon.create(UserService, {
       throw new NotFoundError();
     }
     return user;
-  },
-  async update(ctx, options) {
+  }
+  async update(ctx: SophonInstance, options: UserUpdateOptions) {
     const user = await prisma.user.update({
       where: { id: ctx.data.user.sub },
       data: {
@@ -88,5 +98,5 @@ export const userService = sophon.create(UserService, {
       },
     });
     return user;
-  },
-});
+  }
+}

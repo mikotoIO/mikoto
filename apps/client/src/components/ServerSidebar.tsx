@@ -10,6 +10,8 @@ import { useHover } from 'usehooks-ts';
 import { useMikoto } from '../hooks';
 import { useDeltaWithRedux } from '../hooks/useDelta';
 import { useErrorElement } from '../hooks/useErrorElement';
+import { DialogPanel } from '../lucid/DialogPanel';
+import { Input } from '../lucid/Input';
 import { useMikotoSelector } from '../redux';
 import { spaceActions } from '../redux/mikoto';
 import { treebarSpaceState, useTabkit } from '../store';
@@ -38,9 +40,36 @@ const StyledServerIcon = styled.div<{ active?: boolean; icon?: string }>`
   background-size: cover;
 `;
 
+const InviteModalWrapper = styled.div`
+  button {
+    border-radius: 4px;
+    display: block;
+    padding: 16px;
+    margin-bottom: 8px;
+    border: none;
+    color: ${(p) => p.theme.colors.N0};
+    background-color: ${(p) => p.theme.colors.N1000};
+  }
+`;
+
+function InviteModal() {
+  return (
+    <DialogPanel>
+      <InviteModalWrapper>
+        <h1>Invite Link</h1>
+        <button type="button" onClick={() => {}}>
+          https://app.mikoto.io/m/abcdefgh
+        </button>
+      </InviteModalWrapper>
+    </DialogPanel>
+  );
+}
+
 function ServerIconContextMenu({ space }: { space: Space }) {
   const mikoto = useMikoto();
   const tabkit = useTabkit();
+  const setModal = useSetRecoilState(modalState);
+
   return (
     <ContextMenu>
       <ContextMenu.Link
@@ -61,6 +90,16 @@ function ServerIconContextMenu({ space }: { space: Space }) {
         onClick={async () => await navigator.clipboard.writeText(space.id)}
       >
         Copy ID
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          setModal({
+            title: 'Invite',
+            elem: <InviteModal />,
+          });
+        }}
+      >
+        Generate Invite
       </ContextMenu.Link>
       <ContextMenu.Link
         onClick={async () => await mikoto.client.spaces.leave(space.id)}
@@ -110,6 +149,30 @@ function ServerIcon({ space }: { space: Space }) {
   );
 }
 
+function SpaceCreateForm({ closeModal }: { closeModal: () => void }) {
+  const mikoto = useMikoto();
+  const form = useForm();
+
+  return (
+    <form
+      onSubmit={form.handleSubmit(async (data) => {
+        await mikoto.client.spaces.create(data.spaceName);
+        closeModal();
+        form.reset();
+      })}
+    >
+      <Input
+        labelName="Space Name"
+        placeholder="Awesomerino Space"
+        {...form.register('spaceName')}
+      />
+      <Button mt={16} fullWidth type="submit">
+        Create Space
+      </Button>
+    </form>
+  );
+}
+
 function CreateSpaceModal() {
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
@@ -135,19 +198,17 @@ function CreateSpaceModal() {
   );
 }
 
-export function SpaceJoinModal() {
+function SpaceJoinForm({ closeModal }: { closeModal: () => void }) {
   const mikoto = useMikoto();
-  const setModal = useSetRecoilState(modalState);
 
   const { register, formState, handleSubmit, reset } = useForm({});
   const error = useErrorElement();
-
   return (
     <form
       onSubmit={handleSubmit(async (data) => {
         try {
           await mikoto.client.spaces.join(data.spaceId);
-          setModal(null);
+          closeModal();
           reset();
         } catch (e) {
           error.setError((e as AxiosError).response?.data as any);
@@ -155,15 +216,43 @@ export function SpaceJoinModal() {
       })}
     >
       {error.el}
-      <TextInput
-        label="Space ID"
-        placeholder="9a807e83-15db-4267-9940-cdda7cb696fd"
-        {...register('spaceId')}
-      />
+      <Input labelName="Space ID" {...register('spaceId')} />
       <Button mt={16} fullWidth type="submit" loading={formState.isSubmitting}>
         Join Space
       </Button>
     </form>
+  );
+}
+
+const SpaceJoinModalWrapper = styled.div`
+  min-width: 400px;
+  .inviteheader {
+    text-align: center;
+  }
+`;
+
+export function SpaceJoinModal() {
+  const setModal = useSetRecoilState(modalState);
+
+  return (
+    <DialogPanel>
+      <SpaceJoinModalWrapper>
+        <h1 className="inviteheader" style={{ marginTop: 0 }}>
+          Create a Space
+        </h1>
+        <SpaceCreateForm
+          closeModal={() => {
+            setModal(null);
+          }}
+        />
+        <h2 className="inviteheader">Have an invite already?</h2>
+        <SpaceJoinForm
+          closeModal={() => {
+            setModal(null);
+          }}
+        />
+      </SpaceJoinModalWrapper>
+    </DialogPanel>
   );
 }
 

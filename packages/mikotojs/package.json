@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@sophon-js/cli": "^0.0.2",
+    "@sophon-js/cli": "^0.0.4",
     "typescript": "^5.0.4"
   },
   "dependencies": {

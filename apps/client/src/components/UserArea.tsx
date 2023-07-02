@@ -50,10 +50,25 @@ function UserAreaMenu() {
     <ContextMenu>
       <ContextMenu.Link
         onClick={() => {
+          tabkit.openTab({ kind: 'palette', key: 'main' }, false);
+        }}
+      >
+        Open Palette
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
           tabkit.openTab({ kind: 'accountSettings', key: 'main' }, false);
         }}
       >
         User Settings
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          localStorage.removeItem('REFRESH_TOKEN');
+          window.location.reload();
+        }}
+      >
+        Log out
       </ContextMenu.Link>
     </ContextMenu>
   );

@@ -1,8 +1,10 @@
-import { Modal } from '@mantine/core';
+import { Dialog } from '@headlessui/react';
 import useEventListener from '@use-it/event-listener';
 import React, { useRef } from 'react';
 import { atom, useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
+
+import { Backdrop, DialogPanel } from '../lucid/DialogPanel';
 
 interface Positions {
   top?: number;
@@ -155,13 +157,16 @@ export const modalState = atom<ModalData | null>({
 export function ModalKit() {
   const [modal, setModal] = useRecoilState(modalState);
 
+  // opened={modal !== null}
   return (
-    <Modal
-      opened={modal !== null}
-      onClose={() => setModal(null)}
-      title={modal?.title}
+    <Dialog
+      open={modal !== null}
+      onClose={() => {
+        setModal(null);
+      }}
     >
+      <Backdrop />
       {modal?.elem}
-    </Modal>
+    </Dialog>
   );
 }

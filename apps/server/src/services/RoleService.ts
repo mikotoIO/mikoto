@@ -1,4 +1,3 @@
-import { RoleService } from './schema';
-import { sophon } from './sophon';
+import { AbstractRoleService } from './schema';
 
-export const roleService = sophon.create(RoleService, {});
+export class RoleService extends AbstractRoleService {}

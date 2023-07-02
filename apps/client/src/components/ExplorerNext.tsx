@@ -13,8 +13,10 @@ export const StyledTreeBody = styled.div`
   margin: 0;
   padding: 10px;
   min-height: min-content;
+  max-height: 100%;
   flex: 1;
   overflow-y: auto;
+  height: 100%;
   box-sizing: border-box;
 `;
 

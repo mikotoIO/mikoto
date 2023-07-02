@@ -13,6 +13,7 @@ type TabBaseType =
   | { kind: 'voiceChannel'; channel: Channel }
   | { kind: 'spaceSettings'; space: Space }
   | { kind: 'accountSettings' }
+  | { kind: 'palette' }
   | { kind: 'unknown' };
 
 export type Tabable = TabBaseType & {

@@ -121,6 +121,13 @@ function BotCard({ id, name, secret }: BotProps) {
       <h2>{name}</h2>
       <p>Bot ID: {id}</p>
       <p>Bot Secret: ******</p>
+      <Button
+        onClick={() => {
+          navigator.clipboard.writeText(`${id}:${secret}`);
+        }}
+      >
+        Copy ID:Secret Pair
+      </Button>
     </BotCardContainer>
   );
 }

@@ -260,6 +260,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@axiomhq/axiom-node@npm:^0.12.0":
+  version: 0.12.0
+  resolution: "@axiomhq/axiom-node@npm:0.12.0"
+  dependencies:
+    axios: ^1.2.0
+    axios-retry: ^3.3.1
+    to-time: ^1.0.2
+    winston-transport: ^4.5.0
+  checksum: c0f90f89ced62f765edb9c688f0197ccde862bfc26ee705856eac30d23a66bc4c2fab7155b9cfc2460227632bb14e76f05e172e2ced44cfea851a711db18fe05
+  languageName: node
+  linkType: hard
+
 "@babel/code-frame@npm:7.10.4, @babel/code-frame@npm:~7.10.4":
   version: 7.10.4
   resolution: "@babel/code-frame@npm:7.10.4"
@@ -2037,7 +2049,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.10.2, @babel/runtime@npm:^7.10.3, @babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.13, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.13.10, @babel/runtime@npm:^7.14.5, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.17.2, @babel/runtime@npm:^7.17.8, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.18.6, @babel/runtime@npm:^7.19.4, @babel/runtime@npm:^7.20.0, @babel/runtime@npm:^7.20.13, @babel/runtime@npm:^7.20.7, @babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.21.5, @babel/runtime@npm:^7.3.1, @babel/runtime@npm:^7.5.0, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.6.2, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.7.6, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
+"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.10.2, @babel/runtime@npm:^7.10.3, @babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.13, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.13.10, @babel/runtime@npm:^7.14.5, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.17.2, @babel/runtime@npm:^7.17.8, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.18.6, @babel/runtime@npm:^7.19.4, @babel/runtime@npm:^7.20.0, @babel/runtime@npm:^7.20.13, @babel/runtime@npm:^7.20.7, @babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.21.5, @babel/runtime@npm:^7.3.1, @babel/runtime@npm:^7.5.0, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.6.2, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.7.6, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
   version: 7.22.5
   resolution: "@babel/runtime@npm:7.22.5"
   dependencies:
@@ -10524,6 +10536,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios-retry@npm:^3.3.1":
+  version: 3.5.1
+  resolution: "axios-retry@npm:3.5.1"
+  dependencies:
+    "@babel/runtime": ^7.15.4
+    is-retry-allowed: ^2.2.0
+  checksum: ff1690a635c74b45a0ff60b2608d36bae82ea23660a2571dea918c79242fd88cc0332ba9757810bfac398c947a950299078cef2bc2b08807c27c6ffe069aad4a
+  languageName: node
+  linkType: hard
+
 "axios@npm:^0.25.0":
   version: 0.25.0
   resolution: "axios@npm:0.25.0"
@@ -10543,7 +10565,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.3.6":
+"axios@npm:^1.2.0, axios@npm:^1.3.6":
   version: 1.4.0
   resolution: "axios@npm:1.4.0"
   dependencies:
@@ -11062,6 +11084,13 @@ __metadata:
   version: 5.2.2
   resolution: "big.js@npm:5.2.2"
   checksum: b89b6e8419b097a8fb4ed2399a1931a68c612bce3cfd5ca8c214b2d017531191070f990598de2fc6f3f993d91c0f08aa82697717f6b3b8732c9731866d233c9e
+  languageName: node
+  linkType: hard
+
+"bignumber.js@npm:^2.4.0":
+  version: 2.4.0
+  resolution: "bignumber.js@npm:2.4.0"
+  checksum: 822c0318b8d077566f2ae1e3b3a78ebd0aa0a1f74a2dc4a5c0bab0fbcfc3e4af56489db814f64cdca973d4682468d99c251fe10dc81060225a1cfc19404a92c5
   languageName: node
   linkType: hard
 
@@ -19413,6 +19442,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-retry-allowed@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "is-retry-allowed@npm:2.2.0"
+  checksum: 3d1103a9290b5d03626756a41054844633eac78bc5d3e3a95b13afeae94fa3cfbcf7f0b5520d83f75f48a25ce7b142fdbac4217dc4b0630f3ea55e866ec3a029
+  languageName: node
+  linkType: hard
+
 "is-root@npm:^2.1.0":
   version: 2.1.0
   resolution: "is-root@npm:2.1.0"
@@ -23419,6 +23455,7 @@ __metadata:
     eslint-config-airbnb-typescript: ^17.0.0
     prettier: ^2.8.7
     turbo: ^1.10.7
+    winston-transport: ^4.5.0
   languageName: unknown
   linkType: soft
 
@@ -29356,6 +29393,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "server@workspace:apps/server"
   dependencies:
+    "@axiomhq/axiom-node": ^0.12.0
     "@prisma/client": ^4.16.2
     "@sophon-js/cli": ^0.0.4
     "@sophon-js/server": ^0.0.5
@@ -29405,7 +29443,7 @@ __metadata:
     typedi: ^0.10.0
     typescript: ^5.1.6
     uuid: ^8.3.2
-    winston: ^3.8.1
+    winston: ^3.9.0
   languageName: unknown
   linkType: soft
 
@@ -31428,6 +31466,15 @@ __metadata:
     regex-not: ^1.0.2
     safe-regex: ^1.1.0
   checksum: 4ed4a619059b64e204aad84e4e5f3ea82d97410988bcece7cf6cbfdbf193d11bff48cf53842d88b8bb00b1bfc0d048f61f20f0709e6f393fd8fe0122662d9db4
+  languageName: node
+  linkType: hard
+
+"to-time@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "to-time@npm:1.0.2"
+  dependencies:
+    bignumber.js: ^2.4.0
+  checksum: fbe253a0bd57657dc5d5b74bb87ab871ebf8fb379ffbeb1609ba4d0410c7f46355820ac6faca1d06dfdace2b3b991ed1955b5eed3fa4b4963dd027c11d2f9371
   languageName: node
   linkType: hard
 
@@ -33628,7 +33675,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"winston@npm:^3.8.1":
+"winston@npm:^3.9.0":
   version: 3.9.0
   resolution: "winston@npm:3.9.0"
   dependencies:

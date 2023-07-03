@@ -35,6 +35,7 @@
     "studio": "prisma studio"
   },
   "dependencies": {
+    "@axiomhq/axiom-node": "^0.12.0",
     "@prisma/client": "^4.16.2",
     "@sophon-js/cli": "^0.0.4",
     "@sophon-js/server": "^0.0.5",
@@ -64,7 +65,7 @@
     "tslib": "^2.4.0",
     "typedi": "^0.10.0",
     "uuid": "^8.3.2",
-    "winston": "^3.8.1"
+    "winston": "^3.9.0"
   },
   "bundledDependencies": [
     "eslint-config"

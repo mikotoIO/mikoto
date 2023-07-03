@@ -1,6 +1,6 @@
 import { LiveKitRoom } from '@livekit/react-components';
 import { Channel, VoiceToken } from 'mikotojs';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useMikoto } from '../../hooks';
 import { TabName } from '../TabBar';

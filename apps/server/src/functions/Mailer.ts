@@ -23,7 +23,6 @@ export default class Mailer {
   }
   // send mail using nodemailer
   async sendMail(to: string, subject: string, template: string, data: any) {
-    console.log(path.join(__dirname, '../../emails'));
     const t = await fs.readFile(
       path.join(__dirname, '../../emails', template),
       { encoding: 'utf8' },

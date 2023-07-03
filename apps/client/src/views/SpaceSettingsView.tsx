@@ -5,12 +5,10 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  Button,
   ColorPicker,
   NumberInput,
   SegmentedControl,
   Switch,
-  TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { Role, Space, Permissions } from 'mikotojs';
@@ -28,6 +26,9 @@ import {
   uploadFileWithAxios,
 } from '../components/molecules/AvatarEditor';
 import { useMikoto } from '../hooks';
+import { Button } from '../lucid/Button';
+import { Form } from '../lucid/Form';
+import { Input } from '../lucid/Input';
 
 const Sidebar = styled.div`
   padding: 16px;
@@ -53,26 +54,31 @@ function Overview({ space }: { space: Space }) {
   return (
     <SidebarContainerArea>
       <TabName name={`Settings for ${space.name}`} />
-      <h1>Space Overview</h1>
-      <AvatarEditor
-        onDrop={async (file) => {
-          const { data } = await uploadFileWithAxios<{ url: string }>(
-            mediaServerAxios,
-            '/spaceicon',
-            file,
-          );
-          await mikoto.client.spaces.update(space.id, {
-            icon: data.url,
-            name: null,
-          });
-        }}
-      />
+      <Form>
+        <h1>Space Overview</h1>
+        <AvatarEditor
+          onDrop={async (file) => {
+            const { data } = await uploadFileWithAxios<{ url: string }>(
+              mediaServerAxios,
+              '/spaceicon',
+              file,
+            );
+            await mikoto.client.spaces.update(space.id, {
+              icon: data.url,
+              name: null,
+            });
+          }}
+        />
 
-      <TextInput
-        value={spaceName}
-        onChange={(x) => setSpaceName(x.target.value)}
-      />
-      <Button>Update</Button>
+        <Input
+          labelName="Space Name"
+          value={spaceName}
+          onChange={(x) => setSpaceName(x.target.value)}
+        />
+        <div>
+          <Button variant="primary">Update</Button>
+        </div>
+      </Form>
     </SidebarContainerArea>
   );
 }
@@ -199,7 +205,7 @@ function RoleEditor({ role, space }: { space: Space; role: Role }) {
       {role.name !== '@everyone' && (
         <div>
           <h2>Edit Role</h2>
-          <TextInput label="Role Name" {...getInputProps('name')} />
+          <Input labelName="Role Name" {...getInputProps('name')} />
           <NumberInput label="Role Priority" {...getInputProps('position')} />
           <ColorPicker {...getInputProps('color')} />
         </div>

@@ -2,6 +2,12 @@ import axios, { Axios } from 'axios';
 
 import { TokenPair } from './models';
 
+interface Bot {
+  id: string;
+  name: string;
+  secret: string;
+}
+
 export class AuthClient {
   axios: Axios;
   constructor(baseUrl: string) {
@@ -39,12 +45,15 @@ export class AuthClient {
       .then((x) => x.data);
   }
 
-  refresh(pair: TokenPair) {
-    return this.axios
+  async refresh(pair: TokenPair) {
+    const newPair = await this.axios
       .post<TokenPair>('/account/refresh', {
         refreshToken: pair.refreshToken,
       })
       .then((x) => x.data);
+
+    this.axios.defaults.headers.common.Authorization = `Bearer ${newPair.accessToken}`;
+    return newPair;
   }
 
   resetPassword(email: string) {
@@ -56,5 +65,14 @@ export class AuthClient {
       newPassword,
       token,
     });
+  }
+
+  // bot works
+  async listBots() {
+    return this.axios.get<Bot[]>('/bots').then((x) => x.data);
+  }
+
+  async createBot(name: string) {
+    return this.axios.post<Bot>('/bots', { name }).then((x) => x.data);
   }
 }

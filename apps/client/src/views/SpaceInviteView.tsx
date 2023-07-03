@@ -63,7 +63,16 @@ export function SpaceInviteViewInner() {
               {space.icon === null ? space.name[0] : ''}
             </StyledSpaceIcon>
             <h1>{space.name}</h1>
-            <Button variant="primary">Accept Invite</Button>
+            <Button
+              variant="primary"
+              onClick={async () => {
+                // TODO: Rewrite to use invite links instead of server IDs!
+                await mikoto.client.spaces.join(space.id);
+                window.location.href = `/`;
+              }}
+            >
+              Accept Invite
+            </Button>
           </>
         ) : (
           <Spinner />

@@ -91,7 +91,7 @@ export class AccountController {
 
   @Post('/account/register')
   async register(@Body() body: RegisterPayload) {
-    return this.prisma.user.create({
+    await this.prisma.user.create({
       data: {
         name: body.name,
         Account: {
@@ -102,6 +102,10 @@ export class AccountController {
         },
       },
     });
+    const account = await this.prisma.account.findUnique({
+      where: { email: body.email },
+    });
+    return await this.createTokenPair(account!);
   }
 
   @Post('/account/login')
@@ -110,7 +114,7 @@ export class AccountController {
       where: { email: body.email },
     });
     if (account && (await bcrypt.compare(body.password, account.passhash))) {
-      return this.createTokenPair(account);
+      return await this.createTokenPair(account);
     }
     throw new UnauthorizedError('Incorrect Credentials');
   }
@@ -257,13 +261,20 @@ export class AccountController {
   ) {
     const secret = await generateRandomToken();
 
-    const bot = await this.prisma.bot.create({
+    const bot = await this.prisma.user.create({
       data: {
         name: body.name,
-        ownerId: account.sub,
-        secret,
+        Bot: {
+          create: {
+            name: body.name,
+            ownerId: account.sub,
+            secret,
+          },
+        },
       },
+      include: { Bot: true },
     });
-    return bot;
+
+    return bot.Bot;
   }
 }

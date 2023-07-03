@@ -4897,31 +4897,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@prisma/client@npm:^4.9.0":
-  version: 4.16.1
-  resolution: "@prisma/client@npm:4.16.1"
+"@prisma/client@npm:^4.16.2":
+  version: 4.16.2
+  resolution: "@prisma/client@npm:4.16.2"
   dependencies:
-    "@prisma/engines-version": 4.16.0-66.b20ead4d3ab9e78ac112966e242ded703f4a052c
+    "@prisma/engines-version": 4.16.1-1.4bc8b6e1b66cb932731fb1bdbbc550d1e010de81
   peerDependencies:
     prisma: "*"
   peerDependenciesMeta:
     prisma:
       optional: true
-  checksum: da715b6e930f56493cb7c6232b179250a4e93bbc2b5fe42a84cb9511d127b6fd89e1271f83e1d531bd4fdd7e87f6ac0701b30174cf89212ae7da88097de31026
+  checksum: 38e1356644a764946c69c8691ea4bbed0ba37739d833a435625bd5435912bed4b9bdd7c384125f3a4ab8128faf566027985c0f0840a42741c338d72e40b5d565
   languageName: node
   linkType: hard
 
-"@prisma/engines-version@npm:4.16.0-66.b20ead4d3ab9e78ac112966e242ded703f4a052c":
-  version: 4.16.0-66.b20ead4d3ab9e78ac112966e242ded703f4a052c
-  resolution: "@prisma/engines-version@npm:4.16.0-66.b20ead4d3ab9e78ac112966e242ded703f4a052c"
-  checksum: 23183cab33f95e0711cd6cee7642f4beeeb77b8b0aa54b419f55097bfb96863a11a28f6509ab27fef0ea794522e188044ce850993a25c341333f8305711a255f
+"@prisma/engines-version@npm:4.16.1-1.4bc8b6e1b66cb932731fb1bdbbc550d1e010de81":
+  version: 4.16.1-1.4bc8b6e1b66cb932731fb1bdbbc550d1e010de81
+  resolution: "@prisma/engines-version@npm:4.16.1-1.4bc8b6e1b66cb932731fb1bdbbc550d1e010de81"
+  checksum: b42c6abe7c1928e546f15449e40ffa455701ef2ab1f62973628ecb4e19ff3652e34609a0d83196d1cbd0864adb44c55e082beec852b11929acf1c15fb57ca45a
   languageName: node
   linkType: hard
 
-"@prisma/engines@npm:4.16.1":
-  version: 4.16.1
-  resolution: "@prisma/engines@npm:4.16.1"
-  checksum: 7b8c1a9e20434edaa919fb24585ebff573c4ace787ea5a135dfefde3571ae31d3f0b0347397774c38be6d2e3fc0087d4e21a2720fe9f7a66ffd870e34377040f
+"@prisma/engines@npm:4.16.2":
+  version: 4.16.2
+  resolution: "@prisma/engines@npm:4.16.2"
+  checksum: f423e6092c3e558cd089a68ae87459fba7fd390c433df087342b3269c3b04163965b50845150dfe47d01f811781bfff89d5ae81c95ca603c59359ab69ebd810f
   languageName: node
   linkType: hard
 
@@ -12382,6 +12382,7 @@ __metadata:
     eslint-plugin-react: ^7.28.0
     eslint-plugin-react-hooks: 4.3.0
     events: ^3.3.0
+    gemoji: ^8.1.0
     immer: ^10.0.2
     jest: ^29.5.0
     jsonwebtoken: ^8.5.1
@@ -12427,6 +12428,7 @@ __metadata:
     ts-jest: ^29.0.5
     typed-emitter: ^2.1.0
     typescript: ^4.7.4
+    unist-util-visit: ^4.1.2
     usehooks-ts: ^2.6.0
     vite: ^3.0.9
     vitest: ^0.18.0
@@ -17190,6 +17192,13 @@ __metadata:
     strip-ansi: ^6.0.1
     wide-align: ^1.1.5
   checksum: 788b6bfe52f1dd8e263cda800c26ac0ca2ff6de0b6eee2fe0d9e3abf15e149b651bd27bf5226be10e6e3edb5c4e5d5985a5a1a98137e7a892f75eff76467ad2d
+  languageName: node
+  linkType: hard
+
+"gemoji@npm:^8.1.0":
+  version: 8.1.0
+  resolution: "gemoji@npm:8.1.0"
+  checksum: 89ef0708e77bbb938c3f87af8263e9e42891fb15b0f5d78e5d3b204a3430e82f8931a2459c912562f46cacb2addc9e8570857f1a3304d4307ebff7c32b126373
   languageName: node
   linkType: hard
 
@@ -26218,15 +26227,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prisma@npm:^4.9.0":
-  version: 4.16.1
-  resolution: "prisma@npm:4.16.1"
+"prisma@npm:^4.16.2":
+  version: 4.16.2
+  resolution: "prisma@npm:4.16.2"
   dependencies:
-    "@prisma/engines": 4.16.1
+    "@prisma/engines": 4.16.2
   bin:
     prisma: build/index.js
     prisma2: build/index.js
-  checksum: eb0f43970464fbaa6ba190a714f23d00acd39dcc14fd8a7183dffc51a548cc32040cc5360415787578749862af7501a7bedcf9f2a0e64a3f82e3af402e9439d7
+  checksum: 1d0ed616abd7f8de22441e333b976705f1cb05abcb206965df3fc6a7ea03911ef467dd484a4bc51fdc6cff72dd9857b9852be5f232967a444af0a98c49bfdb76
   languageName: node
   linkType: hard
 
@@ -29347,7 +29356,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "server@workspace:apps/server"
   dependencies:
-    "@prisma/client": ^4.9.0
+    "@prisma/client": ^4.16.2
     "@sophon-js/cli": ^0.0.4
     "@sophon-js/server": ^0.0.5
     "@types/bcrypt": ^5.0.0
@@ -29381,7 +29390,7 @@ __metadata:
     node-notifier: ^10.0.1
     nodemailer: ^6.8.0
     prettier: ^2.7.1
-    prisma: ^4.9.0
+    prisma: ^4.16.2
     redis: ^4.6.7
     reflect-metadata: ^0.1.13
     routing-controllers: ^0.9.0
@@ -32463,7 +32472,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"unist-util-visit@npm:^4.0.0":
+"unist-util-visit@npm:^4.0.0, unist-util-visit@npm:^4.1.2":
   version: 4.1.2
   resolution: "unist-util-visit@npm:4.1.2"
   dependencies:

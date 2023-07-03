@@ -5,8 +5,6 @@ import { ChannelEmitter, MessageEmitter, SpaceEmitter } from './emitters';
 import { createClient, MainServiceClient } from './schema';
 
 export class MikotoClient {
-  axios: AxiosInstance;
-
   // spaces: SpaceEngine = new SpaceEngine(this);
   authAPI: AuthClient;
   client!: MainServiceClient;
@@ -17,17 +15,12 @@ export class MikotoClient {
   spaceEmitter = new SpaceEmitter();
 
   constructor(
-    authUrl: string,
+    authClient: AuthClient,
     sophonUrl: string,
     accessToken: string,
     onready?: (self: MikotoClient) => void,
   ) {
-    this.authAPI = new AuthClient(authUrl);
-
-    this.axios = axios.create({
-      baseURL: authUrl,
-    });
-    this.axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+    this.authAPI = authClient;
 
     createClient(
       {
@@ -77,22 +70,6 @@ export class MikotoClient {
 
     this.client.spaces.onDelete((space) => {
       this.spaceEmitter.emit('delete/@', space.id);
-    });
-  }
-
-  updateAccessToken(token: string) {
-    this.axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-  }
-
-  // endregion
-
-  async uploadAvatar(file: File) {
-    const formData = new FormData();
-    formData.append('avatar', file);
-    await this.axios.post('/account/avatar', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
     });
   }
 }

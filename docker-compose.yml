@@ -33,6 +33,15 @@ services:
       - '7880:7880'
       - '7881:7881'
       - '7882:7882'
+  mailhog:
+    image: mailhog/mailhog
+    # environment:
+    #   MH_HOSTNAME: localhost
+    ports:
+      - '8025:8025'
+      - '1025:1025'
+    logging:
+      driver: none
 
 volumes:
   cockroachdb:

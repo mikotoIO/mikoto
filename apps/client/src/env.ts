@@ -1,4 +1,6 @@
 export const env = {
+  PUBLIC_FRONTEND_URL:
+    import.meta.env.PUBLIC_FRONTEND_URL ?? 'http://localhost:5173',
   PUBLIC_AUTH_URL: import.meta.env.PUBLIC_AUTH_URL ?? 'http://localhost:9500',
   PUBLIC_SERVER_URL:
     import.meta.env.PUBLIC_SERVER_URL ?? 'http://localhost:3510',

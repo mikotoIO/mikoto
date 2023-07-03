@@ -7,6 +7,7 @@ import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 import { useHover } from 'usehooks-ts';
 
+import { env } from '../env';
 import { useMikoto } from '../hooks';
 import { useDeltaWithRedux } from '../hooks/useDelta';
 import { useErrorElement } from '../hooks/useErrorElement';
@@ -32,6 +33,8 @@ const StyledServerSidebar = styled.div`
 
 const InviteModalWrapper = styled.div`
   button {
+    width: 100%;
+    font-size: 14px;
     border-radius: 4px;
     display: block;
     padding: 16px;
@@ -46,11 +49,11 @@ const InviteModalWrapper = styled.div`
   }
 `;
 
-function InviteModal() {
-  const link = 'https://app.mikoto.io/m/abcdefgh';
+function InviteModal({ space }: { space: Space }) {
+  const link = `${env.PUBLIC_FRONTEND_URL}/invite/${space.id}`;
 
   return (
-    <DialogPanel>
+    <DialogPanel style={{ minWidth: '400px' }}>
       <InviteModalWrapper>
         <h1>Invite Link</h1>
         <button
@@ -97,7 +100,7 @@ function ServerIconContextMenu({ space }: { space: Space }) {
         onClick={() => {
           setModal({
             title: 'Invite',
-            elem: <InviteModal />,
+            elem: <InviteModal space={space} />,
           });
         }}
       >

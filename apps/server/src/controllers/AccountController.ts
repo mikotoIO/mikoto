@@ -21,8 +21,8 @@ import Minio from '../functions/Minio';
 import { logger } from '../functions/logger';
 
 const randomBytes = promisify(crypto.randomBytes);
-async function generateRandomToken() {
-  const b = await randomBytes(128);
+async function generateRandomToken(size = 32) {
+  const b = await randomBytes(size);
   return b.toString('base64url');
 }
 

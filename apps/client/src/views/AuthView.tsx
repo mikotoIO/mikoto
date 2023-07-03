@@ -1,10 +1,13 @@
-import { Anchor, Button, Input } from '@mantine/core';
+import { Anchor } from '@mantine/core';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { useErrorElement } from '../hooks/useErrorElement';
+import { Button } from '../lucid/Button';
+import { Form } from '../lucid/Form';
+import { Input } from '../lucid/Input';
 import { authClient } from '../store/authClient';
 
 const AuthViewContainer = styled.div`
@@ -16,6 +19,10 @@ const AuthViewContainer = styled.div`
 const AuthViewInner = styled.div`
   color: white;
   background-color: ${(p) => p.theme.colors.N800};
+  ${Form} {
+    width: 300px;
+    margin: 0 auto;
+  }
 `;
 
 const bgImageUrl = '/images/background-1.jpg';
@@ -23,13 +30,6 @@ const bgImageUrl = '/images/background-1.jpg';
 const BackgroundArt = styled.div`
   background: url('${bgImageUrl}') no-repeat center center fixed;
   background-size: cover;
-`;
-
-const Form = styled.form`
-  display: grid;
-  grid-gap: 8px;
-  width: 300px;
-  margin: 0 auto;
 `;
 
 const Logo = styled.img`
@@ -73,14 +73,11 @@ export function LoginView() {
       >
         <h1>Log In</h1>
         {error.el}
-        <Input size="md" placeholder="Email" {...register('email')} />
-        <Input
-          size="md"
-          placeholder="Password"
-          type="password"
-          {...register('password')}
-        />
-        <Button type="submit">Log In</Button>
+        <Input labelName="Email" {...register('email')} />
+        <Input labelName="Password" type="password" {...register('password')} />
+        <Button variant="primary" type="submit">
+          Log In
+        </Button>
         <Anchor to="/register" component={Link}>
           Register
         </Anchor>
@@ -96,32 +93,31 @@ export function RegisterView() {
   const { register, handleSubmit } = useForm();
   const error = useErrorElement();
 
-  const navigate = useNavigate();
-
   return (
     <AuthView>
       {error.el}
       <Form
         onSubmit={handleSubmit(async (data) => {
-          navigate('/login');
           try {
-            await authClient.register(data.name, data.email, data.password);
-            navigate('/login');
+            const tk = await authClient.register(
+              data.name,
+              data.email,
+              data.password,
+            );
+            localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
+            window.location.href = '/';
           } catch (e) {
             error.setError((e as any)?.response?.data);
           }
         })}
       >
         <h1>Register</h1>
-        <Input size="md" placeholder="Username" {...register('name')} />
-        <Input size="md" placeholder="Email" {...register('email')} />
-        <Input
-          size="md"
-          placeholder="Password"
-          type="password"
-          {...register('password')}
-        />
-        <Button type="submit">Register</Button>
+        <Input labelName="Username" {...register('name')} />
+        <Input labelName="Email" {...register('email')} />
+        <Input labelName="Password" type="password" {...register('password')} />
+        <Button variant="primary" type="submit">
+          Register
+        </Button>
         <Anchor to="/login" component={Link}>
           Log In
         </Anchor>
@@ -150,8 +146,10 @@ export function ResetPasswordView() {
         ) : (
           <>
             <h1>Reset Password</h1>
-            <Input size="md" placeholder="Email" {...register('email')} />
-            <Button type="submit">Send Password Reset Email</Button>
+            <Input labelName="Email" {...register('email')} />
+            <Button variant="primary" type="submit">
+              Send Password Reset Email
+            </Button>
           </>
         )}
       </Form>
@@ -205,16 +203,18 @@ export function ResetChangePasswordView() {
           <>
             <h1>Reset Password</h1>
             <Input
-              placeholder="New Password"
+              labelName="New Password"
               type="password"
               {...register('password')}
             />
             <Input
-              placeholder="Confirm New Password"
+              labelName="Confirm New Password"
               type="password"
               {...register('passwordConfirm')}
             />
-            <Button type="submit">Confirm new password</Button>
+            <Button variant="primary" type="submit">
+              Confirm new password
+            </Button>
           </>
         )}
       </Form>

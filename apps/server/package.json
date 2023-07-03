@@ -19,7 +19,7 @@
     "jest": "^28.1.3",
     "node-notifier": "^10.0.1",
     "prettier": "^2.7.1",
-    "prisma": "^4.9.0",
+    "prisma": "^4.16.2",
     "ts-jest": "^28.0.8",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
@@ -35,7 +35,7 @@
     "studio": "prisma studio"
   },
   "dependencies": {
-    "@prisma/client": "^4.9.0",
+    "@prisma/client": "^4.16.2",
     "@sophon-js/cli": "^0.0.4",
     "@sophon-js/server": "^0.0.5",
     "adminjs": "^6.2.4",

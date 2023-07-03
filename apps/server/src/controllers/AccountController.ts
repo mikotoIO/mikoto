@@ -261,13 +261,20 @@ export class AccountController {
   ) {
     const secret = await generateRandomToken();
 
-    const bot = await this.prisma.bot.create({
+    const bot = await this.prisma.user.create({
       data: {
         name: body.name,
-        ownerId: account.sub,
-        secret,
+        Bot: {
+          create: {
+            name: body.name,
+            ownerId: account.sub,
+            secret,
+          },
+        },
       },
+      include: { Bot: true },
     });
-    return bot;
+
+    return bot.Bot;
   }
 }

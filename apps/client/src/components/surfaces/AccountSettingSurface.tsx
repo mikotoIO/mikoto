@@ -1,3 +1,4 @@
+import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -125,6 +126,7 @@ function BotCard({ id, name, secret }: BotProps) {
 }
 
 function BotCreateModal() {
+  const mikoto = useMikoto();
   const { register, handleSubmit } = useForm();
   const setModal = useSetRecoilState(modalState);
 
@@ -132,7 +134,7 @@ function BotCreateModal() {
     <DialogPanel>
       <Form
         onSubmit={handleSubmit(async (form) => {
-          console.log(form);
+          await mikoto.authAPI.createBot(form.name);
           setModal(null);
         })}
       >
@@ -147,7 +149,10 @@ function BotCreateModal() {
 }
 
 function BotsSegment() {
+  const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
+
+  const { result: bots } = useAsync(() => mikoto.authAPI.listBots(), []);
 
   return (
     <div>
@@ -162,7 +167,7 @@ function BotsSegment() {
       >
         Create Bot
       </Button>
-      <BotCard id="lol" name="CactusBot" secret="" />
+      {bots && bots.map((bot) => <BotCard key={bot.id} {...bot} />)}
     </div>
   );
 }

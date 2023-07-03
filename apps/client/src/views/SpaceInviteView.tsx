@@ -7,7 +7,7 @@ import { Spinner } from '../components/atoms/Spinner';
 import { useMikoto } from '../hooks';
 import { Button } from '../lucid/Button';
 
-const bgUrl = 'https://mikoto.io/images/hero-placeholder.jpg';
+const bgUrl = '/images/artworks/1.jpg';
 
 const Grid = styled.div`
   display: grid;

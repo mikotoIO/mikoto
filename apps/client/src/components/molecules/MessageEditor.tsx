@@ -11,8 +11,8 @@ const StyledEditable = styled(Editable)`
   margin: 12px 16px 4px;
   padding: 16px;
   border-radius: 4px;
-  word-wrap: break-word;
   box-sizing: border-box;
+  outline: none;
 `;
 
 const initialEditorValue = [{ children: [{ text: '' }] }];
@@ -59,11 +59,10 @@ export function MessageEditor({
   return (
     <Slate
       editor={editor}
-      value={editorValue}
+      initialValue={editorValue}
       onChange={(x) => setEditorValue(x)}
     >
       <StyledEditable
-        placeholder={placeholder}
         onKeyDown={(ev) => {
           // submission
           if (ev.key !== 'Enter' || ev.shiftKey) {

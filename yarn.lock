@@ -4468,6 +4468,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@juggle/resize-observer@npm:^3.4.0":
+  version: 3.4.0
+  resolution: "@juggle/resize-observer@npm:3.4.0"
+  checksum: 2505028c05cc2e17639fcad06218b1c4b60f932a4ebb4b41ab546ef8c157031ae377e3f560903801f6d01706dbefd4943b6c4704bf19ed86dfa1c62f1473a570
+  languageName: node
+  linkType: hard
+
 "@leichtgewicht/ip-codec@npm:^2.0.1":
   version: 2.0.4
   resolution: "@leichtgewicht/ip-codec@npm:2.0.4"
@@ -12448,9 +12455,9 @@ __metadata:
     rollup-plugin-analyzer: ^4.0.0
     rollup-plugin-visualizer: ^5.8.0
     serve: ^14.0.1
-    slate: ^0.88.1
-    slate-history: ^0.86.0
-    slate-react: ^0.88.2
+    slate: ^0.94.1
+    slate-history: ^0.93.0
+    slate-react: ^0.97.1
     socket.io-client: ^4.5.1
     source-map-explorer: ^2.5.2
     styled-components: ^5.3.3
@@ -29738,21 +29745,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"slate-history@npm:^0.86.0":
-  version: 0.86.0
-  resolution: "slate-history@npm:0.86.0"
+"slate-history@npm:^0.93.0":
+  version: 0.93.0
+  resolution: "slate-history@npm:0.93.0"
   dependencies:
     is-plain-object: ^5.0.0
   peerDependencies:
     slate: ">=0.65.3"
-  checksum: 1adb1997056b87ddac83ab5e69efd317ece443458a3f40aa82429121b4f79501576b16a8b143bc9b6c7ba2374cbcf5f9e9bd05b1377ab6238a52086cd3b94838
+  checksum: 4ce44a9ecbccbfd3b9c023e5bc20c6e151f1064fb2a6dd42cfec72bd6f8fd29e60f533e74130bb69f4706e86802929eb6fd89eb271dda34924ab46965c36a3e2
   languageName: node
   linkType: hard
 
-"slate-react@npm:^0.88.2":
-  version: 0.88.2
-  resolution: "slate-react@npm:0.88.2"
+"slate-react@npm:^0.97.1":
+  version: 0.97.1
+  resolution: "slate-react@npm:0.97.1"
   dependencies:
+    "@juggle/resize-observer": ^3.4.0
     "@types/is-hotkey": ^0.1.1
     "@types/lodash": ^4.14.149
     direction: ^1.0.3
@@ -29765,18 +29773,18 @@ __metadata:
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
     slate: ">=0.65.3"
-  checksum: bc5173417e33772b6ea8515431e08c85cba86fa34f965ade96fe82e9285a8da63f7bd02803f75957ffe58f4ebdf3bb482e0f6171a5322f37fc2c601182563363
+  checksum: 065adf2d3662de5bec11f753c368c2dc13dc80da72164b085343e1916353fbb0190cb1cc306ef94edf013849c2b1431f618c619aef25460020ab1d78158e0b77
   languageName: node
   linkType: hard
 
-"slate@npm:^0.88.1":
-  version: 0.88.1
-  resolution: "slate@npm:0.88.1"
+"slate@npm:^0.94.1":
+  version: 0.94.1
+  resolution: "slate@npm:0.94.1"
   dependencies:
     immer: ^9.0.6
     is-plain-object: ^5.0.0
     tiny-warning: ^1.0.3
-  checksum: 55a9bbb2363130bebfc2b9ac080caa8d79308507e65868a699dc760a0dc4faf0d64962005d0ad84c15114d9072dae41d9725833f82360e42076209f33449173c
+  checksum: 07666fe3373e59aaa19261366fd3cf1df546edfc0162fb88d675d71f158ebd1bf0630fd00ecc9152ab6547080f3e90c9f6d1504e09c25b3bf980cceb9b15c3c1
   languageName: node
   linkType: hard
 

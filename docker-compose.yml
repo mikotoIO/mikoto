@@ -4,7 +4,7 @@ services:
     ports:
       - '26257:26257'
       - '8080:8080'
-    command: start-single-node --insecure --http-addr=localhost:8080
+    command: start-single-node --insecure
     volumes:
       - 'cockroachdb:/cockroach/cockroach-data'
   redis:
@@ -45,5 +45,7 @@ services:
 
 volumes:
   cockroachdb:
+  cockroach1:
+  cockroach2:
   redis:
     driver: local

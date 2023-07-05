@@ -25,7 +25,7 @@ const AuthViewInner = styled.div`
   }
 `;
 
-const bgImageUrl = '/images/background-1.jpg';
+const bgImageUrl = '/images/artworks/1.jpg';
 
 const BackgroundArt = styled.div`
   background: url('${bgImageUrl}') no-repeat center center fixed;

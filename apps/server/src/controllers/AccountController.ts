@@ -1,4 +1,4 @@
-import { Account, PrismaClient } from '@prisma/client';
+import { Account, Bot, PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
@@ -21,8 +21,8 @@ import Minio from '../functions/Minio';
 import { logger } from '../functions/logger';
 
 const randomBytes = promisify(crypto.randomBytes);
-async function generateRandomToken() {
-  const b = await randomBytes(128);
+async function generateRandomToken(size = 32) {
+  const b = await randomBytes(size);
   return b.toString('base64url');
 }
 
@@ -59,7 +59,7 @@ export class AccountController {
     };
   }
 
-  private async createTokenPair(account: Account, oldToken?: string) {
+  private async createTokenPair(account: Account | Bot, oldToken?: string) {
     const accessToken = jwt.sign({}, env.SECRET, {
       expiresIn: '1h',
       subject: account.id,
@@ -276,5 +276,22 @@ export class AccountController {
     });
 
     return bot.Bot;
+  }
+
+  @Post('/bots/auth')
+  async botAuth(@Body() body: { botKey: string }) {
+    const botKey = body.botKey.split(':');
+    if (botKey.length !== 2) {
+      throw new UnauthorizedError('Invalid Bot Key');
+    }
+    const [botId, secret] = botKey;
+    const bot = await this.prisma.bot.findUnique({
+      where: { id: botId },
+    });
+    if (bot === null || bot.secret !== secret) {
+      throw new UnauthorizedError('Invalid Bot Key');
+    }
+
+    return this.createTokenPair(bot);
   }
 }

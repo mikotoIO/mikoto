@@ -106,7 +106,6 @@ const BotCardContainer = styled.div`
   margin: 16px 0;
   padding: 16px;
   border-radius: 8px;
-  height: 100px;
   width: 800px;
 `;
 
@@ -121,6 +120,13 @@ function BotCard({ id, name, secret }: BotProps) {
     <BotCardContainer>
       <h2>{name}</h2>
       <p>Bot ID: {id}</p>
+      <Button
+        onClick={() => {
+          navigator.clipboard.writeText(`${id}:${secret}`);
+        }}
+      >
+        Copy ID:Secret Pair
+      </Button>
     </BotCardContainer>
   );
 }
@@ -217,6 +223,9 @@ export function AccountSettingsView() {
       </div>
       <h2>Bots</h2>
       <BotsSegment />
+      <div>
+        <Button variant="danger">Delete Account</Button>
+      </div>
     </SettingsView>
   );
 }

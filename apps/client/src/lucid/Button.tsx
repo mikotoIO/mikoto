@@ -14,6 +14,22 @@ const variantMap = {
     backgroundColor: 'var(--B700)',
     color: 'var(--N0)',
   },
+  secondary: {
+    backgroundColor: 'var(--V700)',
+    color: 'var(--N0)',
+  },
+  success: {
+    backgroundColor: 'var(--G700)',
+    color: 'var(--N0)',
+  },
+  warning: {
+    backgroundColor: 'var(--Y700)',
+    color: 'var(--N0)',
+  },
+  danger: {
+    backgroundColor: 'var(--R700)',
+    color: 'var(--N0)',
+  },
 };
 
 export const Button = styled.button<{ variant?: keyof typeof variantMap }>`

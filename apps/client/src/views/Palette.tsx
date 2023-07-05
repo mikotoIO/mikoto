@@ -83,8 +83,11 @@ export function DesignStory() {
       <Form>
         <Input labelName="Test Input" />
         <Buttons>
-          <Button variant="primary">Primary Button</Button>
-          <Button>Secondary Button</Button>
+          <Button type="button">Default Button</Button>
+          <Button variant="primary" type="button">Primary Button</Button>
+          <Button variant="success" type="button">Success Button</Button>
+          <Button variant="warning" type="button">Warning Button</Button>
+          <Button variant="danger" type="button">Danger Button</Button>
         </Buttons>
       </Form>
     </ViewContainer>

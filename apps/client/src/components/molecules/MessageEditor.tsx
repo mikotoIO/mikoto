@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { createEditor, Transforms, Node } from 'slate';
+import { useEffect, useMemo, useState } from 'react';
+import { createEditor, Transforms, Node, Editor } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import styled from 'styled-components';
@@ -29,6 +29,14 @@ function serialize(nodes: Node[]) {
   return nodes.map((x) => Node.string(x)).join('\n');
 }
 
+// check if document.activeElement is either an input, textarea, or contenteditable
+function isInputLike() {
+  return (
+    ['INPUT', 'TEXTAREA'].includes(document.activeElement?.nodeName ?? '') ||
+    document.activeElement?.getAttribute('contenteditable') === 'true'
+  );
+}
+
 interface MessageEditorProps {
   placeholder: string;
   onSubmit: (content: string) => void;
@@ -50,6 +58,12 @@ export function MessageEditor({
     ReactEditor.focus(editor);
     const fn = (ev: KeyboardEvent) => {
       // TODO: focus into the editor on text-producing keypress
+      if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
+      if (ev.key.length !== 1) return;
+      if (isInputLike()) return;
+      ReactEditor.focus(editor);
+      editor.insertText(ev.key);
+      ev.preventDefault();
     };
     document.addEventListener('keydown', fn);
 

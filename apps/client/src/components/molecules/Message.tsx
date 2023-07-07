@@ -224,8 +224,6 @@ const markdownComponents: Partial<
   },
 };
 
-type W = keyof typeof markdownComponents;
-
 function Markdown({ content }: { content: string }) {
   const co =
     isUrl(content) && isUrlImage(content)

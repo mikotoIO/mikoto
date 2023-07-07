@@ -39,7 +39,9 @@ export const sophon = new SophonCore<SophonContext>(sophonIO, {
   },
 });
 
-sophon.boot(new MainService(sophon));
+const mainService = new MainService(sophon);
+
+sophon.boot(mainService);
 
 export function boot(port: number, cb: () => void) {
   httpServer.listen(port, cb);

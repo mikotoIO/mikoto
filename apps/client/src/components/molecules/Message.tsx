@@ -2,7 +2,7 @@ import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Modal } from '@mantine/core';
 import { Message } from 'mikotojs';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { SpecialComponents } from 'react-markdown/lib/ast-to-react';
 import { NormalComponents } from 'react-markdown/lib/complex-types';
@@ -66,6 +66,10 @@ const MessageContainer = styled.div<{ isSimple?: boolean }>`
 
   p {
     margin: 0;
+  }
+
+  .twemoji {
+    height: 1.5em;
   }
 
   .avatar {

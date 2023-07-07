@@ -8,6 +8,9 @@ export function remarkEmoji(): Plugin {
   return (tree) => {
     findAndReplace(tree, REGEX, (all, text) => {
       if (nameToEmoji[text]) {
+        // const p = twemoji.parse(nameToEmoji[text]);
+        // console.log(p);
+
         return {
           type: 'text',
           data: {

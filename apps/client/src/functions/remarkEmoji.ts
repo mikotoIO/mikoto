@@ -8,18 +8,18 @@ export function remarkEmoji(): Plugin {
   return (tree) => {
     findAndReplace(tree, REGEX, (all, text) => {
       if (nameToEmoji[text]) {
-        // const p = twemoji.parse(nameToEmoji[text]);
-        // console.log(p);
+        const url = `https://abs.twimg.com/emoji/v2/svg/${nameToEmoji[text]
+          .codePointAt(0)
+          ?.toString(16)}.svg`;
 
         return {
-          type: 'text',
+          type: 'image',
+          url,
           data: {
-            hName: 'span',
+            hName: 'img',
             hProperties: {
-              role: 'img',
-              ariaLabel: text,
+              className: 'emoji',
             },
-            hChildren: [{ type: 'text', value: nameToEmoji[text] }],
           },
         };
       }

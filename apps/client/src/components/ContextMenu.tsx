@@ -4,7 +4,7 @@ import React, { useRef } from 'react';
 import { atom, useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
-import { Backdrop, DialogPanel } from '../lucid/DialogPanel';
+import { Backdrop } from '../lucid/DialogPanel';
 
 interface Positions {
   top?: number;

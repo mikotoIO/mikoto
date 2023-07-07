@@ -12,6 +12,7 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import styled from 'styled-components';
 
+import { remarkEmoji } from '../../functions/remarkEmoji';
 import { useMikoto } from '../../hooks';
 import { ContextMenu, useContextMenu } from '../ContextMenu';
 import { MessageAvatar } from '../atoms/Avatar';
@@ -202,13 +203,28 @@ interface MessageProps {
   isSimple?: boolean;
 }
 
+const StyledEmoji = styled.img`
+  display: inline-block;
+  height: 1.5em;
+  vertical-align: middle;
+`;
+
+function Emoji({ src }: { src: string }) {
+  return <StyledEmoji src={src} />;
+}
+
 const markdownComponents: Partial<
   Omit<NormalComponents, keyof SpecialComponents> & SpecialComponents
 > = {
-  img({ src, alt }) {
+  img({ src, alt, className }) {
+    if (className === 'emoji') {
+      return <Emoji src={src!} />;
+    }
     return <MessageImage src={src} alt={alt} />;
   },
 };
+
+type W = keyof typeof markdownComponents;
 
 function Markdown({ content }: { content: string }) {
   const co =
@@ -219,7 +235,7 @@ function Markdown({ content }: { content: string }) {
   return (
     <ReactMarkdown
       components={markdownComponents}
-      remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
+      remarkPlugins={[remarkGfm, remarkBreaks, remarkMath, remarkEmoji]}
       rehypePlugins={[rehypeKatex]}
     >
       {co}

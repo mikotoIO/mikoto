@@ -153,9 +153,7 @@ function Tab({ tab, index }: TabProps) {
       onClick={() => {
         setTabbed(({ tabs }) => ({ index, tabs }));
       }}
-      onAuxClick={() => {
-        closeTab();
-      }}
+      onAuxClick={() => {}}
     >
       <IconBox size={20} icon={getTabIcon(tab)} />
       <div>{tabName}</div>
@@ -194,13 +192,15 @@ const StyledWelcome = styled.div`
 
 const MikotoLogo = styled.img`
   width: 220px;
+  mix-blend-mode: overlay;
+  opacity: 0.4;
 `;
 
 function WelcomeToMikoto() {
   return (
     <StyledWelcome>
-      <MikotoLogo src="/logo.svg" />
-      <h1>Welcome to Mikoto!</h1>
+      <MikotoLogo src="/logo/logo.svg" />
+      {/* <h1>Welcome to Mikoto!</h1> */}
     </StyledWelcome>
   );
 }

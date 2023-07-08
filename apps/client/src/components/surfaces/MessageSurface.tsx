@@ -163,6 +163,7 @@ function RealMessageView({ channel }: { channel: Channel }) {
   const deleteFn = (id: string) => {
     setMsgs((xs) => {
       if (xs === null) return null;
+      setScrollToBottom(true);
       return xs.filter((y) => y.id !== id);
     });
   };

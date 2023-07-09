@@ -2,7 +2,7 @@ import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Modal } from '@mantine/core';
 import { Message } from 'mikotojs';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { SpecialComponents } from 'react-markdown/lib/ast-to-react';
 import { NormalComponents } from 'react-markdown/lib/complex-types';
@@ -12,6 +12,7 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import styled from 'styled-components';
 
+import { remarkEmoji } from '../../functions/remarkEmoji';
 import { useMikoto } from '../../hooks';
 import { ContextMenu, useContextMenu } from '../ContextMenu';
 import { MessageAvatar } from '../atoms/Avatar';
@@ -51,6 +52,16 @@ function padTime(n: number): string {
   return String(n).padStart(2, '0');
 }
 
+const StyledEmoji = styled.img`
+  display: inline-block;
+  height: 1.5em;
+  vertical-align: middle;
+`;
+
+function Emoji({ src }: { src: string }) {
+  return <StyledEmoji src={src} />;
+}
+
 const MessageContainer = styled.div<{ isSimple?: boolean }>`
   margin: 0;
   margin-top: ${(p) => (p.isSimple ? 0 : '8px')};
@@ -78,6 +89,7 @@ const MessageInner = styled.div`
   font-size: 14px;
 
   pre {
+    text-wrap: wrap;
     padding: 16px;
     margin: 0;
     background-color: #282c34;
@@ -113,6 +125,11 @@ const Name = styled.div<{ color: string | null }>`
   font-weight: 600;
   margin: 0;
   color: ${(p) => p.color ?? 'currentColor'};
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+    text-decoration-color: ${(p) => p.color ?? 'currentColor'};
+  }
 `;
 
 const StyledTimestamp = styled.div`
@@ -205,7 +222,10 @@ interface MessageProps {
 const markdownComponents: Partial<
   Omit<NormalComponents, keyof SpecialComponents> & SpecialComponents
 > = {
-  img({ src, alt }) {
+  img({ src, alt, className }) {
+    if (className === 'emoji') {
+      return <Emoji src={src!} />;
+    }
     return <MessageImage src={src} alt={alt} />;
   },
 };
@@ -219,7 +239,7 @@ function Markdown({ content }: { content: string }) {
   return (
     <ReactMarkdown
       components={markdownComponents}
-      remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
+      remarkPlugins={[remarkGfm, remarkBreaks, remarkMath, remarkEmoji]}
       rehypePlugins={[rehypeKatex]}
     >
       {co}

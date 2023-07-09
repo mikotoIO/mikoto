@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
-import { useMikoto } from '../../hooks';
+import { useAuthClient, useMikoto } from '../../hooks';
 import { useErrorElement } from '../../hooks/useErrorElement';
 import { Button } from '../../lucid/Button';
 import { DialogPanel } from '../../lucid/DialogPanel';
@@ -47,6 +47,7 @@ const Content = styled.div`
 
 export function PasswordChangeModal() {
   const mikoto = useMikoto();
+  const authClient = useAuthClient();
   const user = useRecoilValue(userState);
 
   const { register, handleSubmit, getValues } = useForm();
@@ -58,7 +59,7 @@ export function PasswordChangeModal() {
         style={{ minWidth: 400 }}
         onSubmit={handleSubmit(async (form) => {
           try {
-            await mikoto.authAPI.changePassword(
+            await authClient.changePassword(
               user!.id,
               form.oldPassword,
               form.newPassword,
@@ -132,7 +133,7 @@ function BotCard({ id, name, secret }: BotProps) {
 }
 
 function BotCreateModal() {
-  const mikoto = useMikoto();
+  const authClient = useAuthClient();
   const { register, handleSubmit } = useForm();
   const setModal = useSetRecoilState(modalState);
 
@@ -140,7 +141,7 @@ function BotCreateModal() {
     <DialogPanel>
       <Form
         onSubmit={handleSubmit(async (form) => {
-          await mikoto.authAPI.createBot(form.name);
+          await authClient.createBot(form.name);
           setModal(null);
         })}
       >
@@ -155,10 +156,10 @@ function BotCreateModal() {
 }
 
 function BotsSegment() {
-  const mikoto = useMikoto();
+  const authClient = useAuthClient();
   const setModal = useSetRecoilState(modalState);
 
-  const { result: bots } = useAsync(() => mikoto.authAPI.listBots(), []);
+  const { result: bots } = useAsync(() => authClient.listBots(), []);
 
   return (
     <div>

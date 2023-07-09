@@ -10,9 +10,9 @@ import {
   SegmentedControl,
   Switch,
 } from '@mantine/core';
-import { useForm } from '@mantine/form';
 import { Role, Space, Permissions } from 'mikotojs';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';
@@ -192,8 +192,8 @@ const StyledRoleEditor = styled.div`
 
 function RoleEditor({ role, space }: { space: Space; role: Role }) {
   const mikoto = useMikoto();
-  const { getInputProps, values, setFieldValue } = useForm({
-    initialValues: {
+  const form = useForm({
+    defaultValues: {
       name: role.name,
       color: role.color,
       position: role.position,
@@ -205,16 +205,16 @@ function RoleEditor({ role, space }: { space: Space; role: Role }) {
       {role.name !== '@everyone' && (
         <div>
           <h2>Edit Role</h2>
-          <Input labelName="Role Name" {...getInputProps('name')} />
-          <NumberInput label="Role Priority" {...getInputProps('position')} />
-          <ColorPicker {...getInputProps('color')} />
+          <Input labelName="Role Name" {...form.register('name')} />
+          {/* <NumberInput label="Role Priority" {...form.register('position')} />
+          <ColorPicker {...form.register('color')} /> */}
         </div>
       )}
 
       <RolePermissionEditor
         permissions={role.permissions}
         onChange={(perm) => {
-          setFieldValue('permissions', perm);
+          form.setValue('permissions', perm);
         }}
       />
       <Button

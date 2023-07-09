@@ -4585,18 +4585,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mantine/form@npm:^5.2.3":
-  version: 5.10.5
-  resolution: "@mantine/form@npm:5.10.5"
-  dependencies:
-    fast-deep-equal: ^3.1.3
-    klona: ^2.0.5
-  peerDependencies:
-    react: ">=16.8.0"
-  checksum: 0dc4ce123b68d21a05d99faac85209aea0915559971c46eb3e451b58951691b3e6c5baf7f037a115b0f675ed5e9dd6a43d3e8bc0a41891431c89d26876cccbf9
-  languageName: node
-  linkType: hard
-
 "@mantine/hooks@npm:^5.2.3":
   version: 5.10.5
   resolution: "@mantine/hooks@npm:5.10.5"
@@ -8666,6 +8654,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-twemoji@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@types/react-twemoji@npm:0.4.0"
+  dependencies:
+    "@types/react": "*"
+  checksum: 240659c5fa29fc296574e3529b81d807e01641e2a357c07fe3dbbf13230918d2f8e1dfa139d3d19c6b701576aae578c2e1b899714d525d0f15459f54db650905
+  languageName: node
+  linkType: hard
+
 "@types/react@npm:*, @types/react@npm:^18.0.0, @types/react@npm:^18.0.8":
   version: 18.2.14
   resolution: "@types/react@npm:18.2.14"
@@ -12371,7 +12368,6 @@ __metadata:
     "@livekit/react-components": ^1.0.2
     "@livekit/react-core": ^1.0.2
     "@mantine/core": ^5.2.3
-    "@mantine/form": ^5.2.3
     "@mantine/hooks": ^5.2.3
     "@mantine/modals": ^5.2.3
     "@mdx-js/react": ^1.6.22
@@ -12398,6 +12394,7 @@ __metadata:
     "@types/react-dom": ^18.0.0
     "@types/react-helmet": ^6.1.6
     "@types/react-syntax-highlighter": ^15.5.1
+    "@types/react-twemoji": ^0.4.0
     "@types/styled-components": ^5.1.23
     "@typescript-eslint/eslint-plugin": ^5.9.0
     "@typescript-eslint/parser": ^5.9.0
@@ -12426,6 +12423,7 @@ __metadata:
     livekit-client: ^1.4.1
     lodash: ^4.17.21
     markdown-draft-js: ^2.4.0
+    mdast-util-find-and-replace: ^2.2.2
     mikotojs: "*"
     re-resizable: ^6.9.9
     react: ^18.2.0
@@ -12464,6 +12462,7 @@ __metadata:
     ts-jest: ^29.0.5
     typed-emitter: ^2.1.0
     typescript: ^4.7.4
+    unified: ^10.1.2
     unist-util-visit: ^4.1.2
     usehooks-ts: ^2.6.0
     vite: ^3.0.9
@@ -21279,7 +21278,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"klona@npm:^2.0.4, klona@npm:^2.0.5":
+"klona@npm:^2.0.4":
   version: 2.0.6
   resolution: "klona@npm:2.0.6"
   checksum: ac9ee3732e42b96feb67faae4d27cf49494e8a3bf3fa7115ce242fe04786788e0aff4741a07a45a2462e2079aa983d73d38519c85d65b70ef11447bbc3c58ce7
@@ -22248,7 +22247,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mdast-util-find-and-replace@npm:^2.0.0":
+"mdast-util-find-and-replace@npm:^2.0.0, mdast-util-find-and-replace@npm:^2.2.2":
   version: 2.2.2
   resolution: "mdast-util-find-and-replace@npm:2.2.2"
   dependencies:
@@ -32292,7 +32291,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"unified@npm:^10.0.0":
+"unified@npm:^10.0.0, unified@npm:^10.1.2":
   version: 10.1.2
   resolution: "unified@npm:10.1.2"
   dependencies:

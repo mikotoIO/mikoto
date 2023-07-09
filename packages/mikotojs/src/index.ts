@@ -1,15 +1,10 @@
-import { AuthClient } from './AuthClient';
 import { MikotoClient } from './MikotoClient';
 
-function constructMikotoSimple(
-  authClient: AuthClient,
-  sophonUrl: string,
-  token: string,
-) {
+function constructMikotoSimple(sophonUrl: string, token: string) {
   return new Promise<MikotoClient>((resolve, reject) => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const mikotoApi = new MikotoClient(authClient, sophonUrl, token, (m) => {
+      const mikotoApi = new MikotoClient(sophonUrl, token, (m) => {
         resolve(m);
       });
     } catch (e) {
@@ -18,21 +13,16 @@ function constructMikotoSimple(
   });
 }
 
-export async function constructMikoto(authUrl: string, sophonUrl: string) {
-  const ac = new AuthClient(authUrl);
-  const token = await ac.refresh({
-    refreshToken: localStorage.getItem('REFRESH_TOKEN')!,
-    accessToken: '',
-  });
-  localStorage.setItem('REFRESH_TOKEN', token.refreshToken);
-  const mikoto = await constructMikotoSimple(ac, sophonUrl, token.accessToken);
+export interface ConstructMikotoOptions {
+  urlBase: string;
+  token: string;
+}
 
-  // await refreshAccess(mikoto);
-  // setInterval(() => {
-  //   refreshAccess(mikoto).then(() => {
-  //     console.log('refreshed');
-  //   });
-  // }, 10 * 60 * 1000);
+export async function constructMikoto({
+  urlBase,
+  token,
+}: ConstructMikotoOptions) {
+  const mikoto = await constructMikotoSimple(urlBase, token);
 
   await mikoto.client.spaces.list();
   return mikoto;

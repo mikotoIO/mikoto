@@ -1,7 +1,6 @@
-import { MikotoClient, Space, constructMikoto } from 'mikotojs';
+import { Space } from 'mikotojs';
 import React, { useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { Navigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 

@@ -1,4 +1,4 @@
-import { MikotoClient } from 'mikotojs';
+import { AuthClient, MikotoClient } from 'mikotojs';
 import React, { useContext } from 'react';
 
 import { useInterval } from './useInterval';
@@ -11,6 +11,10 @@ export function useMikoto() {
   return useContext(MikotoContext);
 }
 
-export function useEvent() {
-  
+export const AuthContext = React.createContext<AuthClient>(undefined!);
+
+export function useAuthClient() {
+  return useContext(AuthContext);
 }
+
+export function useEvent() {}

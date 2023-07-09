@@ -1,13 +1,15 @@
-import { MikotoClient, constructMikoto } from 'mikotojs';
+import { AuthClient, MikotoClient, constructMikoto } from 'mikotojs';
 import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { env } from '../env';
-import { MikotoContext } from '../hooks';
+import { AuthContext, MikotoContext } from '../hooks';
 
 export function MikotoApiLoader({ children }: { children: React.ReactNode }) {
   const [mikoto, setMikoto] = React.useState<MikotoClient | null>(null);
   const [err, setErr] = React.useState<unknown>(null);
+
+  const auth = new AuthClient(env.PUBLIC_AUTH_URL);
 
   // TODO: Try suspense
   useEffect(() => {
@@ -22,6 +24,8 @@ export function MikotoApiLoader({ children }: { children: React.ReactNode }) {
   }
   if (mikoto === null) return null;
   return (
-    <MikotoContext.Provider value={mikoto}>{children}</MikotoContext.Provider>
+    <MikotoContext.Provider value={mikoto}>
+      <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
+    </MikotoContext.Provider>
   );
 }

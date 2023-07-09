@@ -124,6 +124,11 @@ const Name = styled.div<{ color: string | null }>`
   font-weight: 600;
   margin: 0;
   color: ${(p) => p.color ?? 'currentColor'};
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+    text-decoration-color: ${(p) => p.color ?? 'currentColor'};
+  }
 `;
 
 const StyledTimestamp = styled.div`

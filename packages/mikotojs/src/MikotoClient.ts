@@ -1,12 +1,8 @@
-import axios, { AxiosInstance } from 'axios';
-
-import { AuthClient } from './AuthClient';
 import { ChannelEmitter, MessageEmitter, SpaceEmitter } from './emitters';
 import { createClient, MainServiceClient } from './schema';
 
 export class MikotoClient {
   // spaces: SpaceEngine = new SpaceEngine(this);
-  authAPI: AuthClient;
   client!: MainServiceClient;
 
   // screw all of the above, we're rewriting the entire thing
@@ -15,13 +11,10 @@ export class MikotoClient {
   spaceEmitter = new SpaceEmitter();
 
   constructor(
-    authClient: AuthClient,
     sophonUrl: string,
     accessToken: string,
     onready?: (self: MikotoClient) => void,
   ) {
-    this.authAPI = authClient;
-
     createClient(
       {
         url: sophonUrl,

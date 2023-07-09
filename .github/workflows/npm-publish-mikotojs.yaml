@@ -1,0 +1,22 @@
+name: Publish Sophon CLI to NPM
+on:
+  push:
+    paths:
+      - packages/mikotojs/**
+    branches: ['main']
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+        working-directory: ./packages/mikotojs
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          package: ./packages/mikotojs/package.json

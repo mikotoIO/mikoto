@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "main": "src/index.ts",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "generate:server": "sophon generate ./schema.sophon -t ts-socketio-server -o ../../apps/server/src/services/schema.ts",
     "generate:client": "sophon generate ./schema.sophon -t ts-socketio-client -o ./src/schema.ts",

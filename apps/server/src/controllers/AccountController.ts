@@ -59,11 +59,15 @@ export class AccountController {
     };
   }
 
-  private async createTokenPair(account: Account | Bot, oldToken?: string) {
-    const accessToken = jwt.sign({}, env.SECRET, {
+  private createToken(account: Account | Bot): string {
+    return jwt.sign({}, env.SECRET, {
       expiresIn: '1h',
       subject: account.id,
     });
+  }
+
+  private async createTokenPair(account: Account, oldToken?: string) {
+    const accessToken = this.createToken(account);
     const refreshToken = await generateRandomToken();
     const expiresAt = new Date(Date.now() + 86400000 * 30);
 
@@ -292,6 +296,6 @@ export class AccountController {
       throw new UnauthorizedError('Invalid Bot Key');
     }
 
-    return this.createTokenPair(bot);
+    return { accessToken: this.createToken(bot) };
   }
 }

@@ -23,7 +23,6 @@ export class MikotoClient {
         },
       },
       (client) => {
-        console.log(client);
         this.client = client;
         this.setupClient();
         onready?.(this);

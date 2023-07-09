@@ -12,7 +12,6 @@
     "@livekit/react-components": "^1.0.2",
     "@livekit/react-core": "^1.0.2",
     "@mantine/core": "^5.2.3",
-    "@mantine/form": "^5.2.3",
     "@mantine/hooks": "^5.2.3",
     "@mantine/modals": "^5.2.3",
     "@reduxjs/toolkit": "^1.9.5",

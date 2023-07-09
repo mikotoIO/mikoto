@@ -52,6 +52,16 @@ function padTime(n: number): string {
   return String(n).padStart(2, '0');
 }
 
+const StyledEmoji = styled.img`
+  display: inline-block;
+  height: 1.5em;
+  vertical-align: middle;
+`;
+
+function Emoji({ src }: { src: string }) {
+  return <StyledEmoji src={src} />;
+}
+
 const MessageContainer = styled.div<{ isSimple?: boolean }>`
   margin: 0;
   margin-top: ${(p) => (p.isSimple ? 0 : '8px')};
@@ -66,10 +76,6 @@ const MessageContainer = styled.div<{ isSimple?: boolean }>`
 
   p {
     margin: 0;
-  }
-
-  .twemoji {
-    height: 1.5em;
   }
 
   .avatar {
@@ -205,16 +211,6 @@ function MessageImage({ src, alt }: MessageImageProps) {
 interface MessageProps {
   message: Message;
   isSimple?: boolean;
-}
-
-const StyledEmoji = styled.img`
-  display: inline-block;
-  height: 1.5em;
-  vertical-align: middle;
-`;
-
-function Emoji({ src }: { src: string }) {
-  return <StyledEmoji src={src} />;
 }
 
 const markdownComponents: Partial<

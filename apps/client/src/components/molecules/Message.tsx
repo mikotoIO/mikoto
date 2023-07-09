@@ -89,6 +89,7 @@ const MessageInner = styled.div`
   font-size: 14px;
 
   pre {
+    text-wrap: wrap;
     padding: 16px;
     margin: 0;
     background-color: #282c34;

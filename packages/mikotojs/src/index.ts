@@ -13,8 +13,16 @@ function constructMikotoSimple(sophonUrl: string, token: string) {
   });
 }
 
-export async function constructMikoto(accessToken: string, sophonUrl: string) {
-  const mikoto = await constructMikotoSimple(sophonUrl, accessToken);
+export interface ConstructMikotoOptions {
+  urlBase: string;
+  token: string;
+}
+
+export async function constructMikoto({
+  urlBase,
+  token,
+}: ConstructMikotoOptions) {
+  const mikoto = await constructMikotoSimple(urlBase, token);
 
   await mikoto.client.spaces.list();
   return mikoto;

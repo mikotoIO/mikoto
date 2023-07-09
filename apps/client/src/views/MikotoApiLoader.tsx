@@ -14,8 +14,11 @@ export function MikotoApiLoader({ children }: { children: React.ReactNode }) {
   // TODO: Try suspense
   useEffect(() => {
     refreshAuth(authClient)
-      .then((accessToken) =>
-        constructMikoto(accessToken, env.PUBLIC_SERVER_URL),
+      .then((token) =>
+        constructMikoto({
+          token,
+          urlBase: env.PUBLIC_SERVER_URL,
+        }),
       )
       .then((mi) => setMikoto(mi))
       .catch((e) => setErr(e));

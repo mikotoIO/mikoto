@@ -16,26 +16,24 @@ export class AuthClient {
     });
   }
 
-  register(name: string, email: string, password: string) {
-    return this.axios
-      .post<TokenPair>('/account/register', {
-        name,
-        email,
-        password,
-      })
-      .then((x) => x.data);
+  async register(name: string, email: string, password: string) {
+    const x = await this.axios.post<TokenPair>('/account/register', {
+      name,
+      email,
+      password,
+    });
+    return x.data;
   }
 
-  login(email: string, password: string) {
-    return this.axios
-      .post<TokenPair>('/account/login', {
-        email,
-        password,
-      })
-      .then((x) => x.data);
+  async login(email: string, password: string) {
+    const x = await this.axios.post<TokenPair>('/account/login', {
+      email,
+      password,
+    });
+    return x.data;
   }
 
-  changePassword(id: string, oldPassword: string, newPassword: string) {
+  async changePassword(id: string, oldPassword: string, newPassword: string) {
     return this.axios
       .post<TokenPair>('/account/change_password', {
         id,
@@ -45,10 +43,10 @@ export class AuthClient {
       .then((x) => x.data);
   }
 
-  async refresh(pair: TokenPair) {
+  async refresh(refreshToken: string) {
     const newPair = await this.axios
       .post<TokenPair>('/account/refresh', {
-        refreshToken: pair.refreshToken,
+        refreshToken,
       })
       .then((x) => x.data);
 
@@ -74,5 +72,10 @@ export class AuthClient {
 
   async createBot(name: string) {
     return this.axios.post<Bot>('/bots', { name }).then((x) => x.data);
+  }
+
+  // for actual bot usage
+  async authenticateBot(botKey: string) {
+    return this.axios.post<TokenPair>('/bots/auth', { botKey });
   }
 }

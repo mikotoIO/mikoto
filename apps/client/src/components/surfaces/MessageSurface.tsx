@@ -187,7 +187,7 @@ function RealMessageView({ channel }: { channel: Channel }) {
           ref={virtuosoRef}
           followOutput="auto"
           defaultItemHeight={28}
-          style={{ flexGrow: 1 }}
+          style={{ flexGrow: 1, overflowX: 'hidden' }}
           initialTopMostItemIndex={msgs.length - 1}
           data={msgs}
           components={{

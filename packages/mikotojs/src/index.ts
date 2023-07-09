@@ -1,4 +1,3 @@
-import { AuthClient } from './AuthClient';
 import { MikotoClient } from './MikotoClient';
 
 function constructMikotoSimple(sophonUrl: string, token: string) {
@@ -14,14 +13,8 @@ function constructMikotoSimple(sophonUrl: string, token: string) {
   });
 }
 
-export async function constructMikoto(authUrl: string, sophonUrl: string) {
-  const ac = new AuthClient(authUrl);
-  const token = await ac.refresh({
-    refreshToken: localStorage.getItem('REFRESH_TOKEN')!,
-    accessToken: '',
-  });
-  localStorage.setItem('REFRESH_TOKEN', token.refreshToken);
-  const mikoto = await constructMikotoSimple(sophonUrl, token.accessToken);
+export async function constructMikoto(accessToken: string, sophonUrl: string) {
+  const mikoto = await constructMikotoSimple(sophonUrl, accessToken);
 
   await mikoto.client.spaces.list();
   return mikoto;

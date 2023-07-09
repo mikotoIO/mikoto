@@ -1,4 +1,4 @@
-name: Publish Sophon CLI to NPM
+name: Publish Mikoto.js to NPM
 on:
   push:
     paths:

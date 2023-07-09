@@ -3,6 +3,7 @@
 # dependencies
 node_modules/
 dist
+*.tsbuildinfo
 
 # yarn
 .yarn/*

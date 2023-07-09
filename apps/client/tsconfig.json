@@ -21,6 +21,8 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
+  "references": [{ "path": "../../packages/mikotojs" }],
+  "files": [],
   "include": [
     "src"
   ]

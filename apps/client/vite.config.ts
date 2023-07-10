@@ -1,6 +1,7 @@
 /// <reference types="vitest" />
 import react from '@vitejs/plugin-react';
 import * as dotenv from 'dotenv';
+import { fileURLToPath, URL } from 'node:url';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 
@@ -14,6 +15,14 @@ export default ({ mode }: { mode: string }) =>
     },
     build: {
       target: 'es2020',
+    },
+    resolve: {
+      alias: {
+        '@/*': fileURLToPath(new URL('./src', import.meta.url)),
+        mikotojs: fileURLToPath(
+          new URL('../../packages/mikotojs/src/index.ts', import.meta.url),
+        ),
+      },
     },
     plugins: [
       react({

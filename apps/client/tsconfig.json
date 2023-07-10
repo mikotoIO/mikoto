@@ -19,10 +19,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": ["./src/*"],
+      "mikotojs": ["../../packages/mikotojs/src/index.ts"]
+    }
   },
-  // "references": [{ "path": "../../packages/mikotojs" }],
-  // "files": [],
   "include": [
     "src"
   ]

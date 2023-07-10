@@ -76,6 +76,8 @@ export class AuthClient {
 
   // for actual bot usage
   async authenticateBot(botKey: string) {
-    return this.axios.post<{ accessToken: string }>('/bots/auth', { botKey });
+    return this.axios
+      .post<{ accessToken: string }>('/bots/auth', { botKey })
+      .then((x) => x.data);
   }
 }

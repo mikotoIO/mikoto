@@ -1,4 +1,5 @@
 import { NotFoundError } from 'routing-controllers';
+
 import { prisma } from './prisma';
 
 export const memberInclude = {
@@ -10,6 +11,7 @@ export const memberInclude = {
       id: true,
       name: true,
       avatar: true,
+      category: true,
     },
   },
 };

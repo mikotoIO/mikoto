@@ -18,6 +18,7 @@ const memberInclude = {
       id: true,
       name: true,
       avatar: true,
+      category: true,
     },
   },
 };
@@ -78,11 +79,6 @@ export class UserService extends AbstractUserService {
   async me(ctx: SophonInstance) {
     const user = await prisma.user.findUnique({
       where: { id: ctx.data.user.sub },
-      select: {
-        id: true,
-        name: true,
-        avatar: true,
-      },
     });
     if (!user) {
       throw new NotFoundError();

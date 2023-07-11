@@ -38,6 +38,7 @@ export interface User {
   id: string;
   name: string;
   avatar: string | null;
+  category: string | null;
 }
 export interface Message {
   id: string;

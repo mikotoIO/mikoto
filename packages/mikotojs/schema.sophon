@@ -35,6 +35,7 @@ struct User {
   id: string;
   name: string;
   avatar: string?;
+  category: string?;
 }
 
 struct Message {

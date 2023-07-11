@@ -16,6 +16,7 @@ const authorInclude = {
     id: true,
     avatar: true,
     name: true,
+    category: true,
   },
 };
 

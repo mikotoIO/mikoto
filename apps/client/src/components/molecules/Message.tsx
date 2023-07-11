@@ -6,6 +6,7 @@ import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { SpecialComponents } from 'react-markdown/lib/ast-to-react';
 import { NormalComponents } from 'react-markdown/lib/complex-types';
+import rehypeHighlight from 'rehype-highlight';
 import rehypeKatex from 'rehype-katex';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
@@ -83,23 +84,29 @@ const MessageContainer = styled.div<{ isSimple?: boolean }>`
   }
 `;
 
+const Pre = styled.pre`
+  text-wrap: wrap;
+  padding: 16px;
+  margin: 0;
+  background-color: var(--N1000);;
+  color: var(--N300);
+  border-radius: 4px;
+
+  .hljs-comment { color: var(--N400); }
+  .hljs-string { color: var(--G700); }
+  .hljs-keyword { color: var(--V400); }
+  .hljs-title.class_ { color: var(--Y600) }
+  .hljs-title.function_ { color: var(--B500) }
+
+  & > div {
+    padding: 0 !important;
+  }
+`;
+
 const MessageInner = styled.div`
   margin: 0;
   padding-top: 4px;
   font-size: 14px;
-
-  pre {
-    text-wrap: wrap;
-    padding: 16px;
-    margin: 0;
-    background-color: #282c34;
-    color: #abb2bf;
-    border-radius: 4px;
-
-    & > div {
-      padding: 0 !important;
-    }
-  }
 
   a {
     color: #00aff4;
@@ -228,6 +235,7 @@ const markdownComponents: Partial<
     }
     return <MessageImage src={src} alt={alt} />;
   },
+  pre: (props) => <Pre {...props} />,
 };
 
 function Markdown({ content }: { content: string }) {
@@ -240,7 +248,7 @@ function Markdown({ content }: { content: string }) {
     <ReactMarkdown
       components={markdownComponents}
       remarkPlugins={[remarkGfm, remarkBreaks, remarkMath, remarkEmoji]}
-      rehypePlugins={[rehypeKatex]}
+      rehypePlugins={[rehypeKatex, rehypeHighlight]}
     >
       {co}
     </ReactMarkdown>

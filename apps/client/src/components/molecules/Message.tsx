@@ -79,6 +79,11 @@ const MessageContainer = styled.div<{ isSimple?: boolean }>`
     margin: 0;
   }
 
+  code {
+    padding: 2px;
+    background-color: var(--N1000);
+  }
+
   .avatar {
     margin-top: 4px;
   }
@@ -88,15 +93,25 @@ const Pre = styled.pre`
   text-wrap: wrap;
   padding: 16px;
   margin: 0;
-  background-color: var(--N1000);;
+  background-color: var(--N1000);
   color: var(--N300);
   border-radius: 4px;
 
-  .hljs-comment { color: var(--N400); }
-  .hljs-string { color: var(--G700); }
-  .hljs-keyword { color: var(--V400); }
-  .hljs-title.class_ { color: var(--Y600) }
-  .hljs-title.function_ { color: var(--B500) }
+  .hljs-comment {
+    color: var(--N400);
+  }
+  .hljs-string {
+    color: var(--G700);
+  }
+  .hljs-keyword {
+    color: var(--V400);
+  }
+  .hljs-title.class_ {
+    color: var(--Y600);
+  }
+  .hljs-title.function_ {
+    color: var(--B500);
+  }
 
   & > div {
     padding: 0 !important;
@@ -124,6 +139,11 @@ const MessageInner = styled.div`
   ul,
   ol {
     padding-inline-start: 24px;
+  }
+
+  p:not(:first-child),
+  pre:not(:first-child) {
+    margin-top: 8px;
   }
 `;
 

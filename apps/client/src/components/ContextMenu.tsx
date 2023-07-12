@@ -145,7 +145,6 @@ export function useContextMenu(
 
 // modal stuff
 interface ModalData {
-  title: string;
   elem: React.ReactNode;
 }
 

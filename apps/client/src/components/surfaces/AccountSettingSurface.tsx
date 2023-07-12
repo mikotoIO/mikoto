@@ -167,7 +167,6 @@ function BotsSegment() {
         variant="primary"
         onClick={() => {
           setModal({
-            title: 'Create Bot',
             elem: <BotCreateModal />,
           });
         }}
@@ -214,7 +213,6 @@ export function AccountSettingsView() {
         <Button
           onClick={() => {
             setModal({
-              title: 'Change Password',
               elem: <PasswordChangeModal />,
             });
           }}

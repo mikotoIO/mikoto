@@ -2,7 +2,10 @@ import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Modal } from '@mantine/core';
 import { useState } from 'react';
+import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
+
+import { modalState } from '../../ContextMenu';
 
 const ImageModal = styled(Modal)`
   .mantine-Paper-root {
@@ -34,6 +37,7 @@ const StyledMessageImage = styled.img`
 
 export function MessageImage({ src, alt }: MessageImageProps) {
   const [opened, setOpened] = useState(false);
+  const setModal = useRecoilState(modalState);
 
   return (
     <>

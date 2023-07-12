@@ -154,7 +154,7 @@ function TreebarContextMenu() {
     <ContextMenu>
       <ContextMenu.Link
         onClick={() => {
-          setModal({ title: 'Create Channel', elem: <CreateChannelModal /> });
+          setModal({ elem: <CreateChannelModal /> });
         }}
       >
         Create Channel
@@ -256,7 +256,6 @@ export function Explorer({ space }: { space: Space }) {
           <ContextMenu.Link
             onClick={() => {
               setModal({
-                title: `Create Subchannel for #${channel.name}`,
                 elem: <CreateChannelModal channel={channel} />,
               });
             }}

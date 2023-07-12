@@ -34,7 +34,7 @@ export default class Mailer {
     });
 
     await this.transporter.sendMail({
-      from: 'Mikoto.io <system@mikoto.io>',
+      from: `Mikoto.io <${process.env.MAIL_FROM!}>`,
       to,
       subject,
       html,

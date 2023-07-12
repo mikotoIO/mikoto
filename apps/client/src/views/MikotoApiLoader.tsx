@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { MikotoClient, constructMikoto } from 'mikotojs';
 import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
@@ -9,7 +10,7 @@ import { authClient } from '../store/authClient';
 
 export function MikotoApiLoader({ children }: { children: React.ReactNode }) {
   const [mikoto, setMikoto] = React.useState<MikotoClient | null>(null);
-  const [err, setErr] = React.useState<unknown>(null);
+  const [err, setErr] = React.useState<AxiosError | null>(null);
 
   // TODO: Try suspense
   useEffect(() => {
@@ -21,7 +22,7 @@ export function MikotoApiLoader({ children }: { children: React.ReactNode }) {
         }),
       )
       .then((mi) => setMikoto(mi))
-      .catch((e) => setErr(e));
+      .catch((e) => setErr(e as AxiosError));
   }, []);
 
   if (err !== null) {

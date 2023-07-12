@@ -268,6 +268,7 @@ export class AccountController {
     const bot = await this.prisma.user.create({
       data: {
         name: body.name,
+        category: 'BOT',
         Bot: {
           create: {
             name: body.name,

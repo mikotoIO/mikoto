@@ -99,7 +99,6 @@ function ServerIconContextMenu({ space }: { space: Space }) {
       <ContextMenu.Link
         onClick={() => {
           setModal({
-            title: 'Invite',
             elem: <InviteModal space={space} />,
           });
         }}
@@ -265,7 +264,6 @@ function ServerSidebarContextMenu() {
       <ContextMenu.Link
         onClick={() => {
           setModal({
-            title: 'Join Space',
             elem: <SpaceJoinModal />,
           });
         }}
@@ -299,7 +297,6 @@ export function ServerSidebar() {
         <StyledSpaceIcon
           onClick={() => {
             setModal({
-              title: 'Join Space',
               elem: <SpaceJoinModal />,
             });
           }}

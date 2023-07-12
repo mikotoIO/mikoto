@@ -4585,15 +4585,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mantine/hooks@npm:^5.2.3":
-  version: 5.10.5
-  resolution: "@mantine/hooks@npm:5.10.5"
-  peerDependencies:
-    react: ">=16.8.0"
-  checksum: 5af61db880d2ae4146282771ee627b258fe1c001819f12365028a3686bbf7e1a0cd672757b27f2f828579f0741e0470b0f5fac61fcb7f304b6810b829f9f3974
-  languageName: node
-  linkType: hard
-
 "@mantine/modals@npm:^5.2.3":
   version: 5.10.5
   resolution: "@mantine/modals@npm:5.10.5"
@@ -12368,7 +12359,6 @@ __metadata:
     "@livekit/react-components": ^1.0.2
     "@livekit/react-core": ^1.0.2
     "@mantine/core": ^5.2.3
-    "@mantine/hooks": ^5.2.3
     "@mantine/modals": ^5.2.3
     "@mdx-js/react": ^1.6.22
     "@reduxjs/toolkit": ^1.9.5
@@ -12446,6 +12436,7 @@ __metadata:
     react-virtuoso: ^4.0.3
     reactjs-popup: ^2.0.5
     recoil: ^0.7.5
+    rehype-highlight: ^6.0.0
     rehype-katex: ^6.0.3
     remark-breaks: ^3.0.2
     remark-gfm: ^3.0.1
@@ -16437,6 +16428,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fault@npm:^2.0.0":
+  version: 2.0.1
+  resolution: "fault@npm:2.0.1"
+  dependencies:
+    format: ^0.2.0
+  checksum: c9b30f47d95769177130a9409976a899ed31eb598450fbad5b0d39f2f5f56d5f4a9ff9257e0bee8407cb0fc3ce37165657888c6aa6d78472e403893104329b72
+  languageName: node
+  linkType: hard
+
 "faye-websocket@npm:^0.11.3":
   version: 0.11.4
   resolution: "faye-websocket@npm:0.11.4"
@@ -18079,7 +18079,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hast-util-to-text@npm:^3.1.0":
+"hast-util-to-text@npm:^3.0.0, hast-util-to-text@npm:^3.1.0":
   version: 3.1.2
   resolution: "hast-util-to-text@npm:3.1.2"
   dependencies:
@@ -18162,6 +18162,13 @@ __metadata:
   version: 10.7.3
   resolution: "highlight.js@npm:10.7.3"
   checksum: defeafcd546b535d710d8efb8e650af9e3b369ef53e28c3dc7893eacfe263200bba4c5fcf43524ae66d5c0c296b1af0870523ceae3e3104d24b7abf6374a4fea
+  languageName: node
+  linkType: hard
+
+"highlight.js@npm:~11.8.0":
+  version: 11.8.0
+  resolution: "highlight.js@npm:11.8.0"
+  checksum: d2578a57aee7315946ff19379053fd0a28b127baabf7617ab1d28d62cdc4eaf3d75053569cb8479a5afdc7a68f1ba9a6c1d612d8ae399b4b9aa43093b4fb6831
   languageName: node
   linkType: hard
 
@@ -21909,6 +21916,17 @@ __metadata:
     fault: ^1.0.0
     highlight.js: ~10.7.0
   checksum: 14a1815d6bae202ddee313fc60f06d46e5235c02fa483a77950b401d85b4c1e12290145ccd17a716b07f9328bd5864aa2d402b6a819ff3be7c833d9748ff8ba7
+  languageName: node
+  linkType: hard
+
+"lowlight@npm:^2.0.0":
+  version: 2.9.0
+  resolution: "lowlight@npm:2.9.0"
+  dependencies:
+    "@types/hast": ^2.0.0
+    fault: ^2.0.0
+    highlight.js: ~11.8.0
+  checksum: 6fa0c747018a5ba4d226121c1018a891249b2614c6a62ff135c6f32c0c3c3fa248f76c019c1bb8a79cdcf3fef034b508afc2827db94283b493f30702f5503ab7
   languageName: node
   linkType: hard
 
@@ -28195,6 +28213,19 @@ __metadata:
   bin:
     regjsparser: bin/parser
   checksum: 5e1b76afe8f1d03c3beaf9e0d935dd467589c3625f6d65fb8ffa14f224d783a0fed4bf49c2c1b8211043ef92b6117313419edf055a098ed8342e340586741afc
+  languageName: node
+  linkType: hard
+
+"rehype-highlight@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "rehype-highlight@npm:6.0.0"
+  dependencies:
+    "@types/hast": ^2.0.0
+    hast-util-to-text: ^3.0.0
+    lowlight: ^2.0.0
+    unified: ^10.0.0
+    unist-util-visit: ^4.0.0
+  checksum: 5a70e7ad459384f2d6401fbf52a6309a555b79d29742f0c2d1989d4c2a07f52d77663edc79b287cda8b40737a5dd0594a7dc5fae236dc22f1b9147f8ee4abb4d
   languageName: node
   linkType: hard
 

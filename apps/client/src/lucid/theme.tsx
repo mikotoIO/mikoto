@@ -1,5 +1,7 @@
 import { createGlobalStyle } from 'styled-components';
 
+import './fonts.css';
+
 export const neutrals = {
   N1200: 'hsl(220, 4%, 11%)', // darkest
   N1100: 'hsl(220, 4%, 15%)', // darkest
@@ -107,10 +109,9 @@ export const theme = {
 };
 
 export const GlobalStyle = createGlobalStyle`
-  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
-  
   :root {
     --main-font: 'Open Sans', sans-serif;
+    --code-font: 'JetBrains Mono', monospace;
     ${Object.entries(theme.colors)
       .map(([name, value]) => `--${name}: ${value};`)
       .join('\n')}
@@ -138,6 +139,10 @@ export const GlobalStyle = createGlobalStyle`
     font-family: var(--main-font);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  code {
+    font-family: var(--code-font);
   }
 
   ::-webkit-scrollbar {

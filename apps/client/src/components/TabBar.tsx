@@ -13,8 +13,8 @@ const StyledTabbedView = styled.div`
   flex: 1;
   background-color: ${(p) => p.theme.colors.N1000};
   display: grid;
-  height: 100vh;
-  grid-template-rows: 40px calc(100vh - 40px);
+  height: 100%;
+  grid-template-rows: 40px calc(100% - 40px);
 `;
 
 const StyledTabBar = styled.div`

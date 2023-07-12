@@ -42,6 +42,7 @@ const MessageContainer = styled.div<{ isSimple?: boolean }>`
   }
 
   code {
+    border-radius: 4px;
     padding: 2px;
     background-color: var(--N1000);
   }

@@ -9,14 +9,14 @@ import { Explorer } from '../components/Explorer';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { TabbedView } from '../components/TabBar';
 import { Sidebar } from '../components/UserArea';
-import { AccountSettingsView } from '../components/surfaces/AccountSettingSurface';
+import { AccountSettingsSurface } from '../components/surfaces/AccountSettingSurface';
 import { MessageView } from '../components/surfaces/MessageSurface';
+import { SpaceSettingsView } from '../components/surfaces/SpaceSettingsSurface';
 import { VoiceView } from '../components/surfaces/VoiceSurface';
 import { useMikoto } from '../hooks';
 import { Tabable, tabbedState, TabContext, treebarSpaceState } from '../store';
 import { MikotoApiLoader } from './MikotoApiLoader';
 import { DesignStory } from './Palette';
-import { SpaceSettingsView } from './SpaceSettingsView';
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -42,7 +42,7 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
     case 'spaceSettings':
       return <SpaceSettingsView space={tab.space} />;
     case 'accountSettings':
-      return <AccountSettingsView />;
+      return <AccountSettingsSurface />;
     case 'palette':
       return <DesignStory />;
     default:

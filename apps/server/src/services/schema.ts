@@ -48,6 +48,9 @@ export interface Message {
   author: User | null;
   channelId: string;
 }
+export interface Invite {
+  code: string;
+}
 export interface SpaceUpdateOptions {
   name: string | null;
   icon: string | null;
@@ -145,7 +148,15 @@ export abstract class AbstractSpaceService {
   abstract createInvite(
     ctx: SophonInstance<SophonContext>,
     id: string
-  ): Promise<string>;
+  ): Promise<Invite>;
+  abstract deleteInvite(
+    ctx: SophonInstance<SophonContext>,
+    code: string
+  ): Promise<void>;
+  abstract listInvites(
+    ctx: SophonInstance<SophonContext>,
+    id: string
+  ): Promise<Invite[]>;
 }
 
 export class MemberServiceSender {

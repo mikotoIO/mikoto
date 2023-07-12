@@ -254,7 +254,7 @@ const ACCOUNT_SETTING_CATEGORIES = [
   // 'Security',
 ];
 
-export function AccountSettingsView() {
+export function AccountSettingsSurface() {
   const [nav, setNav] = useState('Account');
   return (
     <SettingsView.Container>

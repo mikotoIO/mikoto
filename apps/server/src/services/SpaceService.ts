@@ -5,6 +5,7 @@ import { prisma } from '../functions/prisma';
 import { serializeDates } from '../functions/serializeDate';
 import {
   AbstractSpaceService,
+  Invite,
   SophonContext,
   Space,
   SpaceServiceSender,
@@ -120,13 +121,34 @@ export class SpaceService extends AbstractSpaceService {
   async createInvite(
     ctx: SophonInstance<SophonContext>,
     id: string,
-  ): Promise<string> {
+  ): Promise<Invite> {
     const invite = await prisma.invite.create({
       data: {
         spaceId: id,
       },
     });
-    return invite.id;
+    return {
+      code: invite.id,
+    };
+  }
+
+  async listInvites(
+    ctx: SophonInstance<SophonContext>,
+    id: string,
+  ): Promise<Invite[]> {
+    const invites = await prisma.invite.findMany({
+      where: { spaceId: id },
+    });
+    return invites.map((invite) => ({
+      code: invite.id,
+    }));
+  }
+
+  async deleteInvite(
+    ctx: SophonInstance<SophonContext>,
+    code: string,
+  ): Promise<void> {
+    await prisma.invite.delete({ where: { id: code } });
   }
 }
 

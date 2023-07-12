@@ -44,6 +44,9 @@ export interface Message {
   author: User | null;
   channelId: string;
 }
+export interface Invite {
+  code: string;
+}
 export interface SpaceUpdateOptions {
   name: string | null;
   icon: string | null;
@@ -144,8 +147,14 @@ export class SpaceServiceClient {
   leave(id: string): Promise<void> {
     return this.socket.call("spaces/leave", id);
   }
-  createInvite(id: string): Promise<string> {
+  createInvite(id: string): Promise<Invite> {
     return this.socket.call("spaces/createInvite", id);
+  }
+  deleteInvite(code: string): Promise<void> {
+    return this.socket.call("spaces/deleteInvite", code);
+  }
+  listInvites(id: string): Promise<Invite[]> {
+    return this.socket.call("spaces/listInvites", id);
   }
 
   onCreate(handler: (space: Space) => void) {

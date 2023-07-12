@@ -47,6 +47,10 @@ struct Message {
   channelId: string;
 }
 
+struct Invite {
+  code: string;
+}
+
 service MainService {
   spaces: SpaceService;
   channels: ChannelService;
@@ -75,7 +79,9 @@ service SpaceService {
 
   join(id: string): void;
   leave(id: string): void;
-  createInvite(id: string): string;
+  createInvite(id: string): Invite;
+  deleteInvite(code: string): void;
+  listInvites(id: string): Invite[];
 }
 
 struct MemberUpdateOptions {

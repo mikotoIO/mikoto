@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
@@ -5,7 +6,7 @@ import styled from 'styled-components';
 
 import { useAuthClient, useMikoto } from '../../hooks';
 import { useErrorElement } from '../../hooks/useErrorElement';
-import { Button } from '../../lucid/Button';
+import { Button, Buttons } from '../../lucid/Button';
 import { DialogPanel } from '../../lucid/DialogPanel';
 import { Form } from '../../lucid/Form';
 import { Input } from '../../lucid/Input';
@@ -13,6 +14,7 @@ import { SettingsView } from '../../views/SettingsViewTemplate';
 import { modalState } from '../ContextMenu';
 import { TabName } from '../TabBar';
 import { userState } from '../UserArea';
+import { ViewContainerWithSidebar } from '../ViewContainer';
 import {
   AvatarEditor,
   mediaServerAxios,
@@ -107,7 +109,9 @@ const BotCardContainer = styled.div`
   margin: 16px 0;
   padding: 16px;
   border-radius: 8px;
-  width: 800px;
+  min-width: 800px;
+  max-width: 100%;
+  box-sizing: border-box;
 `;
 
 interface BotProps {
@@ -155,14 +159,15 @@ function BotCreateModal() {
   );
 }
 
-function BotsSegment() {
+function BotsSurface() {
   const authClient = useAuthClient();
   const setModal = useSetRecoilState(modalState);
 
   const { result: bots } = useAsync(() => authClient.listBots(), []);
 
   return (
-    <div>
+    <SettingsView>
+      <h1>Bots</h1>
       <Button
         variant="primary"
         onClick={() => {
@@ -174,11 +179,11 @@ function BotsSegment() {
         Create Bot
       </Button>
       {bots && bots.map((bot) => <BotCard key={bot.id} {...bot} />)}
-    </div>
+    </SettingsView>
   );
 }
 
-export function AccountSettingsView() {
+export function Overview() {
   const setModal = useSetRecoilState(modalState);
 
   const mikoto = useMikoto();
@@ -209,7 +214,8 @@ export function AccountSettingsView() {
         </Content>
       </AccountInfo>
       <h2>Authentication</h2>
-      <div>
+
+      <Buttons>
         <Button
           onClick={() => {
             setModal({
@@ -219,12 +225,53 @@ export function AccountSettingsView() {
         >
           Change Password
         </Button>
-      </div>
-      <h2>Bots</h2>
-      <BotsSegment />
-      <div>
+      </Buttons>
+      <h2>Dangerous</h2>
+      <Buttons>
         <Button variant="danger">Delete Account</Button>
-      </div>
+      </Buttons>
     </SettingsView>
+  );
+}
+
+function Switch({ nav }: { nav: string }) {
+  switch (nav) {
+    case 'Account':
+      return <Overview />;
+    case 'Bots and API':
+      return <BotsSurface />;
+    default:
+      return null;
+  }
+}
+
+const ACCOUNT_SETTING_CATEGORIES = [
+  'Account',
+  'Bots and API',
+  // 'Billing',
+  // 'Notifications',
+  // 'Themes',
+  // 'Security',
+];
+
+export function AccountSettingsView() {
+  const [nav, setNav] = useState('Account');
+  return (
+    <SettingsView.Container>
+      <SettingsView.Sidebar>
+        {ACCOUNT_SETTING_CATEGORIES.map((c) => (
+          <SettingsView.Nav
+            active={nav === c}
+            onClick={() => {
+              setNav(c);
+            }}
+            key={c}
+          >
+            {c}
+          </SettingsView.Nav>
+        ))}
+      </SettingsView.Sidebar>
+      <Switch nav={nav} />
+    </SettingsView.Container>
   );
 }

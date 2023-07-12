@@ -75,6 +75,7 @@ service SpaceService {
 
   join(id: string): void;
   leave(id: string): void;
+  createInvite(id: string): string;
 }
 
 struct MemberUpdateOptions {

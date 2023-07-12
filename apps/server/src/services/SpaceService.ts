@@ -116,6 +116,18 @@ export class SpaceService extends AbstractSpaceService {
       serializeDates(space),
     );
   }
+
+  async createInvite(
+    ctx: SophonInstance<SophonContext>,
+    id: string,
+  ): Promise<string> {
+    const invite = await prisma.invite.create({
+      data: {
+        spaceId: id,
+      },
+    });
+    return invite.id;
+  }
 }
 
 async function joinSpace(

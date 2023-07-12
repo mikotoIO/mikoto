@@ -142,6 +142,10 @@ export abstract class AbstractSpaceService {
   ): Promise<void>;
   abstract join(ctx: SophonInstance<SophonContext>, id: string): Promise<void>;
   abstract leave(ctx: SophonInstance<SophonContext>, id: string): Promise<void>;
+  abstract createInvite(
+    ctx: SophonInstance<SophonContext>,
+    id: string
+  ): Promise<string>;
 }
 
 export class MemberServiceSender {

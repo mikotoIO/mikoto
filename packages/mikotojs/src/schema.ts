@@ -144,6 +144,9 @@ export class SpaceServiceClient {
   leave(id: string): Promise<void> {
     return this.socket.call("spaces/leave", id);
   }
+  createInvite(id: string): Promise<string> {
+    return this.socket.call("spaces/createInvite", id);
+  }
 
   onCreate(handler: (space: Space) => void) {
     return this.socket.subscribe("spaces/onCreate", handler);

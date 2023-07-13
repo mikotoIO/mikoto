@@ -1,12 +1,18 @@
-import { faX } from '@fortawesome/free-solid-svg-icons';
+import { faX, faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Helmet } from 'react-helmet';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
-import { Tabable, tabbedState, TabContext, tabNameFamily } from '../store';
+import {
+  rightBarOpenState,
+  Tabable,
+  tabbedState,
+  TabContext,
+  tabNameFamily,
+} from '../store';
 import { getTabIcon, IconBox } from './atoms/IconBox';
 
 const StyledTabbedView = styled.div`
@@ -205,8 +211,24 @@ function WelcomeToMikoto() {
   );
 }
 
+const RightSidebarButton = styled.button`
+  border: none;
+  margin-top: 4px;
+  margin-right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+
+  color: var(--N400);
+  background-color: transparent;
+  &:hover {
+    background-color: var(--N800);
+  }
+`;
+
 export function TabbedView({ children, tabs }: TabbedViewProps) {
   const reorderFn = useReorderable();
+  const setRightBarOpen = useSetRecoilState(rightBarOpenState);
 
   const [, drop] = useDrop<TabDnd>({
     accept: 'TAB',
@@ -223,6 +245,13 @@ export function TabbedView({ children, tabs }: TabbedViewProps) {
           <Tab tab={tab} index={index} key={`${tab.kind}/${tab.key}`} />
         ))}
         <StyledRest ref={drop} />
+        <RightSidebarButton
+          onClick={() => {
+            setRightBarOpen((x) => !x);
+          }}
+        >
+          <FontAwesomeIcon icon={faBarsStaggered} />
+        </RightSidebarButton>
       </StyledTabBar>
       {tabs.length ? children : <WelcomeToMikoto />}
     </StyledTabbedView>

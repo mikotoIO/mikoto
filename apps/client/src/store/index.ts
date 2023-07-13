@@ -93,3 +93,8 @@ export function useTabkit() {
 export const CurrentSpaceContext = React.createContext<Space | undefined>(
   undefined,
 );
+
+export const rightBarOpenState = atom<boolean>({
+  key: 'rightBarOpen',
+  default: false,
+});

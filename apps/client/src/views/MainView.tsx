@@ -14,9 +14,20 @@ import { MessageView } from '../components/surfaces/MessageSurface';
 import { SpaceSettingsView } from '../components/surfaces/SpaceSettingsSurface';
 import { VoiceView } from '../components/surfaces/VoiceSurface';
 import { useMikoto } from '../hooks';
-import { Tabable, tabbedState, TabContext, treebarSpaceState } from '../store';
+import {
+  rightBarOpenState,
+  Tabable,
+  tabbedState,
+  TabContext,
+  treebarSpaceState,
+} from '../store';
 import { MikotoApiLoader } from './MikotoApiLoader';
 import { DesignStory } from './Palette';
+
+const AppWindow = styled.div`
+  height: 100vh;
+  width: 100vw;
+`;
 
 const AppContainer = styled.div`
   overflow: hidden;
@@ -24,7 +35,8 @@ const AppContainer = styled.div`
   color: white;
   display: flex;
   flex-direction: row;
-  height: 100vh;
+  height: 100%;
+  width: 100%;
 `;
 
 function ErrorBoundaryPage({ children }: { children: React.ReactNode }) {
@@ -56,6 +68,9 @@ function AppView() {
   const spaceVal = useRecoilValue(treebarSpaceState);
   const [space, setSpace] = useState<Space | null>(null);
   const mikoto = useMikoto();
+
+  const rightBarOpen = useRecoilValue(rightBarOpenState);
+
   useEffect(() => {
     if (spaceVal) {
       mikoto.client.spaces.get(spaceVal.id).then((x) => setSpace(x));
@@ -63,26 +78,31 @@ function AppView() {
   }, [spaceVal?.id]);
 
   return (
-    <AppContainer>
-      <ServerSidebar />
-      <Sidebar>{space && <Explorer space={space} />}</Sidebar>
-      <TabbedView tabs={tabbed.tabs}>
-        <ErrorBoundaryPage>
-          {tabbed.tabs.map((tab, idx) => (
-            <TabContext.Provider
-              value={{ key: `${tab.kind}/${tab.key}` }}
-              key={`${tab.kind}/${tab.key}`}
-            >
-              <div
-                style={idx !== tabbed.index ? { display: 'none' } : undefined}
+    <AppWindow>
+      <AppContainer>
+        <ServerSidebar />
+        <Sidebar>{space && <Explorer space={space} />}</Sidebar>
+        <TabbedView tabs={tabbed.tabs}>
+          <ErrorBoundaryPage>
+            {tabbed.tabs.map((tab, idx) => (
+              <TabContext.Provider
+                value={{ key: `${tab.kind}/${tab.key}` }}
+                key={`${tab.kind}/${tab.key}`}
               >
-                <TabViewSwitch tab={tab} />
-              </div>
-            </TabContext.Provider>
-          ))}
-        </ErrorBoundaryPage>
-      </TabbedView>
-    </AppContainer>
+                <div
+                  style={idx !== tabbed.index ? { display: 'none' } : undefined}
+                >
+                  <TabViewSwitch tab={tab} />
+                </div>
+              </TabContext.Provider>
+            ))}
+          </ErrorBoundaryPage>
+        </TabbedView>
+        {rightBarOpen && (
+          <Sidebar>{space && <Explorer space={space} />}</Sidebar>
+        )}
+      </AppContainer>
+    </AppWindow>
   );
 }
 

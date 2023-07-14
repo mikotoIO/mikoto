@@ -4,31 +4,23 @@ import {
   faX,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  ColorPicker,
-  NumberInput,
-  SegmentedControl,
-  Switch,
-} from '@mantine/core';
+import { SegmentedControl, Switch } from '@mantine/core';
 import { Role, Space, Permissions } from 'mikotojs';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 
-import { TabName } from '../components/TabBar';
-import {
-  SidebarContainerArea,
-  ViewContainerWithSidebar,
-} from '../components/ViewContainer';
+import { useMikoto } from '../../../hooks';
+import { Button } from '../../../lucid/Button';
+import { Form } from '../../../lucid/Form';
+import { Input } from '../../../lucid/Input';
+import { SettingsView } from '../../../views/SettingsViewTemplate';
+import { TabName } from '../../TabBar';
 import {
   AvatarEditor,
   mediaServerAxios,
   uploadFileWithAxios,
-} from '../components/molecules/AvatarEditor';
-import { useMikoto } from '../hooks';
-import { Button } from '../lucid/Button';
-import { Form } from '../lucid/Form';
-import { Input } from '../lucid/Input';
+} from '../../molecules/AvatarEditor';
 
 const Sidebar = styled.div`
   padding: 16px;
@@ -52,7 +44,7 @@ function Overview({ space }: { space: Space }) {
   const mikoto = useMikoto();
 
   return (
-    <SidebarContainerArea>
+    <SettingsView>
       <TabName name={`Settings for ${space.name}`} />
       <Form>
         <h1>Space Overview</h1>
@@ -79,15 +71,15 @@ function Overview({ space }: { space: Space }) {
           <Button variant="primary">Update</Button>
         </div>
       </Form>
-    </SidebarContainerArea>
+    </SettingsView>
   );
 }
 
 function Invites({ space }: { space: Space }) {
   return (
-    <SidebarContainerArea>
+    <SettingsView>
       <h1>Invites</h1>
-    </SidebarContainerArea>
+    </SettingsView>
   );
 }
 
@@ -270,8 +262,8 @@ function Roles({ space }: { space: Space }) {
   );
 }
 
-function SettingSwitch({ tab, space }: { tab: string; space: Space }) {
-  switch (tab) {
+function SettingSwitch({ nav, space }: { nav: string; space: Space }) {
+  switch (nav) {
     case 'Overview':
       return <Overview space={space} />;
     case 'Invites':
@@ -283,24 +275,26 @@ function SettingSwitch({ tab, space }: { tab: string; space: Space }) {
   }
 }
 
+const CATEGORIES = ['Overview', 'Invites', 'Roles'];
+
 export function SpaceSettingsView({ space }: { space: Space }) {
-  const [tab, setTab] = useState('Overview');
+  const [nav, setNav] = useState('Overview');
   return (
-    <ViewContainerWithSidebar>
-      <Sidebar>
-        {['Overview', 'Invites', 'Roles'].map((x) => (
-          <SidebarButton
-            selected={tab === x}
-            key={x}
+    <SettingsView.Container>
+      <SettingsView.Sidebar>
+        {CATEGORIES.map((c) => (
+          <SettingsView.Nav
+            active={nav === c}
             onClick={() => {
-              setTab(x);
+              setNav(c);
             }}
+            key={c}
           >
-            {x}
-          </SidebarButton>
+            {c}
+          </SettingsView.Nav>
         ))}
-      </Sidebar>
-      <SettingSwitch tab={tab} space={space} />
-    </ViewContainerWithSidebar>
+      </SettingsView.Sidebar>
+      <SettingSwitch nav={nav} space={space} />
+    </SettingsView.Container>
   );
 }

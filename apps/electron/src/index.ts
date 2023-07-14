@@ -3,14 +3,17 @@ import { app, BrowserWindow } from 'electron';
 async function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
-    width: 800,
+    width: 1000,
     height: 600,
+    frame: false,
     webPreferences: {
       nodeIntegration: true,
     },
   });
 
-  await win.loadURL(`http://localhost:3000`);
+  win.setMenuBarVisibility(false);
+
+  await win.loadURL(`http://localhost:5173`);
 }
 
 // This method will be called when Electron has finished

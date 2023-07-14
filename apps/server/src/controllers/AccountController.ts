@@ -176,7 +176,7 @@ export class AccountController {
       },
     });
 
-    const resetLink = `${process.env.WEB_CLIENT!}/forgotpassword/${
+    const resetLink = `${env.WEB_CLIENT}/forgotpassword/${
       verification.token
     }`;
 

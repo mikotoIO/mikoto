@@ -8,6 +8,7 @@ export const env = load({
   LIVEKIT_SERVER: String,
   LIVEKIT_KEY: String,
   LIVEKIT_SECRET: String,
+  WEB_CLIENT: String,
   AXIOM_TOKEN: {
     type: String,
     optional: true,

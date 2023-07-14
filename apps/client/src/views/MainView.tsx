@@ -1,13 +1,15 @@
+import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Space } from 'mikotojs';
 import React, { useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 
 import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
 import { Explorer } from '../components/Explorer';
 import { ServerSidebar } from '../components/ServerSidebar';
-import { TabbedView } from '../components/TabBar';
+import { TabBarButton, TabbedView } from '../components/TabBar';
 import { Sidebar } from '../components/UserArea';
 import { AccountSettingsSurface } from '../components/surfaces/AccountSettingSurface';
 import { MessageView } from '../components/surfaces/MessageSurface';
@@ -15,6 +17,7 @@ import { SpaceSettingsView } from '../components/surfaces/SpaceSettingsSurface';
 import { VoiceView } from '../components/surfaces/VoiceSurface';
 import { useMikoto } from '../hooks';
 import {
+  leftBarOpenState,
   rightBarOpenState,
   Tabable,
   tabbedState,
@@ -62,6 +65,18 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
   }
 }
 
+const LeftBar = styled.div`
+  display: grid;
+  grid-template-rows: 40px auto;
+  .top {
+    background-color: var(--N1000);
+  }
+  .bars {
+    display: grid;
+    grid-template-columns: auto 1fr;
+  }
+`;
+
 function AppView() {
   const tabbed = useRecoilValue(tabbedState);
 
@@ -69,6 +84,7 @@ function AppView() {
   const [space, setSpace] = useState<Space | null>(null);
   const mikoto = useMikoto();
 
+  const [leftBarOpen, setLeftBarOpen] = useRecoilState(leftBarOpenState);
   const rightBarOpen = useRecoilValue(rightBarOpenState);
 
   useEffect(() => {
@@ -80,8 +96,23 @@ function AppView() {
   return (
     <AppWindow>
       <AppContainer>
-        <ServerSidebar />
-        <Sidebar>{space && <Explorer space={space} />}</Sidebar>
+        <LeftBar>
+          <div className="top">
+            <TabBarButton
+              onClick={() => {
+                setLeftBarOpen((x) => !x);
+              }}
+            >
+              <FontAwesomeIcon icon={faBarsStaggered} />
+            </TabBarButton>
+          </div>
+          <div className="bars">
+            <ServerSidebar />
+            {leftBarOpen && (
+              <Sidebar>{space && <Explorer space={space} />}</Sidebar>
+            )}
+          </div>
+        </LeftBar>
         <TabbedView tabs={tabbed.tabs}>
           <ErrorBoundaryPage>
             {tabbed.tabs.map((tab, idx) => (

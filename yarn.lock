@@ -4647,6 +4647,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@marsidev/react-turnstile@npm:^0.2.2":
+  version: 0.2.2
+  resolution: "@marsidev/react-turnstile@npm:0.2.2"
+  peerDependencies:
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+  checksum: 0e4d2bb1e46c4b80cf54402634726b91acd37acd5989a8f7141d21d56befe8fa7501ba60bfa8c3faed5e9bc045c8023299b1d1130d50365b31659971d1757f42
+  languageName: node
+  linkType: hard
+
 "@mdx-js/mdx@npm:^1.6.22":
   version: 1.6.22
   resolution: "@mdx-js/mdx@npm:1.6.22"
@@ -12440,6 +12450,7 @@ __metadata:
     "@mantine/core": ^5.2.3
     "@mantine/hooks": ^6.0.16
     "@mantine/modals": ^5.2.3
+    "@marsidev/react-turnstile": ^0.2.2
     "@mdx-js/react": ^1.6.22
     "@reduxjs/toolkit": ^1.9.5
     "@sentry/react": ^7.51.0

@@ -211,10 +211,9 @@ function WelcomeToMikoto() {
   );
 }
 
-const RightSidebarButton = styled.button`
+export const TabBarButton = styled.button`
   border: none;
-  margin-top: 4px;
-  margin-right: 8px;
+  margin: 4px 8px 0;
   width: 32px;
   height: 32px;
   border-radius: 4px;
@@ -245,13 +244,13 @@ export function TabbedView({ children, tabs }: TabbedViewProps) {
           <Tab tab={tab} index={index} key={`${tab.kind}/${tab.key}`} />
         ))}
         <StyledRest ref={drop} />
-        <RightSidebarButton
+        <TabBarButton
           onClick={() => {
             setRightBarOpen((x) => !x);
           }}
         >
           <FontAwesomeIcon icon={faBarsStaggered} />
-        </RightSidebarButton>
+        </TabBarButton>
       </StyledTabBar>
       {tabs.length ? children : <WelcomeToMikoto />}
     </StyledTabbedView>

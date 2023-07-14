@@ -94,6 +94,11 @@ export const CurrentSpaceContext = React.createContext<Space | undefined>(
   undefined,
 );
 
+export const leftBarOpenState = atom<boolean>({
+  key: 'leftBarOpen',
+  default: true,
+});
+
 export const rightBarOpenState = atom<boolean>({
   key: 'rightBarOpen',
   default: false,

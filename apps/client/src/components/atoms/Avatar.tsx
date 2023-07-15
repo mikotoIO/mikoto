@@ -9,22 +9,21 @@ import { CurrentSpaceContext } from '../../store';
 import { contextMenuState } from '../ContextMenu';
 import { RoleBadge } from './RoleBadge';
 
-const AvatarImg = styled.img<{ size: number }>`
+export const Avatar = styled.img<{ size?: number | string }>`
   user-select: none;
-  width: ${(p) => p.size}px;
-  height: ${(p) => p.size}px;
+  width: ${(p) => (typeof p.size === 'number' ? `${p.size}px` : p.size)};
+  height: ${(p) => (typeof p.size === 'number' ? `${p.size}px` : p.size)};
   border-radius: 8px;
 `;
+
+Avatar.defaultProps = {
+  src: '/images/default_avatar.png',
+  size: 40,
+};
 
 interface AvatarProps {
   src?: string;
   size?: number;
-}
-
-export function Avatar({ src, size }: AvatarProps) {
-  return (
-    <AvatarImg src={src ?? '/images/default_avatar.png'} size={size ?? 40} />
-  );
 }
 
 const AvatarContextWrapper = styled.div`
@@ -170,7 +169,7 @@ export function MessageAvatar({ src, user, size }: MessageAvatarProps) {
   const space = useContext(CurrentSpaceContext);
 
   return (
-    <AvatarImg
+    <Avatar
       className="avatar"
       src={src ?? '/images/default_avatar.png'}
       size={size ?? 40}

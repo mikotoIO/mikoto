@@ -9,7 +9,7 @@ import { useTabkit } from '../store';
 import { ContextMenu, useContextMenu } from './ContextMenu';
 import { Avatar } from './atoms/Avatar';
 
-const StyledSidebar = styled(Resizable)`
+const StyledSidebarInner = styled.div`
   display: grid;
   grid-template-rows: 1fr 64px;
   height: 100%;
@@ -100,17 +100,11 @@ export function UserArea() {
   );
 }
 
-export function Sidebar({ children }: { children: React.ReactNode }) {
+export function ExplorerWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <StyledSidebar
-      enable={{ right: true }}
-      minWidth={200}
-      maxWidth="50vw"
-      maxHeight="100%"
-      defaultSize={{ width: 240, height: '100%' }}
-    >
+    <StyledSidebarInner>
       <div>{children}</div>
       <UserArea />
-    </StyledSidebar>
+    </StyledSidebarInner>
   );
 }

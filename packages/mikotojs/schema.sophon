@@ -90,6 +90,7 @@ struct MemberUpdateOptions {
 
 service MemberService {
   get(spaceId: string, userId: string): Member;
+  list(spaceId: string): Member[];
   update(spaceId: string, userId: string, roleIds: MemberUpdateOptions): Member;
 }
 

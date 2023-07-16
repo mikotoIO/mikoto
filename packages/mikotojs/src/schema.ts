@@ -173,6 +173,9 @@ export class MemberServiceClient {
   get(spaceId: string, userId: string): Promise<Member> {
     return this.socket.call("members/get", spaceId, userId);
   }
+  list(spaceId: string): Promise<Member[]> {
+    return this.socket.call("members/list", spaceId);
+  }
   update(
     spaceId: string,
     userId: string,

@@ -48,7 +48,7 @@ export function MessageEditor({
   onSubmit,
   onTyping,
 }: MessageEditorProps) {
-  const editor = useMemo(
+  const editor: ReactEditor = useMemo(
     () => withHistory(withReact(createEditor() as ReactEditor)),
     [],
   );
@@ -78,6 +78,9 @@ export function MessageEditor({
     >
       <StyledEditable
         onKeyDown={(ev) => {
+          if (serialize(editorValue).trim() === '') {
+            return;
+          }
           // submission
           if (ev.key !== 'Enter' || ev.shiftKey) {
             onTyping?.();

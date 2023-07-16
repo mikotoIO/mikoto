@@ -10,7 +10,10 @@ import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
 import { Explorer } from '../components/Explorer';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { TabBarButton, TabbedView } from '../components/TabBar';
-import { Sidebar } from '../components/UserArea';
+import { ExplorerWrapper } from '../components/UserArea';
+import { Avatar } from '../components/atoms/Avatar';
+import { Sidebar } from '../components/sidebars/Base';
+import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
 import { AccountSettingsSurface } from '../components/surfaces/AccountSettingSurface';
 import { MessageView } from '../components/surfaces/MessageSurface';
 import { SpaceSettingsView } from '../components/surfaces/SpaceSettingsSurface';
@@ -69,6 +72,7 @@ const LeftBar = styled.div`
   display: grid;
   grid-template-rows: 40px auto;
   .top {
+    display: flex;
     background-color: var(--N1000);
   }
   .bars {
@@ -105,11 +109,16 @@ function AppView() {
             >
               <FontAwesomeIcon icon={faBarsStaggered} />
             </TabBarButton>
+            {leftBarOpen && <Avatar size={28} style={{ marginTop: '6px' }} />}
           </div>
           <div className="bars">
             <ServerSidebar />
             {leftBarOpen && (
-              <Sidebar>{space && <Explorer space={space} />}</Sidebar>
+              <Sidebar position="left">
+                <ExplorerWrapper>
+                  {space && <Explorer space={space} />}
+                </ExplorerWrapper>
+              </Sidebar>
             )}
           </div>
         </LeftBar>
@@ -130,7 +139,9 @@ function AppView() {
           </ErrorBoundaryPage>
         </TabbedView>
         {rightBarOpen && (
-          <Sidebar>{space && <Explorer space={space} />}</Sidebar>
+          <Sidebar position="right">
+            <MemberListSidebar />
+          </Sidebar>
         )}
       </AppContainer>
     </AppWindow>

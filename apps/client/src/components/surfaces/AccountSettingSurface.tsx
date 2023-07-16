@@ -14,7 +14,6 @@ import { SettingsView } from '../../views/SettingsViewTemplate';
 import { modalState } from '../ContextMenu';
 import { TabName } from '../TabBar';
 import { userState } from '../UserArea';
-import { ViewContainerWithSidebar } from '../ViewContainer';
 import {
   AvatarEditor,
   mediaServerAxios,
@@ -109,7 +108,7 @@ const BotCardContainer = styled.div`
   margin: 16px 0;
   padding: 16px;
   border-radius: 8px;
-  min-width: 800px;
+  width: 800px;
   max-width: 100%;
   box-sizing: border-box;
 `;

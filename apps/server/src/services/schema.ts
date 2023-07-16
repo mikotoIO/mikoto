@@ -174,6 +174,10 @@ export abstract class AbstractMemberService {
     spaceId: string,
     userId: string
   ): Promise<Member>;
+  abstract list(
+    ctx: SophonInstance<SophonContext>,
+    spaceId: string
+  ): Promise<Member[]>;
   abstract update(
     ctx: SophonInstance<SophonContext>,
     spaceId: string,

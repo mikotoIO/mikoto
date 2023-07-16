@@ -38,6 +38,21 @@ export class MemberService extends AbstractMemberService {
       ...rest,
     };
   }
+
+  async list(ctx: SophonInstance, spaceId: string) {
+    const members = await prisma.spaceUser.findMany({
+      where: { spaceId },
+      include: memberInclude,
+    });
+    return members.map((member) => {
+      const { roles, ...rest } = member;
+      return {
+        roleIds: roles.map((x) => x.id),
+        ...rest,
+      };
+    });
+  }
+
   async update(
     ctx: SophonInstance,
     spaceId: string,

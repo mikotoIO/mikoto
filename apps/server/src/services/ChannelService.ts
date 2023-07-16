@@ -9,6 +9,7 @@ import {
   AbstractChannelService,
   AbstractMessageService,
   ChannelCreateOptions,
+  SophonContext,
 } from './schema';
 
 const authorInclude = {
@@ -192,5 +193,19 @@ export class MessageService extends AbstractMessageService {
     await prisma.message.delete({ where: { id: messageId } });
 
     this.$(`space/${channel.spaceId}`).onDelete({ messageId, channelId });
+  }
+
+  async ack(
+    ctx: SophonInstance<SophonContext>,
+    channelId: string,
+    timestamp: string,
+  ) {
+    await prisma.channelUnread.create({
+      data: {
+        channelId,
+        userId: ctx.data.user.sub,
+        timestamp: new Date(timestamp),
+      },
+    });
   }
 }

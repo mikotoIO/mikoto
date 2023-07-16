@@ -150,6 +150,19 @@ export class SpaceService extends AbstractSpaceService {
   ): Promise<void> {
     await prisma.invite.delete({ where: { id: code } });
   }
+
+  async addBot(
+    ctx: SophonInstance<SophonContext>,
+    spaceId: string,
+    botId: string,
+  ) {
+    const bot = await prisma.user.findUnique({ where: { id: botId } });
+    if (bot === null) throw new NotFoundError();
+    if (bot.category !== 'BOT') throw new ForbiddenError();
+    await prisma.spaceUser.create({
+      data: { userId: botId, spaceId },
+    });
+  }
 }
 
 async function joinSpace(

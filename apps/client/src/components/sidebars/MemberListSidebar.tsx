@@ -1,5 +1,8 @@
+import { Member } from 'mikotojs';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
+import { useMikoto } from '../../hooks';
 import { Avatar } from '../atoms/Avatar';
 
 const StyledMember = styled.div`
@@ -20,22 +23,29 @@ const Divider = styled.div`
   color: var(--N300);
 `;
 
-function Member() {
+function MemberElement({ member }: { member: Member }) {
   return (
     <StyledMember>
-      <Avatar size={32} />
-      <div className="name">Cactus</div>
+      <Avatar size={32} src={member.user.avatar ?? undefined} />
+      <div className="name">{member.user.name}</div>
     </StyledMember>
   );
 }
 
-export function MemberListSidebar() {
+export function MemberListSidebar({ spaceId }: { spaceId: string }) {
+  const [members, setMembers] = useState<Member[]>([]);
+  const mikoto = useMikoto();
+
+  useEffect(() => {
+    mikoto.client.members.list(spaceId).then((x) => setMembers(x));
+  }, [spaceId]);
+
   return (
     <div>
       <Divider>Members</Divider>
-      <Member />
-      <Member />
-      <Member />
+      {members.map((x) => (
+        <MemberElement key={x.id} member={x} />
+      ))}
     </div>
   );
 }

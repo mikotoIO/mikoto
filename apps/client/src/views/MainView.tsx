@@ -140,7 +140,7 @@ function AppView() {
         </TabbedView>
         {rightBarOpen && (
           <Sidebar position="right">
-            <MemberListSidebar />
+            {spaceVal && <MemberListSidebar spaceId={spaceVal.id} />}
           </Sidebar>
         )}
       </AppContainer>

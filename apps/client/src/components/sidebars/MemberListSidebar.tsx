@@ -1,4 +1,6 @@
-import { Member } from 'mikotojs';
+import { faCrown } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Member, Space } from 'mikotojs';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
@@ -15,6 +17,10 @@ const StyledMember = styled.div`
   &:hover {
     background-color: var(--N700);
   }
+
+  .crown {
+    color: var(--Y700);
+  }
 `;
 
 const Divider = styled.div`
@@ -23,28 +29,31 @@ const Divider = styled.div`
   color: var(--N300);
 `;
 
-function MemberElement({ member }: { member: Member }) {
+function MemberElement({ member, space }: { space: Space; member: Member }) {
   return (
     <StyledMember>
       <Avatar size={32} src={member.user.avatar ?? undefined} />
       <div className="name">{member.user.name}</div>
+      {member.user.id === space.ownerId && (
+        <FontAwesomeIcon className="crown" icon={faCrown} />
+      )}
     </StyledMember>
   );
 }
 
-export function MemberListSidebar({ spaceId }: { spaceId: string }) {
+export function MemberListSidebar({ space }: { space: Space }) {
   const [members, setMembers] = useState<Member[]>([]);
   const mikoto = useMikoto();
 
   useEffect(() => {
-    mikoto.client.members.list(spaceId).then((x) => setMembers(x));
-  }, [spaceId]);
+    mikoto.client.members.list(space.id).then((x) => setMembers(x));
+  }, [space.id]);
 
   return (
     <div>
       <Divider>Members</Divider>
       {members.map((x) => (
-        <MemberElement key={x.id} member={x} />
+        <MemberElement key={x.id} member={x} space={space} />
       ))}
     </div>
   );

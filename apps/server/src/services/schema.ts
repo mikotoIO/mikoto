@@ -20,6 +20,7 @@ export interface Space {
   icon: string | null;
   channels: Channel[];
   roles: Role[];
+  ownerId: string;
 }
 export interface Role {
   id: string;

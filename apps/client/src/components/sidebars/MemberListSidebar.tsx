@@ -5,7 +5,9 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../hooks';
+import { useContextMenu } from '../ContextMenu';
 import { Avatar } from '../atoms/Avatar';
+import { UserContextMenu } from '../modals/ContextMenus';
 
 const StyledMember = styled.div`
   display: flex;
@@ -30,8 +32,12 @@ const Divider = styled.div`
 `;
 
 function MemberElement({ member, space }: { space: Space; member: Member }) {
+  const userContextMenu = useContextMenu(() => (
+    <UserContextMenu user={member.user} />
+  ));
+
   return (
-    <StyledMember>
+    <StyledMember onContextMenu={userContextMenu}>
       <Avatar size={32} src={member.user.avatar ?? undefined} />
       <div className="name">{member.user.name}</div>
       {member.user.id === space.ownerId && (

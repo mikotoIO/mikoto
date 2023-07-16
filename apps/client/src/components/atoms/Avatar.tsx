@@ -6,7 +6,8 @@ import styled from 'styled-components';
 
 import { useMikoto } from '../../hooks';
 import { CurrentSpaceContext } from '../../store';
-import { contextMenuState } from '../ContextMenu';
+import { contextMenuState, useContextMenu } from '../ContextMenu';
+import { UserContextMenu } from '../modals/ContextMenus';
 import { RoleBadge } from './RoleBadge';
 
 export const Avatar = styled.img<{ size?: number | string }>`
@@ -168,12 +169,17 @@ export function MessageAvatar({ src, user, size }: MessageAvatarProps) {
   const avatarRef = useRef<HTMLImageElement>(null);
   const space = useContext(CurrentSpaceContext);
 
+  const userContextMenu = useContextMenu(() => (
+    <UserContextMenu user={user!} />
+  ));
+
   return (
     <Avatar
       className="avatar"
       src={src ?? '/images/default_avatar.png'}
       size={size ?? 40}
       ref={avatarRef}
+      onContextMenu={user && userContextMenu}
       onClick={(ev) => {
         if (!user) return;
         ev.preventDefault();

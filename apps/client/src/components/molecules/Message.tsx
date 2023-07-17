@@ -82,7 +82,7 @@ const MessageInner = styled.div`
   }
 `;
 
-const Name = styled.div<{ color: string | null }>`
+const Name = styled.div<{ color?: string | null }>`
   font-size: 14px;
   font-weight: 600;
   margin: 0;
@@ -155,7 +155,7 @@ export function MessageItem({ message, isSimple }: MessageProps) {
       <MessageInner>
         {!isSimple && (
           <NameBox>
-            <Name color="#20BBD2">{message.author?.name ?? 'Ghost'}</Name>
+            <Name>{message.author?.name ?? 'Ghost'}</Name>
             {message.author?.category === 'BOT' && <BotTag />}
             <Timestamp time={new Date(message.timestamp)} />
           </NameBox>

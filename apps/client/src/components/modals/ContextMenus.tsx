@@ -12,7 +12,7 @@ export function UserContextMenu({ user }: { user: User }) {
       <ContextMenu.Link
         onClick={() => {
           setModal({
-            elem: <ProfileModal />,
+            elem: <ProfileModal user={user} />,
           });
         }}
       >

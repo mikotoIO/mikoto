@@ -3,7 +3,8 @@ import styled from 'styled-components';
 
 import { useMikoto } from '../../hooks';
 import { ContextMenu, useContextMenu } from '../ContextMenu';
-import { MessageAvatar } from '../atoms/Avatar';
+import { BotTag } from '../atoms/BotTag';
+import { MessageAvatar } from '../atoms/MessageAvatar';
 import { Markdown } from './markdown';
 
 const dateFormat = new Intl.DateTimeFormat('en', {
@@ -126,16 +127,6 @@ const AvatarFiller = styled.div`
   width: 40px;
 `;
 
-const Tag = styled.span`
-  display: inline-block;
-  padding: 2px 4px;
-  margin-left: 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 600;
-  background-color: var(--B700);
-`;
-
 export function MessageItem({ message, isSimple }: MessageProps) {
   const mikoto = useMikoto();
 
@@ -165,7 +156,7 @@ export function MessageItem({ message, isSimple }: MessageProps) {
         {!isSimple && (
           <NameBox>
             <Name color="#20BBD2">{message.author?.name ?? 'Ghost'}</Name>
-            {message.author?.category === 'BOT' && <Tag>BOT</Tag>}
+            {message.author?.category === 'BOT' && <BotTag />}
             <Timestamp time={new Date(message.timestamp)} />
           </NameBox>
         )}

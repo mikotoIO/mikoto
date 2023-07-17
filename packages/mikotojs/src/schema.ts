@@ -16,6 +16,7 @@ export interface Space {
   icon: string | null;
   channels: Channel[];
   roles: Role[];
+  ownerId: string | null;
 }
 export interface Role {
   id: string;
@@ -156,6 +157,9 @@ export class SpaceServiceClient {
   listInvites(id: string): Promise<Invite[]> {
     return this.socket.call("spaces/listInvites", id);
   }
+  addBot(spaceId: string, userId: string): Promise<void> {
+    return this.socket.call("spaces/addBot", spaceId, userId);
+  }
 
   onCreate(handler: (space: Space) => void) {
     return this.socket.subscribe("spaces/onCreate", handler);
@@ -246,6 +250,9 @@ export class MessageServiceClient {
   }
   delete(channelId: string, messageId: string): Promise<void> {
     return this.socket.call("messages/delete", channelId, messageId);
+  }
+  ack(channelId: string, timestamp: string): Promise<void> {
+    return this.socket.call("messages/ack", channelId, timestamp);
   }
 
   onCreate(handler: (message: Message) => void) {

@@ -14,6 +14,7 @@ struct Space {
   icon: string?;
   channels: Channel[];
   roles: Role[];
+  ownerId: string?;
 }
 
 struct Role {
@@ -82,6 +83,8 @@ service SpaceService {
   createInvite(id: string): Invite;
   deleteInvite(code: string): void;
   listInvites(id: string): Invite[];
+  
+  addBot(spaceId: string, userId: string): void;
 }
 
 struct MemberUpdateOptions {
@@ -92,6 +95,7 @@ service MemberService {
   get(spaceId: string, userId: string): Member;
   list(spaceId: string): Member[];
   update(spaceId: string, userId: string, roleIds: MemberUpdateOptions): Member;
+  delete(spaceId: string, userId: string): void;
 }
 
 struct UserUpdateOptions {
@@ -152,6 +156,7 @@ service MessageService {
   ~onCreate(message: Message);
   ~onUpdate(message: Message);
   ~onDelete(event: MessageDeleteEvent);
+  ack(channelId: string, timestamp: string): void;
 }
 
 service RoleService {

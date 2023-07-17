@@ -20,6 +20,7 @@ export interface Space {
   icon: string | null;
   channels: Channel[];
   roles: Role[];
+  ownerId: string | null;
 }
 export interface Role {
   id: string;
@@ -157,6 +158,11 @@ export abstract class AbstractSpaceService {
     ctx: SophonInstance<SophonContext>,
     id: string
   ): Promise<Invite[]>;
+  abstract addBot(
+    ctx: SophonInstance<SophonContext>,
+    spaceId: string,
+    userId: string
+  ): Promise<void>;
 }
 
 export class MemberServiceSender {
@@ -294,6 +300,11 @@ export abstract class AbstractMessageService {
     ctx: SophonInstance<SophonContext>,
     channelId: string,
     messageId: string
+  ): Promise<void>;
+  abstract ack(
+    ctx: SophonInstance<SophonContext>,
+    channelId: string,
+    timestamp: string
   ): Promise<void>;
 }
 

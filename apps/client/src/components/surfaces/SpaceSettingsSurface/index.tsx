@@ -8,13 +8,16 @@ import { SegmentedControl, Switch } from '@mantine/core';
 import { Role, Space, Permissions } from 'mikotojs';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../../hooks';
-import { Button } from '../../../lucid/Button';
+import { Button, Buttons } from '../../../lucid/Button';
+import { DialogPanel } from '../../../lucid/DialogPanel';
 import { Form } from '../../../lucid/Form';
 import { Input } from '../../../lucid/Input';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
+import { modalState } from '../../ContextMenu';
 import { TabName } from '../../TabBar';
 import {
   AvatarEditor,
@@ -39,9 +42,21 @@ const SidebarButton = styled.a<{ selected?: boolean }>`
   user-select: none;
 `;
 
+function AddBotModal() {
+  return (
+    <DialogPanel>
+      <Form>
+        <Input labelName="Bot ID" />
+        <Button>Submit</Button>
+      </Form>
+    </DialogPanel>
+  );
+}
+
 function Overview({ space }: { space: Space }) {
   const [spaceName, setSpaceName] = useState(space.name);
   const mikoto = useMikoto();
+  const setModal = useSetRecoilState(modalState);
 
   return (
     <SettingsView>
@@ -67,9 +82,20 @@ function Overview({ space }: { space: Space }) {
           value={spaceName}
           onChange={(x) => setSpaceName(x.target.value)}
         />
-        <div>
+        <Buttons>
           <Button variant="primary">Update</Button>
-        </div>
+          <Button
+            role="button"
+            onClick={(e) => {
+              setModal({
+                elem: <AddBotModal />,
+              });
+              e.preventDefault();
+            }}
+          >
+            Add Bot
+          </Button>
+        </Buttons>
       </Form>
     </SettingsView>
   );

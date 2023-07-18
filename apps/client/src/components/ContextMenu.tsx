@@ -69,13 +69,7 @@ export function ContextMenuKit() {
   return (
     <StyledContextMenuOverlay tabIndex={0}>
       {context && (
-        <StyledContextMenu
-          ref={ref}
-          style={{
-            top: context.position.top,
-            left: context.position.left,
-          }}
-        >
+        <StyledContextMenu ref={ref} style={{ ...context.position }}>
           {context.elem}
         </StyledContextMenu>
       )}

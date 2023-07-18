@@ -110,8 +110,8 @@ export const theme = {
 
 export const GlobalStyle = createGlobalStyle`
   :root {
-    --main-font: 'Open Sans', sans-serif;
-    --code-font: 'JetBrains Mono', monospace;
+    --font-main: 'Open Sans', sans-serif;
+    --font-code: 'JetBrains Mono', monospace;
     ${Object.entries(theme.colors)
       .map(([name, value]) => `--${name}: ${value};`)
       .join('\n')}
@@ -136,13 +136,13 @@ export const GlobalStyle = createGlobalStyle`
     min-height: 100%;
     margin: 0;
     background-color: #2f3237;
-    font-family: var(--main-font);
+    font-family: var(--font-main);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   code {
-    font-family: var(--code-font);
+    font-family: var(--font-code);
   }
 
   ::-webkit-scrollbar {

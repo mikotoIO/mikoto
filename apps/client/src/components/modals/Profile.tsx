@@ -19,6 +19,22 @@ const ProfileContainer = styled.div`
     padding: 64px 16px 16px;
   }
 
+  h1 {
+    font-size: 24px;
+    margin-bottom: 0;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  .mikotoid {
+    margin-top: 0;
+    font-size: 14px;
+    font-family: var(--font-code);
+    color: var(--N400);
+  }
+
   ${Tag} {
     font-size: 12px;
   }
@@ -38,7 +54,9 @@ export function ProfileModal({ user }: { user: User }) {
         <div className="content">
           <span>
             <h1>{user.name}</h1>
+            <h2 className="mikotoid">@cactus.mikoto.io</h2>
           </span>
+          <h2>Bio</h2>
           <p>Bio Should go here. Lorem ipsum dolor sit amet consectetur.</p>
         </div>
       </ProfileContainer>

@@ -1,4 +1,5 @@
 import { Anchor } from '@mantine/core';
+import { Turnstile } from '@marsidev/react-turnstile';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -37,6 +38,11 @@ const Logo = styled.img`
   display: block;
   margin: 100px auto 20px;
 `;
+
+// not always a real captcha
+function Captcha() {
+  return <Turnstile siteKey="3x00000000000000000000FF" />;
+}
 
 export function AuthView({ children }: { children: React.ReactNode }) {
   return (
@@ -121,6 +127,7 @@ export function RegisterView() {
         <Anchor to="/login" component={Link}>
           Log In
         </Anchor>
+        <Captcha />
       </Form>
     </AuthView>
   );
@@ -150,6 +157,7 @@ export function ResetPasswordView() {
             <Button variant="primary" type="submit">
               Send Password Reset Email
             </Button>
+            <Captcha />
           </>
         )}
       </Form>

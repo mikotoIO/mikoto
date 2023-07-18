@@ -20,12 +20,11 @@ import { SpaceSettingsView } from '../components/surfaces/SpaceSettingsSurface';
 import { VoiceView } from '../components/surfaces/VoiceSurface';
 import { useMikoto } from '../hooks';
 import {
-  leftBarOpenState,
-  rightBarOpenState,
   Tabable,
   tabbedState,
   TabContext,
   treebarSpaceState,
+  workspaceState,
 } from '../store';
 import { MikotoApiLoader } from './MikotoApiLoader';
 import { DesignStory } from './Palette';
@@ -88,8 +87,7 @@ function AppView() {
   const [space, setSpace] = useState<Space | null>(null);
   const mikoto = useMikoto();
 
-  const [leftBarOpen, setLeftBarOpen] = useRecoilState(leftBarOpenState);
-  const rightBarOpen = useRecoilValue(rightBarOpenState);
+  const [workspace, setWorkspace] = useRecoilState(workspaceState);
 
   useEffect(() => {
     if (spaceVal) {
@@ -104,17 +102,29 @@ function AppView() {
           <div className="top">
             <TabBarButton
               onClick={() => {
-                setLeftBarOpen((x) => !x);
+                setWorkspace((ws) => ({
+                  ...ws,
+                  leftOpen: !workspace.leftOpen,
+                }));
               }}
             >
               <FontAwesomeIcon icon={faBarsStaggered} />
             </TabBarButton>
-            {leftBarOpen && <Avatar size={28} style={{ marginTop: '6px' }} />}
+            {workspace.leftOpen && (
+              <Avatar size={28} style={{ marginTop: '6px' }} />
+            )}
           </div>
           <div className="bars">
             <ServerSidebar />
-            {leftBarOpen && (
-              <Sidebar position="left">
+            {workspace.leftOpen && (
+              <Sidebar position="left" size={workspace.left}
+                onResize={(size) => {
+                  setWorkspace((ws) => ({
+                    ...ws,
+                    left: ws.left + size.width,
+                  }));
+                }}
+              >
                 <ExplorerWrapper>
                   {space && <Explorer space={space} />}
                 </ExplorerWrapper>
@@ -138,8 +148,17 @@ function AppView() {
             ))}
           </ErrorBoundaryPage>
         </TabbedView>
-        {rightBarOpen && (
-          <Sidebar position="right">
+        {workspace.rightOpen && (
+          <Sidebar
+            position="right"
+            size={workspace.right}
+            onResize={(size) => {
+              setWorkspace((ws) => ({
+                ...ws,
+                right: ws.right + size.width,
+              }));
+            }}
+          >
             {spaceVal && <MemberListSidebar space={spaceVal} />}
           </Sidebar>
         )}

@@ -12,6 +12,7 @@ import {
   tabbedState,
   TabContext,
   tabNameFamily,
+  workspaceState,
 } from '../store';
 import { getTabIcon, IconBox } from './atoms/IconBox';
 
@@ -227,7 +228,7 @@ export const TabBarButton = styled.button`
 
 export function TabbedView({ children, tabs }: TabbedViewProps) {
   const reorderFn = useReorderable();
-  const setRightBarOpen = useSetRecoilState(rightBarOpenState);
+  const setWorkspace = useSetRecoilState(workspaceState);
 
   const [, drop] = useDrop<TabDnd>({
     accept: 'TAB',
@@ -246,7 +247,10 @@ export function TabbedView({ children, tabs }: TabbedViewProps) {
         <StyledRest ref={drop} />
         <TabBarButton
           onClick={() => {
-            setRightBarOpen((x) => !x);
+            setWorkspace((ws) => ({
+              ...ws,
+              rightOpen: !ws.rightOpen,
+            }));
           }}
         >
           <FontAwesomeIcon icon={faBarsStaggered} />

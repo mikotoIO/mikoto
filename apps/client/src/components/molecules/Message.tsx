@@ -28,12 +28,12 @@ function padTime(n: number): string {
 
 const MessageContainer = styled.div<{ isSimple?: boolean }>`
   margin: 0;
-  margin-top: ${(p) => (p.isSimple ? 0 : '8px')};
   display: grid;
   grid-template-columns: min-content auto;
   min-height: 20px;
   grid-gap: 16px;
   padding: 2px 20px 6px;
+  padding-top: ${(p) => (p.isSimple ? '2px' : '8px')};
   &:hover {
     background-color: rgba(0, 0, 0, 0.06);
   }

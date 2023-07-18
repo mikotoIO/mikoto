@@ -7,8 +7,9 @@ import styled from 'styled-components';
 import { useMikoto } from '../../hooks';
 import { Button } from '../../lucid/Button';
 import { CurrentSpaceContext } from '../../store';
-import { contextMenuState, useContextMenu } from '../ContextMenu';
+import { contextMenuState, modalState, useContextMenu } from '../ContextMenu';
 import { UserContextMenu } from '../modals/ContextMenus';
+import { ProfileModal } from '../modals/Profile';
 import { Avatar } from './Avatar';
 import { RoleBadge } from './RoleBadge';
 
@@ -110,6 +111,8 @@ const StyledPlusBadge = styled.div`
 function AvatarContextMenu({ user, space }: { user: User; space?: Space }) {
   const mikoto = useMikoto();
   const [member, setMember] = useState<Member | null>(null);
+  const setModal = useSetRecoilState(modalState);
+
   useEffect(() => {
     if (space) {
       mikoto.client.members.get(space.id, user.id).then(setMember);
@@ -117,6 +120,7 @@ function AvatarContextMenu({ user, space }: { user: User; space?: Space }) {
   }, [user.id]);
 
   const [roleEditorOpen, setRoleEditorOpen] = useState(false);
+  const setContextMenu = useSetRecoilState(contextMenuState);
 
   return (
     <div style={{ display: 'grid', gridGap: '8px' }}>
@@ -125,7 +129,16 @@ function AvatarContextMenu({ user, space }: { user: User; space?: Space }) {
           'loading'
         ) : (
           <div>
-            <Avatar src={user.avatar ?? undefined} size={80} />
+            <Avatar
+              src={user.avatar ?? undefined}
+              size={80}
+              onClick={() => {
+                setModal({
+                  elem: <ProfileModal user={user} />,
+                });
+                setContextMenu(null);
+              }}
+            />
             <h1>{user.name}</h1>
             <hr />
             <h2>Roles</h2>

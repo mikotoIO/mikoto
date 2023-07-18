@@ -1,6 +1,7 @@
 import { Channel, Space } from 'mikotojs';
 import React, { createContext } from 'react';
 import { atom, atomFamily, useRecoilState } from 'recoil';
+import { recoilPersist } from 'recoil-persist';
 
 export const treebarSpaceState = atom<Space | null>({
   key: 'treebarSpace',
@@ -94,12 +95,31 @@ export const CurrentSpaceContext = React.createContext<Space | undefined>(
   undefined,
 );
 
-export const leftBarOpenState = atom<boolean>({
-  key: 'leftBarOpen',
-  default: true,
-});
+
 
 export const rightBarOpenState = atom<boolean>({
   key: 'rightBarOpen',
   default: false,
+});
+
+interface Workspace {
+  left: number;
+  leftOpen: boolean;
+  right: number;
+  rightOpen: boolean;
+}
+
+const workspacePersist = recoilPersist({
+  key: 'workspace',
+});
+
+export const workspaceState = atom<Workspace>({
+  key: 'workspace',
+  default: {
+    left: 300,
+    leftOpen: true,
+    right: 300,
+    rightOpen: true,
+  },
+  effects_UNSTABLE: [workspacePersist.persistAtom],
 });

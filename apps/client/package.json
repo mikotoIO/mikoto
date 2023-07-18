@@ -59,6 +59,7 @@
     "react-virtuoso": "^4.0.3",
     "reactjs-popup": "^2.0.5",
     "recoil": "^0.7.5",
+    "recoil-persist": "^5.1.0",
     "rehype-highlight": "^6.0.0",
     "rehype-katex": "^6.0.3",
     "remark-breaks": "^3.0.2",

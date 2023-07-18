@@ -12528,6 +12528,7 @@ __metadata:
     react-virtuoso: ^4.0.3
     reactjs-popup: ^2.0.5
     recoil: ^0.7.5
+    recoil-persist: ^5.1.0
     rehype-highlight: ^6.0.0
     rehype-katex: ^6.0.3
     remark-breaks: ^3.0.2
@@ -28102,6 +28103,15 @@ __metadata:
   dependencies:
     resolve: ^1.1.6
   checksum: fe76bf9c21875ac16e235defedd7cbd34f333c02a92546142b7911a0f7c7059d2e16f441fe6fb9ae203f459c05a31b2bcf26202896d89e390eda7514d5d2702b
+  languageName: node
+  linkType: hard
+
+"recoil-persist@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "recoil-persist@npm:5.1.0"
+  peerDependencies:
+    recoil: ^0.7.2
+  checksum: 03ee8417b9bfcb1e5d61af373a304437190da394bf42b0979cf54ec4edeb27e7577f76ae4f9348d131865b87b19dc8dedc158e2bacd3976d4b936be1ab005d18
   languageName: node
   linkType: hard
 

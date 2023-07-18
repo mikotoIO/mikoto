@@ -1,4 +1,4 @@
-import { Resizable } from 're-resizable';
+import { Resizable, NumberSize } from 're-resizable';
 import styled from 'styled-components';
 
 export const StyledSidebar = styled(Resizable)`
@@ -7,17 +7,22 @@ export const StyledSidebar = styled(Resizable)`
 
 interface SidebarProps {
   position: 'left' | 'right';
+  size: number;
   children: React.ReactNode;
+  onResize?: (size: NumberSize) => void;
 }
 
-export function Sidebar({ children, position }: SidebarProps) {
+export function Sidebar({ children, position, size, onResize }: SidebarProps) {
   return (
     <StyledSidebar
       enable={{ right: position === 'left', left: position === 'right' }}
       minWidth={200}
       maxWidth="50vw"
       maxHeight="100%"
-      defaultSize={{ width: 240, height: '100%' }}
+      size={{ width: size, height: '100%' }}
+      onResizeStop={(_, _1, _2, d) => {
+        onResize?.(d);
+      }}
     >
       {children}
     </StyledSidebar>

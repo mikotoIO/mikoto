@@ -10,7 +10,7 @@ import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
 import { Explorer } from '../components/Explorer';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { TabBarButton, TabbedView } from '../components/TabBar';
-import { ExplorerWrapper } from '../components/UserArea';
+import { ExplorerWrapper, UserAreaAvatar } from '../components/UserArea';
 import { Avatar } from '../components/atoms/Avatar';
 import { Sidebar } from '../components/sidebars/Base';
 import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
@@ -110,14 +110,14 @@ function AppView() {
             >
               <FontAwesomeIcon icon={faBarsStaggered} />
             </TabBarButton>
-            {workspace.leftOpen && (
-              <Avatar size={28} style={{ marginTop: '6px' }} />
-            )}
+            {workspace.leftOpen && <UserAreaAvatar />}
           </div>
           <div className="bars">
             <ServerSidebar />
             {workspace.leftOpen && (
-              <Sidebar position="left" size={workspace.left}
+              <Sidebar
+                position="left"
+                size={workspace.left}
                 onResize={(size) => {
                   setWorkspace((ws) => ({
                     ...ws,

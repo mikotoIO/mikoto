@@ -224,6 +224,9 @@ export function Overview() {
         >
           Change Password
         </Button>
+        <Button variant="warning" type="submit">
+          Log out of all devices
+        </Button>
       </Buttons>
       <h2>Dangerous</h2>
       <Buttons>

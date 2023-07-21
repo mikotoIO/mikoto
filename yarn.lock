@@ -4472,6 +4472,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@khanacademy/simple-markdown@npm:^0.9.2":
+  version: 0.9.3
+  resolution: "@khanacademy/simple-markdown@npm:0.9.3"
+  dependencies:
+    "@types/react": ">=16.0.0"
+  peerDependencies:
+    react: 16.14.0
+    react-dom: 16.14.0
+  checksum: 059534793a78af8f9cecaec92e5673b968b19cb316e172341073d8020183702bcc66751ac4d4f2722fe7760607f99362f67100ffe5f752ee46cb01b320d19942
+  languageName: node
+  linkType: hard
+
 "@leichtgewicht/ip-codec@npm:^2.0.1":
   version: 2.0.4
   resolution: "@leichtgewicht/ip-codec@npm:2.0.4"
@@ -8723,6 +8735,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react@npm:>=16.0.0":
+  version: 18.2.15
+  resolution: "@types/react@npm:18.2.15"
+  dependencies:
+    "@types/prop-types": "*"
+    "@types/scheduler": "*"
+    csstype: ^3.0.2
+  checksum: 36989f638201bfe2f4110b06c119180f6df9c0e13d7060481e82e7a745f81745a01ae543c478a25b61e0767cb52e82da2ad5b0dedacabf99339e523d06176705
+  languageName: node
+  linkType: hard
+
 "@types/react@npm:~18.0.14":
   version: 18.0.38
   resolution: "@types/react@npm:18.0.38"
@@ -12445,6 +12468,7 @@ __metadata:
     "@fortawesome/free-solid-svg-icons": ^6.3.0
     "@fortawesome/react-fontawesome": ^0.2.0
     "@headlessui/react": ^1.7.15
+    "@khanacademy/simple-markdown": ^0.9.2
     "@livekit/react-components": ^1.0.2
     "@livekit/react-core": ^1.0.2
     "@mantine/core": ^5.2.3

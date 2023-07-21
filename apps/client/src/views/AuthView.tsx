@@ -6,9 +6,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { useErrorElement } from '../hooks/useErrorElement';
-import { Button } from '../lucid/Button';
-import { Form } from '../lucid/Form';
-import { Input } from '../lucid/Input';
+import { Button, Form, Input } from '../lucid';
 import { authClient } from '../store/authClient';
 
 const AuthViewContainer = styled.div`

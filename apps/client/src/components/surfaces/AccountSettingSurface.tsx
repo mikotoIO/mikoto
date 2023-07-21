@@ -6,10 +6,8 @@ import styled from 'styled-components';
 
 import { useAuthClient, useMikoto } from '../../hooks';
 import { useErrorElement } from '../../hooks/useErrorElement';
-import { Button, Buttons } from '../../lucid/Button';
+import { Input, Form, Button, Buttons } from '../../lucid';
 import { DialogPanel } from '../../lucid/DialogPanel';
-import { Form } from '../../lucid/Form';
-import { Input } from '../../lucid/Input';
 import { SettingsView } from '../../views/SettingsViewTemplate';
 import { modalState } from '../ContextMenu';
 import { TabName } from '../TabBar';

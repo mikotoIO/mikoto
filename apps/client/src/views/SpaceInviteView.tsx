@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { StyledSpaceIcon } from '../components/atoms/SpaceIcon';
 import { Spinner } from '../components/atoms/Spinner';
 import { useMikoto } from '../hooks';
-import { Button } from '../lucid/Button';
+import { Button } from '../lucid';
 
 const bgUrl = '/images/artworks/1.jpg';
 

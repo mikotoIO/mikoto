@@ -12,10 +12,8 @@ import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../../hooks';
-import { Button, Buttons } from '../../../lucid/Button';
+import { Input, Form, Button, Buttons } from '../../../lucid';
 import { DialogPanel } from '../../../lucid/DialogPanel';
-import { Form } from '../../../lucid/Form';
-import { Input } from '../../../lucid/Input';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
 import { modalState } from '../../ContextMenu';
 import { TabName } from '../../TabBar';

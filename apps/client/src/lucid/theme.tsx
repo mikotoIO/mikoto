@@ -96,6 +96,16 @@ export const pinks = {
   P100: 'hsl(328, 95%, 90%)',
 };
 
+export const colors = {
+  neutrals,
+  purples,
+  blues,
+  greens,
+  yellows,
+  reds,
+  pinks,
+};
+
 export const theme = {
   colors: {
     ...neutrals,

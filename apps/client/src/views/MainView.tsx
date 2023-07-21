@@ -10,8 +10,7 @@ import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
 import { Explorer } from '../components/Explorer';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { TabBarButton, TabbedView } from '../components/TabBar';
-import { ExplorerWrapper, UserAreaAvatar } from '../components/UserArea';
-import { Avatar } from '../components/atoms/Avatar';
+import { UserAreaAvatar } from '../components/UserArea';
 import { Sidebar } from '../components/sidebars/Base';
 import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
 import { AccountSettingsSurface } from '../components/surfaces/AccountSettingSurface';
@@ -125,9 +124,7 @@ function AppView() {
                   }));
                 }}
               >
-                <ExplorerWrapper>
-                  {space && <Explorer space={space} />}
-                </ExplorerWrapper>
+                {space && <Explorer space={space} />}
               </Sidebar>
             )}
           </div>

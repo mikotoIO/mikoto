@@ -4,7 +4,7 @@ import React, { useRef } from 'react';
 import { atom, useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
-import { Backdrop } from '../lucid/DialogPanel';
+import { ModalBackdrop } from '../lucid';
 
 interface Positions {
   top?: number;
@@ -164,7 +164,7 @@ export function ModalKit() {
         setModal(null);
       }}
     >
-      <Backdrop />
+      <ModalBackdrop />
       {modal?.elem}
     </Dialog>
   );

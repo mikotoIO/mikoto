@@ -5,7 +5,7 @@ import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../hooks';
-import { Button } from '../../lucid/Button';
+import { Button } from '../../lucid';
 import { CurrentSpaceContext } from '../../store';
 import { contextMenuState, modalState, useContextMenu } from '../ContextMenu';
 import { UserContextMenu } from '../modals/ContextMenus';

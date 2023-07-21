@@ -1,9 +1,9 @@
 import { User } from 'mikotojs';
 import styled from 'styled-components';
 
-import { DialogPanel } from '../../lucid/DialogPanel';
+import { Modal } from '../../lucid';
 import { Avatar } from '../atoms/Avatar';
-import { BotTag, Tag } from '../atoms/BotTag';
+import { Tag } from '../atoms/BotTag';
 
 const ProfileContainer = styled.div`
   width: 500px;
@@ -46,7 +46,7 @@ const ProfileContainer = styled.div`
 
 export function ProfileModal({ user }: { user: User }) {
   return (
-    <DialogPanel style={{ padding: 0 }}>
+    <Modal style={{ padding: 0 }}>
       <ProfileContainer>
         <div className="banner">
           <Avatar src={user.avatar ?? undefined} size={100} />
@@ -60,6 +60,6 @@ export function ProfileModal({ user }: { user: User }) {
           <p>Bio Should go here. Lorem ipsum dolor sit amet consectetur.</p>
         </div>
       </ProfileContainer>
-    </DialogPanel>
+    </Modal>
   );
 }

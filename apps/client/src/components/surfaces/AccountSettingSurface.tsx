@@ -6,8 +6,7 @@ import styled from 'styled-components';
 
 import { useAuthClient, useMikoto } from '../../hooks';
 import { useErrorElement } from '../../hooks/useErrorElement';
-import { Input, Form, Button, Buttons } from '../../lucid';
-import { DialogPanel } from '../../lucid/DialogPanel';
+import { Input, Form, Button, Buttons, Modal } from '../../lucid';
 import { SettingsView } from '../../views/SettingsViewTemplate';
 import { modalState } from '../ContextMenu';
 import { TabName } from '../TabBar';
@@ -53,7 +52,7 @@ export function PasswordChangeModal() {
   const error = useErrorElement();
 
   return (
-    <DialogPanel>
+    <Modal>
       <Form
         style={{ minWidth: 400 }}
         onSubmit={handleSubmit(async (form) => {
@@ -97,7 +96,7 @@ export function PasswordChangeModal() {
           Change Password
         </Button>
       </Form>
-    </DialogPanel>
+    </Modal>
   );
 }
 
@@ -139,7 +138,7 @@ function BotCreateModal() {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <DialogPanel>
+    <Modal>
       <Form
         onSubmit={handleSubmit(async (form) => {
           await authClient.createBot(form.name);
@@ -152,7 +151,7 @@ function BotCreateModal() {
           Create Bot
         </Button>
       </Form>
-    </DialogPanel>
+    </Modal>
   );
 }
 

@@ -9,7 +9,7 @@ import { RecoilRoot } from 'recoil';
 import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
 import App from './App';
-import { GlobalStyle, theme } from './lucid/theme';
+import { GlobalStyle, theme } from './lucid';
 import { store } from './redux';
 import reportWebVitals from './reportWebVitals';
 

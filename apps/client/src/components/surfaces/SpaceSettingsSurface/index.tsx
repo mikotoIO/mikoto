@@ -12,8 +12,7 @@ import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../../hooks';
-import { Input, Form, Button, Buttons } from '../../../lucid';
-import { DialogPanel } from '../../../lucid/DialogPanel';
+import { Input, Form, Button, Buttons, Modal } from '../../../lucid';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
 import { modalState } from '../../ContextMenu';
 import { TabName } from '../../TabBar';
@@ -42,12 +41,12 @@ const SidebarButton = styled.a<{ selected?: boolean }>`
 
 function AddBotModal() {
   return (
-    <DialogPanel>
+    <Modal>
       <Form>
         <Input labelName="Bot ID" />
         <Button>Submit</Button>
       </Form>
-    </DialogPanel>
+    </Modal>
   );
 }
 

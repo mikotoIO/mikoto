@@ -1,14 +1,12 @@
 import { Anchor } from '@mantine/core';
 import { Turnstile } from '@marsidev/react-turnstile';
+import { Button, Form, Input } from '@mikoto-io/lucid';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { useErrorElement } from '../hooks/useErrorElement';
-import { Button } from '../lucid/Button';
-import { Form } from '../lucid/Form';
-import { Input } from '../lucid/Input';
 import { authClient } from '../store/authClient';
 
 const AuthViewContainer = styled.div`

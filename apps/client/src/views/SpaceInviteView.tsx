@@ -1,3 +1,4 @@
+import { Button } from '@mikoto-io/lucid';
 import { useAsync } from 'react-async-hook';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -5,7 +6,6 @@ import styled from 'styled-components';
 import { StyledSpaceIcon } from '../components/atoms/SpaceIcon';
 import { Spinner } from '../components/atoms/Spinner';
 import { useMikoto } from '../hooks';
-import { Button } from '../lucid/Button';
 
 const bgUrl = '/images/artworks/1.jpg';
 

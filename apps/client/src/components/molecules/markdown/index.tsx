@@ -62,6 +62,16 @@ const StyledEmoji = styled.img`
   vertical-align: middle;
 `;
 
+const Table = styled.table`
+  border-collapse: collapse;
+  &,
+  th,
+  td {
+    border: 1px solid var(--N600);
+    padding: 8px 12px;
+  }
+`;
+
 function Emoji({ src }: { src: string }) {
   return <StyledEmoji src={src} />;
 }
@@ -76,6 +86,7 @@ const markdownComponents: Partial<
     return <MessageImage src={src} alt={alt} />;
   },
   pre: (props) => <Pre {...props} />,
+  table: (props) => <Table {...props} />,
 };
 
 export function Markdown({ content }: { content: string }) {

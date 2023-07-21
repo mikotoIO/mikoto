@@ -2,7 +2,7 @@ import { Dialog } from '@headlessui/react';
 import styled from 'styled-components';
 
 // absolute center
-export const DialogPanel = styled(Dialog.Panel)`
+export const Modal = styled(Dialog.Panel)`
   background-color: ${(p) => p.theme.colors.N800};
   color: ${(p) => p.theme.colors.N0};
   position: absolute;
@@ -14,7 +14,7 @@ export const DialogPanel = styled(Dialog.Panel)`
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 `;
 
-export const Backdrop = styled.div`
+export const ModalBackdrop = styled.div`
   background-color: rgba(0, 0, 0, 0.5);
   position: absolute;
   top: 0;

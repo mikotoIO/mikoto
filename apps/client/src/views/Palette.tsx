@@ -1,19 +1,8 @@
+import { Form, Button, Buttons, Input, colors } from '@mikoto-io/lucid';
 import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';
 import { ViewContainer } from '../components/ViewContainer';
-import { Button, Buttons } from '../lucid/Button';
-import { Form } from '../lucid/Form';
-import { Input } from '../lucid/Input';
-import {
-  blues,
-  greens,
-  neutrals,
-  pinks,
-  purples,
-  reds,
-  yellows,
-} from '../lucid/theme';
 
 // design a color palette component, using styled components
 interface Color {
@@ -48,14 +37,14 @@ const ColorItem = styled.div<{ clr: Color }>`
   }
 `;
 
-function ColorPalette({ colors }: { colors: Record<string, string> }) {
+function ColorPalette({ colors: clrs }: { colors: Record<string, string> }) {
   return (
     <ColorPaletteContainer>
-      {Object.keys(colors).map((nm) => (
+      {Object.keys(clrs).map((nm) => (
         <ColorItem
           clr={{
             name: nm,
-            hex: colors[nm],
+            hex: clrs[nm],
           }}
           key={nm}
         >
@@ -72,22 +61,30 @@ export function DesignStory() {
     <ViewContainer padded scroll>
       <TabName name="Design Stories" />
       <h1>Design Stories</h1>
-      <ColorPalette colors={neutrals} />
-      <ColorPalette colors={purples} />
-      <ColorPalette colors={blues} />
-      <ColorPalette colors={greens} />
-      <ColorPalette colors={yellows} />
-      <ColorPalette colors={reds} />
-      <ColorPalette colors={pinks} />
+      <ColorPalette colors={colors.neutrals} />
+      <ColorPalette colors={colors.purples} />
+      <ColorPalette colors={colors.blues} />
+      <ColorPalette colors={colors.greens} />
+      <ColorPalette colors={colors.yellows} />
+      <ColorPalette colors={colors.reds} />
+      <ColorPalette colors={colors.pinks} />
 
       <Form>
         <Input labelName="Test Input" />
         <Buttons>
           <Button type="button">Default Button</Button>
-          <Button variant="primary" type="button">Primary Button</Button>
-          <Button variant="success" type="button">Success Button</Button>
-          <Button variant="warning" type="button">Warning Button</Button>
-          <Button variant="danger" type="button">Danger Button</Button>
+          <Button variant="primary" type="button">
+            Primary Button
+          </Button>
+          <Button variant="success" type="button">
+            Success Button
+          </Button>
+          <Button variant="warning" type="button">
+            Warning Button
+          </Button>
+          <Button variant="danger" type="button">
+            Danger Button
+          </Button>
         </Buttons>
       </Form>
     </ViewContainer>

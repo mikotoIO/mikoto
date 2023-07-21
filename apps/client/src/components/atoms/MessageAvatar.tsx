@@ -1,11 +1,11 @@
 import { Checkbox } from '@mantine/core';
+import { Button } from '@mikoto-io/lucid';
 import { Member, Role, Space, User } from 'mikotojs';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../hooks';
-import { Button } from '../../lucid/Button';
 import { CurrentSpaceContext } from '../../store';
 import { contextMenuState, modalState, useContextMenu } from '../ContextMenu';
 import { UserContextMenu } from '../modals/ContextMenus';

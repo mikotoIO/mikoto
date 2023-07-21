@@ -22,6 +22,7 @@
     "jsx": "react-jsx",
     "paths": {
       // "@/*": ["./src/*"],
+      "@mikoto-io/lucid": ["../../packages/lucid/src/index.ts"],
       "mikotojs": ["../../packages/mikotojs/src/index.ts"]
     }
   },

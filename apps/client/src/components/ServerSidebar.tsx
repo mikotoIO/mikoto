@@ -1,4 +1,5 @@
 import { TextInput, Tooltip } from '@mantine/core';
+import { Button, Form, Input, Modal } from '@mikoto-io/lucid';
 import { AxiosError } from 'axios';
 import { Space } from 'mikotojs';
 import { useRef } from 'react';
@@ -11,10 +12,6 @@ import { env } from '../env';
 import { useMikoto } from '../hooks';
 import { useDeltaWithRedux } from '../hooks/useDelta';
 import { useErrorElement } from '../hooks/useErrorElement';
-import { Button } from '../lucid/Button';
-import { DialogPanel } from '../lucid/DialogPanel';
-import { Form } from '../lucid/Form';
-import { Input } from '../lucid/Input';
 import { useMikotoSelector } from '../redux';
 import { spaceActions } from '../redux/mikoto';
 import { treebarSpaceState, useTabkit } from '../store';
@@ -53,7 +50,7 @@ function InviteModal({ space }: { space: Space }) {
   const link = `${env.PUBLIC_FRONTEND_URL}/invite/${space.id}`;
 
   return (
-    <DialogPanel style={{ minWidth: '400px' }}>
+    <Modal style={{ minWidth: '400px' }}>
       <InviteModalWrapper>
         <h1>Invite Link</h1>
         <button
@@ -66,7 +63,7 @@ function InviteModal({ space }: { space: Space }) {
           {link}
         </button>
       </InviteModalWrapper>
-    </DialogPanel>
+    </Modal>
   );
 }
 
@@ -235,7 +232,7 @@ export function SpaceJoinModal() {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <DialogPanel>
+    <Modal>
       <SpaceJoinModalWrapper>
         <h1 className="inviteheader" style={{ marginTop: 0 }}>
           Create a Space
@@ -252,7 +249,7 @@ export function SpaceJoinModal() {
           }}
         />
       </SpaceJoinModalWrapper>
-    </DialogPanel>
+    </Modal>
   );
 }
 

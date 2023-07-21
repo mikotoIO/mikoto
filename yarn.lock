@@ -4472,6 +4472,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@khanacademy/simple-markdown@npm:^0.9.2":
+  version: 0.9.3
+  resolution: "@khanacademy/simple-markdown@npm:0.9.3"
+  dependencies:
+    "@types/react": ">=16.0.0"
+  peerDependencies:
+    react: 16.14.0
+    react-dom: 16.14.0
+  checksum: 059534793a78af8f9cecaec92e5673b968b19cb316e172341073d8020183702bcc66751ac4d4f2722fe7760607f99362f67100ffe5f752ee46cb01b320d19942
+  languageName: node
+  linkType: hard
+
 "@leichtgewicht/ip-codec@npm:^2.0.1":
   version: 2.0.4
   resolution: "@leichtgewicht/ip-codec@npm:2.0.4"
@@ -4699,6 +4711,21 @@ __metadata:
   checksum: 4b393907e39a1a75214f0314bf72a0adfa5e5adffd050dd5efe9c055b8549481a3cfc9f308c16dfb33311daf3ff63added7d5fd1fe52db614c004f886e0e559a
   languageName: node
   linkType: hard
+
+"@mikoto-io/lucid@workspace:packages/lucid":
+  version: 0.0.0-use.local
+  resolution: "@mikoto-io/lucid@workspace:packages/lucid"
+  dependencies:
+    "@headlessui/react": ^1.7.15
+    "@types/react": ^18.2.15
+    "@types/react-dom": ^18.2.7
+    typescript: ^5.1.6
+  peerDependencies:
+    react: "*"
+    react-dom: "*"
+    styled-components: "*"
+  languageName: unknown
+  linkType: soft
 
 "@mrmlnc/readdir-enhanced@npm:^2.2.1":
   version: 2.2.1
@@ -8635,6 +8662,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-dom@npm:^18.2.7":
+  version: 18.2.7
+  resolution: "@types/react-dom@npm:18.2.7"
+  dependencies:
+    "@types/react": "*"
+  checksum: e02ea908289a7ad26053308248d2b87f6aeafd73d0e2de2a3d435947bcea0422599016ffd1c3e38ff36c42f5e1c87c7417f05b0a157e48649e4a02f21727d54f
+  languageName: node
+  linkType: hard
+
 "@types/react-helmet@npm:^6.1.6":
   version: 6.1.6
   resolution: "@types/react-helmet@npm:6.1.6"
@@ -8720,6 +8756,17 @@ __metadata:
     "@types/scheduler": "*"
     csstype: ^3.0.2
   checksum: a6a5e8cc78f486b9020d1ad009aa6c56943c68c7c6376e0f8399e9cbcd950b7b8f5d73f00200f5379f5e58d31d57d8aed24357f301d8e86108cd438ce6c8b3dd
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:>=16.0.0, @types/react@npm:^18.2.15":
+  version: 18.2.15
+  resolution: "@types/react@npm:18.2.15"
+  dependencies:
+    "@types/prop-types": "*"
+    "@types/scheduler": "*"
+    csstype: ^3.0.2
+  checksum: 36989f638201bfe2f4110b06c119180f6df9c0e13d7060481e82e7a745f81745a01ae543c478a25b61e0767cb52e82da2ad5b0dedacabf99339e523d06176705
   languageName: node
   linkType: hard
 
@@ -12445,6 +12492,7 @@ __metadata:
     "@fortawesome/free-solid-svg-icons": ^6.3.0
     "@fortawesome/react-fontawesome": ^0.2.0
     "@headlessui/react": ^1.7.15
+    "@khanacademy/simple-markdown": ^0.9.2
     "@livekit/react-components": ^1.0.2
     "@livekit/react-core": ^1.0.2
     "@mantine/core": ^5.2.3

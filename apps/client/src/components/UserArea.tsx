@@ -11,7 +11,6 @@ import { Avatar } from './atoms/Avatar';
 
 const StyledSidebarInner = styled.div`
   display: grid;
-  grid-template-rows: 1fr 64px;
   height: 100%;
 `;
 
@@ -100,11 +99,33 @@ export function UserArea() {
   );
 }
 
+export function UserAreaAvatar() {
+  const mikoto = useMikoto();
+  const [user, setUser] = useRecoilState(userState);
+  const contextMenu = useContextMenu(() => <UserAreaMenu />, {
+    top: 48,
+    left: 80,
+  });
+  useEffect(() => {
+    mikoto.client.users.me().then(setUser);
+  }, []);
+
+  return (
+    user && (
+      <Avatar
+        size={28}
+        style={{ marginTop: '6px' }}
+        onClick={contextMenu}
+        src={user.avatar ?? undefined}
+      />
+    )
+  );
+}
+
 export function ExplorerWrapper({ children }: { children: React.ReactNode }) {
   return (
     <StyledSidebarInner>
       <div>{children}</div>
-      <UserArea />
     </StyledSidebarInner>
   );
 }

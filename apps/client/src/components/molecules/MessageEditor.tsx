@@ -13,6 +13,8 @@ const StyledEditable = styled(Editable)`
   border-radius: 4px;
   box-sizing: border-box;
   outline: none;
+  word-break: break-word;
+  min-height: auto !important;
 `;
 
 const initialEditorValue = [{ children: [{ text: '' }] }];
@@ -77,6 +79,7 @@ export function MessageEditor({
       onChange={(x) => setEditorValue(x)}
     >
       <StyledEditable
+        placeholder={placeholder}
         onKeyDown={(ev) => {
           if (serialize(editorValue).trim() === '') {
             return;

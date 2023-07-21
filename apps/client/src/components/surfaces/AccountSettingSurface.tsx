@@ -1,3 +1,4 @@
+import { Input, Form, Button, Buttons, Modal } from '@mikoto-io/lucid';
 import { useState } from 'react';
 import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
@@ -6,10 +7,6 @@ import styled from 'styled-components';
 
 import { useAuthClient, useMikoto } from '../../hooks';
 import { useErrorElement } from '../../hooks/useErrorElement';
-import { Button, Buttons } from '../../lucid/Button';
-import { DialogPanel } from '../../lucid/DialogPanel';
-import { Form } from '../../lucid/Form';
-import { Input } from '../../lucid/Input';
 import { SettingsView } from '../../views/SettingsViewTemplate';
 import { modalState } from '../ContextMenu';
 import { TabName } from '../TabBar';
@@ -55,7 +52,7 @@ export function PasswordChangeModal() {
   const error = useErrorElement();
 
   return (
-    <DialogPanel>
+    <Modal>
       <Form
         style={{ minWidth: 400 }}
         onSubmit={handleSubmit(async (form) => {
@@ -99,7 +96,7 @@ export function PasswordChangeModal() {
           Change Password
         </Button>
       </Form>
-    </DialogPanel>
+    </Modal>
   );
 }
 
@@ -141,7 +138,7 @@ function BotCreateModal() {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <DialogPanel>
+    <Modal>
       <Form
         onSubmit={handleSubmit(async (form) => {
           await authClient.createBot(form.name);
@@ -154,7 +151,7 @@ function BotCreateModal() {
           Create Bot
         </Button>
       </Form>
-    </DialogPanel>
+    </Modal>
   );
 }
 
@@ -223,6 +220,9 @@ export function Overview() {
           }}
         >
           Change Password
+        </Button>
+        <Button variant="warning" type="submit">
+          Log out of all devices
         </Button>
       </Buttons>
       <h2>Dangerous</h2>

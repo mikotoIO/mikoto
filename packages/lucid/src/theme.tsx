@@ -1,7 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
 
-import './fonts.css';
-
 export const neutrals = {
   N1200: 'hsl(220, 4%, 11%)', // darkest
   N1100: 'hsl(220, 4%, 15%)', // darkest
@@ -94,6 +92,16 @@ export const pinks = {
   P300: 'hsl(328, 95%, 80%)',
   P200: 'hsl(328, 95%, 85%)',
   P100: 'hsl(328, 95%, 90%)',
+};
+
+export const colors = {
+  neutrals,
+  purples,
+  blues,
+  greens,
+  yellows,
+  reds,
+  pinks,
 };
 
 export const theme = {

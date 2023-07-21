@@ -4,6 +4,7 @@ import {
   faMicrophone,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Form, Input, Button, Modal } from '@mikoto-io/lucid';
 import { Channel, Space } from 'mikotojs';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -13,10 +14,6 @@ import styled from 'styled-components';
 import { useMikoto } from '../hooks';
 import { useDeltaNext } from '../hooks/useDelta';
 import { useErrorElement } from '../hooks/useErrorElement';
-import { Button } from '../lucid/Button';
-import { DialogPanel } from '../lucid/DialogPanel';
-import { Form } from '../lucid/Form';
-import { Input } from '../lucid/Input';
 import { Tabable, treebarSpaceState, useTabkit } from '../store';
 import { ContextMenu, modalState, useContextMenuX } from './ContextMenu';
 import { ExplorerNext, NodeObject } from './ExplorerNext';
@@ -98,7 +95,7 @@ function CreateChannelModal({ channel }: { channel?: Channel }) {
   const error = useErrorElement();
 
   return (
-    <DialogPanel>
+    <Modal>
       <CreateChannelWrapper>
         <h1 style={{ margin: 0 }}>
           {channel ? 'Create Subchannel' : 'Create Channel'}
@@ -144,7 +141,7 @@ function CreateChannelModal({ channel }: { channel?: Channel }) {
           </Button>
         </Form>
       </CreateChannelWrapper>
-    </DialogPanel>
+    </Modal>
   );
 }
 

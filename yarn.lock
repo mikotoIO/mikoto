@@ -4712,6 +4712,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mikoto-io/lucid@workspace:packages/lucid":
+  version: 0.0.0-use.local
+  resolution: "@mikoto-io/lucid@workspace:packages/lucid"
+  dependencies:
+    "@headlessui/react": ^1.7.15
+    "@types/react": ^18.2.15
+    "@types/react-dom": ^18.2.7
+    typescript: ^5.1.6
+  peerDependencies:
+    react: "*"
+    react-dom: "*"
+    styled-components: "*"
+  languageName: unknown
+  linkType: soft
+
 "@mrmlnc/readdir-enhanced@npm:^2.2.1":
   version: 2.2.1
   resolution: "@mrmlnc/readdir-enhanced@npm:2.2.1"
@@ -8647,6 +8662,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-dom@npm:^18.2.7":
+  version: 18.2.7
+  resolution: "@types/react-dom@npm:18.2.7"
+  dependencies:
+    "@types/react": "*"
+  checksum: e02ea908289a7ad26053308248d2b87f6aeafd73d0e2de2a3d435947bcea0422599016ffd1c3e38ff36c42f5e1c87c7417f05b0a157e48649e4a02f21727d54f
+  languageName: node
+  linkType: hard
+
 "@types/react-helmet@npm:^6.1.6":
   version: 6.1.6
   resolution: "@types/react-helmet@npm:6.1.6"
@@ -8735,7 +8759,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:>=16.0.0":
+"@types/react@npm:>=16.0.0, @types/react@npm:^18.2.15":
   version: 18.2.15
   resolution: "@types/react@npm:18.2.15"
   dependencies:

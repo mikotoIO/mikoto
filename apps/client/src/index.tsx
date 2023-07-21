@@ -1,4 +1,5 @@
 import { MantineProvider } from '@mantine/core';
+import { GlobalStyle, theme } from '@mikoto-io/lucid';
 import * as Sentry from '@sentry/react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -8,8 +9,9 @@ import { Provider } from 'react-redux';
 import { RecoilRoot } from 'recoil';
 import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
+// eslint-disable-next-line import/no-relative-packages
+import '../../../packages/lucid/src/fonts.css';
 import App from './App';
-import { GlobalStyle, theme } from './lucid';
 import { store } from './redux';
 import reportWebVitals from './reportWebVitals';
 

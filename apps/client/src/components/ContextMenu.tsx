@@ -1,10 +1,9 @@
 import { Dialog } from '@headlessui/react';
+import { ModalBackdrop } from '@mikoto-io/lucid';
 import useEventListener from '@use-it/event-listener';
 import React, { useRef } from 'react';
 import { atom, useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
-
-import { ModalBackdrop } from '../lucid';
 
 interface Positions {
   top?: number;

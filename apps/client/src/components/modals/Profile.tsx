@@ -1,7 +1,7 @@
+import { Modal } from '@mikoto-io/lucid';
 import { User } from 'mikotojs';
 import styled from 'styled-components';
 
-import { Modal } from '../../lucid';
 import { Avatar } from '../atoms/Avatar';
 import { Tag } from '../atoms/BotTag';
 

@@ -1,8 +1,8 @@
+import { Form, Button, Buttons, Input, colors } from '@mikoto-io/lucid';
 import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';
 import { ViewContainer } from '../components/ViewContainer';
-import { Form, Button, Buttons, Input, colors } from '../lucid';
 
 // design a color palette component, using styled components
 interface Color {

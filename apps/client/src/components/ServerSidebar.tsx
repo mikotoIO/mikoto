@@ -1,4 +1,5 @@
 import { TextInput, Tooltip } from '@mantine/core';
+import { Button, Form, Input, Modal } from '@mikoto-io/lucid';
 import { AxiosError } from 'axios';
 import { Space } from 'mikotojs';
 import { useRef } from 'react';
@@ -11,7 +12,6 @@ import { env } from '../env';
 import { useMikoto } from '../hooks';
 import { useDeltaWithRedux } from '../hooks/useDelta';
 import { useErrorElement } from '../hooks/useErrorElement';
-import { Button, Form, Input, Modal } from '../lucid';
 import { useMikotoSelector } from '../redux';
 import { spaceActions } from '../redux/mikoto';
 import { treebarSpaceState, useTabkit } from '../store';

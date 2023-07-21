@@ -1,7 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
 
-import './fonts.css';
-
 export const neutrals = {
   N1200: 'hsl(220, 4%, 11%)', // darkest
   N1100: 'hsl(220, 4%, 15%)', // darkest

@@ -1,3 +1,4 @@
+import { Input, Form, Button, Buttons, Modal } from '@mikoto-io/lucid';
 import { useState } from 'react';
 import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
@@ -6,7 +7,6 @@ import styled from 'styled-components';
 
 import { useAuthClient, useMikoto } from '../../hooks';
 import { useErrorElement } from '../../hooks/useErrorElement';
-import { Input, Form, Button, Buttons, Modal } from '../../lucid';
 import { SettingsView } from '../../views/SettingsViewTemplate';
 import { modalState } from '../ContextMenu';
 import { TabName } from '../TabBar';

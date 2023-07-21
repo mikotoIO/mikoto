@@ -5,6 +5,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SegmentedControl, Switch } from '@mantine/core';
+import { Input, Form, Button, Buttons, Modal } from '@mikoto-io/lucid';
 import { Role, Space, Permissions } from 'mikotojs';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -12,7 +13,6 @@ import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../../hooks';
-import { Input, Form, Button, Buttons, Modal } from '../../../lucid';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
 import { modalState } from '../../ContextMenu';
 import { TabName } from '../../TabBar';

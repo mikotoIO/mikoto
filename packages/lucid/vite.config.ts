@@ -5,6 +5,7 @@ import { defineConfig } from 'vite';
 export default () =>
   defineConfig({
     build: {
+      sourcemap: true,
       lib: {
         entry: resolve(__dirname, 'src/index.ts'),
         name: '@mikoto-io/lucid',
@@ -12,7 +13,7 @@ export default () =>
         fileName: () => 'index.js',
       },
       rollupOptions: {
-        external: ['react', 'react-dom', 'styled-components'],
+        output: { interop: 'auto' },
       },
     },
     plugins: [

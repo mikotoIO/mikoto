@@ -1,7 +1,7 @@
 import type * as CSS from 'csstype';
 import styled from 'styled-components';
 
-type Dimension =
+export type Dimension =
   | number
   | string
   | undefined
@@ -14,7 +14,7 @@ type Dimension =
       bottom: number | string;
     }>;
 
-type Direction = 'top' | 'bottom' | 'left' | 'right';
+export type Direction = 'top' | 'bottom' | 'left' | 'right';
 
 function computeUnits(
   dim: Dimension,
@@ -72,7 +72,7 @@ export const Box = styled.div<BoxProps>((props) => ({
   ...props.mix?.reduce((acc, cur) => ({ ...acc, ...cur }), {}),
 }));
 
-interface GridProps {
+export interface GridProps {
   tcol?: string;
   trow?: string;
 }
@@ -83,7 +83,7 @@ export const Grid = styled(Box)<GridProps>((props) => ({
   gridTemplateRows: props.trow,
 }));
 
-interface FlexProps {
+export interface FlexProps {
   center?: boolean;
 }
 

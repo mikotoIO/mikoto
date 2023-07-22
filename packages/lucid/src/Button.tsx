@@ -32,7 +32,11 @@ const variantMap = {
   },
 };
 
-export const Button = styled.button<{ variant?: keyof typeof variantMap }>`
+interface ButtonProps {
+  variant: keyof typeof variantMap;
+}
+
+export const Button = styled.button<Partial<ButtonProps>>`
   background-color: ${(p) => variantMap[p.variant!].backgroundColor};
 
   color: ${(p) => variantMap[p.variant!].color};

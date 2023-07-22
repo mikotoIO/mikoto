@@ -44,18 +44,19 @@ function unitToPixel(unit?: string | number): string | undefined {
 }
 
 export interface BoxProps {
-  m?: Dimension;
-  p?: Dimension;
-  w?: number | string;
-  h?: number | string;
-  bg?: string;
-  txt?: string;
-  fs?: number;
-  mix?: CSS.Properties[];
-  rounded?: number | string;
+  m: Dimension;
+  p: Dimension;
+  w: number | string;
+  h: number | string;
+  bg: string;
+  txt: string;
+  fs: number;
+  mix: CSS.Properties[];
+  rounded: number | string;
+  gap: number | string;
 }
 
-export const Box = styled.div<BoxProps>((props) => ({
+export const Box = styled.div<Partial<BoxProps>>((props) => ({
   marginTop: unitToPixel(computeUnits(props.m, 'top')),
   marginBottom: unitToPixel(computeUnits(props.m, 'bottom')),
   marginLeft: unitToPixel(computeUnits(props.m, 'left')),
@@ -68,32 +69,31 @@ export const Box = styled.div<BoxProps>((props) => ({
 
   width: unitToPixel(props.w),
   height: unitToPixel(props.h),
-  backgroundColor: `var(--${props.bg})`,
-  color: `var(--${props.txt})`,
+  backgroundColor: props.bg && `var(--${props.bg})`,
+  color: props.txt && `var(--${props.txt})`,
   fontSize: unitToPixel(props.fs),
   ...props.mix?.reduce((acc, cur) => ({ ...acc, ...cur }), {}),
   borderRadius: unitToPixel(props.rounded),
-}));
-
-export interface GridProps {
-  tcol?: string;
-  trow?: string;
-  gap?: number | string;
-}
-
-export const Grid = styled(Box)<GridProps>((props) => ({
-  display: 'grid',
-  gridTemplateColumns: props.tcol,
-  gridTemplateRows: props.trow,
   gap: unitToPixel(props.gap),
 }));
 
-export interface FlexProps {
-  dir?: 'row' | 'column';
-  center?: boolean;
+export interface GridProps {
+  tcol: string;
+  trow: string;
 }
 
-export const Flex = styled(Box)<FlexProps>((props) => ({
+export const Grid = styled(Box)<Partial<GridProps>>((props) => ({
+  display: 'grid',
+  gridTemplateColumns: props.tcol,
+  gridTemplateRows: props.trow,
+}));
+
+export interface FlexProps {
+  dir: 'row' | 'column';
+  center: boolean;
+}
+
+export const Flex = styled(Box)<Partial<FlexProps>>((props) => ({
   display: 'flex',
   flexDirection: props.dir,
   alignItems: props.center ? 'center' : undefined,

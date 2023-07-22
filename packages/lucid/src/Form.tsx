@@ -1,7 +1,10 @@
 import styled from 'styled-components';
 
-export const Form = styled.form`
-  display: grid;
+import { Grid } from './Layout';
+
+export const Form = styled(Grid).attrs(() => ({
+  as: 'form',
+}))`
   grid-gap: 8px;
   padding: 16px 0;
 `;

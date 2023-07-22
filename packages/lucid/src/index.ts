@@ -4,4 +4,4 @@ export * from './Input';
 export * from './Layout';
 export * from './Modal';
 
-export { theme, colors, GlobalStyle } from './theme';
+export { theme, colors, GlobalStyle, LucidProvider } from './theme';

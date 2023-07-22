@@ -75,12 +75,14 @@ export const Box = styled.div<BoxProps>((props) => ({
 export interface GridProps {
   tcol?: string;
   trow?: string;
+  gap?: number | string;
 }
 
 export const Grid = styled(Box)<GridProps>((props) => ({
   display: 'grid',
   gridTemplateColumns: props.tcol,
   gridTemplateRows: props.trow,
+  gap: unitToPixel(props.gap),
 }));
 
 export interface FlexProps {

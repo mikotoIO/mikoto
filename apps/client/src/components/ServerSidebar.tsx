@@ -1,4 +1,4 @@
-import { TextInput, Tooltip } from '@mantine/core';
+import { Tooltip } from '@mantine/core';
 import { Button, Form, Input, Modal } from '@mikoto-io/lucid';
 import { AxiosError } from 'axios';
 import { Space } from 'mikotojs';
@@ -171,29 +171,6 @@ function SpaceCreateForm({ closeModal }: { closeModal: () => void }) {
         Create Space
       </Button>
     </Form>
-  );
-}
-
-function CreateSpaceModal() {
-  const mikoto = useMikoto();
-  const setModal = useSetRecoilState(modalState);
-  const form = useForm();
-
-  return (
-    <form
-      onSubmit={form.handleSubmit(async (data) => {
-        await mikoto.client.spaces.create(data.spaceName);
-        setModal(null);
-        form.reset();
-      })}
-    >
-      <TextInput
-        label="Space Name"
-        placeholder="Awesomerino Space"
-        {...form.register('spaceName')}
-      />
-      <Button type="submit">Create Space</Button>
-    </form>
   );
 }
 

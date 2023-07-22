@@ -1,6 +1,6 @@
-import { Anchor } from '@mantine/core';
 import { Turnstile } from '@marsidev/react-turnstile';
 import {
+  Anchor,
   Box,
   Button,
   Form,
@@ -76,10 +76,10 @@ export function LoginView() {
         <Button variant="primary" type="submit">
           Log In
         </Button>
-        <Anchor to="/register" component={Link}>
+        <Anchor to="/register" as={Link}>
           Register
         </Anchor>
-        <Anchor to="/forgotpassword" component={Link}>
+        <Anchor to="/forgotpassword" as={Link}>
           Forgot Password?
         </Anchor>
       </Form>
@@ -116,7 +116,7 @@ export function RegisterView() {
         <Button variant="primary" type="submit">
           Register
         </Button>
-        <Anchor to="/login" component={Link}>
+        <Anchor to="/login" as={Link}>
           Log In
         </Anchor>
         <Captcha />

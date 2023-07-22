@@ -44,25 +44,27 @@ function unitToPixel(unit?: string | number): string | undefined {
 }
 
 export interface BoxProps {
-  margin?: Dimension;
-  padding?: Dimension;
+  m?: Dimension;
+  p?: Dimension;
   w?: number | string;
   h?: number | string;
   bg?: string;
   txt?: string;
   fs?: number;
   mix?: CSS.Properties[];
+  rounded?: number | string;
 }
 
 export const Box = styled.div<BoxProps>((props) => ({
-  marginTop: unitToPixel(computeUnits(props.margin, 'top')),
-  marginBottom: unitToPixel(computeUnits(props.margin, 'bottom')),
-  marginLeft: unitToPixel(computeUnits(props.margin, 'left')),
-  marginRight: unitToPixel(computeUnits(props.margin, 'right')),
-  paddingTop: unitToPixel(computeUnits(props.padding, 'top')),
-  paddingBottom: unitToPixel(computeUnits(props.padding, 'bottom')),
-  paddingLeft: unitToPixel(computeUnits(props.padding, 'left')),
-  paddingRight: unitToPixel(computeUnits(props.padding, 'right')),
+  marginTop: unitToPixel(computeUnits(props.m, 'top')),
+  marginBottom: unitToPixel(computeUnits(props.m, 'bottom')),
+  marginLeft: unitToPixel(computeUnits(props.m, 'left')),
+  marginRight: unitToPixel(computeUnits(props.m, 'right')),
+  paddingTop: unitToPixel(computeUnits(props.p, 'top')),
+  paddingBottom: unitToPixel(computeUnits(props.p, 'bottom')),
+  paddingLeft: unitToPixel(computeUnits(props.p, 'left')),
+  paddingRight: unitToPixel(computeUnits(props.p, 'right')),
+  boxSizing: 'border-box',
 
   width: unitToPixel(props.w),
   height: unitToPixel(props.h),
@@ -70,6 +72,7 @@ export const Box = styled.div<BoxProps>((props) => ({
   color: `var(--${props.txt})`,
   fontSize: unitToPixel(props.fs),
   ...props.mix?.reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+  borderRadius: unitToPixel(props.rounded),
 }));
 
 export interface GridProps {
@@ -86,14 +89,22 @@ export const Grid = styled(Box)<GridProps>((props) => ({
 }));
 
 export interface FlexProps {
+  dir?: 'row' | 'column';
   center?: boolean;
 }
 
 export const Flex = styled(Box)<FlexProps>((props) => ({
   display: 'flex',
+  flexDirection: props.dir,
   alignItems: props.center ? 'center' : undefined,
   justifyContent: props.center ? 'center' : undefined,
 }));
+
+export const Image = styled(Box)``;
+
+Image.defaultProps = {
+  as: 'img',
+};
 
 export function defineMix(props: CSS.Properties) {
   return props;
@@ -101,9 +112,9 @@ export function defineMix(props: CSS.Properties) {
 
 export function backgroundMix(image: string) {
   return defineMix({
-    background: `url(${image}) no-repeat center center fixed`,
-    backgroundSize: 'cover',
+    background: `url(${image}) no-repeat center center`,
     WebkitBackgroundSize: 'cover',
     MozBackgroundSize: 'cover',
+    backgroundSize: 'cover',
   });
 }

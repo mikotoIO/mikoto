@@ -8,7 +8,7 @@ export default () =>
       lib: {
         entry: resolve(__dirname, 'src/index.ts'),
         name: '@mikoto-io/lucid',
-        formats: ['umd'],
+        formats: ['es'],
         fileName: () => 'index.js',
       },
     },

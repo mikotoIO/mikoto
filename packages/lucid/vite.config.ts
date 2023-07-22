@@ -14,6 +14,7 @@ export default () =>
       },
       rollupOptions: {
         output: { interop: 'auto' },
+        external: ['react', 'react-dom', 'styled-components'],
       },
     },
     plugins: [

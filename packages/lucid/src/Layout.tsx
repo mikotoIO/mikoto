@@ -68,7 +68,7 @@ export const Box = styled.div<BoxProps>((props) => ({
   height: unitToPixel(props.h),
   backgroundColor: `var(--${props.bg})`,
   color: `var(--${props.txt})`,
-  fontSize: props.fs,
+  fontSize: unitToPixel(props.fs),
   ...props.mix?.reduce((acc, cur) => ({ ...acc, ...cur }), {}),
 }));
 

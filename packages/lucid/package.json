@@ -1,13 +1,13 @@
 {
   "name": "@mikoto-io/lucid",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "main": "dist/index.js",
   "types": "dist/src/index.d.ts",
   "license": "MIT",
   "peerDependencies": {
     "react": "*",
     "react-dom": "*",
-    "styled-components": "*"
+    "styled-components": ">= 6"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.15",
@@ -20,6 +20,7 @@
     "@types/react-dom": "^18.2.7",
     "babel-plugin-styled-components": "^2.1.4",
     "csstype": "^3.1.2",
+    "styled-components": "^6.0.5",
     "typescript": "^5.1.6"
   },
   "scripts": {

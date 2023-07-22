@@ -1,13 +1,7 @@
 import { Dialog } from '@headlessui/react';
-import type {} from '@headlessui/react';
-import styled, { StyledComponent } from 'styled-components';
+import styled, { IStyledComponent } from 'styled-components';
 
-export type StyledModalType = StyledComponent<
-  typeof Dialog.Panel,
-  any,
-  {},
-  never
->;
+export type StyledModalType = IStyledComponent<'web', typeof Dialog.Panel>;
 
 // absolute center
 export const Modal: StyledModalType = styled(Dialog.Panel)`

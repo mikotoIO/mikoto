@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core';
-import { GlobalStyle, theme } from '@mikoto-io/lucid';
+import { GlobalStyle, LucidProvider, theme } from '@mikoto-io/lucid';
 import * as Sentry from '@sentry/react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -40,7 +40,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <SilentRecoilRoot>
     <Provider store={store}>
       <StyleSheetManager disableCSSOMInjection>
-        <ThemeProvider theme={theme}>
+        <LucidProvider>
           <MantineProvider theme={{ colorScheme: 'dark' }}>
             <DndProvider backend={HTML5Backend}>
               <>
@@ -49,7 +49,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               </>
             </DndProvider>
           </MantineProvider>
-        </ThemeProvider>
+        </LucidProvider>
       </StyleSheetManager>
     </Provider>
   </SilentRecoilRoot>,

@@ -1,4 +1,9 @@
-import { createGlobalStyle } from 'styled-components';
+import isPropValid from '@emotion/is-prop-valid';
+import {
+  StyleSheetManager,
+  ThemeProvider,
+  createGlobalStyle,
+} from 'styled-components';
 
 export const neutrals = {
   N1200: 'hsl(220, 4%, 11%)', // darkest
@@ -169,3 +174,16 @@ export const GlobalStyle = createGlobalStyle`
     border-radius: 4px;
   }
 `;
+
+export function LucidProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <StyleSheetManager shouldForwardProp={isPropValid}>
+      <ThemeProvider theme={theme}>
+        <>
+          <GlobalStyle />
+          {children}
+        </>
+      </ThemeProvider>
+    </StyleSheetManager>
+  );
+}

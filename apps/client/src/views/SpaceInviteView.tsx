@@ -1,4 +1,4 @@
-import { Button } from '@mikoto-io/lucid';
+import { Button, Flex, Grid, backgroundMix } from '@mikoto-io/lucid';
 import { useAsync } from 'react-async-hook';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -6,26 +6,6 @@ import styled from 'styled-components';
 import { StyledSpaceIcon } from '../components/atoms/SpaceIcon';
 import { Spinner } from '../components/atoms/Spinner';
 import { useMikoto } from '../hooks';
-
-const bgUrl = '/images/artworks/1.jpg';
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: 400px 1fr;
-  height: 100vh;
-`;
-
-const Background = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: url(${bgUrl}) no-repeat center center fixed;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
-`;
 
 const InvitationBox = styled.div`
   display: flex;
@@ -55,7 +35,7 @@ export function SpaceInviteViewInner() {
   );
 
   return (
-    <Grid>
+    <Grid tcol="400px 1fr" h="100vh">
       <InvitationBox>
         {space ? (
           <>
@@ -78,7 +58,7 @@ export function SpaceInviteViewInner() {
           <Spinner />
         )}
       </InvitationBox>
-      <Background />
+      <Flex mix={[backgroundMix('/images/artworks/1.jpg')]} center />
     </Grid>
   );
 }

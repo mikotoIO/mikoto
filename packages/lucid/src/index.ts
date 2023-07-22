@@ -1,6 +1,7 @@
-export { Button, Buttons } from './Button';
-export { Form } from './Form';
-export { Input } from './Input';
-export { Modal, ModalBackdrop } from './Modal';
+export * from './Button';
+export * from './Form';
+export * from './Input';
+export * from './Layout';
+export * from './Modal';
 
 export { theme, colors, GlobalStyle } from './theme';

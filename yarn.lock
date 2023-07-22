@@ -4712,13 +4712,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mikoto-io/lucid@workspace:packages/lucid":
+"@mikoto-io/lucid@*, @mikoto-io/lucid@workspace:packages/lucid":
   version: 0.0.0-use.local
   resolution: "@mikoto-io/lucid@workspace:packages/lucid"
   dependencies:
     "@headlessui/react": ^1.7.15
     "@types/react": ^18.2.15
     "@types/react-dom": ^18.2.7
+    csstype: ^3.1.2
     typescript: ^5.1.6
   peerDependencies:
     react: "*"
@@ -12500,6 +12501,7 @@ __metadata:
     "@mantine/modals": ^5.2.3
     "@marsidev/react-turnstile": ^0.2.2
     "@mdx-js/react": ^1.6.22
+    "@mikoto-io/lucid": "*"
     "@reduxjs/toolkit": ^1.9.5
     "@sentry/react": ^7.51.0
     "@storybook/addon-actions": ^6.5.16
@@ -13794,7 +13796,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"csstype@npm:^3.0.2":
+"csstype@npm:^3.0.2, csstype@npm:^3.1.2":
   version: 3.1.2
   resolution: "csstype@npm:3.1.2"
   checksum: e1a52e6c25c1314d6beef5168da704ab29c5186b877c07d822bd0806717d9a265e8493a2e35ca7e68d0f5d472d43fac1cdce70fd79fd0853dff81f3028d857b5

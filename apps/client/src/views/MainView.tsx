@@ -1,5 +1,6 @@
 import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Grid } from '@mikoto-io/lucid';
 import { Space } from 'mikotojs';
 import React, { useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -66,9 +67,7 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
   }
 }
 
-const LeftBar = styled.div`
-  display: grid;
-  grid-template-rows: 40px auto;
+const LeftBar = styled(Grid)`
   .top {
     display: flex;
     background-color: var(--N1000);
@@ -97,7 +96,7 @@ function AppView() {
   return (
     <AppWindow>
       <AppContainer>
-        <LeftBar>
+        <LeftBar trow="40px auto">
           <div className="top">
             <TabBarButton
               onClick={() => {

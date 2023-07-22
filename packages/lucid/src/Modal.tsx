@@ -1,8 +1,16 @@
 import { Dialog } from '@headlessui/react';
-import styled from 'styled-components';
+import type {} from '@headlessui/react';
+import styled, { StyledComponent } from 'styled-components';
+
+export type StyledModalType = StyledComponent<
+  typeof Dialog.Panel,
+  any,
+  {},
+  never
+>;
 
 // absolute center
-export const Modal = styled(Dialog.Panel)`
+export const Modal: StyledModalType = styled(Dialog.Panel)`
   background-color: ${(p) => p.theme.colors.N800};
   color: ${(p) => p.theme.colors.N0};
   position: absolute;

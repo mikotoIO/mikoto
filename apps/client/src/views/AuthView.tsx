@@ -1,6 +1,13 @@
 import { Anchor } from '@mantine/core';
 import { Turnstile } from '@marsidev/react-turnstile';
-import { Button, Form, Input } from '@mikoto-io/lucid';
+import {
+  Box,
+  Button,
+  Form,
+  Grid,
+  Input,
+  backgroundMix,
+} from '@mikoto-io/lucid';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -9,12 +16,6 @@ import styled from 'styled-components';
 import { useErrorElement } from '../hooks/useErrorElement';
 import { authClient } from '../store/authClient';
 
-const AuthViewContainer = styled.div`
-  height: 100vh;
-  display: grid;
-  grid-template-columns: 520px auto;
-`;
-
 const AuthViewInner = styled.div`
   color: white;
   background-color: ${(p) => p.theme.colors.N800};
@@ -22,13 +23,6 @@ const AuthViewInner = styled.div`
     width: 300px;
     margin: 0 auto;
   }
-`;
-
-const bgImageUrl = '/images/artworks/1.jpg';
-
-const BackgroundArt = styled.div`
-  background: url('${bgImageUrl}') no-repeat center center fixed;
-  background-size: cover;
 `;
 
 const Logo = styled.img`
@@ -44,13 +38,13 @@ function Captcha() {
 
 export function AuthView({ children }: { children: React.ReactNode }) {
   return (
-    <AuthViewContainer>
+    <Grid tcol="520px auto" h="100vh">
       <AuthViewInner>
         <Logo src="/logo.svg" />
         {children}
       </AuthViewInner>
-      <BackgroundArt />
-    </AuthViewContainer>
+      <Box mix={[backgroundMix('/images/artworks/1.jpg')]} />
+    </Grid>
   );
 }
 

@@ -16,6 +16,7 @@
     "@mantine/hooks": "^6.0.16",
     "@mantine/modals": "^5.2.3",
     "@marsidev/react-turnstile": "^0.2.2",
+    "@mikoto-io/lucid": "*",
     "@reduxjs/toolkit": "^1.9.5",
     "@sentry/react": "^7.51.0",
     "@testing-library/jest-dom": "^5.16.5",

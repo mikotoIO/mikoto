@@ -1,5 +1,6 @@
 import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Grid } from '@mikoto-io/lucid';
 import { Space } from 'mikotojs';
 import React, { useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -10,8 +11,7 @@ import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
 import { Explorer } from '../components/Explorer';
 import { ServerSidebar } from '../components/ServerSidebar';
 import { TabBarButton, TabbedView } from '../components/TabBar';
-import { ExplorerWrapper, UserAreaAvatar } from '../components/UserArea';
-import { Avatar } from '../components/atoms/Avatar';
+import { UserAreaAvatar } from '../components/UserArea';
 import { Sidebar } from '../components/sidebars/Base';
 import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
 import { AccountSettingsSurface } from '../components/surfaces/AccountSettingSurface';
@@ -67,9 +67,7 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
   }
 }
 
-const LeftBar = styled.div`
-  display: grid;
-  grid-template-rows: 40px auto;
+const LeftBar = styled(Grid)`
   .top {
     display: flex;
     background-color: var(--N1000);
@@ -98,7 +96,7 @@ function AppView() {
   return (
     <AppWindow>
       <AppContainer>
-        <LeftBar>
+        <LeftBar trow="40px auto">
           <div className="top">
             <TabBarButton
               onClick={() => {
@@ -125,9 +123,7 @@ function AppView() {
                   }));
                 }}
               >
-                <ExplorerWrapper>
-                  {space && <Explorer space={space} />}
-                </ExplorerWrapper>
+                {space && <Explorer space={space} />}
               </Sidebar>
             )}
           </div>

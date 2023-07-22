@@ -1,5 +1,6 @@
 import { faX, faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Flex, Grid } from '@mikoto-io/lucid';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Helmet } from 'react-helmet';
@@ -7,7 +8,6 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import {
-  rightBarOpenState,
   Tabable,
   tabbedState,
   TabContext,
@@ -16,25 +16,8 @@ import {
 } from '../store';
 import { getTabIcon, IconBox } from './atoms/IconBox';
 
-const StyledTabbedView = styled.div`
-  flex: 1;
-  background-color: ${(p) => p.theme.colors.N1000};
-  display: grid;
-  height: 100%;
-  grid-template-rows: 40px calc(100% - 40px);
-`;
-
-const StyledTabBar = styled.div`
-  font-size: 14px;
-  height: 40px;
-  display: flex;
-`;
-
-const StyledCloseButton = styled.div<{ active?: boolean }>`
+const StyledCloseButton = styled(Flex)<{ active?: boolean }>`
   margin-left: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border-radius: 4px;
   width: 20px;
   height: 20px;
@@ -63,7 +46,6 @@ const StyledTab = styled.div<{ active?: boolean }>`
     background-color: ${(p) => p.theme.colors.N700};
   }
 
-  // ${(p) => p.active && 'border-left: 4px solid #3b83ff;'}
   border-right: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
@@ -165,6 +147,7 @@ function Tab({ tab, index }: TabProps) {
       <IconBox size={20} icon={getTabIcon(tab)} />
       <div>{tabName}</div>
       <StyledCloseButton
+        center
         active={active}
         onClick={(ev) => {
           ev.stopPropagation(); // close button shouldn't reset tab index
@@ -238,9 +221,9 @@ export function TabbedView({ children, tabs }: TabbedViewProps) {
   });
 
   return (
-    <StyledTabbedView>
+    <Grid trow="40px calc(100% - 40px)" h="100%" bg="N1000" style={{ flex: 1 }}>
       <Helmet titleTemplate="Mikoto | %s" defaultTitle="Mikoto" />
-      <StyledTabBar>
+      <Flex h={40} fs={14}>
         {tabs.map((tab, index) => (
           <Tab tab={tab} index={index} key={`${tab.kind}/${tab.key}`} />
         ))}
@@ -255,8 +238,8 @@ export function TabbedView({ children, tabs }: TabbedViewProps) {
         >
           <FontAwesomeIcon icon={faBarsStaggered} />
         </TabBarButton>
-      </StyledTabBar>
+      </Flex>
       {tabs.length ? children : <WelcomeToMikoto />}
-    </StyledTabbedView>
+    </Grid>
   );
 }

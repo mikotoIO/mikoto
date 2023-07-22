@@ -11,6 +11,9 @@ export default () =>
         formats: ['es'],
         fileName: () => 'index.js',
       },
+      rollupOptions: {
+        external: ['react', 'react-dom', 'styled-components'],
+      },
     },
     plugins: [
       react({

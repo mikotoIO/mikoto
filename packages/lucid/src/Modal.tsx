@@ -1,10 +1,21 @@
 import { Dialog } from '@headlessui/react';
 import styled, { IStyledComponent } from 'styled-components';
 
-export type StyledModalType = IStyledComponent<'web', typeof Dialog.Panel>;
+type FastOmit<T extends object, U extends string | number | symbol> = {
+  [K in keyof T as K extends U ? never : K]: T[K];
+};
 
 // absolute center
-export const Modal: StyledModalType = styled(Dialog.Panel)`
+export const Modal: IStyledComponent<
+  'web',
+  FastOmit<
+    React.DetailedHTMLProps<
+      React.HTMLAttributes<HTMLDivElement>,
+      HTMLDivElement
+    >,
+    never
+  >
+> = styled(Dialog.Panel)`
   background-color: ${(p) => p.theme.colors.N800};
   color: ${(p) => p.theme.colors.N0};
   position: absolute;

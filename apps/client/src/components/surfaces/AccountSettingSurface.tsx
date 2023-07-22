@@ -1,4 +1,13 @@
-import { Input, Form, Button, Buttons, Modal } from '@mikoto-io/lucid';
+import {
+  Input,
+  Form,
+  Button,
+  Buttons,
+  Modal,
+  Box,
+  backgroundMix,
+  Flex,
+} from '@mikoto-io/lucid';
 import { useState } from 'react';
 import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
@@ -17,26 +26,13 @@ import {
   uploadFileWithAxios,
 } from '../molecules/AvatarEditor';
 
-const bgUrl = 'https://i1.sndcdn.com/visuals-000328863415-MJdwB0-t2480x520.jpg';
+const bgUrl = '/images/artworks/1.jpg';
 
-const Banner = styled.div`
-  border-radius: 8px;
-  background-color: ${(p) => p.theme.colors.B700};
-  height: 160px;
-  background: url('${bgUrl}') no-repeat center center;
-  background-size: cover;
-`;
-
-const AccountInfo = styled.div`
-  border-radius: 8px;
-  background-color: ${(p) => p.theme.colors.N900};
-  width: 100%;
+const AccountInfo = styled(Box)`
   max-width: 600px;
 `;
 
-const Content = styled.div`
-  padding: 16px;
-  display: flex;
+const Content = styled(Flex)`
   align-items: center;
   h2 {
     margin-left: 32px;
@@ -189,9 +185,9 @@ export function Overview() {
     <SettingsView>
       <TabName name="Account Settings" />
       <h1>My Account</h1>
-      <AccountInfo>
-        <Banner />
-        <Content>
+      <AccountInfo rounded={8} bg="N900" w="100%">
+        <Box txt="B700" h={160} mix={[backgroundMix(bgUrl)]} rounded={8} />
+        <Content p={16}>
           <AvatarEditor
             avatar={user?.avatar ?? undefined}
             onDrop={async (file) => {

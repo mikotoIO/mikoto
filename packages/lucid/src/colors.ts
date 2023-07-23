@@ -1,6 +1,9 @@
 import parseCSSColor from 'parse-css-color';
 
 export function transparency(color: string, alpha: number) {
-  const [r, g, b] = parseCSSColor(color)!.values;
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  const {
+    type,
+    values: [r, g, b],
+  } = parseCSSColor(color)!;
+  return `${type}a(${r}, ${g}, ${b}, ${alpha})`;
 }

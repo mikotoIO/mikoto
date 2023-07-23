@@ -41,14 +41,16 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Provider store={store}>
       <StyleSheetManager disableCSSOMInjection>
         <LucidProvider>
-          <MantineProvider theme={{ colorScheme: 'dark' }}>
-            <DndProvider backend={HTML5Backend}>
-              <>
-                <GlobalStyle />
-                <App />
-              </>
-            </DndProvider>
-          </MantineProvider>
+          <ThemeProvider theme={theme}>
+            <MantineProvider theme={{ colorScheme: 'dark' }}>
+              <DndProvider backend={HTML5Backend}>
+                <>
+                  <GlobalStyle />
+                  <App />
+                </>
+              </DndProvider>
+            </MantineProvider>
+          </ThemeProvider>
         </LucidProvider>
       </StyleSheetManager>
     </Provider>

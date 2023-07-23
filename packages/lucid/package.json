@@ -1,6 +1,6 @@
 {
   "name": "@mikoto-io/lucid",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "main": "dist/index.js",
   "types": "dist/src/index.d.ts",
   "license": "MIT",

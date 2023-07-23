@@ -1,5 +1,6 @@
 export * from './Anchor';
 export * from './Button';
+export * from './colors';
 export * from './Form';
 export * from './Heading';
 export * from './Input';

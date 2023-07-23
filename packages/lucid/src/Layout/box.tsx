@@ -54,6 +54,7 @@ export type BoxProps = Partial<{
   mix: CSS.Properties[];
   rounded: number | string;
   gap: number | string;
+  tf: string[];
 }>;
 
 export const boxCss = css<BoxProps>((props) => ({
@@ -75,4 +76,5 @@ export const boxCss = css<BoxProps>((props) => ({
   ...props.mix?.reduce((acc, cur) => ({ ...acc, ...cur }), {}),
   borderRadius: unitToPixel(props.rounded),
   gap: unitToPixel(props.gap),
+  transform: props.tf?.join(' '),
 }));

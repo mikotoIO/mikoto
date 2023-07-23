@@ -36,18 +36,23 @@ const variantMap = {
 
 export type ButtonProps = Partial<{
   variant: keyof typeof variantMap;
+  transparent: boolean;
 }>;
 
 export const Button = styled.button<ButtonProps & BoxProps>`
   ${boxCss}
-  background-color: ${(p) => variantMap[p.variant!].backgroundColor};
+  background-color: ${(p) =>
+    p.transparent ? 'transparent' : variantMap[p.variant!].backgroundColor};
 
-  color: ${(p) => variantMap[p.variant!].color};
+  color: ${(p) =>
+    p.transparent
+      ? variantMap[p.variant!].backgroundColor
+      : variantMap[p.variant!].color};
   font-weight: bolder;
   border: none;
 
   &:hover {
-    box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.1);
   }
   transition: box-shadow 0.1s ease-in-out;
   cursor: pointer;

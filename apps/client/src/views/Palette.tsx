@@ -83,7 +83,13 @@ export function DesignStory() {
             Warning Button
           </Button>
           <Button variant="danger" type="button">
-            Danger Button
+            Danger Buttons
+          </Button>
+        </Buttons>
+
+        <Buttons>
+          <Button variant="primary" type="button" transparent>
+            Transparent button
           </Button>
         </Buttons>
       </Form>

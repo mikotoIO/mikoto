@@ -31,7 +31,9 @@ export const Flex = styled.div<FlexProps & BoxProps>`
   ${(p) => p.center && `align-items: center; justify-content: center;`}
 `;
 
-export const Image = styled.img`
+type ImageProps = Partial<{}>;
+
+export const Image = styled.img<ImageProps & BoxProps>`
   ${boxCss}
 `;
 Image.defaultProps = { as: 'img' };

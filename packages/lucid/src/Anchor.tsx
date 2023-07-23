@@ -1,8 +1,9 @@
 import styled from 'styled-components';
 
-import { Box } from './Layout';
+import { Box, BoxProps } from './Layout';
 
-export const Anchor = styled(Box)`
+export const Anchor = styled.a<BoxProps>`
+  ${Box}
   color: var(--B500);
 `;
 

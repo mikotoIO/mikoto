@@ -36,7 +36,7 @@ const AppWindow = styled.div`
 
 const AppContainer = styled.div`
   overflow: hidden;
-  background-color: ${(p) => p.theme.colors.N900};
+  background-color: var(--N900);
   color: white;
   display: flex;
   flex-direction: row;

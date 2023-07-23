@@ -1,5 +1,5 @@
 import type * as CSS from 'csstype';
-import styled, { css } from 'styled-components';
+import { css } from 'styled-components';
 
 export type Dimension =
   | number
@@ -76,49 +76,3 @@ export const boxCss = css<BoxProps>((props) => ({
   borderRadius: unitToPixel(props.rounded),
   gap: unitToPixel(props.gap),
 }));
-
-export const Box = styled.div<BoxProps>`
-  ${boxCss}
-`;
-
-export interface GridProps {
-  tcol: string;
-  trow: string;
-}
-
-export const Grid = styled(Box)<Partial<GridProps>>((props) => ({
-  display: 'grid',
-  gridTemplateColumns: props.tcol,
-  gridTemplateRows: props.trow,
-}));
-
-export interface FlexProps {
-  dir: 'row' | 'column';
-  center: boolean;
-}
-
-export const Flex = styled(Box)<Partial<FlexProps>>((props) => ({
-  display: 'flex',
-  flexDirection: props.dir,
-  alignItems: props.center ? 'center' : undefined,
-  justifyContent: props.center ? 'center' : undefined,
-}));
-
-export const Image = styled(Box)``;
-
-Image.defaultProps = {
-  as: 'img',
-};
-
-export function defineMix(props: CSS.Properties) {
-  return props;
-}
-
-export function backgroundMix(image: string) {
-  return defineMix({
-    background: `url(${image}) no-repeat center center`,
-    WebkitBackgroundSize: 'cover',
-    MozBackgroundSize: 'cover',
-    backgroundSize: 'cover',
-  });
-}

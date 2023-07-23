@@ -1,5 +1,5 @@
 import type * as CSS from 'csstype';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export type Dimension =
   | number
@@ -43,7 +43,7 @@ function unitToPixel(unit?: string | number): string | undefined {
   return unit;
 }
 
-export interface BoxProps {
+export type BoxProps = Partial<{
   m: Dimension;
   p: Dimension;
   w: number | string;
@@ -54,9 +54,9 @@ export interface BoxProps {
   mix: CSS.Properties[];
   rounded: number | string;
   gap: number | string;
-}
+}>;
 
-export const Box = styled.div<Partial<BoxProps>>((props) => ({
+export const boxCss = css<BoxProps>((props) => ({
   marginTop: unitToPixel(computeUnits(props.m, 'top')),
   marginBottom: unitToPixel(computeUnits(props.m, 'bottom')),
   marginLeft: unitToPixel(computeUnits(props.m, 'left')),
@@ -76,6 +76,10 @@ export const Box = styled.div<Partial<BoxProps>>((props) => ({
   borderRadius: unitToPixel(props.rounded),
   gap: unitToPixel(props.gap),
 }));
+
+export const Box = styled.div<BoxProps>`
+  ${boxCss}
+`;
 
 export interface GridProps {
   tcol: string;

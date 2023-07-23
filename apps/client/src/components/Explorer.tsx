@@ -59,7 +59,7 @@ const CreateChannelWrapper = styled.div`
 `;
 
 const ChannelTypeButton = styled.button<{ active?: boolean }>`
-  background-color: ${(p) => p.theme.colors.N900};
+  background-color: var(--N900);
   border: 2px solid
     ${(p) => (p.active ? p.theme.colors.B700 : p.theme.colors.N600)};
   color: ${(p) => p.theme.colors.N100};

@@ -3,7 +3,11 @@ import parseCSSColor from 'parse-css-color';
 export function transparency(color: string, alpha: number) {
   const {
     type,
-    values: [r, g, b],
+    values: [a, b, c],
   } = parseCSSColor(color)!;
-  return `${type}a(${r}, ${g}, ${b}, ${alpha})`;
+  if (type === 'rgb') {
+    return `rgba(${a}, ${b}, ${c}, ${alpha})`;
+  }
+  // hsl
+  return `hsla(${a}, ${b}%, ${c}%, ${alpha})`;
 }

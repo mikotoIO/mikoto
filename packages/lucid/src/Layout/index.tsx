@@ -42,9 +42,12 @@ export function defineMix(props: CSS.Properties) {
   return props;
 }
 
-export function backgroundMix(image: string) {
+export function backgroundMix(image: string, overlayColor?: string) {
   return defineMix({
-    background: `url(${image}) no-repeat center center`,
+    background: overlayColor
+      ? `linear-gradient(${overlayColor}, ${overlayColor}) 0% 0% / cover, 
+      url(${image}) no-repeat center center`
+      : `url(${image}) no-repeat center center`,
     WebkitBackgroundSize: 'cover',
     MozBackgroundSize: 'cover',
     backgroundSize: 'cover',

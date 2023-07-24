@@ -3,6 +3,7 @@ import {
   Anchor,
   Box,
   Button,
+  Flex,
   Form,
   Grid,
   Input,
@@ -25,11 +26,24 @@ const AuthViewInner = styled.div`
   }
 `;
 
-const Logo = styled.img`
-  width: 80px;
-  display: block;
-  margin: 100px auto 20px;
+const StyledLogo = styled.img`
+  width: 72px;
 `;
+
+function Logo() {
+  return (
+    <Flex
+      center
+      bg="N1100"
+      w={128}
+      h={128}
+      rounded={32}
+      m={{ x: 'auto', bottom: 20 }}
+    >
+      <StyledLogo src="/logo/logo-mono.svg" />
+    </Flex>
+  );
+}
 
 // not always a real captcha
 function Captcha() {
@@ -40,8 +54,10 @@ export function AuthView({ children }: { children: React.ReactNode }) {
   return (
     <Grid tcol="520px auto" h="100vh">
       <AuthViewInner>
-        <Logo src="/logo.svg" />
-        {children}
+        <Flex center dir="column" h="100%">
+          <Logo />
+          {children}
+        </Flex>
       </AuthViewInner>
       <Box mix={[backgroundMix('/images/artworks/1.jpg')]} />
     </Grid>

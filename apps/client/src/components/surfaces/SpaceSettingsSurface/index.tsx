@@ -1,11 +1,4 @@
-import {
-  faCheck,
-  faGripLinesVertical,
-  faX,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { SegmentedControl, Switch } from '@mantine/core';
-import { Input, Form, Button, Buttons, Modal } from '@mikoto-io/lucid';
+import { Input, Form, Button, Buttons, Modal, Toggle } from '@mikoto-io/lucid';
 import { Role, Space, Permissions } from 'mikotojs';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -21,11 +14,6 @@ import {
   mediaServerAxios,
   uploadFileWithAxios,
 } from '../../molecules/AvatarEditor';
-
-const Sidebar = styled.div`
-  padding: 16px;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
-`;
 
 const SidebarButton = styled.a<{ selected?: boolean }>`
   display: block;
@@ -124,38 +112,6 @@ const RoleEditorGrid = styled.div`
 
 const RoleList = styled.div``;
 
-function TriStateSelector() {
-  const [value, setValue] = useState<string>('U');
-
-  return (
-    <SegmentedControl
-      value={value}
-      onChange={setValue}
-      color={
-        {
-          Y: 'green',
-          U: 'gray',
-          N: 'red',
-        }[value]
-      }
-      data={[
-        {
-          value: 'Y',
-          label: <FontAwesomeIcon icon={faCheck} width={32} />,
-        },
-        {
-          value: 'U',
-          label: <FontAwesomeIcon icon={faGripLinesVertical} width={32} />,
-        },
-        {
-          value: 'N',
-          label: <FontAwesomeIcon icon={faX} width={32} />,
-        },
-      ]}
-    />
-  );
-}
-
 const PermissionBox = styled.div`
   display: flex;
   justify-content: space-between;
@@ -182,16 +138,7 @@ function RolePermissionEditor({
       {rolePermissionData.map((x) => (
         <PermissionBox key={x.permission.toString()}>
           <h3>{x.name}</h3>
-          <Switch
-            size="lg"
-            checked={Permissions.check(x.permission, roleInt)}
-            onChange={() => {
-              // eslint-disable-next-line no-bitwise
-              const newVal = x.permission ^ roleInt;
-              setRoleInt(newVal);
-              onChange?.(newVal.toString());
-            }}
-          />
+          <Toggle />
         </PermissionBox>
       ))}
     </div>

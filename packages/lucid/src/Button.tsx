@@ -56,6 +56,10 @@ export const Button = styled.button<ButtonProps & BoxProps>`
   }
   transition: box-shadow 0.1s ease-in-out;
   cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  gap: 0.6em;
 
   ${boxCss}
 `;
@@ -64,7 +68,7 @@ Button.defaultProps = {
   as: 'button',
   variant: 'default',
   p: {
-    x: 20,
+    x: 16,
     y: 12,
   },
   fs: 14,

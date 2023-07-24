@@ -1,4 +1,6 @@
-import { Form, Button, Buttons, Input, colors } from '@mikoto-io/lucid';
+import { faChevronRight, faStar } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Form, Button, Buttons, Input, colors, Toggle } from '@mikoto-io/lucid';
 import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';
@@ -75,6 +77,7 @@ export function DesignStory() {
           <Button type="button">Default Button</Button>
           <Button variant="primary" type="button">
             Primary Button
+            <FontAwesomeIcon icon={faStar} />
           </Button>
           <Button variant="success" type="button">
             Success Button
@@ -83,15 +86,17 @@ export function DesignStory() {
             Warning Button
           </Button>
           <Button variant="danger" type="button">
-            Danger Buttons
+            Danger Button
           </Button>
         </Buttons>
 
         <Buttons>
           <Button variant="primary" type="button" transparent>
             Transparent button
+            <FontAwesomeIcon icon={faChevronRight} />
           </Button>
         </Buttons>
+        <Toggle />
       </Form>
     </ViewContainer>
   );

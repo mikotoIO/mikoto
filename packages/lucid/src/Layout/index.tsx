@@ -13,10 +13,10 @@ export type GridProps = Partial<{
 }>;
 
 export const Grid = styled.div<GridProps & BoxProps>`
-  ${boxCss}
   display: grid;
   ${(p) => p.tcol && `grid-template-columns: ${p.tcol};`}
   ${(p) => p.trow && `grid-template-rows: ${p.trow};`}
+  ${boxCss}
 `;
 
 export type FlexProps = Partial<{
@@ -25,10 +25,10 @@ export type FlexProps = Partial<{
 }>;
 
 export const Flex = styled.div<FlexProps & BoxProps>`
-  ${boxCss}
   display: flex;
   ${(p) => p.dir && `flex-direction: ${p.dir};`}
   ${(p) => p.center && `align-items: center; justify-content: center;`}
+  ${boxCss}
 `;
 
 type ImageProps = Partial<{}>;

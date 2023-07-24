@@ -40,7 +40,6 @@ export type ButtonProps = Partial<{
 }>;
 
 export const Button = styled.button<ButtonProps & BoxProps>`
-  ${boxCss}
   background-color: ${(p) =>
     p.transparent ? 'transparent' : variantMap[p.variant!].backgroundColor};
 
@@ -50,19 +49,26 @@ export const Button = styled.button<ButtonProps & BoxProps>`
       : variantMap[p.variant!].color};
   font-weight: bolder;
   border: none;
+  text-decoration: none;
 
   &:hover {
     box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.1);
   }
   transition: box-shadow 0.1s ease-in-out;
   cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  gap: 0.6em;
+
+  ${boxCss}
 `;
 
 Button.defaultProps = {
   as: 'button',
   variant: 'default',
   p: {
-    x: 20,
+    x: 16,
     y: 12,
   },
   fs: 14,

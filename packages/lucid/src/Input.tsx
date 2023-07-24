@@ -1,6 +1,9 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
+import { Switch } from '@headlessui/react';
 import React from 'react';
 import styled from 'styled-components';
+
+import { BoxProps, boxCss } from './Layout';
 
 export const SInput = styled.input`
   height: 44px;
@@ -13,6 +16,7 @@ export const SInput = styled.input`
   color: ${(p) => p.theme.colors.N200};
   background-color: ${(p) => p.theme.colors.N1100};
   outline: none;
+  ${boxCss}
 `;
 
 const Label = styled.label`
@@ -26,7 +30,8 @@ const Label = styled.label`
 
 type InputProps = {
   labelName?: string;
-} & React.InputHTMLAttributes<HTMLInputElement>;
+} & BoxProps &
+  React.InputHTMLAttributes<HTMLInputElement>;
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ labelName, ...props }, ref) => {
@@ -41,3 +46,44 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     );
   },
 );
+
+type ToggleProps = Partial<{
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}>;
+
+const StyledToggle = styled(Switch)`
+  outline: none;
+  border: none;
+  border-radius: 40px;
+  width: 60px;
+  height: 30px;
+  display: flex;
+  background-color: var(--N1000);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+
+  &[data-headlessui-state='checked'] {
+    background-color: var(--B700);
+  }
+`;
+
+const ToggleInner = styled.div<{ checked: boolean }>`
+  display: flex;
+  transition: 0.2s;
+  transform: ${(p) => (p.checked ? 'translateX(60%)' : 'translateX(-60%)')};
+  height: 75%;
+  aspect-ratio: 1 / 1;
+  border-radius: 40px;
+  background-color: var(--N0);
+`;
+
+export function Toggle({ checked, onChange }: ToggleProps) {
+  return (
+    <StyledToggle checked={checked} onChange={onChange}>
+      {(c) => <ToggleInner checked={c.checked} />}
+    </StyledToggle>
+  );
+}

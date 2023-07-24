@@ -5,9 +5,8 @@
       <rect x="1554" y="647" width="1118" height="1103"/>
     </clipPath>
     <linearGradient id="color-0" bx:pinned="true">
-      <stop style="stop-color: rgb(52, 233, 173);" offset="0"/>
-      <stop style="stop-color: rgb(39, 109, 250);" offset="0.5"/>
-      <stop style="stop-color: rgb(177, 28, 229);" offset="1"/>
+      <stop style="stop-color: #22c0ff;" offset="0"/>
+      <stop style="stop-color: #3b6cff;" offset="1"/>
     </linearGradient>
     <linearGradient id="color-0-0" gradientTransform="matrix(1.081493, 0.604023, -0.476126, 0.875841, -0.035653, 0.158319)" xlink:href="#color-0"/>
   </defs>

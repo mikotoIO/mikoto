@@ -81,6 +81,12 @@ export interface MessageDeleteEvent {
   messageId: string;
   channelId: string;
 }
+export interface RoleEditPayload {
+  name: string | null;
+  color: string | null;
+  permissions: string | null;
+  position: number | null;
+}
 export interface VoiceToken {
   url: string;
   channelId: string;
@@ -190,6 +196,11 @@ export abstract class AbstractMemberService {
     userId: string,
     roleIds: MemberUpdateOptions
   ): Promise<Member>;
+  abstract delete(
+    ctx: SophonInstance<SophonContext>,
+    spaceId: string,
+    userId: string
+  ): Promise<void>;
 }
 
 export class UserServiceSender {
@@ -317,6 +328,21 @@ export abstract class AbstractRoleService {
   public constructor(protected sophonCore: SophonCore<SophonContext>) {
     this.$ = (room) => new RoleServiceSender(sophonCore.senderCore, room);
   }
+
+  abstract create(
+    ctx: SophonInstance<SophonContext>,
+    spaceId: string,
+    name: string
+  ): Promise<Role>;
+  abstract edit(
+    ctx: SophonInstance<SophonContext>,
+    id: string,
+    edit: RoleEditPayload
+  ): Promise<Role>;
+  abstract delete(
+    ctx: SophonInstance<SophonContext>,
+    id: string
+  ): Promise<void>;
 }
 
 export class VoiceServiceSender {

@@ -77,6 +77,12 @@ export interface MessageDeleteEvent {
   messageId: string;
   channelId: string;
 }
+export interface RoleEditPayload {
+  name: string | null;
+  color: string | null;
+  permissions: string | null;
+  position: number | null;
+}
 export interface VoiceToken {
   url: string;
   channelId: string;
@@ -187,6 +193,9 @@ export class MemberServiceClient {
   ): Promise<Member> {
     return this.socket.call("members/update", spaceId, userId, roleIds);
   }
+  delete(spaceId: string, userId: string): Promise<void> {
+    return this.socket.call("members/delete", spaceId, userId);
+  }
 }
 
 export class UserServiceClient {
@@ -268,6 +277,15 @@ export class MessageServiceClient {
 
 export class RoleServiceClient {
   constructor(private socket: SocketClient) {}
+  create(spaceId: string, name: string): Promise<Role> {
+    return this.socket.call("roles/create", spaceId, name);
+  }
+  edit(id: string, edit: RoleEditPayload): Promise<Role> {
+    return this.socket.call("roles/edit", id, edit);
+  }
+  delete(id: string): Promise<void> {
+    return this.socket.call("roles/delete", id);
+  }
 }
 
 export class VoiceServiceClient {

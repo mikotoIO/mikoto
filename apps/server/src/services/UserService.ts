@@ -6,6 +6,7 @@ import {
   AbstractMemberService,
   AbstractUserService,
   MemberUpdateOptions,
+  SophonContext,
   UserUpdateOptions,
 } from './schema';
 
@@ -87,6 +88,17 @@ export class MemberService extends AbstractMemberService {
       roleIds: member.roles.map((x) => x.id),
       ...member,
     };
+  }
+
+  // kick
+  async delete(
+    ctx: SophonInstance<SophonContext>,
+    spaceId: string,
+    userId: string,
+  ): Promise<void> {
+    await prisma.spaceUser.delete({
+      where: { userId_spaceId: { userId, spaceId } },
+    });
   }
 }
 

@@ -159,7 +159,17 @@ service MessageService {
   ack(channelId: string, timestamp: string): void;
 }
 
+struct RoleEditPayload {
+  name: string?;
+  color: string?;
+  permissions: string?;
+  position: int?;
+}
+
 service RoleService {
+  create(spaceId: string, name: string): Role;
+  edit(id: string, edit: RoleEditPayload): Role;
+  delete(id: string);
 }
 
 struct VoiceToken {

@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { SophonCore, SophonInstance } from '@sophon-js/server';
 import { ForbiddenError, NotFoundError } from 'routing-controllers';
 
@@ -49,10 +50,7 @@ export class SpaceService extends AbstractSpaceService {
           create: [{ name: '@everyone', position: 0, permissions: '0' }],
         },
       },
-      include: {
-        channels: true,
-        roles: true,
-      },
+      include: spaceInclude,
     });
     await joinSpace(
       this.sophonCore,

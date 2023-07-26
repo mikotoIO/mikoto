@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { SophonCore, SophonInstance } from '@sophon-js/server';
 import { ForbiddenError, NotFoundError } from 'routing-controllers';
 
@@ -14,8 +15,8 @@ import {
 
 const spaceInclude = {
   channels: true,
-  roles: true,
-};
+  roles: { orderBy: { position: 'desc' } },
+} satisfies Prisma.SpaceInclude;
 
 export class SpaceService extends AbstractSpaceService {
   async get(ctx: SophonInstance, id: string) {
@@ -46,13 +47,10 @@ export class SpaceService extends AbstractSpaceService {
         channels: { create: [{ name: 'general', order: 0 }] },
         ownerId: ctx.data.user.sub,
         roles: {
-          create: [{ name: '@everyone', position: 0, permissions: '0' }],
+          create: [{ name: '@everyone', position: -1, permissions: '0' }],
         },
       },
-      include: {
-        channels: true,
-        roles: true,
-      },
+      include: spaceInclude,
     });
     await joinSpace(
       this.sophonCore,

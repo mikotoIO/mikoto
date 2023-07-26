@@ -1,5 +1,4 @@
-import { Dialog } from '@headlessui/react';
-import { ModalBackdrop } from '@mikoto-io/lucid';
+import { ModalView } from '@mikoto-io/lucid';
 import useEventListener from '@use-it/event-listener';
 import React, { useRef } from 'react';
 import { atom, useRecoilState, useSetRecoilState } from 'recoil';
@@ -157,14 +156,13 @@ export function ModalKit() {
 
   // opened={modal !== null}
   return (
-    <Dialog
+    <ModalView
       open={modal !== null}
       onClose={() => {
         setModal(null);
       }}
     >
-      <ModalBackdrop />
       {modal?.elem}
-    </Dialog>
+    </ModalView>
   );
 }

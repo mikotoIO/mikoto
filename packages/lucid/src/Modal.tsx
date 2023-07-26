@@ -24,3 +24,18 @@ export const ModalBackdrop = styled.div`
   width: 100vw;
   height: 100vh;
 `;
+
+export interface ModalViewProps {
+  children: React.ReactNode;
+  open?: boolean;
+  onClose?: () => void;
+}
+
+export function ModalView({ children, open, onClose }: ModalViewProps) {
+  return (
+    <Dialog open={open} onClose={() => onClose?.()}>
+      <ModalBackdrop />
+      {children}
+    </Dialog>
+  );
+}

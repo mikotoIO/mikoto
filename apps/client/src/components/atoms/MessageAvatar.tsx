@@ -108,7 +108,13 @@ const StyledPlusBadge = styled.div`
   font-size: 12px;
 `;
 
-function AvatarContextMenu({ user, space }: { user: User; space?: Space }) {
+export function MemberContextMenu({
+  user,
+  space,
+}: {
+  user: User;
+  space?: Space;
+}) {
   const mikoto = useMikoto();
   const [member, setMember] = useState<Member | null>(null);
   const setModal = useSetRecoilState(modalState);
@@ -192,7 +198,7 @@ export function MessageAvatar({ src, user, size }: MessageAvatarProps) {
 
         setContextMenu({
           position: { top, left: right + 8 },
-          elem: <AvatarContextMenu user={user} space={space} />,
+          elem: <MemberContextMenu user={user} space={space} />,
         });
       }}
     />

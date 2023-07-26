@@ -12,6 +12,7 @@ import {
   mediaServerAxios,
   uploadFileWithAxios,
 } from '../../molecules/AvatarEditor';
+import { EmojiSubsurface } from './Emojis';
 import { RolesSubsurface } from './Roles';
 
 function AddBotModal() {
@@ -89,12 +90,14 @@ function SettingSwitch({ nav, space }: { nav: string; space: Space }) {
       return <Invites space={space} />;
     case 'Roles':
       return <RolesSubsurface space={space} />;
+    case 'Emojis':
+      return <EmojiSubsurface />;
     default:
       return null;
   }
 }
 
-const CATEGORIES = ['Overview', 'Invites', 'Roles'];
+const CATEGORIES = ['Overview', 'Invites', 'Roles', 'Emojis'];
 
 export function SpaceSettingsView({ space }: { space: Space }) {
   const [nav, setNav] = useState('Overview');

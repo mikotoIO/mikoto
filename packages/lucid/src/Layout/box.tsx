@@ -43,6 +43,13 @@ function unitToPixel(unit?: string | number): string | undefined {
   return unit;
 }
 
+function computeColor(color: string): string {
+  if (/^[A-Z]\d+$/i.test(color)) {
+    return `var(--${color})`;
+  }
+  return color;
+}
+
 export type BoxProps = Partial<{
   m: Dimension;
   p: Dimension;
@@ -70,8 +77,8 @@ export const boxCss = css<BoxProps>((props) => ({
 
   width: unitToPixel(props.w),
   height: unitToPixel(props.h),
-  backgroundColor: props.bg && `var(--${props.bg})`,
-  color: props.txt && `var(--${props.txt})`,
+  backgroundColor: props.bg && computeColor(props.bg),
+  color: props.txt && computeColor(props.txt),
   fontSize: unitToPixel(props.fs),
   ...props.mix?.reduce((acc, cur) => ({ ...acc, ...cur }), {}),
   borderRadius: unitToPixel(props.rounded),

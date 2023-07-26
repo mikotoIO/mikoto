@@ -1,4 +1,6 @@
 /* eslint-disable no-bitwise */
+import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   Box,
   Flex,
@@ -18,6 +20,7 @@ import styled from 'styled-components';
 
 import { useMikoto } from '../../../hooks';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
+import { useContextMenu } from '../../ContextMenu';
 
 const SidebarButton = styled.a<{ selected?: boolean }>`
   display: block;
@@ -58,18 +61,48 @@ type ColorPickerProps = Partial<{
   onChange: (x: string | null) => void;
 }>;
 
+const defaultColors = [
+  '#F80688',
+  '#AD0DF2',
+  '#006FFF',
+  '#00D68B',
+  '#FF981A',
+  '#f72649',
+];
+
 function RoleColorPicker({ value, onChange }: ColorPickerProps) {
+  const menu = useContextMenu(() => (
+    <StyledColorPicker color={value ?? '#006FFF'} onChange={onChange} />
+  ));
   return (
     <Flex p={{ y: 16 }} gap={8}>
-      {/* <Box>
-        <Box
-          w={64}
-          h={64}
-          rounded={8}
-          style={{ backgroundColor: value ?? undefined }}
-        />
-      </Box> */}
-      <StyledColorPicker color={value ?? '#ffffff'} onChange={onChange} />
+      <Box w={64} h={64} bg={value ?? 'N400'} rounded={4} onClick={menu} />
+      <Flex
+        center
+        fs={32}
+        w={64}
+        h={64}
+        bg="N300"
+        txt="N400"
+        rounded={4}
+        onClick={() => {
+          onChange?.(null);
+        }}
+      >
+        <FontAwesomeIcon icon={faCircleXmark} />
+      </Flex>
+      <Flex gap={8}>
+        {defaultColors.map((x) => (
+          <Box
+            w={32}
+            h={32}
+            bg={x}
+            rounded={4}
+            key={x}
+            onClick={() => onChange?.(x)}
+          />
+        ))}
+      </Flex>
     </Flex>
   );
 }
@@ -121,18 +154,18 @@ function RoleEditor({ role, space }: { space: Space; role: Role }) {
   const form = useForm({
     defaultValues: {
       name: role.name,
-      color: role.color,
       position: role.position,
     },
   });
   const [perms, setPerms] = useState(role.permissions);
+  const [color, setColor] = useState<string | null>(role.color);
 
   return (
     <StyledRoleEditor
       p={16}
       h="100%"
       onSubmit={form.handleSubmit((d) => {
-        const data = { ...d, permissions: perms };
+        const data = { ...d, permissions: perms, color };
         mikoto.client.roles.edit(role.id, data).then((x) => {
           console.log(x);
         });
@@ -148,12 +181,7 @@ function RoleEditor({ role, space }: { space: Space; role: Role }) {
             type="number"
             {...form.register('position', { valueAsNumber: true })}
           />
-          <RoleColorPicker
-            value={form.getValues('color')}
-            onChange={(v) => {
-              form.setValue('color', v);
-            }}
-          />
+          <RoleColorPicker value={color} onChange={setColor} />
         </>
       )}
 
@@ -162,6 +190,9 @@ function RoleEditor({ role, space }: { space: Space; role: Role }) {
         <Button variant="primary" type="submit">
           Save Changes
         </Button>
+        {role.name !== '@everyone' && (
+          <Button variant="danger">Delete Role</Button>
+        )}
       </Buttons>
     </StyledRoleEditor>
   );
@@ -175,7 +206,7 @@ export function RolesSubsurface({ space }: { space: Space }) {
   const role = space.roles.find((x) => x.id === selectedRoleId);
   // const role = rolesDelta.data.find((x) => x.id === selectedRoleId);
   return (
-    <SettingsView>
+    <SettingsView style={{ paddingRight: 0 }}>
       <Grid w="100%" h="100%" tcol="200px auto">
         <Box>
           <Button
@@ -187,18 +218,16 @@ export function RolesSubsurface({ space }: { space: Space }) {
           >
             New Role
           </Button>
-          {[...space.roles]
-            .sort((a, b) => b.position - a.position)
-            .map((r) => (
-              <SidebarButton
-                key={r.id}
-                selected={selectedRoleId === r.id}
-                onClick={() => setSelectedRoleId(r.id)}
-              >
-                <ColorDot color={r.color ?? undefined} />
-                {r.name}
-              </SidebarButton>
-            ))}
+          {space.roles.map((r) => (
+            <SidebarButton
+              key={r.id}
+              selected={selectedRoleId === r.id}
+              onClick={() => setSelectedRoleId(r.id)}
+            >
+              <ColorDot color={r.color ?? undefined} />
+              {r.name}
+            </SidebarButton>
+          ))}
         </Box>
         {role && <RoleEditor role={role} space={space} key={role.id} />}
       </Grid>

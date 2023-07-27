@@ -156,7 +156,7 @@ function RealMessageView({ channel }: { channel: Channel }) {
         ts.filter((y) => y.member.user.id !== x.author?.id),
       );
       mikoto.client.messages
-        .ack(channel.id, `${new Date().getTime()}`)
+        .ack(channel.id, `${new Date().toString()}`)
         .then(() => {});
       setScrollToBottom(true);
       return [...xs, x];

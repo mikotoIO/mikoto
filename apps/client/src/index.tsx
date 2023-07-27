@@ -12,6 +12,7 @@ import { StyleSheetManager, ThemeProvider } from 'styled-components';
 // eslint-disable-next-line import/no-relative-packages
 import '../../../packages/lucid/src/fonts.css';
 import App from './App';
+import './i18n';
 import { store } from './redux';
 import reportWebVitals from './reportWebVitals';
 

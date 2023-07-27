@@ -1,0 +1,24 @@
+{
+  "accountSettings": {
+    "title": "계정 설정",
+    "general": {
+      "title": "사용자",
+      "authentication": "계정 인증",
+      "dangerous": "위험",
+      "changePassword": "비밀번호 변경",
+      "logOutOfAllDevices": "모든 기기에서 로그아웃",
+      "deleteAccount": "계정 삭제"
+    },
+    "bots": {
+      "title": "개발자 설정",
+      "createBot": "봇 추가"
+    },
+    "language": {
+      "title": "언어"
+    }
+  },
+  "spaceSettings": {
+    "spaceOverview": "공간 설정",
+    "settingsForSpace": "{{name}} 설정"
+  }
+}

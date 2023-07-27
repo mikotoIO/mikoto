@@ -1,11 +1,13 @@
+/* eslint-disable react/prop-types */
+
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { Switch } from '@headlessui/react';
+import { Switch, Listbox } from '@headlessui/react';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { BoxProps, boxCss } from './Layout';
 
-export const SInput = styled.input`
+const baseInputCss = css`
   height: 44px;
   font-size: 16px;
   border: none;
@@ -16,6 +18,10 @@ export const SInput = styled.input`
   color: ${(p) => p.theme.colors.N200};
   background-color: ${(p) => p.theme.colors.N1100};
   outline: none;
+`;
+
+export const SInput = styled.input`
+  ${baseInputCss}
   ${boxCss}
 `;
 
@@ -46,6 +52,57 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     );
   },
 );
+
+type SelectProps = {
+  labelName?: string;
+  children?: React.ReactNode;
+};
+
+const BaseSelectInput = React.forwardRef<HTMLSelectElement, SelectProps>(
+  ({ labelName, children }, ref) => {
+    if (!labelName) {
+      return <Listbox />;
+    }
+    return (
+      <Label>
+        <div className="label">{labelName}</div>
+        <Listbox ref={ref}>{children}</Listbox>
+      </Label>
+    );
+  },
+);
+
+const StyledSelectInputButton = styled(Listbox.Button)`
+  ${baseInputCss}
+  ${boxCss}
+`;
+
+export function SelectInputButton(
+  props: React.HTMLAttributes<HTMLButtonElement>,
+) {
+  return <StyledSelectInputButton {...props} />;
+}
+
+export function SelectInputOptions(
+  props: React.HTMLAttributes<HTMLUListElement>,
+) {
+  return <Listbox.Options {...props} />;
+}
+
+export function SelectInputOption(
+  props: React.LiHTMLAttributes<HTMLLIElement> & {
+    disabled?: boolean | undefined;
+    value: string;
+  },
+) {
+  return <Listbox.Option {...props} />;
+}
+
+export const SelectInput = Object.assign(BaseSelectInput, {
+  Button: SelectInputButton,
+  Options: SelectInputOptions,
+  Option: SelectInputOption,
+});
 
 type ToggleProps = Partial<{
   checked: boolean;

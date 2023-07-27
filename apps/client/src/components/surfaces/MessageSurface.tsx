@@ -155,6 +155,9 @@ function RealMessageView({ channel }: { channel: Channel }) {
       setCurrentTypers((ts) =>
         ts.filter((y) => y.member.user.id !== x.author?.id),
       );
+      mikoto.client.messages
+        .ack(channel.id, `${new Date().toString()}`)
+        .then(() => {});
       setScrollToBottom(true);
       return [...xs, x];
     });

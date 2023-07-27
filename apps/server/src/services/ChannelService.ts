@@ -200,11 +200,20 @@ export class MessageService extends AbstractMessageService {
     channelId: string,
     timestamp: string,
   ) {
-    await prisma.channelUnread.create({
-      data: {
+    await prisma.channelUnread.upsert({
+      create: {
         channelId,
         userId: ctx.data.user.sub,
         timestamp: new Date(timestamp),
+      },
+      update: {
+        timestamp: new Date(timestamp),
+      },
+      where: {
+        channelId_userId: {
+          channelId,
+          userId: ctx.data.user.sub,
+        },
       },
     });
   }

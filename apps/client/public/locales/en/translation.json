@@ -1,0 +1,24 @@
+{
+  "accountSettings": {
+    "title": "Account Settings",
+    "general": {
+      "title": "My Account",
+      "authentication": "Authentication",
+      "dangerous": "Dangerous Actions",
+      "changePassword": "Change Password",
+      "logOutOfAllDevices": "Log out of all devices",
+      "deleteAccount": "Delete Account"
+    },
+    "bots": {
+      "title": "Bots and API",
+      "createBot": "Create Bot"
+    },
+    "language": {
+      "title": "Language"
+    }
+  },
+  "spaceSettings": {
+    "spaceOverview": "Space Overview",
+    "settingsForSpace": "Settings for {{name}}"
+  }
+}

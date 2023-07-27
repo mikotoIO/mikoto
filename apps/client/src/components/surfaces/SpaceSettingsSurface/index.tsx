@@ -1,6 +1,7 @@
 import { Input, Form, Button, Buttons, Modal } from '@mikoto-io/lucid';
 import { Space } from 'mikotojs';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSetRecoilState } from 'recoil';
 
 import { useMikoto } from '../../../hooks';
@@ -27,15 +28,20 @@ function AddBotModal() {
 }
 
 function Overview({ space }: { space: Space }) {
+  const { t } = useTranslation();
   const [spaceName, setSpaceName] = useState(space.name);
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
 
   return (
     <SettingsView>
-      <TabName name={`Settings for ${space.name}`} />
+      <TabName
+        name={t('spaceSettings.settingsForSpace', {
+          name: space.name,
+        })}
+      />
       <Form>
-        <h1>Space Overview</h1>
+        <h1>{t('spaceSettings.spaceOverview')}</h1>
         <AvatarEditor
           onDrop={async (file) => {
             const { data } = await uploadFileWithAxios<{ url: string }>(

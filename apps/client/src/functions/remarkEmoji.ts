@@ -8,6 +8,7 @@ export function remarkEmoji(): Plugin {
   return (tree) => {
     findAndReplace(tree, REGEX, (all, text) => {
       if (nameToEmoji[text]) {
+        
         const url = `https://abs.twimg.com/emoji/v2/svg/${nameToEmoji[text]
           .codePointAt(0)
           ?.toString(16)}.svg`;

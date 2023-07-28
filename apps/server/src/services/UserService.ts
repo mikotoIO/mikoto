@@ -60,6 +60,7 @@ export class MemberService extends AbstractMemberService {
     userId: string,
     options: MemberUpdateOptions,
   ) {
+    // Compares the old roleIds with the new roleIds and connects/disconnects them
     // TODO: probably a cleaner method to do this
 
     const roleIds = new Set(options.roleIds);

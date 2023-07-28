@@ -30,6 +30,9 @@ model User {
   Account       Account?
   Bot           Bot?
   Bots          Bot[]           @relation("Bots")
+
+  alphaRelation Relationship[] @relation("AlphaRelation")
+  betaRelation  Relationship[] @relation("BetaRelation")
 }
 
 // factor out email and password
@@ -92,17 +95,25 @@ model Role {
   @@index([spaceId])
 }
 
+enum SpaceType {
+  NONE // regular
+  DM
+  GROUP
+}
+
 model Space {
-  id      String  @id @default(uuid()) @db.Uuid
+  id      String    @id @default(uuid()) @db.Uuid
   name    String
   icon    String?
-  ownerId String? @db.Uuid
-  owner   User?   @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId String?   @db.Uuid
+  owner   User?     @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  type    SpaceType @default(NONE)
 
-  users    SpaceUser[]
-  channels Channel[]
-  roles    Role[]
-  Invite   Invite[]
+  users        SpaceUser[]
+  channels     Channel[]
+  roles        Role[]
+  Invite       Invite[]
+  Relationship Relationship?
 }
 
 model Channel {
@@ -168,4 +179,28 @@ model Invite {
   id      String @id @default(uuid()) @db.Uuid
   spaceId String @db.Uuid
   space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+}
+
+model Relationship {
+  id        String @id @default(uuid()) @db.Uuid
+  alphaId   String @db.Uuid
+  alphaUser User?  @relation("AlphaRelation", fields: [alphaId], references: [id], onDelete: NoAction)
+  betaId    String @db.Uuid
+  betaUser  User?  @relation("BetaRelation", fields: [betaId], references: [id], onDelete: NoAction)
+
+  // yes, every DM gets their own space
+  spaceId String @unique @db.Uuid
+  space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  aToB RelationState
+  bTOA RelationState
+
+  @@unique([alphaId, betaId])
+  @@index([betaId])
+}
+
+enum RelationState {
+  NONE
+  FRIEND
+  BLOCKED
 }

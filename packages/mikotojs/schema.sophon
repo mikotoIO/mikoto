@@ -60,6 +60,7 @@ service MainService {
   messages: MessageService;
   roles: RoleService;
   voice: VoiceService;
+  relations: RelationService;
 }
 
 struct SpaceUpdateOptions {
@@ -180,4 +181,8 @@ struct VoiceToken {
 
 service VoiceService {
   join(channelId: string): VoiceToken;
+}
+
+service RelationService {
+  
 }

@@ -1,5 +1,5 @@
 import { Tooltip } from '@mantine/core';
-import { Button, Form, Input, Modal } from '@mikoto-io/lucid';
+import { Button, Form, Input, Modal, Image } from '@mikoto-io/lucid';
 import { AxiosError } from 'axios';
 import { Space } from 'mikotojs';
 import { useRef } from 'react';
@@ -250,6 +250,7 @@ function ServerSidebarContextMenu() {
 
 export function ServerSidebar() {
   const setModal = useSetRecoilState(modalState);
+  const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
 
   const mikoto = useMikoto();
   useDeltaWithRedux<Space>(
@@ -264,6 +265,19 @@ export function ServerSidebar() {
 
   return (
     <StyledServerSidebar onContextMenu={contextMenu}>
+      <StyledIconWrapper>
+        <Pill h={stateSpace === null ? 32 : 8} />
+        <StyledSpaceIcon
+          onClick={() => {
+            setSpace(null);
+          }}
+        >
+          <Image
+            src={stateSpace === null ? '/logo/logo-mono.svg' : '/logo/logo.svg'}
+            w={20}
+          />
+        </StyledSpaceIcon>
+      </StyledIconWrapper>
       {spaces.map((space) => (
         <SidebarSpaceIcon space={space} key={space.id} />
       ))}

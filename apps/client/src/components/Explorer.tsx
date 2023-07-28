@@ -6,7 +6,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Form, Input, Button, Modal } from '@mikoto-io/lucid';
 import { Channel, Space } from 'mikotojs';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -219,16 +219,22 @@ function channelToStructuredTree(
   return root;
 }
 
-export function Explorer({ space }: { space: Space }) {
+export function Explorer({ spaceId }: { spaceId: string }) {
   const tabkit = useTabkit();
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
 
+  const [space, setSpace] = useState<Space|null>(null);
+
+  useEffect(() => {
+    mikoto.client.spaces.get(spaceId).then((x) => setSpace(x));
+  }, [spaceId]);
+
   const channelDelta = useDeltaNext<Channel>(
     mikoto.channelEmitter,
-    space.id,
-    async () => await mikoto.client.channels.list(space.id),
-    [space.id!],
+    spaceId,
+    async () => await mikoto.client.channels.list(spaceId),
+    [spaceId],
   );
   // const channelDelta = useDelta(space.channels, [space?.id!]);
   const nodeContextMenu = useContextMenuX();
@@ -270,6 +276,9 @@ export function Explorer({ space }: { space: Space }) {
       );
     },
   });
+
+  // TODO: return loading indicator
+  if (space === null) return null;
 
   return (
     <StyledTree onContextMenu={nodeContextMenu(<TreebarContextMenu />)}>

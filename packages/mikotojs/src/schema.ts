@@ -120,6 +120,7 @@ export class MainServiceClient {
   readonly messages: MessageServiceClient;
   readonly roles: RoleServiceClient;
   readonly voice: VoiceServiceClient;
+  readonly relations: RelationServiceClient;
   constructor(private socket: SocketClient) {
     this.spaces = new SpaceServiceClient(socket);
     this.channels = new ChannelServiceClient(socket);
@@ -128,6 +129,7 @@ export class MainServiceClient {
     this.messages = new MessageServiceClient(socket);
     this.roles = new RoleServiceClient(socket);
     this.voice = new VoiceServiceClient(socket);
+    this.relations = new RelationServiceClient(socket);
   }
 }
 
@@ -293,6 +295,10 @@ export class VoiceServiceClient {
   join(channelId: string): Promise<VoiceToken> {
     return this.socket.call("voice/join", channelId);
   }
+}
+
+export class RelationServiceClient {
+  constructor(private socket: SocketClient) {}
 }
 
 export function createClient(

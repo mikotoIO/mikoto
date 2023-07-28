@@ -114,6 +114,7 @@ export abstract class AbstractMainService {
   abstract messages: AbstractMessageService;
   abstract roles: AbstractRoleService;
   abstract voice: AbstractVoiceService;
+  abstract relations: AbstractRelationService;
 }
 
 export class SpaceServiceSender {
@@ -359,4 +360,15 @@ export abstract class AbstractVoiceService {
     ctx: SophonInstance<SophonContext>,
     channelId: string
   ): Promise<VoiceToken>;
+}
+
+export class RelationServiceSender {
+  constructor(private sender: SenderCore, private room: string) {}
+}
+
+export abstract class AbstractRelationService {
+  $: (room: string) => RelationServiceSender;
+  public constructor(protected sophonCore: SophonCore<SophonContext>) {
+    this.$ = (room) => new RelationServiceSender(sophonCore.senderCore, room);
+  }
 }

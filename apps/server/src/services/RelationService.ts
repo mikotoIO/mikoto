@@ -1,5 +1,3 @@
-import { AbstractRelationService } from "./schema";
+import { AbstractRelationService } from './schema';
 
-export class RelationService extends AbstractRelationService {
-  
-}
+export class RelationService extends AbstractRelationService {}

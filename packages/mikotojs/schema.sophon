@@ -1,3 +1,18 @@
+struct User {
+  id: string;
+  name: string;
+  avatar: string?;
+  category: string?;
+}
+
+struct Role {
+  id: string;
+  name: string;
+  color: string?;
+  permissions: string;
+  position: int;
+}
+
 struct Channel {
   id: string;
   spaceId: string;
@@ -17,26 +32,11 @@ struct Space {
   ownerId: string?;
 }
 
-struct Role {
-  id: string;
-  name: string;
-  color: string?;
-  permissions: string;
-  position: int;
-}
-
 struct Member {
   id: string;
   spaceId: string;
   user: User;
   roleIds: string[];
-}
-
-struct User {
-  id: string;
-  name: string;
-  avatar: string?;
-  category: string?;
 }
 
 struct Message {
@@ -183,6 +183,9 @@ service VoiceService {
   join(channelId: string): VoiceToken;
 }
 
-service RelationService {
+struct Relations {
   
+}
+
+service RelationService {
 }

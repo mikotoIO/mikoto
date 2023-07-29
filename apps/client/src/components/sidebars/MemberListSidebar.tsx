@@ -1,10 +1,12 @@
 import { faCrown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Box } from '@mikoto-io/lucid';
 import { Member, Space } from 'mikotojs';
 import { useEffect, useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
+import { computeRoleColor } from '../../functions/roleFunctions';
 import { useMikoto } from '../../hooks';
 import { contextMenuState, useContextMenu } from '../ContextMenu';
 import { Avatar } from '../atoms/Avatar';
@@ -61,7 +63,9 @@ function MemberElement({ member, space }: { space: Space; member: Member }) {
       onContextMenu={userContextMenu}
     >
       <Avatar size={32} src={member.user.avatar ?? undefined} />
-      <div className="name">{member.user.name}</div>
+      <Box className="name" txt={computeRoleColor(space, member)}>
+        {member.user.name}
+      </Box>
       {member.user.id === space.ownerId && (
         <FontAwesomeIcon className="crown" icon={faCrown} />
       )}

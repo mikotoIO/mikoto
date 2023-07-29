@@ -1,3 +1,4 @@
+import { Flex } from '@mikoto-io/lucid';
 import { Message } from 'mikotojs';
 import styled from 'styled-components';
 
@@ -109,8 +110,7 @@ function Timestamp({ time }: { time: Date }) {
   );
 }
 
-const NameBox = styled.div`
-  display: flex;
+const NameBox = styled(Flex)`
   margin-bottom: 4px;
   & > * {
     align-self: flex-end;

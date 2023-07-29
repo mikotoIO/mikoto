@@ -11,15 +11,20 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.21.5",
-    "expo": "~48.0.15",
-    "expo-status-bar": "~1.4.4",
+    "@fortawesome/free-regular-svg-icons": "^6.3.0",
+    "@fortawesome/free-solid-svg-icons": "^6.3.0",
+    "@fortawesome/react-native-fontawesome": "^0.3.0",
+    "expo": "~49.0.5",
+    "expo-status-bar": "~1.6.0",
     "react": "18.2.0",
-    "react-native": "0.71.7",
-    "react-native-get-random-values": "^1.8.0"
+    "react-native": "0.72.3",
+    "react-native-get-random-values": "^1.9.0",
+    "react-native-svg": "13.9.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0",
-    "@types/react": "~18.0.14",
+    "@babel/core": "^7.22.9",
+    "@expo/ngrok": "^4.1.0",
+    "@types/react": "~18.2.17",
     "typescript": "^4.9.4"
   },
   "private": true

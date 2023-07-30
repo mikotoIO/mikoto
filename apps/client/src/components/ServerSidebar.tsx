@@ -1,7 +1,8 @@
 import { Tooltip } from '@mantine/core';
-import { Button, Form, Input, Modal } from '@mikoto-io/lucid';
+import { Button, Form, Input, Modal, Image } from '@mikoto-io/lucid';
 import { AxiosError } from 'axios';
-import { Space } from 'mikotojs';
+import { ClientSpace, Space, SpaceStore } from 'mikotojs';
+import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilState, useSetRecoilState } from 'recoil';
@@ -12,7 +13,6 @@ import { env } from '../env';
 import { useMikoto } from '../hooks';
 import { useDeltaWithRedux } from '../hooks/useDelta';
 import { useErrorElement } from '../hooks/useErrorElement';
-import { useMikotoSelector } from '../redux';
 import { spaceActions } from '../redux/mikoto';
 import { treebarSpaceState, useTabkit } from '../store';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
@@ -248,23 +248,28 @@ function ServerSidebarContextMenu() {
   );
 }
 
-export function ServerSidebar() {
+export const ServerSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
   const setModal = useSetRecoilState(modalState);
+  const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
 
-  const mikoto = useMikoto();
-  useDeltaWithRedux<Space>(
-    spaceActions,
-    mikoto.spaceEmitter,
-    '@',
-    () => mikoto.client.spaces.list(),
-    [],
-  );
-  const spaces = Object.values(useMikotoSelector((x) => x.spaces));
   const contextMenu = useContextMenu(() => <ServerSidebarContextMenu />);
 
   return (
     <StyledServerSidebar onContextMenu={contextMenu}>
-      {spaces.map((space) => (
+      <StyledIconWrapper>
+        <Pill h={stateSpace === null ? 32 : 8} />
+        <StyledSpaceIcon
+          onClick={() => {
+            setSpace(null);
+          }}
+        >
+          <Image
+            src={stateSpace === null ? '/logo/logo-mono.svg' : '/logo/logo.svg'}
+            w={20}
+          />
+        </StyledSpaceIcon>
+      </StyledIconWrapper>
+      {Array.from(spaces.values()).map((space) => (
         <SidebarSpaceIcon space={space} key={space.id} />
       ))}
       <StyledIconWrapper>
@@ -280,4 +285,4 @@ export function ServerSidebar() {
       </StyledIconWrapper>
     </StyledServerSidebar>
   );
-}
+});

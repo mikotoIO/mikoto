@@ -87,6 +87,10 @@ function AppView() {
 
   const [workspace, setWorkspace] = useRecoilState(workspaceState);
 
+  // arguably the worst code I've seen.
+  // TODO: Move the storage into redux store, and make it a hook.
+  // Lower the fetching/update logic into the Explorer component.
+  // make it take just the space id as a prop.
   useEffect(() => {
     if (spaceVal) {
       mikoto.client.spaces.get(spaceVal.id).then((x) => setSpace(x));
@@ -111,7 +115,7 @@ function AppView() {
             {workspace.leftOpen && <UserAreaAvatar />}
           </div>
           <div className="bars">
-            <ServerSidebar />
+            <ServerSidebar spaces={mikoto.spaces} />
             {workspace.leftOpen && (
               <Sidebar
                 position="left"
@@ -123,7 +127,9 @@ function AppView() {
                   }));
                 }}
               >
-                {space && <Explorer space={space} />}
+                {spaceVal && (
+                  <Explorer space={mikoto.spaces.get(spaceVal.id)!} />
+                )}
               </Sidebar>
             )}
           </div>

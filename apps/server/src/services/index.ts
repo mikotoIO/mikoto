@@ -1,4 +1,5 @@
 import { ChannelService, MessageService } from './ChannelService';
+import { RelationService } from './RelationService';
 import { RoleService } from './RoleService';
 import { SpaceService } from './SpaceService';
 import { MemberService, UserService } from './UserService';
@@ -13,4 +14,5 @@ export class MainService extends AbstractMainService {
   messages = new MessageService(this.sophonCore);
   roles = new RoleService(this.sophonCore);
   voice = new VoiceService(this.sophonCore);
+  relations = new RelationService(this.sophonCore);
 }

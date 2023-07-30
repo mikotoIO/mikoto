@@ -1,5 +1,5 @@
 import { Checkbox } from '@mantine/core';
-import { Button } from '@mikoto-io/lucid';
+import { Flex } from '@mikoto-io/lucid';
 import { Member, Role, Space, User } from 'mikotojs';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
@@ -58,7 +58,7 @@ function RoleSetter({ roles, member }: { roles: Role[]; member: Member }) {
       const o: Record<string, boolean> = {};
       roles.forEach((role) => {
         if (role.name === '@everyone') return;
-        o[role.id] = false;
+        o[role.id] = member.roleIds.includes(role.id);
       });
       return o;
     },
@@ -66,33 +66,35 @@ function RoleSetter({ roles, member }: { roles: Role[]; member: Member }) {
 
   return (
     <AvatarContextWrapper>
-      {roles.map((x) => {
-        if (x.name === '@everyone') return null;
-        return (
-          <Checkbox
-            label={x.name}
-            key={x.id}
-            checked={selectedRoles[x.id]}
-            onChange={(e) => {
-              setSelectedRoles({
-                ...selectedRoles,
-                [x.id]: e.currentTarget.checked,
-              });
-            }}
-          />
-        );
-      })}
-      <Button
-        onClick={async () => {
-          await mikoto.client.members.update(member.spaceId, member.user.id, {
-            roleIds: Object.keys(selectedRoles).filter(
-              (id) => selectedRoles[id],
-            ),
-          });
-        }}
-      >
-        Set Roles
-      </Button>
+      <Flex dir="column" gap={8}>
+        {roles.map((x) => {
+          if (x.name === '@everyone') return null;
+          return (
+            <Checkbox
+              label={x.name}
+              key={x.id}
+              checked={selectedRoles[x.id]}
+              onChange={async (e) => {
+                const newSelectedRoles = {
+                  ...selectedRoles,
+                  [x.id]: e.currentTarget.checked,
+                };
+                setSelectedRoles(newSelectedRoles);
+
+                await mikoto.client.members.update(
+                  member.spaceId,
+                  member.user.id,
+                  {
+                    roleIds: Object.keys(newSelectedRoles).filter(
+                      (id) => newSelectedRoles[id],
+                    ),
+                  },
+                );
+              }}
+            />
+          );
+        })}
+      </Flex>
     </AvatarContextWrapper>
   );
 }

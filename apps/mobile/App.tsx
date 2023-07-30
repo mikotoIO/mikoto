@@ -1,17 +1,65 @@
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput } from 'react-native';
+import { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableHighlight,
+  StatusBar,
+} from 'react-native';
 
 import { SafeAreaView } from './components/SafeAreaView';
+import { theme } from './lucid/theme';
 
+function MessageInput() {
+  const [text, setText] = useState('');
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        gap: 8,
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Type a message"
+        placeholderTextColor={theme.colors.N400}
+      />
+      <TouchableHighlight
+        onPress={() => {
+          setText('');
+        }}
+      >
+        <View style={styles.sendButton}>
+          <FontAwesomeIcon icon={faPaperPlane} color={theme.colors.N0} />
+        </View>
+      </TouchableHighlight>
+    </View>
+  );
+}
 export default function App() {
   return (
     <SafeAreaView>
+      <StatusBar
+        backgroundColor={theme.colors.N1100}
+        barStyle="light-content"
+      />
       <View style={styles.container}>
         <View style={styles.messages}>
-          <Text>Open up App.tsx to start working on your app!</Text>
+          <Text style={styles.text}>
+            Open up App.tsx to start working on your app.
+          </Text>
         </View>
         <ExpoStatusBar style="auto" />
-        <TextInput style={styles.input} />
+        <MessageInput />
       </View>
     </SafeAreaView>
   );
@@ -19,20 +67,36 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
+    padding: 4,
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.N800,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  text: {
+    color: theme.colors.N0,
   },
   messages: {
     flex: 1,
   },
   input: {
     // fill up all horizontal space
-    width: '100%',
+    borderColor: undefined,
+    backgroundColor: theme.colors.N700,
+    color: theme.colors.N0,
+    borderTopWidth: 0,
     height: 40,
-    margin: 12,
-    borderWidth: 1,
+    flex: 1,
+    borderRadius: 4,
+    borderWidth: 0,
     padding: 10,
+  },
+  sendButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 4,
+    backgroundColor: theme.colors.B700,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

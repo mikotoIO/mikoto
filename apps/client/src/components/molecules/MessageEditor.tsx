@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { createEditor, Transforms, Node, Editor } from 'slate';
+import { createEditor, Transforms, Node } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import styled from 'styled-components';
 
 // TODO: Fix the two-pixel snap
 const StyledEditable = styled(Editable)`
-  background-color: ${(p) => p.theme.colors.N700};
+  background-color: var(--N700);
   font-size: 14px;
   margin: 12px 16px 4px;
   padding: 16px;
@@ -59,7 +59,6 @@ export function MessageEditor({
   useEffect(() => {
     ReactEditor.focus(editor);
     const fn = (ev: KeyboardEvent) => {
-      // TODO: focus into the editor on text-producing keypress
       if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
       if (ev.key.length !== 1) return;
       if (isInputLike()) return;

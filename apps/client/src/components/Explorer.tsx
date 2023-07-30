@@ -5,8 +5,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Form, Input, Button, Modal } from '@mikoto-io/lucid';
-import { Channel, Space } from 'mikotojs';
-import React from 'react';
+import { Channel, ClientChannel, ClientSpace, Space } from 'mikotojs';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -194,7 +195,6 @@ function channelToStructuredTree(
 
   const map = new Map<string, NodeObject>();
   map.set(root.id, root);
-
   channels.forEach((channel) => {
     const node: NodeObject = {
       icon: getIconFromChannelType(channel.type),
@@ -204,9 +204,14 @@ function channelToStructuredTree(
       onContextMenu: options.onContextMenuFactory(channel),
     };
     map.set(node.id, node);
+  });
 
+  channels.forEach((channel) => {
+    const node = map.get(channel.id)!;
     if (channel.parentId) {
       const parent = map.get(channel.parentId);
+      // bugged
+      // how do we know that parent is already defined?
       if (parent) {
         if (parent.descendant === undefined) parent.descendant = [];
         parent.descendant.push(node);
@@ -215,68 +220,64 @@ function channelToStructuredTree(
       root.descendant!.push(node);
     }
   });
-
   return root;
 }
 
-export function Explorer({ space }: { space: Space }) {
-  const tabkit = useTabkit();
-  const mikoto = useMikoto();
-  const setModal = useSetRecoilState(modalState);
+export const Explorer = observer(
+  ({ space }: { space: ClientSpace }) => {
+    const tabkit = useTabkit();
+    const mikoto = useMikoto();
+    const setModal = useSetRecoilState(modalState);
 
-  const channelDelta = useDeltaNext<Channel>(
-    mikoto.channelEmitter,
-    space.id,
-    async () => await mikoto.client.channels.list(space.id),
-    [space.id!],
-  );
-  // const channelDelta = useDelta(space.channels, [space?.id!]);
-  const nodeContextMenu = useContextMenuX();
-  const channels = [...channelDelta.data].sort((a, b) => a.order - b.order);
-  const channelTree = channelToStructuredTree(channels, {
-    onClickFactory(ch) {
-      return (ev) => {
-        tabkit.openTab(channelToTab(ch), ev.ctrlKey);
-      };
-    },
-    onContextMenuFactory(channel) {
-      return nodeContextMenu(
-        <ContextMenu>
-          <ContextMenu.Link
-            onClick={() => {
-              tabkit.openTab(channelToTab(channel), true);
-            }}
-          >
-            Open in new tab
-          </ContextMenu.Link>
-          <ContextMenu.Link>Mark as Read</ContextMenu.Link>
-          <ContextMenu.Link
-            onClick={() => {
-              setModal({
-                elem: <CreateChannelModal channel={channel} />,
-              });
-            }}
-          >
-            Create Subchannel
-          </ContextMenu.Link>
-          <ContextMenu.Link
-            onClick={async () => {
-              await mikoto.client.channels.delete(channel.id);
-            }}
-          >
-            Delete Channel
-          </ContextMenu.Link>
-        </ContextMenu>,
-      );
-    },
-  });
+    const nodeContextMenu = useContextMenuX();
+    const channelTree = channelToStructuredTree(space.channels, {
+      onClickFactory(ch) {
+        return (ev) => {
+          tabkit.openTab(channelToTab(ch), ev.ctrlKey);
+        };
+      },
+      onContextMenuFactory(channel) {
+        return nodeContextMenu(
+          <ContextMenu>
+            <ContextMenu.Link
+              onClick={() => {
+                tabkit.openTab(channelToTab(channel), true);
+              }}
+            >
+              Open in new tab
+            </ContextMenu.Link>
+            <ContextMenu.Link>Mark as Read</ContextMenu.Link>
+            <ContextMenu.Link
+              onClick={() => {
+                setModal({
+                  elem: <CreateChannelModal channel={channel} />,
+                });
+              }}
+            >
+              Create Subchannel
+            </ContextMenu.Link>
+            <ContextMenu.Link
+              onClick={async () => {
+                await mikoto.client.channels.delete(channel.id);
+              }}
+            >
+              Delete Channel
+            </ContextMenu.Link>
+          </ContextMenu>,
+        );
+      },
+    });
 
-  return (
-    <StyledTree onContextMenu={nodeContextMenu(<TreebarContextMenu />)}>
-      <TreeHead>
-        <h1>{space.name}</h1>
-      </TreeHead>
-      <ExplorerNext nodes={channelTree.descendant!} />
-    </StyledTree>
-  );
-}
+    // TODO: return loading indicator
+    if (space === null) return null;
+
+    return (
+      <StyledTree onContextMenu={nodeContextMenu(<TreebarContextMenu />)}>
+        <TreeHead>
+          <h1>{space.name}</h1>
+        </TreeHead>
+        <ExplorerNext nodes={channelTree.descendant!} />
+      </StyledTree>
+    );
+  },
+);

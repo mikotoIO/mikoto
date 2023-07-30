@@ -1,5 +1,6 @@
 import { ChannelEmitter, MessageEmitter, SpaceEmitter } from './emitters';
 import { createClient, MainServiceClient } from './schema';
+import { ChannelStore, ClientChannel, ClientSpace, SpaceStore } from './store';
 
 export class MikotoClient {
   // spaces: SpaceEngine = new SpaceEngine(this);
@@ -9,6 +10,9 @@ export class MikotoClient {
   messageEmitter = new MessageEmitter();
   channelEmitter = new ChannelEmitter();
   spaceEmitter = new SpaceEmitter();
+
+  spaces = new SpaceStore(this, ClientSpace);
+  channels = new ChannelStore(this, ClientChannel);
 
   constructor(
     sophonUrl: string,
@@ -31,6 +35,9 @@ export class MikotoClient {
   }
 
   setupClient() {
+    this.spaces.subscribe(this.client.spaces);
+    this.channels.subscribe(this.client.channels);
+
     // rewrite io to use sophon
     this.client.messages.onCreate((message) => {
       this.messageEmitter.emit(`create/${message.channelId}`, message);

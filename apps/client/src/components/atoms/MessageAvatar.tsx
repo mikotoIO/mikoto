@@ -1,5 +1,5 @@
 import { Checkbox } from '@mantine/core';
-import { Button, Flex } from '@mikoto-io/lucid';
+import { Flex } from '@mikoto-io/lucid';
 import { Member, Role, Space, User } from 'mikotojs';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';

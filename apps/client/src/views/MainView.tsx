@@ -115,7 +115,7 @@ function AppView() {
             {workspace.leftOpen && <UserAreaAvatar />}
           </div>
           <div className="bars">
-            <ServerSidebar />
+            <ServerSidebar spaces={mikoto.spaces} />
             {workspace.leftOpen && (
               <Sidebar
                 position="left"
@@ -127,7 +127,9 @@ function AppView() {
                   }));
                 }}
               >
-                {spaceVal && <Explorer spaceId={spaceVal.id} />}
+                {spaceVal && (
+                  <Explorer space={mikoto.spaces.get(spaceVal.id)!} />
+                )}
               </Sidebar>
             )}
           </div>

@@ -13323,6 +13323,8 @@ __metadata:
     markdown-draft-js: ^2.4.0
     mdast-util-find-and-replace: ^2.2.2
     mikotojs: "*"
+    mobx: ^6.10.0
+    mobx-react-lite: ^4.0.3
     re-resizable: ^6.9.9
     react: ^18.2.0
     react-aspect-ratio: ^1.1.2
@@ -24488,6 +24490,7 @@ __metadata:
   dependencies:
     "@sophon-js/cli": ^0.0.5
     axios: ^0.27.2
+    mobx: ^6.10.0
     socket.io-client: ^4.5.1
     typed-emitter: ^2.1.0
     typescript: ^5.0.4
@@ -24867,6 +24870,30 @@ __metadata:
     typescript: ^4.9.4
   languageName: unknown
   linkType: soft
+
+"mobx-react-lite@npm:^4.0.3":
+  version: 4.0.3
+  resolution: "mobx-react-lite@npm:4.0.3"
+  dependencies:
+    use-sync-external-store: ^1.2.0
+  peerDependencies:
+    mobx: ^6.9.0
+    react: ^16.8.0 || ^17 || ^18
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+  checksum: 327151c61f6520605ce855b2972f30f4b4d9e277d546be5bf0abc663cf09f3e242193603d51d41a9e847fd359a3b9a5cfbeb89ccbb0905f04a2e1b38021d3025
+  languageName: node
+  linkType: hard
+
+"mobx@npm:^6.10.0":
+  version: 6.10.0
+  resolution: "mobx@npm:6.10.0"
+  checksum: 8279d5a978d845664fb1830ce1e7f3fcebd5809bd9be6f2cac9b190e07cf6f16b09581107cc2d1ff7097e979da758fefd9ac68db76c814b8e783e59d0b8e418c
+  languageName: node
+  linkType: hard
 
 "move-concurrently@npm:^1.0.1":
   version: 1.0.1

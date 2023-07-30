@@ -24,7 +24,10 @@ export async function constructMikoto({
 }: ConstructMikotoOptions) {
   const mikoto = await constructMikotoSimple(urlBase, token);
 
-  await mikoto.client.spaces.list();
+  await mikoto.spaces.list(true);
+  if (typeof window !== 'undefined') {
+    (window as any).client = mikoto;
+  }
   return mikoto;
 }
 
@@ -32,3 +35,4 @@ export * from './models';
 export * from './emitters';
 export * from './AuthClient';
 export * from './MikotoClient';
+export * from './store';

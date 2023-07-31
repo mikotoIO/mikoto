@@ -1,5 +1,6 @@
 import { throttle } from 'lodash';
 import { Channel, Member, Message } from 'mikotojs';
+import { observer, Observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAsync } from 'react-async-hook';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
@@ -72,7 +73,7 @@ function ChannelHead({ channel }: { channel: Channel }) {
 // Please laugh
 const FUNNY_NUMBER = 69_420_000;
 
-function RealMessageView({ channel }: { channel: Channel }) {
+const RealMessageView = observer(({ channel }: { channel: Channel }) => {
   const virtuosoRef = React.useRef<VirtuosoHandle>(null);
   const mikoto = useMikoto();
   const user = useRecoilValue(userState);
@@ -246,23 +247,15 @@ function RealMessageView({ channel }: { channel: Channel }) {
       </StyledTypingIndicatorContainer>
     </ViewContainer>
   );
-}
+});
 
 export function MessageView({ channel }: MessageViewProps) {
   const mikoto = useMikoto();
-  const space = useMikotoSelector((s) => s.spaces[channel.spaceId]);
-
-  const { result: mChannel, error } = useAsync(
-    (id: string) => mikoto.client.channels.get(id),
-    [channel.id],
-  );
-  if (error) throw error;
-  // TODO: better loading
-  if (!mChannel) return <div>loading</div>;
+  const space = mikoto.spaces.get(channel.spaceId);
 
   return (
     <CurrentSpaceContext.Provider value={space}>
-      <RealMessageView channel={mChannel} />
+      <RealMessageView channel={channel} />
     </CurrentSpaceContext.Provider>
   );
 }

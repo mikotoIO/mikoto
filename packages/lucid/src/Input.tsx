@@ -18,11 +18,19 @@ const baseInputCss = css`
   color: ${(p) => p.theme.colors.N200};
   background-color: ${(p) => p.theme.colors.N1100};
   outline: none;
+  resize: none;
+  font-family: var(--font-main);
 `;
 
 export const SInput = styled.input`
   ${baseInputCss}
   ${boxCss}
+`;
+
+export const STextArea = styled.textarea`
+  ${baseInputCss}
+  ${boxCss}
+  padding: 16px 16px;
 `;
 
 const Label = styled.label`
@@ -36,11 +44,12 @@ const Label = styled.label`
 
 type InputProps = {
   labelName?: string;
+  textarea?: boolean;
 } & BoxProps &
   React.InputHTMLAttributes<HTMLInputElement>;
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ labelName, ...props }, ref) => {
+  ({ textarea, labelName, ...props }, ref) => {
     if (!labelName) {
       return <SInput {...props} />;
     }
@@ -48,6 +57,26 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <Label>
         <div className="label">{labelName}</div>
         <SInput {...props} ref={ref} />
+      </Label>
+    );
+  },
+);
+
+type TextAreaProps = {
+  labelName?: string;
+  textarea?: boolean;
+} & BoxProps &
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>;
+
+export const TextArea = React.forwardRef<HTMLInputElement, TextAreaProps>(
+  ({ textarea, labelName, ...props }, ref) => {
+    if (!labelName) {
+      return <STextArea {...props} />;
+    }
+    return (
+      <Label>
+        <div className="label">{labelName}</div>
+        <STextArea {...props} ref={ref} />
       </Label>
     );
   },

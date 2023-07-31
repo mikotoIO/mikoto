@@ -7,6 +7,7 @@ import {
   Box,
   backgroundMix,
   Flex,
+  TextArea,
 } from '@mikoto-io/lucid';
 import { useState } from 'react';
 import { useAsync } from 'react-async-hook';
@@ -252,6 +253,7 @@ export function Overview() {
           <h2>{user?.name}</h2>
         </Content>
       </AccountInfo>
+      <TextArea h={160} labelName="Bio" />
       <h2>{t('accountSettings.general.authentication')}</h2>
 
       <Buttons>

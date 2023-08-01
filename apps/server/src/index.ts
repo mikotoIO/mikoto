@@ -24,6 +24,7 @@ import Mailer from './functions/Mailer';
 import Minio from './functions/Minio';
 import { logger } from './functions/logger';
 import './functions/prismaRecursive';
+import { redis } from './functions/redis';
 import { boot, sophon } from './services/sophon';
 
 const app = express();
@@ -65,11 +66,17 @@ useSocketServer(io, {
   controllers: [path.join(`${__dirname}/ws-controllers/*.{js,ts}`)],
 });
 
-server.listen(env.AUTH_PORT, () => {
-  logger.info(`Mikoto server started on http://0.0.0.0:${env.AUTH_PORT}`);
-});
+async function main() {
+  await redis.connect();
 
-// set up a sophon server as well
-boot(env.SERVER_PORT, () => {
-  logger.info(`Mikoto Sophon listening on http://0.0.0.0:${env.SERVER_PORT}`);
-});
+  server.listen(env.AUTH_PORT, () => {
+    logger.info(`Mikoto server started on http://0.0.0.0:${env.AUTH_PORT}`);
+  });
+
+  // set up a sophon server as well
+  boot(env.SERVER_PORT, () => {
+    logger.info(`Mikoto Sophon listening on http://0.0.0.0:${env.SERVER_PORT}`);
+  });
+}
+
+main().then();

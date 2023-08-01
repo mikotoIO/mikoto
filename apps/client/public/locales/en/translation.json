@@ -15,6 +15,9 @@
     },
     "language": {
       "title": "Language"
+    },
+    "connections": {
+      "title": "Connections"
     }
   },
   "spaceSettings": {

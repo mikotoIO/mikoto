@@ -68,7 +68,7 @@ type TextAreaProps = {
 } & BoxProps &
   React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
-export const TextArea = React.forwardRef<HTMLInputElement, TextAreaProps>(
+export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
   ({ textarea, labelName, ...props }, ref) => {
     if (!labelName) {
       return <STextArea {...props} />;

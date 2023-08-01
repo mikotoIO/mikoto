@@ -18,7 +18,8 @@
     }
   },
   "spaceSettings": {
-    "spaceOverview": "공간 설정",
+    "spaceOverview": "스페이스 설정",
+    "spaceName": "스페이스 이름",
     "settingsForSpace": "{{name}} 설정"
   }
 }

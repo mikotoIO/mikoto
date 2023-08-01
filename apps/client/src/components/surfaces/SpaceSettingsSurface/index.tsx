@@ -43,6 +43,7 @@ function Overview({ space }: { space: Space }) {
       <Form>
         <h1>{t('spaceSettings.spaceOverview')}</h1>
         <AvatarEditor
+          avatar={space.icon ?? undefined}
           onDrop={async (file) => {
             const { data } = await uploadFileWithAxios<{ url: string }>(
               mediaServerAxios,
@@ -74,6 +75,10 @@ function Overview({ space }: { space: Space }) {
           >
             Add Bot
           </Button>
+        </Buttons>
+        <h2>Dangerous</h2>
+        <Buttons>
+          <Button variant="danger">Delete Space</Button>
         </Buttons>
       </Form>
     </SettingsView>

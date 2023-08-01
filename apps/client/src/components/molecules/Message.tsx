@@ -1,7 +1,9 @@
 import { Flex } from '@mikoto-io/lucid';
-import { Message } from 'mikotojs';
+import { ClientMessage } from 'mikotojs';
+import { observer } from 'mobx-react-lite';
 import styled from 'styled-components';
 
+import { computeRoleColor } from '../../functions/roleFunctions';
 import { useMikoto } from '../../hooks';
 import { ContextMenu, useContextMenu } from '../ContextMenu';
 import { BotTag } from '../atoms/BotTag';
@@ -117,17 +119,17 @@ const NameBox = styled(Flex)`
   }
 `;
 
-interface MessageProps {
-  message: Message;
-  isSimple?: boolean;
-}
-
 const AvatarFiller = styled.div`
   margin: 0;
   width: 40px;
 `;
 
-export function MessageItem({ message, isSimple }: MessageProps) {
+interface MessageProps {
+  message: ClientMessage;
+  isSimple?: boolean;
+}
+
+export const MessageItem = observer(({ message, isSimple }: MessageProps) => {
   const mikoto = useMikoto();
 
   const menu = useContextMenu(() => (
@@ -155,7 +157,9 @@ export function MessageItem({ message, isSimple }: MessageProps) {
       <MessageInner>
         {!isSimple && (
           <NameBox>
-            <Name>{message.author?.name ?? 'Ghost'}</Name>
+            <Name color={message.member?.roleColor}>
+              {message.author?.name ?? 'Ghost'}
+            </Name>
             {message.author?.category === 'BOT' && <BotTag />}
             <Timestamp time={new Date(message.timestamp)} />
           </NameBox>
@@ -164,4 +168,4 @@ export function MessageItem({ message, isSimple }: MessageProps) {
       </MessageInner>
     </MessageContainer>
   );
-}
+});

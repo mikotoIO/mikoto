@@ -3,6 +3,7 @@ import { makeAutoObservable } from 'mobx';
 import type { MikotoClient } from '../MikotoClient';
 import { Channel } from '../schema';
 import { Store } from './base';
+import { ClientMessage } from './message';
 
 export class ClientChannel implements Channel {
   id!: string;
@@ -15,6 +16,15 @@ export class ClientChannel implements Channel {
 
   get space() {
     return this.client.spaces.get(this.spaceId);
+  }
+
+  async listMessages(limit: number, cursor: string | null) {
+    const msgs = await this.client.client.messages.list(this.id, {
+      limit,
+      cursor,
+    });
+    // return msgs;
+    return msgs.map((x) => new ClientMessage(this.client, x));
   }
 
   constructor(public client: MikotoClient, data: Channel) {

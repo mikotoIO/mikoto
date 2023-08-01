@@ -24462,9 +24462,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mikoto-electron@workspace:apps/electron":
+"mikoto-electron@workspace:apps/desktop":
   version: 0.0.0-use.local
-  resolution: "mikoto-electron@workspace:apps/electron"
+  resolution: "mikoto-electron@workspace:apps/desktop"
   dependencies:
     electron: ^25.3.0
     typescript: ^4.6.4

@@ -14,6 +14,7 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { env } from '../env';
 import { useErrorElement } from '../hooks/useErrorElement';
 import { authClient } from '../store/authClient';
 
@@ -47,7 +48,7 @@ function Logo() {
 
 // not always a real captcha
 function Captcha() {
-  return <Turnstile siteKey="3x00000000000000000000FF" />;
+  return <Turnstile siteKey={env.PUBLIC_CAPTCHA_KEY} />;
 }
 
 export function AuthView({ children }: { children: React.ReactNode }) {
@@ -98,6 +99,7 @@ export function LoginView() {
         <Anchor to="/forgotpassword" as={Link}>
           Forgot Password?
         </Anchor>
+        <Captcha />
       </Form>
     </AuthView>
   );

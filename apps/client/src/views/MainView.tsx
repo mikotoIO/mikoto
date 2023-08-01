@@ -161,7 +161,9 @@ function AppView() {
               }));
             }}
           >
-            {spaceVal && <MemberListSidebar space={spaceVal} />}
+            {spaceVal && (
+              <MemberListSidebar space={mikoto.spaces.get(spaceVal.id)!} />
+            )}
           </Sidebar>
         )}
       </AppContainer>

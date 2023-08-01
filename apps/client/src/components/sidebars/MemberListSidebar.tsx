@@ -1,13 +1,14 @@
 import { faCrown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box } from '@mikoto-io/lucid';
-import { Member, Space } from 'mikotojs';
+import { ClientSpace, Member, Space } from 'mikotojs';
+import { runInAction } from 'mobx';
+import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { computeRoleColor } from '../../functions/roleFunctions';
-import { useMikoto } from '../../hooks';
 import { contextMenuState, useContextMenu } from '../ContextMenu';
 import { Avatar } from '../atoms/Avatar';
 import { MemberContextMenu } from '../atoms/MessageAvatar';
@@ -73,20 +74,20 @@ function MemberElement({ member, space }: { space: Space; member: Member }) {
   );
 }
 
-export function MemberListSidebar({ space }: { space: Space }) {
-  const [members, setMembers] = useState<Member[]>([]);
-  const mikoto = useMikoto();
+export const MemberListSidebar = observer(
+  ({ space }: { space: ClientSpace }) => {
+    useEffect(() => {
+      space.fetchMembers();
+    }, [space.id]);
 
-  useEffect(() => {
-    mikoto.client.members.list(space.id).then((x) => setMembers(x));
-  }, [space.id]);
-
-  return (
-    <div>
-      <Divider>Members</Divider>
-      {members.map((x) => (
-        <MemberElement key={x.id} member={x} space={space} />
-      ))}
-    </div>
-  );
-}
+    return (
+      <div>
+        <Divider>Members</Divider>
+        {space.members &&
+          Array.from(space.members.values()).map((x) => (
+            <MemberElement key={x.id} member={x} space={space} />
+          ))}
+      </div>
+    );
+  },
+);

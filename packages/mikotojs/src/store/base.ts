@@ -1,4 +1,4 @@
-import { ObservableMap, action, runInAction } from 'mobx';
+import { action, runInAction } from 'mobx';
 
 import type { MikotoClient } from '../MikotoClient';
 
@@ -23,10 +23,10 @@ export interface DeltaSystem<T extends EntityBase> {
   onDelete(fn: (entity: T) => void): void;
 }
 
-export abstract class Store<
-  B extends EntityBase,
-  T extends B,
-> extends ObservableMap<string, T> {
+export abstract class Store<B extends EntityBase, T extends B> extends Map<
+  string,
+  T
+> {
   constructor(
     protected client: MikotoClient,
     protected Ent: EntityConstructor<B, T>,
@@ -88,14 +88,12 @@ export abstract class Store<
   }
 }
 
-type OnlyEntityArrays<T> = {
-  [K in keyof T]: T[K] extends EntityBase[] ? T[K] : never;
-};
-
+// toNormalized fields are not assigned to the entity
+// instead, they are assigned to the entity's ID field
 export function normalizedAssign<B extends EntityBase, T extends B>(
   entity: T,
   data: B,
-  toNormalize: Partial<Record<keyof OnlyEntityArrays<B>, string>> = {} as any,
+  toNormalize: Partial<Record<keyof B, string>> = {},
 ) {
   // eslint-disable-next-line no-restricted-syntax
   for (const key of Object.keys(data) as (keyof B)[]) {
@@ -103,7 +101,11 @@ export function normalizedAssign<B extends EntityBase, T extends B>(
       entity[key] = data[key] as any;
     } else {
       const idKey = toNormalize[key];
-      (entity as any)[idKey] = (data[key] as EntityBase[]).map((x) => x.id);
+      if (idKey?.slice(-1) === 's') {
+        (entity as any)[idKey] = (data[key] as EntityBase[]).map((x) => x.id);
+      } else {
+        (entity as any)[idKey] = (data[key] as EntityBase).id;
+      }
     }
   }
 }

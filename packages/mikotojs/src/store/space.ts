@@ -1,9 +1,10 @@
-import { makeAutoObservable } from 'mobx';
+import { ObservableMap, makeAutoObservable, runInAction } from 'mobx';
 
 import type { MikotoClient } from '../MikotoClient';
-import { Channel, Role, Space } from '../schema';
+import { Role, Space } from '../schema';
 import { Store, normalizedAssign } from './base';
 import { ClientChannel } from './channel';
+import { ClientMember } from './member';
 
 export class ClientSpace implements Space {
   id!: string;
@@ -13,6 +14,9 @@ export class ClientSpace implements Space {
   ownerId!: string | null;
   channelIds!: string[];
 
+  // null means members hasn't been fetched yet
+  members: ObservableMap<string, ClientMember> | null = null;
+
   constructor(public client: MikotoClient, data: Space) {
     normalizedAssign(this, data, { channels: 'channelIds' });
     makeAutoObservable(this, { id: false, client: false });
@@ -20,6 +24,17 @@ export class ClientSpace implements Space {
 
   get channels(): ClientChannel[] {
     return this.channelIds.map((x) => this.client.channels.get(x)!);
+  }
+
+  async fetchMembers(forceSync?: boolean) {
+    if (this.members && !forceSync) return;
+    const members = await this.client.client.members.list(this.id);
+
+    runInAction(() => {
+      this.members = new ObservableMap(
+        members.map((x) => [x.user.id, new ClientMember(this.client, x)]),
+      );
+    });
   }
 }
 

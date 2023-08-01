@@ -297,6 +297,7 @@ const ACCOUNT_SETTING_CATEGORIES = [
   { code: 'general', tkey: 'accountSettings.general.title' },
   { code: 'bots', tkey: 'accountSettings.bots.title' },
   { code: 'language', tkey: 'accountSettings.language.title' },
+  { code: 'connections', tkey: 'accountSettings.connections.title' },
 ];
 
 export function AccountSettingsSurface() {

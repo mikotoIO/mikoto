@@ -1,6 +1,12 @@
 import { throttle } from 'lodash';
-import { Channel, Member, Message } from 'mikotojs';
-import { observer, Observer } from 'mobx-react-lite';
+import {
+  Channel,
+  ClientChannel,
+  ClientMessage,
+  Member,
+  Message,
+} from 'mikotojs';
+import { Observer, observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAsync } from 'react-async-hook';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
@@ -8,7 +14,6 @@ import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 
 import { useInterval, useMikoto } from '../../hooks';
-import { useMikotoSelector } from '../../redux';
 import { CurrentSpaceContext } from '../../store';
 import { TabName } from '../TabBar';
 import { userState } from '../UserArea';
@@ -73,7 +78,7 @@ function ChannelHead({ channel }: { channel: Channel }) {
 // Please laugh
 const FUNNY_NUMBER = 69_420_000;
 
-const RealMessageView = observer(({ channel }: { channel: Channel }) => {
+const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
   const virtuosoRef = React.useRef<VirtuosoHandle>(null);
   const mikoto = useMikoto();
   const user = useRecoilValue(userState);
@@ -128,17 +133,12 @@ const RealMessageView = observer(({ channel }: { channel: Channel }) => {
     [],
   );
 
-  const [msgs, setMsgs] = useState<Message[] | null>(null);
+  const [msgs, setMsgs] = useState<ClientMessage[] | null>(null);
   useEffect(() => {
-    mikoto.client.messages
-      .list(channel.id, {
-        limit: 50,
-        cursor: null,
-      })
-      .then((m) => {
-        setMsgs(m);
-        if (m.length === 0) setTopLoaded(true);
-      });
+    channel.listMessages(50, null).then((m) => {
+      setMsgs(m);
+      if (m.length === 0) setTopLoaded(true);
+    });
   }, [channel.id]);
 
   const [scrollToBottom, setScrollToBottom] = useState(false);
@@ -160,7 +160,7 @@ const RealMessageView = observer(({ channel }: { channel: Channel }) => {
         .ack(channel.id, `${new Date().toString()}`)
         .then(() => {});
       setScrollToBottom(true);
-      return [...xs, x];
+      return [...xs, new ClientMessage(mikoto, x)];
     });
   };
 
@@ -207,10 +207,7 @@ const RealMessageView = observer(({ channel }: { channel: Channel }) => {
           startReached={async () => {
             if (!msgs) return;
             if (msgs.length === 0) return;
-            const m = await mikoto.client.messages.list(channel.id, {
-              limit: 50,
-              cursor: msgs[0].id,
-            });
+            const m = await channel.listMessages(50, msgs[0].id);
             if (m.length === 0) {
               setTopLoaded(true);
               return;
@@ -219,10 +216,18 @@ const RealMessageView = observer(({ channel }: { channel: Channel }) => {
             setFirstItemIndex((x) => x - m.length);
           }}
           itemContent={(index, msg) => (
-            <MessageItem
-              message={msg}
-              isSimple={isMessageSimple(msg, msgs[index - firstItemIndex - 1])}
-            />
+            <Observer>
+              {() => (
+                <MessageItem
+                  message={msg}
+                  // message={new ClientMessage(mikoto, msg)}
+                  isSimple={isMessageSimple(
+                    msg,
+                    msgs[index - firstItemIndex - 1],
+                  )}
+                />
+              )}
+            </Observer>
           )}
         />
       )}
@@ -252,10 +257,11 @@ const RealMessageView = observer(({ channel }: { channel: Channel }) => {
 export function MessageView({ channel }: MessageViewProps) {
   const mikoto = useMikoto();
   const space = mikoto.spaces.get(channel.spaceId);
+  const cChannel = mikoto.channels.get(channel.id)!;
 
   return (
     <CurrentSpaceContext.Provider value={space}>
-      <RealMessageView channel={channel} />
+      <RealMessageView channel={cChannel} />
     </CurrentSpaceContext.Provider>
   );
 }

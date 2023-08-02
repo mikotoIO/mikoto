@@ -5,15 +5,14 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Form, Input, Button, Modal } from '@mikoto-io/lucid';
-import { Channel, ClientChannel, ClientSpace, Space } from 'mikotojs';
+import { Channel, ClientSpace } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../hooks';
-import { useDeltaNext } from '../hooks/useDelta';
 import { useErrorElement } from '../hooks/useErrorElement';
 import { Tabable, treebarSpaceState, useTabkit } from '../store';
 import { ContextMenu, modalState, useContextMenuX } from './ContextMenu';
@@ -146,7 +145,7 @@ function CreateChannelModal({ channel }: { channel?: Channel }) {
   );
 }
 
-function TreebarContextMenu() {
+function TreebarContextMenu({ space }: { space: ClientSpace }) {
   const setModal = useSetRecoilState(modalState);
   return (
     <ContextMenu>
@@ -223,61 +222,61 @@ function channelToStructuredTree(
   return root;
 }
 
-export const Explorer = observer(
-  ({ space }: { space: ClientSpace }) => {
-    const tabkit = useTabkit();
-    const mikoto = useMikoto();
-    const setModal = useSetRecoilState(modalState);
+export const Explorer = observer(({ space }: { space: ClientSpace }) => {
+  const tabkit = useTabkit();
+  const mikoto = useMikoto();
+  const setModal = useSetRecoilState(modalState);
 
-    const nodeContextMenu = useContextMenuX();
-    const channelTree = channelToStructuredTree(space.channels, {
-      onClickFactory(ch) {
-        return (ev) => {
-          tabkit.openTab(channelToTab(ch), ev.ctrlKey);
-        };
-      },
-      onContextMenuFactory(channel) {
-        return nodeContextMenu(
-          <ContextMenu>
-            <ContextMenu.Link
-              onClick={() => {
-                tabkit.openTab(channelToTab(channel), true);
-              }}
-            >
-              Open in new tab
-            </ContextMenu.Link>
-            <ContextMenu.Link>Mark as Read</ContextMenu.Link>
-            <ContextMenu.Link
-              onClick={() => {
-                setModal({
-                  elem: <CreateChannelModal channel={channel} />,
-                });
-              }}
-            >
-              Create Subchannel
-            </ContextMenu.Link>
-            <ContextMenu.Link
-              onClick={async () => {
-                await mikoto.client.channels.delete(channel.id);
-              }}
-            >
-              Delete Channel
-            </ContextMenu.Link>
-          </ContextMenu>,
-        );
-      },
-    });
+  const nodeContextMenu = useContextMenuX();
+  const channelTree = channelToStructuredTree(space.channels, {
+    onClickFactory(ch) {
+      return (ev) => {
+        tabkit.openTab(channelToTab(ch), ev.ctrlKey);
+      };
+    },
+    onContextMenuFactory(channel) {
+      return nodeContextMenu(
+        <ContextMenu>
+          <ContextMenu.Link
+            onClick={() => {
+              tabkit.openTab(channelToTab(channel), true);
+            }}
+          >
+            Open in new tab
+          </ContextMenu.Link>
+          <ContextMenu.Link>Mark as Read</ContextMenu.Link>
+          <ContextMenu.Link
+            onClick={() => {
+              setModal({
+                elem: <CreateChannelModal channel={channel} />,
+              });
+            }}
+          >
+            Create Subchannel
+          </ContextMenu.Link>
+          <ContextMenu.Link
+            onClick={async () => {
+              await mikoto.client.channels.delete(channel.id);
+            }}
+          >
+            Delete Channel
+          </ContextMenu.Link>
+        </ContextMenu>,
+      );
+    },
+  });
 
-    // TODO: return loading indicator
-    if (space === null) return null;
+  // TODO: return loading indicator
+  if (space === null) return null;
 
-    return (
-      <StyledTree onContextMenu={nodeContextMenu(<TreebarContextMenu />)}>
-        <TreeHead>
-          <h1>{space.name}</h1>
-        </TreeHead>
-        <ExplorerNext nodes={channelTree.descendant!} />
-      </StyledTree>
-    );
-  },
-);
+  return (
+    <StyledTree
+      onContextMenu={nodeContextMenu(<TreebarContextMenu space={space} />)}
+    >
+      <TreeHead>
+        <h1>{space.name}</h1>
+      </TreeHead>
+      <ExplorerNext nodes={channelTree.descendant!} />
+    </StyledTree>
+  );
+});

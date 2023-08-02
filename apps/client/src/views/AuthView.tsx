@@ -99,7 +99,7 @@ export function LoginView() {
         <Anchor to="/forgotpassword" as={Link}>
           Forgot Password?
         </Anchor>
-        <Captcha />
+        {/* <Captcha /> */}
       </Form>
     </AuthView>
   );

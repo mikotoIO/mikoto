@@ -1,6 +1,13 @@
 import { ChannelEmitter, MessageEmitter, SpaceEmitter } from './emitters';
 import { createClient, MainServiceClient } from './schema';
-import { ChannelStore, ClientChannel, ClientSpace, SpaceStore } from './store';
+import {
+  ChannelStore,
+  ClientChannel,
+  ClientRole,
+  ClientSpace,
+  RoleStore,
+  SpaceStore,
+} from './store';
 
 export class MikotoClient {
   // spaces: SpaceEngine = new SpaceEngine(this);
@@ -13,6 +20,7 @@ export class MikotoClient {
 
   spaces = new SpaceStore(this, ClientSpace);
   channels = new ChannelStore(this, ClientChannel);
+  roles = new RoleStore(this, ClientRole);
 
   constructor(
     sophonUrl: string,

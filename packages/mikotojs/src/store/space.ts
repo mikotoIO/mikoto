@@ -5,25 +5,31 @@ import { Role, Space } from '../schema';
 import { Store, normalizedAssign } from './base';
 import { ClientChannel } from './channel';
 import { ClientMember } from './member';
+import { ClientRole } from './role';
 
 export class ClientSpace implements Space {
   id!: string;
   name!: string;
   icon!: string | null;
-  roles!: Role[];
   ownerId!: string | null;
+
   channelIds!: string[];
+  roleIds!: string[];
 
   // null means members hasn't been fetched yet
   members: ObservableMap<string, ClientMember> | null = null;
 
   constructor(public client: MikotoClient, data: Space) {
-    normalizedAssign(this, data, { channels: 'channelIds' });
+    normalizedAssign(this, data, { channels: 'channelIds', roles: 'roleIds' });
     makeAutoObservable(this, { id: false, client: false });
   }
 
   get channels(): ClientChannel[] {
     return this.channelIds.map((x) => this.client.channels.get(x)!);
+  }
+
+  get roles(): ClientRole[] {
+    return this.roleIds.map((x) => this.client.roles.get(x)!);
   }
 
   async fetchMembers(forceSync?: boolean) {
@@ -47,6 +53,7 @@ export class SpaceStore extends Store<Space, ClientSpace> {
 
   expand(data: Space) {
     data.channels.forEach((x) => this.client.channels.produce(x));
+    data.roles.forEach((x) => this.client.roles.produce(x));
   }
 
   async list(reload?: boolean) {

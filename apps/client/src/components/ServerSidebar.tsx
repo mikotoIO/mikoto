@@ -1,9 +1,9 @@
 import { Tooltip } from '@mantine/core';
 import { Button, Form, Input, Modal, Image } from '@mikoto-io/lucid';
 import { AxiosError } from 'axios';
-import { Space, SpaceStore } from 'mikotojs';
+import { ClientSpace, Space, SpaceStore } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -118,7 +118,7 @@ const StyledIconWrapper = styled.div`
   width: 68px;
 `;
 
-function SidebarSpaceIcon({ space }: { space: Space }) {
+function SidebarSpaceIcon({ space }: { space: ClientSpace }) {
   const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
   const isActive = stateSpace?.id === space.id;
 
@@ -139,6 +139,7 @@ function SidebarSpaceIcon({ space }: { space: Space }) {
           icon={space.icon ?? undefined}
           onClick={() => {
             setSpace(space);
+            space.fetchMembers().then();
           }}
         >
           {space.icon === null ? space.name[0] : ''}

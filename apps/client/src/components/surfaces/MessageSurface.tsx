@@ -8,7 +8,6 @@ import {
 } from 'mikotojs';
 import { Observer, observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useAsync } from 'react-async-hook';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';

@@ -16,6 +16,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
+    "@mikoto-io/permcheck": "*",
     "axios": "^0.27.2",
     "mobx": "^6.10.0",
     "socket.io-client": "^4.5.1",

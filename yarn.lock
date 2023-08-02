@@ -5359,6 +5359,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@mikoto-io/permcheck@*, @mikoto-io/permcheck@workspace:packages/permcheck":
+  version: 0.0.0-use.local
+  resolution: "@mikoto-io/permcheck@workspace:packages/permcheck"
+  languageName: unknown
+  linkType: soft
+
 "@mrmlnc/readdir-enhanced@npm:^2.2.1":
   version: 2.2.1
   resolution: "@mrmlnc/readdir-enhanced@npm:2.2.1"
@@ -24488,6 +24494,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "mikotojs@workspace:packages/mikotojs"
   dependencies:
+    "@mikoto-io/permcheck": "*"
     "@sophon-js/cli": ^0.0.5
     axios: ^0.27.2
     mobx: ^6.10.0

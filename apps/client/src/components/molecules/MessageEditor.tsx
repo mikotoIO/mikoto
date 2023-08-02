@@ -15,6 +15,10 @@ const StyledEditable = styled(Editable)`
   outline: none;
   word-break: break-word;
   min-height: auto !important;
+
+  ::selection {
+    background: var(--B700);
+  }
 `;
 
 const initialEditorValue = [{ children: [{ text: '' }] }];

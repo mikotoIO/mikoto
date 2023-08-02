@@ -3,7 +3,6 @@ import { ClientMessage } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import styled from 'styled-components';
 
-import { computeRoleColor } from '../../functions/roleFunctions';
 import { useMikoto } from '../../hooks';
 import { ContextMenu, useContextMenu } from '../ContextMenu';
 import { BotTag } from '../atoms/BotTag';
@@ -150,6 +149,7 @@ export const MessageItem = observer(({ message, isSimple }: MessageProps) => {
         <AvatarFiller />
       ) : (
         <MessageAvatar
+          member={message.member ?? undefined}
           src={message.author?.avatar ?? undefined}
           user={message.author ?? undefined}
         />

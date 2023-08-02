@@ -1,14 +1,12 @@
 import { faCrown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box } from '@mikoto-io/lucid';
-import { ClientSpace, Member, Space } from 'mikotojs';
-import { runInAction } from 'mobx';
+import { ClientMember, ClientSpace } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
-import { computeRoleColor } from '../../functions/roleFunctions';
 import { contextMenuState, useContextMenu } from '../ContextMenu';
 import { Avatar } from '../atoms/Avatar';
 import { MemberContextMenu } from '../atoms/MessageAvatar';
@@ -38,7 +36,7 @@ const Divider = styled.div`
   color: var(--N300);
 `;
 
-function MemberElement({ member, space }: { space: Space; member: Member }) {
+const MemberElement = observer(({ member }: { member: ClientMember }) => {
   const setContextMenu = useSetRecoilState(contextMenuState);
   const elemRef = useRef<HTMLDivElement>(null);
 
@@ -58,21 +56,21 @@ function MemberElement({ member, space }: { space: Space; member: Member }) {
 
         setContextMenu({
           position: { top, right: window.innerWidth - left + 16 },
-          elem: <MemberContextMenu space={space} user={member.user} />,
+          elem: <MemberContextMenu member={member} user={member.user} />,
         });
       }}
       onContextMenu={userContextMenu}
     >
       <Avatar size={32} src={member.user.avatar ?? undefined} />
-      <Box className="name" txt={computeRoleColor(space, member)}>
+      <Box className="name" txt={member.roleColor}>
         {member.user.name}
       </Box>
-      {member.user.id === space.ownerId && (
+      {member.isSpaceOwner && (
         <FontAwesomeIcon className="crown" icon={faCrown} />
       )}
     </StyledMember>
   );
-}
+});
 
 export const MemberListSidebar = observer(
   ({ space }: { space: ClientSpace }) => {
@@ -85,7 +83,7 @@ export const MemberListSidebar = observer(
         <Divider>Members</Divider>
         {space.members &&
           Array.from(space.members.values()).map((x) => (
-            <MemberElement key={x.id} member={x} space={space} />
+            <MemberElement key={x.id} member={x} />
           ))}
       </div>
     );

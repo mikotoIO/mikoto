@@ -15,15 +15,24 @@ export class ClientMember implements Member {
     return this.client.spaces.get(this.spaceId)!;
   }
 
+  get isSpaceOwner() {
+    return this.space.ownerId === this.userId;
+  }
+
   constructor(public client: MikotoClient, data: Member) {
     normalizedAssign(this, data);
     makeAutoObservable(this, { id: false, client: false });
   }
 
+  get roles() {
+    return this.roleIds.map((x) => this.client.roles.get(x)!);
+  }
+
   get roleColor() {
     // eslint-disable-next-line no-restricted-syntax
     for (const roleId of this.roleIds) {
-      const role = this.space.roles.find((x) => x.id === roleId);
+      const role = this.client.roles.get(roleId);
+      console.log(role);
       if (role && role.color) {
         return role.color;
       }

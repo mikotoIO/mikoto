@@ -1,6 +1,7 @@
 import { Checkbox } from '@mantine/core';
 import { Flex } from '@mikoto-io/lucid';
-import { Member, Role, Space, User } from 'mikotojs';
+import { ClientMember, Member, Role, Space, User } from 'mikotojs';
+import { observer } from 'mobx-react-lite';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -100,75 +101,71 @@ const StyledPlusBadge = styled.div`
   font-size: 12px;
 `;
 
-export function MemberContextMenu({
-  user,
-  space,
-}: {
-  user: User;
-  space?: Space;
-}) {
-  const mikoto = useMikoto();
-  const [member, setMember] = useState<Member | null>(null);
-  const setModal = useSetRecoilState(modalState);
+export const MemberContextMenu = observer(
+  ({ user, member }: { user: User; member?: ClientMember }) => {
+    const setModal = useSetRecoilState(modalState);
 
-  useEffect(() => {
-    if (space) {
-      mikoto.client.members.get(space.id, user.id).then(setMember);
-    }
-  }, [user.id]);
+    const [roleEditorOpen, setRoleEditorOpen] = useState(false);
+    const setContextMenu = useSetRecoilState(contextMenuState);
 
-  const [roleEditorOpen, setRoleEditorOpen] = useState(false);
-  const setContextMenu = useSetRecoilState(contextMenuState);
-
-  return (
-    <div style={{ display: 'grid', gridGap: '8px' }}>
-      <AvatarContextWrapper>
-        {member === null ? (
-          'loading'
-        ) : (
-          <div>
-            <Avatar
-              src={user.avatar ?? undefined}
-              size={80}
-              onClick={() => {
-                setModal({
-                  elem: <ProfileModal user={user} />,
-                });
-                setContextMenu(null);
-              }}
-            />
-            <h1>{user.name}</h1>
-            <hr />
-            <h2>Roles</h2>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              {member.roleIds.map((r) => {
-                const role = space?.roles.find((x) => x.id === r);
-                return role && <RoleBadge key={r} role={role} />;
-              })}
-              <StyledPlusBadge
+    return (
+      <div style={{ display: 'grid', gridGap: '8px' }}>
+        <AvatarContextWrapper>
+          {member === null ? (
+            'loading'
+          ) : (
+            <div>
+              <Avatar
+                src={user.avatar ?? undefined}
+                size={80}
                 onClick={() => {
-                  setRoleEditorOpen((x) => !x);
+                  setModal({
+                    elem: <ProfileModal user={user} />,
+                  });
+                  setContextMenu(null);
                 }}
-              >
-                +
-              </StyledPlusBadge>
+              />
+              <h1>{user.name}</h1>
+              <hr />
+              {member && (
+                <>
+                  <h2>Roles</h2>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    {member.roles.map(
+                      (r) => r && <RoleBadge key={r.id} role={r} />,
+                    )}
+                    <StyledPlusBadge
+                      onClick={() => {
+                        setRoleEditorOpen((x) => !x);
+                      }}
+                    >
+                      +
+                    </StyledPlusBadge>
+                  </div>
+                </>
+              )}
             </div>
-          </div>
+          )}
+        </AvatarContextWrapper>
+        {member && roleEditorOpen && (
+          <RoleSetter roles={member.space?.roles!} member={member!} />
         )}
-      </AvatarContextWrapper>
-      {roleEditorOpen && <RoleSetter roles={space?.roles!} member={member!} />}
-    </div>
-  );
-}
+      </div>
+    );
+  },
+);
 
 interface MessageAvatarProps extends AvatarProps {
   user?: User;
+  member?: ClientMember;
 }
 
-export function MessageAvatar({ src, user, size }: MessageAvatarProps) {
+export function MessageAvatar({ src, member, size }: MessageAvatarProps) {
   const setContextMenu = useSetRecoilState(contextMenuState);
   const avatarRef = useRef<HTMLImageElement>(null);
   const space = useContext(CurrentSpaceContext);
+
+  const user = member?.user;
 
   const userContextMenu = useContextMenu(() => (
     <UserContextMenu user={user!} />
@@ -190,7 +187,7 @@ export function MessageAvatar({ src, user, size }: MessageAvatarProps) {
 
         setContextMenu({
           position: { top, left: right + 8 },
-          elem: <MemberContextMenu user={user} space={space} />,
+          elem: <MemberContextMenu member={member} user={user} />,
         });
       }}
     />

@@ -1,8 +1,7 @@
 import { Tooltip } from '@mantine/core';
 import { Button, Form, Input, Modal, Image } from '@mikoto-io/lucid';
 import { AxiosError } from 'axios';
-import { ClientSpace, Space, SpaceStore } from 'mikotojs';
-import { isObservableMap } from 'mobx';
+import { Space, SpaceStore } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
@@ -12,9 +11,7 @@ import { useHover } from 'usehooks-ts';
 
 import { env } from '../env';
 import { useMikoto } from '../hooks';
-import { useDeltaWithRedux } from '../hooks/useDelta';
 import { useErrorElement } from '../hooks/useErrorElement';
-import { spaceActions } from '../redux/mikoto';
 import { treebarSpaceState, useTabkit } from '../store';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { Pill } from './atoms/Pill';

@@ -2,6 +2,7 @@ import { Tooltip } from '@mantine/core';
 import { Button, Form, Input, Modal, Image } from '@mikoto-io/lucid';
 import { AxiosError } from 'axios';
 import { ClientSpace, Space, SpaceStore } from 'mikotojs';
+import { isObservableMap } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';

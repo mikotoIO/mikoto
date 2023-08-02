@@ -1,4 +1,5 @@
-import { action, runInAction } from 'mobx';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { ObservableMap, action, runInAction } from 'mobx';
 
 import type { MikotoClient } from '../MikotoClient';
 
@@ -23,10 +24,10 @@ export interface DeltaSystem<T extends EntityBase> {
   onDelete(fn: (entity: T) => void): void;
 }
 
-export abstract class Store<B extends EntityBase, T extends B> extends Map<
-  string,
-  T
-> {
+export abstract class Store<
+  B extends EntityBase,
+  T extends B,
+> extends ObservableMap<string, T> {
   constructor(
     protected client: MikotoClient,
     protected Ent: EntityConstructor<B, T>,

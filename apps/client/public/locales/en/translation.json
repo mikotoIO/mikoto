@@ -16,6 +16,9 @@
     "language": {
       "title": "Language"
     },
+    "notifications": {
+      "title": "Notifications"
+    },
     "connections": {
       "title": "Connections"
     }

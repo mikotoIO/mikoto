@@ -19,6 +19,7 @@ import { TabName } from '../TabBar';
 import { userState } from '../UserArea';
 import { ViewContainer } from '../ViewContainer';
 import { Spinner } from '../atoms/Spinner';
+import { TypingDots } from '../atoms/TypingDots';
 import { MessageItem } from '../molecules/Message';
 import { MessageEditor } from '../molecules/MessageEditor';
 
@@ -62,8 +63,8 @@ const StyledChannelHead = styled.div`
 
 const StyledTypingIndicatorContainer = styled.div`
   font-size: 12px;
-  height: 12px;
-  padding: 4px 16px 8px;
+  height: 24px;
+  padding: 0 16px;
 `;
 
 function ChannelHead({ channel }: { channel: Channel }) {
@@ -243,6 +244,7 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
       <StyledTypingIndicatorContainer>
         {currentTypers.length > 0 && (
           <div>
+            <TypingDots />
             <strong>
               {currentTypers.map((x) => x.member.user.name).join(', ')}
             </strong>{' '}

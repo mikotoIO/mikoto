@@ -45,6 +45,8 @@ interface MessageEditorProps {
   onTyping?: () => void;
 }
 
+const audio = new Audio('audio/notification/extralife.wav');
+
 export function MessageEditor({
   placeholder,
   onSubmit,
@@ -92,6 +94,8 @@ export function MessageEditor({
           ev.preventDefault();
           const text = serialize(editorValue).trim();
           if (text.length === 0) return;
+
+          // audio.play();
 
           onSubmit(text);
           setEditorValue(initialEditorValue);

@@ -10,23 +10,24 @@ import {
   TextArea,
 } from '@mikoto-io/lucid';
 import { useState } from 'react';
-import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
-import { useAuthClient, useMikoto } from '../../hooks';
-import { useErrorElement } from '../../hooks/useErrorElement';
-import { SettingsView } from '../../views/SettingsViewTemplate';
-import { modalState } from '../ContextMenu';
-import { TabName } from '../TabBar';
-import { userState } from '../UserArea';
+import { useAuthClient, useMikoto } from '../../../hooks';
+import { useErrorElement } from '../../../hooks/useErrorElement';
+import { SettingsView } from '../../../views/SettingsViewTemplate';
+import { modalState } from '../../ContextMenu';
+import { TabName } from '../../TabBar';
+import { userState } from '../../UserArea';
 import {
   AvatarEditor,
   mediaServerAxios,
   uploadFileWithAxios,
-} from '../molecules/AvatarEditor';
+} from '../../molecules/AvatarEditor';
+import { BotsSurface } from './bots';
+import { LanguageSurface } from './language';
 
 const bgUrl = '/images/artworks/1.jpg';
 
@@ -42,7 +43,6 @@ const Content = styled(Flex)`
 `;
 
 export function PasswordChangeModal() {
-  const mikoto = useMikoto();
   const authClient = useAuthClient();
   const user = useRecoilValue(userState);
 
@@ -98,130 +98,6 @@ export function PasswordChangeModal() {
   );
 }
 
-const BotCardContainer = styled.div`
-  background-color: var(--N1000);
-  margin: 16px 0;
-  padding: 16px;
-  border-radius: 8px;
-  width: 800px;
-  max-width: 100%;
-  box-sizing: border-box;
-`;
-
-interface BotProps {
-  id: string;
-  name: string;
-  secret: string;
-}
-
-function BotCard({ id, name, secret }: BotProps) {
-  return (
-    <BotCardContainer>
-      <h2>{name}</h2>
-      <p>Bot ID: {id}</p>
-      <Button
-        onClick={() => {
-          navigator.clipboard.writeText(`${id}:${secret}`);
-        }}
-      >
-        Copy ID:Secret Pair
-      </Button>
-    </BotCardContainer>
-  );
-}
-
-function BotCreateModal() {
-  const authClient = useAuthClient();
-  const { register, handleSubmit } = useForm();
-  const setModal = useSetRecoilState(modalState);
-
-  return (
-    <Modal>
-      <Form
-        onSubmit={handleSubmit(async (form) => {
-          await authClient.createBot(form.name);
-          setModal(null);
-        })}
-      >
-        <h1>Create Bot</h1>
-        <Input labelName="Bot Name" {...register('name', { required: true })} />
-        <Button variant="primary" type="submit">
-          Create Bot
-        </Button>
-      </Form>
-    </Modal>
-  );
-}
-
-function BotsSurface() {
-  const authClient = useAuthClient();
-  const setModal = useSetRecoilState(modalState);
-  const { t } = useTranslation();
-
-  const { result: bots } = useAsync(() => authClient.listBots(), []);
-
-  return (
-    <SettingsView>
-      <TabName name={t('accountSettings.bots.title')} />
-      <h1>{t('accountSettings.bots.title')}</h1>
-      <Button
-        variant="primary"
-        onClick={() => {
-          setModal({
-            elem: <BotCreateModal />,
-          });
-        }}
-      >
-        {t('accountSettings.bots.createBot')}{' '}
-      </Button>
-      {bots && bots.map((bot) => <BotCard key={bot.id} {...bot} />)}
-    </SettingsView>
-  );
-}
-
-const languages = [
-  { name: 'English', code: 'en' },
-  { name: '日本語', code: 'ja' },
-  { name: '한국어', code: 'ko' },
-];
-
-const LanguageSelect = styled(Box)`
-  cursor: pointer;
-`;
-
-function LanguageSurface() {
-  const { t, i18n } = useTranslation();
-  const [language, setLanguage] = useState(
-    localStorage.getItem('language') ?? 'en',
-  );
-
-  return (
-    <SettingsView>
-      <TabName name={t('accountSettings.language.title')} />
-      <h1>{t('accountSettings.language.title')}</h1>
-      <div>
-        {languages.map((lang) => (
-          <LanguageSelect
-            w="100%"
-            key={lang.code}
-            bg={lang.code === language ? 'N600' : 'N1000'}
-            p={12}
-            m={8}
-            rounded={4}
-            onClick={() => {
-              setLanguage(lang.code);
-              localStorage.setItem('language', lang.code);
-              i18n.changeLanguage(lang.code);
-            }}
-          >
-            {lang.name}
-          </LanguageSelect>
-        ))}
-      </div>
-    </SettingsView>
-  );
-}
-
 export function Overview() {
   const setModal = useSetRecoilState(modalState);
   const { t } = useTranslation();
@@ -231,7 +107,6 @@ export function Overview() {
 
   return (
     <SettingsView>
-      <TabName name={t('accountSettings.general.title')} />
       <h1>{t('accountSettings.general.title')}</h1>
       <AccountInfo rounded={8} bg="N900" w="100%">
         <Box txt="B700" h={160} mix={[backgroundMix(bgUrl)]} rounded={8} />
@@ -280,6 +155,16 @@ export function Overview() {
   );
 }
 
+function NotificationSubsurface() {
+  const { t } = useTranslation();
+
+  return (
+    <SettingsView>
+      <h1>{t('accountSettings.notifications.title')}</h1>
+    </SettingsView>
+  );
+}
+
 function Switch({ nav }: { nav: string }) {
   switch (nav) {
     case 'general':
@@ -288,6 +173,8 @@ function Switch({ nav }: { nav: string }) {
       return <BotsSurface />;
     case 'language':
       return <LanguageSurface />;
+    case 'notifications':
+      return <NotificationSubsurface />;
     default:
       return null;
   }
@@ -297,6 +184,7 @@ const ACCOUNT_SETTING_CATEGORIES = [
   { code: 'general', tkey: 'accountSettings.general.title' },
   { code: 'bots', tkey: 'accountSettings.bots.title' },
   { code: 'language', tkey: 'accountSettings.language.title' },
+  { code: 'notifications', tkey: 'accountSettings.notifications.title' },
   { code: 'connections', tkey: 'accountSettings.connections.title' },
 ];
 
@@ -319,6 +207,9 @@ export function AccountSettingsSurface() {
           </SettingsView.Nav>
         ))}
       </SettingsView.Sidebar>
+      <TabName
+        name={t(ACCOUNT_SETTING_CATEGORIES.find((x) => x.code === nav)?.tkey!)}
+      />
       <Switch nav={nav} />
     </SettingsView.Container>
   );

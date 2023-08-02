@@ -4,7 +4,6 @@ import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 import express from 'express';
 import * as http from 'http';
-import { createServer } from 'http';
 import jwt from 'jsonwebtoken';
 import * as path from 'path';
 import {
@@ -16,7 +15,7 @@ import {
   useContainer as useSocketContainer,
   useSocketServer,
 } from 'socket-controllers';
-import socketio, { Server } from 'socket.io';
+import socketio from 'socket.io';
 import { Container } from 'typedi';
 
 import { env } from './env';
@@ -25,7 +24,7 @@ import Minio from './functions/Minio';
 import { logger } from './functions/logger';
 import './functions/prismaRecursive';
 import { redis } from './functions/redis';
-import { boot, sophon } from './services/sophon';
+import { boot } from './services/sophon';
 
 const app = express();
 

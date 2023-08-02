@@ -15,6 +15,9 @@
     },
     "language": {
       "title": "언어"
+    },
+    "notifications": {
+      "title": "알림"
     }
   },
   "spaceSettings": {

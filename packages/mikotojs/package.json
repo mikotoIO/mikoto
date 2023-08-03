@@ -9,7 +9,7 @@
     "generate:client": "sophon generate ./schema.sophon -t ts-socketio-client -o ./src/schema.ts",
     "generate": "npm run generate:server && npm run generate:client",
     "typecheck": "tsc --noEmit",
-    "build": "tsc"
+    "build": "tsc --build"
   },
   "devDependencies": {
     "@sophon-js/cli": "^0.0.5",

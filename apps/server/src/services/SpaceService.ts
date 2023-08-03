@@ -1,4 +1,4 @@
-import { spacePermissions } from '@mikoto-io/permcheck';
+import { permissions } from '@mikoto-io/permcheck';
 import { Prisma } from '@prisma/client';
 import { SophonCore, SophonInstance } from '@sophon-js/server';
 import { ForbiddenError, NotFoundError } from 'routing-controllers';
@@ -69,7 +69,7 @@ export class SpaceService extends AbstractSpaceService {
   }
 
   async update(ctx: SophonInstance, id: string, options: SpaceUpdateOptions) {
-    assertPermission(ctx.data.user.sub, id, spacePermissions.manageSpace);
+    assertPermission(ctx.data.user.sub, id, permissions.manageSpace);
     const space = await prisma.space.update({
       where: { id },
       data: {

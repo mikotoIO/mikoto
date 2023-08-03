@@ -1,9 +1,5 @@
 /* eslint-disable no-bitwise */
-import {
-  spacePermissions,
-  channelPermissions,
-  checkPermission,
-} from '@mikoto-io/permcheck';
+import { permissions, checkPermission } from '@mikoto-io/permcheck';
 
 import { ClientMember } from '../store';
 
@@ -18,7 +14,7 @@ export function checkMemberPermission(
 
   let act = typeof action === 'string' ? BigInt(action) : action;
   if (superuserOverride) {
-    act |= spacePermissions.superuser;
+    act |= permissions.superuser;
   }
   const totalPerms = subject.roles.reduce(
     (acc, x) => acc | BigInt(x.permissions),
@@ -27,9 +23,3 @@ export function checkMemberPermission(
 
   return checkPermission(act, totalPerms);
 }
-
-export const Permissions = {
-  space: spacePermissions,
-  channel: channelPermissions,
-  check: checkPermission,
-};

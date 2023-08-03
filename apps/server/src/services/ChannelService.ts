@@ -1,4 +1,4 @@
-import { spacePermissions } from '@mikoto-io/permcheck';
+import { permissions } from '@mikoto-io/permcheck';
 import { ChannelType } from '@prisma/client';
 import { SophonInstance } from '@sophon-js/server';
 import { NotFoundError, UnauthorizedError } from 'routing-controllers';
@@ -197,7 +197,7 @@ export class MessageService extends AbstractMessageService {
     await assertPermission(
       ctx.data.user.sub,
       channel.spaceId,
-      spacePermissions.manageChannels,
+      permissions.manageChannels,
     );
 
     const message = await prisma.message.findUnique({

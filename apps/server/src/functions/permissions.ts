@@ -1,4 +1,4 @@
-import { checkPermission, spacePermissions } from '@mikoto-io/permcheck';
+import { checkPermission, permissions } from '@mikoto-io/permcheck';
 import { ForbiddenError, NotFoundError } from 'routing-controllers';
 
 import { prisma } from './prisma';
@@ -35,7 +35,7 @@ export async function assertPermission(
   );
 
   if (superuserOverride) {
-    r |= spacePermissions.superuser;
+    r |= permissions.superuser;
   }
   const res = checkPermission(r, totalPerms);
   if (!res) throw new ForbiddenError('Insufficient permissions');

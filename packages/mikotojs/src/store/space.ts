@@ -1,7 +1,7 @@
 import { ObservableMap, makeAutoObservable, runInAction } from 'mobx';
 
 import type { MikotoClient } from '../MikotoClient';
-import { Role, Space } from '../schema';
+import { Space } from '../schema';
 import { Store, normalizedAssign } from './base';
 import { ClientChannel } from './channel';
 import { ClientMember } from './member';
@@ -30,6 +30,10 @@ export class ClientSpace implements Space {
 
   get roles(): ClientRole[] {
     return this.roleIds.map((x) => this.client.roles.get(x)!);
+  }
+
+  get member() {
+    return this.members?.get(this.client.me.id);
   }
 
   async fetchMembers(forceSync?: boolean) {

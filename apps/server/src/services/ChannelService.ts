@@ -1,8 +1,10 @@
+import { spacePermissions } from '@mikoto-io/permcheck';
 import { ChannelType } from '@prisma/client';
 import { SophonInstance } from '@sophon-js/server';
 import { NotFoundError, UnauthorizedError } from 'routing-controllers';
 
 import { findMember } from '../functions/includes';
+import { assertMembership, assertPermission } from '../functions/permissions';
 import { prisma } from '../functions/prisma';
 import { serializeDates } from '../functions/serializeDate';
 import {
@@ -126,6 +128,12 @@ export class MessageService extends AbstractMessageService {
     channelId: string,
     { cursor, limit }: { cursor: string | null; limit: number },
   ) {
+    const channel = await prisma.channel.findUnique({
+      where: { id: channelId },
+    });
+    if (channel === null) throw new NotFoundError('ChannelNotFound');
+
+    await assertMembership(ctx.data.user.sub, channel.spaceId);
     const messages = await prisma.message.findMany({
       where: { channelId },
 
@@ -181,10 +189,16 @@ export class MessageService extends AbstractMessageService {
   }
 
   async delete(ctx: SophonInstance, channelId: string, messageId: string) {
+    // TODO: Fine-grained permission checking for channels
     const channel = await prisma.channel.findUnique({
       where: { id: channelId },
     });
     if (channel === null) throw new NotFoundError('ChannelNotFound');
+    await assertPermission(
+      ctx.data.user.sub,
+      channel.spaceId,
+      spacePermissions.manageChannels,
+    );
 
     const message = await prisma.message.findUnique({
       where: { id: messageId },

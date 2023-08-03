@@ -101,7 +101,9 @@ function ServerIconContextMenu({ space }: { space: Space }) {
         Generate Invite
       </ContextMenu.Link>
       <ContextMenu.Link
-        onClick={async () => await mikoto.client.spaces.leave(space.id)}
+        onClick={async () => {
+          await mikoto.client.spaces.leave(space.id);
+        }}
       >
         Leave Space
       </ContextMenu.Link>
@@ -156,7 +158,7 @@ function SpaceCreateForm({ closeModal }: { closeModal: () => void }) {
   return (
     <Form
       onSubmit={form.handleSubmit(async (data) => {
-        await mikoto.client.spaces.create(data.spaceName);
+        // await mikoto.client.spaces.create(data.spaceName);
         closeModal();
         form.reset();
       })}

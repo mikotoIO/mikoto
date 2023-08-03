@@ -24,7 +24,7 @@ export async function constructMikoto({
 }: ConstructMikotoOptions) {
   const mikoto = await constructMikotoSimple(urlBase, token);
 
-  await mikoto.spaces.list(true);
+  await Promise.all([mikoto.spaces.list(true), mikoto.getMe()]);
   if (typeof window !== 'undefined') {
     (window as any).client = mikoto;
   }

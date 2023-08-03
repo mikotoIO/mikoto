@@ -26,8 +26,8 @@
     "typescript": "^5.1.6"
   },
   "scripts": {
-    "start": "tsc && node ./dist",
-    "build": "tsc",
+    "start": "tsc --build && node ./dist",
+    "build": "tsc --build",
     "run": "node ./dist",
     "dev": "ts-node-dev --respawn --notify -- src/index.ts",
     "test": "jest",
@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@axiomhq/axiom-node": "^0.12.0",
+    "@mikoto-io/permcheck": "*",
     "@prisma/client": "^4.16.2",
     "@sophon-js/cli": "^0.0.4",
     "@sophon-js/server": "^0.0.5",

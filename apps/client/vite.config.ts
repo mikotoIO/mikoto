@@ -23,6 +23,10 @@ export default ({ mode }: { mode: string }) =>
           new URL('../../packages/lucid/src/index.ts', import.meta.url),
         ),
 
+        '@mikoto-io/permcheck': fileURLToPath(
+          new URL('../../packages/permcheck/src/index.ts', import.meta.url),
+        ),
+
         mikotojs: fileURLToPath(
           new URL('../../packages/mikotojs/src/index.ts', import.meta.url),
         ),

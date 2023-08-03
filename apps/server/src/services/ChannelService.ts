@@ -194,18 +194,21 @@ export class MessageService extends AbstractMessageService {
       where: { id: channelId },
     });
     if (channel === null) throw new NotFoundError('ChannelNotFound');
-    await assertPermission(
-      ctx.data.user.sub,
-      channel.spaceId,
-      permissions.manageChannels,
-    );
 
     const message = await prisma.message.findUnique({
       where: { id: messageId },
     });
     if (message === null) throw new NotFoundError('MessageNotFound');
-    await prisma.message.delete({ where: { id: messageId } });
 
+    if (message?.authorId !== ctx.data.user.sub) {
+      await assertPermission(
+        ctx.data.user.sub,
+        channel.spaceId,
+        permissions.manageChannels,
+      );
+    }
+
+    await prisma.message.delete({ where: { id: messageId } });
     this.$(`space/${channel.spaceId}`).onDelete({ messageId, channelId });
   }
 

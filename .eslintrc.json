@@ -19,6 +19,7 @@
     "class-methods-use-this": "off",
     "import/prefer-default-export": "off",
     "no-param-reassign": "off",
+    "no-bitwise": "off",
     "no-console": "off",
     "object-curly-spacing": ["error", "always"],
     "@typescript-eslint/return-await": "off",

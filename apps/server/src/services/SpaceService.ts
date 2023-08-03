@@ -1,7 +1,13 @@
+import { spacePermissions } from '@mikoto-io/permcheck';
 import { Prisma } from '@prisma/client';
 import { SophonCore, SophonInstance } from '@sophon-js/server';
 import { ForbiddenError, NotFoundError } from 'routing-controllers';
 
+import {
+  assertMembership,
+  assertOwnership,
+  assertPermission,
+} from '../functions/permissions';
 import { prisma } from '../functions/prisma';
 import { serializeDates } from '../functions/serializeDate';
 import {
@@ -20,6 +26,7 @@ const spaceInclude = {
 
 export class SpaceService extends AbstractSpaceService {
   async get(ctx: SophonInstance, id: string) {
+    await assertMembership(ctx.data.user.sub, id);
     const space = await prisma.space.findUnique({
       where: { id },
       include: spaceInclude,
@@ -62,6 +69,7 @@ export class SpaceService extends AbstractSpaceService {
   }
 
   async update(ctx: SophonInstance, id: string, options: SpaceUpdateOptions) {
+    assertPermission(ctx.data.user.sub, id, spacePermissions.manageSpace);
     const space = await prisma.space.update({
       where: { id },
       data: {
@@ -76,6 +84,7 @@ export class SpaceService extends AbstractSpaceService {
   }
 
   async delete(ctx: SophonInstance, id: string) {
+    assertOwnership(ctx.data.user.sub, id);
     const space = await prisma.space.findUnique({
       where: { id },
       include: spaceInclude,

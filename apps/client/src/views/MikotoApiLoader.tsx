@@ -26,6 +26,7 @@ export function MikotoApiLoader({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (err !== null) {
+    console.log('this should only redirect auth-related errors');
     console.log(err);
     return <Navigate to="/login" />;
   }

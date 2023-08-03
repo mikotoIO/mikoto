@@ -1,19 +1,31 @@
 /* eslint-disable no-bitwise */
-export const spacePermissions = {
-  superuser: 1n << 0n,
-  manageSpace: 1n << 1n,
-  manageChannels: 1n << 2n,
-  manageRoles: 1n << 3n,
-};
+import {
+  spacePermissions,
+  channelPermissions,
+  checkPermission,
+} from '@mikoto-io/permcheck';
 
-export const channelPermissions = {
-  read: 1n << 0n,
-  send: 1n << 1n,
-};
+import { ClientMember } from '../store';
 
-export function checkPermission(rule: bigint, perms: bigint | string) {
-  const p = typeof perms === 'string' ? BigInt(perms) : perms;
-  return (rule & p) !== 0n;
+export function checkMemberPermission(
+  subject: ClientMember,
+  action: string | bigint,
+  // while most actions can be overridden by superuser, some actions cannot
+  superuserOverride = true,
+) {
+  // space owners can override any permissions, regardless of role
+  if (subject.isSpaceOwner) return true;
+
+  let act = typeof action === 'string' ? BigInt(action) : action;
+  if (superuserOverride) {
+    act |= spacePermissions.superuser;
+  }
+  const totalPerms = subject.roles.reduce(
+    (acc, x) => acc | BigInt(x.permissions),
+    0n,
+  );
+
+  return checkPermission(act, totalPerms);
 }
 
 export const Permissions = {

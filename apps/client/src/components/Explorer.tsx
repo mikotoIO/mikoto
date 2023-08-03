@@ -5,7 +5,13 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Form, Input, Button, Modal } from '@mikoto-io/lucid';
-import { Channel, ClientSpace } from 'mikotojs';
+import {
+  Channel,
+  ClientChannel,
+  ClientSpace,
+  Permissions,
+  checkMemberPermission,
+} from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -180,10 +186,10 @@ function getIconFromChannelType(type: Channel['type']) {
 }
 
 function channelToStructuredTree(
-  channels: Channel[],
+  channels: ClientChannel[],
   options: {
-    onClickFactory(ch: Channel): (ev: React.MouseEvent) => void;
-    onContextMenuFactory(ch: Channel): (ev: React.MouseEvent) => void;
+    onClickFactory(ch: ClientChannel): (ev: React.MouseEvent) => void;
+    onContextMenuFactory(ch: ClientChannel): (ev: React.MouseEvent) => void;
   },
 ): NodeObject {
   const root: NodeObject = {
@@ -222,10 +228,52 @@ function channelToStructuredTree(
   return root;
 }
 
+const ChannelContextMenu = observer(
+  ({ channel }: { channel: ClientChannel }) => {
+    const mikoto = useMikoto();
+    const tabkit = useTabkit();
+    const setModal = useSetRecoilState(modalState);
+
+    return (
+      <ContextMenu>
+        <ContextMenu.Link
+          onClick={() => {
+            tabkit.openTab(channelToTab(channel), true);
+          }}
+        >
+          Open in new tab
+        </ContextMenu.Link>
+        <ContextMenu.Link>Mark as Read</ContextMenu.Link>
+        {checkMemberPermission(
+          channel.space!.member!,
+          Permissions.space.superuser,
+        ) && (
+          <>
+            <ContextMenu.Link
+              onClick={() => {
+                setModal({
+                  elem: <CreateChannelModal channel={channel} />,
+                });
+              }}
+            >
+              Create Subchannel
+            </ContextMenu.Link>
+            <ContextMenu.Link
+              onClick={async () => {
+                await mikoto.client.channels.delete(channel.id);
+              }}
+            >
+              Delete Channel
+            </ContextMenu.Link>
+          </>
+        )}
+      </ContextMenu>
+    );
+  },
+);
+
 export const Explorer = observer(({ space }: { space: ClientSpace }) => {
   const tabkit = useTabkit();
-  const mikoto = useMikoto();
-  const setModal = useSetRecoilState(modalState);
 
   const nodeContextMenu = useContextMenuX();
   const channelTree = channelToStructuredTree(space.channels, {
@@ -235,34 +283,7 @@ export const Explorer = observer(({ space }: { space: ClientSpace }) => {
       };
     },
     onContextMenuFactory(channel) {
-      return nodeContextMenu(
-        <ContextMenu>
-          <ContextMenu.Link
-            onClick={() => {
-              tabkit.openTab(channelToTab(channel), true);
-            }}
-          >
-            Open in new tab
-          </ContextMenu.Link>
-          <ContextMenu.Link>Mark as Read</ContextMenu.Link>
-          <ContextMenu.Link
-            onClick={() => {
-              setModal({
-                elem: <CreateChannelModal channel={channel} />,
-              });
-            }}
-          >
-            Create Subchannel
-          </ContextMenu.Link>
-          <ContextMenu.Link
-            onClick={async () => {
-              await mikoto.client.channels.delete(channel.id);
-            }}
-          >
-            Delete Channel
-          </ContextMenu.Link>
-        </ContextMenu>,
-      );
+      return nodeContextMenu(() => <ChannelContextMenu channel={channel} />);
     },
   });
 

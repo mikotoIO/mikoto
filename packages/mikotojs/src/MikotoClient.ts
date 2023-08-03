@@ -5,6 +5,7 @@ import {
   ClientChannel,
   ClientRole,
   ClientSpace,
+  ClientUser,
   RoleStore,
   SpaceStore,
 } from './store';
@@ -21,6 +22,7 @@ export class MikotoClient {
   spaces = new SpaceStore(this, ClientSpace);
   channels = new ChannelStore(this, ClientChannel);
   roles = new RoleStore(this, ClientRole);
+  me!: ClientUser;
 
   constructor(
     sophonUrl: string,
@@ -78,5 +80,11 @@ export class MikotoClient {
     this.client.spaces.onDelete((space) => {
       this.spaceEmitter.emit('delete/@', space.id);
     });
+  }
+
+  async getMe() {
+    if (this.me) return this.me;
+    this.me = new ClientUser(this, await this.client.users.me());
+    return this.me;
   }
 }

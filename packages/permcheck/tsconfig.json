@@ -1,10 +1,9 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "commonjs",
     "moduleResolution": "node",
     "target": "es2020",
     "esModuleInterop": true,
-    "skipLibCheck": true,
     "sourceMap": true,
     "composite": true,
     "allowSyntheticDefaultImports": true,

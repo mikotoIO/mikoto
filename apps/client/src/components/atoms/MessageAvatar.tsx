@@ -1,8 +1,15 @@
 import { Checkbox } from '@mantine/core';
 import { Flex } from '@mikoto-io/lucid';
-import { ClientMember, Member, Role, Space, User } from 'mikotojs';
+import { permissions } from '@mikoto-io/permcheck';
+import {
+  ClientMember,
+  Member,
+  Role,
+  User,
+  checkMemberPermission,
+} from 'mikotojs';
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
@@ -134,13 +141,18 @@ export const MemberContextMenu = observer(
                     {member.roles.map(
                       (r) => r && <RoleBadge key={r.id} role={r} />,
                     )}
-                    <StyledPlusBadge
-                      onClick={() => {
-                        setRoleEditorOpen((x) => !x);
-                      }}
-                    >
-                      +
-                    </StyledPlusBadge>
+                    {checkMemberPermission(
+                      member.space.member!,
+                      permissions.manageRoles,
+                    ) && (
+                      <StyledPlusBadge
+                        onClick={() => {
+                          setRoleEditorOpen((x) => !x);
+                        }}
+                      >
+                        +
+                      </StyledPlusBadge>
+                    )}
                   </div>
                 </>
               )}

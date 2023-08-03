@@ -12,7 +12,8 @@ import {
   Form,
   Buttons,
 } from '@mikoto-io/lucid';
-import { Space, Role, Permissions } from 'mikotojs';
+import { permissions, checkPermission } from '@mikoto-io/permcheck';
+import { Space, Role } from 'mikotojs';
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
@@ -44,10 +45,10 @@ const ColorDot = styled.span<{ color?: string }>`
 `;
 
 const rolePermissionData = [
-  { name: 'Superuser', permission: Permissions.space.superuser },
-  { name: 'Manage Space', permission: Permissions.space.manageSpace },
-  { name: 'Manage Channel', permission: Permissions.space.manageChannels },
-  { name: 'Manage Roles', permission: Permissions.space.manageRoles },
+  { name: 'Superuser', permission: permissions.superuser },
+  { name: 'Manage Space', permission: permissions.manageSpace },
+  { name: 'Manage Channel', permission: permissions.manageChannels },
+  { name: 'Manage Roles', permission: permissions.manageRoles },
 ];
 
 const StyledColorPicker = styled(HexColorPicker)`
@@ -108,13 +109,13 @@ function RoleColorPicker({ value, onChange }: ColorPickerProps) {
 }
 
 function RolePermissionEditor({
-  permissions,
+  perms,
   onChange,
 }: {
-  permissions: string;
+  perms: string;
   onChange?: (x: string) => void;
 }) {
-  const perm = BigInt(permissions);
+  const perm = BigInt(perms);
 
   return (
     <Box>
@@ -125,7 +126,7 @@ function RolePermissionEditor({
               {x.name}
             </Heading>
             <Toggle
-              checked={Permissions.check(x.permission, perm)}
+              checked={checkPermission(x.permission, perm)}
               onChange={(t) => {
                 // if X is true, switch the bitset to 1
                 // if X is false, switch the bitset to 0
@@ -185,7 +186,7 @@ function RoleEditor({ role, space }: { space: Space; role: Role }) {
         </>
       )}
 
-      <RolePermissionEditor permissions={perms} onChange={setPerms} />
+      <RolePermissionEditor perms={perms} onChange={setPerms} />
       <Buttons>
         <Button variant="primary" type="submit">
           Save Changes

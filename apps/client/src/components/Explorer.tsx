@@ -5,11 +5,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Form, Input, Button, Modal } from '@mikoto-io/lucid';
+import { permissions } from '@mikoto-io/permcheck';
 import {
   Channel,
   ClientChannel,
   ClientSpace,
-  Permissions,
   checkMemberPermission,
 } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
@@ -246,7 +246,7 @@ const ChannelContextMenu = observer(
         <ContextMenu.Link>Mark as Read</ContextMenu.Link>
         {checkMemberPermission(
           channel.space!.member!,
-          Permissions.space.superuser,
+          permissions.superuser,
         ) && (
           <>
             <ContextMenu.Link

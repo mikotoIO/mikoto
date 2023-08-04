@@ -158,7 +158,7 @@ function SpaceCreateForm({ closeModal }: { closeModal: () => void }) {
   return (
     <Form
       onSubmit={form.handleSubmit(async (data) => {
-        // await mikoto.client.spaces.create(data.spaceName);
+        await mikoto.client.spaces.create(data.spaceName);
         closeModal();
         form.reset();
       })}

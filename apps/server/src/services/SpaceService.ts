@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { SophonCore, SophonInstance } from '@sophon-js/server';
 import { ForbiddenError, NotFoundError } from 'routing-controllers';
 
+import { logger } from '../functions/logger';
 import {
   assertMembership,
   assertOwnership,
@@ -48,6 +49,7 @@ export class SpaceService extends AbstractSpaceService {
   }
 
   async create(ctx: SophonInstance, name: string) {
+    logger.debug(`Creating space ${name}`);
     const space = await prisma.space.create({
       data: {
         name,
@@ -179,7 +181,10 @@ async function joinSpace(
   space: Space,
 ) {
   await prisma.spaceUser.create({
-    data: { userId, spaceId: space.id },
+    data: {
+      userId,
+      spaceId: space.id,
+    },
   });
   await sophonCore.joinAll(`user/${userId}`, `space/${space.id}`);
 

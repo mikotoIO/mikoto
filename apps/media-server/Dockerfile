@@ -24,7 +24,7 @@ WORKDIR /mikoto/apps/media-server
 RUN yarn build
 
 FROM node:16-alpine AS runner
-COPY --from=installer /mikoto/apps/media-server /mikoto/apps/media-server
+COPY --from=installer /mikoto /mikoto
 COPY --from=installer /mikoto/node_modules /mikoto/node_modules
 WORKDIR /mikoto/apps/media-server
 

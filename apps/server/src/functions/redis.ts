@@ -1,7 +1,5 @@
-import { createClient } from 'redis';
+import { Redis } from 'ioredis';
 
 import { env } from '../env';
 
-export const redis = createClient({
-  url: env.REDIS_URL,
-});
+export const redis = new Redis(env.REDIS_URL, { lazyConnect: true });

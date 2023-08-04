@@ -1,4 +1,4 @@
-import { RedisClientType } from 'redis';
+import { Redis } from 'ioredis';
 
 // channel name -> message type
 // type PubSubMap = {
@@ -7,44 +7,46 @@ import { RedisClientType } from 'redis';
 
 // typed wrapper for redis pubsub
 export class RedisPubSub<M> {
-  client: RedisClientType;
+  private sender: Redis;
+  private receiver: Redis;
 
-  constructor(client: RedisClientType) {
-    this.client = client.duplicate();
+  constructor(redis: Redis) {
+    this.sender = redis;
+    this.receiver = redis.duplicate({ lazyConnect: true });
   }
 
-  pub<T extends keyof M>(channel: T, id: string, message: M[T]) {
-    this.client.publish(`${channel as string}:${id}`, JSON.stringify(message));
+  async connect() {
+    await this.receiver.connect();
   }
 
-  sub<T extends keyof M>(
-    channel: T,
-    id: string | string[],
-    cb: (message: M[T]) => void,
-  ) {
+  async pub(channel: string, message: any) {
+    await this.sender.publish(channel, JSON.stringify(message));
+  }
+
+  async sub(id: string | string[]) {
     if (Array.isArray(id)) {
-      this.client.subscribe(
-        id.map((i) => `${channel as string}:${i}`),
-        (j) => {
-          cb(JSON.parse(j) as M[T]);
-        },
-      );
+      await this.receiver.subscribe(...id.map((s) => s));
       return;
     }
-    this.client.subscribe(`${channel as string}:${id}`, (j) => {
-      cb(JSON.parse(j) as M[T]);
+    await this.receiver.subscribe(id);
+  }
+
+  async unsub(id?: string) {
+    if (!id) {
+      await this.receiver.unsubscribe();
+      return;
+    }
+    this.receiver.unsubscribe(id);
+  }
+
+  on(fn: (x: any) => void) {
+    this.receiver.on('message', (channel, message) => {
+      // TODO: COME UP WITH A TYPE FOR THIS
+      fn(JSON.parse(message));
     });
   }
 
-  unsub<T extends keyof M>(channel: T, id?: string) {
-    if (!id) {
-      this.client.pUnsubscribe(`${channel as string}:*`);
-      return;
-    }
-    this.client.unsubscribe(`${channel as string}:${id}`);
-  }
-
-  close() {
-    this.client.quit();
+  async close() {
+    await this.receiver.quit();
   }
 }

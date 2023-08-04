@@ -1,17 +1,16 @@
 import { permissions } from '@mikoto-io/permcheck';
 import { ChannelType } from '@prisma/client';
-import { SophonInstance } from '@sophon-js/server';
 import { NotFoundError, UnauthorizedError } from 'routing-controllers';
 
 import { findMember } from '../functions/includes';
 import { assertMembership, assertPermission } from '../functions/permissions';
 import { prisma } from '../functions/prisma';
 import { serializeDates } from '../functions/serializeDate';
+import { MikotoInstance } from './context';
 import {
   AbstractChannelService,
   AbstractMessageService,
   ChannelCreateOptions,
-  SophonContext,
 } from './schema';
 
 const authorInclude = {
@@ -24,21 +23,21 @@ const authorInclude = {
 };
 
 export class ChannelService extends AbstractChannelService {
-  async get(ctx: SophonInstance, id: string) {
+  async get(ctx: MikotoInstance, id: string) {
     const channel = await prisma.channel.findUnique({ where: { id } });
     if (channel === null) throw new NotFoundError();
     return serializeDates(channel);
   }
 
   // list: async (ctx, spaceId: string) => {
-  async list(ctx: SophonInstance, spaceId: string) {
+  async list(ctx: MikotoInstance, spaceId: string) {
     const channels = await prisma.channel.findMany({ where: { spaceId } });
     return serializeDates(channels);
   }
 
   // create: async (ctx, spaceId, { name, type, parentId }) => {
   async create(
-    ctx: SophonInstance,
+    ctx: MikotoInstance,
     spaceId: string,
     { name, type, parentId }: ChannelCreateOptions,
   ) {
@@ -58,14 +57,14 @@ export class ChannelService extends AbstractChannelService {
     return serializeDates(channel);
   }
 
-  async delete(ctx: SophonInstance, id: string) {
+  async delete(ctx: MikotoInstance, id: string) {
     const channel = await prisma.channel.findUnique({ where: { id } });
     if (channel === null) throw new NotFoundError();
     await prisma.channel.delete({ where: { id } });
     this.$(`space/${channel.spaceId}`).onDelete(serializeDates(channel));
   }
 
-  async move(ctx: SophonInstance, id: string, order: number) {
+  async move(ctx: MikotoInstance, id: string, order: number) {
     const channel = await prisma.channel.findUnique({ where: { id } });
     if (channel === null) throw new NotFoundError();
     if (channel.order === order) return;
@@ -103,7 +102,7 @@ export class ChannelService extends AbstractChannelService {
     }
   }
 
-  async startTyping(ctx: SophonInstance, channelId: string) {
+  async startTyping(ctx: MikotoInstance, channelId: string) {
     const channel = await prisma.channel.findUnique({
       where: { id: channelId },
     });
@@ -124,7 +123,7 @@ export class ChannelService extends AbstractChannelService {
 
 export class MessageService extends AbstractMessageService {
   async list(
-    ctx: SophonInstance,
+    ctx: MikotoInstance,
     channelId: string,
     { cursor, limit }: { cursor: string | null; limit: number },
   ) {
@@ -152,7 +151,7 @@ export class MessageService extends AbstractMessageService {
     return serializeDates(messages.reverse());
   }
 
-  async send(ctx: SophonInstance, channelId: string, content: string) {
+  async send(ctx: MikotoInstance, channelId: string, content: string) {
     const channel = await prisma.channel.findUnique({
       where: { id: channelId },
     });
@@ -184,36 +183,36 @@ export class MessageService extends AbstractMessageService {
       }),
     ]);
 
+    ctx.data.pubsub.pub(`space:${channel.spaceId}`, message);
     this.$(`space/${channel.spaceId}`).onCreate(serializeDates(message));
     return serializeDates(message);
   }
 
-  async delete(ctx: SophonInstance, channelId: string, messageId: string) {
+  async delete(ctx: MikotoInstance, channelId: string, messageId: string) {
     // TODO: Fine-grained permission checking for channels
     const channel = await prisma.channel.findUnique({
       where: { id: channelId },
     });
     if (channel === null) throw new NotFoundError('ChannelNotFound');
-    await assertPermission(
-      ctx.data.user.sub,
-      channel.spaceId,
-      permissions.manageChannels,
-    );
 
     const message = await prisma.message.findUnique({
       where: { id: messageId },
     });
     if (message === null) throw new NotFoundError('MessageNotFound');
-    await prisma.message.delete({ where: { id: messageId } });
 
+    if (message?.authorId !== ctx.data.user.sub) {
+      await assertPermission(
+        ctx.data.user.sub,
+        channel.spaceId,
+        permissions.manageChannels,
+      );
+    }
+
+    await prisma.message.delete({ where: { id: messageId } });
     this.$(`space/${channel.spaceId}`).onDelete({ messageId, channelId });
   }
 
-  async ack(
-    ctx: SophonInstance<SophonContext>,
-    channelId: string,
-    timestamp: string,
-  ) {
+  async ack(ctx: MikotoInstance, channelId: string, timestamp: string) {
     await prisma.channelUnread.upsert({
       create: {
         channelId,

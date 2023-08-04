@@ -10,6 +10,10 @@ export const env = load({
   LIVEKIT_KEY: String,
   LIVEKIT_SECRET: String,
   WEB_CLIENT: String,
+  LOG_LEVEL: {
+    type: String,
+    default: 'info',
+  },
   AXIOM_TOKEN: {
     type: String,
     optional: true,

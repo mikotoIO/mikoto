@@ -5405,9 +5405,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sophon-js/cli@npm:^0.0.5":
-  version: 0.0.5
-  resolution: "@sophon-js/cli@npm:0.0.5"
+"@sophon-js/cli@npm:^0.0.7":
+  version: 0.0.7
+  resolution: "@sophon-js/cli@npm:0.0.7"
   dependencies:
     "@oclif/core": ^2
     "@oclif/plugin-help": ^5
@@ -5418,7 +5418,7 @@ __metadata:
     typescript-parsec: ^0.3.2
   bin:
     sophon: bin/run
-  checksum: 34aac0320f88f81a84dc827718082e4dd58339577e18b0c8ea2ca367e584e69d546de36f5a05634ae79f39ad1664e7f10c1769ddaf7f997b4e4c05b5d0ab6304
+  checksum: 29b096e04ab7224874c521de059d9f2cedf82d2c4dcbb62972c303b788d3b04b484fd7a399d62a9b27c5ee7f9d14cbc3446ae433c98a7f8ee5e8c8089b281258
   languageName: node
   linkType: hard
 
@@ -21154,7 +21154,7 @@ __metadata:
   resolution: "mikotojs@workspace:packages/mikotojs"
   dependencies:
     "@mikoto-io/permcheck": "*"
-    "@sophon-js/cli": ^0.0.5
+    "@sophon-js/cli": ^0.0.7
     axios: ^0.27.2
     mobx: ^6.10.0
     socket.io-client: ^4.5.1

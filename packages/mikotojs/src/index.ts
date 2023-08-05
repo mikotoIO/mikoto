@@ -4,8 +4,17 @@ function constructMikotoSimple(sophonUrl: string, token: string) {
   return new Promise<MikotoClient>((resolve, reject) => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const mikotoApi = new MikotoClient(sophonUrl, token, (m) => {
-        resolve(m);
+      let connected = false;
+      const mikotoApi = new MikotoClient(sophonUrl, token, {
+        onReady: (m) => {
+          connected = true;
+          resolve(m);
+        },
+        onDisconnect: () => {
+          if (!connected) {
+            reject(new Error('Disconnected'));
+          }
+        },
       });
     } catch (e) {
       reject(e);
@@ -23,7 +32,6 @@ export async function constructMikoto({
   token,
 }: ConstructMikotoOptions) {
   const mikoto = await constructMikotoSimple(urlBase, token);
-
   await Promise.all([mikoto.spaces.list(true), mikoto.getMe()]);
   if (typeof window !== 'undefined') {
     (window as any).client = mikoto;

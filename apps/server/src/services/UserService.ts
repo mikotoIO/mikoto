@@ -65,18 +65,18 @@ export class MemberService extends AbstractMemberService {
     // TODO: probably a cleaner method to do this
 
     const roleIds = new Set(options.roleIds);
-    const roles =
+    const rolesList =
       (await prisma.spaceUser
         .findUnique({
           where: { userId_spaceId: { userId, spaceId } },
         })
         .roles()) ?? [];
 
-    const oldRoleIds = new Set(roles.map((x) => x.id));
+    const oldRoleIds = new Set(rolesList.map((x) => x.id));
     const roleIdsToCreate = [...roleIds].filter((x) => !oldRoleIds.has(x));
     const roleIdsToDelete = [...oldRoleIds].filter((x) => !roleIds.has(x));
 
-    const member = await prisma.spaceUser.update({
+    const { roles, ...member } = await prisma.spaceUser.update({
       where: { userId_spaceId: { userId, spaceId } },
       data: {
         roles: {
@@ -88,7 +88,7 @@ export class MemberService extends AbstractMemberService {
     });
 
     const mappedMember = {
-      roleIds: member.roles.map((x) => x.id),
+      roleIds: roles.map((x) => x.id),
       ...member,
     };
 

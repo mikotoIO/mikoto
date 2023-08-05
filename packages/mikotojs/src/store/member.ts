@@ -40,4 +40,16 @@ export class ClientMember implements Member {
   }
 }
 
-export class MemberStore extends Store<Member, ClientMember> {}
+export class MemberStore extends Store<Member, ClientMember> {
+  foreignCreate(data: Member) {
+    console.log(data);
+
+    this.client.spaces
+      .get(data.spaceId)
+      ?.members?.set(data.user.id, this.produce(data));
+  }
+
+  foreignDelete(item: ClientMember): void {
+    this.client.spaces.get(item.spaceId)?.members?.delete(item.user.id);
+  }
+}

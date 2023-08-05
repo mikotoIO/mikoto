@@ -2,15 +2,18 @@ import { AxiosError } from 'axios';
 import { MikotoClient, constructMikoto } from 'mikotojs';
 import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
+import { useSetRecoilState } from 'recoil';
 
 import { env } from '../env';
 import { refreshAuth } from '../functions/refreshAuth';
 import { AuthContext, MikotoContext } from '../hooks';
+import { onlineState } from '../store';
 import { authClient } from '../store/authClient';
 
 export function MikotoApiLoader({ children }: { children: React.ReactNode }) {
   const [mikoto, setMikoto] = React.useState<MikotoClient | null>(null);
   const [err, setErr] = React.useState<AxiosError | null>(null);
+  const setOnlineState = useSetRecoilState(onlineState);
 
   // TODO: Try suspense
   useEffect(() => {
@@ -18,7 +21,13 @@ export function MikotoApiLoader({ children }: { children: React.ReactNode }) {
       .then((token) =>
         constructMikoto({
           token,
-          urlBase: env.PUBLIC_SERVER_URL,
+          url: env.PUBLIC_SERVER_URL,
+          onConnect() {
+            setOnlineState(true);
+          },
+          onDisconnect() {
+            setOnlineState(false);
+          },
         }),
       )
       .then((mi) => setMikoto(mi))

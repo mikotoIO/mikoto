@@ -1,19 +1,30 @@
 import { MikotoClient } from './MikotoClient';
 
-function constructMikotoSimple(sophonUrl: string, token: string) {
+interface MikotoConstructOptions {
+  url: string;
+  token: string;
+  onConnect?: () => void;
+  onDisconnect?: () => void;
+}
+
+function constructMikotoSimple(options: MikotoConstructOptions) {
   return new Promise<MikotoClient>((resolve, reject) => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       let connected = false;
-      const mikotoApi = new MikotoClient(sophonUrl, token, {
+      const mikotoApi = new MikotoClient(options.url, options.token, {
         onReady: (m) => {
           connected = true;
           resolve(m);
+        },
+        onConnect: () => {
+          options.onConnect?.();
         },
         onDisconnect: () => {
           if (!connected) {
             reject(new Error('Disconnected'));
           }
+          options.onDisconnect?.();
         },
       });
     } catch (e) {
@@ -22,16 +33,8 @@ function constructMikotoSimple(sophonUrl: string, token: string) {
   });
 }
 
-export interface ConstructMikotoOptions {
-  urlBase: string;
-  token: string;
-}
-
-export async function constructMikoto({
-  urlBase,
-  token,
-}: ConstructMikotoOptions) {
-  const mikoto = await constructMikotoSimple(urlBase, token);
+export async function constructMikoto(options: MikotoConstructOptions) {
+  const mikoto = await constructMikotoSimple(options);
   await Promise.all([mikoto.spaces.list(true), mikoto.getMe()]);
   if (typeof window !== 'undefined') {
     (window as any).client = mikoto;

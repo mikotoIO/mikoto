@@ -38,7 +38,6 @@ export class SpaceService extends AbstractSpaceService {
   }
 
   async list(ctx: SophonInstance) {
-    // console.log('listing....!')
     const list = await prisma.spaceUser.findMany({
       where: { userId: ctx.data.user.sub },
       include: {

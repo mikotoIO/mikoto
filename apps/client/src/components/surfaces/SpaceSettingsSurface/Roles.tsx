@@ -181,6 +181,8 @@ const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
           <Input
             labelName="Role Priority"
             type="number"
+            min={0}
+            max={99}
             {...form.register('position', { valueAsNumber: true })}
           />
           <RoleColorPicker value={color} onChange={setColor} />

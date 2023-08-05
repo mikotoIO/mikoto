@@ -14,6 +14,7 @@ import {
 
 interface MikotoClientOptions {
   onReady?: (client: MikotoClient) => void;
+  onConnect?: () => void;
   onDisconnect?: () => void;
 }
 
@@ -35,22 +36,21 @@ export class MikotoClient {
   constructor(
     sophonUrl: string,
     accessToken: string,
-    { onReady, onDisconnect }: MikotoClientOptions,
+    { onReady, onConnect, onDisconnect }: MikotoClientOptions,
   ) {
-    createClient(
-      {
-        url: sophonUrl,
-        params: {
-          accessToken,
-        },
+    createClient({
+      url: sophonUrl,
+      params: {
+        accessToken,
       },
-      (client) => {
+      onReady: (client) => {
         this.client = client;
         this.setupClient();
         onReady?.(this);
       },
+      onConnect,
       onDisconnect,
-    );
+    });
   }
 
   setupClient() {

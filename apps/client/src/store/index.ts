@@ -95,8 +95,6 @@ export const CurrentSpaceContext = React.createContext<Space | undefined>(
   undefined,
 );
 
-
-
 export const rightBarOpenState = atom<boolean>({
   key: 'rightBarOpen',
   default: false,
@@ -122,4 +120,11 @@ export const workspaceState = atom<Workspace>({
     rightOpen: true,
   },
   effects_UNSTABLE: [workspacePersist.persistAtom],
+});
+
+// online status
+
+export const onlineState = atom<boolean>({
+  key: 'online',
+  default: true,
 });

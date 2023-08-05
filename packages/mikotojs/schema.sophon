@@ -175,6 +175,10 @@ service RoleService {
   create(spaceId: string, name: string): Role;
   edit(id: string, edit: RoleEditPayload): Role;
   delete(id: string);
+
+  ~onCreate(role: Role);
+  ~onUpdate(role: Role);
+  ~onDelete(role: Role);
 }
 
 struct VoiceToken {
@@ -188,7 +192,7 @@ service VoiceService {
 }
 
 struct Relations {
-  
+
 }
 
 service RelationService {

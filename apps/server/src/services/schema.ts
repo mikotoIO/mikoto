@@ -366,6 +366,15 @@ export abstract class AbstractMessageService {
 
 export class RoleServiceSender {
   constructor(private sender: SenderCore, private room: string) {}
+  onCreate(role: Role) {
+    this.sender.emit(this.room, "roles/onCreate", role);
+  }
+  onUpdate(role: Role) {
+    this.sender.emit(this.room, "roles/onUpdate", role);
+  }
+  onDelete(role: Role) {
+    this.sender.emit(this.room, "roles/onDelete", role);
+  }
 }
 
 export abstract class AbstractRoleService {

@@ -1,6 +1,7 @@
 import { SophonInstance } from '@sophon-js/server';
 
 import { prisma } from '../functions/prisma';
+import { MikotoInstance } from './context';
 import {
   AbstractRoleService,
   Role,
@@ -10,7 +11,7 @@ import {
 
 export class RoleService extends AbstractRoleService {
   async create(
-    ctx: SophonInstance<SophonContext>,
+    ctx: MikotoInstance,
     spaceId: string,
     name: string,
   ): Promise<Role> {
@@ -22,11 +23,12 @@ export class RoleService extends AbstractRoleService {
         name,
       },
     });
+    ctx.data.pubsub.pub(`space:${spaceId}`, 'createRole', role);
     return role;
   }
 
   async edit(
-    ctx: SophonInstance<SophonContext>,
+    ctx: MikotoInstance,
     id: string,
     edit: RoleEditPayload,
   ): Promise<Role> {
@@ -39,12 +41,14 @@ export class RoleService extends AbstractRoleService {
         color: edit.color ?? undefined,
       },
     });
+    ctx.data.pubsub.pub(`space:${role.spaceId}`, 'updateRole', role);
     return role;
   }
 
   async delete(ctx: SophonInstance<SophonContext>, id: string): Promise<void> {
-    await prisma.role.delete({
+    const role = await prisma.role.delete({
       where: { id },
     });
+    ctx.data.pubsub.pub(`space:${id}`, 'deleteRole', role);
   }
 }

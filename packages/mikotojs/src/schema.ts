@@ -333,6 +333,16 @@ export class RoleServiceClient {
   delete(id: string): Promise<void> {
     return this.socket.call("roles/delete", id);
   }
+
+  onCreate(handler: (role: Role) => void) {
+    return this.socket.subscribe("roles/onCreate", handler);
+  }
+  onUpdate(handler: (role: Role) => void) {
+    return this.socket.subscribe("roles/onUpdate", handler);
+  }
+  onDelete(handler: (role: Role) => void) {
+    return this.socket.subscribe("roles/onDelete", handler);
+  }
 }
 
 export class VoiceServiceClient {

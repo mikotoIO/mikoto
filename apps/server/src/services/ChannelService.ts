@@ -183,8 +183,12 @@ export class MessageService extends AbstractMessageService {
       }),
     ]);
 
-    // ctx.data.pubsub.pub(`space:${channel.spaceId}`,  message);
-    this.$(`space/${channel.spaceId}`).onCreate(serializeDates(message));
+    ctx.data.pubsub.pub(
+      `space:${channel.spaceId}`,
+      'createMessage',
+      serializeDates(message),
+    );
+    // this.$(`space/${channel.spaceId}`).onCreate(serializeDates(message));
     return serializeDates(message);
   }
 
@@ -209,7 +213,10 @@ export class MessageService extends AbstractMessageService {
     }
 
     await prisma.message.delete({ where: { id: messageId } });
-    this.$(`space/${channel.spaceId}`).onDelete({ messageId, channelId });
+    ctx.data.pubsub.pub(`space:${channel.spaceId}`, 'deleteMessage', {
+      messageId,
+      channelId,
+    });
   }
 
   async ack(ctx: MikotoInstance, channelId: string, timestamp: string) {

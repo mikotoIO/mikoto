@@ -12,6 +12,11 @@ import {
   SpaceStore,
 } from './store';
 
+interface MikotoClientOptions {
+  onReady?: (client: MikotoClient) => void;
+  onDisconnect?: () => void;
+}
+
 export class MikotoClient {
   // spaces: SpaceEngine = new SpaceEngine(this);
   client!: MainServiceClient;
@@ -30,7 +35,7 @@ export class MikotoClient {
   constructor(
     sophonUrl: string,
     accessToken: string,
-    onready?: (self: MikotoClient) => void,
+    { onReady, onDisconnect }: MikotoClientOptions,
   ) {
     createClient(
       {
@@ -42,8 +47,9 @@ export class MikotoClient {
       (client) => {
         this.client = client;
         this.setupClient();
-        onready?.(this);
+        onReady?.(this);
       },
+      onDisconnect,
     );
   }
 

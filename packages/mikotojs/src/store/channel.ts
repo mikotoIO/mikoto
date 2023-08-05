@@ -41,7 +41,7 @@ export class ChannelStore extends Store<Channel, ClientChannel> {
   }
 
   foreignCreate(data: Channel) {
-    this.client.spaces.get(data.spaceId)?.channelIds.push(data.id);
+    this.client.spaces.get(data.spaceId)?.channelIds?.push?.(data.id);
   }
 
   foreignDelete(data: Channel) {

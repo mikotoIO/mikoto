@@ -348,13 +348,18 @@ export class RelationServiceClient {
 
 export function createClient(
   options: { url: string; params?: Record<string, string> },
-  onConnect: (client: MainServiceClient) => void
+  onConnect: (client: MainServiceClient) => void,
+  onDisconnect?: () => void
 ) {
   const socket = io(options.url, { query: options.params });
 
   socket.once("connect", () => {
     const socketClient = new SocketClient(socket);
     onConnect(new MainServiceClient(socketClient));
+  });
+
+  socket.on("disconnect", () => {
+    onDisconnect?.();
   });
 
   return () => {

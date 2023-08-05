@@ -1,5 +1,5 @@
 import { MainService } from '..';
-import { Member } from '../schema';
+import { Member, Message } from '../schema';
 
 export function buildPubSub(service: MainService, id: string) {
   return {
@@ -11,6 +11,14 @@ export function buildPubSub(service: MainService, id: string) {
     },
     deleteMember(member: Member) {
       service.members.$(id).onDelete(member);
+    },
+
+    createMessage(message: Message) {
+      service.messages.$(id).onCreate(message);
+    },
+
+    deleteMessage(message: { messageId: string; channelId: string }) {
+      service.messages.$(id).onDelete(message);
     },
   };
 }

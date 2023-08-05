@@ -1,5 +1,5 @@
 import { permissions } from '@mikoto-io/permcheck';
-import { Prisma } from '@prisma/client';
+import { Prisma, SpaceUser } from '@prisma/client';
 import { SophonCore, SophonInstance } from '@sophon-js/server';
 import { ForbiddenError, NotFoundError } from 'routing-controllers';
 
@@ -126,6 +126,7 @@ export class SpaceService extends AbstractSpaceService {
       this.$,
       ctx.data.user.sub,
       serializeDates(space),
+      ctx,
     );
   }
 
@@ -183,7 +184,7 @@ async function joinSpace(
   space: Space,
   ctx: MikotoInstance,
 ) {
-  const member = await prisma.spaceUser.create({
+  const { roles, ...member } = await prisma.spaceUser.create({
     data: {
       userId,
       spaceId: space.id,
@@ -194,7 +195,7 @@ async function joinSpace(
 
   $(`user/${userId}`).onCreate(space);
   ctx.data.pubsub.pub(`space:${space.id}`, 'createMember', {
-    roleIds: member.roles.map((x) => x.id),
+    roleIds: roles.map((x) => x.id),
     ...member,
   });
 }
@@ -204,11 +205,19 @@ async function leaveSpace(
   $: (room: string) => SpaceServiceSender,
   userId: string,
   space: Space,
+  ctx: MikotoInstance,
 ) {
-  await prisma.spaceUser.delete({
-    where: { userId_spaceId: { userId, spaceId: space.id } },
+  const { roles, ...member } = await prisma.spaceUser.delete({
+    where: {
+      userId_spaceId: { userId, spaceId: space.id },
+    },
+    include: memberInclude,
   });
   await sophonCore.leaveAll(`user/${userId}`, `space/${space.id}`);
 
   $(`user/${userId}`).onDelete(space);
+  ctx.data.pubsub.pub(`space:${space.id}`, 'deleteMember', {
+    roleIds: roles.map((x) => x.id),
+    ...member,
+  });
 }

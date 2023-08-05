@@ -6,7 +6,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import ReactDOM from 'react-dom/client';
 import { Helmet } from 'react-helmet';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { Provider } from 'react-redux';
 import { RecoilRoot } from 'recoil';
 import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
@@ -15,7 +14,6 @@ import '../../../packages/lucid/src/fonts.css';
 import App from './App';
 import { env } from './env';
 import './i18n';
-import { store } from './redux';
 import reportWebVitals from './reportWebVitals';
 
 /// global polyfill
@@ -41,31 +39,25 @@ const SilentRecoilRoot = RecoilRoot as any;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <SilentRecoilRoot>
-    <Provider store={store}>
-      <StyleSheetManager disableCSSOMInjection>
-        <LucidProvider>
-          <ThemeProvider theme={theme}>
-            <MantineProvider theme={{ colorScheme: 'dark' }}>
-              <DndProvider backend={HTML5Backend}>
-                <>
-                  <Helmet>
-                    {env.DEV && (
-                      <link
-                        rel="icon"
-                        type="image/png"
-                        href="/favicon-dev.ico"
-                      />
-                    )}
-                  </Helmet>
-                  <GlobalStyle />
-                  <App />
-                </>
-              </DndProvider>
-            </MantineProvider>
-          </ThemeProvider>
-        </LucidProvider>
-      </StyleSheetManager>
-    </Provider>
+    <StyleSheetManager disableCSSOMInjection>
+      <LucidProvider>
+        <ThemeProvider theme={theme}>
+          <MantineProvider theme={{ colorScheme: 'dark' }}>
+            <DndProvider backend={HTML5Backend}>
+              <>
+                <Helmet>
+                  {env.DEV && (
+                    <link rel="icon" type="image/png" href="/favicon-dev.ico" />
+                  )}
+                </Helmet>
+                <GlobalStyle />
+                <App />
+              </>
+            </DndProvider>
+          </MantineProvider>
+        </ThemeProvider>
+      </LucidProvider>
+    </StyleSheetManager>
   </SilentRecoilRoot>,
 );
 

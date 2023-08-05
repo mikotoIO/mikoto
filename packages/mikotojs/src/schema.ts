@@ -354,8 +354,10 @@ export function createClient(
   const socket = io(options.url, { query: options.params });
 
   socket.once("connect", () => {
-    const socketClient = new SocketClient(socket);
-    onConnect(new MainServiceClient(socketClient));
+    socket.once("ready", () => {
+      const socketClient = new SocketClient(socket);
+      onConnect(new MainServiceClient(socketClient));
+    });
   });
 
   socket.on("disconnect", () => {

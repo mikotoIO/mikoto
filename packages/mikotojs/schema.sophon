@@ -9,6 +9,7 @@ struct Role {
   id: string;
   name: string;
   color: string?;
+  spaceId: string;
   permissions: string;
   position: int;
 }

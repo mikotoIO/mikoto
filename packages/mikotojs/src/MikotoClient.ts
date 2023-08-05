@@ -57,6 +57,7 @@ export class MikotoClient {
     this.spaces.subscribe(this.client.spaces);
     this.channels.subscribe(this.client.channels);
     this.members.subscribe(this.client.members);
+    this.roles.subscribe(this.client.roles);
 
     // rewrite io to use sophon
     this.client.messages.onCreate((message) => {

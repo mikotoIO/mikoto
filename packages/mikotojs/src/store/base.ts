@@ -38,6 +38,7 @@ export abstract class Store<
   // overridable
   expand(data: B): void {}
   foreignCreate(item: T): void {}
+  foreignUpdate(item: T): void {}
   foreignDelete(item: T): void {}
 
   // errors if ID is not found w/o data
@@ -46,6 +47,7 @@ export abstract class Store<
     const entity = this.get(id)!;
     if (data) {
       updateAction(entity, data);
+      this.foreignUpdate(entity);
     }
     return entity;
   }

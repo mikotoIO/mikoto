@@ -49,6 +49,6 @@ export class RoleService extends AbstractRoleService {
     const role = await prisma.role.delete({
       where: { id },
     });
-    ctx.data.pubsub.pub(`space:${id}`, 'deleteRole', role);
+    ctx.data.pubsub.pub(`space:${role.spaceId}`, 'deleteRole', role);
   }
 }

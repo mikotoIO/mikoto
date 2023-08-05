@@ -49,7 +49,7 @@ export class MemberStore extends Store<Member, ClientMember> {
       ?.members?.set(data.user.id, this.produce(data));
   }
 
-  foreignDelete(item: ClientMember): void {
+  foreignDelete(item: Member): void {
     this.client.spaces.get(item.spaceId)?.members?.delete(item.user.id);
   }
 }

@@ -14,6 +14,7 @@ export const Role = z.object({
   id: z.string(),
   name: z.string(),
   color: z.nullable(z.string()),
+  spaceId: z.string(),
   permissions: z.string(),
   position: z.number().int(),
 });

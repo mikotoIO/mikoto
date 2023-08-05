@@ -42,7 +42,7 @@ export class ClientSpace implements Space {
 
     runInAction(() => {
       this.members = new ObservableMap(
-        members.map((x) => [x.user.id, new ClientMember(this.client, x)]),
+        members.map((x) => [x.user.id, this.client.members.produce(x)]),
       );
     });
   }

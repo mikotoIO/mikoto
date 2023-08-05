@@ -32,7 +32,6 @@ export class ClientMember implements Member {
     // eslint-disable-next-line no-restricted-syntax
     for (const roleId of this.roleIds) {
       const role = this.client.roles.get(roleId);
-      console.log(role);
       if (role && role.color) {
         return role.color;
       }

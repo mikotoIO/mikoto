@@ -3,7 +3,6 @@ import { Prisma } from '@prisma/client';
 import { SophonCore, SophonInstance } from '@sophon-js/server';
 import { ForbiddenError, NotFoundError } from 'routing-controllers';
 
-import { logger } from '../functions/logger';
 import {
   assertMembership,
   assertOwnership,
@@ -11,6 +10,8 @@ import {
 } from '../functions/permissions';
 import { prisma } from '../functions/prisma';
 import { serializeDates } from '../functions/serializeDate';
+import { memberInclude } from './UserService';
+import { MikotoInstance } from './context';
 import {
   AbstractSpaceService,
   Invite,
@@ -48,8 +49,7 @@ export class SpaceService extends AbstractSpaceService {
     return serializeDates(list.map((x) => x.space));
   }
 
-  async create(ctx: SophonInstance, name: string) {
-    logger.debug(`Creating space ${name}`);
+  async create(ctx: MikotoInstance, name: string) {
     const space = await prisma.space.create({
       data: {
         name,
@@ -66,6 +66,7 @@ export class SpaceService extends AbstractSpaceService {
       this.$,
       ctx.data.user.sub,
       serializeDates(space),
+      ctx,
     );
     return serializeDates(space);
   }
@@ -99,7 +100,7 @@ export class SpaceService extends AbstractSpaceService {
     await this.$(`space/${id}`).onDelete(serializeDates(space));
   }
 
-  async join(ctx: SophonInstance, id: string) {
+  async join(ctx: MikotoInstance, id: string) {
     const space = await prisma.space.findUnique({
       where: { id },
       include: { roles: true, channels: true },
@@ -110,6 +111,7 @@ export class SpaceService extends AbstractSpaceService {
       this.$,
       ctx.data.user.sub,
       serializeDates(space),
+      ctx,
     );
   }
 
@@ -179,16 +181,22 @@ async function joinSpace(
   $: (room: string) => SpaceServiceSender,
   userId: string,
   space: Space,
+  ctx: MikotoInstance,
 ) {
-  await prisma.spaceUser.create({
+  const member = await prisma.spaceUser.create({
     data: {
       userId,
       spaceId: space.id,
     },
+    include: memberInclude,
   });
   await sophonCore.joinAll(`user/${userId}`, `space/${space.id}`);
 
   $(`user/${userId}`).onCreate(space);
+  ctx.data.pubsub.pub(`space:${space.id}`, 'createMember', {
+    roleIds: member.roles.map((x) => x.id),
+    ...member,
+  });
 }
 
 async function leaveSpace(

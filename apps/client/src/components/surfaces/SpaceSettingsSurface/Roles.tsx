@@ -13,7 +13,8 @@ import {
   Buttons,
 } from '@mikoto-io/lucid';
 import { permissions, checkPermission } from '@mikoto-io/permcheck';
-import { Space, Role } from 'mikotojs';
+import { Space, Role, ClientSpace } from 'mikotojs';
+import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
@@ -150,7 +151,7 @@ const StyledRoleEditor = styled(Form)`
   overflow-y: scroll;
 `;
 
-function RoleEditor({ role, space }: { space: Space; role: Role }) {
+const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
   const mikoto = useMikoto();
   const form = useForm({
     defaultValues: {
@@ -192,19 +193,29 @@ function RoleEditor({ role, space }: { space: Space; role: Role }) {
           Save Changes
         </Button>
         {role.name !== '@everyone' && (
-          <Button variant="danger">Delete Role</Button>
+          <Button
+            type="button"
+            variant="danger"
+            onClick={() => {
+              mikoto.client.roles.delete(role.id).then(() => {
+                console.log('role deleted');
+              });
+            }}
+          >
+            Delete Role
+          </Button>
         )}
       </Buttons>
     </StyledRoleEditor>
   );
-}
+});
 
-export function RolesSubsurface({ space }: { space: Space }) {
-  // const rolesDelta = useDelta(space.roles, [space.id]);
+export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
   const mikoto = useMikoto();
 
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
   const role = space.roles.find((x) => x.id === selectedRoleId);
+  console.log(space);
   // const role = rolesDelta.data.find((x) => x.id === selectedRoleId);
   return (
     <SettingsView style={{ paddingRight: 0 }}>
@@ -234,4 +245,4 @@ export function RolesSubsurface({ space }: { space: Space }) {
       </Grid>
     </SettingsView>
   );
-}
+});

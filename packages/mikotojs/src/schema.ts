@@ -14,6 +14,7 @@ export const Role = z.object({
   id: z.string(),
   name: z.string(),
   color: z.nullable(z.string()),
+  spaceId: z.string(),
   permissions: z.string(),
   position: z.number().int(),
 });
@@ -332,6 +333,16 @@ export class RoleServiceClient {
   }
   delete(id: string): Promise<void> {
     return this.socket.call("roles/delete", id);
+  }
+
+  onCreate(handler: (role: Role) => void) {
+    return this.socket.subscribe("roles/onCreate", handler);
+  }
+  onUpdate(handler: (role: Role) => void) {
+    return this.socket.subscribe("roles/onUpdate", handler);
+  }
+  onDelete(handler: (role: Role) => void) {
+    return this.socket.subscribe("roles/onDelete", handler);
   }
 }
 

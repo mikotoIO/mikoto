@@ -18,6 +18,7 @@ export const Role = z.object({
   id: z.string(),
   name: z.string(),
   color: z.nullable(z.string()),
+  spaceId: z.string(),
   permissions: z.string(),
   position: z.number().int(),
 });
@@ -366,6 +367,15 @@ export abstract class AbstractMessageService {
 
 export class RoleServiceSender {
   constructor(private sender: SenderCore, private room: string) {}
+  onCreate(role: Role) {
+    this.sender.emit(this.room, "roles/onCreate", role);
+  }
+  onUpdate(role: Role) {
+    this.sender.emit(this.room, "roles/onUpdate", role);
+  }
+  onDelete(role: Role) {
+    this.sender.emit(this.room, "roles/onDelete", role);
+  }
 }
 
 export abstract class AbstractRoleService {

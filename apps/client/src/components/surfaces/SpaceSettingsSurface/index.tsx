@@ -1,5 +1,5 @@
 import { Input, Form, Button, Buttons, Modal } from '@mikoto-io/lucid';
-import { Space } from 'mikotojs';
+import { ClientSpace, Space } from 'mikotojs';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSetRecoilState } from 'recoil';
@@ -93,7 +93,7 @@ function Invites({ space }: { space: Space }) {
   );
 }
 
-function SettingSwitch({ nav, space }: { nav: string; space: Space }) {
+function SettingSwitch({ nav, space }: { nav: string; space: ClientSpace }) {
   switch (nav) {
     case 'Overview':
       return <Overview space={space} />;
@@ -112,6 +112,9 @@ const CATEGORIES = ['Overview', 'Invites', 'Roles', 'Emojis'];
 
 export function SpaceSettingsView({ space }: { space: Space }) {
   const [nav, setNav] = useState('Overview');
+  const mikoto = useMikoto();
+  const cSpace = mikoto.spaces.get(space.id)!;
+
   return (
     <SettingsView.Container>
       <SettingsView.Sidebar>
@@ -127,7 +130,7 @@ export function SpaceSettingsView({ space }: { space: Space }) {
           </SettingsView.Nav>
         ))}
       </SettingsView.Sidebar>
-      <SettingSwitch nav={nav} space={space} />
+      <SettingSwitch nav={nav} space={cSpace} />
     </SettingsView.Container>
   );
 }

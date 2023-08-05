@@ -36,6 +36,14 @@ export class ClientSpace implements Space {
     return this.members?.get(this.client.me.id);
   }
 
+  sortRoles() {
+    this.roleIds.sort((a, b) => {
+      const roleA = this.client.roles.get(a)!;
+      const roleB = this.client.roles.get(b)!;
+      return roleB.position - roleA.position;
+    });
+  }
+
   async fetchMembers(forceSync?: boolean) {
     if (this.members && !forceSync) return;
     const members = await this.client.client.members.list(this.id);

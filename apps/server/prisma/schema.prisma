@@ -33,6 +33,7 @@ model User {
 
   alphaRelation Relationship[] @relation("AlphaRelation")
   betaRelation  Relationship[] @relation("BetaRelation")
+  Ban           Ban[]
 }
 
 // factor out email and password
@@ -114,6 +115,7 @@ model Space {
   roles        Role[]
   Invite       Invite[]
   Relationship Relationship?
+  Ban          Ban[]
 }
 
 model Channel {
@@ -193,7 +195,7 @@ model Relationship {
   space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 
   aToB RelationState
-  bTOA RelationState
+  bToA RelationState
 
   @@unique([alphaId, betaId])
   @@index([betaId])
@@ -203,4 +205,16 @@ enum RelationState {
   NONE
   FRIEND
   BLOCKED
+}
+
+model Ban {
+  id      String @id @default(uuid()) @db.Uuid
+  userId  String @db.Uuid
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceId String @db.Uuid
+  space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  reason String?
+
+  @@unique([spaceId, userId])
 }

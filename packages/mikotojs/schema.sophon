@@ -97,6 +97,10 @@ service MemberService {
   list(spaceId: string): Member[];
   update(spaceId: string, userId: string, roleIds: MemberUpdateOptions): Member;
   delete(spaceId: string, userId: string): void;
+
+  ~onCreate(member: Member);
+  ~onUpdate(member: Member);
+  ~onDelete(member: Member);
 }
 
 struct UserUpdateOptions {

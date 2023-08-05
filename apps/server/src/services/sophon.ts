@@ -4,22 +4,23 @@ import { createServer } from 'http';
 import jwt from 'jsonwebtoken';
 import { UnauthorizedError } from 'routing-controllers';
 import { Server } from 'socket.io';
+import { log } from 'winston';
 
 import { MainService } from '.';
 import { env } from '../env';
+import { logger } from '../functions/logger';
 import { prisma } from '../functions/prisma';
 import { RedisPubSub } from '../functions/pubsub';
 import { redis } from '../functions/redis';
-import { Member, SophonContext } from './schema';
+import { buildPubSub } from './events';
+import { SophonContext } from './schema';
 
-type PubSubEngine = {
-  memberUpdate: Member;
-};
+type MikotoRedis = RedisPubSub<ReturnType<typeof buildPubSub>>;
 
 declare module './schema' {
   interface SophonContext {
     user: { sub: string };
-    pubsub: RedisPubSub<PubSubEngine>;
+    pubsub: MikotoRedis;
   }
 }
 
@@ -37,31 +38,39 @@ const sophonIO = new Server(httpServer, {
 });
 
 export const sophon = new SophonCore<SophonContext>(sophonIO, {
-  async connect({ params, join }) {
-    if (!params.accessToken) throw new UnauthorizedError('No Header');
-    const user = jwt.verify(params.accessToken, env.SECRET) as any;
+  async connect({ params, join, id }) {
+    try {
+      if (!params.accessToken) throw new UnauthorizedError('No Header');
+      const user = jwt.verify(params.accessToken, env.SECRET) as any;
 
-    join(`user/${user.sub}`);
+      join(`user/${user.sub}`);
 
-    const spaces = await prisma.spaceUser
-      .findMany({
-        where: { userId: user.sub },
-        include: {
-          space: true,
-        },
-      })
-      .then((xs) => xs.map((x) => x.space));
+      const spaces = await prisma.spaceUser
+        .findMany({
+          where: { userId: user.sub },
+          include: {
+            space: true,
+          },
+        })
+        .then((xs) => xs.map((x) => x.space));
 
-    const pubsub = new RedisPubSub<PubSubEngine>(redis);
-    await pubsub.sub(spaces.map((x) => `space:${x.id}`));
-    pubsub.on((x) => {
-      // console.log(x);
-    });
+      const pubsub: MikotoRedis = new RedisPubSub<
+        ReturnType<typeof buildPubSub>
+      >(redis, buildPubSub(mainService, id));
+      const toSub = [...spaces.map((x) => `space:${x.id}`)];
+      if (toSub.length > 0) {
+        await pubsub.sub(toSub);
+      }
+      pubsub.on();
 
-    return {
-      pubsub,
-      user,
-    };
+      return {
+        pubsub,
+        user,
+      };
+    } catch (e) {
+      logger.error(e);
+      throw new Error('wtf');
+    }
   },
   disconnect(data) {
     data.pubsub.close();

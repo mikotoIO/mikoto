@@ -1,4 +1,6 @@
 import { Button, Flex, Grid, backgroundMix } from '@mikoto-io/lucid';
+import { Space } from 'mikotojs';
+import { useEffect, useState } from 'react';
 import { useAsync } from 'react-async-hook';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -27,12 +29,15 @@ const InvitationBox = styled.div`
 
 export function SpaceInviteViewInner() {
   const mikoto = useMikoto();
+  const [space, setSpace] = useState<Space | null>(null);
   const params = useParams<{ id: string }>();
 
-  const { result: space } = useAsync(
-    async (id: string) => mikoto.client.spaces.get(id),
-    [params.id ?? ''],
-  );
+  // TODO: Use proper invite links
+  useEffect(() => {
+    mikoto.client.spaces.get(params.id ?? '').then((x) => {
+      setSpace(x);
+    });
+  }, [params.id ?? '']);
 
   return (
     <Grid tcol="400px 1fr" h="100vh">

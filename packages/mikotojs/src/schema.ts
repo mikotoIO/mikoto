@@ -233,6 +233,16 @@ export class MemberServiceClient {
   delete(spaceId: string, userId: string): Promise<void> {
     return this.socket.call("members/delete", spaceId, userId);
   }
+
+  onCreate(handler: (member: Member) => void) {
+    return this.socket.subscribe("members/onCreate", handler);
+  }
+  onUpdate(handler: (member: Member) => void) {
+    return this.socket.subscribe("members/onUpdate", handler);
+  }
+  onDelete(handler: (member: Member) => void) {
+    return this.socket.subscribe("members/onDelete", handler);
+  }
 }
 
 export class UserServiceClient {

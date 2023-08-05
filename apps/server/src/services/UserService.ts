@@ -2,6 +2,7 @@ import { SophonInstance } from '@sophon-js/server';
 import { NotFoundError } from 'routing-controllers';
 
 import { prisma } from '../functions/prisma';
+import { MikotoInstance } from './context';
 import {
   AbstractMemberService,
   AbstractUserService,
@@ -10,7 +11,7 @@ import {
   UserUpdateOptions,
 } from './schema';
 
-const memberInclude = {
+export const memberInclude = {
   roles: {
     select: { id: true },
   },
@@ -55,7 +56,7 @@ export class MemberService extends AbstractMemberService {
   }
 
   async update(
-    ctx: SophonInstance,
+    ctx: MikotoInstance,
     spaceId: string,
     userId: string,
     options: MemberUpdateOptions,
@@ -85,10 +86,14 @@ export class MemberService extends AbstractMemberService {
       },
       include: memberInclude,
     });
-    return {
+
+    const mappedMember = {
       roleIds: member.roles.map((x) => x.id),
       ...member,
     };
+
+    ctx.data.pubsub.pub(`space:${spaceId}`, 'updateMember', mappedMember);
+    return mappedMember;
   }
 
   // kick

@@ -209,6 +209,15 @@ export abstract class AbstractSpaceService {
 
 export class MemberServiceSender {
   constructor(private sender: SenderCore, private room: string) {}
+  onCreate(member: Member) {
+    this.sender.emit(this.room, "members/onCreate", member);
+  }
+  onUpdate(member: Member) {
+    this.sender.emit(this.room, "members/onUpdate", member);
+  }
+  onDelete(member: Member) {
+    this.sender.emit(this.room, "members/onDelete", member);
+  }
 }
 
 export abstract class AbstractMemberService {

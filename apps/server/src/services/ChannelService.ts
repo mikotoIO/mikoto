@@ -183,7 +183,7 @@ export class MessageService extends AbstractMessageService {
       }),
     ]);
 
-    ctx.data.pubsub.pub(`space:${channel.spaceId}`, message);
+    // ctx.data.pubsub.pub(`space:${channel.spaceId}`,  message);
     this.$(`space/${channel.spaceId}`).onCreate(serializeDates(message));
     return serializeDates(message);
   }

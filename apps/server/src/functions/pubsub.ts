@@ -6,11 +6,11 @@ import { Redis } from 'ioredis';
 // };
 
 // typed wrapper for redis pubsub
-export class RedisPubSub<M> {
+export class RedisPubSub<M extends Record<string, (arg: any) => void>> {
   private sender: Redis;
   private receiver: Redis;
 
-  constructor(redis: Redis) {
+  constructor(redis: Redis, private handlers: M) {
     this.sender = redis;
     this.receiver = redis.duplicate({ lazyConnect: true });
   }
@@ -19,8 +19,14 @@ export class RedisPubSub<M> {
     await this.receiver.connect();
   }
 
-  async pub(channel: string, message: any) {
-    await this.sender.publish(channel, JSON.stringify(message));
+  async pub<K extends keyof M>(channel: string, key: K, message: Parameters<M[K]>[0]) {
+    await this.sender.publish(
+      channel,
+      JSON.stringify({
+        op: key,
+        data: message,
+      }),
+    );
   }
 
   async sub(id: string | string[]) {
@@ -39,10 +45,13 @@ export class RedisPubSub<M> {
     this.receiver.unsubscribe(id);
   }
 
-  on(fn: (x: any) => void) {
+  on() {
     this.receiver.on('message', (channel, message) => {
       // TODO: COME UP WITH A TYPE FOR THIS
-      fn(JSON.parse(message));
+      const { op, data } = JSON.parse(message);
+      if (data) {
+        this.handlers[op](data);
+      }
     });
   }
 

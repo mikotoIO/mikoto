@@ -20,7 +20,7 @@ import { authClient } from '../store/authClient';
 
 const AuthViewInner = styled.div`
   color: white;
-  background-color: ${(p) => p.theme.colors.N800};
+  background-color: var(--N800);
   ${Form} {
     width: 300px;
     margin: 0 auto;

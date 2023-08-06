@@ -28,7 +28,7 @@ interface AvatarProps {
 
 const AvatarContextWrapper = styled.div`
   position: relative;
-  background-color: ${(p) => p.theme.colors.N1100};
+  background-color: var(--N1100);
   color: white;
   padding: 16px;
   border-radius: 4px;
@@ -100,9 +100,9 @@ function RoleSetter({ roles, member }: { roles: Role[]; member: Member }) {
 const StyledPlusBadge = styled.div`
   display: inline-block;
   padding: 4px 8px;
-  border: 1px solid ${(p) => p.theme.colors.N0};
-  background-color: ${(p) => p.theme.colors.N800};
-  color: ${(p) => p.theme.colors.N0};
+  border: 1px solid var(--N0);
+  background-color: var(--N800);
+  color: var(--N0);
   border-radius: 4px;
 
   font-size: 12px;

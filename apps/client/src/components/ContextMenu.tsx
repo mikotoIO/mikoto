@@ -102,7 +102,7 @@ const StyledContextMenuLink = styled(ContextMenuLink)`
   width: 100%;
 
   &:hover {
-    background-color: ${(p) => p.theme.colors.N800};
+    background-color: var(--N800);
   }
 `;
 

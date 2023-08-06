@@ -63,12 +63,11 @@ const CreateChannelWrapper = styled.div`
     margin-top: 16px;
   }
 `;
-
+``
 const ChannelTypeButton = styled.button<{ active?: boolean }>`
   background-color: var(--N900);
-  border: 2px solid
-    ${(p) => (p.active ? p.theme.colors.B700 : p.theme.colors.N600)};
-  color: ${(p) => p.theme.colors.N100};
+  border: 2px solid ${(p) => (p.active ? 'var(--B700)' : 'var(--N600)')};
+  color: var(--N100);
   font-size: 16px;
   border-radius: 8px;
   min-width: 100px;
@@ -79,7 +78,7 @@ const ChannelTypeButton = styled.button<{ active?: boolean }>`
   .icon {
     margin-bottom: 8px;
     font-size: 24px;
-    color: ${(p) => p.theme.colors.N400};
+    color: var(--N400);
   }
 
   transition: border-color 0.1s ease-in-out;
@@ -169,7 +168,7 @@ function TreebarContextMenu({ space }: { space: ClientSpace }) {
 
 const TreeHead = styled.div`
   padding: 4px 16px;
-  background-color: ${(p) => p.theme.colors.N1000};
+  background-color: var(--N1000);
 
   h1 {
     font-size: 16px;

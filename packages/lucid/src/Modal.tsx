@@ -5,8 +5,8 @@ import { StyledComponent } from './types';
 
 // absolute center
 export const Modal: StyledComponent<HTMLDivElement> = styled(Dialog.Panel)`
-  background-color: ${(p) => p.theme.colors.N800};
-  color: ${(p) => p.theme.colors.N0};
+  background-color: var(--N800);
+  color: var(--N0);
   position: absolute;
   top: 50%;
   left: 50%;

@@ -15,8 +15,8 @@ const baseInputCss = css`
   box-sizing: border-box;
   width: 100%;
   padding: 4px 16px;
-  color: ${(p) => p.theme.colors.N200};
-  background-color: ${(p) => p.theme.colors.N1100};
+  color: var(--N200);
+  background-color: var(--N1100);
   outline: none;
   resize: none;
   font-family: var(--font-main);
@@ -35,7 +35,7 @@ export const STextArea = styled.textarea`
 
 const Label = styled.label`
   display: block;
-  color: ${(p) => p.theme.colors.N200};
+  color: var(--N200);
   .label {
     font-weight: bold;
     margin-bottom: 8px;

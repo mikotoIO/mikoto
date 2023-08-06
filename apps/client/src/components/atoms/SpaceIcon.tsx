@@ -13,7 +13,7 @@ export const StyledSpaceIcon = styled.div<SpaceIconProps>`
   align-items: center;
   justify-content: center;
   border-radius: ${(p) => (p.active ? 16 : 100)}px;
-  background-color: ${(p) => p.theme.colors.N800};
+  background-color: var(--N800);
   transition-duration: 100ms;
   background-image: url(${(p) => p.icon ?? 'none'});
   background-size: cover;

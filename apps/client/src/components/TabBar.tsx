@@ -39,11 +39,10 @@ const StyledTab = styled.div<{ active?: boolean }>`
   align-items: center;
   justify-content: center;
 
-  background-color: ${(p) =>
-    p.active ? p.theme.colors.N800 : p.theme.colors.N900};
+  background-color: ${(p) => (p.active ? 'var(--N800)' : 'var(--N900)')};
 
   &:hover {
-    background-color: ${(p) => p.theme.colors.N700};
+    background-color: var(--N700);
   }
 
   border-right: 1px solid rgba(0, 0, 0, 0.1);

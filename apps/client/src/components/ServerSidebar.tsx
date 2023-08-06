@@ -18,7 +18,7 @@ import { Pill } from './atoms/Pill';
 import { StyledSpaceIcon } from './atoms/SpaceIcon';
 
 const StyledServerSidebar = styled.div`
-  background-color: ${(p) => p.theme.colors.N1000};
+  background-color: var(--N1000);
   align-items: center;
   box-sizing: border-box;
   width: 68px;
@@ -35,7 +35,7 @@ const InviteModalWrapper = styled.div`
     padding: 16px;
     margin-bottom: 8px;
     border: none;
-    color: ${(p) => p.theme.colors.N0};
+    color: var(--N0);
     background-color: var(--N1000);
 
     &:hover {

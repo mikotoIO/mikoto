@@ -62,7 +62,6 @@ const StyledChannelHead = styled.div`
 
 const StyledTypingIndicatorContainer = styled.div`
   font-size: 12px;
-  height: 24px;
   padding: 0 16px;
 `;
 
@@ -75,8 +74,19 @@ function ChannelHead({ channel }: { channel: Channel }) {
   );
 }
 
+const MessagingContainerInner = styled.div`
+  display: grid;
+  grid-template-rows: auto 24px;
+  height: 100%;
+`;
+
 // Please laugh
 const FUNNY_NUMBER = 69_420_000;
+
+const OtherInner = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
 
 const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
   const virtuosoRef = React.useRef<VirtuosoHandle>(null);
@@ -184,73 +194,77 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
   return (
     <ViewContainer key={channel.id}>
       <TabName name={channel.name} />
-      {msgs === null ? (
-        <MessagesLoading />
-      ) : (
-        <Virtuoso
-          ref={virtuosoRef}
-          followOutput="auto"
-          defaultItemHeight={28}
-          style={{ flexGrow: 1, overflowX: 'hidden' }}
-          initialTopMostItemIndex={msgs.length - 1}
-          data={msgs}
-          components={{
-            Header() {
-              return topLoaded ? (
-                <ChannelHead channel={channel} />
-              ) : (
-                <MessagesLoading />
-              );
-            },
-          }}
-          firstItemIndex={firstItemIndex}
-          startReached={async () => {
-            if (!msgs) return;
-            if (msgs.length === 0) return;
-            const m = await channel.listMessages(50, msgs[0].id);
-            if (m.length === 0) {
-              setTopLoaded(true);
-              return;
-            }
-            setMsgs((xs) => (xs ? [...m, ...xs] : null));
-            setFirstItemIndex((x) => x - m.length);
-          }}
-          itemContent={(index, msg) => (
-            <Observer>
-              {() => (
-                <MessageItem
-                  message={msg}
-                  // message={new ClientMessage(mikoto, msg)}
-                  isSimple={isMessageSimple(
-                    msg,
-                    msgs[index - firstItemIndex - 1],
+      <MessagingContainerInner>
+        <OtherInner>
+          {msgs === null ? (
+            <MessagesLoading />
+          ) : (
+            <Virtuoso
+              ref={virtuosoRef}
+              followOutput="auto"
+              defaultItemHeight={28}
+              style={{ flexGrow: 1, overflowX: 'hidden' }}
+              initialTopMostItemIndex={msgs.length - 1}
+              data={msgs}
+              components={{
+                Header() {
+                  return topLoaded ? (
+                    <ChannelHead channel={channel} />
+                  ) : (
+                    <MessagesLoading />
+                  );
+                },
+              }}
+              firstItemIndex={firstItemIndex}
+              startReached={async () => {
+                if (!msgs) return;
+                if (msgs.length === 0) return;
+                const m = await channel.listMessages(50, msgs[0].id);
+                if (m.length === 0) {
+                  setTopLoaded(true);
+                  return;
+                }
+                setMsgs((xs) => (xs ? [...m, ...xs] : null));
+                setFirstItemIndex((x) => x - m.length);
+              }}
+              itemContent={(index, msg) => (
+                <Observer>
+                  {() => (
+                    <MessageItem
+                      message={msg}
+                      // message={new ClientMessage(mikoto, msg)}
+                      isSimple={isMessageSimple(
+                        msg,
+                        msgs[index - firstItemIndex - 1],
+                      )}
+                    />
                   )}
-                />
+                </Observer>
               )}
-            </Observer>
+            />
           )}
-        />
-      )}
-      <MessageEditor
-        placeholder={`Message #${channel.name}`}
-        onTyping={() => {
-          typing();
-        }}
-        onSubmit={async (msg) => {
-          await mikoto.client.messages.send(channel.id, msg);
-        }}
-      />
-      <StyledTypingIndicatorContainer>
-        {currentTypers.length > 0 && (
-          <div>
-            <TypingDots />
-            <strong>
-              {currentTypers.map((x) => x.member.user.name).join(', ')}
-            </strong>{' '}
-            is typing...
-          </div>
-        )}
-      </StyledTypingIndicatorContainer>
+          <MessageEditor
+            placeholder={`Message #${channel.name}`}
+            onTyping={() => {
+              typing();
+            }}
+            onSubmit={async (msg) => {
+              await mikoto.client.messages.send(channel.id, msg);
+            }}
+          />
+        </OtherInner>
+        <StyledTypingIndicatorContainer>
+          {currentTypers.length > 0 && (
+            <div>
+              <TypingDots />
+              <strong>
+                {currentTypers.map((x) => x.member.user.name).join(', ')}
+              </strong>{' '}
+              is typing...
+            </div>
+          )}
+        </StyledTypingIndicatorContainer>
+      </MessagingContainerInner>
     </ViewContainer>
   );
 });

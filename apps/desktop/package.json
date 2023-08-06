@@ -1,7 +1,7 @@
 {
   "name": "desktop",
   "productName": "Mikoto",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The most overkill messaging app in the world.",
   "main": "dist/index.js",
   "scripts": {

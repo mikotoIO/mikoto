@@ -93,7 +93,7 @@ yarn build
 | `apps/media-server`  | S3 Proxy                  | NodeJS + TypeScript                        |
 | `apps/client`        | The web client for Mikoto | React + MobX                               |
 | `apps/mobile`        | Mobile client for Mikoto  | React Native + MobX                        |
-| `apps/desktop`       | Desktop client for Mikoto | Electron + React + MobX                    |
+| `apps/desktop`       | Desktop client for Mikoto | Electron                                   |
 | `packages/mikotojs`  | Mikoto API for JS         | TypeScript                                 |
 | `packages/permcheck` | Permisson Calculator      | TypeScript                                 |
 | `packages/lucid`     | UI Framework              | React + TypeScript + Styled Components     |

@@ -2673,6 +2673,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@emoji-mart/data@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "@emoji-mart/data@npm:1.1.2"
+  checksum: 1216ac85e05bddfebaccd79710b70d5a4efd68ca6eef632c94ce9688c288de5f2ba2e98a694c024568e9eb2d1cd63e7a5e3c4a2979e10aa2d501b019ee2f1fda
+  languageName: node
+  linkType: hard
+
+"@emoji-mart/react@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@emoji-mart/react@npm:1.1.1"
+  peerDependencies:
+    emoji-mart: ^5.2
+    react: ^16.8 || ^17 || ^18
+  checksum: def4dddaa01ce88c396510d84d1878b881fe0f9c484a836a50e3db784a91ab98edf94816cff503b4d1cab7b00400a01c87e32d19dee2d950f64ef9243f79101e
+  languageName: node
+  linkType: hard
+
 "@emotion/babel-plugin@npm:^11.11.0":
   version: 11.11.0
   resolution: "@emotion/babel-plugin@npm:11.11.0"
@@ -11253,6 +11270,8 @@ __metadata:
   resolution: "client@workspace:apps/client"
   dependencies:
     "@babel/core": ^7.20.12
+    "@emoji-mart/data": ^1.1.2
+    "@emoji-mart/react": ^1.1.1
     "@emotion/react": ^11.10.0
     "@fortawesome/fontawesome-svg-core": ^6.3.0
     "@fortawesome/free-regular-svg-icons": ^6.3.0
@@ -11303,6 +11322,7 @@ __metadata:
     draft-js: ^0.11.7
     draftjs-utils: ^0.10.2
     electron: ^25.3.0
+    emoji-mart: ^5.5.2
     eslint: ^8.6.0
     eslint-config-airbnb: ^19.0.4
     eslint-config-airbnb-typescript: ^16.1.0
@@ -13337,6 +13357,13 @@ __metadata:
   version: 0.13.1
   resolution: "emittery@npm:0.13.1"
   checksum: 2b089ab6306f38feaabf4f6f02792f9ec85fc054fda79f44f6790e61bbf6bc4e1616afb9b232e0c5ec5289a8a452f79bfa6d905a6fd64e94b49981f0934001c6
+  languageName: node
+  linkType: hard
+
+"emoji-mart@npm:^5.5.2":
+  version: 5.5.2
+  resolution: "emoji-mart@npm:5.5.2"
+  checksum: a9d8db731443581baebafbcb8494086e9d02b1475ddee9901fc657a7e8f08c14594a810605a3abe8d52627b75f5d78ea19adf3166fb0f38cea174694f86635f9
   languageName: node
   linkType: hard
 

@@ -1,15 +1,21 @@
+import emojiData from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
 import {
   faFaceSmileWink,
   faFileArrowUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Flex } from '@mikoto-io/lucid';
-import { useEffect, useMemo, useState } from 'react';
+import { set } from 'lodash';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { useSetRecoilState } from 'recoil';
 import { createEditor, Transforms, Node } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import styled from 'styled-components';
+
+import { contextMenuState, useContextMenu } from '../ContextMenu';
 
 // TODO: Fix the two-pixel snap
 const StyledEditable = styled(Editable)`
@@ -90,6 +96,8 @@ export function MessageEditor({
     [],
   );
   const [editorValue, setEditorValue] = useState<Node[]>(initialEditorValue);
+  const setContextMenu = useSetRecoilState(contextMenuState);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     ReactEditor.focus(editor);
@@ -110,7 +118,7 @@ export function MessageEditor({
   const dropzone = useDropzone();
 
   return (
-    <EditableContainer>
+    <EditableContainer ref={ref}>
       <Slate
         editor={editor}
         initialValue={editorValue}
@@ -148,7 +156,29 @@ export function MessageEditor({
         >
           <FontAwesomeIcon icon={faFileArrowUp} />
         </EditorButton>
-        <EditorButton>
+        <EditorButton
+          onClick={(ev) => {
+            if (!ref.current) return;
+            const bounds = ref.current.getBoundingClientRect();
+            ev.preventDefault();
+            ev.stopPropagation();
+            setContextMenu({
+              elem: (
+                <Picker
+                  data={emojiData}
+                  onEmojiSelect={(x: any) => {
+                    // console.log(x);
+                    editor.insertText(x.shortcodes);
+                  }}
+                />
+              ),
+              position: {
+                right: window.innerWidth - bounds.right,
+                bottom: window.innerHeight - bounds.top + 16,
+              },
+            });
+          }}
+        >
           <FontAwesomeIcon icon={faFaceSmileWink} />
         </EditorButton>
       </EditorButtons>

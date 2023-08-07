@@ -1,3 +1,9 @@
+import {
+  faFaceSmileWink,
+  faFileArrowUp,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Button, Flex } from '@mikoto-io/lucid';
 import { useEffect, useMemo, useState } from 'react';
 import { createEditor, Transforms, Node } from 'slate';
 import { withHistory } from 'slate-history';
@@ -6,16 +12,15 @@ import styled from 'styled-components';
 
 // TODO: Fix the two-pixel snap
 const StyledEditable = styled(Editable)`
-  background-color: var(--N700);
   font-size: 14px;
-  padding: 16px;
-  border-radius: 4px;
+
   box-sizing: border-box;
   outline: none;
   word-break: break-word;
   min-height: auto !important;
   max-height: 300px;
   overflow-y: auto;
+  flex-grow: 1;
 
   ::selection {
     background: var(--B700);
@@ -23,7 +28,11 @@ const StyledEditable = styled(Editable)`
 `;
 
 const EditableContainer = styled.div`
+  background-color: var(--N700);
+  padding: 16px 16px 4px;
+  border-radius: 4px;
   margin: 12px 16px 4px;
+  display: flex;
 `;
 
 const initialEditorValue = [{ children: [{ text: '' }] }];
@@ -55,6 +64,20 @@ interface MessageEditorProps {
 }
 
 const audio = new Audio('audio/notification/extralife.wav');
+
+const EditorButtons = styled(Flex)`
+  transform: translateY(-8px);
+  font-size: 24px;
+`;
+
+const EditorButton = styled.div`
+  color: var(--N400);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--N200);
+  }
+`;
 
 export function MessageEditor({
   placeholder,
@@ -113,6 +136,14 @@ export function MessageEditor({
           }}
         />
       </Slate>
+      <EditorButtons gap={16}>
+        <EditorButton>
+          <FontAwesomeIcon icon={faFileArrowUp} />
+        </EditorButton>
+        <EditorButton>
+          <FontAwesomeIcon icon={faFaceSmileWink} />
+        </EditorButton>
+      </EditorButtons>
     </EditableContainer>
   );
 }

@@ -1,4 +1,4 @@
-import emojiData from '@emoji-mart/data';
+import emojiData from '@emoji-mart/data/sets/14/twitter.json';
 import Picker from '@emoji-mart/react';
 import {
   faFaceSmileWink,
@@ -166,6 +166,7 @@ export function MessageEditor({
               elem: (
                 <Picker
                   data={emojiData}
+                  set="twitter"
                   onEmojiSelect={(x: any) => {
                     // console.log(x);
                     editor.insertText(x.shortcodes);

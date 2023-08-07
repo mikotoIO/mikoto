@@ -1,15 +1,18 @@
 import { app, BrowserWindow } from 'electron';
-import * as electronSquirrelStartup from 'electron-squirrel-startup';
 import path from 'path';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-// if (electronSquirrelStartup) {
-//   app.quit();
-// }
+import('electron-squirrel-startup').then((electronSquirrelStartup) => {
+  if (electronSquirrelStartup && electronSquirrelStartup.default) {
+    app.quit();
+  }
+});
+
+let mainWindow: BrowserWindow | undefined;
 
 const createWindow = () => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     title: 'Mikoto',
@@ -33,7 +36,22 @@ const createWindow = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+
+const appLock = app.requestSingleInstanceLock();
+
+if (!appLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+
+  app.on('ready', createWindow);
+}
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

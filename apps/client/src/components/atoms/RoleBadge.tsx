@@ -4,7 +4,7 @@ import styled from 'styled-components';
 const StyledRoleBadge = styled.div<{ color?: string }>`
   display: inline-block;
   padding: 4px 8px;
-  border: 1px solid var(--N0);
+  border: 1px solid ${(p) => p.color ?? 'var(--N0)'};
   background-color: var(--N800);
   color: var(--N0);
   border-radius: 4px;

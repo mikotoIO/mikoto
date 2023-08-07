@@ -1,6 +1,6 @@
 import { Notification } from '@mantine/core';
 import { AppError } from 'mikotojs';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export function useErrorElement() {
   const [error, setError] = useState<AppError | null>(null);

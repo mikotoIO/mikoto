@@ -30,18 +30,22 @@ import { MikotoApiLoader } from './MikotoApiLoader';
 import { DesignStory } from './Palette';
 
 const AppWindow = styled.div`
-  height: 100vh;
-  width: 100vw;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 `;
 
 const AppContainer = styled.div`
-  overflow: hidden;
+  // overflow: hidden;
   background-color: var(--N900);
   color: white;
   display: flex;
   flex-direction: row;
   height: 100%;
   width: 100%;
+  box-sizing: border-box;
 `;
 
 function ErrorBoundaryPage({ children }: { children: React.ReactNode }) {

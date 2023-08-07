@@ -5,6 +5,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Flex } from '@mikoto-io/lucid';
 import { useEffect, useMemo, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
 import { createEditor, Transforms, Node } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
@@ -105,6 +106,9 @@ export function MessageEditor({
     return () => document.removeEventListener('keydown', fn);
   }, []);
 
+  // upload logic
+  const dropzone = useDropzone();
+
   return (
     <EditableContainer>
       <Slate
@@ -137,7 +141,11 @@ export function MessageEditor({
         />
       </Slate>
       <EditorButtons gap={16}>
-        <EditorButton>
+        <EditorButton
+          onClick={() => {
+            dropzone.open();
+          }}
+        >
           <FontAwesomeIcon icon={faFileArrowUp} />
         </EditorButton>
         <EditorButton>

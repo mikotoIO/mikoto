@@ -1,15 +1,7 @@
-import SimpleMarkdown from '@khanacademy/simple-markdown';
-import ReactMarkdown from 'react-markdown';
-import { SpecialComponents } from 'react-markdown/lib/ast-to-react';
-import { NormalComponents } from 'react-markdown/lib/complex-types';
-import rehypeHighlight from 'rehype-highlight';
-import rehypeKatex from 'rehype-katex';
-import remarkBreaks from 'remark-breaks';
-import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
-import styled from 'styled-components';
+import SimpleMarkdown, { SingleASTNode } from '@khanacademy/simple-markdown';
+import Highlight from 'react-highlight';
+import styled, { css } from 'styled-components';
 
-import { remarkEmoji } from '../../../functions/remarkEmoji';
 import { MessageImage } from './Image';
 
 function isUrl(s: string) {
@@ -28,13 +20,17 @@ function isUrlImage(url: string): boolean {
   return url.match(/\.(jpeg|jpg|gif|png)$/) !== null;
 }
 
-const Pre = styled.pre`
-  text-wrap: wrap;
+const Pre = styled.div`
+  pre {
+    margin: 0;
+    text-wrap: wrap;
+  }
   padding: 16px;
   margin: 0;
   background-color: var(--N1000);
   color: var(--N300);
   border-radius: 4px;
+  max-width: 800px;
 
   .hljs-comment {
     color: var(--N400);
@@ -48,19 +44,13 @@ const Pre = styled.pre`
   .hljs-title.class_ {
     color: var(--Y600);
   }
-  .hljs-title.function_ {
+  .hljs-title {
     color: var(--B500);
   }
 
   & > div {
     padding: 0 !important;
   }
-`;
-
-const StyledEmoji = styled.img`
-  display: inline-block;
-  height: 1.5em;
-  vertical-align: middle;
 `;
 
 const Table = styled.table`
@@ -73,31 +63,59 @@ const Table = styled.table`
   }
 `;
 
-function Emoji({ src }: { src: string }) {
-  return <StyledEmoji src={src} />;
+// Emoji Regex
+const EMOJI_REGEX = /^:(\+1|[-\w]+):/;
+
+function Emoji({ emoji }: { emoji: string }) {
+  return (
+    // @ts-expect-error 2339
+    <em-emoji
+      id={emoji}
+      className="emoji"
+      set="twitter"
+      size="1.2em"
+      fallback={`:${emoji}:`}
+      style={{ verticalAlign: 'middle' }}
+    />
+  );
 }
 
-const markdownComponents: Partial<
-  Omit<NormalComponents, keyof SpecialComponents> & SpecialComponents
-> = {
-  img({ src, alt, className }) {
-    if (className === 'emoji') {
-      return <Emoji src={src!} />;
-    }
-    return <MessageImage src={src} alt={alt} />;
+const emojiRule = {
+  order: SimpleMarkdown.defaultRules.em.order + 1,
+  match(source: string) {
+    return EMOJI_REGEX.exec(source);
   },
-  pre: (props) => <Pre {...props} />,
-  table: (props) => <Table {...props} />,
+  parse(capture: string[]) {
+    return {
+      emoji: capture[1],
+    };
+  },
+  react(node: any, _: any, state: any) {
+    return <Emoji emoji={node.emoji} key={state.key} />;
+  },
 };
 
 const rules = {
   ...SimpleMarkdown.defaultRules,
   image: {
     ...SimpleMarkdown.defaultRules.image,
-    react: (node: any, output: any, state: any) => (
+    react: (node: any, _: any, state: any) => (
       <MessageImage src={node.target} alt={node.alt} key={state.key} />
     ),
   },
+  codeBlock: {
+    ...SimpleMarkdown.defaultRules.codeBlock,
+    react(node: any, _: any, state: any) {
+      // deerp
+      console.log(node);
+      return (
+        <Pre key={state.key}>
+          <Highlight className={node.lang}>{node.content}</Highlight>
+        </Pre>
+      );
+    },
+  },
+  emoji: emojiRule,
 };
 // console.log(rules);
 
@@ -108,6 +126,32 @@ function parse(source: string) {
 }
 const reactOutput = SimpleMarkdown.outputFor(rules, 'react');
 
+const emojiSizing = css<{ emojiSize: string }>`
+  .emoji-mart-emoji img {
+    max-width: ${(p) => p.emojiSize} !important;
+    max-height: ${(p) => p.emojiSize} !important;
+  }
+`;
+
+const MarkdownWrapper = styled.div<{ emojiSize: string }>`
+  ${emojiSizing}
+`;
+
+function emojiFest(nodes: SingleASTNode[]) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const x of nodes) {
+    if (x.type === 'paragraph') {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const y of x.content) {
+        if (y.type !== 'emoji') {
+          return '1.2em';
+        }
+      }
+    }
+  }
+  return '3em';
+}
+
 export function Markdown({ content }: { content: string }) {
   const co =
     isUrl(content) && isUrlImage(content)
@@ -117,5 +161,8 @@ export function Markdown({ content }: { content: string }) {
   const parsed = parse(co);
   const output = reactOutput(parsed);
 
-  return <div>{output}</div>;
+  return (
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+    <MarkdownWrapper emojiSize={emojiFest(parsed)}>{output}</MarkdownWrapper>
+  );
 }

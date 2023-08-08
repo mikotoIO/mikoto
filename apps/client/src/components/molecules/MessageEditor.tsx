@@ -6,6 +6,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Flex } from '@mikoto-io/lucid';
+import { init } from 'emoji-mart';
 import { set } from 'lodash';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -16,6 +17,8 @@ import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import styled from 'styled-components';
 
 import { contextMenuState, useContextMenu } from '../ContextMenu';
+
+init({ data: emojiData });
 
 // TODO: Fix the two-pixel snap
 const StyledEditable = styled(Editable)`

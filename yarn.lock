@@ -7748,6 +7748,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-highlight@npm:^0.12.5":
+  version: 0.12.5
+  resolution: "@types/react-highlight@npm:0.12.5"
+  dependencies:
+    "@types/react": "*"
+  checksum: a8a2a13ec8bb89b78ec2ffd0cdf04e43e8e418ae655d61c73a5cd607a3a3770684179347fd6ecfbedec7cd01ac8987b4fcd3fadd3787a0bf7fe74766baf90daa
+  languageName: node
+  linkType: hard
+
 "@types/react-responsive@npm:^8.0.2":
   version: 8.0.5
   resolution: "@types/react-responsive@npm:8.0.5"
@@ -11309,6 +11318,7 @@ __metadata:
     "@types/react": ^18.0.0
     "@types/react-dom": ^18.0.0
     "@types/react-helmet": ^6.1.6
+    "@types/react-highlight": ^0.12.5
     "@types/react-syntax-highlighter": ^15.5.1
     "@types/react-twemoji": ^0.4.0
     "@typescript-eslint/eslint-plugin": ^5.9.0
@@ -11358,6 +11368,7 @@ __metadata:
     react-dropzone: ^14.2.3
     react-error-boundary: ^3.1.4
     react-helmet: ^6.1.0
+    react-highlight: ^0.15.0
     react-hook-form: ^7.34.2
     react-i18next: ^13.0.2
     react-loading-skeleton: ^3.1.0
@@ -16977,7 +16988,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"highlight.js@npm:^10.4.1, highlight.js@npm:~10.7.0":
+"highlight.js@npm:^10.4.1, highlight.js@npm:^10.5.0, highlight.js@npm:~10.7.0":
   version: 10.7.3
   resolution: "highlight.js@npm:10.7.3"
   checksum: defeafcd546b535d710d8efb8e650af9e3b369ef53e28c3dc7893eacfe263200bba4c5fcf43524ae66d5c0c296b1af0870523ceae3e3104d24b7abf6374a4fea
@@ -25006,6 +25017,15 @@ __metadata:
   peerDependencies:
     react: ">=16.3.0"
   checksum: a4998479dab7fc1c2799eddefb1870a9d881b5f71cfdf97979a9882e42f4bb50402d55335f308f461e735e01a06f46b16cc7b4e6bcb22c7a4a6f85a753c5c106
+  languageName: node
+  linkType: hard
+
+"react-highlight@npm:^0.15.0":
+  version: 0.15.0
+  resolution: "react-highlight@npm:0.15.0"
+  dependencies:
+    highlight.js: ^10.5.0
+  checksum: 8a0e3f2d9db0a5332b8b33eef8d6c58eb4c6f0a9426b0cedc5331fb4a777cff1895138b54368261d4e2a22338b11aa6b93adb1e3db496524072613255540a911
   languageName: node
   linkType: hard
 

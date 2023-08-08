@@ -175,7 +175,6 @@ interface MessageAvatarProps extends AvatarProps {
 export function MessageAvatar({ src, member, size }: MessageAvatarProps) {
   const setContextMenu = useSetRecoilState(contextMenuState);
   const avatarRef = useRef<HTMLImageElement>(null);
-  const space = useContext(CurrentSpaceContext);
 
   const user = member?.user;
 

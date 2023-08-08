@@ -9,12 +9,11 @@ import {
   checkMemberPermission,
 } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
-import { useContext, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../hooks';
-import { CurrentSpaceContext } from '../../store';
 import { contextMenuState, modalState, useContextMenu } from '../ContextMenu';
 import { UserContextMenu } from '../modals/ContextMenus';
 import { ProfileModal } from '../modals/Profile';

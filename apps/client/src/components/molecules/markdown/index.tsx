@@ -163,6 +163,16 @@ const rules = {
       );
     },
   },
+
+  paragraph: {
+    ...SimpleMarkdown.defaultRules.paragraph,
+    match: SimpleMarkdown.blockRegex(/^((?:[^\n])+)(?:\n *)+/),
+  },
+
+  // paragraph: {
+  //   ...SimpleMarkdown.defaultRules.paragraph,
+  //   match: SimpleMarkdown.blockRegex(/^((?:[^\n]|\n(?! *\n))+)(?:\n *)*\n/),
+  // },
   emoji: emojiRule,
   spoiler: spoilerRule,
 };
@@ -211,6 +221,13 @@ export function Markdown({ content }: { content: string }) {
 
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-    <MarkdownWrapper emojiSize={emojiFest(parsed)}>{output}</MarkdownWrapper>
+    <MarkdownWrapper
+      emojiSize={emojiFest(parsed)}
+      // onClick={() => {
+      //   console.log(parsed);
+      // }}
+    >
+      {output}
+    </MarkdownWrapper>
   );
 }

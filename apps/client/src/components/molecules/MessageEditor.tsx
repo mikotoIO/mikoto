@@ -5,9 +5,8 @@ import {
   faFileArrowUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Flex } from '@mikoto-io/lucid';
+import { Flex } from '@mikoto-io/lucid';
 import { init } from 'emoji-mart';
-import { set } from 'lodash';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useSetRecoilState } from 'recoil';
@@ -16,7 +15,7 @@ import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import styled from 'styled-components';
 
-import { contextMenuState, useContextMenu } from '../ContextMenu';
+import { contextMenuState } from '../ContextMenu';
 
 init({ data: emojiData });
 

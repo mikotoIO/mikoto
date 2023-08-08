@@ -1,3 +1,4 @@
+import SimpleMarkdown from '@khanacademy/simple-markdown';
 import ReactMarkdown from 'react-markdown';
 import { SpecialComponents } from 'react-markdown/lib/ast-to-react';
 import { NormalComponents } from 'react-markdown/lib/complex-types';
@@ -89,19 +90,32 @@ const markdownComponents: Partial<
   table: (props) => <Table {...props} />,
 };
 
+const rules = {
+  ...SimpleMarkdown.defaultRules,
+  image: {
+    ...SimpleMarkdown.defaultRules.image,
+    react: (node: any, output: any, state: any) => (
+      <MessageImage src={node.target} alt={node.alt} key={state.key} />
+    ),
+  },
+};
+// console.log(rules);
+
+const rawBuiltParser = SimpleMarkdown.parserFor(rules as any);
+function parse(source: string) {
+  const blockSource = `${source}\n\n`;
+  return rawBuiltParser(blockSource, { inline: false });
+}
+const reactOutput = SimpleMarkdown.outputFor(rules, 'react');
+
 export function Markdown({ content }: { content: string }) {
   const co =
     isUrl(content) && isUrlImage(content)
       ? `![Image Embed](${content})`
       : content;
 
-  return (
-    <ReactMarkdown
-      components={markdownComponents}
-      remarkPlugins={[remarkGfm, remarkBreaks, remarkMath, remarkEmoji]}
-      rehypePlugins={[rehypeKatex, rehypeHighlight]}
-    >
-      {co}
-    </ReactMarkdown>
-  );
+  const parsed = parse(co);
+  const output = reactOutput(parsed);
+
+  return <div>{output}</div>;
 }

@@ -1,4 +1,5 @@
 import SimpleMarkdown, { SingleASTNode } from '@khanacademy/simple-markdown';
+import { Anchor } from '@mikoto-io/lucid';
 import React from 'react';
 import Highlight from 'react-highlight';
 import styled, { css } from 'styled-components';
@@ -169,10 +170,21 @@ const rules = {
     match: SimpleMarkdown.blockRegex(/^((?:[^\n])+)(?:\n *)+/),
   },
 
-  // paragraph: {
-  //   ...SimpleMarkdown.defaultRules.paragraph,
-  //   match: SimpleMarkdown.blockRegex(/^((?:[^\n]|\n(?! *\n))+)(?:\n *)*\n/),
-  // },
+  link: {
+    ...SimpleMarkdown.defaultRules.link,
+    react(node: any, output: any, state: any) {
+      return (
+        <Anchor
+          key={state.key}
+          href={SimpleMarkdown.sanitizeUrl(node.target) ?? '#'}
+          target="_blank"
+        >
+          {output(node.content, state)}
+        </Anchor>
+      );
+    },
+  },
+
   emoji: emojiRule,
   spoiler: spoilerRule,
 };

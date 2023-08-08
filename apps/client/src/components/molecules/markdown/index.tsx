@@ -1,4 +1,5 @@
 import SimpleMarkdown, { SingleASTNode } from '@khanacademy/simple-markdown';
+import React from 'react';
 import Highlight from 'react-highlight';
 import styled, { css } from 'styled-components';
 
@@ -65,6 +66,7 @@ const Table = styled.table`
 
 // Emoji Regex
 const EMOJI_REGEX = /^:(\+1|[-\w]+):/;
+const SPOILER_REGEX = /^\|\|([\s\S]+?)\|\|(?!\|)/;
 
 function Emoji({ emoji }: { emoji: string }) {
   return (
@@ -80,7 +82,18 @@ function Emoji({ emoji }: { emoji: string }) {
   );
 }
 
-const emojiRule = {
+interface RuleOption<T> {
+  order: number;
+  match(source: string): RegExpExecArray | null;
+  parse(capture: RegExpExecArray): T;
+  react(node: T, _: any, state: any): JSX.Element;
+}
+
+function createRule<T>(option: RuleOption<T>) {
+  return option;
+}
+
+const emojiRule = createRule({
   order: SimpleMarkdown.defaultRules.em.order + 1,
   match(source: string) {
     return EMOJI_REGEX.exec(source);
@@ -90,10 +103,47 @@ const emojiRule = {
       emoji: capture[1],
     };
   },
-  react(node: any, _: any, state: any) {
+  react(node, _, state) {
     return <Emoji emoji={node.emoji} key={state.key} />;
   },
-};
+});
+
+const StyledSpoiler = styled.span<{ hide: boolean }>`
+  background-color: ${(p) => (p.hide ? 'var(--N1100)' : 'var(--N600)')};
+  color: ${(p) => (p.hide ? 'transparent' : 'var(--N0)')};
+  padding: 0px 4px;
+  border-radius: 4px;
+  cursor: pointer;
+`;
+
+function Spoiler({ children }: { children: React.ReactNode }) {
+  const [hidden, setHidden] = React.useState(true);
+  return (
+    <StyledSpoiler
+      hide={hidden}
+      onClick={() => {
+        setHidden(!hidden);
+      }}
+    >
+      {children}
+    </StyledSpoiler>
+  );
+}
+
+const spoilerRule = createRule({
+  order: SimpleMarkdown.defaultRules.em.order + 1,
+  match(source: string) {
+    return SPOILER_REGEX.exec(source);
+  },
+  parse(capture: string[]) {
+    return {
+      content: capture[1],
+    };
+  },
+  react(node, _, state) {
+    return <Spoiler key={state.key}>{node.content}</Spoiler>;
+  },
+});
 
 const rules = {
   ...SimpleMarkdown.defaultRules,
@@ -106,8 +156,6 @@ const rules = {
   codeBlock: {
     ...SimpleMarkdown.defaultRules.codeBlock,
     react(node: any, _: any, state: any) {
-      // deerp
-      console.log(node);
       return (
         <Pre key={state.key}>
           <Highlight className={node.lang}>{node.content}</Highlight>
@@ -116,8 +164,8 @@ const rules = {
     },
   },
   emoji: emojiRule,
+  spoiler: spoilerRule,
 };
-// console.log(rules);
 
 const rawBuiltParser = SimpleMarkdown.parserFor(rules as any);
 function parse(source: string) {

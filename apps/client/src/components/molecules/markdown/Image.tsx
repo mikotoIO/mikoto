@@ -29,7 +29,7 @@ export function MessageImage({ src, alt }: MessageImageProps) {
       onClick={() => {
         setModal({
           elem: (
-            <Modal>
+            <Modal style={{ padding: 0, background: 'none' }}>
               <StyledMessageImage src={src} alt={alt} />
             </Modal>
           ),

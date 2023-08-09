@@ -11,10 +11,6 @@ import {
   useContainer,
   useExpressServer,
 } from 'routing-controllers';
-import {
-  useContainer as useSocketContainer,
-  useSocketServer,
-} from 'socket-controllers';
 import socketio from 'socket.io';
 import { Container } from 'typedi';
 
@@ -44,7 +40,6 @@ Container.set(Mailer, new Mailer());
 app.use(cors());
 
 useContainer(Container);
-useSocketContainer(Container);
 
 useExpressServer(app, {
   controllers: [path.join(`${__dirname}/controllers/*.{js,ts}`)],
@@ -59,10 +54,6 @@ useExpressServer(app, {
     authHeader = authHeader.slice(7);
     return jwt.verify(authHeader, env.SECRET);
   },
-});
-
-useSocketServer(io, {
-  controllers: [path.join(`${__dirname}/ws-controllers/*.{js,ts}`)],
 });
 
 async function main() {

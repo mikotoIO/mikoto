@@ -154,6 +154,11 @@ struct MessageDeleteEvent {
   channelId: string;
 }
 
+struct Unread {
+  channelId: string;
+  timestamp: string;
+}
+
 service MessageService {
   list(channelId: string, options: ListMessageOptions): Message[];
   send(channelId: string, content: string): Message;
@@ -162,6 +167,8 @@ service MessageService {
   ~onCreate(message: Message);
   ~onUpdate(message: Message);
   ~onDelete(event: MessageDeleteEvent);
+
+  listUnread(spaceId: string): Unread[]; 
   ack(channelId: string, timestamp: string): void;
 }
 

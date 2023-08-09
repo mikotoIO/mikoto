@@ -169,8 +169,8 @@ export function MessageEditor({
                 <Picker
                   data={emojiData}
                   set="twitter"
+                  noCountryFlags={false}
                   onEmojiSelect={(x: any) => {
-                    // console.log(x);
                     editor.insertText(x.shortcodes);
                   }}
                 />

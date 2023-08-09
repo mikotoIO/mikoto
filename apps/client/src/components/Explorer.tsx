@@ -13,7 +13,7 @@ import {
   checkMemberPermission,
 } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -186,10 +186,7 @@ function getIconFromChannelType(type: Channel['type']) {
 
 function channelToStructuredTree(
   channels: ClientChannel[],
-  options: {
-    onClickFactory(ch: ClientChannel): (ev: React.MouseEvent) => void;
-    onContextMenuFactory(ch: ClientChannel): (ev: React.MouseEvent) => void;
-  },
+  nodeObjectFactory: (ch: ClientChannel) => NodeObject,
 ): NodeObject {
   const root: NodeObject = {
     id: 'root',
@@ -200,13 +197,7 @@ function channelToStructuredTree(
   const map = new Map<string, NodeObject>();
   map.set(root.id, root);
   channels.forEach((channel) => {
-    const node: NodeObject = {
-      icon: getIconFromChannelType(channel.type),
-      id: channel.id,
-      text: channel.name,
-      onClick: options.onClickFactory(channel),
-      onContextMenu: options.onContextMenuFactory(channel),
-    };
+    const node: NodeObject = nodeObjectFactory(channel);
     map.set(node.id, node);
   });
 
@@ -271,20 +262,54 @@ const ChannelContextMenu = observer(
   },
 );
 
+function isUnread(lastUpdate: Date | null, ack: Date | null) {
+  if (lastUpdate === null || ack === null) return false;
+  return lastUpdate.getTime() > ack.getTime();
+}
+
 export const Explorer = observer(({ space }: { space: ClientSpace }) => {
   const tabkit = useTabkit();
+  const mikoto = useMikoto();
+
+  const [acks, setAcks] = React.useState<Record<string, Date>>({});
+
+  useEffect(() => {
+    mikoto.client.messages.listUnread(space.id).then((ur) => {
+      setAcks(
+        Object.fromEntries(ur.map((u) => [u.channelId, new Date(u.timestamp)])),
+      );
+    });
+  }, [space.id]);
+
+  useEffect(() => {
+    const destroy = mikoto.client.messages.onCreate((msg) => {
+      const ch = mikoto.channels.get(msg.channelId);
+      if (ch?.spaceId !== space.id) return;
+
+      ch.lastUpdated = msg.timestamp;
+    });
+    return () => {
+      destroy();
+    };
+  }, [space.id]);
 
   const nodeContextMenu = useContextMenuX();
-  const channelTree = channelToStructuredTree(space.channels, {
-    onClickFactory(ch) {
-      return (ev) => {
-        tabkit.openTab(channelToTab(ch), ev.ctrlKey);
-      };
+  const channelTree = channelToStructuredTree(space.channels, (channel) => ({
+    icon: getIconFromChannelType(channel.type),
+    id: channel.id,
+    text: channel.name,
+    unread: isUnread(channel.lastUpdatedDate, acks[channel.id] ?? null),
+    onClick(ev) {
+      tabkit.openTab(channelToTab(channel), ev.ctrlKey);
+      const now = new Date();
+      mikoto.client.messages.ack(channel.id, now.toISOString()).then(() => {
+        setAcks((xs) => ({ ...xs, [channel.id]: now }));
+      });
     },
-    onContextMenuFactory(channel) {
-      return nodeContextMenu(() => <ChannelContextMenu channel={channel} />);
-    },
-  });
+    onContextMenu: nodeContextMenu(() => (
+      <ChannelContextMenu channel={channel} />
+    )),
+  }));
 
   // TODO: return loading indicator
   if (space === null) return null;

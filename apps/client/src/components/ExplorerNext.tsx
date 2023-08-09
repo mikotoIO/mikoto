@@ -29,7 +29,7 @@ const StyledNode = styled.a<{ unread?: boolean; isDndHover?: boolean }>`
   display: flex;
   align-items: center;
   font-weight: ${(p) => (p.unread ? '600' : 'inherit')};
-  color: ${(p) => (p.unread ? 'white' : 'rgba(255, 255, 255, 0.8)')};
+  color: ${(p) => (p.unread ? 'white' : 'var(--N300)')};
   cursor: pointer;
   user-select: none;
 
@@ -44,8 +44,13 @@ export interface NodeObject {
   text: string;
   icon?: IconDefinition;
   descendant?: NodeObject[];
+  unread?: boolean;
   onClick?(ev: React.MouseEvent): void;
   onContextMenu?(ev: React.MouseEvent): void;
+}
+
+interface NodeProps extends NodeObject {
+  path: string[];
 }
 
 const ChevronWrapper = styled.div`
@@ -61,10 +66,6 @@ export const StyledSubtree = styled.div`
   padding-left: 8px;
   border-left: 1px solid rgba(255, 255, 255, 0.1);
 `;
-
-interface NodeProps extends NodeObject {
-  path: string[];
-}
 
 function Node(props: NodeProps) {
   const [open, setOpen] = useState(false);
@@ -104,6 +105,7 @@ function Node(props: NodeProps) {
           props.onContextMenu?.(ev);
         }}
         isDndHover={isOver}
+        unread={props.unread}
       >
         <ChevronWrapper
           onClick={(ev) => {

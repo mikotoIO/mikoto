@@ -18,6 +18,10 @@ export class ClientChannel implements Channel {
     return this.client.spaces.get(this.spaceId);
   }
 
+  get lastUpdatedDate() {
+    return this.lastUpdated ? new Date(this.lastUpdated) : null;
+  }
+
   async listMessages(limit: number, cursor: string | null) {
     const msgs = await this.client.client.messages.list(this.id, {
       limit,

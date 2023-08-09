@@ -1,5 +1,6 @@
 import { permissions } from '@mikoto-io/permcheck';
 import { ChannelType } from '@prisma/client';
+import { SophonInstance } from '@sophon-js/server';
 import { NotFoundError, UnauthorizedError } from 'routing-controllers';
 
 import { findMember } from '../functions/includes';
@@ -11,6 +12,7 @@ import {
   AbstractChannelService,
   AbstractMessageService,
   ChannelCreateOptions,
+  SophonContext,
 } from './schema';
 
 const authorInclude = {
@@ -217,6 +219,16 @@ export class MessageService extends AbstractMessageService {
       messageId,
       channelId,
     });
+  }
+
+  async listUnread(ctx: SophonInstance<SophonContext>, spaceId: string) {
+    const unreads = await prisma.channelUnread.findMany({
+      where: { userId: ctx.data.user.sub, channel: { spaceId } },
+    });
+    return unreads.map((u) => ({
+      channelId: u.channelId,
+      timestamp: u.timestamp.toISOString(),
+    }));
   }
 
   async ack(ctx: MikotoInstance, channelId: string, timestamp: string) {

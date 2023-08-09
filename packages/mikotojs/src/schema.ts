@@ -107,6 +107,12 @@ export const MessageDeleteEvent = z.object({
 });
 export type MessageDeleteEvent = z.infer<typeof MessageDeleteEvent>;
 
+export const Unread = z.object({
+  channelId: z.string(),
+  timestamp: z.string(),
+});
+export type Unread = z.infer<typeof Unread>;
+
 export const RoleEditPayload = z.object({
   name: z.nullable(z.string()),
   color: z.nullable(z.string()),
@@ -307,6 +313,9 @@ export class MessageServiceClient {
   }
   delete(channelId: string, messageId: string): Promise<void> {
     return this.socket.call("messages/delete", channelId, messageId);
+  }
+  listUnread(spaceId: string): Promise<Unread[]> {
+    return this.socket.call("messages/listUnread", spaceId);
   }
   ack(channelId: string, timestamp: string): Promise<void> {
     return this.socket.call("messages/ack", channelId, timestamp);

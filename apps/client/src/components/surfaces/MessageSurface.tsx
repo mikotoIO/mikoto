@@ -166,9 +166,7 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
       setCurrentTypers((ts) =>
         ts.filter((y) => y.member.user.id !== x.author?.id),
       );
-      mikoto.client.messages
-        .ack(channel.id, `${new Date().toString()}`)
-        .then(() => {});
+      mikoto.client.messages.ack(channel.id, x.timestamp).then(() => {});
       setScrollToBottom(true);
       return [...xs, new ClientMessage(mikoto, x)];
     });

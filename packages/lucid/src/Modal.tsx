@@ -1,10 +1,11 @@
 import { Dialog } from '@headlessui/react';
+import { ComponentProps } from 'react';
 import styled from 'styled-components';
 
 import { StyledComponent } from './types';
 
 // absolute center
-export const Modal: StyledComponent<HTMLDivElement> = styled(Dialog.Panel)`
+export const ModalBase: StyledComponent<HTMLDivElement> = styled(Dialog.Panel)`
   background-color: var(--N800);
   color: var(--N0);
   position: absolute;
@@ -15,6 +16,20 @@ export const Modal: StyledComponent<HTMLDivElement> = styled(Dialog.Panel)`
   border-radius: 8px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 `;
+
+export function Modal({
+  noBackdrop,
+  ...props
+}: ComponentProps<typeof ModalBase> & {
+  noBackdrop?: boolean;
+}) {
+  return (
+    <>
+      {!noBackdrop && <ModalBackdrop />}
+      <ModalBase {...props} />
+    </>
+  );
+}
 
 export const ModalBackdrop = styled.div`
   background-color: rgba(0, 0, 0, 0.5);
@@ -34,7 +49,6 @@ export interface ModalViewProps {
 export function ModalView({ children, open, onClose }: ModalViewProps) {
   return (
     <Dialog open={open} onClose={() => onClose?.()}>
-      <ModalBackdrop />
       {children}
     </Dialog>
   );

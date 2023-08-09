@@ -167,9 +167,7 @@ const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
       h="100%"
       onSubmit={form.handleSubmit((d) => {
         const data = { ...d, permissions: perms, color };
-        mikoto.client.roles.edit(role.id, data).then((x) => {
-          console.log(x);
-        });
+        mikoto.client.roles.edit(role.id, data).then((x) => {});
       })}
     >
       <h2>Edit {role.name}</h2>
@@ -198,9 +196,7 @@ const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
             type="button"
             variant="danger"
             onClick={() => {
-              mikoto.client.roles.delete(role.id).then(() => {
-                console.log('role deleted');
-              });
+              mikoto.client.roles.delete(role.id).then(() => {});
             }}
           >
             Delete Role
@@ -216,7 +212,6 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
 
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
   const role = space.roles.find((x) => x.id === selectedRoleId);
-  console.log(space);
   // const role = rolesDelta.data.find((x) => x.id === selectedRoleId);
   return (
     <SettingsView style={{ paddingRight: 0 }}>
@@ -224,9 +219,7 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
         <Box>
           <Button
             onClick={() => {
-              mikoto.client.roles.create(space.id, 'New Role').then(() => {
-                console.log('role created');
-              });
+              mikoto.client.roles.create(space.id, 'New Role').then(() => {});
             }}
           >
             New Role

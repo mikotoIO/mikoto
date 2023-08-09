@@ -7,6 +7,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 
+import { CommandMenuKit } from '../components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
 import { Explorer } from '../components/Explorer';
 import { ServerSidebar } from '../components/ServerSidebar';
@@ -174,6 +175,7 @@ export default function MainView() {
   return (
     <MikotoApiLoader>
       <AppView />
+      <CommandMenuKit />
       <ContextMenuKit />
       <ModalKit />
     </MikotoApiLoader>

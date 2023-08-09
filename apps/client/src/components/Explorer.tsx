@@ -285,6 +285,7 @@ export const Explorer = observer(({ space }: { space: ClientSpace }) => {
     const destroy = mikoto.client.messages.onCreate((msg) => {
       const ch = mikoto.channels.get(msg.channelId);
       if (ch?.spaceId !== space.id) return;
+      if (msg.author?.id === mikoto.me.id) return;
 
       ch.lastUpdated = msg.timestamp;
     });

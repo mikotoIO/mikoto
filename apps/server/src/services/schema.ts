@@ -111,6 +111,12 @@ export const MessageDeleteEvent = z.object({
 });
 export type MessageDeleteEvent = z.infer<typeof MessageDeleteEvent>;
 
+export const Unread = z.object({
+  channelId: z.string(),
+  timestamp: z.string(),
+});
+export type Unread = z.infer<typeof Unread>;
+
 export const RoleEditPayload = z.object({
   name: z.nullable(z.string()),
   color: z.nullable(z.string()),
@@ -358,6 +364,10 @@ export abstract class AbstractMessageService {
     channelId: string,
     messageId: string
   ): Promise<void>;
+  abstract listUnread(
+    ctx: SophonInstance<SophonContext>,
+    spaceId: string
+  ): Promise<Unread[]>;
   abstract ack(
     ctx: SophonInstance<SophonContext>,
     channelId: string,

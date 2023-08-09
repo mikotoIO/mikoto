@@ -281,6 +281,18 @@ export const Explorer = observer(({ space }: { space: ClientSpace }) => {
     });
   }, [space.id]);
 
+  useEffect(() => {
+    const destroy = mikoto.client.messages.onCreate((msg) => {
+      const ch = mikoto.channels.get(msg.channelId);
+      if (ch?.spaceId !== space.id) return;
+
+      ch.lastUpdated = msg.timestamp;
+    });
+    return () => {
+      destroy();
+    };
+  }, [space.id]);
+
   const nodeContextMenu = useContextMenuX();
   const channelTree = channelToStructuredTree(space.channels, (channel) => ({
     icon: getIconFromChannelType(channel.type),
@@ -290,7 +302,9 @@ export const Explorer = observer(({ space }: { space: ClientSpace }) => {
     onClick(ev) {
       tabkit.openTab(channelToTab(channel), ev.ctrlKey);
       const now = new Date();
-      mikoto.client.messages.ack(channel.id, now.toISOString());
+      mikoto.client.messages.ack(channel.id, now.toISOString()).then(() => {
+        setAcks((xs) => ({ ...xs, [channel.id]: now }));
+      });
     },
     onContextMenu: nodeContextMenu(() => (
       <ChannelContextMenu channel={channel} />

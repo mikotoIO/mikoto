@@ -54,6 +54,7 @@ export const Button = styled.button<ButtonProps & BoxProps>`
   &:hover {
     box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.1);
   }
+
   transition: box-shadow 0.1s ease-in-out;
   cursor: pointer;
   align-items: center;

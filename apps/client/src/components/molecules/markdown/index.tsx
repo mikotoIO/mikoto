@@ -233,13 +233,6 @@ export function Markdown({ content }: { content: string }) {
 
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-    <MarkdownWrapper
-      emojiSize={emojiFest(parsed)}
-      // onClick={() => {
-      //   console.log(parsed);
-      // }}
-    >
-      {output}
-    </MarkdownWrapper>
+    <MarkdownWrapper emojiSize={emojiFest(parsed)}>{output}</MarkdownWrapper>
   );
 }

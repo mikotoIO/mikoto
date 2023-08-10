@@ -42,8 +42,6 @@ export class ClientMember implements Member {
 
 export class MemberStore extends Store<Member, ClientMember> {
   foreignCreate(data: Member) {
-    console.log(data);
-
     this.client.spaces
       .get(data.spaceId)
       ?.members?.set(data.user.id, this.produce(data));

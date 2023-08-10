@@ -1,4 +1,4 @@
-FROM node:16-alpine AS builder
+FROM node:18-alpine AS builder
 RUN apk add --no-cache libc6-compat
 RUN apk update
 
@@ -7,7 +7,7 @@ RUN yarn global add turbo
 COPY . .
 RUN turbo prune --scope=media-server --docker
 
-FROM node:16-alpine AS installer
+FROM node:18-alpine AS installer
 RUN apk add --no-cache libc6-compat
 RUN apk update
 WORKDIR /mikoto
@@ -23,7 +23,7 @@ COPY --from=builder /mikoto/out/full/ .
 WORKDIR /mikoto/apps/media-server
 RUN yarn build
 
-FROM node:16-alpine AS runner
+FROM node:18-alpine AS runner
 COPY --from=installer /mikoto /mikoto
 COPY --from=installer /mikoto/node_modules /mikoto/node_modules
 WORKDIR /mikoto/apps/media-server

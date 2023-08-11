@@ -3,7 +3,7 @@ import { Button, Form, Input, Modal, Image } from '@mikoto-io/lucid';
 import { AxiosError } from 'axios';
 import { ClientSpace, Space, SpaceStore } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';

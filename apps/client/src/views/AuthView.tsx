@@ -9,7 +9,7 @@ import {
   Input,
   backgroundMix,
 } from '@mikoto-io/lucid';
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -145,7 +145,7 @@ export function RegisterView() {
 
 export function ResetPasswordView() {
   const { register, handleSubmit } = useForm();
-  const [sent, setSent] = React.useState(false);
+  const [sent, setSent] = useState(false);
 
   return (
     <AuthView>
@@ -178,7 +178,7 @@ export function ResetPasswordView() {
 export function ResetChangePasswordView() {
   const params = useParams<{ token: string }>();
   const { register, handleSubmit } = useForm();
-  const [sent, setSent] = React.useState(false);
+  const [sent, setSent] = useState(false);
   const error = useErrorElement();
   const navigate = useNavigate();
 

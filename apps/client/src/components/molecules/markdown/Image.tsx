@@ -1,5 +1,5 @@
 import { Anchor, Box, Modal } from '@mikoto-io/lucid';
-import { useRecoilState } from 'recoil';
+import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { modalState } from '../../ContextMenu';
@@ -20,7 +20,7 @@ const MImage = styled.img`
 `;
 
 export function MessageImage({ src, alt }: MessageImageProps) {
-  const [modal, setModal] = useRecoilState(modalState);
+  const setModal = useSetRecoilState(modalState);
 
   return (
     <MImage

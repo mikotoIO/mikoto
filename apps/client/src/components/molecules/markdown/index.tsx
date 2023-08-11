@@ -1,6 +1,6 @@
 import SimpleMarkdown, { SingleASTNode } from '@khanacademy/simple-markdown';
 import { Anchor } from '@mikoto-io/lucid';
-import React from 'react';
+import React, { useState } from 'react';
 import Highlight from 'react-highlight';
 import styled, { css } from 'styled-components';
 
@@ -118,7 +118,7 @@ const StyledSpoiler = styled.span<{ hide: boolean }>`
 `;
 
 function Spoiler({ children }: { children: React.ReactNode }) {
-  const [hidden, setHidden] = React.useState(true);
+  const [hidden, setHidden] = useState(true);
   return (
     <StyledSpoiler
       hide={hidden}

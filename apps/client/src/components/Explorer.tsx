@@ -13,7 +13,7 @@ import {
   checkMemberPermission,
 } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -96,7 +96,7 @@ function CreateChannelModal({ channel }: { channel?: Channel }) {
   const space = useRecoilValue(treebarSpaceState);
   const { register, handleSubmit } = useForm();
 
-  const [channelType, setChannelType] = React.useState('TEXT');
+  const [channelType, setChannelType] = useState('TEXT');
   const error = useErrorElement();
 
   return (
@@ -271,7 +271,7 @@ export const Explorer = observer(({ space }: { space: ClientSpace }) => {
   const tabkit = useTabkit();
   const mikoto = useMikoto();
 
-  const [acks, setAcks] = React.useState<Record<string, Date>>({});
+  const [acks, setAcks] = useState<Record<string, Date>>({});
 
   useEffect(() => {
     mikoto.client.messages.listUnread(space.id).then((ur) => {

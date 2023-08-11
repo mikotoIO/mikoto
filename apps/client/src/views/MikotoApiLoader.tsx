@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import { MikotoClient, constructMikoto } from 'mikotojs';
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 
@@ -11,8 +11,8 @@ import { onlineState } from '../store';
 import { authClient } from '../store/authClient';
 
 export function MikotoApiLoader({ children }: { children: React.ReactNode }) {
-  const [mikoto, setMikoto] = React.useState<MikotoClient | null>(null);
-  const [err, setErr] = React.useState<AxiosError | null>(null);
+  const [mikoto, setMikoto] = useState<MikotoClient | null>(null);
+  const [err, setErr] = useState<AxiosError | null>(null);
   const setOnlineState = useSetRecoilState(onlineState);
 
   // TODO: Try suspense

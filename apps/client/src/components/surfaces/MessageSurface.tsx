@@ -7,7 +7,7 @@ import {
   Message,
 } from 'mikotojs';
 import { Observer, observer } from 'mobx-react-lite';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
@@ -89,7 +89,7 @@ const OtherInner = styled.div`
 `;
 
 const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
-  const virtuosoRef = React.useRef<VirtuosoHandle>(null);
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
   const mikoto = useMikoto();
   const user = useRecoilValue(userState);
   // you will probably run out of memory before this number

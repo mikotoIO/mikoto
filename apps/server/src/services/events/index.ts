@@ -1,8 +1,22 @@
 import { MainService } from '..';
-import { Member, Message, Role } from '../schema';
+import { RedisPubSub } from '../../functions/pubsub';
+import { Member, Message, Role, Space } from '../schema';
 
-export function buildPubSub(service: MainService, id: string) {
+export function buildPubSub(
+  ps: RedisPubSub<any>,
+  service: MainService,
+  id: string,
+) {
   return {
+    createSpace(space: Space) {
+      ps.sub(`space:${space.id}`);
+      service.spaces.$(id).onCreate(space);
+    },
+    deleteSpace(space: Space) {
+      ps.unsub(`space:${space.id}`);
+      service.spaces.$(id).onDelete(space);
+    },
+
     createMember(member: Member) {
       service.members.$(id).onCreate(member);
     },

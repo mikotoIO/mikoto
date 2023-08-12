@@ -4,7 +4,6 @@ import { createServer } from 'http';
 import jwt from 'jsonwebtoken';
 import { UnauthorizedError } from 'routing-controllers';
 import { Server } from 'socket.io';
-import { log } from 'winston';
 
 import { MainService } from '.';
 import { env } from '../env';
@@ -56,8 +55,9 @@ export const sophon = new SophonCore<SophonContext>(sophonIO, {
 
       const pubsub: MikotoRedis = new RedisPubSub<
         ReturnType<typeof buildPubSub>
-      >(redis, buildPubSub(mainService, id));
-      const toSub = [...spaces.map((x) => `space:${x.id}`)];
+      >(redis, (ps) => buildPubSub(ps, mainService, id));
+
+      const toSub = [`user:${user.sub}`, ...spaces.map((x) => `space:${x.id}`)];
       if (toSub.length > 0) {
         await pubsub.sub(toSub);
       }

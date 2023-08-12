@@ -9,17 +9,23 @@ import { Redis } from 'ioredis';
 export class RedisPubSub<M extends Record<string, (arg: any) => void>> {
   private sender: Redis;
   private receiver: Redis;
+  private handlers: M;
 
-  constructor(redis: Redis, private handlers: M) {
+  constructor(redis: Redis, handlers: (ps: RedisPubSub<M>) => M) {
     this.sender = redis;
     this.receiver = redis.duplicate({ lazyConnect: true });
+    this.handlers = handlers(this);
   }
 
   async connect() {
     await this.receiver.connect();
   }
 
-  async pub<K extends keyof M>(channel: string, key: K, message: Parameters<M[K]>[0]) {
+  async pub<K extends keyof M>(
+    channel: string,
+    key: K,
+    message: Parameters<M[K]>[0],
+  ) {
     await this.sender.publish(
       channel,
       JSON.stringify({

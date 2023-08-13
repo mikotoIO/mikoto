@@ -192,8 +192,11 @@ export class SpaceServiceClient {
   delete(id: string): Promise<void> {
     return this.socket.call("spaces/delete", id);
   }
-  join(id: string): Promise<void> {
-    return this.socket.call("spaces/join", id);
+  getSpaceFromInvite(inviteCode: string): Promise<Space> {
+    return this.socket.call("spaces/getSpaceFromInvite", inviteCode);
+  }
+  join(inviteCode: string): Promise<void> {
+    return this.socket.call("spaces/join", inviteCode);
   }
   leave(id: string): Promise<void> {
     return this.socket.call("spaces/leave", id);

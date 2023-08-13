@@ -24,7 +24,7 @@ function App() {
           element={<ResetChangePasswordView />}
         />
         <Route
-          path="/invite/:id"
+          path="/invite/:inviteCode"
           element={
             <MikotoApiLoader>
               <SpaceInviteView />

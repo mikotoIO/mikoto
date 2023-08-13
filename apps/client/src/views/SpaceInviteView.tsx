@@ -30,14 +30,13 @@ const InvitationBox = styled.div`
 export function SpaceInviteViewInner() {
   const mikoto = useMikoto();
   const [space, setSpace] = useState<Space | null>(null);
-  const params = useParams<{ id: string }>();
+  const { inviteCode } = useParams<{ inviteCode: string }>();
 
-  // TODO: Use proper invite links
   useEffect(() => {
-    mikoto.client.spaces.get(params.id ?? '').then((x) => {
+    mikoto.client.spaces.getSpaceFromInvite(inviteCode ?? '').then((x) => {
       setSpace(x);
     });
-  }, [params.id ?? '']);
+  }, [inviteCode ?? '']);
 
   return (
     <Grid tcol="400px 1fr" h="100vh">
@@ -51,8 +50,8 @@ export function SpaceInviteViewInner() {
             <Button
               variant="primary"
               onClick={async () => {
-                // TODO: Rewrite to use invite links instead of server IDs!
-                await mikoto.client.spaces.join(space.id);
+                // TODO: Proper fix for malformed invite links
+                await mikoto.client.spaces.join(inviteCode ?? '');
                 window.location.href = `/`;
               }}
             >

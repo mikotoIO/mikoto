@@ -80,7 +80,8 @@ service SpaceService {
   ~onUpdate(space: Space);
   ~onDelete(space: Space);
 
-  join(id: string): void;
+  getSpaceFromInvite(inviteCode: string): Space;
+  join(inviteCode: string): void;
   leave(id: string): void;
   createInvite(id: string): Invite;
   deleteInvite(code: string): void;

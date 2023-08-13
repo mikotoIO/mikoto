@@ -1,6 +1,7 @@
 import { permissions } from '@mikoto-io/permcheck';
 import { Prisma, SpaceUser } from '@prisma/client';
 import { SophonCore, SophonInstance } from '@sophon-js/server';
+import { nanoid } from 'nanoid';
 import { ForbiddenError, NotFoundError } from 'routing-controllers';
 
 import {
@@ -100,9 +101,31 @@ export class SpaceService extends AbstractSpaceService {
     await this.$(`space/${id}`).onDelete(serializeDates(space));
   }
 
-  async join(ctx: MikotoInstance, id: string) {
+  async getSpaceFromInvite(
+    ctx: SophonInstance<SophonContext>,
+    inviteCode: string,
+  ) {
+    const invite = await prisma.invite.findUnique({
+      where: { id: inviteCode },
+    });
+    if (invite === null) throw new NotFoundError();
+
     const space = await prisma.space.findUnique({
-      where: { id },
+      where: { id: invite?.spaceId },
+      include: { roles: true, channels: true },
+    });
+    if (space === null) throw new NotFoundError();
+    return serializeDates(space);
+  }
+
+  async join(ctx: MikotoInstance, inviteCode: string) {
+    const invite = await prisma.invite.findUnique({
+      where: { id: inviteCode },
+    });
+    if (invite === null) throw new NotFoundError();
+
+    const space = await prisma.space.findUnique({
+      where: { id: invite?.spaceId },
       include: { roles: true, channels: true },
     });
     if (space === null) throw new NotFoundError();
@@ -136,7 +159,9 @@ export class SpaceService extends AbstractSpaceService {
   ): Promise<Invite> {
     const invite = await prisma.invite.create({
       data: {
+        id: nanoid(12),
         spaceId: id,
+        creatorId: ctx.data.user.sub,
       },
     });
     return {

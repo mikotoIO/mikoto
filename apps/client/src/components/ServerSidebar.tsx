@@ -1,9 +1,9 @@
 import { Tooltip } from '@mantine/core';
 import { Button, Form, Input, Modal, Image } from '@mikoto-io/lucid';
 import { AxiosError } from 'axios';
-import { ClientSpace, Space, SpaceStore } from 'mikotojs';
+import { ClientSpace, Invite, Space, SpaceStore } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -27,7 +27,7 @@ const StyledServerSidebar = styled.div`
 `;
 
 const InviteModalWrapper = styled.div`
-  button {
+  .invite-link {
     width: 100%;
     font-size: 14px;
     border-radius: 4px;
@@ -37,6 +37,7 @@ const InviteModalWrapper = styled.div`
     border: none;
     color: var(--N0);
     background-color: var(--N1000);
+    font-family: var(--font-mono);
 
     &:hover {
       background-color: var(--N1100);
@@ -45,21 +46,41 @@ const InviteModalWrapper = styled.div`
 `;
 
 function InviteModal({ space }: { space: Space }) {
-  const link = `${env.PUBLIC_FRONTEND_URL}/invite/${space.id}`;
+  const [invite, setInvite] = useState<Invite | null>(null);
+  const mikoto = useMikoto();
+  const link = invite
+    ? `${env.PUBLIC_FRONTEND_URL}/invite/${invite.code}`
+    : undefined;
 
   return (
     <Modal style={{ minWidth: '400px' }}>
       <InviteModalWrapper>
-        <h1>Invite Link</h1>
-        <button
-          type="button"
-          onClick={() => {
-            // copy to clipboard
-            navigator.clipboard.writeText(link);
-          }}
-        >
-          {link}
-        </button>
+        {!invite ? (
+          <Button
+            type="button"
+            onClick={() => {
+              mikoto.client.spaces.createInvite(space.id).then((x) => {
+                setInvite(x);
+              });
+            }}
+          >
+            Generate
+          </Button>
+        ) : (
+          <>
+            <h1>Invite Link</h1>
+            <button
+              className="invite-link"
+              type="button"
+              onClick={() => {
+                // copy to clipboard
+                navigator.clipboard.writeText(link ?? '');
+              }}
+            >
+              {link}
+            </button>
+          </>
+        )}
       </InviteModalWrapper>
     </Modal>
   );

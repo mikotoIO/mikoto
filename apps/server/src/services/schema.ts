@@ -193,7 +193,14 @@ export abstract class AbstractSpaceService {
     ctx: SophonInstance<SophonContext>,
     id: string
   ): Promise<void>;
-  abstract join(ctx: SophonInstance<SophonContext>, id: string): Promise<void>;
+  abstract getSpaceFromInvite(
+    ctx: SophonInstance<SophonContext>,
+    inviteCode: string
+  ): Promise<Space>;
+  abstract join(
+    ctx: SophonInstance<SophonContext>,
+    inviteCode: string
+  ): Promise<void>;
   abstract leave(ctx: SophonInstance<SophonContext>, id: string): Promise<void>;
   abstract createInvite(
     ctx: SophonInstance<SophonContext>,

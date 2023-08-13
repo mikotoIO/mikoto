@@ -1,6 +1,7 @@
 import { permissions } from '@mikoto-io/permcheck';
 import { Prisma, SpaceUser } from '@prisma/client';
 import { SophonCore, SophonInstance } from '@sophon-js/server';
+import { nanoid } from 'nanoid';
 import { ForbiddenError, NotFoundError } from 'routing-controllers';
 
 import {
@@ -136,7 +137,9 @@ export class SpaceService extends AbstractSpaceService {
   ): Promise<Invite> {
     const invite = await prisma.invite.create({
       data: {
+        id: nanoid(12),
         spaceId: id,
+        creatorId: ctx.data.user.sub,
       },
     });
     return {

@@ -1,6 +1,6 @@
-import { Input, Form, Button, Buttons, Modal } from '@mikoto-io/lucid';
-import { ClientSpace, Space } from 'mikotojs';
-import { useState } from 'react';
+import { Input, Form, Button, Buttons, Modal, Box } from '@mikoto-io/lucid';
+import { ClientSpace, Invite, Space } from 'mikotojs';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSetRecoilState } from 'recoil';
 
@@ -86,9 +86,36 @@ function Overview({ space }: { space: Space }) {
 }
 
 function Invites({ space }: { space: Space }) {
+  const mikoto = useMikoto();
+  const [invites, setInvites] = useState<Invite[] | null>(null);
+
+  useEffect(() => {
+    mikoto.client.spaces.listInvites(space.id).then((x) => {
+      setInvites(x);
+    });
+  }, [space.id]);
+
   return (
     <SettingsView>
       <h1>Invites</h1>
+      {invites &&
+        invites.map((invite) => (
+          <Box key={invite.code} bg="N900" m={4} p={16} rounded={8}>
+            <Box bg="N1000" p={8} rounded={8}>
+              {invite.code}
+            </Box>
+            <Button
+              variant="danger"
+              onClick={() => {
+                mikoto.client.spaces.deleteInvite(invite.code).then(() => {
+                  setInvites(invites.filter((x) => x.code !== invite.code));
+                });
+              }}
+            >
+              Delete
+            </Button>
+          </Box>
+        ))}
     </SettingsView>
   );
 }

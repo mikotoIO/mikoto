@@ -34,6 +34,7 @@ model User {
   alphaRelation Relationship[] @relation("AlphaRelation")
   betaRelation  Relationship[] @relation("BetaRelation")
   Ban           Ban[]
+  Invite        Invite[]
 }
 
 // factor out email and password
@@ -178,9 +179,12 @@ model Verification {
 }
 
 model Invite {
-  id      String @id @default(uuid()) @db.Uuid
-  spaceId String @db.Uuid
-  space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  id        String   @id // use NanoID instead
+  spaceId   String   @db.Uuid
+  space     Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  creatorId String?  @db.Uuid
+  creator   User?    @relation(fields: [creatorId], references: [id], onDelete: SetNull)
 }
 
 model Relationship {

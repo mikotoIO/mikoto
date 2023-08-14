@@ -9,10 +9,12 @@ export const treebarSpaceState = atom<Space | null>({
   dangerouslyAllowMutability: true, // we like to live dangerously
 });
 
+// TODO: stop putting full objects in here
 type TabBaseType =
   | { kind: 'textChannel'; channel: Channel }
   | { kind: 'voiceChannel'; channel: Channel }
   | { kind: 'spaceSettings'; space: Space }
+  | { kind: 'channelSettings'; channelId: string }
   | { kind: 'accountSettings' }
   | { kind: 'palette' }
   | { kind: 'unknown' };

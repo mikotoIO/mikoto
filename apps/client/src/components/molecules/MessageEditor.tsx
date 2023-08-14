@@ -9,13 +9,14 @@ import { Flex } from '@mikoto-io/lucid';
 import { init } from 'emoji-mart';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { createEditor, Transforms, Node } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import styled from 'styled-components';
 
 import { contextMenuState } from '../ContextMenu';
+import { messageEditIdState } from './Message';
 
 init({ data: emojiData });
 
@@ -98,8 +99,18 @@ export function MessageEditor({
     [],
   );
   const [editorValue, setEditorValue] = useState<Node[]>(initialEditorValue);
+  // const [messageEditId, setMessageEditId] = useRecoilState(messageEditIdState);
   const setContextMenu = useSetRecoilState(contextMenuState);
   const ref = useRef<HTMLDivElement>(null);
+
+  // useEffect(() => {
+  //   console.log(messageEditId);
+  //   if (!messageEditId) setEditorValue(initialEditorValue);
+  //   else {
+  //     const { content } = messageEditId;
+  //     setEditorValue([{ children: [{ text: content }] }]);
+  //   }
+  // }, [messageEditId]);
 
   useEffect(() => {
     ReactEditor.focus(editor);

@@ -15,7 +15,8 @@ import { TabBarButton, TabbedView } from '../components/TabBar';
 import { UserAreaAvatar } from '../components/UserArea';
 import { Sidebar } from '../components/sidebars/Base';
 import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
-import { AccountSettingsSurface } from '../components/surfaces/AccountSettingSurface';
+import { AccountSettingsSurface } from '../components/surfaces/AccountSettingsSurface';
+import { ChannelSettingsSurface } from '../components/surfaces/ChannelSettingsSurface';
 import { MessageView } from '../components/surfaces/MessageSurface';
 import { SpaceSettingsView } from '../components/surfaces/SpaceSettingsSurface';
 import { VoiceView } from '../components/surfaces/VoiceSurface';
@@ -60,6 +61,8 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
       return <SpaceSettingsView space={tab.space} />;
     case 'accountSettings':
       return <AccountSettingsSurface />;
+    case 'channelSettings':
+      return <ChannelSettingsSurface />;
     case 'palette':
       return <DesignStory />;
     default:

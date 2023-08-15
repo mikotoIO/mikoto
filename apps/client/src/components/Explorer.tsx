@@ -234,6 +234,20 @@ const ChannelContextMenu = observer(
           Open in new tab
         </ContextMenu.Link>
         <ContextMenu.Link>Mark as Read</ContextMenu.Link>
+        <ContextMenu.Link
+          onClick={() => {
+            tabkit.openTab(
+              {
+                kind: 'channelSettings',
+                key: `channelSettings/${channel.id}`,
+                channelId: channel.id,
+              },
+              false,
+            );
+          }}
+        >
+          Channel Settings
+        </ContextMenu.Link>
         {checkMemberPermission(
           channel.space!.member!,
           permissions.superuser,

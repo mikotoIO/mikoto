@@ -1,6 +1,7 @@
 import { Flex } from '@mikoto-io/lucid';
 import { ClientMessage } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
+import { atom, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../hooks';
@@ -128,11 +129,27 @@ interface MessageProps {
   isSimple?: boolean;
 }
 
+export const messageEditIdState = atom<{ id: string; content: string } | null>({
+  key: 'messageEditId',
+  default: null,
+});
+
 export const MessageItem = observer(({ message, isSimple }: MessageProps) => {
   const mikoto = useMikoto();
+  const setMessageEditId = useSetRecoilState(messageEditIdState);
 
   const menu = useContextMenu(() => (
     <ContextMenu>
+      <ContextMenu.Link
+        onClick={() => {
+          setMessageEditId({
+            id: message.id,
+            content: message.content,
+          });
+        }}
+      >
+        Edit Message
+      </ContextMenu.Link>
       <ContextMenu.Link
         onClick={async () => {
           await mikoto.client.messages.delete(message.channelId, message.id);

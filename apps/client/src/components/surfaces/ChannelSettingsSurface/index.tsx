@@ -1,3 +1,4 @@
+import { Form, Heading, Input } from '@mikoto-io/lucid';
 import { ClientChannel } from 'mikotojs';
 
 import { useMikoto } from '../../../hooks';
@@ -10,7 +11,14 @@ const ACCOUNT_SETTING_CATEGORIES = [
 ];
 
 function General({ channel }: { channel: ClientChannel }) {
-  return <SettingsView>Channel General</SettingsView>;
+  return (
+    <SettingsView>
+      <Heading>Overview</Heading>
+      <Form>
+        <Input labelName="Channel Name" />
+      </Form>
+    </SettingsView>
+  );
 }
 
 function Switch({ nav, channel }: { nav: string; channel: ClientChannel }) {

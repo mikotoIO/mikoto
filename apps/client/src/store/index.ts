@@ -1,12 +1,18 @@
-import { Channel, Space } from 'mikotojs';
+import { Space } from 'mikotojs';
 import React, { createContext } from 'react';
 import { atom, atomFamily, useRecoilState } from 'recoil';
 import { recoilPersist } from 'recoil-persist';
 
-export const treebarSpaceState = atom<Space | null>({
+// spaceId, not space
+const spaceIdPersist = recoilPersist({
+  key: 'spaceId',
+});
+
+export const treebarSpaceState = atom<string | null>({
   key: 'treebarSpace',
   default: null,
   dangerouslyAllowMutability: true, // we like to live dangerously
+  effects_UNSTABLE: [spaceIdPersist.persistAtom],
 });
 
 // TODO: stop putting full objects in here

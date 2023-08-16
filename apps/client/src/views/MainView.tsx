@@ -84,21 +84,9 @@ const LeftBar = styled(Grid)`
 function AppView() {
   const tabbed = useRecoilValue(tabbedState);
 
-  const spaceVal = useRecoilValue(treebarSpaceState);
-  const [space, setSpace] = useState<Space | null>(null);
+  const spaceId = useRecoilValue(treebarSpaceState);
   const mikoto = useMikoto();
-
   const [workspace, setWorkspace] = useRecoilState(workspaceState);
-
-  // arguably the worst code I've seen.
-  // TODO: Move the storage into redux store, and make it a hook.
-  // Lower the fetching/update logic into the Explorer component.
-  // make it take just the space id as a prop.
-  useEffect(() => {
-    if (spaceVal) {
-      mikoto.client.spaces.get(spaceVal.id).then((x) => setSpace(x));
-    }
-  }, [spaceVal?.id]);
 
   return (
     <AppWindow>
@@ -130,8 +118,8 @@ function AppView() {
                   }));
                 }}
               >
-                {spaceVal && (
-                  <Explorer space={mikoto.spaces.get(spaceVal.id)!} />
+                {spaceId && (
+                  <Explorer space={mikoto.spaces.get(spaceId)!} />
                 )}
               </Sidebar>
             )}
@@ -164,8 +152,8 @@ function AppView() {
               }));
             }}
           >
-            {spaceVal && (
-              <MemberListSidebar space={mikoto.spaces.get(spaceVal.id)!} />
+            {spaceId && (
+              <MemberListSidebar space={mikoto.spaces.get(spaceId)!} />
             )}
           </Sidebar>
         )}

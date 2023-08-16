@@ -40,14 +40,14 @@ export async function upload(req: FastifyRequest, res: FastifyReply) {
     }
   }
   // eslint-disable-next-line no-restricted-syntax
-  for (const transformation of transformations) {
-    switch (transformation.id) {
+  for (const tf of transformations ?? []) {
+    switch (tf.id) {
       case 'RESIZE':
         // eslint-disable-next-line no-await-in-loop
         fileBuffer = await sharp(fileBuffer)
           .resize({
-            width: transformation.width,
-            height: transformation.height,
+            width: tf.width,
+            height: tf.height,
           })
           .png()
           .toBuffer();

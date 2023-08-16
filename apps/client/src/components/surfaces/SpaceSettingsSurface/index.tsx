@@ -145,13 +145,13 @@ const SPACE_SETTING_CATEGORIES = [
 
 export function SpaceSettingsView({ spaceId }: { spaceId: string }) {
   const mikoto = useMikoto();
-  const cSpace = mikoto.spaces.get(spaceId)!;
+  const space = mikoto.spaces.get(spaceId)!;
 
   return (
     <BaseSettingsSurface
       defaultNav="overview"
       categories={SPACE_SETTING_CATEGORIES}
-      switcher={(nav) => <Switch space={cSpace} nav={nav} />}
+      switcher={(nav) => <Switch space={space} nav={nav} />}
     />
   );
 }

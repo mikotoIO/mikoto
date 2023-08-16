@@ -1,3 +1,6 @@
+import { ClientChannel } from 'mikotojs';
+
+import { useMikoto } from '../../../hooks';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
 import { BaseSettingsSurface } from '../BaseSettingSurface';
 
@@ -6,26 +9,28 @@ const ACCOUNT_SETTING_CATEGORIES = [
   { code: 'permissions', tkey: 'channelSettings.permissions.title' },
 ];
 
-function General() {
+function General({ channel }: { channel: ClientChannel }) {
   return <SettingsView>Channel General</SettingsView>;
 }
 
-function Switch({ nav }: { nav: string }) {
+function Switch({ nav, channel }: { nav: string; channel: ClientChannel }) {
   // TODO
   switch (nav) {
     case 'general':
-      return <General />;
+      return <General channel={channel} />;
     default:
       return null;
   }
 }
 
-export function ChannelSettingsSurface() {
+export function ChannelSettingsSurface({ channelId }: { channelId: string }) {
+  const mikoto = useMikoto();
+  const channel = mikoto.channels.get(channelId)!;
   return (
     <BaseSettingsSurface
       defaultNav="general"
       categories={ACCOUNT_SETTING_CATEGORIES}
-      switcher={(nav) => <Switch nav={nav} />}
+      switcher={(nav) => <Switch nav={nav} channel={channel} />}
     />
   );
 }

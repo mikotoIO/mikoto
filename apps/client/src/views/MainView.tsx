@@ -62,7 +62,7 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
     case 'accountSettings':
       return <AccountSettingsSurface />;
     case 'channelSettings':
-      return <ChannelSettingsSurface />;
+      return <ChannelSettingsSurface channelId={tab.channelId} />;
     case 'palette':
       return <DesignStory />;
     default:

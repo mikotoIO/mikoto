@@ -1,6 +1,6 @@
 # MikotoJS
 
-MikotoJS is the TypeScript library for interacting with the Mikoto API from browser or NodeJS.
+MikotoJS is the official JavaScript/TypeScript library for interacting with the Mikoto API from browser or NodeJS.
 
 ## Installation
 

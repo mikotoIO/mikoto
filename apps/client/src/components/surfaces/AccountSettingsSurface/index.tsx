@@ -26,6 +26,7 @@ import {
   mediaServerAxios,
   uploadFileWithAxios,
 } from '../../molecules/AvatarEditor';
+import { BaseSettingsSurface } from '../BaseSettingSurface';
 import { BotsSurface } from './bots';
 import { LanguageSurface } from './language';
 
@@ -189,28 +190,11 @@ const ACCOUNT_SETTING_CATEGORIES = [
 ];
 
 export function AccountSettingsSurface() {
-  const [nav, setNav] = useState('general');
-  const { t } = useTranslation();
-
   return (
-    <SettingsView.Container>
-      <SettingsView.Sidebar>
-        {ACCOUNT_SETTING_CATEGORIES.map((c) => (
-          <SettingsView.Nav
-            active={nav === c.code}
-            onClick={() => {
-              setNav(c.code);
-            }}
-            key={c.code}
-          >
-            {t(c.tkey)}
-          </SettingsView.Nav>
-        ))}
-      </SettingsView.Sidebar>
-      <TabName
-        name={t(ACCOUNT_SETTING_CATEGORIES.find((x) => x.code === nav)?.tkey!)}
-      />
-      <Switch nav={nav} />
-    </SettingsView.Container>
+    <BaseSettingsSurface
+      defaultNav="general"
+      categories={ACCOUNT_SETTING_CATEGORIES}
+      switcher={(nav) => <Switch nav={nav} />}
+    />
   );
 }

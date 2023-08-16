@@ -267,14 +267,13 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
   );
 });
 
-export function MessageView({ channel }: MessageViewProps) {
+export function MessageView({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
-  const space = mikoto.spaces.get(channel.spaceId);
-  const cChannel = mikoto.channels.get(channel.id)!;
+  const channel = mikoto.channels.get(channelId)!;
 
   return (
-    <CurrentSpaceContext.Provider value={space}>
-      <RealMessageView channel={cChannel} />
+    <CurrentSpaceContext.Provider value={channel.space!}>
+      <RealMessageView channel={channel} />
     </CurrentSpaceContext.Provider>
   );
 }

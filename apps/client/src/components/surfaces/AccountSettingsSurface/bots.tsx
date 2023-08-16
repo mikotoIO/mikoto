@@ -8,7 +8,6 @@ import styled from 'styled-components';
 import { useAuthClient } from '../../../hooks';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
 import { modalState } from '../../ContextMenu';
-import { TabName } from '../../TabBar';
 
 const BotCardContainer = styled.div`
   background-color: var(--N1000);

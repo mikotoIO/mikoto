@@ -25,6 +25,29 @@
   },
   "spaceSettings": {
     "spaceOverview": "Space Overview",
-    "settingsForSpace": "Settings for {{name}}"
+    "settingsForSpace": "Settings for {{name}}",
+    "overview": {
+      "title": "Overview"
+    },
+    "invites": {
+      "title": "Invites"
+    },
+    "roles": {
+      "title": "Roles"
+    },
+    "members": {
+      "title": "Members"
+    },
+    "emojis": {
+      "title": "Emojis"
+    }
+  },
+  "channelSettings": {
+    "general": {
+      "title": "General"
+    },
+    "permissions": {
+      "title": "Permissions"
+    }
   }
 }

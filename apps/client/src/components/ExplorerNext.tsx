@@ -79,7 +79,7 @@ function Node(props: NodeProps) {
   const [{ isOver }, drop] = useDrop<NodeObject, any, { isOver: boolean }>({
     accept: 'CHANNEL',
     async drop(item) {
-      console.log(`Dropped ${item.text} on ${props.text}`);
+      // console.log(`Dropped ${item.text} on ${props.text}`);
     },
 
     canDrop(item) {

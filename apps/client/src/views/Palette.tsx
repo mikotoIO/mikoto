@@ -79,7 +79,6 @@ export function DesignStory() {
             type="button"
             onClick={() => {
               toast(<div>lol</div>);
-              console.log('lol');
             }}
           >
             Default Button

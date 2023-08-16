@@ -98,7 +98,7 @@ function ServerIconContextMenu({ space }: { space: Space }) {
             {
               kind: 'spaceSettings',
               key: space.id,
-              space,
+              spaceId: space.id,
             },
             true,
           )

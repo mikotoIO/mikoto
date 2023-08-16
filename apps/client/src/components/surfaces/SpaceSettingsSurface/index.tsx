@@ -13,6 +13,7 @@ import {
   mediaServerAxios,
   uploadFileWithAxios,
 } from '../../molecules/AvatarEditor';
+import { BaseSettingsSurface } from '../BaseSettingSurface';
 import { EmojiSubsurface } from './Emojis';
 import { RolesSubsurface } from './Roles';
 
@@ -120,44 +121,37 @@ function Invites({ space }: { space: Space }) {
   );
 }
 
-function SettingSwitch({ nav, space }: { nav: string; space: ClientSpace }) {
+function Switch({ nav, space }: { nav: string; space: ClientSpace }) {
   switch (nav) {
-    case 'Overview':
+    case 'overview':
       return <Overview space={space} />;
-    case 'Invites':
+    case 'invites':
       return <Invites space={space} />;
-    case 'Roles':
+    case 'roles':
       return <RolesSubsurface space={space} />;
-    case 'Emojis':
+    case 'emojis':
       return <EmojiSubsurface />;
     default:
       return null;
   }
 }
 
-const CATEGORIES = ['Overview', 'Invites', 'Roles', 'Emojis'];
+const SPACE_SETTING_CATEGORIES = [
+  { code: 'overview', tkey: 'spaceSettings.overview.title' },
+  { code: 'invites', tkey: 'spaceSettings.invites.title' },
+  { code: 'roles', tkey: 'spaceSettings.roles.title' },
+  { code: 'emojis', tkey: 'spaceSettings.emojis.title' },
+];
 
-export function SpaceSettingsView({ space }: { space: Space }) {
-  const [nav, setNav] = useState('Overview');
+export function SpaceSettingsView({ spaceId }: { spaceId: string }) {
   const mikoto = useMikoto();
-  const cSpace = mikoto.spaces.get(space.id)!;
+  const space = mikoto.spaces.get(spaceId)!;
 
   return (
-    <SettingsView.Container>
-      <SettingsView.Sidebar>
-        {CATEGORIES.map((c) => (
-          <SettingsView.Nav
-            active={nav === c}
-            onClick={() => {
-              setNav(c);
-            }}
-            key={c}
-          >
-            {c}
-          </SettingsView.Nav>
-        ))}
-      </SettingsView.Sidebar>
-      <SettingSwitch nav={nav} space={cSpace} />
-    </SettingsView.Container>
+    <BaseSettingsSurface
+      defaultNav="overview"
+      categories={SPACE_SETTING_CATEGORIES}
+      switcher={(nav) => <Switch space={space} nav={nav} />}
+    />
   );
 }

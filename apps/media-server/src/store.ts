@@ -6,7 +6,7 @@ export type Transformation = { id: 'RESIZE'; width: number; height: number };
 
 export interface Store {
   restrictions: Restrictions[];
-  transformations: Transformation[];
+  transformations?: Transformation[];
 }
 
 export const storeConfig: Record<string, Store> = {
@@ -17,5 +17,9 @@ export const storeConfig: Record<string, Store> = {
   spaceicon: {
     restrictions: [{ id: 'IS_FILETYPE', type: 'image' }],
     transformations: [{ id: 'RESIZE', width: 512, height: 512 }],
+  },
+  attachments: {
+    // 50mb max
+    restrictions: [{ id: 'MAX_FILESIZE', size: 50 * 1024 * 1024 }],
   },
 };

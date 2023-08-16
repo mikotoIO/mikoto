@@ -1,0 +1,40 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { SettingsView } from '../../views/SettingsViewTemplate';
+import { TabName } from '../TabBar';
+
+interface BaseSettingsSurfaceProps {
+  categories: { code: string; tkey: string }[];
+  switcher: (nav: string) => React.ReactNode;
+  defaultNav: string;
+}
+
+export function BaseSettingsSurface({
+  categories,
+  switcher,
+  defaultNav,
+}: BaseSettingsSurfaceProps) {
+  const [nav, setNav] = useState(defaultNav);
+  const { t } = useTranslation();
+
+  return (
+    <SettingsView.Container>
+      <SettingsView.Sidebar>
+        {categories.map((c) => (
+          <SettingsView.Nav
+            active={nav === c.code}
+            onClick={() => {
+              setNav(c.code);
+            }}
+            key={c.code}
+          >
+            {t(c.tkey)}
+          </SettingsView.Nav>
+        ))}
+      </SettingsView.Sidebar>
+      <TabName name={t(categories.find((x) => x.code === nav)?.tkey!)} />
+      {switcher(nav)}
+    </SettingsView.Container>
+  );
+}

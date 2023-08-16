@@ -13,10 +13,14 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - run: yarn install --frozen-lockfile
+      - run: corepack enable
+      - run: npm i -g turbo
+      - run: turbo prune --scope=mikotojs
+      - run: yarn install --immutable
+        working-directory: ./out
       - run: yarn build
-        working-directory: ./packages/mikotojs
+        working-directory: ./out/packages/mikotojs
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
-          package: ./packages/mikotojs/package.json
+          package: ./out/packages/mikotojs/package.json

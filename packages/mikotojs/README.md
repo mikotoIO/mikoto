@@ -10,4 +10,4 @@ yarn add mikotojs
 
 ## Usage
 
-TODO
+TODO: Write usage

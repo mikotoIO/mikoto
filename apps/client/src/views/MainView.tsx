@@ -58,7 +58,7 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
     case 'voiceChannel':
       return <VoiceView channel={tab.channel} />;
     case 'spaceSettings':
-      return <SpaceSettingsView space={tab.space} />;
+      return <SpaceSettingsView spaceId={tab.spaceId} />;
     case 'accountSettings':
       return <AccountSettingsSurface />;
     case 'channelSettings':

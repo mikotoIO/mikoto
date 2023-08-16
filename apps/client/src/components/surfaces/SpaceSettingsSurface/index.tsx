@@ -143,9 +143,9 @@ const SPACE_SETTING_CATEGORIES = [
   { code: 'emojis', tkey: 'spaceSettings.emojis.title' },
 ];
 
-export function SpaceSettingsView({ space }: { space: Space }) {
+export function SpaceSettingsView({ spaceId }: { spaceId: string }) {
   const mikoto = useMikoto();
-  const cSpace = mikoto.spaces.get(space.id)!;
+  const cSpace = mikoto.spaces.get(spaceId)!;
 
   return (
     <BaseSettingsSurface

@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --immutable
       - run: yarn build
         working-directory: ./packages/lucid
       - uses: JS-DevTools/npm-publish@v1

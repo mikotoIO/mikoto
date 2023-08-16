@@ -54,9 +54,9 @@ function ErrorBoundaryPage({ children }: { children: React.ReactNode }) {
 function TabViewSwitch({ tab }: { tab: Tabable }) {
   switch (tab.kind) {
     case 'textChannel':
-      return <MessageView channel={tab.channel} />;
+      return <MessageView channelId={tab.channelId} />;
     case 'voiceChannel':
-      return <VoiceView channel={tab.channel} />;
+      return <VoiceView channelId={tab.channelId} />;
     case 'spaceSettings':
       return <SpaceSettingsView spaceId={tab.spaceId} />;
     case 'accountSettings':

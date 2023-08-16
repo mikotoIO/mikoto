@@ -37,13 +37,13 @@ function channelToTab(channel: Channel): Tabable {
       return {
         kind: 'textChannel',
         key: channel.id,
-        channel,
+        channelId: channel.id,
       };
     case 'VOICE':
       return {
         kind: 'voiceChannel',
         key: channel.id,
-        channel,
+        channelId: channel.id,
       };
     default:
       throw new Error('Unknown channel type');

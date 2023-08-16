@@ -1,13 +1,14 @@
 import { LiveKitRoom } from '@livekit/react-components';
-import { Channel, VoiceToken } from 'mikotojs';
+import { VoiceToken } from 'mikotojs';
 import { useEffect, useState } from 'react';
 
 import { useMikoto } from '../../hooks';
 import { TabName } from '../TabBar';
 import { ViewContainer } from '../ViewContainer';
 
-export function VoiceView({ channel }: { channel: Channel }) {
+export function VoiceView({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
+  const channel = mikoto.channels.get(channelId)!;
 
   const [voiceConfig, setVoiceConfig] = useState<VoiceToken | null>(null);
   useEffect(() => {

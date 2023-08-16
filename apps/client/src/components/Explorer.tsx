@@ -13,7 +13,7 @@ import {
   checkMemberPermission,
 } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';

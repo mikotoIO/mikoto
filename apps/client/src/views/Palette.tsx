@@ -1,6 +1,7 @@
 import { faChevronRight, faStar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Form, Button, Buttons, Input, colors, Toggle } from '@mikoto-io/lucid';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';
@@ -74,7 +75,15 @@ export function DesignStory() {
       <Form>
         <Input labelName="Test Input" />
         <Buttons>
-          <Button type="button">Default Button</Button>
+          <Button
+            type="button"
+            onClick={() => {
+              toast(<div>lol</div>);
+              console.log('lol');
+            }}
+          >
+            Default Button
+          </Button>
           <Button variant="primary" type="button">
             Primary Button
             <FontAwesomeIcon icon={faStar} />

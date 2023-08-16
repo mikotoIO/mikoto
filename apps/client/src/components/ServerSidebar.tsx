@@ -23,7 +23,6 @@ const StyledServerSidebar = styled.div`
   box-sizing: border-box;
   width: 68px;
   height: 100%;
-  padding-top: 10px;
 `;
 
 const InviteModalWrapper = styled.div`

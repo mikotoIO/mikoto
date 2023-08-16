@@ -22029,6 +22029,7 @@ __metadata:
     socket.io-client: ^4.5.1
     typed-emitter: ^2.1.0
     typescript: ^5.0.4
+    zod: ^3.22.1
   languageName: unknown
   linkType: soft
 
@@ -31381,6 +31382,13 @@ __metadata:
   version: 3.21.4
   resolution: "zod@npm:3.21.4"
   checksum: f185ba87342ff16f7a06686767c2b2a7af41110c7edf7c1974095d8db7a73792696bcb4a00853de0d2edeb34a5b2ea6a55871bc864227dace682a0a28de33e1f
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.22.1":
+  version: 3.22.1
+  resolution: "zod@npm:3.22.1"
+  checksum: 05b62cc1069da6e6349ad2325ec6b7d0c00699f0796e0fd071bcc2b44ac711679e52ad00bc563019504c7e64bbf0bf73737f31366d882a856962cd6e2882cf0e
   languageName: node
   linkType: hard
 

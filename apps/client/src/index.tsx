@@ -6,6 +6,8 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import ReactDOM from 'react-dom/client';
 import { Helmet } from 'react-helmet';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { RecoilRoot } from 'recoil';
 import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
@@ -52,6 +54,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 </Helmet>
                 <GlobalStyle />
                 <App />
+                <ToastContainer theme="dark" limit={3} />
               </>
             </DndProvider>
           </MantineProvider>

@@ -18,7 +18,7 @@ import { useForm } from 'react-hook-form';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
-import { useMikoto } from '../hooks';
+import { useFetchMember, useMikoto } from '../hooks';
 import { useErrorElement } from '../hooks/useErrorElement';
 import { Tabable, treebarSpaceState, useTabkit } from '../store';
 import { ContextMenu, modalState, useContextMenuX } from './ContextMenu';
@@ -93,7 +93,7 @@ const channelTypes = [
 function CreateChannelModal({ channel }: { channel?: Channel }) {
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
-  const space = useRecoilValue(treebarSpaceState);
+  const spaceId = useRecoilValue(treebarSpaceState)!;
   const { register, handleSubmit } = useForm();
 
   const [channelType, setChannelType] = useState('TEXT');
@@ -109,7 +109,7 @@ function CreateChannelModal({ channel }: { channel?: Channel }) {
         <Form
           onSubmit={handleSubmit(async (formData) => {
             try {
-              await mikoto.client.channels.create(space!.id, {
+              await mikoto.client.channels.create(spaceId, {
                 name: formData.name,
                 type: channelType,
                 parentId: channel?.id ?? null,
@@ -284,6 +284,7 @@ function isUnread(lastUpdate: Date | null, ack: Date | null) {
 export const Explorer = observer(({ space }: { space: ClientSpace }) => {
   const tabkit = useTabkit();
   const mikoto = useMikoto();
+  useFetchMember(space);
 
   const [acks, setAcks] = useState<Record<string, Date>>({});
 

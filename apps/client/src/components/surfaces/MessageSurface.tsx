@@ -12,7 +12,7 @@ import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 
-import { useInterval, useMikoto } from '../../hooks';
+import { useFetchMember, useInterval, useMikoto } from '../../hooks';
 import { CurrentSpaceContext } from '../../store';
 import { TabName } from '../TabBar';
 import { userState } from '../UserArea';
@@ -89,6 +89,8 @@ const OtherInner = styled.div`
 `;
 
 const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
+  useFetchMember(channel.space!);
+
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const mikoto = useMikoto();
   const user = useRecoilValue(userState);

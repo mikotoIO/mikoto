@@ -142,7 +142,7 @@ const StyledIconWrapper = styled.div`
 
 function SidebarSpaceIcon({ space }: { space: ClientSpace }) {
   const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
-  const isActive = stateSpace?.id === space.id;
+  const isActive = stateSpace === space.id;
 
   const ref = useRef<HTMLDivElement>(null);
   const isHover = useHover(ref);
@@ -160,7 +160,7 @@ function SidebarSpaceIcon({ space }: { space: ClientSpace }) {
           ref={ref}
           icon={space.icon ?? undefined}
           onClick={() => {
-            setSpace(space);
+            setSpace(space.id);
             space.fetchMembers().then();
           }}
         >

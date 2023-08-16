@@ -1,8 +1,7 @@
 import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Grid } from '@mikoto-io/lucid';
-import { Space } from 'mikotojs';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
@@ -118,9 +117,7 @@ function AppView() {
                   }));
                 }}
               >
-                {spaceId && (
-                  <Explorer space={mikoto.spaces.get(spaceId)!} />
-                )}
+                {spaceId && <Explorer space={mikoto.spaces.get(spaceId)!} />}
               </Sidebar>
             )}
           </div>

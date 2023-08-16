@@ -157,5 +157,6 @@
     "source-map-explorer": "^2.5.2",
     "ts-jest": "^29.0.5",
     "vitest": "^0.18.0"
-  }
+  },
+  "packageManager": "yarn@3.6.1"
 }

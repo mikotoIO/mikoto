@@ -144,6 +144,7 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   body {
+    overscroll-behavior-x: none;
     overscroll-behavior-y: none;
     height: 100%;
     min-height: 100%;

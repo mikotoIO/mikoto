@@ -7,3 +7,7 @@ Mikoto.JS is the TypeScript library for interacting with the Mikoto API, either 
 ```sh
 yarn add mikotojs
 ```
+
+## Usage
+
+TODO

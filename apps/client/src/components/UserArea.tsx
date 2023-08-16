@@ -24,6 +24,7 @@ function UserAreaMenu() {
       >
         Open Palette
       </ContextMenu.Link>
+      <ContextMenu.Link onClick={() => {}}>Set Status</ContextMenu.Link>
       <ContextMenu.Link
         onClick={() => {
           tabkit.openTab({ kind: 'accountSettings', key: 'main' }, false);

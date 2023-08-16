@@ -1,7 +1,6 @@
 import { Button, Flex, Grid, backgroundMix } from '@mikoto-io/lucid';
 import { Space } from 'mikotojs';
 import { useEffect, useState } from 'react';
-import { useAsync } from 'react-async-hook';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 

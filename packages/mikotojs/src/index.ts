@@ -10,9 +10,9 @@ interface MikotoConstructOptions {
 function constructMikotoSimple(options: MikotoConstructOptions) {
   return new Promise<MikotoClient>((resolve, reject) => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       let connected = false;
-      const mikotoApi = new MikotoClient(options.url, options.token, {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const mikoto = new MikotoClient(options.url, options.token, {
         onReady: (m) => {
           connected = true;
           resolve(m);

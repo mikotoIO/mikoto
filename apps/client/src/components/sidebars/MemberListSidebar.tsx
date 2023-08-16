@@ -11,6 +11,7 @@ import { contextMenuState, useContextMenu } from '../ContextMenu';
 import { Avatar } from '../atoms/Avatar';
 import { MemberContextMenu } from '../atoms/MessageAvatar';
 import { UserContextMenu } from '../modals/ContextMenus';
+import { useFetchMember } from '../../hooks';
 
 const StyledMember = styled.div`
   display: flex;
@@ -74,9 +75,7 @@ const MemberElement = observer(({ member }: { member: ClientMember }) => {
 
 export const MemberListSidebar = observer(
   ({ space }: { space: ClientSpace }) => {
-    useEffect(() => {
-      space.fetchMembers();
-    }, [space.id]);
+    useFetchMember(space);
 
     return (
       <div>

@@ -1,5 +1,5 @@
-import { AuthClient, MikotoClient } from 'mikotojs';
-import React, { useContext } from 'react';
+import { AuthClient, ClientSpace, MikotoClient } from 'mikotojs';
+import React, { useContext, useEffect } from 'react';
 
 import { useInterval } from './useInterval';
 
@@ -18,3 +18,10 @@ export function useAuthClient() {
 }
 
 export function useEvent() {}
+
+export const useFetchMember = (space: ClientSpace) => {
+  useEffect(() => {
+    space.fetchMembers();
+  }, [space.id]);
+};
+

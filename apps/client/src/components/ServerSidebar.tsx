@@ -275,6 +275,12 @@ function ServerSidebarContextMenu() {
   );
 }
 
+const Seperator = styled.hr`
+  border-width: 1px;
+  width: 28px;
+  border-color: var(--N500);
+`;
+
 export const ServerSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
   const setModal = useSetRecoilState(modalState);
   const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
@@ -287,9 +293,11 @@ export const ServerSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
         <Pill h={stateSpace === null ? 32 : 8} />
         <StyledSpaceIcon
           style={{
-            backgroundColor: stateSpace === null ? 'var(--B700)' : undefined,
+            background:
+              stateSpace === null
+                ? 'linear-gradient(133deg, #2298ff 0%, rgba(59,108,255,1) 100%)'
+                : undefined,
             marginTop: '8px',
-            marginBottom: '8px',
           }}
           active
           onClick={() => {
@@ -299,6 +307,8 @@ export const ServerSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
           <Image src="/logo/logo.svg" w={20} />
         </StyledSpaceIcon>
       </StyledIconWrapper>
+      <Seperator />
+
       {Array.from(spaces.values()).map((space) => (
         <SidebarSpaceIcon space={space} key={space.id} />
       ))}

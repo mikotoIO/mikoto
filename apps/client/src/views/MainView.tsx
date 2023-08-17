@@ -66,15 +66,14 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
 
 const LeftBar = styled(Flex)`
   height: 100%;
-  overflow-x: hidden;
-  overflow-y: scroll;
+
   .top {
     display: flex;
     background-color: var(--N1000);
   }
   .bars {
     display: flex;
-    height: 400px;
+    min-height: 0;
     flex-grow: 1;
   }
 `;

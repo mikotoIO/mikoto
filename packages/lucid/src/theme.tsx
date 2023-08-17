@@ -160,12 +160,12 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   ::-webkit-scrollbar {
-    width: 10px;
+    width: 6px;
   }
 
   /* Track */
   ::-webkit-scrollbar-track {
-    background: hsl(220, 7%, 23%);
+    background: transparent;
     border-radius: 4px;
   }
 

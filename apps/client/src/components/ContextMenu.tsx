@@ -1,6 +1,6 @@
 import { ModalView } from '@mikoto-io/lucid';
 import useEventListener from '@use-it/event-listener';
-import React, { useRef } from 'react';
+import React, { useRef, useLayoutEffect, useState } from 'react';
 import { atom, useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
@@ -40,18 +40,36 @@ const ContextMenuBase = styled.div`
   box-shadow: rgba(0, 0, 0, 0.1) 0 8px 24px;
 `;
 
-const StyledContextMenu = styled.div`
+interface StyledContextMenuProps {
+  bottomPin?: boolean;
+}
+
+// TODO: probably a smarter way to do this
+const StyledContextMenu = styled.div<StyledContextMenuProps>`
   pointer-events: all;
   position: absolute;
   &:focus {
     outline: none;
   }
+  ${(p) => p.bottomPin && `bottom: 0 !important; top: unset !important;`}
 `;
 
 export function ContextMenuKit() {
   const [context, setContext] = useRecoilState(contextMenuState);
+  const [bottomPin, setBottomPin] = useState<boolean>(false);
 
   const ref = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    if (ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      setBottomPin(rect.top + rect.height > window.innerHeight);
+      // console.log(rect);
+      // console.log(rect.top + rect.height > window.innerHeight);
+    } else {
+      setBottomPin(false);
+    }
+  }, [context ? 'something' : '']);
+
   useEventListener('mousedown', (ev) => {
     if (ref.current && !ref.current.contains(ev.target as any)) {
       setContext(null);
@@ -67,7 +85,11 @@ export function ContextMenuKit() {
   return (
     <StyledContextMenuOverlay tabIndex={0}>
       {context && (
-        <StyledContextMenu ref={ref} style={{ ...context.position }}>
+        <StyledContextMenu
+          ref={ref}
+          style={{ ...context.position }}
+          bottomPin={bottomPin}
+        >
           {context.elem}
         </StyledContextMenu>
       )}

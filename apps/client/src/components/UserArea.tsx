@@ -3,9 +3,10 @@ import { useEffect } from 'react';
 import { atom, useRecoilState } from 'recoil';
 
 import { useMikoto } from '../hooks';
-import { useTabkit } from '../store';
+import { useModalKit, useTabkit } from '../store';
 import { ContextMenu, useContextMenu } from './ContextMenu';
 import { Avatar } from './atoms/Avatar';
+import { SetStatusModal } from './modals/Status';
 
 export const userState = atom<User | null>({
   default: null,
@@ -14,6 +15,7 @@ export const userState = atom<User | null>({
 
 function UserAreaMenu() {
   const tabkit = useTabkit();
+  const modal = useModalKit();
 
   return (
     <ContextMenu>
@@ -24,7 +26,13 @@ function UserAreaMenu() {
       >
         Open Palette
       </ContextMenu.Link>
-      <ContextMenu.Link onClick={() => {}}>Set Status</ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          modal(<SetStatusModal />);
+        }}
+      >
+        Set Status
+      </ContextMenu.Link>
       <ContextMenu.Link
         onClick={() => {
           tabkit.openTab({ kind: 'accountSettings', key: 'main' }, false);

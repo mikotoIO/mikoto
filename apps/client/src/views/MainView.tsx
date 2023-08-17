@@ -1,6 +1,6 @@
 import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Grid } from '@mikoto-io/lucid';
+import { Flex, Grid } from '@mikoto-io/lucid';
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -30,18 +30,13 @@ import {
 import { MikotoApiLoader } from './MikotoApiLoader';
 import { DesignStory } from './Palette';
 
-const AppWindow = styled.div`
-  height: 100vh;
-  width: 100vw;
-`;
-
 const AppContainer = styled.div`
   background-color: var(--N900);
   color: white;
   display: flex;
   flex-direction: row;
-  height: 100%;
-  width: 100%;
+  height: 100vh;
+  width: 100vw;
 `;
 
 function ErrorBoundaryPage({ children }: { children: React.ReactNode }) {
@@ -69,14 +64,18 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
   }
 }
 
-const LeftBar = styled(Grid)`
+const LeftBar = styled(Flex)`
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
   .top {
     display: flex;
     background-color: var(--N1000);
   }
   .bars {
-    display: grid;
-    grid-template-columns: auto 1fr;
+    display: flex;
+    height: 400px;
+    flex-grow: 1;
   }
 `;
 
@@ -88,74 +87,70 @@ function AppView() {
   const [workspace, setWorkspace] = useRecoilState(workspaceState);
 
   return (
-    <AppWindow>
-      <AppContainer>
-        <LeftBar trow="40px auto">
-          <div className="top">
-            <TabBarButton
-              onClick={() => {
-                setWorkspace((ws) => ({
-                  ...ws,
-                  leftOpen: !workspace.leftOpen,
-                }));
-              }}
-            >
-              <FontAwesomeIcon icon={faBarsStaggered} />
-            </TabBarButton>
-            {workspace.leftOpen && <UserAreaAvatar />}
-          </div>
-          <div className="bars">
-            <ServerSidebar spaces={mikoto.spaces} />
-            {workspace.leftOpen && (
-              <Sidebar
-                position="left"
-                size={workspace.left}
-                onResize={(size) => {
-                  setWorkspace((ws) => ({
-                    ...ws,
-                    left: ws.left + size.width,
-                  }));
-                }}
-              >
-                {spaceId && <Explorer space={mikoto.spaces.get(spaceId)!} />}
-              </Sidebar>
-            )}
-          </div>
-        </LeftBar>
-        <TabbedView tabs={tabbed.tabs}>
-          <ErrorBoundaryPage>
-            {tabbed.tabs.map((tab, idx) => (
-              <TabContext.Provider
-                value={{ key: `${tab.kind}/${tab.key}` }}
-                key={`${tab.kind}/${tab.key}`}
-              >
-                <div
-                  style={idx !== tabbed.index ? { display: 'none' } : undefined}
-                >
-                  <TabViewSwitch tab={tab} />
-                </div>
-              </TabContext.Provider>
-            ))}
-          </ErrorBoundaryPage>
-        </TabbedView>
-        {workspace.rightOpen && (
-          <Sidebar
-            position="right"
-            size={workspace.right}
-            onResize={(size) => {
+    <AppContainer>
+      <LeftBar dir="column">
+        <div className="top">
+          <TabBarButton
+            onClick={() => {
               setWorkspace((ws) => ({
                 ...ws,
-                right: ws.right + size.width,
+                leftOpen: !workspace.leftOpen,
               }));
             }}
           >
-            {spaceId && (
-              <MemberListSidebar space={mikoto.spaces.get(spaceId)!} />
-            )}
-          </Sidebar>
-        )}
-      </AppContainer>
-    </AppWindow>
+            <FontAwesomeIcon icon={faBarsStaggered} />
+          </TabBarButton>
+          {workspace.leftOpen && <UserAreaAvatar />}
+        </div>
+        <div className="bars">
+          <ServerSidebar spaces={mikoto.spaces} />
+          {workspace.leftOpen && (
+            <Sidebar
+              position="left"
+              size={workspace.left}
+              onResize={(size) => {
+                setWorkspace((ws) => ({
+                  ...ws,
+                  left: ws.left + size.width,
+                }));
+              }}
+            >
+              {spaceId && <Explorer space={mikoto.spaces.get(spaceId)!} />}
+            </Sidebar>
+          )}
+        </div>
+      </LeftBar>
+      <TabbedView tabs={tabbed.tabs}>
+        <ErrorBoundaryPage>
+          {tabbed.tabs.map((tab, idx) => (
+            <TabContext.Provider
+              value={{ key: `${tab.kind}/${tab.key}` }}
+              key={`${tab.kind}/${tab.key}`}
+            >
+              <div
+                style={idx !== tabbed.index ? { display: 'none' } : undefined}
+              >
+                <TabViewSwitch tab={tab} />
+              </div>
+            </TabContext.Provider>
+          ))}
+        </ErrorBoundaryPage>
+      </TabbedView>
+      {workspace.rightOpen && (
+        <Sidebar
+          position="right"
+          size={workspace.right}
+          onResize={(size) => {
+            setWorkspace((ws) => ({
+              ...ws,
+              right: ws.right + size.width,
+            }));
+          }}
+        >
+          {spaceId && <MemberListSidebar space={mikoto.spaces.get(spaceId)!} />}
+        </Sidebar>
+      )}
+    </AppContainer>
   );
 }
 

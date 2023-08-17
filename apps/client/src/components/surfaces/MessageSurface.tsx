@@ -39,10 +39,6 @@ function MessagesLoading() {
   );
 }
 
-interface MessageViewProps {
-  channel: Channel;
-}
-
 function isMessageSimple(message: Message, prevMessage: Message) {
   return (
     prevMessage &&

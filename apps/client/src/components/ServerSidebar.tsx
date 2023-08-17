@@ -22,7 +22,13 @@ const StyledServerSidebar = styled.div`
   align-items: center;
   box-sizing: border-box;
   width: 68px;
-  height: 100%;
+
+  flex-grow: 1;
+  overflow: scroll;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
 `;
 
 const InviteModalWrapper = styled.div`

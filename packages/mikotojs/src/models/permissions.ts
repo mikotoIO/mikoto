@@ -9,7 +9,6 @@ export function checkMemberPermission(
   // while most actions can be overridden by superuser, some actions cannot
   superuserOverride = true,
 ) {
-  console.log(subject);
   // space owners can override any permissions, regardless of role
   if (subject.isSpaceOwner) return true;
 

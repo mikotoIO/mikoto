@@ -8,7 +8,7 @@ import { Helmet } from 'react-helmet';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { RecoilRoot } from 'recoil';
+import { RecoilRoot, RecoilEnv } from 'recoil';
 import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
 // eslint-disable-next-line import/no-relative-packages
@@ -37,10 +37,10 @@ if (SENTRY) {
   });
 }
 
-const SilentRecoilRoot = RecoilRoot as any;
+// RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = !env.DEV;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <SilentRecoilRoot>
+  <RecoilRoot>
     <StyleSheetManager disableCSSOMInjection>
       <LucidProvider>
         <ThemeProvider theme={theme}>
@@ -61,7 +61,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </ThemeProvider>
       </LucidProvider>
     </StyleSheetManager>
-  </SilentRecoilRoot>,
+  </RecoilRoot>,
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -286,14 +286,17 @@ export const ServerSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
       <StyledIconWrapper>
         <Pill h={stateSpace === null ? 32 : 8} />
         <StyledSpaceIcon
+          style={{
+            backgroundColor: stateSpace === null ? 'var(--B700)' : undefined,
+            marginTop: '8px',
+            marginBottom: '8px',
+          }}
+          active
           onClick={() => {
             setSpace(null);
           }}
         >
-          <Image
-            src={stateSpace === null ? '/logo/logo-mono.svg' : '/logo/logo.svg'}
-            w={20}
-          />
+          <Image src="/logo/logo.svg" w={20} />
         </StyledSpaceIcon>
       </StyledIconWrapper>
       {Array.from(spaces.values()).map((space) => (

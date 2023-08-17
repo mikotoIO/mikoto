@@ -20,7 +20,6 @@ export function Sidebar({ children, position, size, onResize }: SidebarProps) {
         bottomLeft: false,
         bottomRight: false,
       }}
-      handleWrapperClass="lol"
       minWidth={200}
       maxWidth="50vw"
       maxHeight="100%"

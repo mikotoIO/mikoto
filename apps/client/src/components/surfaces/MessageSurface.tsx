@@ -9,13 +9,11 @@ import {
 import { Observer, observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
-import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 
 import { useFetchMember, useInterval, useMikoto } from '../../hooks';
 import { CurrentSpaceContext } from '../../store';
 import { TabName } from '../TabBar';
-import { userState } from '../UserArea';
 import { ViewContainer } from '../ViewContainer';
 import { Spinner } from '../atoms/Spinner';
 import { TypingDots } from '../atoms/TypingDots';

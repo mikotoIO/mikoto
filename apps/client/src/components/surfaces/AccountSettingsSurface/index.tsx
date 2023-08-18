@@ -109,27 +109,31 @@ export function Overview() {
   return (
     <SettingsView>
       <h1>{t('accountSettings.general.title')}</h1>
-      <AccountInfo rounded={8} bg="N900" w="100%">
-        <Box txt="B700" h={160} mix={[backgroundMix(bgUrl)]} rounded={8} />
-        <Content p={16}>
-          <AvatarEditor
-            avatar={user?.avatar ?? undefined}
-            onDrop={async (file) => {
-              const { data } = await uploadFileWithAxios<{ url: string }>(
-                mediaServerAxios,
-                '/avatar',
-                file,
-              );
-              await mikoto.client.users.update({
-                avatar: data.url,
-                name: null,
-              });
-            }}
-          />
-          <h2>{user?.name}</h2>
-        </Content>
-      </AccountInfo>
-      <TextArea h={160} labelName="Bio" />
+      <Form>
+        <AccountInfo rounded={8} bg="N900" w="100%">
+          <Box txt="B700" h={160} mix={[backgroundMix(bgUrl)]} rounded={8} />
+          <Content p={16}>
+            <AvatarEditor
+              avatar={user?.avatar ?? undefined}
+              onDrop={async (file) => {
+                const { data } = await uploadFileWithAxios<{ url: string }>(
+                  mediaServerAxios,
+                  '/avatar',
+                  file,
+                );
+                await mikoto.client.users.update({
+                  avatar: data.url,
+                  name: null,
+                });
+              }}
+            />
+            <h2>{user?.name}</h2>
+          </Content>
+        </AccountInfo>
+        <TextArea h={160} labelName="Bio" />
+        <Button variant="primary">Save</Button>
+      </Form>
+
       <h2>{t('accountSettings.general.authentication')}</h2>
 
       <Buttons>

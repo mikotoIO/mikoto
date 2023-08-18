@@ -19,6 +19,7 @@ import { ChannelSettingsSurface } from '../components/surfaces/ChannelSettingsSu
 import { MessageView } from '../components/surfaces/MessageSurface';
 import { SpaceSettingsView } from '../components/surfaces/SpaceSettingsSurface';
 import { VoiceView } from '../components/surfaces/VoiceSurface';
+import { WelcomeSurface } from '../components/surfaces/WelcomeSurface';
 import { useMikoto } from '../hooks';
 import {
   Tabable,
@@ -59,6 +60,8 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
       return <ChannelSettingsSurface channelId={tab.channelId} />;
     case 'palette':
       return <DesignStory />;
+    case 'welcome':
+      return <WelcomeSurface />;
     default:
       return null;
   }

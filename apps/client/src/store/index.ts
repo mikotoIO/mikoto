@@ -25,6 +25,7 @@ type TabBaseType =
   | { kind: 'channelSettings'; channelId: string }
   | { kind: 'accountSettings' }
   | { kind: 'palette' }
+  | { kind: 'welcome' }
   | { kind: 'unknown' };
 
 export type Tabable = TabBaseType & {

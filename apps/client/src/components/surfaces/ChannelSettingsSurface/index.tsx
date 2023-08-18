@@ -1,5 +1,6 @@
-import { Form, Heading, Input } from '@mikoto-io/lucid';
+import { Form, Heading, Input, Button } from '@mikoto-io/lucid';
 import { ClientChannel } from 'mikotojs';
+import { useForm } from 'react-hook-form';
 
 import { useMikoto } from '../../../hooks';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
@@ -11,11 +12,17 @@ const ACCOUNT_SETTING_CATEGORIES = [
 ];
 
 function General({ channel }: { channel: ClientChannel }) {
+  const form = useForm({
+    defaultValues: {
+      name: channel.name,
+    },
+  });
   return (
     <SettingsView>
       <Heading>Overview</Heading>
       <Form>
-        <Input labelName="Channel Name" />
+        <Input labelName="Channel Name" {...form.register('name')} />
+        <Button variant="primary">Save</Button>
       </Form>
     </SettingsView>
   );

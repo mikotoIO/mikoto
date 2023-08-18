@@ -47,12 +47,12 @@ const EditableContainer = styled.div`
 
 const initialEditorValue = [{ children: [{ text: '' }] }];
 
-function resetEditor(editor: ReactEditor) {
+function resetEditor(editor: ReactEditor, text: string = '') {
   Transforms.setSelection(editor, {
     anchor: { path: [0, 0], offset: 0 },
     focus: { path: [0, 0], offset: 0 },
   });
-  editor.children = initialEditorValue;
+  editor.children = [{ children: [{ text }] }];
 }
 
 function serialize(nodes: Node[]) {
@@ -108,7 +108,8 @@ export function MessageEditor({
   //   if (!messageEditId) setEditorValue(initialEditorValue);
   //   else {
   //     const { content } = messageEditId;
-  //     setEditorValue([{ children: [{ text: content }] }]);
+  //     console.log(content);
+  //     resetEditor(editor, content);
   //   }
   // }, [messageEditId]);
 

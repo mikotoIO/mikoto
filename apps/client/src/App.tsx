@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
-import { RoomPage } from './components/LiveKitPlayground';
 import {
   LoginView,
   RegisterView,
@@ -31,7 +30,6 @@ function App() {
             </MikotoApiLoader>
           }
         />
-        <Route path="/livekit" element={<RoomPage />} />
       </Routes>
     </BrowserRouter>
   );

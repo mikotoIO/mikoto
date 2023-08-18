@@ -21,6 +21,13 @@ function UserAreaMenu() {
     <ContextMenu>
       <ContextMenu.Link
         onClick={() => {
+          tabkit.openTab({ kind: 'welcome', key: 'welcome' }, false);
+        }}
+      >
+        Open Welcome
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
           tabkit.openTab({ kind: 'palette', key: 'main' }, false);
         }}
       >

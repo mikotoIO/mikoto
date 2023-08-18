@@ -77,6 +77,8 @@ const MessagingContainerInner = styled.div`
 `;
 
 // Please laugh
+// Meant to be a large sentinel value to mark the last message (when loaded) position
+// as Virtuoso does not allow negative values
 const FUNNY_NUMBER = 69_420_000;
 
 const OtherInner = styled.div`
@@ -84,20 +86,7 @@ const OtherInner = styled.div`
   flex-direction: column;
 `;
 
-const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
-  useFetchMember(channel.space!);
-
-  const virtuosoRef = useRef<VirtuosoHandle>(null);
-  const mikoto = useMikoto();
-  const user = useRecoilValue(userState);
-  // you will probably run out of memory before this number
-  const [firstItemIndex, setFirstItemIndex] = useState(FUNNY_NUMBER);
-  const [topLoaded, setTopLoaded] = useState(false);
-
-  useEffect(() => {
-    // mikoto.ack(channel.id).then();
-  }, [channel.id]);
-
+function useTyping() {
   const [currentTypers, setCurrentTypers] = useState<
     { timestamp: number; member: Member }[]
   >([]);
@@ -106,12 +95,25 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
     if (currentTypers.length === 0) return;
     setCurrentTypers(currentTypers.filter((x) => x.timestamp > Date.now()));
   }, 500);
+  return [currentTypers, setCurrentTypers] as const;
+}
+
+const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
+  useFetchMember(channel.space!);
+
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
+  const mikoto = useMikoto();
+  // you will probably run out of memory before this number
+  const [firstItemIndex, setFirstItemIndex] = useState(FUNNY_NUMBER);
+  const [topLoaded, setTopLoaded] = useState(false);
+
+  const [currentTypers, setCurrentTypers] = useTyping();
 
   useEffect(
     () =>
       mikoto.client.channels.onTypingStart((ev) => {
         if (ev.channelId !== channel.id) return;
-        if (ev.member!.user.id === user?.id) return;
+        if (ev.member!.user.id === mikoto.me.id) return;
 
         setCurrentTypers((cts) => {
           const ct = [...cts];

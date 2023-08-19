@@ -124,7 +124,7 @@ function Node(props: NodeProps) {
       <StyledSubtree>
         {open &&
           !isLeaf &&
-          props.descendant?.map((x) => (
+          nodeSort(props.descendant)?.map((x) => (
             <Node {...x} path={[...props.path, x.id]} key={x.id} />
           ))}
       </StyledSubtree>
@@ -136,10 +136,16 @@ interface ExplorerNextProps extends React.HTMLAttributes<HTMLDivElement> {
   nodes: NodeObject[];
 }
 
+export function nodeSort(nodes?: NodeObject[]) {
+  // sort by name
+  if (nodes === undefined) return undefined;
+  return [...nodes].sort((a, b) => (a.text > b.text ? 1 : -1));
+}
+
 export function ExplorerNext({ nodes, ...props }: ExplorerNextProps) {
   return (
     <StyledTreeBody {...props}>
-      {nodes.map((x) => (
+      {nodeSort(nodes)?.map((x) => (
         <Node {...x} path={[x.id]} key={x.id} />
       ))}
     </StyledTreeBody>

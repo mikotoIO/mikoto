@@ -22,7 +22,7 @@ import { useFetchMember, useMikoto } from '../hooks';
 import { useErrorElement } from '../hooks/useErrorElement';
 import { Tabable, treebarSpaceState, useTabkit } from '../store';
 import { ContextMenu, modalState, useContextMenuX } from './ContextMenu';
-import { ExplorerNext, NodeObject } from './ExplorerNext';
+import { ExplorerNext, NodeObject, nodeSort } from './ExplorerNext';
 
 const StyledTree = styled.div`
   display: flex;

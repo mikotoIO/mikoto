@@ -12,7 +12,6 @@
     "build": "tsc --build"
   },
   "devDependencies": {
-    "@sophon-js/cli": "^0.0.8",
     "typescript": "^5.0.4"
   },
   "dependencies": {

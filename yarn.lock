@@ -5714,23 +5714,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sophon-js/cli@npm:^0.0.4":
-  version: 0.0.4
-  resolution: "@sophon-js/cli@npm:0.0.4"
-  dependencies:
-    "@oclif/core": ^2
-    "@oclif/plugin-help": ^5
-    "@oclif/plugin-plugins": ^2.3.0
-    prettier: ^2.8.8
-    ts-creator: ^1.2.5
-    ts-morph: ^17.0.1
-    typescript-parsec: ^0.3.2
-  bin:
-    sophon: bin/run
-  checksum: af5ec72858902c9d69210cad3780effa86df22b8941cea1ba634ec9728d91654463341f1327be72ef4b82a7d55d3014006cf6caa7e520576a458f2b37aba9778
-  languageName: node
-  linkType: hard
-
 "@sophon-js/cli@npm:^0.0.8":
   version: 0.0.8
   resolution: "@sophon-js/cli@npm:0.0.8"
@@ -22023,7 +22006,6 @@ __metadata:
   resolution: "mikotojs@workspace:packages/mikotojs"
   dependencies:
     "@mikoto-io/permcheck": "*"
-    "@sophon-js/cli": ^0.0.8
     axios: ^0.27.2
     mobx: ^6.10.0
     socket.io-client: ^4.5.1
@@ -26931,7 +26913,7 @@ __metadata:
     "@axiomhq/axiom-node": ^0.12.0
     "@mikoto-io/permcheck": "*"
     "@prisma/client": ^4.16.2
-    "@sophon-js/cli": ^0.0.4
+    "@sophon-js/cli": ^0.0.8
     "@sophon-js/server": ^0.0.8
     "@types/bcrypt": ^5.0.0
     "@types/body-parser": ^1.19.2

@@ -136,7 +136,7 @@ interface ExplorerNextProps extends React.HTMLAttributes<HTMLDivElement> {
   nodes: NodeObject[];
 }
 
-export function nodeSort(nodes?: NodeObject[]) {
+function nodeSort(nodes?: NodeObject[]) {
   // sort by name
   if (nodes === undefined) return undefined;
   return [...nodes].sort((a, b) => (a.text > b.text ? 1 : -1));

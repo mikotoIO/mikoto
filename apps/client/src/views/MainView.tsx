@@ -117,7 +117,11 @@ function AppView() {
                 }));
               }}
             >
-              {spaceId && <Explorer space={mikoto.spaces.get(spaceId)!} />}
+              {spaceId ? (
+                <Explorer space={mikoto.spaces.get(spaceId)!} />
+              ) : (
+                <div>TODO: DMs</div>
+              )}
             </Sidebar>
           )}
         </div>

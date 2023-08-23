@@ -1,5 +1,5 @@
 import { permissions } from '@mikoto-io/permcheck';
-import { Prisma, SpaceUser } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { SophonCore, SophonInstance } from '@sophon-js/server';
 import { nanoid } from 'nanoid';
 import { ForbiddenError, NotFoundError } from 'routing-controllers';
@@ -78,7 +78,7 @@ export class SpaceService extends AbstractSpaceService {
       where: { id },
       data: {
         name: options.name ?? undefined,
-        icon: options.icon ?? undefined,
+        icon: options.icon ? new URL(options.icon).pathname : undefined,
       },
       include: spaceInclude,
     });

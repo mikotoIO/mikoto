@@ -14,6 +14,7 @@ import { useMikoto } from '../hooks';
 import { useErrorElement } from '../hooks/useErrorElement';
 import { treebarSpaceState, useTabkit } from '../store';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
+import { normalizeMediaUrl } from './atoms/Avatar';
 import { Pill } from './atoms/Pill';
 import { StyledSpaceIcon } from './atoms/SpaceIcon';
 
@@ -164,7 +165,7 @@ function SidebarSpaceIcon({ space }: { space: ClientSpace }) {
           active={isActive}
           onContextMenu={contextMenu}
           ref={ref}
-          icon={space.icon ?? undefined}
+          icon={space.icon ? normalizeMediaUrl(space.icon) : undefined}
           onClick={() => {
             setSpace(space.id);
             space.fetchMembers().then();

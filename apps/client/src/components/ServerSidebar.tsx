@@ -4,6 +4,7 @@ import { AxiosError } from 'axios';
 import { ClientSpace, Invite, Space, SpaceStore } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
 import { useForm } from 'react-hook-form';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -151,7 +152,22 @@ function SidebarSpaceIcon({ space }: { space: ClientSpace }) {
   const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
   const isActive = stateSpace === space.id;
 
+  const [, drag] = useDrag(
+    () => ({
+      type: 'SPACE',
+      item: { spaceId: space.id },
+    }),
+    [space.id],
+  );
+  const [, drop] = useDrop({
+    accept: 'SPACE',
+    drop: (item: { spaceId: string }) => {
+      console.log(item);
+    },
+  });
+
   const ref = useRef<HTMLDivElement>(null);
+  drag(drop(ref));
   const isHover = useHover(ref);
   const contextMenu = useContextMenu(() => (
     <ServerIconContextMenu space={space} />

@@ -69,8 +69,6 @@ export default function App() {
   );
 }
 
-const screenWidth = Dimensions.get('window').width;
-
 const styles = StyleSheet.create({
   container: {
     padding: 4,

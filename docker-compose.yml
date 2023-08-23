@@ -42,6 +42,16 @@ services:
       - '1025:1025'
     logging:
       driver: none
+  caddy:
+    image: caddy
+    restart: always
+    network_mode: host
+    environment:
+      CADDY_HOST: http://localhost:2000
+    ports:
+      - "2000:2000"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
 
 volumes:
   cockroachdb:

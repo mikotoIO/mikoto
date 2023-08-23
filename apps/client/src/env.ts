@@ -10,5 +10,3 @@ export const env = {
   PUBLIC_CAPTCHA_KEY:
     import.meta.env.PUBLIC_CAPTCHA_KEY ?? '3x00000000000000000000FF',
 };
-
-console.log(env);

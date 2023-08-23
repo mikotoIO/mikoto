@@ -179,12 +179,12 @@ export function MessageAvatar({ src, member, size }: MessageAvatarProps) {
 
   const userContextMenu = useContextMenu(() => (
     <UserContextMenu user={user!} />
-  ));     
+  ));
 
   return (
     <Avatar
       className="avatar"
-      src={src ?? '/images/default_avatar.png'}
+      src={src}
       size={size ?? 40}
       ref={avatarRef}
       onContextMenu={user && userContextMenu}

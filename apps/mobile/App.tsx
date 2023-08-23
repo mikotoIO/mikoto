@@ -9,8 +9,10 @@ import {
   TextInput,
   TouchableHighlight,
   StatusBar,
+  Dimensions,
 } from 'react-native';
 
+import { Message } from './components/Message';
 import { SafeAreaView } from './components/SafeAreaView';
 import { theme } from './lucid/theme';
 
@@ -54,9 +56,11 @@ export default function App() {
       />
       <View style={styles.container}>
         <View style={styles.messages}>
-          <Text style={styles.text}>
-            Open up App.tsx to start working on your app.
-          </Text>
+          <View style={styles.messageInner}>
+            <Message />
+            <Message />
+            <Message />
+          </View>
         </View>
         <ExpoStatusBar style="auto" />
         <MessageInput />
@@ -64,6 +68,8 @@ export default function App() {
     </SafeAreaView>
   );
 }
+
+const screenWidth = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
   container: {
@@ -78,6 +84,12 @@ const styles = StyleSheet.create({
   },
   messages: {
     flex: 1,
+    flexGrow: 1,
+    width: '100%',
+    padding: 8,
+  },
+  messageInner: {
+    gap: 16,
   },
   input: {
     // fill up all horizontal space

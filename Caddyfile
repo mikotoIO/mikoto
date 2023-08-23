@@ -1,4 +1,4 @@
-:2000 {
+:2100 {
     reverse_proxy http://localhost:5173
     # TODO: stop hardcoding this
     route /auth* {
@@ -12,7 +12,7 @@
     }
 
     route /media* {
-        uri strip_prefix /content
+        uri strip_prefix /media
         reverse_proxy http://localhost:9501
     }
 }

@@ -78,7 +78,7 @@ export class SpaceService extends AbstractSpaceService {
       where: { id },
       data: {
         name: options.name ?? undefined,
-        icon: options.icon ? new URL(options.icon).pathname : undefined,
+        icon: options.icon ? new URL(options.icon).pathname.substring(1) : undefined,
       },
       include: spaceInclude,
     });

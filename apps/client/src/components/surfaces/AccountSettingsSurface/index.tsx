@@ -99,6 +99,19 @@ export function PasswordChangeModal() {
   );
 }
 
+function NameChangeModal() {
+  return (
+    <Modal>
+      <Form>
+        <Input labelName="New Name" />
+        <Button type="submit" variant="primary">
+          Change Name
+        </Button>
+      </Form>
+    </Modal>
+  );
+}
+
 export function Overview() {
   const setModal = useSetRecoilState(modalState);
   const { t } = useTranslation();
@@ -129,6 +142,18 @@ export function Overview() {
             />
             <h2>{user?.name}</h2>
           </Content>
+          <Box p={16}>
+            <Button
+              type="button"
+              onClick={() => {
+                setModal({
+                  elem: <NameChangeModal />,
+                });
+              }}
+            >
+              Edit Name
+            </Button>
+          </Box>
         </AccountInfo>
         <TextArea h={160} labelName="Bio" />
         <Button variant="primary">Save</Button>
@@ -151,11 +176,15 @@ export function Overview() {
         </Button>
       </Buttons>
       <h2>{t('accountSettings.general.dangerous')}</h2>
+      <Box p={{ bottom: 16 }}>
+        Warning: This action is irreversible. You will lose all your data.
+      </Box>
       <Buttons>
         <Button variant="danger">
           {t('accountSettings.general.deleteAccount')}
         </Button>
       </Buttons>
+      <Box m={{ bottom: 80 }} />
     </SettingsView>
   );
 }

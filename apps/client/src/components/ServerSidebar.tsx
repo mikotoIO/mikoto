@@ -13,7 +13,7 @@ import { useHover } from 'usehooks-ts';
 import { env } from '../env';
 import { useMikoto } from '../hooks';
 import { useErrorElement } from '../hooks/useErrorElement';
-import { treebarSpaceState, useTabkit } from '../store';
+import { treebarSpaceState, useTabkit, workspaceState } from '../store';
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { normalizeMediaUrl } from './atoms/Avatar';
 import { Pill } from './atoms/Pill';
@@ -151,6 +151,7 @@ const StyledIconWrapper = styled.div`
 function SidebarSpaceIcon({ space }: { space: ClientSpace }) {
   const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
   const isActive = stateSpace === space.id;
+  const [workspace, setWorkspace] = useRecoilState(workspaceState);
 
   const [, drag] = useDrag(
     () => ({
@@ -182,6 +183,9 @@ function SidebarSpaceIcon({ space }: { space: ClientSpace }) {
           onContextMenu={contextMenu}
           ref={ref}
           icon={space.icon ? normalizeMediaUrl(space.icon) : undefined}
+          onDoubleClick={() => {
+            setWorkspace((x) => ({ ...x, leftOpen: !x.leftOpen }));
+          }}
           onClick={() => {
             setSpace(space.id);
             space.fetchMembers().then();

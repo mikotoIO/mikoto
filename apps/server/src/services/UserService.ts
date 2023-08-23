@@ -124,7 +124,9 @@ export class UserService extends AbstractUserService {
       where: { id: ctx.data.user.sub },
       data: {
         name: options.name ?? undefined,
-        avatar: options.avatar ? new URL(options.avatar).pathname : undefined,
+        avatar: options.avatar
+          ? new URL(options.avatar).pathname.substring(1)
+          : undefined,
       },
     });
     return user;

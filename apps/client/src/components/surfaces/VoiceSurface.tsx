@@ -1,4 +1,5 @@
 import { LiveKitRoom } from '@livekit/react-components';
+import '@livekit/react-components/dist/index.css';
 import { VoiceToken } from 'mikotojs';
 import { useEffect, useState } from 'react';
 

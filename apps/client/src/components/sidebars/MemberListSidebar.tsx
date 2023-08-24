@@ -7,11 +7,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
+import { useFetchMember } from '../../hooks';
 import { contextMenuState, useContextMenu } from '../ContextMenu';
 import { Avatar } from '../atoms/Avatar';
 import { MemberContextMenu } from '../atoms/MessageAvatar';
 import { UserContextMenu } from '../modals/ContextMenus';
-import { useFetchMember } from '../../hooks';
 
 const StyledMember = styled.div`
   display: flex;
@@ -33,7 +33,7 @@ const StyledMember = styled.div`
 
 const Divider = styled.div`
   font-weight: bold;
-  margin: 16px;
+  padding: 16px;
   color: var(--N300);
 `;
 
@@ -73,18 +73,25 @@ const MemberElement = observer(({ member }: { member: ClientMember }) => {
   );
 });
 
+const StyledMemberListSidebar = styled.div`
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding-bottom: 32px;
+`;
+
 export const MemberListSidebar = observer(
   ({ space }: { space: ClientSpace }) => {
     useFetchMember(space);
 
     return (
-      <div>
+      <StyledMemberListSidebar>
         <Divider>Members</Divider>
         {space.members &&
           Array.from(space.members.values()).map((x) => (
             <MemberElement key={x.id} member={x} />
           ))}
-      </div>
+      </StyledMemberListSidebar>
     );
   },
 );

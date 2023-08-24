@@ -1,4 +1,4 @@
-import { Turnstile } from '@marsidev/react-turnstile';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import {
   Anchor,
   Box,
@@ -48,7 +48,14 @@ function Logo() {
 
 // not always a real captcha
 function Captcha() {
-  return <Turnstile siteKey={env.PUBLIC_CAPTCHA_KEY} />;
+  return (
+    <HCaptcha
+      sitekey={env.PUBLIC_CAPTCHA_KEY}
+      onVerify={(t) => {
+        console.log(t);
+      }}
+    />
+  );
 }
 
 export function AuthView({ children }: { children: React.ReactNode }) {

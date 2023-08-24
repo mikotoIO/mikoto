@@ -2113,6 +2113,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.17.9":
+  version: 7.22.10
+  resolution: "@babel/runtime@npm:7.22.10"
+  dependencies:
+    regenerator-runtime: ^0.14.0
+  checksum: 524d41517e68953dbc73a4f3616b8475e5813f64e28ba89ff5fca2c044d535c2ea1a3f310df1e5bb06162e1f0b401b5c4af73fe6e2519ca2450d9d8c44cf268d
+  languageName: node
+  linkType: hard
+
 "@babel/runtime@npm:^7.22.5":
   version: 7.22.6
   resolution: "@babel/runtime@npm:7.22.6"
@@ -3826,6 +3835,18 @@ __metadata:
   dependencies:
     "@hapi/hoek": ^9.0.0
   checksum: 604dfd5dde76d5c334bd03f9001fce69c7ce529883acf92da96f4fe7e51221bf5e5110e964caca287a6a616ba027c071748ab636ff178ad750547fba611d6014
+  languageName: node
+  linkType: hard
+
+"@hcaptcha/react-hcaptcha@npm:^1.8.1":
+  version: 1.8.1
+  resolution: "@hcaptcha/react-hcaptcha@npm:1.8.1"
+  dependencies:
+    "@babel/runtime": ^7.17.9
+  peerDependencies:
+    react: ">= 16.3.0"
+    react-dom: ">= 16.3.0"
+  checksum: 01fcfe91bce52e1f45c7ddb4a9a6b885765eee0b8241e838c5637fc764cab4cf30f562b120a9a1e88fec27d17f155d3ae172a9769081d0e6c0eb9f7c1f00ae3a
   languageName: node
   linkType: hard
 
@@ -11278,6 +11299,7 @@ __metadata:
     "@fortawesome/free-regular-svg-icons": ^6.3.0
     "@fortawesome/free-solid-svg-icons": ^6.3.0
     "@fortawesome/react-fontawesome": ^0.2.0
+    "@hcaptcha/react-hcaptcha": ^1.8.1
     "@headlessui/react": ^1.7.15
     "@khanacademy/simple-markdown": ^0.9.2
     "@livekit/react-components": ^1.0.2
@@ -25671,6 +25693,13 @@ __metadata:
   version: 0.13.11
   resolution: "regenerator-runtime@npm:0.13.11"
   checksum: 27481628d22a1c4e3ff551096a683b424242a216fee44685467307f14d58020af1e19660bf2e26064de946bad7eff28950eae9f8209d55723e2d9351e632bbb4
+  languageName: node
+  linkType: hard
+
+"regenerator-runtime@npm:^0.14.0":
+  version: 0.14.0
+  resolution: "regenerator-runtime@npm:0.14.0"
+  checksum: 1c977ad82a82a4412e4f639d65d22be376d3ebdd30da2c003eeafdaaacd03fc00c2320f18120007ee700900979284fc78a9f00da7fb593f6e6eeebc673fba9a3
   languageName: node
   linkType: hard
 

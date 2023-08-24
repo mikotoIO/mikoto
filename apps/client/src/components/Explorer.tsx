@@ -4,7 +4,7 @@ import {
   faMicrophone,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Form, Input, Button, Modal } from '@mikoto-io/lucid';
+import { Form, Input, Button, Modal, Buttons, Box } from '@mikoto-io/lucid';
 import { permissions } from '@mikoto-io/permcheck';
 import {
   Channel,
@@ -218,6 +218,38 @@ function channelToStructuredTree(
   return root;
 }
 
+function DeleteChannelModal({ channel }: { channel: ClientChannel }) {
+  const setModal = useSetRecoilState(modalState);
+  const mikoto = useMikoto();
+
+  return (
+    <Modal>
+      <Box p={{ bottom: 16 }}>
+        Are you sure you want to delete the channel{' '}
+        <strong>#{channel.name}</strong>?
+      </Box>
+      <Buttons>
+        <Button
+          variant="danger"
+          onClick={async () => {
+            await mikoto.client.channels.delete(channel.id);
+            setModal(null);
+          }}
+        >
+          Delete
+        </Button>
+        <Button
+          onClick={() => {
+            setModal(null);
+          }}
+        >
+          Cancel
+        </Button>
+      </Buttons>
+    </Modal>
+  );
+}
+
 const ChannelContextMenu = observer(
   ({ channel }: { channel: ClientChannel }) => {
     const mikoto = useMikoto();
@@ -263,8 +295,9 @@ const ChannelContextMenu = observer(
               Create Subchannel
             </ContextMenu.Link>
             <ContextMenu.Link
-              onClick={async () => {
-                await mikoto.client.channels.delete(channel.id);
+              onClick={() => {
+                setModal({ elem: <DeleteChannelModal channel={channel} /> });
+                // await mikoto.client.channels.delete(channel.id);
               }}
             >
               Delete Channel

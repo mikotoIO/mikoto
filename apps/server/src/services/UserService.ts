@@ -118,7 +118,7 @@ export class UserService extends AbstractUserService {
     }
     return user;
   }
-  async update(ctx: SophonInstance, options: UserUpdateOptions) {
+  async update(ctx: MikotoInstance, options: UserUpdateOptions) {
     // TODO: Security issue. A third party image upload service can be used to upload unwanted tracking images.
     const user = await prisma.user.update({
       where: { id: ctx.data.user.sub },
@@ -129,6 +129,7 @@ export class UserService extends AbstractUserService {
           : undefined,
       },
     });
+    ctx.data.pubsub.pub(`user:${user.id}`, 'updateUser', user);
     return user;
   }
 }

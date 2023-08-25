@@ -1,6 +1,6 @@
 import { MainService } from '..';
 import { RedisPubSub } from '../../functions/pubsub';
-import { Member, Message, Role, Space } from '../schema';
+import { Member, Message, Role, Space, User } from '../schema';
 
 export function buildPubSub(
   ps: RedisPubSub<any>,
@@ -45,6 +45,10 @@ export function buildPubSub(
 
     deleteRole(role: Role) {
       service.roles.$(id).onDelete(role);
+    },
+
+    updateUser(user: User) {
+      service.users.$(id).onUpdate(user);
     },
   };
 }

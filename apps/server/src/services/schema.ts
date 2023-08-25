@@ -264,6 +264,15 @@ export abstract class AbstractMemberService {
 
 export class UserServiceSender {
   constructor(private sender: SenderCore, private room: string) {}
+  onCreate(user: User) {
+    this.sender.emit(this.room, "users/onCreate", user);
+  }
+  onUpdate(user: User) {
+    this.sender.emit(this.room, "users/onUpdate", user);
+  }
+  onDelete(user: User) {
+    this.sender.emit(this.room, "users/onDelete", user);
+  }
 }
 
 export abstract class AbstractUserService {

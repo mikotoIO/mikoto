@@ -1,3 +1,5 @@
+import { runInAction } from 'mobx';
+
 import { ChannelEmitter, MessageEmitter, SpaceEmitter } from './emitters';
 import { createClient, MainServiceClient } from './schema';
 import {
@@ -90,6 +92,14 @@ export class MikotoClient {
 
     this.client.spaces.onDelete((space) => {
       this.spaceEmitter.emit('delete/@', space.id);
+    });
+
+    this.client.users.onUpdate((user) => {
+      if (this.me && user.id === this.me.id) {
+        runInAction(() => {
+          Object.assign(this.me, user);
+        });
+      }
     });
   }
 

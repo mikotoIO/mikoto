@@ -263,6 +263,16 @@ export class UserServiceClient {
   update(options: UserUpdateOptions): Promise<User> {
     return this.socket.call("users/update", options);
   }
+
+  onCreate(handler: (user: User) => void) {
+    return this.socket.subscribe("users/onCreate", handler);
+  }
+  onUpdate(handler: (user: User) => void) {
+    return this.socket.subscribe("users/onUpdate", handler);
+  }
+  onDelete(handler: (user: User) => void) {
+    return this.socket.subscribe("users/onDelete", handler);
+  }
 }
 
 export class ChannelServiceClient {

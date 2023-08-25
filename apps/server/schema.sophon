@@ -113,6 +113,10 @@ struct UserUpdateOptions {
 service UserService {
   me(): User;
   update(options: UserUpdateOptions): User;
+
+  ~onCreate(user: User);
+  ~onUpdate(user: User);
+  ~onDelete(user: User);
 }
 
 struct ChannelCreateOptions {

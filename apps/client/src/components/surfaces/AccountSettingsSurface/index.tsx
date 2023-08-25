@@ -9,7 +9,6 @@ import {
   Flex,
   TextArea,
 } from '@mikoto-io/lucid';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
@@ -29,6 +28,7 @@ import {
 import { BaseSettingsSurface } from '../BaseSettingSurface';
 import { BotsSurface } from './bots';
 import { LanguageSurface } from './language';
+import { observer } from 'mobx-react-lite';
 
 const bgUrl = '/images/artworks/1.jpg';
 
@@ -124,12 +124,12 @@ function NameChangeModal() {
   );
 }
 
-export function Overview() {
+const Overview = observer(() => {
   const setModal = useSetRecoilState(modalState);
   const { t } = useTranslation();
 
   const mikoto = useMikoto();
-  const [user] = useRecoilState(userState);
+  const user = mikoto.me;
 
   return (
     <SettingsView>
@@ -200,7 +200,7 @@ export function Overview() {
     </SettingsView>
   );
 }
-
+)
 function NotificationSubsurface() {
   const { t } = useTranslation();
 

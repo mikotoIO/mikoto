@@ -1,6 +1,6 @@
 import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Flex, Grid } from '@mikoto-io/lucid';
+import { Flex } from '@mikoto-io/lucid';
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';

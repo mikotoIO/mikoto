@@ -100,10 +100,22 @@ export function PasswordChangeModal() {
 }
 
 function NameChangeModal() {
+  const { register, handleSubmit } = useForm();
+  const mikoto = useMikoto();
+  const setModal = useSetRecoilState(modalState);
+
   return (
     <Modal>
-      <Form>
-        <Input labelName="New Name" />
+      <Form
+        onSubmit={handleSubmit(async (form) => {
+          await mikoto.client.users.update({
+            name: form.name,
+            avatar: null,
+          });
+          setModal(null);
+        })}
+      >
+        <Input labelName="New Name" {...register('name')} />
         <Button type="submit" variant="primary">
           Change Name
         </Button>

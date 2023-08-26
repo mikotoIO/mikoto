@@ -73,8 +73,6 @@ interface MessageEditorProps {
   onTyping?: () => void;
 }
 
-const audio = new Audio('audio/notification/extralife.wav');
-
 const EditorButtons = styled(Flex)`
   transform: translateY(-8px);
   font-size: 24px;

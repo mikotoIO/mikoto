@@ -59,6 +59,9 @@ function ColorPalette({ colors: clrs }: { colors: Record<string, string> }) {
   );
 }
 
+const audio = new Audio('audio/notification/extralife.wav');
+audio.volume = 0.05;
+
 export function DesignStory() {
   return (
     <ViewContainer padded scroll>
@@ -78,7 +81,19 @@ export function DesignStory() {
           <Button
             type="button"
             onClick={() => {
-              toast(<div>lol</div>);
+              const notification = new Notification('Cactus (#general)', {
+                body: 'This is a message that I am testing',
+                icon: 'https://cdn.alpha.mikoto.io/spaceicon/927eec40-9274-45b3-8d1c-393aa7186cce.png',
+                silent: true,
+              });
+              notification.onshow = () => {
+                audio.play();
+
+                setTimeout(() => {
+                  notification.close();
+                }, 3000);
+              };
+              // toast(<div>lol</div>);
             }}
           >
             Default Button

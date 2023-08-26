@@ -304,25 +304,25 @@ const Seperator = styled.hr`
 
 export const ServerSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
   const setModal = useSetRecoilState(modalState);
-  const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
+  const [spaceId, setSpaceId] = useRecoilState(treebarSpaceState);
 
   const contextMenu = useContextMenu(() => <ServerSidebarContextMenu />);
 
   return (
     <StyledServerSidebar onContextMenu={contextMenu}>
       <StyledIconWrapper>
-        <Pill h={stateSpace === null ? 32 : 8} />
+        <Pill h={spaceId === null ? 32 : 8} />
         <StyledSpaceIcon
           style={{
             background:
-              stateSpace === null
+              spaceId === null
                 ? 'linear-gradient(133deg, #2298ff 0%, rgba(59,108,255,1) 100%)'
                 : undefined,
             marginTop: '8px',
           }}
           active
           onClick={() => {
-            setSpace(null);
+            setSpaceId(null);
           }}
         >
           <Image src="/logo/logo.svg" w={20} />

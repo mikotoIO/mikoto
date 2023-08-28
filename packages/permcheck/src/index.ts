@@ -8,13 +8,14 @@ export const permissions = {
   manageMemberRoles: 1n << 4n,
   manageMemberProfiles: 1n << 5n,
   manageInvites: 1n << 6n,
-  ban: 1n << 7n,
+  manageMessages: 1n << 7n,
+  ban: 1n << 8n,
 
   // channelwise permissions
-  readChannel: 1n << 8n,
-  sendInChannel: 1n << 9n,
-  createSubChannels: 1n << 10n,
-  manageSubChannels: 1n << 11n,
+  readChannel: 1n << 9n,
+  sendInChannel: 1n << 10n,
+  createSubChannels: 1n << 11n,
+  manageSubChannels: 1n << 12n,
 };
 
 export function checkPermission(rule: bigint, perms: bigint | string) {

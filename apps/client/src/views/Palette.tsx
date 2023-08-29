@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';
 import { ViewContainer } from '../components/ViewContainer';
+import { Triselector } from '../components/atoms/Triselect';
 
 // design a color palette component, using styled components
 interface Color {
@@ -119,6 +120,9 @@ export function DesignStory() {
             <FontAwesomeIcon icon={faChevronRight} />
           </Button>
         </Buttons>
+        <div>
+          <Triselector />
+        </div>
         <Toggle />
       </Form>
     </ViewContainer>

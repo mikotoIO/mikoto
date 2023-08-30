@@ -86,6 +86,18 @@ function InviteModal({ space }: { space: Space }) {
             >
               {link}
             </button>
+            <Button
+              type="button"
+              variant="primary"
+              onClick={() => {
+                navigator.share({
+                  title: `Invite to ${space.name} on Mikoto`,
+                  url: link,
+                });
+              }}
+            >
+              Share
+            </Button>
           </>
         )}
       </InviteModalWrapper>

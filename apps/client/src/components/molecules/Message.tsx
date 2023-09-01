@@ -1,5 +1,6 @@
 import { Flex } from '@mikoto-io/lucid';
 import { ClientMessage } from 'mikotojs';
+import { makeAutoObservable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { atom, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -127,6 +128,7 @@ const AvatarFiller = styled.div`
 interface MessageProps {
   message: ClientMessage;
   isSimple?: boolean;
+  editState: MessageEditState;
 }
 
 export const messageEditIdState = atom<{ id: string; content: string } | null>({
@@ -134,55 +136,63 @@ export const messageEditIdState = atom<{ id: string; content: string } | null>({
   default: null,
 });
 
-export const MessageItem = observer(({ message, isSimple }: MessageProps) => {
-  const mikoto = useMikoto();
-  const setMessageEditId = useSetRecoilState(messageEditIdState);
+export class MessageEditState {
+  message: ClientMessage | null = null;
+  constructor() {
+    makeAutoObservable(this);
+  }
+}
 
-  const menu = useContextMenu(() => (
-    <ContextMenu>
-      <ContextMenu.Link
-        onClick={() => {
-          setMessageEditId({
-            id: message.id,
-            content: message.content,
-          });
-        }}
-      >
-        Edit Message
-      </ContextMenu.Link>
-      <ContextMenu.Link
-        onClick={async () => {
-          await mikoto.client.messages.delete(message.channelId, message.id);
-        }}
-      >
-        Delete Message
-      </ContextMenu.Link>
-    </ContextMenu>
-  ));
+export const MessageItem = observer(
+  ({ message, editState, isSimple }: MessageProps) => {
+    const mikoto = useMikoto();
+    const setMessageEditId = useSetRecoilState(messageEditIdState);
 
-  return (
-    <MessageContainer isSimple={isSimple} onContextMenu={menu}>
-      {isSimple ? (
-        <AvatarFiller />
-      ) : (
-        <MessageAvatar
-          member={message.member ?? undefined}
-          src={message.author?.avatar ?? undefined}
-          user={message.author ?? undefined}
-        />
-      )}
-      <MessageInner>
-        {!isSimple && (
-          <NameBox>
-            <Name color={message.member?.roleColor}>
-              {message.author?.name ?? 'Ghost'}
-            </Name>
-            {message.author?.category === 'BOT' && <BotTag />}
-            <Timestamp time={new Date(message.timestamp)} />
-          </NameBox>
+    const menu = useContextMenu(() => (
+      <ContextMenu>
+        <ContextMenu.Link
+          onClick={() => {
+            runInAction(() => {
+              editState.message = message;
+            });
+          }}
+        >
+          Edit Message
+        </ContextMenu.Link>
+        <ContextMenu.Link
+          onClick={async () => {
+            await mikoto.client.messages.delete(message.channelId, message.id);
+          }}
+        >
+          Delete Message
+        </ContextMenu.Link>
+      </ContextMenu>
+    ));
+
+    return (
+      <MessageContainer isSimple={isSimple} onContextMenu={menu}>
+        {isSimple ? (
+          <AvatarFiller />
+        ) : (
+          <MessageAvatar
+            member={message.member ?? undefined}
+            src={message.author?.avatar ?? undefined}
+            user={message.author ?? undefined}
+          />
         )}
-        <Markdown content={message.content} />
-      </MessageInner>
-    </MessageContainer>
-  );
-});
+        <MessageInner>
+          {!isSimple && (
+            <NameBox>
+              <Name color={message.member?.roleColor}>
+                {message.author?.name ?? 'Ghost'}
+              </Name>
+              {message.author?.category === 'BOT' && <BotTag />}
+              <Timestamp time={new Date(message.timestamp)} />
+            </NameBox>
+          )}
+          <Markdown content={message.content} />
+        </MessageInner>
+      </MessageContainer>
+    );
+  },
+);

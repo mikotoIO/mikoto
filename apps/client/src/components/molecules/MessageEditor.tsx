@@ -7,6 +7,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Flex } from '@mikoto-io/lucid';
 import { init } from 'emoji-mart';
+import { runInAction } from 'mobx';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useRecoilState, useSetRecoilState } from 'recoil';
@@ -16,7 +17,7 @@ import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import styled from 'styled-components';
 
 import { contextMenuState } from '../ContextMenu';
-import { messageEditIdState } from './Message';
+import { MessageEditState, messageEditIdState } from './Message';
 
 init({ data: emojiData });
 
@@ -41,7 +42,6 @@ const EditableContainer = styled.div`
   background-color: var(--N700);
   padding: 16px 16px 4px;
   border-radius: 4px;
-  margin: 12px 16px 4px;
   display: flex;
 `;
 
@@ -69,6 +69,7 @@ function isInputLike() {
 
 interface MessageEditorProps {
   placeholder: string;
+  editState: MessageEditState;
   onSubmit: (content: string) => void;
   onTyping?: () => void;
 }
@@ -87,8 +88,23 @@ const EditorButton = styled.div`
   }
 `;
 
+const EditMode = styled.div`
+  background-color: var(--N1000);
+  height: 40px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding-left: 16px;
+`;
+
+const TopContainer = styled.div`
+  margin: 16px 16px 4px;
+`;
+
 export function MessageEditor({
   placeholder,
+  editState,
   onSubmit,
   onTyping,
 }: MessageEditorProps) {
@@ -96,24 +112,21 @@ export function MessageEditor({
     () => withHistory(withReact(createEditor() as ReactEditor)),
     [],
   );
-  const [editorValue, setEditorValue] = useState<Node[]>(initialEditorValue);
-  // const [messageEditId, setMessageEditId] = useRecoilState(messageEditIdState);
+  const [editorValue, setEditorValue] = useState<Node[]>(() => [
+    { children: [{ text: editState.message?.content ?? '' }] },
+  ]);
   const setContextMenu = useSetRecoilState(contextMenuState);
   const ref = useRef<HTMLDivElement>(null);
-
-  // useEffect(() => {
-  //   console.log(messageEditId);
-  //   if (!messageEditId) setEditorValue(initialEditorValue);
-  //   else {
-  //     const { content } = messageEditId;
-  //     console.log(content);
-  //     resetEditor(editor, content);
-  //   }
-  // }, [messageEditId]);
 
   useEffect(() => {
     ReactEditor.focus(editor);
     const fn = (ev: KeyboardEvent) => {
+      if (ev.key === 'Escape' && editState.message) {
+        runInAction(() => {
+          editState.message = null;
+        });
+        setEditorValue(initialEditorValue);
+      }
       if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
       if (ev.key.length !== 1) return;
       if (isInputLike()) return;
@@ -130,71 +143,74 @@ export function MessageEditor({
   const dropzone = useDropzone();
 
   return (
-    <EditableContainer ref={ref}>
-      <Slate
-        editor={editor}
-        initialValue={editorValue}
-        onChange={(x) => setEditorValue(x)}
-      >
-        <StyledEditable
-          placeholder={placeholder}
-          onKeyDown={(ev) => {
-            if (serialize(editorValue).trim() === '') {
-              return;
-            }
-            // submission
-            if (ev.key !== 'Enter' || ev.shiftKey) {
-              onTyping?.();
-              return;
-            }
-
-            ev.preventDefault();
-            const text = serialize(editorValue).trim();
-            if (text.length === 0) return;
-
-            // audio.play();
-
-            onSubmit(text);
-            setEditorValue(initialEditorValue);
-            resetEditor(editor);
-          }}
-        />
-      </Slate>
-      <EditorButtons gap={16}>
-        <EditorButton
-          onClick={() => {
-            dropzone.open();
-          }}
+    <TopContainer>
+      {editState.message && <EditMode>Editing Message</EditMode>}
+      <EditableContainer ref={ref}>
+        <Slate
+          editor={editor}
+          initialValue={editorValue}
+          onChange={(x) => setEditorValue(x)}
         >
-          <FontAwesomeIcon icon={faFileArrowUp} />
-        </EditorButton>
-        <EditorButton
-          onClick={(ev) => {
-            if (!ref.current) return;
-            const bounds = ref.current.getBoundingClientRect();
-            ev.preventDefault();
-            ev.stopPropagation();
-            setContextMenu({
-              elem: (
-                <Picker
-                  data={emojiData}
-                  set="twitter"
-                  noCountryFlags={false}
-                  onEmojiSelect={(x: any) => {
-                    editor.insertText(x.shortcodes);
-                  }}
-                />
-              ),
-              position: {
-                right: window.innerWidth - bounds.right,
-                bottom: window.innerHeight - bounds.top + 16,
-              },
-            });
-          }}
-        >
-          <FontAwesomeIcon icon={faFaceSmileWink} />
-        </EditorButton>
-      </EditorButtons>
-    </EditableContainer>
+          <StyledEditable
+            placeholder={placeholder}
+            onKeyDown={(ev) => {
+              if (serialize(editorValue).trim() === '') {
+                return;
+              }
+              // submission
+              if (ev.key !== 'Enter' || ev.shiftKey) {
+                onTyping?.();
+                return;
+              }
+
+              ev.preventDefault();
+              const text = serialize(editorValue).trim();
+              if (text.length === 0) return;
+
+              // audio.play();
+
+              onSubmit(text);
+              setEditorValue(initialEditorValue);
+              resetEditor(editor);
+            }}
+          />
+        </Slate>
+        <EditorButtons gap={16}>
+          <EditorButton
+            onClick={() => {
+              dropzone.open();
+            }}
+          >
+            <FontAwesomeIcon icon={faFileArrowUp} />
+          </EditorButton>
+          <EditorButton
+            onClick={(ev) => {
+              if (!ref.current) return;
+              const bounds = ref.current.getBoundingClientRect();
+              ev.preventDefault();
+              ev.stopPropagation();
+              setContextMenu({
+                elem: (
+                  <Picker
+                    data={emojiData}
+                    set="twitter"
+                    noCountryFlags={false}
+                    onEmojiSelect={(x: any) => {
+                      editor.insertText(x.shortcodes);
+                    }}
+                  />
+                ),
+                position: {
+                  right: window.innerWidth - bounds.right,
+                  bottom: window.innerHeight - bounds.top + 16,
+                },
+              });
+            }}
+          >
+            <FontAwesomeIcon icon={faFaceSmileWink} />
+          </EditorButton>
+        </EditorButtons>
+      </EditableContainer>
+    </TopContainer>
   );
 }

@@ -212,7 +212,7 @@ export class MessageService extends AbstractMessageService {
     if (message.authorId !== ctx.data.user.sub) throw new UnauthorizedError();
     const newMessage = await prisma.message.update({
       where: { id: messageId },
-      data: { content },
+      data: { content, editedTimestamp: new Date() },
       include: { author: authorInclude },
     });
     ctx.data.pubsub.pub(

@@ -157,9 +157,10 @@ enum ChannelType {
 }
 
 model Message {
-  id        String   @id @default(uuid()) @db.Uuid
-  content   String
-  timestamp DateTime
+  id              String    @id @default(uuid()) @db.Uuid
+  content         String
+  timestamp       DateTime
+  editedTimestamp DateTime?
 
   authorId  String? @db.Uuid
   author    User?   @relation(fields: [authorId], references: [id])

@@ -44,6 +44,7 @@ struct Message {
   id: string;
   content: string;
   timestamp: string;
+  editedTimestamp: string?;
   authorId: string?;
   author: User?;
   channelId: string;

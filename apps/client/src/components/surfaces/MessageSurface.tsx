@@ -6,6 +6,7 @@ import {
   Member,
   Message,
 } from 'mikotojs';
+import { runInAction } from 'mobx';
 import { Observer, observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
@@ -17,7 +18,7 @@ import { TabName } from '../TabBar';
 import { ViewContainer } from '../ViewContainer';
 import { Spinner } from '../atoms/Spinner';
 import { TypingDots } from '../atoms/TypingDots';
-import { MessageItem } from '../molecules/Message';
+import { MessageEditState, MessageItem } from '../molecules/Message';
 import { MessageEditor } from '../molecules/MessageEditor';
 
 const StyledMessagesLoading = styled.div`
@@ -106,6 +107,7 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
   const [topLoaded, setTopLoaded] = useState(false);
 
   const [currentTypers, setCurrentTypers] = useTyping();
+  const [messageEditState] = useState(() => new MessageEditState());
 
   useEffect(
     () =>
@@ -227,6 +229,7 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
                 <Observer>
                   {() => (
                     <MessageItem
+                      editState={messageEditState}
                       message={msg}
                       // message={new ClientMessage(mikoto, msg)}
                       isSimple={isMessageSimple(
@@ -240,11 +243,16 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
             />
           )}
           <MessageEditor
+            editState={messageEditState}
             placeholder={`Message #${channel.name}`}
+            key={messageEditState.message?.id ?? 'base'}
             onTyping={() => {
               typing();
             }}
             onSubmit={async (msg) => {
+              runInAction(() => {
+                messageEditState.message = null;
+              });
               await mikoto.client.messages.send(channel.id, msg);
             }}
           />

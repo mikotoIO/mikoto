@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   Box,
@@ -18,6 +18,7 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../../hooks';
@@ -218,10 +219,13 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
       <Grid w="100%" h="100%" tcol="200px auto">
         <Box>
           <Button
-            onClick={() => {
-              mikoto.client.roles.create(space.id, 'New Role').then(() => {});
+            m={{ y: 16 }}
+            variant="primary"
+            onClick={async () => {
+              await mikoto.client.roles.create(space.id, 'New Role');
             }}
           >
+            <FontAwesomeIcon icon={faCirclePlus} />
             New Role
           </Button>
           {space.roles.map((r) => (

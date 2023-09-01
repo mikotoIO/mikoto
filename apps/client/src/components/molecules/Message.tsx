@@ -143,6 +143,12 @@ export class MessageEditState {
   }
 }
 
+const EditedNote = styled.span`
+  font-size: 12px;
+  color: var(--N400);
+  margin-left: 4px;
+`;
+
 export const MessageItem = observer(
   ({ message, editState, isSimple }: MessageProps) => {
     const mikoto = useMikoto();
@@ -190,7 +196,10 @@ export const MessageItem = observer(
               <Timestamp time={new Date(message.timestamp)} />
             </NameBox>
           )}
-          <Markdown content={message.content} />
+          <div>
+            <Markdown content={message.content} />
+            {message.editedTimestamp && <EditedNote>(edited)</EditedNote>}
+          </div>
         </MessageInner>
       </MessageContainer>
     );

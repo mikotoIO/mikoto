@@ -53,6 +53,7 @@ export const Message = z.object({
   id: z.string(),
   content: z.string(),
   timestamp: z.string(),
+  editedTimestamp: z.nullable(z.string()),
   authorId: z.nullable(z.string()),
   author: z.nullable(User),
   channelId: z.string(),

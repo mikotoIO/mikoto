@@ -10,6 +10,7 @@ export class ClientMessage implements Message {
   author!: User | null;
   content!: string;
   timestamp!: string;
+  editedTimestamp!: string | null;
 
   get channel() {
     return this.client.channels.get(this.channelId)!;

@@ -90,7 +90,8 @@ const EditorButton = styled.div`
 
 const EditMode = styled.div`
   background-color: var(--N1000);
-  height: 40px;
+  height: 32px;
+  font-size: 14px;
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
   display: flex;

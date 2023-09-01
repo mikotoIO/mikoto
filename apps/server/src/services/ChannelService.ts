@@ -194,6 +194,35 @@ export class MessageService extends AbstractMessageService {
     return serializeDates(message);
   }
 
+  async edit(
+    ctx: MikotoInstance,
+    channelId: string,
+    messageId: string,
+    content: string,
+  ) {
+    const channel = await prisma.channel.findUnique({
+      where: { id: channelId },
+    });
+    if (channel === null) throw new NotFoundError('ChannelNotFound');
+
+    const message = await prisma.message.findUnique({
+      where: { id: messageId },
+    });
+    if (message === null) throw new NotFoundError('MessageNotFound');
+    if (message.authorId !== ctx.data.user.sub) throw new UnauthorizedError();
+    const newMessage = await prisma.message.update({
+      where: { id: messageId },
+      data: { content },
+      include: { author: authorInclude },
+    });
+    ctx.data.pubsub.pub(
+      `space:${channel.spaceId}`,
+      'updateMessage',
+      serializeDates(newMessage),
+    );
+    return serializeDates(newMessage);
+  }
+
   async delete(ctx: MikotoInstance, channelId: string, messageId: string) {
     // TODO: Fine-grained permission checking for channels
     const channel = await prisma.channel.findUnique({

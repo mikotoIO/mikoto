@@ -324,6 +324,13 @@ export class MessageServiceClient {
   send(channelId: string, content: string): Promise<Message> {
     return this.socket.call("messages/send", channelId, content);
   }
+  edit(
+    channelId: string,
+    messageId: string,
+    content: string
+  ): Promise<Message> {
+    return this.socket.call("messages/edit", channelId, messageId, content);
+  }
   delete(channelId: string, messageId: string): Promise<void> {
     return this.socket.call("messages/delete", channelId, messageId);
   }

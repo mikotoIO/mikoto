@@ -172,6 +172,13 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
     });
   };
 
+  const updateFn = (x: Message) => {
+    setMsgs((xs) => {
+      if (xs === null) return null;
+      return xs?.map((m) => (m.id === x.id ? new ClientMessage(mikoto, x) : m));
+    });
+  };
+
   const deleteFn = (id: string) => {
     setMsgs((xs) => {
       if (xs === null) return null;
@@ -182,9 +189,11 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
 
   useEffect(() => {
     mikoto.messageEmitter.on(`create/${channel.id}`, createFn);
+    mikoto.messageEmitter.on(`update/${channel.id}`, updateFn);
     mikoto.messageEmitter.on(`delete/${channel.id}`, deleteFn);
     return () => {
       mikoto.messageEmitter.off(`create/${channel.id}`, createFn);
+      mikoto.messageEmitter.off(`update/${channel.id}`, updateFn);
       mikoto.messageEmitter.off(`delete/${channel.id}`, deleteFn);
     };
   }, [channel.id]);
@@ -250,10 +259,15 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
               typing();
             }}
             onSubmit={async (msg) => {
-              runInAction(() => {
-                messageEditState.message = null;
-              });
-              await mikoto.client.messages.send(channel.id, msg);
+              if (messageEditState.message) {
+                const m = messageEditState.message;
+                runInAction(() => {
+                  messageEditState.message = null;
+                });
+                await mikoto.client.messages.edit(channel.id, m.id, msg);
+              } else {
+                await mikoto.client.messages.send(channel.id, msg);
+              }
             }}
           />
         </OtherInner>

@@ -66,6 +66,10 @@ export class MikotoClient {
       this.messageEmitter.emit(`create/${message.channelId}`, message);
     });
 
+    this.client.messages.onUpdate((message) => {
+      this.messageEmitter.emit(`update/${message.channelId}`, message);
+    });
+
     this.client.messages.onDelete(({ messageId, channelId }) => {
       this.messageEmitter.emit(`delete/${channelId}`, messageId);
     });

@@ -167,6 +167,7 @@ struct Unread {
 service MessageService {
   list(channelId: string, options: ListMessageOptions): Message[];
   send(channelId: string, content: string): Message;
+  edit(channelId: string, messageId: string, content: string): Message;
   delete(channelId: string, messageId: string): void;
 
   ~onCreate(message: Message);

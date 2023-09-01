@@ -375,6 +375,12 @@ export abstract class AbstractMessageService {
     channelId: string,
     content: string
   ): Promise<Message>;
+  abstract edit(
+    ctx: SophonInstance<SophonContext>,
+    channelId: string,
+    messageId: string,
+    content: string
+  ): Promise<Message>;
   abstract delete(
     ctx: SophonInstance<SophonContext>,
     channelId: string,

@@ -31,6 +31,10 @@ export function buildPubSub(
       service.messages.$(id).onCreate(message);
     },
 
+    updateMessage(message: Message) {
+      service.messages.$(id).onUpdate(message);
+    },
+
     deleteMessage(message: { messageId: string; channelId: string }) {
       service.messages.$(id).onDelete(message);
     },

@@ -103,6 +103,7 @@ const StyledPlusBadge = styled.div`
   background-color: var(--N800);
   color: var(--N0);
   border-radius: 4px;
+  margin: 4px;
 
   font-size: 12px;
 `;
@@ -136,7 +137,7 @@ export const MemberContextMenu = observer(
               {member && (
                 <>
                   <h2>Roles</h2>
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <div style={{ gap: '8px' }}>
                     {member.roles.map(
                       (r) => r && <RoleBadge key={r.id} role={r} />,
                     )}

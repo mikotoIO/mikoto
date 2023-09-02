@@ -41,7 +41,6 @@ const StyledEditable = styled(Editable)`
 const EditableContainer = styled.div`
   background-color: var(--N700);
   padding: 16px 16px 4px;
-  border-radius: 4px;
   display: flex;
 `;
 
@@ -92,8 +91,6 @@ const EditMode = styled.div`
   background-color: var(--N1000);
   height: 32px;
   font-size: 14px;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
   display: flex;
   align-items: center;
   padding-left: 16px;
@@ -101,7 +98,68 @@ const EditMode = styled.div`
 
 const TopContainer = styled.div`
   margin: 16px 16px 4px;
+
+  & > *:first-child {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+
+  & > *:last-child {
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
 `;
+
+const UploadSection = styled.div`
+  display: flex;
+  padding: 8px;
+  gap: 8px;
+  background-color: var(--N700);
+  border-bottom: 1px solid var(--N600);
+`;
+
+const withFilePaste = (editor: ReactEditor, fileFn: (fs: FileList) => void) => {
+  const { insertData } = editor;
+  editor.insertData = (data) => {
+    const { files } = data;
+    fileFn(files);
+    insertData(data);
+  };
+  return editor;
+};
+
+const StyledFilePreview = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  border-radius: 4px;
+  background-color: var(--N900);
+
+  .preview {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: 4px;
+  }
+`;
+
+function FilePreview({ file }: { file: File }) {
+  const isImage = ['image/gif', 'image/jpeg', 'image/png'].includes(file.type);
+  return (
+    <StyledFilePreview>
+      <div>{file.name}</div>
+      {isImage && (
+        <img
+          className="preview"
+          src={URL.createObjectURL(file)}
+          alt={file.name}
+        />
+      )}
+    </StyledFilePreview>
+  );
+}
 
 export function MessageEditor({
   placeholder,
@@ -109,13 +167,24 @@ export function MessageEditor({
   onSubmit,
   onTyping,
 }: MessageEditorProps) {
-  const editor: ReactEditor = useMemo(
-    () => withHistory(withReact(createEditor() as ReactEditor)),
-    [],
-  );
   const [editorValue, setEditorValue] = useState<Node[]>(() => [
     { children: [{ text: editState.message?.content ?? '' }] },
   ]);
+  const [files, setFiles] = useState<File[]>([]);
+
+  const fileFn = (fs: FileList) => {
+    setFiles((xs) => [...xs, ...Array.from(fs)]);
+  };
+
+  const editor: ReactEditor = useMemo(
+    () =>
+      withFilePaste(
+        withHistory(withReact(createEditor() as ReactEditor)),
+        fileFn,
+      ),
+    [],
+  );
+
   const setContextMenu = useSetRecoilState(contextMenuState);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -141,11 +210,23 @@ export function MessageEditor({
   }, []);
 
   // upload logic
-  const dropzone = useDropzone();
+  const dropzone = useDropzone({
+    onDrop: (fl) => {
+      setFiles((xs) => [...xs, ...fl]);
+    },
+  });
 
   return (
     <TopContainer>
       {editState.message && <EditMode>Editing Message</EditMode>}
+      {files.length !== 0 && (
+        <UploadSection>
+          {files.map((file, idx) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <FilePreview file={file} key={idx} />
+          ))}
+        </UploadSection>
+      )}
       <EditableContainer ref={ref}>
         <Slate
           editor={editor}
@@ -177,13 +258,15 @@ export function MessageEditor({
           />
         </Slate>
         <EditorButtons gap={16}>
-          <EditorButton
-            onClick={() => {
-              dropzone.open();
-            }}
-          >
-            <FontAwesomeIcon icon={faFileArrowUp} />
-          </EditorButton>
+          {editState.message === null && (
+            <EditorButton
+              onClick={() => {
+                dropzone.open();
+              }}
+            >
+              <FontAwesomeIcon icon={faFileArrowUp} />
+            </EditorButton>
+          )}
           <EditorButton
             onClick={(ev) => {
               if (!ref.current) return;

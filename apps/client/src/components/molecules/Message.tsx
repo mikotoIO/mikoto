@@ -152,7 +152,6 @@ const EditedNote = styled.span`
 export const MessageItem = observer(
   ({ message, editState, isSimple }: MessageProps) => {
     const mikoto = useMikoto();
-    const setMessageEditId = useSetRecoilState(messageEditIdState);
 
     const menu = useContextMenu(() => (
       <ContextMenu>

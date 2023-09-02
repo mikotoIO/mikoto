@@ -155,15 +155,17 @@ export const MessageItem = observer(
 
     const menu = useContextMenu(() => (
       <ContextMenu>
-        <ContextMenu.Link
-          onClick={() => {
-            runInAction(() => {
-              editState.message = message;
-            });
-          }}
-        >
-          Edit Message
-        </ContextMenu.Link>
+        {message.authorId === message.client.me.id && (
+          <ContextMenu.Link
+            onClick={() => {
+              runInAction(() => {
+                editState.message = message;
+              });
+            }}
+          >
+            Edit Message
+          </ContextMenu.Link>
+        )}
         <ContextMenu.Link
           onClick={async () => {
             await mikoto.client.messages.delete(message.channelId, message.id);

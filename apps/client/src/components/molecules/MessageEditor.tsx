@@ -69,7 +69,7 @@ function isInputLike() {
 interface MessageEditorProps {
   placeholder: string;
   editState: MessageEditState;
-  onSubmit: (content: string) => void;
+  onSubmit: (content: string, files: FileUpload[]) => void;
   onTyping?: () => void;
 }
 
@@ -145,11 +145,15 @@ const StyledFilePreview = styled.div`
   }
 `;
 
-function FilePreview({ file }: { file: File }) {
+interface FilePreviewProps {
+  file: File;
+  onRemove?: () => void;
+}
+
+function FilePreview({ file, onRemove }: FilePreviewProps) {
   const isImage = ['image/gif', 'image/jpeg', 'image/png'].includes(file.type);
   return (
-    <StyledFilePreview>
-      <div>{file.name}</div>
+    <StyledFilePreview onClick={onRemove}>
       {isImage && (
         <img
           className="preview"
@@ -157,9 +161,15 @@ function FilePreview({ file }: { file: File }) {
           alt={file.name}
         />
       )}
+      <div>{file.name}</div>
     </StyledFilePreview>
   );
 }
+
+type FileUpload = {
+  file: File;
+  id: string;
+};
 
 export function MessageEditor({
   placeholder,
@@ -170,10 +180,16 @@ export function MessageEditor({
   const [editorValue, setEditorValue] = useState<Node[]>(() => [
     { children: [{ text: editState.message?.content ?? '' }] },
   ]);
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<FileUpload[]>([]);
 
   const fileFn = (fs: FileList) => {
-    setFiles((xs) => [...xs, ...Array.from(fs)]);
+    setFiles((xs) => [
+      ...xs,
+      ...Array.from(fs).map((file) => ({
+        file,
+        id: crypto.randomUUID(),
+      })),
+    ]);
   };
 
   const editor: ReactEditor = useMemo(
@@ -212,7 +228,13 @@ export function MessageEditor({
   // upload logic
   const dropzone = useDropzone({
     onDrop: (fl) => {
-      setFiles((xs) => [...xs, ...fl]);
+      setFiles((xs) => [
+        ...xs,
+        ...fl.map((file) => ({
+          file,
+          id: crypto.randomUUID(),
+        })),
+      ]);
     },
   });
 
@@ -221,9 +243,14 @@ export function MessageEditor({
       {editState.message && <EditMode>Editing Message</EditMode>}
       {files.length !== 0 && (
         <UploadSection>
-          {files.map((file, idx) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <FilePreview file={file} key={idx} />
+          {files.map((fileUpload) => (
+            <FilePreview
+              file={fileUpload.file}
+              key={fileUpload.id}
+              onRemove={() => {
+                setFiles((xs) => xs.filter((x) => x.id !== fileUpload.id));
+              }}
+            />
           ))}
         </UploadSection>
       )}
@@ -236,9 +263,6 @@ export function MessageEditor({
           <StyledEditable
             placeholder={placeholder}
             onKeyDown={(ev) => {
-              if (serialize(editorValue).trim() === '') {
-                return;
-              }
               // submission
               if (ev.key !== 'Enter' || ev.shiftKey) {
                 onTyping?.();
@@ -246,14 +270,21 @@ export function MessageEditor({
               }
 
               ev.preventDefault();
+
+              // no empty message
+              if (serialize(editorValue).trim() === '' && files.length === 0) {
+                return;
+              }
+
               const text = serialize(editorValue).trim();
               if (text.length === 0) return;
 
               // audio.play();
 
-              onSubmit(text);
+              onSubmit(text, files);
               setEditorValue(initialEditorValue);
               resetEditor(editor);
+              setFiles([]);
             }}
           />
         </Slate>

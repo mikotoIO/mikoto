@@ -8,6 +8,8 @@ const StyledRoleBadge = styled.div<{ color?: string }>`
   background-color: var(--N800);
   color: var(--N0);
   border-radius: 4px;
+  white-space: nowrap;
+  margin: 4px;
 
   font-size: 12px;
 

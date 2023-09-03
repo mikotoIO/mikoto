@@ -16,6 +16,7 @@ import { Sidebar } from '../components/sidebars/Base';
 import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
 import { AccountSettingsSurface } from '../components/surfaces/AccountSettingsSurface';
 import { ChannelSettingsSurface } from '../components/surfaces/ChannelSettingsSurface';
+import { DocumentSurface } from '../components/surfaces/DocumentSurface';
 import { MessageView } from '../components/surfaces/MessageSurface';
 import { SpaceSettingsView } from '../components/surfaces/SpaceSettingsSurface';
 import { VoiceView } from '../components/surfaces/VoiceSurface';
@@ -52,6 +53,8 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
       return <MessageView channelId={tab.channelId} />;
     case 'voiceChannel':
       return <VoiceView channelId={tab.channelId} />;
+    case 'documentChannel':
+      return <DocumentSurface channelId={tab.channelId} />;
     case 'spaceSettings':
       return <SpaceSettingsView spaceId={tab.spaceId} />;
     case 'accountSettings':

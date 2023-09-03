@@ -119,7 +119,7 @@ function Node(props: NodeProps) {
             <FontAwesomeIcon icon={props.icon ?? faHashtag} />
           )}
         </ChevronWrapper>
-        {props.text}
+        <span>{props.text}</span>
       </StyledNode>
       <StyledSubtree>
         {open &&

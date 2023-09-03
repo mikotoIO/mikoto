@@ -21,6 +21,7 @@ export const treebarSpaceState = atom<string | null>({
 type TabBaseType =
   | { kind: 'textChannel'; channelId: string }
   | { kind: 'voiceChannel'; channelId: string }
+  | { kind: 'documentChannel'; channelId: string }
   | { kind: 'spaceSettings'; spaceId: string }
   | { kind: 'channelSettings'; channelId: string }
   | { kind: 'accountSettings' }

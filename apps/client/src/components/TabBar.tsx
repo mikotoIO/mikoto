@@ -66,17 +66,15 @@ function useReorderable(surfaceNode: SurfaceLeaf) {
   return (dragIndex: number, dropIndex: number) => {
     if (dragIndex === dropIndex) return;
 
-    const filteredTabs = [...surfaceNode.tabs];
-    const nt = filteredTabs.splice(dragIndex, 1)[0];
-
     runInAction(() => {
+      const nt = surfaceNode.tabs.splice(dragIndex, 1)[0];
+
       if (dropIndex === -1) {
-        surfaceNode.index -= 1;
+        surfaceNode.index = surfaceNode.tabs.length;
         surfaceNode.tabs.push(nt);
       } else {
-        filteredTabs.splice(dropIndex, 0, nt);
+        surfaceNode.tabs.splice(dropIndex, 0, nt);
         surfaceNode.index = dropIndex;
-        surfaceNode.tabs = filteredTabs;
       }
     });
   };
@@ -125,15 +123,13 @@ function Tab({ tab, index }: TabProps) {
 
   const active = index === surfaceNode.index;
 
-  const closeTab = () => {
-    runInAction(() => {
-      surfaceNode.tabs.splice(index, 1);
+  const closeTab = action(() => {
+    surfaceNode.tabs.splice(index, 1);
 
-      if (index <= surfaceNode.index) {
-        surfaceNode.index = Math.max(0, index - 1);
-      }
-    });
-  };
+    if (index <= surfaceNode.index) {
+      surfaceNode.index = Math.max(0, index - 1);
+    }
+  });
 
   const contextMenu = useContextMenu(() => (
     <ContextMenu>
@@ -147,6 +143,7 @@ function Tab({ tab, index }: TabProps) {
       <ContextMenu.Link
         onClick={action(() => {
           surfaceNode.tabs = [];
+          surfaceNode.index = -1;
         })}
       >
         Close All

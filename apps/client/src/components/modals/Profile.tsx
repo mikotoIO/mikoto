@@ -1,12 +1,14 @@
-import { Modal } from '@mikoto-io/lucid';
+import { Button, Buttons, Flex, Modal } from '@mikoto-io/lucid';
 import { User } from 'mikotojs';
 import styled from 'styled-components';
 
+import { useMikoto } from '../../hooks';
 import { Avatar } from '../atoms/Avatar';
 import { Tag } from '../atoms/BotTag';
 
 const ProfileContainer = styled.div`
-  width: 500px;
+  width: 640px;
+  height: 480px;
 
   .banner {
     background-color: var(--N1000);
@@ -16,7 +18,7 @@ const ProfileContainer = styled.div`
     height: 100px;
   }
   .content {
-    padding: 64px 16px 16px;
+    padding: 48px 16px 16px;
   }
 
   h1 {
@@ -45,6 +47,7 @@ const ProfileContainer = styled.div`
 `;
 
 export function ProfileModal({ user }: { user: User }) {
+  const mikoto = useMikoto();
   return (
     <Modal style={{ padding: 0 }}>
       <ProfileContainer>
@@ -52,10 +55,19 @@ export function ProfileModal({ user }: { user: User }) {
           <Avatar src={user.avatar ?? undefined} size={100} />
         </div>
         <div className="content">
-          <span>
-            <h1>{user.name}</h1>
-            <h2 className="mikotoid">@cactus.mikoto.io</h2>
-          </span>
+          <Flex style={{ justifyContent: 'space-between' }}>
+            <div>
+              <h1>{user.name}</h1>
+              <h2 className="mikotoid">@cactus.mikoto.io</h2>
+            </div>
+            <div>
+              {mikoto.me.id !== user.id && (
+                <Buttons>
+                  <Button variant="success">Send Friend Request</Button>
+                </Buttons>
+              )}
+            </div>
+          </Flex>
           <h2>Bio</h2>
           <p>Bio Should go here. Lorem ipsum dolor sit amet consectetur.</p>
         </div>

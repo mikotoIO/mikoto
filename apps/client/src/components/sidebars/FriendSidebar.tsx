@@ -10,6 +10,7 @@ const StyledButtonBase = styled.div`
   height: 40px;
   width: 100%;
   color: var(--N300);
+  cursor: pointer;
   &:hover {
     background-color: var(--N700);
   }

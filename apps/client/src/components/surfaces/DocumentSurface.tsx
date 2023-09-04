@@ -4,6 +4,7 @@ import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import styled from 'styled-components';
 
+import { TabName } from '../TabBar';
 import { ViewContainer } from '../ViewContainer';
 
 const StyledEditable = styled(Editable)`
@@ -22,6 +23,7 @@ export function DocumentSurface({ channelId }: { channelId: string }) {
 
   return (
     <ViewContainer padded scroll>
+      <TabName name="Document" />
       <Slate
         editor={editor}
         initialValue={editorValue}

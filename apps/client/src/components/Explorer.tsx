@@ -1,4 +1,5 @@
 import {
+  faFile,
   faFileAlt,
   faHashtag,
   faMicrophone,
@@ -45,6 +46,12 @@ function channelToTab(channel: Channel): Tabable {
         key: channel.id,
         channelId: channel.id,
       };
+    case 'DOCUMENT':
+      return {
+        kind: 'documentChannel',
+        key: channel.id,
+        channelId: channel.id,
+      };
     default:
       throw new Error('Unknown channel type');
   }
@@ -87,7 +94,7 @@ const ChannelTypeButton = styled.button<{ active?: boolean }>`
 const channelTypes = [
   { id: 'TEXT', name: 'Text', icon: faHashtag },
   { id: 'VOICE', name: 'Voice', icon: faMicrophone },
-  { id: 'DOCS', name: 'Docs', icon: faFileAlt },
+  { id: 'DOCUMENT', name: 'Docs', icon: faFileAlt },
 ];
 
 function CreateChannelModal({ channel }: { channel?: Channel }) {
@@ -179,6 +186,8 @@ function getIconFromChannelType(type: Channel['type']) {
   switch (type) {
     case 'VOICE':
       return faMicrophone;
+    case 'DOCUMENT':
+      return faFile;
     default:
       return undefined;
   }

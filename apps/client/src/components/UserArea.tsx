@@ -35,20 +35,6 @@ function UserAreaMenu() {
       </ContextMenu.Link>
       <ContextMenu.Link
         onClick={() => {
-          tabkit.openTab(
-            {
-              kind: 'documentChannel',
-              key: 'document',
-              channelId: 'placeholder',
-            },
-            false,
-          );
-        }}
-      >
-        Open Documents
-      </ContextMenu.Link>
-      <ContextMenu.Link
-        onClick={() => {
           modal(<SetStatusModal />);
         }}
       >

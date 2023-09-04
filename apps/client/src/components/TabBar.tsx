@@ -1,3 +1,4 @@
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { faX, faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Flex, Grid } from '@mikoto-io/lucid';
@@ -82,8 +83,13 @@ function useReorderable() {
   };
 }
 
+interface TabNameProps {
+  name: string;
+  icon?: IconProp;
+}
+
 // TODO: The fuck was I on when I wrote this code?
-export function TabName({ name }: { name: string }) {
+export function TabName({ name, icon }: TabNameProps) {
   const tabInfo = useContext(TabContext);
   const [tabName, setTabName] = useRecoilState(tabNameFamily(tabInfo.key));
   useEffect(() => {

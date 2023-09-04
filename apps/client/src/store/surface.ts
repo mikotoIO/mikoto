@@ -1,6 +1,6 @@
-import { createContext } from "react";
-import { atom, atomFamily, useRecoilState } from "recoil";
-import { recoilPersist } from "recoil-persist";
+import { autorun, makeAutoObservable, runInAction, set, toJS } from 'mobx';
+import { createContext } from 'react';
+import { atomFamily } from 'recoil';
 
 type TabBaseType =
   | { kind: 'textChannel'; channelId: string }
@@ -27,20 +27,32 @@ export interface MultiSurface {
   children: SurfaceNode[];
 }
 
-type SurfaceNode = SurfaceLeaf | MultiSurface;
+export type SurfaceNode = SurfaceLeaf | MultiSurface;
 
-const tabPersist = recoilPersist({
-  key: 'tabs',
-});
+export class SurfaceStore {
+  node: SurfaceLeaf;
 
-export const tabbedState = atom<SurfaceLeaf>({
-  key: 'tabbedChannels',
-  default: {
-    index: 0,
-    tabs: [],
-  },
-  effects_UNSTABLE: [tabPersist.persistAtom],
-});
+  constructor() {
+    this.node = {
+      index: 0,
+      tabs: [],
+    };
+    try {
+      const storedJson = localStorage.getItem('surface');
+      if (storedJson) {
+        this.node = JSON.parse(storedJson);
+      }
+    } catch (_) {
+      // ignore
+    }
+    makeAutoObservable(this);
+    autorun(() => {
+      localStorage.setItem('surface', JSON.stringify(this.node));
+    });
+  }
+}
+
+export const surfaceStore = new SurfaceStore();
 
 export const tabNameFamily = atomFamily({
   key: 'tabName',
@@ -54,49 +66,40 @@ export const TabContext = createContext<{ key: string }>({
 });
 
 export function useTabkit() {
-  const [tabbed, setTabbed] = useRecoilState(tabbedState);
-
   function openNewChannel(ch: Tabable) {
-    if (!tabbed.tabs.some((x) => x.kind === ch.kind && x.key === ch.key)) {
-      setTabbed(({ index, tabs }) => ({
-        index,
-        tabs: [...tabs, ch],
-      }));
-    }
-    setTabbed(({ tabs }) => ({
-      index: tabbed.tabs.length,
-      tabs,
-    }));
+    runInAction(() => {
+      if (
+        !surfaceStore.node.tabs.some(
+          (x) => x.kind === ch.kind && x.key === ch.key,
+        )
+      ) {
+        surfaceStore.node.tabs.push(ch);
+      }
+      surfaceStore.node.index = surfaceStore.node.tabs.length - 1;
+      // toJS(surfaceStore.node);
+    });
   }
 
   return {
     openNewChannel,
     openTab(tab: Tabable, openNew: boolean) {
-      if (tabbed.tabs.length === 0) {
+      if (surfaceStore.node.tabs.length === 0) {
         openNewChannel(tab);
         return;
       }
 
-      const idx = tabbed.tabs.findIndex(
-        (n) => n.kind === tab.kind && n.key === tab.key,
-      );
-      if (idx !== -1) {
-        setTabbed(({ tabs }) => ({
-          index: idx,
-          tabs,
-        }));
-      } else if (openNew) {
-        openNewChannel(tab);
-      } else {
-        setTabbed(({ tabs, index }) => {
-          const xsn = [...tabs];
-          xsn[index] = tab;
-          return {
-            index,
-            tabs: xsn,
-          };
-        });
-      }
+      runInAction(() => {
+        const idx = surfaceStore.node.tabs.findIndex(
+          (n) => n.kind === tab.kind && n.key === tab.key,
+        );
+        if (idx !== -1) {
+          surfaceStore.node.index = idx;
+        } else if (openNew) {
+          openNewChannel(tab);
+        } else {
+          surfaceStore.node.tabs[surfaceStore.node.index] = tab;
+        }
+      });
     },
   };
 }

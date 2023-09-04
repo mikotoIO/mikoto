@@ -2,6 +2,7 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { faX, faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Flex, Grid } from '@mikoto-io/lucid';
+import { action, runInAction } from 'mobx';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Helmet } from 'react-helmet';
@@ -9,7 +10,13 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { workspaceState } from '../store';
-import { TabContext, Tabable, tabNameFamily, tabbedState } from '../store/surface';
+import {
+  SurfaceLeaf,
+  TabContext,
+  Tabable,
+  surfaceStore,
+  tabNameFamily,
+} from '../store/surface';
 import { ContextMenu, useContextMenu } from './ContextMenu';
 import { getTabIcon, IconBox } from './atoms/IconBox';
 
@@ -55,27 +62,23 @@ interface TabDnd {
   dragIndex: number;
 }
 
-function useReorderable() {
-  const [tabbed, setTabbed] = useRecoilState(tabbedState);
-
+function useReorderable(surfaceNode: SurfaceLeaf) {
   return (dragIndex: number, dropIndex: number) => {
     if (dragIndex === dropIndex) return;
 
-    const filteredTabs = [...tabbed.tabs];
+    const filteredTabs = [...surfaceNode.tabs];
     const nt = filteredTabs.splice(dragIndex, 1)[0];
 
-    if (dropIndex === -1) {
-      setTabbed(({ tabs }) => ({
-        index: tabs.length - 1,
-        tabs: [...filteredTabs, nt],
-      }));
-    } else {
-      filteredTabs.splice(dropIndex, 0, nt);
-      setTabbed({
-        index: dropIndex,
-        tabs: filteredTabs,
-      });
-    }
+    runInAction(() => {
+      if (dropIndex === -1) {
+        surfaceNode.index -= 1;
+        surfaceNode.tabs.push(nt);
+      } else {
+        filteredTabs.splice(dropIndex, 0, nt);
+        surfaceNode.index = dropIndex;
+        surfaceNode.tabs = filteredTabs;
+      }
+    });
   };
 }
 
@@ -102,8 +105,9 @@ export function TabName({ name, icon }: TabNameProps) {
 }
 
 function Tab({ tab, index }: TabProps) {
-  const [tabbed, setTabbed] = useRecoilState(tabbedState);
-  const reorderFn = useReorderable();
+  const surfaceNode = surfaceStore.node;
+
+  const reorderFn = useReorderable(surfaceNode);
   const tabName = useRecoilValue(tabNameFamily(`${tab.kind}/${tab.key}`));
 
   const ref = useRef<HTMLDivElement>(null);
@@ -119,23 +123,16 @@ function Tab({ tab, index }: TabProps) {
   });
   drag(drop(ref));
 
-  const active = index === tabbed.index;
+  const active = index === surfaceNode.index;
 
   const closeTab = () => {
-    setTabbed(({ tabs, index: idx }) => {
-      const xsc = [...tabs];
-      xsc.splice(index, 1);
-      return {
-        index: idx,
-        tabs: xsc,
-      };
+    runInAction(() => {
+      surfaceNode.tabs.splice(index, 1);
+
+      if (index <= surfaceNode.index) {
+        surfaceNode.index = Math.max(0, index - 1);
+      }
     });
-    if (index <= tabbed.index) {
-      setTabbed(({ tabs }) => ({
-        index: Math.max(0, index - 1),
-        tabs,
-      }));
-    }
   };
 
   const contextMenu = useContextMenu(() => (
@@ -148,12 +145,9 @@ function Tab({ tab, index }: TabProps) {
         Close
       </ContextMenu.Link>
       <ContextMenu.Link
-        onClick={() => {
-          setTabbed((tb) => ({
-            ...tb,
-            tabs: [],
-          }));
-        }}
+        onClick={action(() => {
+          surfaceNode.tabs = [];
+        })}
       >
         Close All
       </ContextMenu.Link>
@@ -167,9 +161,9 @@ function Tab({ tab, index }: TabProps) {
       key={tab.key}
       active={active}
       onContextMenu={contextMenu}
-      onClick={() => {
-        setTabbed(({ tabs }) => ({ index, tabs }));
-      }}
+      onClick={action(() => {
+        surfaceNode.index = index;
+      })}
       onAuxClick={() => {}}
     >
       <IconBox size={20} icon={getTabIcon(tab)} />
@@ -238,7 +232,7 @@ export const TabBarButton = styled.button`
 `;
 
 export function TabbedView({ children, tabs }: TabbedViewProps) {
-  const reorderFn = useReorderable();
+  const reorderFn = useReorderable(surfaceStore.node);
   const setWorkspace = useSetRecoilState(workspaceState);
 
   const [, drop] = useDrop<TabDnd>({

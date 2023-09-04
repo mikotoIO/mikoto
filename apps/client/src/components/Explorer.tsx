@@ -21,7 +21,8 @@ import styled from 'styled-components';
 
 import { useFetchMember, useMikoto } from '../hooks';
 import { useErrorElement } from '../hooks/useErrorElement';
-import { Tabable, treebarSpaceState, useTabkit } from '../store';
+import { treebarSpaceState } from '../store';
+import { Tabable, useTabkit } from '../store/surface';
 import { ContextMenu, modalState, useContextMenuX } from './ContextMenu';
 import { ExplorerNext, NodeObject } from './ExplorerNext';
 

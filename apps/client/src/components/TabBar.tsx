@@ -8,13 +8,9 @@ import { Helmet } from 'react-helmet';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
-import {
-  Tabable,
-  tabbedState,
-  TabContext,
-  tabNameFamily,
-  workspaceState,
-} from '../store';
+import { workspaceState } from '../store';
+import { TabContext, Tabable, tabNameFamily, tabbedState } from '../store/surface';
+import { ContextMenu, useContextMenu } from './ContextMenu';
 import { getTabIcon, IconBox } from './atoms/IconBox';
 
 const StyledCloseButton = styled(Flex)<{ active?: boolean }>`
@@ -93,8 +89,11 @@ export function TabName({ name, icon }: TabNameProps) {
   const tabInfo = useContext(TabContext);
   const [tabName, setTabName] = useRecoilState(tabNameFamily(tabInfo.key));
   useEffect(() => {
-    if (tabName !== name) {
-      setTabName(name);
+    if (tabName.name !== name) {
+      setTabName({
+        ...tabName,
+        name,
+      });
     }
   }, [name]);
 
@@ -139,18 +138,42 @@ function Tab({ tab, index }: TabProps) {
     }
   };
 
+  const contextMenu = useContextMenu(() => (
+    <ContextMenu>
+      <ContextMenu.Link
+        onClick={() => {
+          closeTab();
+        }}
+      >
+        Close
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          setTabbed((tb) => ({
+            ...tb,
+            tabs: [],
+          }));
+        }}
+      >
+        Close All
+      </ContextMenu.Link>
+      <ContextMenu.Link>Split Tab</ContextMenu.Link>
+    </ContextMenu>
+  ));
+
   return (
     <StyledTab
       ref={ref}
       key={tab.key}
       active={active}
+      onContextMenu={contextMenu}
       onClick={() => {
         setTabbed(({ tabs }) => ({ index, tabs }));
       }}
       onAuxClick={() => {}}
     >
       <IconBox size={20} icon={getTabIcon(tab)} />
-      <div>{tabName}</div>
+      <div>{tabName.name}</div>
       <StyledCloseButton
         center
         active={active}
@@ -161,7 +184,7 @@ function Tab({ tab, index }: TabProps) {
       >
         <FontAwesomeIcon icon={faX} />
       </StyledCloseButton>
-      {active && <Helmet title={tabName} />}
+      {active && <Helmet title={tabName.name} />}
     </StyledTab>
   );
 }

@@ -5,6 +5,7 @@ import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
+import { from } from 'stylis';
 
 import { CommandMenuKit } from '../components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
@@ -23,13 +24,8 @@ import { SpaceSettingsView } from '../components/surfaces/SpaceSettingsSurface';
 import { VoiceView } from '../components/surfaces/VoiceSurface';
 import { WelcomeSurface } from '../components/surfaces/WelcomeSurface';
 import { useMikoto } from '../hooks';
-import {
-  Tabable,
-  tabbedState,
-  TabContext,
-  treebarSpaceState,
-  workspaceState,
-} from '../store';
+import { treebarSpaceState, workspaceState } from '../store';
+import { Tabable, tabbedState, TabContext } from '../store/surface';
 import { MikotoApiLoader } from './MikotoApiLoader';
 import { DesignStory } from './Palette';
 

@@ -13,6 +13,7 @@ import { ServerSidebar } from '../components/ServerSidebar';
 import { TabBarButton, TabbedView } from '../components/TabBar';
 import { UserAreaAvatar } from '../components/UserArea';
 import { Sidebar } from '../components/sidebars/Base';
+import { FriendSidebar } from '../components/sidebars/FriendSidebar';
 import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
 import { AccountSettingsSurface } from '../components/surfaces/AccountSettingsSurface';
 import { ChannelSettingsSurface } from '../components/surfaces/ChannelSettingsSurface';
@@ -123,7 +124,7 @@ function AppView() {
               {spaceId ? (
                 <Explorer space={mikoto.spaces.get(spaceId)!} />
               ) : (
-                <div>TODO: DMs</div>
+                <FriendSidebar />
               )}
             </Sidebar>
           )}

@@ -81,6 +81,32 @@ const LeftBar = styled(Flex)`
   }
 `;
 
+const SurfaceGroup = observer(() => {
+  const surfaceNode = surfaceStore.node;
+  return (
+    <TabbedView tabs={surfaceNode.tabs} surfaceNode={surfaceNode}>
+      <ErrorBoundaryPage>
+        {surfaceStore.node.tabs.map((tab, idx) => (
+          <TabContext.Provider
+            value={{ key: `${tab.kind}/${tab.key}` }}
+            key={`${tab.kind}/${tab.key}`}
+          >
+            <div
+              style={
+                idx !== surfaceStore.node.index
+                  ? { display: 'none' }
+                  : undefined
+              }
+            >
+              <TabViewSwitch tab={tab} />
+            </div>
+          </TabContext.Provider>
+        ))}
+      </ErrorBoundaryPage>
+    </TabbedView>
+  );
+});
+
 const AppView = observer(() => {
   const spaceId = useRecoilValue(treebarSpaceState);
   const mikoto = useMikoto();
@@ -124,26 +150,7 @@ const AppView = observer(() => {
           )}
         </div>
       </LeftBar>
-      <TabbedView tabs={surfaceStore.node.tabs}>
-        <ErrorBoundaryPage>
-          {surfaceStore.node.tabs.map((tab, idx) => (
-            <TabContext.Provider
-              value={{ key: `${tab.kind}/${tab.key}` }}
-              key={`${tab.kind}/${tab.key}`}
-            >
-              <div
-                style={
-                  idx !== surfaceStore.node.index
-                    ? { display: 'none' }
-                    : undefined
-                }
-              >
-                <TabViewSwitch tab={tab} />
-              </div>
-            </TabContext.Provider>
-          ))}
-        </ErrorBoundaryPage>
-      </TabbedView>
+      <SurfaceGroup />
       {workspace.rightOpen && (
         <Sidebar
           position="right"

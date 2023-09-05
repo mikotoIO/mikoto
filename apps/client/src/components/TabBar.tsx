@@ -3,6 +3,7 @@ import { faX, faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Flex, Grid } from '@mikoto-io/lucid';
 import { action, runInAction } from 'mobx';
+import { observer } from 'mobx-react-lite';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Helmet } from 'react-helmet';
@@ -55,6 +56,7 @@ const StyledTab = styled.div<{ active?: boolean }>`
 interface TabProps {
   tab: Tabable;
   index: number;
+  surfaceNode: SurfaceLeaf;
 }
 
 interface TabDnd {
@@ -102,9 +104,7 @@ export function TabName({ name, icon }: TabNameProps) {
   return <></>;
 }
 
-function Tab({ tab, index }: TabProps) {
-  const surfaceNode = surfaceStore.node;
-
+function Tab({ tab, index, surfaceNode }: TabProps) {
   const reorderFn = useReorderable(surfaceNode);
   const tabName = useRecoilValue(tabNameFamily(`${tab.kind}/${tab.key}`));
 
@@ -183,6 +183,7 @@ function Tab({ tab, index }: TabProps) {
 interface TabbedViewProps {
   tabs: Tabable[];
   children: React.ReactNode;
+  surfaceNode: SurfaceLeaf;
 }
 
 // noinspection CssUnknownProperty
@@ -228,37 +229,49 @@ export const TabBarButton = styled.button`
   }
 `;
 
-export function TabbedView({ children, tabs }: TabbedViewProps) {
-  const reorderFn = useReorderable(surfaceStore.node);
-  const setWorkspace = useSetRecoilState(workspaceState);
+export const TabbedView = observer(
+  ({ children, tabs, surfaceNode }: TabbedViewProps) => {
+    const reorderFn = useReorderable(surfaceStore.node);
+    const setWorkspace = useSetRecoilState(workspaceState);
 
-  const [, drop] = useDrop<TabDnd>({
-    accept: 'TAB',
-    drop(item) {
-      reorderFn(item.dragIndex, -1);
-    },
-  });
+    const [, drop] = useDrop<TabDnd>({
+      accept: 'TAB',
+      drop(item) {
+        reorderFn(item.dragIndex, -1);
+      },
+    });
 
-  return (
-    <Grid trow="40px calc(100% - 40px)" h="100%" bg="N1000" style={{ flex: 1 }}>
-      <Helmet titleTemplate="Mikoto | %s" defaultTitle="Mikoto" />
-      <Flex h={40} fs={14}>
-        {tabs.map((tab, index) => (
-          <Tab tab={tab} index={index} key={`${tab.kind}/${tab.key}`} />
-        ))}
-        <StyledRest ref={drop} />
-        <TabBarButton
-          onClick={() => {
-            setWorkspace((ws) => ({
-              ...ws,
-              rightOpen: !ws.rightOpen,
-            }));
-          }}
-        >
-          <FontAwesomeIcon icon={faBarsStaggered} />
-        </TabBarButton>
-      </Flex>
-      {tabs.length ? children : <WelcomeToMikoto />}
-    </Grid>
-  );
-}
+    return (
+      <Grid
+        trow="40px calc(100% - 40px)"
+        h="100%"
+        bg="N1000"
+        style={{ flex: 1 }}
+      >
+        <Helmet titleTemplate="Mikoto | %s" defaultTitle="Mikoto" />
+        <Flex h={40} fs={14}>
+          {tabs.map((tab, index) => (
+            <Tab
+              tab={tab}
+              index={index}
+              key={`${tab.kind}/${tab.key}`}
+              surfaceNode={surfaceNode}
+            />
+          ))}
+          <StyledRest ref={drop} />
+          <TabBarButton
+            onClick={() => {
+              setWorkspace((ws) => ({
+                ...ws,
+                rightOpen: !ws.rightOpen,
+              }));
+            }}
+          >
+            <FontAwesomeIcon icon={faBarsStaggered} />
+          </TabBarButton>
+        </Flex>
+        {tabs.length ? children : <WelcomeToMikoto />}
+      </Grid>
+    );
+  },
+);

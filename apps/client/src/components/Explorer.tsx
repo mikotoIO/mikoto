@@ -1,4 +1,5 @@
 import {
+  faFile,
   faFileAlt,
   faHashtag,
   faMicrophone,
@@ -20,7 +21,8 @@ import styled from 'styled-components';
 
 import { useFetchMember, useMikoto } from '../hooks';
 import { useErrorElement } from '../hooks/useErrorElement';
-import { Tabable, treebarSpaceState, useTabkit } from '../store';
+import { treebarSpaceState } from '../store';
+import { Tabable, useTabkit } from '../store/surface';
 import { ContextMenu, modalState, useContextMenuX } from './ContextMenu';
 import { ExplorerNext, NodeObject } from './ExplorerNext';
 
@@ -42,6 +44,12 @@ function channelToTab(channel: Channel): Tabable {
     case 'VOICE':
       return {
         kind: 'voiceChannel',
+        key: channel.id,
+        channelId: channel.id,
+      };
+    case 'DOCUMENT':
+      return {
+        kind: 'documentChannel',
         key: channel.id,
         channelId: channel.id,
       };
@@ -87,7 +95,7 @@ const ChannelTypeButton = styled.button<{ active?: boolean }>`
 const channelTypes = [
   { id: 'TEXT', name: 'Text', icon: faHashtag },
   { id: 'VOICE', name: 'Voice', icon: faMicrophone },
-  { id: 'DOCS', name: 'Docs', icon: faFileAlt },
+  { id: 'DOCUMENT', name: 'Docs', icon: faFileAlt },
 ];
 
 function CreateChannelModal({ channel }: { channel?: Channel }) {
@@ -179,6 +187,8 @@ function getIconFromChannelType(type: Channel['type']) {
   switch (type) {
     case 'VOICE':
       return faMicrophone;
+    case 'DOCUMENT':
+      return faFile;
     default:
       return undefined;
   }

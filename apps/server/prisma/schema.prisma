@@ -135,6 +135,7 @@ model Channel {
   lastUpdated DateTime?
 
   channelUnread ChannelUnread[]
+  Document      Document?
 
   @@index([spaceId])
 }
@@ -152,6 +153,8 @@ model ChannelUnread {
 enum ChannelType {
   TEXT
   VOICE
+  DOCUMENT
+  APPLICATION
   THREAD
   CATEGORY
 }
@@ -222,4 +225,11 @@ model Ban {
   reason String?
 
   @@unique([spaceId, userId])
+}
+
+model Document {
+  id        String  @id @default(uuid()) @db.Uuid
+  channelId String  @unique @db.Uuid
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  content   String
 }

@@ -1,36 +1,44 @@
-import { useMemo, useState } from 'react';
-import { createEditor, Node } from 'slate';
-import { withHistory } from 'slate-history';
-import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
+import { Heading } from '@mikoto-io/lucid';
+import Image from '@tiptap/extension-image';
+import Link from '@tiptap/extension-link';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 import styled from 'styled-components';
 
+import { useMikoto } from '../../hooks';
 import { TabName } from '../TabBar';
 import { ViewContainer } from '../ViewContainer';
 
-const StyledEditable = styled(Editable)`
-  outline: none;
+const EditorContentWrapper = styled.div`
+  .tiptap {
+    outline: none;
+  }
+  a {
+    color: var(--B400);
+  }
+
+  img {
+    max-width: 400px;
+    max-height: 400px;
+  }
 `;
 
 export function DocumentSurface({ channelId }: { channelId: string }) {
-  const [editorValue, setEditorValue] = useState<Node[]>(() => [
-    { children: [{ text: '' }] },
-  ]);
+  const mikoto = useMikoto();
+  const channel = mikoto.channels.get(channelId)!;
 
-  const editor: ReactEditor = useMemo(
-    () => withHistory(withReact(createEditor() as ReactEditor)),
-    [],
-  );
+  const editor = useEditor({
+    extensions: [StarterKit, Link, Image],
+    content: '<p>Hello World! 🌎️</p>',
+  });
 
   return (
     <ViewContainer padded scroll>
-      <TabName name="Document" />
-      <Slate
-        editor={editor}
-        initialValue={editorValue}
-        onChange={(x) => setEditorValue(x)}
-      >
-        <StyledEditable placeholder="Use / for commands" />
-      </Slate>
+      <TabName name={channel.name} />
+      <Heading>{channel.name}</Heading>
+      <EditorContentWrapper>
+        <EditorContent editor={editor} />
+      </EditorContentWrapper>
     </ViewContainer>
   );
 }

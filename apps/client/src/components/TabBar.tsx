@@ -1,19 +1,23 @@
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { faX, faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Flex, Grid } from '@mikoto-io/lucid';
+import { action, runInAction } from 'mobx';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Helmet } from 'react-helmet';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
+import { workspaceState } from '../store';
 import {
-  Tabable,
-  tabbedState,
+  SurfaceLeaf,
   TabContext,
+  Tabable,
+  surfaceStore,
   tabNameFamily,
-  workspaceState,
-} from '../store';
+} from '../store/surface';
+import { ContextMenu, useContextMenu } from './ContextMenu';
 import { getTabIcon, IconBox } from './atoms/IconBox';
 
 const StyledCloseButton = styled(Flex)<{ active?: boolean }>`
@@ -58,37 +62,39 @@ interface TabDnd {
   dragIndex: number;
 }
 
-function useReorderable() {
-  const [tabbed, setTabbed] = useRecoilState(tabbedState);
-
+function useReorderable(surfaceNode: SurfaceLeaf) {
   return (dragIndex: number, dropIndex: number) => {
     if (dragIndex === dropIndex) return;
 
-    const filteredTabs = [...tabbed.tabs];
-    const nt = filteredTabs.splice(dragIndex, 1)[0];
+    runInAction(() => {
+      const nt = surfaceNode.tabs.splice(dragIndex, 1)[0];
 
-    if (dropIndex === -1) {
-      setTabbed(({ tabs }) => ({
-        index: tabs.length - 1,
-        tabs: [...filteredTabs, nt],
-      }));
-    } else {
-      filteredTabs.splice(dropIndex, 0, nt);
-      setTabbed({
-        index: dropIndex,
-        tabs: filteredTabs,
-      });
-    }
+      if (dropIndex === -1) {
+        surfaceNode.index = surfaceNode.tabs.length;
+        surfaceNode.tabs.push(nt);
+      } else {
+        surfaceNode.tabs.splice(dropIndex, 0, nt);
+        surfaceNode.index = dropIndex;
+      }
+    });
   };
 }
 
+interface TabNameProps {
+  name: string;
+  icon?: IconProp;
+}
+
 // TODO: The fuck was I on when I wrote this code?
-export function TabName({ name }: { name: string }) {
+export function TabName({ name, icon }: TabNameProps) {
   const tabInfo = useContext(TabContext);
   const [tabName, setTabName] = useRecoilState(tabNameFamily(tabInfo.key));
   useEffect(() => {
-    if (tabName !== name) {
-      setTabName(name);
+    if (tabName.name !== name) {
+      setTabName({
+        ...tabName,
+        name,
+      });
     }
   }, [name]);
 
@@ -97,8 +103,9 @@ export function TabName({ name }: { name: string }) {
 }
 
 function Tab({ tab, index }: TabProps) {
-  const [tabbed, setTabbed] = useRecoilState(tabbedState);
-  const reorderFn = useReorderable();
+  const surfaceNode = surfaceStore.node;
+
+  const reorderFn = useReorderable(surfaceNode);
   const tabName = useRecoilValue(tabNameFamily(`${tab.kind}/${tab.key}`));
 
   const ref = useRef<HTMLDivElement>(null);
@@ -114,37 +121,50 @@ function Tab({ tab, index }: TabProps) {
   });
   drag(drop(ref));
 
-  const active = index === tabbed.index;
+  const active = index === surfaceNode.index;
 
-  const closeTab = () => {
-    setTabbed(({ tabs, index: idx }) => {
-      const xsc = [...tabs];
-      xsc.splice(index, 1);
-      return {
-        index: idx,
-        tabs: xsc,
-      };
-    });
-    if (index <= tabbed.index) {
-      setTabbed(({ tabs }) => ({
-        index: Math.max(0, index - 1),
-        tabs,
-      }));
+  const closeTab = action(() => {
+    surfaceNode.tabs.splice(index, 1);
+
+    if (index <= surfaceNode.index) {
+      surfaceNode.index = Math.max(0, index - 1);
     }
-  };
+  });
+
+  const contextMenu = useContextMenu(() => (
+    <ContextMenu>
+      <ContextMenu.Link
+        onClick={() => {
+          closeTab();
+        }}
+      >
+        Close
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={action(() => {
+          surfaceNode.tabs = [];
+          surfaceNode.index = -1;
+        })}
+      >
+        Close All
+      </ContextMenu.Link>
+      <ContextMenu.Link>Split Tab</ContextMenu.Link>
+    </ContextMenu>
+  ));
 
   return (
     <StyledTab
       ref={ref}
       key={tab.key}
       active={active}
-      onClick={() => {
-        setTabbed(({ tabs }) => ({ index, tabs }));
-      }}
+      onContextMenu={contextMenu}
+      onClick={action(() => {
+        surfaceNode.index = index;
+      })}
       onAuxClick={() => {}}
     >
       <IconBox size={20} icon={getTabIcon(tab)} />
-      <div>{tabName}</div>
+      <div>{tabName.name}</div>
       <StyledCloseButton
         center
         active={active}
@@ -155,7 +175,7 @@ function Tab({ tab, index }: TabProps) {
       >
         <FontAwesomeIcon icon={faX} />
       </StyledCloseButton>
-      {active && <Helmet title={tabName} />}
+      {active && <Helmet title={tabName.name} />}
     </StyledTab>
   );
 }
@@ -209,7 +229,7 @@ export const TabBarButton = styled.button`
 `;
 
 export function TabbedView({ children, tabs }: TabbedViewProps) {
-  const reorderFn = useReorderable();
+  const reorderFn = useReorderable(surfaceStore.node);
   const setWorkspace = useSetRecoilState(workspaceState);
 
   const [, drop] = useDrop<TabDnd>({

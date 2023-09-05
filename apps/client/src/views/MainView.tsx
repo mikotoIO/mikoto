@@ -1,6 +1,7 @@
 import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Flex } from '@mikoto-io/lucid';
+import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -23,13 +24,8 @@ import { SpaceSettingsView } from '../components/surfaces/SpaceSettingsSurface';
 import { VoiceView } from '../components/surfaces/VoiceSurface';
 import { WelcomeSurface } from '../components/surfaces/WelcomeSurface';
 import { useMikoto } from '../hooks';
-import {
-  Tabable,
-  tabbedState,
-  TabContext,
-  treebarSpaceState,
-  workspaceState,
-} from '../store';
+import { treebarSpaceState, workspaceState } from '../store';
+import { surfaceStore, Tabable, TabContext } from '../store/surface';
 import { MikotoApiLoader } from './MikotoApiLoader';
 import { DesignStory } from './Palette';
 
@@ -85,9 +81,7 @@ const LeftBar = styled(Flex)`
   }
 `;
 
-function AppView() {
-  const tabbed = useRecoilValue(tabbedState);
-
+const AppView = observer(() => {
   const spaceId = useRecoilValue(treebarSpaceState);
   const mikoto = useMikoto();
   const [workspace, setWorkspace] = useRecoilState(workspaceState);
@@ -130,15 +124,19 @@ function AppView() {
           )}
         </div>
       </LeftBar>
-      <TabbedView tabs={tabbed.tabs}>
+      <TabbedView tabs={surfaceStore.node.tabs}>
         <ErrorBoundaryPage>
-          {tabbed.tabs.map((tab, idx) => (
+          {surfaceStore.node.tabs.map((tab, idx) => (
             <TabContext.Provider
               value={{ key: `${tab.kind}/${tab.key}` }}
               key={`${tab.kind}/${tab.key}`}
             >
               <div
-                style={idx !== tabbed.index ? { display: 'none' } : undefined}
+                style={
+                  idx !== surfaceStore.node.index
+                    ? { display: 'none' }
+                    : undefined
+                }
               >
                 <TabViewSwitch tab={tab} />
               </div>
@@ -162,7 +160,7 @@ function AppView() {
       )}
     </AppContainer>
   );
-}
+});
 
 export default function MainView() {
   return (

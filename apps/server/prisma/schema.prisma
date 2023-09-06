@@ -231,5 +231,5 @@ model Document {
   id        String  @id @default(uuid()) @db.Uuid
   channelId String  @unique @db.Uuid
   channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  content   String
+  content   String // JSON
 }

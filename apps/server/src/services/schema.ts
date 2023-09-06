@@ -136,6 +136,13 @@ export type VoiceToken = z.infer<typeof VoiceToken>;
 export const Relations = z.object({});
 export type Relations = z.infer<typeof Relations>;
 
+export const Document = z.object({
+  id: z.string(),
+  channelId: z.string(),
+  content: z.string(),
+});
+export type Document = z.infer<typeof Document>;
+
 ////////////////////////////////////////
 // Services
 ////////////////////////////////////////
@@ -158,6 +165,7 @@ export abstract class AbstractMainService {
   abstract roles: AbstractRoleService;
   abstract voice: AbstractVoiceService;
   abstract relations: AbstractRelationService;
+  abstract documents: AbstractDocumentService;
 }
 
 export class SpaceServiceSender {
@@ -458,4 +466,25 @@ export abstract class AbstractRelationService {
   public constructor(protected sophonCore: SophonCore<SophonContext>) {
     this.$ = (room) => new RelationServiceSender(sophonCore.senderCore, room);
   }
+}
+
+export class DocumentServiceSender {
+  constructor(private sender: SenderCore, private room: string) {}
+}
+
+export abstract class AbstractDocumentService {
+  $: (room: string) => DocumentServiceSender;
+  public constructor(protected sophonCore: SophonCore<SophonContext>) {
+    this.$ = (room) => new DocumentServiceSender(sophonCore.senderCore, room);
+  }
+
+  abstract get(
+    ctx: SophonInstance<SophonContext>,
+    channelId: string
+  ): Promise<Document>;
+  abstract update(
+    ctx: SophonInstance<SophonContext>,
+    channelId: string,
+    content: string
+  ): Promise<void>;
 }

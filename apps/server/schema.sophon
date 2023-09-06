@@ -63,6 +63,7 @@ service MainService {
   roles: RoleService;
   voice: VoiceService;
   relations: RelationService;
+  documents: DocumentService;
 }
 
 struct SpaceUpdateOptions {
@@ -211,4 +212,15 @@ struct Relations {
 }
 
 service RelationService {
+}
+
+struct Document {
+  id: string;
+  channelId: string;
+  content: string;
+}
+
+service DocumentService {
+  get(channelId: string): Document;
+  update(channelId: string, content: string);
 }

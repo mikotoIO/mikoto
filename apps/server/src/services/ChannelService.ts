@@ -46,6 +46,7 @@ export class ChannelService extends AbstractChannelService {
     const channelCount = await prisma.channel.count({
       where: { spaceId },
     });
+
     const channel = await prisma.channel.create({
       data: {
         name,
@@ -53,6 +54,14 @@ export class ChannelService extends AbstractChannelService {
         parentId,
         type: type as ChannelType,
         order: channelCount,
+        Document:
+          type === ChannelType.DOCUMENT
+            ? {
+                create: {
+                  content: `{"type":"doc","content":[{"type":"paragraph"}]}`,
+                },
+              }
+            : undefined,
       },
     });
     this.$(`space/${spaceId}`).onCreate(serializeDates(channel));

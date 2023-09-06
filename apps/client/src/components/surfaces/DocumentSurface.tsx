@@ -3,9 +3,11 @@ import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { ClientChannel } from 'mikotojs';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { useMikoto } from '../../hooks';
+import { useInterval, useMikoto } from '../../hooks';
 import { TabName } from '../TabBar';
 import { ViewContainer } from '../ViewContainer';
 
@@ -23,21 +25,55 @@ const EditorContentWrapper = styled.div`
   }
 `;
 
+interface DocumentEditorProps {
+  channel: ClientChannel;
+  content: string;
+}
+
+function DocumentEditor({ channel, content }: DocumentEditorProps) {
+  const [changed, setChanged] = useState(false);
+  const mikoto = useMikoto();
+
+  const editor = useEditor({
+    extensions: [StarterKit as any, Link, Image],
+    onUpdate() {
+      setChanged(true);
+    },
+    content: JSON.parse(content),
+  });
+
+  useInterval(() => {
+    if (editor && changed) {
+      const contentString = JSON.stringify(editor.getJSON());
+      mikoto.client.documents
+        .update(channel.id, contentString)
+        .then(() => setChanged(false))
+        .catch(() => setChanged(true));
+    }
+  }, 5000);
+
+  return <EditorContent editor={editor} />;
+}
+
 export function DocumentSurface({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
   const channel = mikoto.channels.get(channelId)!;
+  const [content, setContent] = useState<string | null>(null);
 
-  const editor = useEditor({
-    extensions: [StarterKit, Link, Image],
-    content: '<p>Hello World! 🌎️</p>',
-  });
+  useEffect(() => {
+    mikoto.client.documents.get(channelId).then((x) => {
+      setContent(x.content);
+    });
+  }, [channelId]);
 
   return (
     <ViewContainer padded scroll>
       <TabName name={channel.name} />
       <Heading>{channel.name}</Heading>
       <EditorContentWrapper>
-        <EditorContent editor={editor} />
+        {content !== null && (
+          <DocumentEditor channel={channel} content={content} />
+        )}
       </EditorContentWrapper>
     </ViewContainer>
   );

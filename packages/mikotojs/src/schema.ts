@@ -132,6 +132,13 @@ export type VoiceToken = z.infer<typeof VoiceToken>;
 export const Relations = z.object({});
 export type Relations = z.infer<typeof Relations>;
 
+export const Document = z.object({
+  id: z.string(),
+  channelId: z.string(),
+  content: z.string(),
+});
+export type Document = z.infer<typeof Document>;
+
 class SocketClient {
   constructor(public socket: Socket) {}
 
@@ -164,6 +171,7 @@ export class MainServiceClient {
   readonly roles: RoleServiceClient;
   readonly voice: VoiceServiceClient;
   readonly relations: RelationServiceClient;
+  readonly documents: DocumentServiceClient;
   constructor(private socket: SocketClient) {
     this.spaces = new SpaceServiceClient(socket);
     this.channels = new ChannelServiceClient(socket);
@@ -173,6 +181,7 @@ export class MainServiceClient {
     this.roles = new RoleServiceClient(socket);
     this.voice = new VoiceServiceClient(socket);
     this.relations = new RelationServiceClient(socket);
+    this.documents = new DocumentServiceClient(socket);
   }
 }
 
@@ -385,6 +394,16 @@ export class VoiceServiceClient {
 
 export class RelationServiceClient {
   constructor(private socket: SocketClient) {}
+}
+
+export class DocumentServiceClient {
+  constructor(private socket: SocketClient) {}
+  get(channelId: string): Promise<Document> {
+    return this.socket.call("documents/get", channelId);
+  }
+  update(channelId: string, content: string): Promise<void> {
+    return this.socket.call("documents/update", channelId, content);
+  }
 }
 
 interface CreateClientOptions {

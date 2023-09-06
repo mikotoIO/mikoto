@@ -15,6 +15,8 @@ import {
   SurfaceLeaf,
   TabContext,
   Tabable,
+  pruneNode,
+  splitNode,
   surfaceStore,
   tabNameFamily,
 } from '../store/surface';
@@ -61,23 +63,28 @@ interface TabProps {
 
 interface TabDnd {
   tab: Tabable;
+  surfaceLeaf: SurfaceLeaf;
   dragIndex: number;
 }
 
-function useReorderable(surfaceNode: SurfaceLeaf) {
-  return (dragIndex: number, dropIndex: number) => {
-    if (dragIndex === dropIndex) return;
+function useReorderable(destinationSurface: SurfaceLeaf) {
+  return (dragIndex: number, dropIndex: number, originSurface: SurfaceLeaf) => {
+    // if (dragIndex === dropIndex) return;
 
     runInAction(() => {
-      const nt = surfaceNode.tabs.splice(dragIndex, 1)[0];
+      const nt = originSurface.tabs.splice(dragIndex, 1)[0];
+
+      originSurface.index = 0;
 
       if (dropIndex === -1) {
-        surfaceNode.index = surfaceNode.tabs.length;
-        surfaceNode.tabs.push(nt);
+        destinationSurface.index = destinationSurface.tabs.length;
+        destinationSurface.tabs.push(nt);
       } else {
-        surfaceNode.tabs.splice(dropIndex, 0, nt);
-        surfaceNode.index = dropIndex;
+        destinationSurface.tabs.splice(dropIndex, 0, nt);
+        destinationSurface.index = dropIndex;
       }
+
+      pruneNode(surfaceStore.node);
     });
   };
 }
@@ -111,12 +118,12 @@ function Tab({ tab, index, surfaceNode }: TabProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [, drag] = useDrag<TabDnd>({
     type: 'TAB',
-    item: { tab, dragIndex: index },
+    item: { tab, dragIndex: index, surfaceLeaf: surfaceNode },
   });
   const [, drop] = useDrop<TabDnd>({
     accept: 'TAB',
     drop(item) {
-      reorderFn(item.dragIndex, index);
+      reorderFn(item.dragIndex, index, item.surfaceLeaf);
     },
   });
   drag(drop(ref));
@@ -129,6 +136,7 @@ function Tab({ tab, index, surfaceNode }: TabProps) {
     if (index <= surfaceNode.index) {
       surfaceNode.index = Math.max(0, index - 1);
     }
+    pruneNode(surfaceStore.node);
   });
 
   const contextMenu = useContextMenu(() => (
@@ -144,11 +152,18 @@ function Tab({ tab, index, surfaceNode }: TabProps) {
         onClick={action(() => {
           surfaceNode.tabs = [];
           surfaceNode.index = -1;
+          pruneNode(surfaceStore.node);
         })}
       >
         Close All
       </ContextMenu.Link>
-      <ContextMenu.Link>Split Tab</ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          splitNode();
+        }}
+      >
+        Split Tab
+      </ContextMenu.Link>
     </ContextMenu>
   ));
 
@@ -231,13 +246,13 @@ export const TabBarButton = styled.button`
 
 export const TabbedView = observer(
   ({ children, tabs, surfaceNode }: TabbedViewProps) => {
-    const reorderFn = useReorderable(surfaceStore.node);
+    const reorderFn = useReorderable(surfaceNode);
     const setWorkspace = useSetRecoilState(workspaceState);
 
     const [, drop] = useDrop<TabDnd>({
       accept: 'TAB',
       drop(item) {
-        reorderFn(item.dragIndex, -1);
+        reorderFn(item.dragIndex, -1, item.surfaceLeaf);
       },
     });
 

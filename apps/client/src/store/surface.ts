@@ -38,10 +38,10 @@ export class SurfaceStore {
       tabs: [],
     };
     try {
-      // const storedJson = localStorage.getItem('surface');
-      // if (storedJson) {
-      //   this.node = JSON.parse(storedJson);
-      // }
+      const storedJson = localStorage.getItem('surface');
+      if (storedJson) {
+        this.node = JSON.parse(storedJson);
+      }
     } catch (_) {
       // ignore
     }

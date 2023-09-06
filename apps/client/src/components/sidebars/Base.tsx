@@ -13,12 +13,6 @@ export function Sidebar({ children, position, size, onResize }: SidebarProps) {
       enable={{
         right: position === 'left',
         left: position === 'right',
-        top: false,
-        bottom: false,
-        topLeft: false,
-        topRight: false,
-        bottomLeft: false,
-        bottomRight: false,
       }}
       minWidth={200}
       maxWidth="50vw"

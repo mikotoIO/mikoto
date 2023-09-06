@@ -2,6 +2,7 @@ import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Flex } from '@mikoto-io/lucid';
 import { observer } from 'mobx-react-lite';
+import { Resizable } from 're-resizable';
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -25,7 +26,12 @@ import { VoiceView } from '../components/surfaces/VoiceSurface';
 import { WelcomeSurface } from '../components/surfaces/WelcomeSurface';
 import { useMikoto } from '../hooks';
 import { treebarSpaceState, workspaceState } from '../store';
-import { surfaceStore, Tabable, TabContext } from '../store/surface';
+import {
+  SurfaceNode,
+  surfaceStore,
+  Tabable,
+  TabContext,
+} from '../store/surface';
 import { MikotoApiLoader } from './MikotoApiLoader';
 import { DesignStory } from './Palette';
 
@@ -81,6 +87,45 @@ const LeftBar = styled(Flex)`
   }
 `;
 
+const SurfaceGroup = observer(
+  ({ surfaceNode }: { surfaceNode: SurfaceNode }) => {
+    if ('children' in surfaceNode) {
+      const [head, ...tails] = surfaceNode.children;
+      return (
+        <>
+          <SurfaceGroup surfaceNode={head} />
+          {tails.map((child, idx) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <Resizable key={idx} enable={{ left: true }}>
+              <SurfaceGroup surfaceNode={child} />
+            </Resizable>
+          ))}
+        </>
+      );
+    }
+    return (
+      <TabbedView tabs={surfaceNode.tabs} surfaceNode={surfaceNode}>
+        <ErrorBoundaryPage>
+          {surfaceNode.tabs.map((tab, idx) => (
+            <TabContext.Provider
+              value={{ key: `${tab.kind}/${tab.key}` }}
+              key={`${tab.kind}/${tab.key}`}
+            >
+              <div
+                style={
+                  idx !== surfaceNode.index ? { display: 'none' } : undefined
+                }
+              >
+                <TabViewSwitch tab={tab} />
+              </div>
+            </TabContext.Provider>
+          ))}
+        </ErrorBoundaryPage>
+      </TabbedView>
+    );
+  },
+);
+
 const AppView = observer(() => {
   const spaceId = useRecoilValue(treebarSpaceState);
   const mikoto = useMikoto();
@@ -124,26 +169,7 @@ const AppView = observer(() => {
           )}
         </div>
       </LeftBar>
-      <TabbedView tabs={surfaceStore.node.tabs}>
-        <ErrorBoundaryPage>
-          {surfaceStore.node.tabs.map((tab, idx) => (
-            <TabContext.Provider
-              value={{ key: `${tab.kind}/${tab.key}` }}
-              key={`${tab.kind}/${tab.key}`}
-            >
-              <div
-                style={
-                  idx !== surfaceStore.node.index
-                    ? { display: 'none' }
-                    : undefined
-                }
-              >
-                <TabViewSwitch tab={tab} />
-              </div>
-            </TabContext.Provider>
-          ))}
-        </ErrorBoundaryPage>
-      </TabbedView>
+      <SurfaceGroup surfaceNode={surfaceStore.node} />
       {workspace.rightOpen && (
         <Sidebar
           position="right"

@@ -3,6 +3,7 @@ import { faX, faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Flex, Grid } from '@mikoto-io/lucid';
 import { action, runInAction } from 'mobx';
+import { observer } from 'mobx-react-lite';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Helmet } from 'react-helmet';
@@ -14,6 +15,8 @@ import {
   SurfaceLeaf,
   TabContext,
   Tabable,
+  pruneNode,
+  splitNode,
   surfaceStore,
   tabNameFamily,
 } from '../store/surface';
@@ -55,27 +58,33 @@ const StyledTab = styled.div<{ active?: boolean }>`
 interface TabProps {
   tab: Tabable;
   index: number;
+  surfaceNode: SurfaceLeaf;
 }
 
 interface TabDnd {
   tab: Tabable;
+  surfaceLeaf: SurfaceLeaf;
   dragIndex: number;
 }
 
-function useReorderable(surfaceNode: SurfaceLeaf) {
-  return (dragIndex: number, dropIndex: number) => {
-    if (dragIndex === dropIndex) return;
+function useReorderable(destinationSurface: SurfaceLeaf) {
+  return (dragIndex: number, dropIndex: number, originSurface: SurfaceLeaf) => {
+    // if (dragIndex === dropIndex) return;
 
     runInAction(() => {
-      const nt = surfaceNode.tabs.splice(dragIndex, 1)[0];
+      const nt = originSurface.tabs.splice(dragIndex, 1)[0];
+
+      originSurface.index = 0;
 
       if (dropIndex === -1) {
-        surfaceNode.index = surfaceNode.tabs.length;
-        surfaceNode.tabs.push(nt);
+        destinationSurface.index = destinationSurface.tabs.length;
+        destinationSurface.tabs.push(nt);
       } else {
-        surfaceNode.tabs.splice(dropIndex, 0, nt);
-        surfaceNode.index = dropIndex;
+        destinationSurface.tabs.splice(dropIndex, 0, nt);
+        destinationSurface.index = dropIndex;
       }
+
+      pruneNode(surfaceStore.node);
     });
   };
 }
@@ -102,21 +111,19 @@ export function TabName({ name, icon }: TabNameProps) {
   return <></>;
 }
 
-function Tab({ tab, index }: TabProps) {
-  const surfaceNode = surfaceStore.node;
-
+function Tab({ tab, index, surfaceNode }: TabProps) {
   const reorderFn = useReorderable(surfaceNode);
   const tabName = useRecoilValue(tabNameFamily(`${tab.kind}/${tab.key}`));
 
   const ref = useRef<HTMLDivElement>(null);
   const [, drag] = useDrag<TabDnd>({
     type: 'TAB',
-    item: { tab, dragIndex: index },
+    item: { tab, dragIndex: index, surfaceLeaf: surfaceNode },
   });
   const [, drop] = useDrop<TabDnd>({
     accept: 'TAB',
     drop(item) {
-      reorderFn(item.dragIndex, index);
+      reorderFn(item.dragIndex, index, item.surfaceLeaf);
     },
   });
   drag(drop(ref));
@@ -129,6 +136,7 @@ function Tab({ tab, index }: TabProps) {
     if (index <= surfaceNode.index) {
       surfaceNode.index = Math.max(0, index - 1);
     }
+    pruneNode(surfaceStore.node);
   });
 
   const contextMenu = useContextMenu(() => (
@@ -144,11 +152,18 @@ function Tab({ tab, index }: TabProps) {
         onClick={action(() => {
           surfaceNode.tabs = [];
           surfaceNode.index = -1;
+          pruneNode(surfaceStore.node);
         })}
       >
         Close All
       </ContextMenu.Link>
-      <ContextMenu.Link>Split Tab</ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          splitNode();
+        }}
+      >
+        Split Tab
+      </ContextMenu.Link>
     </ContextMenu>
   ));
 
@@ -183,6 +198,7 @@ function Tab({ tab, index }: TabProps) {
 interface TabbedViewProps {
   tabs: Tabable[];
   children: React.ReactNode;
+  surfaceNode: SurfaceLeaf;
 }
 
 // noinspection CssUnknownProperty
@@ -228,37 +244,49 @@ export const TabBarButton = styled.button`
   }
 `;
 
-export function TabbedView({ children, tabs }: TabbedViewProps) {
-  const reorderFn = useReorderable(surfaceStore.node);
-  const setWorkspace = useSetRecoilState(workspaceState);
+export const TabbedView = observer(
+  ({ children, tabs, surfaceNode }: TabbedViewProps) => {
+    const reorderFn = useReorderable(surfaceNode);
+    const setWorkspace = useSetRecoilState(workspaceState);
 
-  const [, drop] = useDrop<TabDnd>({
-    accept: 'TAB',
-    drop(item) {
-      reorderFn(item.dragIndex, -1);
-    },
-  });
+    const [, drop] = useDrop<TabDnd>({
+      accept: 'TAB',
+      drop(item) {
+        reorderFn(item.dragIndex, -1, item.surfaceLeaf);
+      },
+    });
 
-  return (
-    <Grid trow="40px calc(100% - 40px)" h="100%" bg="N1000" style={{ flex: 1 }}>
-      <Helmet titleTemplate="Mikoto | %s" defaultTitle="Mikoto" />
-      <Flex h={40} fs={14}>
-        {tabs.map((tab, index) => (
-          <Tab tab={tab} index={index} key={`${tab.kind}/${tab.key}`} />
-        ))}
-        <StyledRest ref={drop} />
-        <TabBarButton
-          onClick={() => {
-            setWorkspace((ws) => ({
-              ...ws,
-              rightOpen: !ws.rightOpen,
-            }));
-          }}
-        >
-          <FontAwesomeIcon icon={faBarsStaggered} />
-        </TabBarButton>
-      </Flex>
-      {tabs.length ? children : <WelcomeToMikoto />}
-    </Grid>
-  );
-}
+    return (
+      <Grid
+        trow="40px calc(100% - 40px)"
+        h="100%"
+        bg="N1000"
+        style={{ flex: 1 }}
+      >
+        <Helmet titleTemplate="Mikoto | %s" defaultTitle="Mikoto" />
+        <Flex h={40} fs={14}>
+          {tabs.map((tab, index) => (
+            <Tab
+              tab={tab}
+              index={index}
+              key={`${tab.kind}/${tab.key}`}
+              surfaceNode={surfaceNode}
+            />
+          ))}
+          <StyledRest ref={drop} />
+          <TabBarButton
+            onClick={() => {
+              setWorkspace((ws) => ({
+                ...ws,
+                rightOpen: !ws.rightOpen,
+              }));
+            }}
+          >
+            <FontAwesomeIcon icon={faBarsStaggered} />
+          </TabBarButton>
+        </Flex>
+        {tabs.length ? children : <WelcomeToMikoto />}
+      </Grid>
+    );
+  },
+);

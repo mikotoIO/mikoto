@@ -199,6 +199,7 @@ interface TabbedViewProps {
   tabs: Tabable[];
   children: React.ReactNode;
   surfaceNode: SurfaceLeaf;
+  leftBorder?: boolean;
 }
 
 // noinspection CssUnknownProperty

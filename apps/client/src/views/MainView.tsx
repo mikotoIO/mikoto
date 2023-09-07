@@ -87,12 +87,21 @@ const LeftBar = styled(Flex)`
   }
 `;
 
+const SurfaceGroupContainer = styled.div`
+  display: flex;
+  height: 100%;
+  flex: 1;
+  & > div:not(:first-child) {
+    border-left: 1px solid var(--N700);
+  }
+`;
+
 const SurfaceGroup = observer(
   ({ surfaceNode }: { surfaceNode: SurfaceNode }) => {
     if ('children' in surfaceNode) {
       const [head, ...tails] = surfaceNode.children;
       return (
-        <>
+        <SurfaceGroupContainer>
           <SurfaceGroup surfaceNode={head} />
           {tails.map((child, idx) => (
             // eslint-disable-next-line react/no-array-index-key
@@ -100,7 +109,7 @@ const SurfaceGroup = observer(
               <SurfaceGroup surfaceNode={child} />
             </Resizable>
           ))}
-        </>
+        </SurfaceGroupContainer>
       );
     }
     return (

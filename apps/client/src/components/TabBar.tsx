@@ -10,6 +10,7 @@ import { Helmet } from 'react-helmet';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
+import { useMikoto } from '../hooks';
 import { workspaceState } from '../store';
 import {
   SurfaceLeaf,
@@ -21,6 +22,8 @@ import {
   tabNameFamily,
 } from '../store/surface';
 import { ContextMenu, useContextMenu } from './ContextMenu';
+import { channelToTab } from './Explorer';
+import { NodeObject } from './ExplorerNext';
 import { getTabIcon, IconBox } from './atoms/IconBox';
 
 const StyledCloseButton = styled(Flex)<{ active?: boolean }>`
@@ -247,13 +250,19 @@ export const TabBarButton = styled.button`
 
 export const TabbedView = observer(
   ({ children, tabs, surfaceNode }: TabbedViewProps) => {
+    const mikoto = useMikoto();
     const reorderFn = useReorderable(surfaceNode);
     const setWorkspace = useSetRecoilState(workspaceState);
 
-    const [, drop] = useDrop<TabDnd>({
-      accept: 'TAB',
+    const [, drop] = useDrop<TabDnd | NodeObject>({
+      accept: ['TAB', 'CHANNEL'],
       drop(item) {
-        reorderFn(item.dragIndex, -1, item.surfaceLeaf);
+        if ('tab' in item) {
+          reorderFn(item.dragIndex, -1, item.surfaceLeaf);
+        } else {
+          surfaceNode.tabs.push(channelToTab(mikoto.channels.get(item.id)!));
+          surfaceNode.index = surfaceNode.tabs.length - 1;
+        }
       },
     });
 

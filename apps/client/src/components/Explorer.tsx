@@ -33,7 +33,7 @@ const StyledTree = styled.div`
   height: 100%;
 `;
 
-function channelToTab(channel: Channel): Tabable {
+export function channelToTab(channel: Channel): Tabable {
   switch (channel.type) {
     case 'TEXT':
       return {

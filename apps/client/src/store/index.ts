@@ -1,6 +1,6 @@
 import { Space } from 'mikotojs';
-import React, { createContext } from 'react';
-import { atom, atomFamily, useRecoilState, useSetRecoilState } from 'recoil';
+import React from 'react';
+import { atom, useSetRecoilState } from 'recoil';
 import { recoilPersist } from 'recoil-persist';
 
 import { modalState } from '../components/ContextMenu';

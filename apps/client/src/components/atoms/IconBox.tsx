@@ -27,19 +27,6 @@ interface TabIconProps {
   icon?: IconDefinition;
 }
 
-export function getTabIcon(tab: Tabable): IconDefinition {
-  switch (tab.kind) {
-    case 'textChannel':
-      return faHashtag;
-    case 'voiceChannel':
-      return faHeadphones;
-    case 'spaceSettings':
-      return faCog;
-    default:
-      return faQuestion;
-  }
-}
-
 export function IconBox({ size, icon }: TabIconProps) {
   return (
     <StyledIcon size={size}>

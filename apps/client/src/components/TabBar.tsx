@@ -1,5 +1,9 @@
-import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { faX, faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
+import {
+  faX,
+  faBarsStaggered,
+  faQuestion,
+  IconDefinition,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Flex, Grid } from '@mikoto-io/lucid';
 import { action, runInAction } from 'mobx';
@@ -24,7 +28,7 @@ import {
 import { ContextMenu, useContextMenu } from './ContextMenu';
 import { channelToTab } from './Explorer';
 import { NodeObject } from './ExplorerNext';
-import { getTabIcon, IconBox } from './atoms/IconBox';
+import { IconBox } from './atoms/IconBox';
 
 const StyledCloseButton = styled(Flex)<{ active?: boolean }>`
   margin-left: 4px;
@@ -94,7 +98,7 @@ function useReorderable(destinationSurface: SurfaceLeaf) {
 
 interface TabNameProps {
   name: string;
-  icon?: IconProp;
+  icon?: IconDefinition;
 }
 
 // TODO: The fuck was I on when I wrote this code?
@@ -106,6 +110,7 @@ export function TabName({ name, icon }: TabNameProps) {
       setTabName({
         ...tabName,
         name,
+        icon,
       });
     }
   }, [name]);
@@ -181,7 +186,7 @@ function Tab({ tab, index, surfaceNode }: TabProps) {
       })}
       onAuxClick={() => {}}
     >
-      <IconBox size={20} icon={getTabIcon(tab)} />
+      <IconBox size={20} icon={tabName.icon ?? faQuestion} />
       <div>{tabName.name}</div>
       <StyledCloseButton
         center

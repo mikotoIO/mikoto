@@ -7655,6 +7655,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tiptap/extension-task-item@npm:^2.1.8":
+  version: 2.1.8
+  resolution: "@tiptap/extension-task-item@npm:2.1.8"
+  peerDependencies:
+    "@tiptap/core": ^2.0.0
+    "@tiptap/pm": ^2.0.0
+  checksum: 4ea61887427adf5163dfc783c3a2fcce2f67c90bddabe807d981f9127f40770f79f0eb0adf9fa9f70062150de6db2142a36071c78ccba3025e23b49fd9c5e292
+  languageName: node
+  linkType: hard
+
+"@tiptap/extension-task-list@npm:^2.1.8":
+  version: 2.1.8
+  resolution: "@tiptap/extension-task-list@npm:2.1.8"
+  peerDependencies:
+    "@tiptap/core": ^2.0.0
+  checksum: c3e044715b0e9da6fb2340c4185bdf58e0b015afbec78914e0e34d714fc94a7f630ad7181717415fdcf269cfb3a5b16ecd707658a593028f6103b05643c5cb18
+  languageName: node
+  linkType: hard
+
 "@tiptap/extension-text@npm:^2.1.7":
   version: 2.1.7
   resolution: "@tiptap/extension-text@npm:2.1.7"
@@ -12117,6 +12136,8 @@ __metadata:
     "@tiptap/extension-collaboration": ^2.1.8
     "@tiptap/extension-image": ^2.1.7
     "@tiptap/extension-link": ^2.1.7
+    "@tiptap/extension-task-item": ^2.1.8
+    "@tiptap/extension-task-list": ^2.1.8
     "@tiptap/pm": ^2.1.7
     "@tiptap/react": ^2.1.7
     "@tiptap/starter-kit": ^2.1.7

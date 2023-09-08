@@ -1,3 +1,4 @@
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { action, autorun, makeAutoObservable, runInAction } from 'mobx';
 import { createContext } from 'react';
 import { atomFamily } from 'recoil';
@@ -54,7 +55,12 @@ export class SurfaceStore {
 
 export const surfaceStore = new SurfaceStore();
 
-export const tabNameFamily = atomFamily({
+interface TabName {
+  name: string;
+  icon?: IconDefinition;
+}
+
+export const tabNameFamily = atomFamily<TabName, string>({
   key: 'tabName',
   default: {
     name: '',

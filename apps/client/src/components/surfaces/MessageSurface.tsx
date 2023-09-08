@@ -1,3 +1,4 @@
+import { faHashtag } from '@fortawesome/free-solid-svg-icons';
 import { throttle } from 'lodash';
 import {
   Channel,
@@ -200,7 +201,7 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
 
   return (
     <ViewContainer key={channel.id}>
-      <TabName name={channel.name} />
+      <TabName name={channel.name} icon={faHashtag} />
       <MessagingContainerInner>
         <OtherInner>
           {msgs === null ? (

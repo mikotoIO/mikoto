@@ -1,5 +1,6 @@
 import {
   faBold,
+  faFileLines,
   faItalic,
   faStrikethrough,
 } from '@fortawesome/free-solid-svg-icons';
@@ -7,6 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Heading } from '@mikoto-io/lucid';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
+import TaskItem from '@tiptap/extension-task-item';
+import TaskList from '@tiptap/extension-task-list';
 import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { ClientChannel } from 'mikotojs';
@@ -28,6 +31,25 @@ const EditorContentWrapper = styled.div`
   img {
     max-width: 400px;
     max-height: 400px;
+  }
+
+  ul[data-type='taskList'] {
+    li {
+      list-style: none;
+    }
+    input {
+      margin-right: 16px;
+      width: 16px;
+      height: 16px;
+    }
+    div,
+    p {
+      display: inline-block;
+    }
+    p {
+      margin: 8px 0;
+    }
+    padding-left: 0;
   }
 `;
 
@@ -59,7 +81,7 @@ function DocumentEditor({ channel, content }: DocumentEditorProps) {
   const mikoto = useMikoto();
 
   const editor = useEditor({
-    extensions: [StarterKit as any, Link, Image],
+    extensions: [StarterKit as any, Link, Image, TaskList, TaskItem],
     onUpdate() {
       setChanged(true);
     },
@@ -126,7 +148,7 @@ export function DocumentSurface({ channelId }: { channelId: string }) {
 
   return (
     <ViewContainer padded scroll>
-      <TabName name={channel.name} />
+      <TabName name={channel.name} icon={faFileLines} />
       <Heading>{channel.name}</Heading>
       <EditorContentWrapper>
         {content !== null && (

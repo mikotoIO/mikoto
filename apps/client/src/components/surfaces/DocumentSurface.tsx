@@ -1,7 +1,13 @@
+import {
+  faBold,
+  faItalic,
+  faStrikethrough,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Heading } from '@mikoto-io/lucid';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { ClientChannel } from 'mikotojs';
 import { useEffect, useState } from 'react';
@@ -30,6 +36,24 @@ interface DocumentEditorProps {
   content: string;
 }
 
+const BubbleMenuContainer = styled.div`
+  background-color: var(--N1100);
+  border: 1px solid var(--N600);
+  padding: 4px;
+  border-radius: 4px;
+
+  button {
+    background: none;
+    border: none;
+    color: var(--N400);
+    font-size: 16px;
+
+    &:hover {
+      color: var(--N0);
+    }
+  }
+`;
+
 function DocumentEditor({ channel, content }: DocumentEditorProps) {
   const [changed, setChanged] = useState(false);
   const mikoto = useMikoto();
@@ -52,7 +76,41 @@ function DocumentEditor({ channel, content }: DocumentEditorProps) {
     }
   }, 5000);
 
-  return <EditorContent editor={editor} />;
+  return (
+    <>
+      {editor && (
+        <BubbleMenu editor={editor} tippyOptions={{ duration: 100 }}>
+          <BubbleMenuContainer>
+            <button
+              type="button"
+              onClick={() => {
+                editor.chain().focus().toggleMark('bold').run();
+              }}
+            >
+              <FontAwesomeIcon icon={faBold} />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                editor.chain().focus().toggleMark('italic').run();
+              }}
+            >
+              <FontAwesomeIcon icon={faItalic} />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                editor.chain().focus().toggleMark('strike').run();
+              }}
+            >
+              <FontAwesomeIcon icon={faStrikethrough} />
+            </button>
+          </BubbleMenuContainer>
+        </BubbleMenu>
+      )}
+      <EditorContent editor={editor} />
+    </>
+  );
 }
 
 export function DocumentSurface({ channelId }: { channelId: string }) {

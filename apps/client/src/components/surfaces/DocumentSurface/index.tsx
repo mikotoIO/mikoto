@@ -11,12 +11,12 @@ import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
+import YouTube from '@tiptap/extension-youtube';
 import {
   useEditor,
   EditorContent,
   BubbleMenu,
   Editor,
-  Extension,
   Extensions,
 } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -28,7 +28,6 @@ import { useInterval, useMikoto } from '../../../hooks';
 import { TabName } from '../../TabBar';
 import { ViewContainer } from '../../ViewContainer';
 import { SlashCommand } from './SlashCommand';
-import { Shortcuts } from './shortcuts';
 
 const EditorContentWrapper = styled.div`
   .tiptap {
@@ -48,9 +47,10 @@ const EditorContentWrapper = styled.div`
       list-style: none;
     }
     input {
-      margin-right: 16px;
+      margin-right: 8px;
       width: 16px;
       height: 16px;
+      accent-color: var(--B700);
     }
     div,
     p {
@@ -138,6 +138,7 @@ const extensions = [
     placeholder: () => "press '/' for commands",
     includeChildren: true,
   }),
+  YouTube,
 ] satisfies Extensions;
 
 function DocumentEditor({ channel, content }: DocumentEditorProps) {

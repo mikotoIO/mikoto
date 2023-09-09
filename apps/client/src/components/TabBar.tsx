@@ -58,8 +58,6 @@ const StyledTab = styled.div<{ active?: boolean }>`
   &:hover {
     background-color: var(--N700);
   }
-
-  border-right: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
 interface TabProps {

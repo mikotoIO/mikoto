@@ -7637,6 +7637,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tiptap/extension-placeholder@npm:^2.1.8":
+  version: 2.1.8
+  resolution: "@tiptap/extension-placeholder@npm:2.1.8"
+  peerDependencies:
+    "@tiptap/core": ^2.0.0
+    "@tiptap/pm": ^2.0.0
+  checksum: 22b88f6fbc14d92d271a05ac52f1c129d739529841f0deceb9b02ca0ef0faa0fa1cb134d4460c06ab2a1d882164882a601efc91e1e7f90eb649119f0450e6658
+  languageName: node
+  linkType: hard
+
 "@tiptap/extension-strike@npm:^2.1.7":
   version: 2.1.7
   resolution: "@tiptap/extension-strike@npm:2.1.7"
@@ -7784,6 +7794,16 @@ __metadata:
     "@tiptap/extension-strike": ^2.1.7
     "@tiptap/extension-text": ^2.1.7
   checksum: f89fd425c128131d77750f4414bcf33a9c3ee0c0e58a8c149bbbde68bb0fcba8fe5215978d9e38e131c668ea11a4f03be139c6e981e763227a99906405ec9696
+  languageName: node
+  linkType: hard
+
+"@tiptap/suggestion@npm:^2.1.8":
+  version: 2.1.8
+  resolution: "@tiptap/suggestion@npm:2.1.8"
+  peerDependencies:
+    "@tiptap/core": ^2.0.0
+    "@tiptap/pm": ^2.0.0
+  checksum: 58d8c39879456965aa995ed483aff0690def6359a2f7f1dc08b4a7e0ca1b06712309075668a034de9517be8018cc632bf0d42c9f079f88c756a0e5382cd08dfa
   languageName: node
   linkType: hard
 
@@ -12136,11 +12156,13 @@ __metadata:
     "@tiptap/extension-collaboration": ^2.1.8
     "@tiptap/extension-image": ^2.1.7
     "@tiptap/extension-link": ^2.1.7
+    "@tiptap/extension-placeholder": ^2.1.8
     "@tiptap/extension-task-item": ^2.1.8
     "@tiptap/extension-task-list": ^2.1.8
     "@tiptap/pm": ^2.1.7
     "@tiptap/react": ^2.1.7
     "@tiptap/starter-kit": ^2.1.7
+    "@tiptap/suggestion": ^2.1.8
     "@types/draft-js": ^0.11.9
     "@types/events": ^3.0.0
     "@types/jest": ^27.4.1
@@ -12228,6 +12250,7 @@ __metadata:
     source-map-explorer: ^2.5.2
     styled-components: ^6.0.5
     stylis: ^4.3.0
+    tippy.js: ^6.3.7
     ts-jest: ^29.0.5
     typed-emitter: ^2.1.0
     typescript: ^4.7.4

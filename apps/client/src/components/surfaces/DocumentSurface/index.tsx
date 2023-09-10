@@ -11,7 +11,14 @@ import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
-import { useEditor, EditorContent, BubbleMenu, Editor } from '@tiptap/react';
+import YouTube from '@tiptap/extension-youtube';
+import {
+  useEditor,
+  EditorContent,
+  BubbleMenu,
+  Editor,
+  Extensions,
+} from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { ClientChannel } from 'mikotojs';
 import { useEffect, useState } from 'react';
@@ -40,9 +47,10 @@ const EditorContentWrapper = styled.div`
       list-style: none;
     }
     input {
-      margin-right: 16px;
+      margin-right: 8px;
       width: 16px;
       height: 16px;
+      accent-color: var(--B700);
     }
     div,
     p {
@@ -119,36 +127,43 @@ function NoteBubbleMenu({ editor }: { editor: Editor }) {
   );
 }
 
+const extensions = [
+  StarterKit as any,
+  Link,
+  Image,
+  TaskList,
+  TaskItem,
+  SlashCommand,
+  Placeholder.configure({
+    placeholder: () => "press '/' for commands",
+    includeChildren: true,
+  }),
+  YouTube,
+] satisfies Extensions;
+
 function DocumentEditor({ channel, content }: DocumentEditorProps) {
   const [changed, setChanged] = useState(false);
   const mikoto = useMikoto();
 
   const editor = useEditor({
-    extensions: [
-      StarterKit as any,
-      Link,
-      Image,
-      TaskList,
-      TaskItem,
-      SlashCommand,
-      Placeholder.configure({
-        placeholder: () => "press '/' for commands",
-        includeChildren: true,
-      }),
-    ],
+    extensions,
     onUpdate() {
       setChanged(true);
     },
     content: JSON.parse(content),
   });
 
+  const save = (edt: Editor) => {
+    const contentString = JSON.stringify(edt.getJSON());
+    mikoto.client.documents
+      .update(channel.id, contentString)
+      .then(() => setChanged(false))
+      .catch(() => setChanged(true));
+  };
+
   useInterval(() => {
     if (editor && changed) {
-      const contentString = JSON.stringify(editor.getJSON());
-      mikoto.client.documents
-        .update(channel.id, contentString)
-        .then(() => setChanged(false))
-        .catch(() => setChanged(true));
+      save(editor);
     }
   }, 5000);
 

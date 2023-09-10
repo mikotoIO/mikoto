@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "mikoto-py"
+version = "0.0.1"
+description = "The Python framework for interacting with Mikoto"
+authors = ["TheCactusBlue <cactus@mikoto.io>"]
+license = "MIT"
+readme = "README.md"
+packages = [{ include = "mikoto" }]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pydantic = "^2.3.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]

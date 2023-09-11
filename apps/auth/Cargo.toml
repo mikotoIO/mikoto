@@ -1,0 +1,16 @@
+[package]
+name = "auth"
+default-run = "auth"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bcrypt = "0.15.0"
+rocket = { version = "0.5.0-rc.1", features = ["json"] }
+serde = "1.0.188"
+tokio = "1.32.0"
+
+# Database
+prisma-client-rust = { git = "https://github.com/Brendonovich/prisma-client-rust", tag = "0.6.9" }

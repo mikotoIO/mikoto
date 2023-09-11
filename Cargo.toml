@@ -1,5 +1,3 @@
 [workspace]
-
-members = [
-    "services/kazari",
-]
+resolver = "2"
+members = ["apps/auth", "tools/prisma-cli"]

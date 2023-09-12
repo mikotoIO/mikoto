@@ -1,0 +1,34 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "cargo prisma"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  name          String?
+  EmailPassword EmailPassword?
+  Session       Session[]
+}
+
+model EmailPassword {
+  id       String @id @default(uuid())
+  user     User?  @relation(fields: [id], references: [id])
+  email    String @unique
+  password String // hashed, not plaintext
+}
+
+model Session {
+  token     String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+
+  @@index([userId])
+}

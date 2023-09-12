@@ -95,7 +95,7 @@ const ChannelTypeButton = styled.button<{ active?: boolean }>`
 const channelTypes = [
   { id: 'TEXT', name: 'Text', icon: faHashtag },
   { id: 'VOICE', name: 'Voice', icon: faMicrophone },
-  { id: 'DOCUMENT', name: 'Docs', icon: faFileAlt },
+  { id: 'DOCUMENT', name: 'Note', icon: faFileAlt },
 ];
 
 function CreateChannelModal({ channel }: { channel?: Channel }) {

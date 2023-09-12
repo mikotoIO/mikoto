@@ -1,3 +1,4 @@
+import { faMicrophone } from '@fortawesome/free-solid-svg-icons';
 import { LiveKitRoom } from '@livekit/react-components';
 import '@livekit/react-components/dist/index.css';
 import { VoiceToken } from 'mikotojs';
@@ -20,7 +21,7 @@ export function VoiceView({ channelId }: { channelId: string }) {
 
   return (
     <ViewContainer>
-      <TabName name={`Voice: ${channel.name}`} />
+      <TabName name={`Voice: ${channel.name}`} icon={faMicrophone} />
       {voiceConfig && (
         <LiveKitRoom
           url={voiceConfig.url}

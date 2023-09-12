@@ -2,6 +2,11 @@ use serde::{Deserialize, Serialize};
 
 use rocket::serde::json::Json;
 
+use crate::{
+    context::Ctx,
+    prisma::{email_password, user},
+};
+
 #[derive(Serialize)]
 pub struct AppInfo {
     name: String,
@@ -23,7 +28,16 @@ pub struct LoginRequest {
 }
 
 #[post("/login", format = "json", data = "<data>")]
-pub fn login(data: Json<LoginRequest>) {
-    if (data.email == "thecactusblue@gmail.com") {}
-    
+pub async fn login(ctx: &Ctx, data: Json<LoginRequest>) {
+    let data = ctx
+        .prisma
+        .email_password()
+        .find_unique(email_password::email::equals(data.email.clone()))
+        .with(email_password::user::fetch())
+        .exec()
+        .await
+        .unwrap()
+        .unwrap();
+
+    let u = user::include!({ email_password });
 }

@@ -64,9 +64,17 @@ function Overview({ space }: { space: Space }) {
           onChange={(x) => setSpaceName(x.target.value)}
         />
         <Buttons>
-          <Button variant="primary">Update</Button>
           <Button
-            role="button"
+            variant="primary"
+            type="button"
+            onClick={() => {
+              // TODO: Implement Space Update
+            }}
+          >
+            Update
+          </Button>
+          <Button
+            type="button"
             onClick={(e) => {
               setModal({
                 elem: <AddBotModal />,

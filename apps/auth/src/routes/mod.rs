@@ -16,7 +16,7 @@ pub struct AppInfo {
 #[get("/")]
 pub fn index() -> Json<AppInfo> {
     Json(AppInfo {
-        name: "mAuth".to_string(),
+        name: "authstar".to_string(),
         version: "0.0.0".to_string(),
     })
 }

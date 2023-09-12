@@ -166,6 +166,7 @@ export const MessageItem = observer(
             Edit Message
           </ContextMenu.Link>
         )}
+        <ContextMenu.Link>Pin Message</ContextMenu.Link>
         <ContextMenu.Link
           onClick={async () => {
             await mikoto.client.messages.delete(message.channelId, message.id);

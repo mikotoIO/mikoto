@@ -1,4 +1,7 @@
-import { faUserGroup } from '@fortawesome/free-solid-svg-icons';
+import {
+  faEarthAmericas,
+  faUserGroup,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Heading } from '@mikoto-io/lucid';
 import styled from 'styled-components';
@@ -26,8 +29,12 @@ export function FriendSidebar() {
   return (
     <Box p={8}>
       <StyledButtonBase>
-        <FontAwesomeIcon icon={faUserGroup} />
+        <FontAwesomeIcon icon={faUserGroup} fixedWidth />
         <span>Friends</span>
+      </StyledButtonBase>
+      <StyledButtonBase>
+        <FontAwesomeIcon icon={faEarthAmericas} fixedWidth />
+        <span>Discover</span>
       </StyledButtonBase>
       <Heading fs={14} p={{ left: 8 }} txt="N300">
         Direct Messaging

@@ -228,6 +228,9 @@ const emojiSizing = css<{ emojiSize: string }>`
 `;
 
 const MarkdownWrapper = styled.div<{ emojiSize: string }>`
+  gap: 8px;
+  display: flex;
+  flex-direction: column;
   ${emojiSizing}
 `;
 

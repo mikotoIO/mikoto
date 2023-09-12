@@ -19,6 +19,7 @@ import { FriendSidebar } from '../components/sidebars/FriendSidebar';
 import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
 import { AccountSettingsSurface } from '../components/surfaces/AccountSettingsSurface';
 import { ChannelSettingsSurface } from '../components/surfaces/ChannelSettingsSurface';
+import { DiscoverySurface } from '../components/surfaces/DiscoverySurface';
 import { DocumentSurface } from '../components/surfaces/DocumentSurface';
 import { MessageView } from '../components/surfaces/MessageSurface';
 import { SpaceSettingsView } from '../components/surfaces/SpaceSettingsSurface';
@@ -64,6 +65,8 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
       return <AccountSettingsSurface />;
     case 'channelSettings':
       return <ChannelSettingsSurface channelId={tab.channelId} />;
+    case 'discovery':
+      return <DiscoverySurface />;
     case 'palette':
       return <DesignStory />;
     case 'welcome':

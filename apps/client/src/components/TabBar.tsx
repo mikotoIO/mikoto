@@ -99,7 +99,7 @@ interface TabNameProps {
   icon?: IconDefinition;
 }
 
-// TODO: The fuck was I on when I wrote this code?
+// TODO: This is still bugged. Cause unknown. Please fix.
 export function TabName({ name, icon }: TabNameProps) {
   const tabInfo = useContext(TabContext);
   const [tabName, setTabName] = useRecoilState(tabNameFamily(tabInfo.key));

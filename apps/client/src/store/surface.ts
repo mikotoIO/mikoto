@@ -7,9 +7,12 @@ type TabBaseType =
   | { kind: 'textChannel'; channelId: string }
   | { kind: 'voiceChannel'; channelId: string }
   | { kind: 'documentChannel'; channelId: string }
+  | { kind: 'applicationChannel'; channelId: string }
   | { kind: 'spaceSettings'; spaceId: string }
   | { kind: 'channelSettings'; channelId: string }
   | { kind: 'accountSettings' }
+  | { kind: 'friends' }
+  | { kind: 'discovery' }
   | { kind: 'palette' }
   | { kind: 'welcome' }
   | { kind: 'unknown' };

@@ -12,7 +12,7 @@ import React, { useContext, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Helmet } from 'react-helmet';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { useMikoto } from '../hooks';
 import { workspaceState } from '../store';
@@ -47,9 +47,10 @@ const StyledCloseButton = styled(Flex)<{ active?: boolean }>`
 const StyledTab = styled.div<{ active?: boolean }>`
   user-select: none;
   cursor: pointer;
-  height: 100%;
   padding: 0 8px 0 20px;
   display: flex;
+  flex-shrink: 0;
+  border-bottom: 2px solid ${(p) => (p.active ? 'var(--B700)' : 'transparent')};
   align-items: center;
   justify-content: center;
 
@@ -99,7 +100,7 @@ interface TabNameProps {
   icon?: IconDefinition;
 }
 
-// TODO: The fuck was I on when I wrote this code?
+// TODO: This is still bugged. Cause unknown. Please fix.
 export function TabName({ name, icon }: TabNameProps) {
   const tabInfo = useContext(TabContext);
   const [tabName, setTabName] = useRecoilState(tabNameFamily(tabInfo.key));
@@ -251,6 +252,15 @@ export const TabBarButton = styled.button`
   }
 `;
 
+const TabsFlex = styled(Flex)`
+  overflow-x: scroll;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+`;
+
 export const TabbedView = observer(
   ({ children, tabs, surfaceNode }: TabbedViewProps) => {
     const mikoto = useMikoto();
@@ -277,7 +287,7 @@ export const TabbedView = observer(
         style={{ flex: 1 }}
       >
         <Helmet titleTemplate="Mikoto | %s" defaultTitle="Mikoto" />
-        <Flex h={40} fs={14}>
+        <TabsFlex h={40} fs={14}>
           {tabs.map((tab, index) => (
             <Tab
               tab={tab}
@@ -297,7 +307,7 @@ export const TabbedView = observer(
           >
             <FontAwesomeIcon icon={faBarsStaggered} />
           </TabBarButton>
-        </Flex>
+        </TabsFlex>
         {tabs.length ? children : <WelcomeToMikoto />}
       </Grid>
     );

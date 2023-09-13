@@ -176,11 +176,19 @@ function TreebarContextMenu({ space }: { space: ClientSpace }) {
 
 const TreeHead = styled.div`
   padding: 4px 16px;
-  background-color: var(--N1000);
+  background-color: var(--N900);
 
   h1 {
+    padding-top: 8px;
     font-size: 16px;
   }
+`;
+
+const TreeBanner = styled.div`
+  background: url(images/discovery-banner.jpg) no-repeat center center;
+  background-size: cover;
+  height: 100px;
+  text-shadow: 0px 0px 4px rgba(0, 0, 0, 1);
 `;
 
 function getIconFromChannelType(type: Channel['type']) {
@@ -380,6 +388,7 @@ export const Explorer = observer(({ space }: { space: ClientSpace }) => {
       <TreeHead>
         <h1>{space.name}</h1>
       </TreeHead>
+      {/* <TreeBanner /> */}
       <ExplorerNext nodes={channelTree.descendant!} />
     </StyledTree>
   );

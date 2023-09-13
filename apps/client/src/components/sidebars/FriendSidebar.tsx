@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Heading } from '@mikoto-io/lucid';
 import styled from 'styled-components';
 
+import { useTabkit } from '../../store/surface';
 import { Avatar } from '../atoms/Avatar';
 
 const StyledButtonBase = styled.div`
@@ -26,13 +27,24 @@ const StyledButtonBase = styled.div`
 `;
 
 export function FriendSidebar() {
+  const tabkit = useTabkit();
   return (
     <Box p={8}>
       <StyledButtonBase>
         <FontAwesomeIcon icon={faUserGroup} fixedWidth />
         <span>Friends</span>
       </StyledButtonBase>
-      <StyledButtonBase>
+      <StyledButtonBase
+        onClick={() => {
+          tabkit.openTab(
+            {
+              kind: 'discovery',
+              key: 'discovery',
+            },
+            false,
+          );
+        }}
+      >
         <FontAwesomeIcon icon={faEarthAmericas} fixedWidth />
         <span>Discover</span>
       </StyledButtonBase>

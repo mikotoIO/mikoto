@@ -1,12 +1,38 @@
 import { faMicrophone } from '@fortawesome/free-solid-svg-icons';
-import { LiveKitRoom } from '@livekit/react-components';
-import '@livekit/react-components/dist/index.css';
+import {
+  GridLayout,
+  LiveKitRoom,
+  VideoConference,
+  ParticipantTile,
+  useTracks,
+  TrackContext,
+} from '@livekit/components-react';
+import '@livekit/components-styles';
+import { Track } from 'livekit-client';
 import { VoiceToken } from 'mikotojs';
 import { useEffect, useState } from 'react';
 
 import { useMikoto } from '../../hooks';
 import { TabName } from '../TabBar';
 import { ViewContainer } from '../ViewContainer';
+
+function Stage() {
+  const cameraTracks = useTracks([
+    { source: Track.Source.Camera, withPlaceholder: true },
+  ]);
+  const screenShareTrack = useTracks([Track.Source.ScreenShare])[0];
+
+  return (
+    <>
+      {screenShareTrack && <ParticipantTile {...screenShareTrack} />}
+      <GridLayout tracks={cameraTracks} style={{ width: '500px' }}>
+        <TrackContext.Consumer>
+          {(track) => <ParticipantTile {...track} style={{ width: '500px' }} />}
+        </TrackContext.Consumer>
+      </GridLayout>
+    </>
+  );
+}
 
 export function VoiceView({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
@@ -20,16 +46,21 @@ export function VoiceView({ channelId }: { channelId: string }) {
   }, []);
 
   return (
-    <ViewContainer>
+    <ViewContainer data-lk-theme="default">
       <TabName name={`Voice: ${channel.name}`} icon={faMicrophone} />
       {voiceConfig && (
         <LiveKitRoom
-          url={voiceConfig.url}
+          serverUrl={voiceConfig.url}
           token={voiceConfig.token}
-          onConnected={async (room) => {
-            await room.localParticipant.setMicrophoneEnabled(true);
+          audio
+          video
+          onConnected={() => {
+            console.log('connecting');
+            // await room.localParticipant.setMicrophoneEnabled(true);
           }}
-        />
+        >
+          <VideoConference />
+        </LiveKitRoom>
       )}
     </ViewContainer>
   );

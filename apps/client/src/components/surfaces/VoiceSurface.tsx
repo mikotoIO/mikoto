@@ -6,33 +6,48 @@ import {
   ParticipantTile,
   useTracks,
   TrackContext,
+  ControlBar,
+  RoomAudioRenderer,
+  useCreateLayoutContext,
+  LayoutContextProvider,
 } from '@livekit/components-react';
 import '@livekit/components-styles';
-import { Track } from 'livekit-client';
+import { RoomEvent, Track } from 'livekit-client';
 import { VoiceToken } from 'mikotojs';
 import { useEffect, useState } from 'react';
+import styled from 'styled-components';
 
 import { useMikoto } from '../../hooks';
 import { TabName } from '../TabBar';
 import { ViewContainer } from '../ViewContainer';
 
 function Stage() {
-  const cameraTracks = useTracks([
-    { source: Track.Source.Camera, withPlaceholder: true },
-  ]);
-  const screenShareTrack = useTracks([Track.Source.ScreenShare])[0];
+  const tracks = useTracks(
+    [
+      { source: Track.Source.Camera, withPlaceholder: true },
+      { source: Track.Source.ScreenShare, withPlaceholder: false },
+    ],
+    { updateOnlyOn: [RoomEvent.ActiveSpeakersChanged], onlySubscribed: false },
+  );
 
   return (
-    <>
-      {screenShareTrack && <ParticipantTile {...screenShareTrack} />}
-      <GridLayout tracks={cameraTracks} style={{ width: '500px' }}>
-        <TrackContext.Consumer>
-          {(track) => <ParticipantTile {...track} style={{ width: '500px' }} />}
-        </TrackContext.Consumer>
-      </GridLayout>
-    </>
+    <GridLayout tracks={tracks}>
+      <ParticipantTile />
+    </GridLayout>
   );
 }
+
+const VoiceViewWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .lk-grid-layout {
+    flex: 1;
+    height: 100px;
+    flex-basis: 0;
+  }
+`;
 
 export function VoiceView({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
@@ -53,13 +68,13 @@ export function VoiceView({ channelId }: { channelId: string }) {
           serverUrl={voiceConfig.url}
           token={voiceConfig.token}
           audio
-          video
-          onConnected={() => {
-            console.log('connecting');
-            // await room.localParticipant.setMicrophoneEnabled(true);
-          }}
         >
-          <VideoConference />
+          <VoiceViewWrapper>
+            <Stage />
+            <ControlBar variation="minimal" />
+          </VoiceViewWrapper>
+          <RoomAudioRenderer />
+          {/* <VideoConference /> */}
         </LiveKitRoom>
       )}
     </ViewContainer>

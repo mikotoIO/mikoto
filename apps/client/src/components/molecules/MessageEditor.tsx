@@ -129,19 +129,27 @@ const withFilePaste = (editor: ReactEditor, fileFn: (fs: FileList) => void) => {
 };
 
 const StyledFilePreview = styled.div`
+  padding: 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 120px;
-  height: 120px;
+  width: 160px;
+  height: 140px;
   border-radius: 4px;
   background-color: var(--N900);
+  overflow: hidden;
 
   .preview {
     max-width: 100px;
     max-height: 100px;
     border-radius: 4px;
+  }
+
+  .filename {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--N400);
   }
 `;
 
@@ -161,7 +169,7 @@ function FilePreview({ file, onRemove }: FilePreviewProps) {
           alt={file.name}
         />
       )}
-      <div>{file.name}</div>
+      <div className="filename">{file.name}</div>
     </StyledFilePreview>
   );
 }

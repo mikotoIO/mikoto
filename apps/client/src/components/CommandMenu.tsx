@@ -14,28 +14,31 @@ const CommandInput = styled.input`
   border-radius: 4px;
 `;
 
+function CommandMenu() {
+  return (
+    <Modal
+      noBackdrop
+      style={{
+        backgroundColor: 'var(--N800)',
+        top: '80px',
+      }}
+    >
+      <Box w={600}>
+        <Input placeholder="> Type your command" />
+      </Box>
+    </Modal>
+  );
+}
+
 export function CommandMenuKit() {
   const setModal = useSetRecoilState(modalState);
   useEffect(() => {
     const fn = (ev: KeyboardEvent) => {
-      if (!ev.ctrlKey) return;
-      if (ev.key !== 'p') return;
+      if (!(ev.ctrlKey && ev.key === 'p')) return;
       ev.preventDefault();
 
       setModal({
-        elem: (
-          <Modal
-            noBackdrop
-            style={{
-              backgroundColor: 'var(--N800)',
-              top: '80px',
-            }}
-          >
-            <Box w={600}>
-              <Input />
-            </Box>
-          </Modal>
-        ),
+        elem: <CommandMenu />,
       });
     };
     document.addEventListener('keydown', fn);

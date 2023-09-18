@@ -28,6 +28,7 @@ import {
 import { BaseSettingsSurface } from '../BaseSettingSurface';
 import { BotsSurface } from './bots';
 import { LanguageSurface } from './language';
+import { ThemesSubsurface } from './themes';
 
 const bgUrl = '/images/artworks/1.jpg';
 
@@ -219,6 +220,8 @@ function Switch({ nav }: { nav: string }) {
       return <LanguageSurface />;
     case 'notifications':
       return <NotificationSubsurface />;
+    case 'themes':
+      return <ThemesSubsurface />;
     default:
       return null;
   }
@@ -230,6 +233,7 @@ const ACCOUNT_SETTING_CATEGORIES = [
   { code: 'language', tkey: 'accountSettings.language.title' },
   { code: 'notifications', tkey: 'accountSettings.notifications.title' },
   { code: 'connections', tkey: 'accountSettings.connections.title' },
+  { code: 'themes', tkey: 'accountSettings.themes.title' },
 ];
 
 export function AccountSettingsSurface() {

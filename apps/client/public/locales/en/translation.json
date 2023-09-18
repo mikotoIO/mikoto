@@ -21,6 +21,9 @@
     },
     "connections": {
       "title": "Connections"
+    },
+    "themes": {
+      "title": "Themes"
     }
   },
   "spaceSettings": {

@@ -14,6 +14,7 @@ type TabBaseType =
   | { kind: 'friends' }
   | { kind: 'discovery' }
   | { kind: 'palette' }
+  | { kind: 'friends' }
   | { kind: 'welcome' }
   | { kind: 'unknown' };
 

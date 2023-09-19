@@ -2,14 +2,10 @@ import { faMicrophone } from '@fortawesome/free-solid-svg-icons';
 import {
   GridLayout,
   LiveKitRoom,
-  VideoConference,
   ParticipantTile,
   useTracks,
-  TrackContext,
   ControlBar,
   RoomAudioRenderer,
-  useCreateLayoutContext,
-  LayoutContextProvider,
 } from '@livekit/components-react';
 import '@livekit/components-styles';
 import { RoomEvent, Track } from 'livekit-client';

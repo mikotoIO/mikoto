@@ -21,6 +21,7 @@ import { AccountSettingsSurface } from '../components/surfaces/AccountSettingsSu
 import { ChannelSettingsSurface } from '../components/surfaces/ChannelSettingsSurface';
 import { DiscoverySurface } from '../components/surfaces/DiscoverySurface';
 import { DocumentSurface } from '../components/surfaces/DocumentSurface';
+import { FriendsSurface } from '../components/surfaces/FriendsSurface';
 import { MessageView } from '../components/surfaces/MessageSurface';
 import { SpaceSettingsView } from '../components/surfaces/SpaceSettingsSurface';
 import { VoiceView } from '../components/surfaces/VoiceSurface';
@@ -65,6 +66,8 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
       return <AccountSettingsSurface />;
     case 'channelSettings':
       return <ChannelSettingsSurface channelId={tab.channelId} />;
+    case 'friends':
+      return <FriendsSurface />;
     case 'discovery':
       return <DiscoverySurface />;
     case 'palette':

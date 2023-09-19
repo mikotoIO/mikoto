@@ -1,10 +1,13 @@
 import SimpleMarkdown, { SingleASTNode } from '@khanacademy/simple-markdown';
 import { Anchor } from '@mikoto-io/lucid';
-import React, { useState } from 'react';
 import Highlight from 'react-highlight';
 import styled, { css } from 'styled-components';
 
+import { emojiRule } from './Emoji';
 import { MessageImage } from './Image';
+import { objectRule } from './Object';
+import { spoilerRule } from './Spoiler';
+import { createRule } from './rules';
 
 function isUrl(s: string) {
   let url;
@@ -64,87 +67,6 @@ const Table = styled.table`
     padding: 8px 12px;
   }
 `;
-
-// Emoji Regex
-const EMOJI_REGEX = /^:(\+1|[-\w]+):/;
-const SPOILER_REGEX = /^\|\|([\s\S]+?)\|\|(?!\|)/;
-
-function Emoji({ emoji }: { emoji: string }) {
-  return (
-    // @ts-expect-error 2339
-    <em-emoji
-      id={emoji}
-      className="emoji"
-      set="twitter"
-      size="1.2em"
-      fallback={`:${emoji}:`}
-      style={{ verticalAlign: 'middle' }}
-    />
-  );
-}
-
-interface RuleOption<T> {
-  order: number;
-  match(source: string): RegExpExecArray | null;
-  parse(capture: RegExpExecArray): T;
-  react(node: T, _: any, state: any): JSX.Element;
-}
-
-function createRule<T>(option: RuleOption<T>) {
-  return option;
-}
-
-const emojiRule = createRule({
-  order: SimpleMarkdown.defaultRules.em.order + 1,
-  match(source: string) {
-    return EMOJI_REGEX.exec(source);
-  },
-  parse(capture: string[]) {
-    return {
-      emoji: capture[1],
-    };
-  },
-  react(node, _, state) {
-    return <Emoji emoji={node.emoji} key={state.key} />;
-  },
-});
-
-const StyledSpoiler = styled.span<{ hide: boolean }>`
-  background-color: ${(p) => (p.hide ? 'var(--N1100)' : 'var(--N600)')};
-  color: ${(p) => (p.hide ? 'transparent' : 'var(--N0)')};
-  padding: 0px 4px;
-  border-radius: 4px;
-  cursor: pointer;
-`;
-
-function Spoiler({ children }: { children: React.ReactNode }) {
-  const [hidden, setHidden] = useState(true);
-  return (
-    <StyledSpoiler
-      hide={hidden}
-      onClick={() => {
-        setHidden(!hidden);
-      }}
-    >
-      {children}
-    </StyledSpoiler>
-  );
-}
-
-const spoilerRule = createRule({
-  order: SimpleMarkdown.defaultRules.em.order + 1,
-  match(source: string) {
-    return SPOILER_REGEX.exec(source);
-  },
-  parse(capture: string[]) {
-    return {
-      content: capture[1],
-    };
-  },
-  react(node, _, state) {
-    return <Spoiler key={state.key}>{node.content}</Spoiler>;
-  },
-});
 
 const Mention = styled.span`
   background-color: #7591ff80;
@@ -208,6 +130,7 @@ const rules = {
     },
   },
 
+  object: objectRule,
   emoji: emojiRule,
   spoiler: spoilerRule,
   mention: mentionRule,
@@ -219,6 +142,7 @@ function parse(source: string) {
   return rawBuiltParser(blockSource, { inline: false });
 }
 const reactOutput = SimpleMarkdown.outputFor(rules, 'react');
+console.log(reactOutput);
 
 const emojiSizing = css<{ emojiSize: string }>`
   .emoji-mart-emoji img {

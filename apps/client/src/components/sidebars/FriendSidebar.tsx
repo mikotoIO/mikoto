@@ -30,7 +30,17 @@ export function FriendSidebar() {
   const tabkit = useTabkit();
   return (
     <Box p={8}>
-      <StyledButtonBase>
+      <StyledButtonBase
+        onClick={() => {
+          tabkit.openTab(
+            {
+              kind: 'friends',
+              key: 'friends',
+            },
+            false,
+          );
+        }}
+      >
         <FontAwesomeIcon icon={faUserGroup} fixedWidth />
         <span>Friends</span>
       </StyledButtonBase>

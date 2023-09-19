@@ -19,7 +19,7 @@
 Mikoto is an messaging service designed for building online communities. It uses a thread-based structure for text messaging, voice/video chat, and real-time collaborative wiki editing.
 
 <p align="center">
-  <img src="./screenshots/img1.png" width="600px">
+  <img src="./screenshots/img2.png" width="800px">
 </p>
 
 ## Features

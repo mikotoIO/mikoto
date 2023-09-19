@@ -142,7 +142,6 @@ function parse(source: string) {
   return rawBuiltParser(blockSource, { inline: false });
 }
 const reactOutput = SimpleMarkdown.outputFor(rules, 'react');
-console.log(reactOutput);
 
 const emojiSizing = css<{ emojiSize: string }>`
   .emoji-mart-emoji img {

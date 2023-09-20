@@ -2,6 +2,8 @@
 extern crate rocket;
 
 pub mod context;
+pub mod models;
+#[allow(warnings, unused)]
 pub mod prisma;
 pub mod routes;
 

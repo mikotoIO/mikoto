@@ -49,6 +49,7 @@
     "electron": "^25.3.0",
     "emoji-mart": "^5.5.2",
     "events": "^3.3.0",
+    "fuse.js": "^6.6.2",
     "gemoji": "^8.1.0",
     "i18next": "^23.3.0",
     "i18next-http-backend": "^2.2.1",

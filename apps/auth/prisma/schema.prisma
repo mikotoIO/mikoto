@@ -12,14 +12,25 @@ datasource db {
 
 model User {
   id            String         @id @default(uuid())
-  name          String?
+  name          String
+  category      String?
   EmailPassword EmailPassword?
   Session       Session[]
+  Service       Service[]
+  RefreshToken  RefreshToken[]
+}
+
+model RefreshToken {
+  token     String   @id
+  issuedAt  DateTime @default(now())
+  expiresAt DateTime
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model EmailPassword {
   id       String @id @default(uuid())
-  user     User?  @relation(fields: [id], references: [id])
+  user     User   @relation(fields: [id], references: [id], onDelete: Cascade)
   email    String @unique
   password String // hashed, not plaintext
 }
@@ -31,4 +42,25 @@ model Session {
   expiresAt DateTime
 
   @@index([userId])
+}
+
+model KeyPair {
+  id         String @id @default(uuid())
+  algorithm  String
+  publicKey  String
+  privateKey String
+
+  Service Service[]
+}
+
+model Service {
+  id        String  @id @default(uuid())
+  name      String  @unique
+  domain    String  @unique
+  ownerId   String
+  owner     User?   @relation(fields: [ownerId], references: [id])
+  keyPairId String
+  keyPair   KeyPair @relation(fields: [keyPairId], references: [id])
+
+  @@index([ownerId])
 }

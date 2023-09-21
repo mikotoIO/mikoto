@@ -1,11 +1,11 @@
 from pydantic import BaseModel
 from typing import Optional, Any, List
 import socketio
-import asyncio
 
-class Client(BaseModel):
-    def __init__(self, sio: socketio.AsyncClient):
-        self.sio = sio
+
+class Client:
+    def __init__(self):
+        self.sio = socketio.AsyncClient()
 
     async def call(self, event: str, *args) -> Any:
         res = await self.sio.call(event, args)
@@ -19,12 +19,9 @@ class Client(BaseModel):
     def ready(self):
         return self.sio.on('ready')
         
-    @classmethod
-    async def create(url: str):
-        sio = socketio.AsyncClient()
-        await sio.connect(url)
-        
-        return Client(sio)
+    async def boot(self, url: str):
+        await self.sio.connect(url)
+        await self.sio.wait()
         
     
 

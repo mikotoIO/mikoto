@@ -42,7 +42,7 @@
     "@hocuspocus/cli": "^2.4.0",
     "@mikoto-io/permcheck": "*",
     "@prisma/client": "^4.16.2",
-    "@sophon-js/cli": "^0.0.8",
+    "@sophon-js/cli": "^0.0.9",
     "@sophon-js/server": "^0.0.8",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.2",

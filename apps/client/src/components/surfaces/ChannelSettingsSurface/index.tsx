@@ -1,4 +1,12 @@
-import { Form, Heading, Input, Button, Box, Flex } from '@mikoto-io/lucid';
+import {
+  Form,
+  Heading,
+  Input,
+  Button,
+  Box,
+  Flex,
+  TextArea,
+} from '@mikoto-io/lucid';
 import { ClientChannel } from 'mikotojs';
 import { useForm } from 'react-hook-form';
 
@@ -16,14 +24,26 @@ function General({ channel }: { channel: ClientChannel }) {
   const form = useForm({
     defaultValues: {
       name: channel.name,
+      description: '',
     },
   });
   return (
     <SettingsView>
       <Heading>Overview</Heading>
-      <Form>
+      <Form
+        onSubmit={form.handleSubmit((data) => {
+          console.log(data);
+        })}
+      >
         <Input labelName="Channel Name" {...form.register('name')} />
-        <Button variant="primary">Save</Button>
+        <TextArea
+          labelName="Metadata"
+          h={200}
+          {...form.register('description')}
+        />
+        <Button variant="primary" type="submit">
+          Save
+        </Button>
       </Form>
     </SettingsView>
   );

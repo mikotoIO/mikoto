@@ -10,6 +10,7 @@ packages = [{ include = "mikoto" }]
 [tool.poetry.dependencies]
 python = "^3.8"
 pydantic = "^2.3.0"
+python-socketio = "^5.9.0"
 
 
 [build-system]

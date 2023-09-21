@@ -5969,9 +5969,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sophon-js/cli@npm:^0.0.8":
-  version: 0.0.8
-  resolution: "@sophon-js/cli@npm:0.0.8"
+"@sophon-js/cli@npm:^0.0.9":
+  version: 0.0.9
+  resolution: "@sophon-js/cli@npm:0.0.9"
   dependencies:
     "@oclif/core": ^2
     "@oclif/plugin-help": ^5
@@ -5982,7 +5982,7 @@ __metadata:
     typescript-parsec: ^0.3.2
   bin:
     sophon: bin/run
-  checksum: 864cc5f01e8ebf8c399fa410b66357538f25c04eb821fb5ca82cea5ed6aa326e5d9496c03810db540a0342c8152434d59bb6371bd8c4e5d0ee851e4deafac767
+  checksum: f902fe279c6356c8a4f24110566f4594961f9eae419146b094355935ff500ce6122d4e62367969033169a639850949799d7db63787929f090e566532c8373675
   languageName: node
   linkType: hard
 
@@ -28346,7 +28346,7 @@ __metadata:
     "@hocuspocus/cli": ^2.4.0
     "@mikoto-io/permcheck": "*"
     "@prisma/client": ^4.16.2
-    "@sophon-js/cli": ^0.0.8
+    "@sophon-js/cli": ^0.0.9
     "@sophon-js/server": ^0.0.8
     "@types/bcrypt": ^5.0.0
     "@types/body-parser": ^1.19.2

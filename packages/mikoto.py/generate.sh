@@ -1,1 +1,1 @@
-sophondev generate ../../apps/server/schema.sophon -t python-client -o ./src/schema.py
+sophondev generate ../../apps/server/schema.sophon -t python-client -o ./mikoto/schema.py

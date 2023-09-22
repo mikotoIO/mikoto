@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, TypeAdapter
-from typing import Optional, Any, List, Callable
+from typing import Optional, Any, List, Callable, Coroutine
 import socketio
 
 class Client:
@@ -18,8 +18,8 @@ class Client:
     def on(self, event: str, callback = None):
         return self.sio.on(event, callback)
 
-    def ready(self):
-        return self.sio.on('ready')
+    def ready(self, fn):
+        return self.sio.on('ready', fn)
         
     async def boot(self, url: str):
         await self.sio.connect(url)
@@ -171,40 +171,40 @@ class SpaceService:
     async def delete(self, id: str) -> None:
         return TypeAdapter(None).validate_python(await self.client.call("spaces/delete", id))
 
-    async def getSpaceFromInvite(self, inviteCode: str) -> Space:
-        return TypeAdapter(Space).validate_python(await self.client.call("spaces/getSpaceFromInvite", inviteCode))
+    async def get_space_from_invite(self, invite_code: str) -> Space:
+        return TypeAdapter(Space).validate_python(await self.client.call("spaces/getSpaceFromInvite", invite_code))
 
-    async def join(self, inviteCode: str) -> None:
-        return TypeAdapter(None).validate_python(await self.client.call("spaces/join", inviteCode))
+    async def join(self, invite_code: str) -> None:
+        return TypeAdapter(None).validate_python(await self.client.call("spaces/join", invite_code))
 
     async def leave(self, id: str) -> None:
         return TypeAdapter(None).validate_python(await self.client.call("spaces/leave", id))
 
-    async def createInvite(self, id: str) -> Invite:
+    async def create_invite(self, id: str) -> Invite:
         return TypeAdapter(Invite).validate_python(await self.client.call("spaces/createInvite", id))
 
-    async def deleteInvite(self, code: str) -> None:
+    async def delete_invite(self, code: str) -> None:
         return TypeAdapter(None).validate_python(await self.client.call("spaces/deleteInvite", code))
 
-    async def listInvites(self, id: str) -> List[Invite]:
+    async def list_invites(self, id: str) -> List[Invite]:
         return TypeAdapter(List[Invite]).validate_python(await self.client.call("spaces/listInvites", id))
 
-    async def addBot(self, spaceId: str, userId: str) -> None:
-        return TypeAdapter(None).validate_python(await self.client.call("spaces/addBot", spaceId, userId))
+    async def add_bot(self, space_id: str, user_id: str) -> None:
+        return TypeAdapter(None).validate_python(await self.client.call("spaces/addBot", space_id, user_id))
 
-    def onCreate(self, fn: Callable[[Space], None]):
+    def on_create(self, fn: Callable[[Space], Coroutine[Any, Any, None]]) -> Callable[[Space], Coroutine[Any, Any, None]]:
         @self.client.on("spaces/onCreate")
         async def handler(data):
             await fn(TypeAdapter(Space).validate_python(data))
         return handler
 
-    def onUpdate(self, fn: Callable[[Space], None]):
+    def on_update(self, fn: Callable[[Space], Coroutine[Any, Any, None]]) -> Callable[[Space], Coroutine[Any, Any, None]]:
         @self.client.on("spaces/onUpdate")
         async def handler(data):
             await fn(TypeAdapter(Space).validate_python(data))
         return handler
 
-    def onDelete(self, fn: Callable[[Space], None]):
+    def on_delete(self, fn: Callable[[Space], Coroutine[Any, Any, None]]) -> Callable[[Space], Coroutine[Any, Any, None]]:
         @self.client.on("spaces/onDelete")
         async def handler(data):
             await fn(TypeAdapter(Space).validate_python(data))
@@ -218,31 +218,31 @@ class SpaceService:
 class MemberService:
     client: Client
 
-    async def get(self, spaceId: str, userId: str) -> Member:
-        return TypeAdapter(Member).validate_python(await self.client.call("members/get", spaceId, userId))
+    async def get(self, space_id: str, user_id: str) -> Member:
+        return TypeAdapter(Member).validate_python(await self.client.call("members/get", space_id, user_id))
 
-    async def list(self, spaceId: str) -> List[Member]:
-        return TypeAdapter(List[Member]).validate_python(await self.client.call("members/list", spaceId))
+    async def list(self, space_id: str) -> List[Member]:
+        return TypeAdapter(List[Member]).validate_python(await self.client.call("members/list", space_id))
 
-    async def update(self, spaceId: str, userId: str, roleIds: MemberUpdateOptions) -> Member:
-        return TypeAdapter(Member).validate_python(await self.client.call("members/update", spaceId, userId, roleIds))
+    async def update(self, space_id: str, user_id: str, role_ids: MemberUpdateOptions) -> Member:
+        return TypeAdapter(Member).validate_python(await self.client.call("members/update", space_id, user_id, role_ids))
 
-    async def delete(self, spaceId: str, userId: str) -> None:
-        return TypeAdapter(None).validate_python(await self.client.call("members/delete", spaceId, userId))
+    async def delete(self, space_id: str, user_id: str) -> None:
+        return TypeAdapter(None).validate_python(await self.client.call("members/delete", space_id, user_id))
 
-    def onCreate(self, fn: Callable[[Member], None]):
+    def on_create(self, fn: Callable[[Member], Coroutine[Any, Any, None]]) -> Callable[[Member], Coroutine[Any, Any, None]]:
         @self.client.on("members/onCreate")
         async def handler(data):
             await fn(TypeAdapter(Member).validate_python(data))
         return handler
 
-    def onUpdate(self, fn: Callable[[Member], None]):
+    def on_update(self, fn: Callable[[Member], Coroutine[Any, Any, None]]) -> Callable[[Member], Coroutine[Any, Any, None]]:
         @self.client.on("members/onUpdate")
         async def handler(data):
             await fn(TypeAdapter(Member).validate_python(data))
         return handler
 
-    def onDelete(self, fn: Callable[[Member], None]):
+    def on_delete(self, fn: Callable[[Member], Coroutine[Any, Any, None]]) -> Callable[[Member], Coroutine[Any, Any, None]]:
         @self.client.on("members/onDelete")
         async def handler(data):
             await fn(TypeAdapter(Member).validate_python(data))
@@ -262,19 +262,19 @@ class UserService:
     async def update(self, options: UserUpdateOptions) -> User:
         return TypeAdapter(User).validate_python(await self.client.call("users/update", options))
 
-    def onCreate(self, fn: Callable[[User], None]):
+    def on_create(self, fn: Callable[[User], Coroutine[Any, Any, None]]) -> Callable[[User], Coroutine[Any, Any, None]]:
         @self.client.on("users/onCreate")
         async def handler(data):
             await fn(TypeAdapter(User).validate_python(data))
         return handler
 
-    def onUpdate(self, fn: Callable[[User], None]):
+    def on_update(self, fn: Callable[[User], Coroutine[Any, Any, None]]) -> Callable[[User], Coroutine[Any, Any, None]]:
         @self.client.on("users/onUpdate")
         async def handler(data):
             await fn(TypeAdapter(User).validate_python(data))
         return handler
 
-    def onDelete(self, fn: Callable[[User], None]):
+    def on_delete(self, fn: Callable[[User], Coroutine[Any, Any, None]]) -> Callable[[User], Coroutine[Any, Any, None]]:
         @self.client.on("users/onDelete")
         async def handler(data):
             await fn(TypeAdapter(User).validate_python(data))
@@ -291,11 +291,11 @@ class ChannelService:
     async def get(self, id: str) -> Channel:
         return TypeAdapter(Channel).validate_python(await self.client.call("channels/get", id))
 
-    async def list(self, spaceId: str) -> List[Channel]:
-        return TypeAdapter(List[Channel]).validate_python(await self.client.call("channels/list", spaceId))
+    async def list(self, space_id: str) -> List[Channel]:
+        return TypeAdapter(List[Channel]).validate_python(await self.client.call("channels/list", space_id))
 
-    async def create(self, spaceId: str, options: ChannelCreateOptions) -> Channel:
-        return TypeAdapter(Channel).validate_python(await self.client.call("channels/create", spaceId, options))
+    async def create(self, space_id: str, options: ChannelCreateOptions) -> Channel:
+        return TypeAdapter(Channel).validate_python(await self.client.call("channels/create", space_id, options))
 
     async def delete(self, id: str) -> None:
         return TypeAdapter(None).validate_python(await self.client.call("channels/delete", id))
@@ -303,37 +303,37 @@ class ChannelService:
     async def move(self, id: str, order: int) -> None:
         return TypeAdapter(None).validate_python(await self.client.call("channels/move", id, order))
 
-    async def startTyping(self, channelId: str, duration: int) -> None:
-        return TypeAdapter(None).validate_python(await self.client.call("channels/startTyping", channelId, duration))
+    async def start_typing(self, channel_id: str, duration: int) -> None:
+        return TypeAdapter(None).validate_python(await self.client.call("channels/startTyping", channel_id, duration))
 
-    async def stopTyping(self, channelId: str) -> None:
-        return TypeAdapter(None).validate_python(await self.client.call("channels/stopTyping", channelId))
+    async def stop_typing(self, channel_id: str) -> None:
+        return TypeAdapter(None).validate_python(await self.client.call("channels/stopTyping", channel_id))
 
-    def onCreate(self, fn: Callable[[Channel], None]):
+    def on_create(self, fn: Callable[[Channel], Coroutine[Any, Any, None]]) -> Callable[[Channel], Coroutine[Any, Any, None]]:
         @self.client.on("channels/onCreate")
         async def handler(data):
             await fn(TypeAdapter(Channel).validate_python(data))
         return handler
 
-    def onUpdate(self, fn: Callable[[Channel], None]):
+    def on_update(self, fn: Callable[[Channel], Coroutine[Any, Any, None]]) -> Callable[[Channel], Coroutine[Any, Any, None]]:
         @self.client.on("channels/onUpdate")
         async def handler(data):
             await fn(TypeAdapter(Channel).validate_python(data))
         return handler
 
-    def onDelete(self, fn: Callable[[Channel], None]):
+    def on_delete(self, fn: Callable[[Channel], Coroutine[Any, Any, None]]) -> Callable[[Channel], Coroutine[Any, Any, None]]:
         @self.client.on("channels/onDelete")
         async def handler(data):
             await fn(TypeAdapter(Channel).validate_python(data))
         return handler
 
-    def onTypingStart(self, fn: Callable[[TypingEvent], None]):
+    def on_typing_start(self, fn: Callable[[TypingEvent], Coroutine[Any, Any, None]]) -> Callable[[TypingEvent], Coroutine[Any, Any, None]]:
         @self.client.on("channels/onTypingStart")
         async def handler(data):
             await fn(TypeAdapter(TypingEvent).validate_python(data))
         return handler
 
-    def onTypingStop(self, fn: Callable[[TypingEvent], None]):
+    def on_typing_stop(self, fn: Callable[[TypingEvent], Coroutine[Any, Any, None]]) -> Callable[[TypingEvent], Coroutine[Any, Any, None]]:
         @self.client.on("channels/onTypingStop")
         async def handler(data):
             await fn(TypeAdapter(TypingEvent).validate_python(data))
@@ -347,37 +347,37 @@ class ChannelService:
 class MessageService:
     client: Client
 
-    async def list(self, channelId: str, options: ListMessageOptions) -> List[Message]:
-        return TypeAdapter(List[Message]).validate_python(await self.client.call("messages/list", channelId, options))
+    async def list(self, channel_id: str, options: ListMessageOptions) -> List[Message]:
+        return TypeAdapter(List[Message]).validate_python(await self.client.call("messages/list", channel_id, options))
 
-    async def send(self, channelId: str, content: str) -> Message:
-        return TypeAdapter(Message).validate_python(await self.client.call("messages/send", channelId, content))
+    async def send(self, channel_id: str, content: str) -> Message:
+        return TypeAdapter(Message).validate_python(await self.client.call("messages/send", channel_id, content))
 
-    async def edit(self, channelId: str, messageId: str, content: str) -> Message:
-        return TypeAdapter(Message).validate_python(await self.client.call("messages/edit", channelId, messageId, content))
+    async def edit(self, channel_id: str, message_id: str, content: str) -> Message:
+        return TypeAdapter(Message).validate_python(await self.client.call("messages/edit", channel_id, message_id, content))
 
-    async def delete(self, channelId: str, messageId: str) -> None:
-        return TypeAdapter(None).validate_python(await self.client.call("messages/delete", channelId, messageId))
+    async def delete(self, channel_id: str, message_id: str) -> None:
+        return TypeAdapter(None).validate_python(await self.client.call("messages/delete", channel_id, message_id))
 
-    async def listUnread(self, spaceId: str) -> List[Unread]:
-        return TypeAdapter(List[Unread]).validate_python(await self.client.call("messages/listUnread", spaceId))
+    async def list_unread(self, space_id: str) -> List[Unread]:
+        return TypeAdapter(List[Unread]).validate_python(await self.client.call("messages/listUnread", space_id))
 
-    async def ack(self, channelId: str, timestamp: str) -> None:
-        return TypeAdapter(None).validate_python(await self.client.call("messages/ack", channelId, timestamp))
+    async def ack(self, channel_id: str, timestamp: str) -> None:
+        return TypeAdapter(None).validate_python(await self.client.call("messages/ack", channel_id, timestamp))
 
-    def onCreate(self, fn: Callable[[Message], None]):
+    def on_create(self, fn: Callable[[Message], Coroutine[Any, Any, None]]) -> Callable[[Message], Coroutine[Any, Any, None]]:
         @self.client.on("messages/onCreate")
         async def handler(data):
             await fn(TypeAdapter(Message).validate_python(data))
         return handler
 
-    def onUpdate(self, fn: Callable[[Message], None]):
+    def on_update(self, fn: Callable[[Message], Coroutine[Any, Any, None]]) -> Callable[[Message], Coroutine[Any, Any, None]]:
         @self.client.on("messages/onUpdate")
         async def handler(data):
             await fn(TypeAdapter(Message).validate_python(data))
         return handler
 
-    def onDelete(self, fn: Callable[[MessageDeleteEvent], None]):
+    def on_delete(self, fn: Callable[[MessageDeleteEvent], Coroutine[Any, Any, None]]) -> Callable[[MessageDeleteEvent], Coroutine[Any, Any, None]]:
         @self.client.on("messages/onDelete")
         async def handler(data):
             await fn(TypeAdapter(MessageDeleteEvent).validate_python(data))
@@ -391,8 +391,8 @@ class MessageService:
 class RoleService:
     client: Client
 
-    async def create(self, spaceId: str, name: str) -> Role:
-        return TypeAdapter(Role).validate_python(await self.client.call("roles/create", spaceId, name))
+    async def create(self, space_id: str, name: str) -> Role:
+        return TypeAdapter(Role).validate_python(await self.client.call("roles/create", space_id, name))
 
     async def edit(self, id: str, edit: RoleEditPayload) -> Role:
         return TypeAdapter(Role).validate_python(await self.client.call("roles/edit", id, edit))
@@ -400,19 +400,19 @@ class RoleService:
     async def delete(self, id: str) -> None:
         return TypeAdapter(None).validate_python(await self.client.call("roles/delete", id))
 
-    def onCreate(self, fn: Callable[[Role], None]):
+    def on_create(self, fn: Callable[[Role], Coroutine[Any, Any, None]]) -> Callable[[Role], Coroutine[Any, Any, None]]:
         @self.client.on("roles/onCreate")
         async def handler(data):
             await fn(TypeAdapter(Role).validate_python(data))
         return handler
 
-    def onUpdate(self, fn: Callable[[Role], None]):
+    def on_update(self, fn: Callable[[Role], Coroutine[Any, Any, None]]) -> Callable[[Role], Coroutine[Any, Any, None]]:
         @self.client.on("roles/onUpdate")
         async def handler(data):
             await fn(TypeAdapter(Role).validate_python(data))
         return handler
 
-    def onDelete(self, fn: Callable[[Role], None]):
+    def on_delete(self, fn: Callable[[Role], Coroutine[Any, Any, None]]) -> Callable[[Role], Coroutine[Any, Any, None]]:
         @self.client.on("roles/onDelete")
         async def handler(data):
             await fn(TypeAdapter(Role).validate_python(data))
@@ -426,8 +426,8 @@ class RoleService:
 class VoiceService:
     client: Client
 
-    async def join(self, channelId: str) -> VoiceToken:
-        return TypeAdapter(VoiceToken).validate_python(await self.client.call("voice/join", channelId))
+    async def join(self, channel_id: str) -> VoiceToken:
+        return TypeAdapter(VoiceToken).validate_python(await self.client.call("voice/join", channel_id))
 
 
 
@@ -448,11 +448,11 @@ class RelationService:
 class DocumentService:
     client: Client
 
-    async def get(self, channelId: str) -> Document:
-        return TypeAdapter(Document).validate_python(await self.client.call("documents/get", channelId))
+    async def get(self, channel_id: str) -> Document:
+        return TypeAdapter(Document).validate_python(await self.client.call("documents/get", channel_id))
 
-    async def update(self, channelId: str, content: str) -> None:
-        return TypeAdapter(None).validate_python(await self.client.call("documents/update", channelId, content))
+    async def update(self, channel_id: str, content: str) -> None:
+        return TypeAdapter(None).validate_python(await self.client.call("documents/update", channel_id, content))
 
 
 

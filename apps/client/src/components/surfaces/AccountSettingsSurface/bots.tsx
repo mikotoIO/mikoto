@@ -1,4 +1,6 @@
-import { Button, Form, Input, Modal } from '@mikoto-io/lucid';
+import { faCopy, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Button, Buttons, Form, Input, Modal } from '@mikoto-io/lucid';
 import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -30,13 +32,19 @@ function BotCard({ id, name, secret }: BotProps) {
     <BotCardContainer>
       <h2>{name}</h2>
       <p>Bot ID: {id}</p>
-      <Button
-        onClick={() => {
-          navigator.clipboard.writeText(`${id}:${secret}`);
-        }}
-      >
-        Copy ID:Secret Pair
-      </Button>
+      <Buttons>
+        <Button
+          onClick={() => {
+            navigator.clipboard.writeText(`${id}:${secret}`);
+          }}
+          type="button"
+        >
+          <FontAwesomeIcon icon={faCopy} /> Copy Bot Token
+        </Button>
+        <Button type="button" variant="danger">
+          <FontAwesomeIcon icon={faTrash} /> Delete Bot
+        </Button>
+      </Buttons>
     </BotCardContainer>
   );
 }

@@ -1,6 +1,7 @@
 import { Input, Form, Button, Buttons, Modal, Box } from '@mikoto-io/lucid';
 import { ClientSpace, Invite, Space } from 'mikotojs';
 import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSetRecoilState } from 'recoil';
 
@@ -18,11 +19,18 @@ import { EmojiSubsurface } from './Emojis';
 import { RolesSubsurface } from './Roles';
 
 function AddBotModal() {
+  const form = useForm();
   return (
     <Modal>
-      <Form>
+      <Form
+        onSubmit={form.handleSubmit((data) => {
+          console.log(data);
+        })}
+      >
         <Input labelName="Bot ID" />
-        <Button>Submit</Button>
+        <Button type="submit" {...form.register('botId')}>
+          Submit
+        </Button>
       </Form>
     </Modal>
   );

@@ -239,6 +239,9 @@ export class MemberServiceClient {
   list(spaceId: string): Promise<Member[]> {
     return this.socket.call("members/list", spaceId);
   }
+  create(spaceId: string, userId: string): Promise<Member> {
+    return this.socket.call("members/create", spaceId, userId);
+  }
   update(
     spaceId: string,
     userId: string,
@@ -335,7 +338,7 @@ export class MessageServiceClient {
     messageId: string,
     content: string
   ): Promise<Message> {
-    return this.socket.call("messages/edit", channelId, messageId, content);2
+    return this.socket.call("messages/edit", channelId, messageId, content);
   }
   delete(channelId: string, messageId: string): Promise<void> {
     return this.socket.call("messages/delete", channelId, messageId);

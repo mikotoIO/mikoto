@@ -99,12 +99,14 @@ struct MemberUpdateOptions {
 service MemberService {
   get(spaceId: string, userId: string): Member;
   list(spaceId: string): Member[];
+  create(spaceId: string, userId: string): Member;
   update(spaceId: string, userId: string, roleIds: MemberUpdateOptions): Member;
   delete(spaceId: string, userId: string): void;
 
   ~onCreate(member: Member);
   ~onUpdate(member: Member);
   ~onDelete(member: Member);
+
 }
 
 struct UserUpdateOptions {

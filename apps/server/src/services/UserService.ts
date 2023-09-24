@@ -43,6 +43,32 @@ export class MemberService extends AbstractMemberService {
     };
   }
 
+  async create(ctx: MikotoInstance, spaceId: string, userId: string) {
+    // only works for bot users
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) throw new NotFoundError();
+    // check if user is a bot
+    if (user.category !== 'BOT') throw new NotFoundError('User is not a bot');
+
+    const member = await prisma.spaceUser.create({
+      data: {
+        userId,
+        spaceId,
+      },
+      include: memberInclude,
+    });
+
+    const { roles, ...rest } = member;
+    const mappedMember = {
+      roleIds: roles.map((x) => x.id),
+      ...rest,
+    };
+    await ctx.data.pubsub.pub(`space:${spaceId}`, 'createMember', mappedMember);
+    return mappedMember;
+  }
+
   async list(ctx: SophonInstance, spaceId: string) {
     const members = await prisma.spaceUser.findMany({
       where: { spaceId },

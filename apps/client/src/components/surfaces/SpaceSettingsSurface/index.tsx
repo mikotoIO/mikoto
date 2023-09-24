@@ -18,25 +18,27 @@ import { BaseSettingsSurface } from '../BaseSettingSurface';
 import { EmojiSubsurface } from './Emojis';
 import { RolesSubsurface } from './Roles';
 
-function AddBotModal() {
+function AddBotModal({ space }: { space: ClientSpace }) {
   const form = useForm();
+  const mikoto = useMikoto();
+  const setModal = useSetRecoilState(modalState);
   return (
     <Modal>
       <Form
-        onSubmit={form.handleSubmit((data) => {
-          console.log(data);
+        onSubmit={form.handleSubmit(async (data) => {
+          console.log(data.botId);
+          await mikoto.client.members.create(space.id, data.botId);
+          setModal(null);
         })}
       >
-        <Input labelName="Bot ID" />
-        <Button type="submit" {...form.register('botId')}>
-          Submit
-        </Button>
+        <Input labelName="Bot ID" {...form.register('botId')} />
+        <Button type="submit">Submit</Button>
       </Form>
     </Modal>
   );
 }
 
-function Overview({ space }: { space: Space }) {
+function Overview({ space }: { space: ClientSpace }) {
   const { t } = useTranslation();
   const [spaceName, setSpaceName] = useState(space.name);
   const mikoto = useMikoto();
@@ -85,7 +87,7 @@ function Overview({ space }: { space: Space }) {
             type="button"
             onClick={(e) => {
               setModal({
-                elem: <AddBotModal />,
+                elem: <AddBotModal space={space} />,
               });
               e.preventDefault();
             }}

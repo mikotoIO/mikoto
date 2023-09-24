@@ -1,6 +1,8 @@
+import { permissions } from '@mikoto-io/permcheck';
 import { SophonInstance } from '@sophon-js/server';
 import { NotFoundError } from 'routing-controllers';
 
+import { assertPermission } from '../functions/permissions';
 import { prisma } from '../functions/prisma';
 import { MikotoInstance } from './context';
 import {
@@ -102,6 +104,8 @@ export class MemberService extends AbstractMemberService {
     spaceId: string,
     userId: string,
   ): Promise<void> {
+    assertPermission(ctx.data.user.sub, spaceId, permissions.ban);
+
     await prisma.spaceUser.delete({
       where: { userId_spaceId: { userId, spaceId } },
     });

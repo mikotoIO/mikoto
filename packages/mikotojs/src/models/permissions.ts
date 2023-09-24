@@ -3,6 +3,18 @@ import { permissions, checkPermission } from '@mikoto-io/permcheck';
 
 import { ClientMember } from '../store';
 
+// asserts that the subject has the lower permission level than the principal
+export function checkPermissionLevel(
+  principal: ClientMember,
+  subject: ClientMember,
+) {
+  // get highest permission level for both
+  const principalLevel = Math.max(...principal.roles.map((x) => x.position));
+  const subjectLevel = Math.max(...subject.roles.map((x) => x.position));
+
+  return subjectLevel < principalLevel;
+}
+
 export function checkMemberPermission(
   subject: ClientMember,
   action: string | bigint,

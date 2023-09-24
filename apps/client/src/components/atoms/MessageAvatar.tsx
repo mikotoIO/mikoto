@@ -179,7 +179,7 @@ export function MessageAvatar({ src, member, size }: MessageAvatarProps) {
   const user = member?.user;
 
   const userContextMenu = useContextMenu(() => (
-    <UserContextMenu user={user!} />
+    <UserContextMenu user={user!} member={member} />
   ));
 
   return (

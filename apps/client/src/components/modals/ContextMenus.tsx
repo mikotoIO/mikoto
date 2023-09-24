@@ -1,11 +1,19 @@
-import { User } from 'mikotojs';
+import { permissions } from '@mikoto-io/permcheck';
+import { ClientMember, User, checkMemberPermission } from 'mikotojs';
 import { useSetRecoilState } from 'recoil';
 
+import { useMikoto } from '../../hooks';
 import { ContextMenu, modalState } from '../ContextMenu';
 import { ProfileModal } from './Profile';
 
-export function UserContextMenu({ user }: { user: User }) {
+interface UserContextMenuProps {
+  user: User;
+  member?: ClientMember;
+}
+
+export function UserContextMenu({ user, member }: UserContextMenuProps) {
   const setModal = useSetRecoilState(modalState);
+  const mikoto = useMikoto();
 
   return (
     <ContextMenu>
@@ -18,7 +26,16 @@ export function UserContextMenu({ user }: { user: User }) {
       >
         Profile
       </ContextMenu.Link>
-      <ContextMenu.Link>Kick {user.name}</ContextMenu.Link>
+      {member &&
+        checkMemberPermission(member.space.member!, permissions.ban) && (
+          <ContextMenu.Link
+            onClick={async () => {
+              await mikoto.client.members.delete(member.spaceId, member.userId);
+            }}
+          >
+            Kick {user.name}
+          </ContextMenu.Link>
+        )}
     </ContextMenu>
   );
 }

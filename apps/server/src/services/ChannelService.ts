@@ -194,7 +194,7 @@ export class MessageService extends AbstractMessageService {
       }),
     ]);
 
-    ctx.data.pubsub.pub(
+    await ctx.data.pubsub.pub(
       `space:${channel.spaceId}`,
       'createMessage',
       serializeDates(message),
@@ -224,7 +224,7 @@ export class MessageService extends AbstractMessageService {
       data: { content, editedTimestamp: new Date() },
       include: { author: authorInclude },
     });
-    ctx.data.pubsub.pub(
+    await ctx.data.pubsub.pub(
       `space:${channel.spaceId}`,
       'updateMessage',
       serializeDates(newMessage),
@@ -253,7 +253,7 @@ export class MessageService extends AbstractMessageService {
     }
 
     await prisma.message.delete({ where: { id: messageId } });
-    ctx.data.pubsub.pub(`space:${channel.spaceId}`, 'deleteMessage', {
+    await ctx.data.pubsub.pub(`space:${channel.spaceId}`, 'deleteMessage', {
       messageId,
       channelId,
     });

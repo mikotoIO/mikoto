@@ -43,7 +43,7 @@ const MemberElement = observer(({ member }: { member: ClientMember }) => {
   const elemRef = useRef<HTMLDivElement>(null);
 
   const userContextMenu = useContextMenu(() => (
-    <UserContextMenu user={member.user} />
+    <UserContextMenu user={member.user} member={member} />
   ));
 
   return (

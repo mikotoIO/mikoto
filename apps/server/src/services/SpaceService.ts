@@ -218,8 +218,8 @@ async function joinSpace(
   });
   await sophonCore.joinAll(`user/${userId}`, `space/${space.id}`);
 
-  ctx.data.pubsub.pub(`user:${userId}`, 'createSpace', space);
-  ctx.data.pubsub.pub(`space:${space.id}`, 'createMember', {
+  await ctx.data.pubsub.pub(`user:${userId}`, 'createSpace', space);
+  await ctx.data.pubsub.pub(`space:${space.id}`, 'createMember', {
     roleIds: roles.map((x) => x.id),
     ...member,
   });
@@ -240,8 +240,8 @@ async function leaveSpace(
   });
   await sophonCore.leaveAll(`user/${userId}`, `space/${space.id}`);
 
-  ctx.data.pubsub.pub(`user:${userId}`, 'deleteSpace', space);
-  ctx.data.pubsub.pub(`space:${space.id}`, 'deleteMember', {
+  await ctx.data.pubsub.pub(`user:${userId}`, 'deleteSpace', space);
+  await ctx.data.pubsub.pub(`space:${space.id}`, 'deleteMember', {
     roleIds: roles.map((x) => x.id),
     ...member,
   });

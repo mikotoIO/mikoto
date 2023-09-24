@@ -1,6 +1,8 @@
+import { permissions } from '@mikoto-io/permcheck';
 import { SophonInstance } from '@sophon-js/server';
 import { NotFoundError } from 'routing-controllers';
 
+import { assertPermission } from '../functions/permissions';
 import { prisma } from '../functions/prisma';
 import { MikotoInstance } from './context';
 import {
@@ -92,7 +94,7 @@ export class MemberService extends AbstractMemberService {
       ...member,
     };
 
-    ctx.data.pubsub.pub(`space:${spaceId}`, 'updateMember', mappedMember);
+    await ctx.data.pubsub.pub(`space:${spaceId}`, 'updateMember', mappedMember);
     return mappedMember;
   }
 
@@ -102,9 +104,18 @@ export class MemberService extends AbstractMemberService {
     spaceId: string,
     userId: string,
   ): Promise<void> {
-    await prisma.spaceUser.delete({
+    assertPermission(ctx.data.user.sub, spaceId, permissions.ban);
+
+    const { roles, ...member } = await prisma.spaceUser.delete({
       where: { userId_spaceId: { userId, spaceId } },
+      include: memberInclude,
     });
+
+    const mappedMember = {
+      roleIds: roles.map((x) => x.id),
+      ...member,
+    };
+    await ctx.data.pubsub.pub(`space:${spaceId}`, 'deleteMember', mappedMember);
   }
 }
 
@@ -129,7 +140,7 @@ export class UserService extends AbstractUserService {
           : undefined,
       },
     });
-    ctx.data.pubsub.pub(`user:${user.id}`, 'updateUser', user);
+    await ctx.data.pubsub.pub(`user:${user.id}`, 'updateUser', user);
     return user;
   }
 }

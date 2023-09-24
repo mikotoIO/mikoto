@@ -68,8 +68,6 @@ export type BoxProps = Partial<{
   tf: string[];
 }>;
 
-// TODO: This is probably not the most efficient way to do this
-// only call functions when they're present
 export const boxCss = css<BoxProps>((props): StyledObject<object> => {
   const cssObject: StyledObject<object> = {
     boxSizing: 'border-box',

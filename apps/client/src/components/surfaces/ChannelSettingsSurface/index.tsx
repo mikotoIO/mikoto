@@ -37,7 +37,7 @@ function General({ channel }: { channel: ClientChannel }) {
       >
         <Input labelName="Channel Name" {...form.register('name')} />
         <TextArea
-          labelName="Metadata"
+          labelName="Description"
           h={200}
           {...form.register('description')}
         />

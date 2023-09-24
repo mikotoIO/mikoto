@@ -101,7 +101,6 @@ const Name = styled.div<{ color?: string | null }>`
 const StyledTimestamp = styled.div`
   color: #9f9e9e;
   font-size: 12px;
-  padding-left: 8px;
 `;
 
 function Timestamp({ time }: { time: Date }) {
@@ -115,6 +114,7 @@ function Timestamp({ time }: { time: Date }) {
 
 const NameBox = styled(Flex)`
   margin-bottom: 4px;
+  gap: 6px;
   & > * {
     align-self: flex-end;
   }

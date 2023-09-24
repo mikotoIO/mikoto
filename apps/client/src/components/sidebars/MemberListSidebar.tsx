@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import { useFetchMember } from '../../hooks';
 import { contextMenuState, useContextMenu } from '../ContextMenu';
 import { Avatar } from '../atoms/Avatar';
+import { BotTag } from '../atoms/BotTag';
 import { MemberContextMenu } from '../atoms/MessageAvatar';
 import { UserContextMenu } from '../modals/ContextMenus';
 
@@ -69,6 +70,7 @@ const MemberElement = observer(({ member }: { member: ClientMember }) => {
       {member.isSpaceOwner && (
         <FontAwesomeIcon className="crown" icon={faCrown} />
       )}
+      {member.user.category === 'BOT' && <BotTag />}
     </StyledMember>
   );
 });

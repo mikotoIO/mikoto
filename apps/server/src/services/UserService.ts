@@ -94,7 +94,7 @@ export class MemberService extends AbstractMemberService {
       ...member,
     };
 
-    ctx.data.pubsub.pub(`space:${spaceId}`, 'updateMember', mappedMember);
+    await ctx.data.pubsub.pub(`space:${spaceId}`, 'updateMember', mappedMember);
     return mappedMember;
   }
 
@@ -106,9 +106,16 @@ export class MemberService extends AbstractMemberService {
   ): Promise<void> {
     assertPermission(ctx.data.user.sub, spaceId, permissions.ban);
 
-    await prisma.spaceUser.delete({
+    const { roles, ...member } = await prisma.spaceUser.delete({
       where: { userId_spaceId: { userId, spaceId } },
+      include: memberInclude,
     });
+
+    const mappedMember = {
+      roleIds: roles.map((x) => x.id),
+      ...member,
+    };
+    await ctx.data.pubsub.pub(`space:${spaceId}`, 'deleteMember', mappedMember);
   }
 }
 
@@ -133,7 +140,7 @@ export class UserService extends AbstractUserService {
           : undefined,
       },
     });
-    ctx.data.pubsub.pub(`user:${user.id}`, 'updateUser', user);
+    await ctx.data.pubsub.pub(`user:${user.id}`, 'updateUser', user);
     return user;
   }
 }

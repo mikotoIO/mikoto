@@ -23,7 +23,7 @@ export class RoleService extends AbstractRoleService {
         name,
       },
     });
-    ctx.data.pubsub.pub(`space:${spaceId}`, 'createRole', role);
+    await ctx.data.pubsub.pub(`space:${spaceId}`, 'createRole', role);
     return role;
   }
 
@@ -41,7 +41,7 @@ export class RoleService extends AbstractRoleService {
         color: edit.color ?? undefined,
       },
     });
-    ctx.data.pubsub.pub(`space:${role.spaceId}`, 'updateRole', role);
+    await ctx.data.pubsub.pub(`space:${role.spaceId}`, 'updateRole', role);
     return role;
   }
 
@@ -49,6 +49,6 @@ export class RoleService extends AbstractRoleService {
     const role = await prisma.role.delete({
       where: { id },
     });
-    ctx.data.pubsub.pub(`space:${role.spaceId}`, 'deleteRole', role);
+    await ctx.data.pubsub.pub(`space:${role.spaceId}`, 'deleteRole', role);
   }
 }

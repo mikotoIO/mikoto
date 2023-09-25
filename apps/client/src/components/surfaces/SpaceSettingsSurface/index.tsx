@@ -26,7 +26,6 @@ function AddBotModal({ space }: { space: ClientSpace }) {
     <Modal>
       <Form
         onSubmit={form.handleSubmit(async (data) => {
-          console.log(data.botId);
           await mikoto.client.members.create(space.id, data.botId);
           setModal(null);
         })}

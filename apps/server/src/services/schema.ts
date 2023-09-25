@@ -100,6 +100,11 @@ export const TypingEvent = z.object({
 });
 export type TypingEvent = z.infer<typeof TypingEvent>;
 
+export const ChannelEditOptions = z.object({
+  name: z.nullable(z.string()),
+});
+export type ChannelEditOptions = z.infer<typeof ChannelEditOptions>;
+
 export const ListMessageOptions = z.object({
   cursor: z.nullable(z.string()),
   limit: z.number().int(),
@@ -339,6 +344,11 @@ export abstract class AbstractChannelService {
     ctx: SophonInstance<SophonContext>,
     spaceId: string,
     options: ChannelCreateOptions
+  ): Promise<Channel>;
+  abstract update(
+    ctx: SophonInstance<SophonContext>,
+    id: string,
+    options: ChannelEditOptions
   ): Promise<Channel>;
   abstract delete(
     ctx: SophonInstance<SophonContext>,

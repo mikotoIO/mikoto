@@ -135,10 +135,15 @@ struct TypingEvent {
   member: Member?;
 }
 
+struct ChannelEditOptions {
+  name: string?;
+}
+
 service ChannelService {
   get(id: string): Channel;
   list(spaceId: string): Channel[];
   create(spaceId: string, options: ChannelCreateOptions): Channel;
+  update(id: string, options: ChannelEditOptions): Channel;
   delete(id: string): void;
   move(id: string, order: int): void;
 

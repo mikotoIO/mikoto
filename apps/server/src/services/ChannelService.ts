@@ -12,6 +12,7 @@ import {
   AbstractChannelService,
   AbstractMessageService,
   ChannelCreateOptions,
+  ChannelEditOptions,
   SophonContext,
 } from './schema';
 
@@ -64,15 +65,46 @@ export class ChannelService extends AbstractChannelService {
             : undefined,
       },
     });
-    this.$(`space/${spaceId}`).onCreate(serializeDates(channel));
+    ctx.data.pubsub.pub(
+      `space:${spaceId}`,
+      'createChannel',
+      serializeDates(channel),
+    );
     return serializeDates(channel);
+  }
+
+  async update(ctx: MikotoInstance, id: string, options: ChannelEditOptions) {
+    const channel = await prisma.channel.findUnique({ where: { id } });
+    if (channel === null) throw new NotFoundError();
+    assertPermission(
+      ctx.data.user.sub,
+      channel?.spaceId,
+      permissions.manageChannels,
+    );
+
+    const updatedChannel = await prisma.channel.update({
+      where: { id },
+      data: {
+        name: options.name ?? undefined,
+      },
+    });
+    ctx.data.pubsub.pub(
+      `space:${channel.spaceId}`,
+      'updateChannel',
+      serializeDates(updatedChannel),
+    );
+    return serializeDates(updatedChannel);
   }
 
   async delete(ctx: MikotoInstance, id: string) {
     const channel = await prisma.channel.findUnique({ where: { id } });
     if (channel === null) throw new NotFoundError();
     await prisma.channel.delete({ where: { id } });
-    this.$(`space/${channel.spaceId}`).onDelete(serializeDates(channel));
+    ctx.data.pubsub.pub(
+      `space:${channel.spaceId}`,
+      'deleteChannel',
+      serializeDates(channel),
+    );
   }
 
   async move(ctx: MikotoInstance, id: string, order: number) {
@@ -199,7 +231,6 @@ export class MessageService extends AbstractMessageService {
       'createMessage',
       serializeDates(message),
     );
-    // this.$(`space/${channel.spaceId}`).onCreate(serializeDates(message));
     return serializeDates(message);
   }
 

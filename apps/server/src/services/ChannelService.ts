@@ -65,7 +65,7 @@ export class ChannelService extends AbstractChannelService {
             : undefined,
       },
     });
-    ctx.data.pubsub.pub(
+    await ctx.data.pubsub.pub(
       `space:${spaceId}`,
       'createChannel',
       serializeDates(channel),
@@ -88,7 +88,7 @@ export class ChannelService extends AbstractChannelService {
         name: options.name ?? undefined,
       },
     });
-    ctx.data.pubsub.pub(
+    await ctx.data.pubsub.pub(
       `space:${channel.spaceId}`,
       'updateChannel',
       serializeDates(updatedChannel),
@@ -100,7 +100,7 @@ export class ChannelService extends AbstractChannelService {
     const channel = await prisma.channel.findUnique({ where: { id } });
     if (channel === null) throw new NotFoundError();
     await prisma.channel.delete({ where: { id } });
-    ctx.data.pubsub.pub(
+    await ctx.data.pubsub.pub(
       `space:${channel.spaceId}`,
       'deleteChannel',
       serializeDates(channel),

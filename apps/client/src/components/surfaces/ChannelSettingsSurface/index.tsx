@@ -21,6 +21,7 @@ const ACCOUNT_SETTING_CATEGORIES = [
 ];
 
 function General({ channel }: { channel: ClientChannel }) {
+  const mikoto = useMikoto();
   const form = useForm({
     defaultValues: {
       name: channel.name,
@@ -31,8 +32,8 @@ function General({ channel }: { channel: ClientChannel }) {
     <SettingsView>
       <Heading>Overview</Heading>
       <Form
-        onSubmit={form.handleSubmit((data) => {
-          console.log(data);
+        onSubmit={form.handleSubmit(async (data) => {
+          await mikoto.client.channels.update(channel.id, data);
         })}
       >
         <Input labelName="Channel Name" {...form.register('name')} />

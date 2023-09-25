@@ -1,6 +1,6 @@
 import { MainService } from '..';
 import { RedisPubSub } from '../../functions/pubsub';
-import { Member, Message, Role, Space, User } from '../schema';
+import { Member, Channel, Message, Role, Space, User } from '../schema';
 
 export function buildPubSub(
   ps: RedisPubSub<any>,
@@ -15,6 +15,18 @@ export function buildPubSub(
     deleteSpace(space: Space) {
       ps.unsub(`space:${space.id}`);
       service.spaces.$(id).onDelete(space);
+    },
+
+    createChannel(channel: Channel) {
+      service.channels.$(id).onCreate(channel);
+    },
+
+    updateChannel(channel: Channel) {
+      service.channels.$(id).onUpdate(channel);
+    },
+
+    deleteChannel(channel: Channel) {
+      service.channels.$(id).onDelete(channel);
     },
 
     createMember(member: Member) {

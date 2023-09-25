@@ -96,6 +96,11 @@ export const TypingEvent = z.object({
 });
 export type TypingEvent = z.infer<typeof TypingEvent>;
 
+export const ChannelEditOptions = z.object({
+  name: z.nullable(z.string()),
+});
+export type ChannelEditOptions = z.infer<typeof ChannelEditOptions>;
+
 export const ListMessageOptions = z.object({
   cursor: z.nullable(z.string()),
   limit: z.number().int(),
@@ -294,6 +299,9 @@ export class ChannelServiceClient {
   }
   create(spaceId: string, options: ChannelCreateOptions): Promise<Channel> {
     return this.socket.call("channels/create", spaceId, options);
+  }
+  update(id: string, options: ChannelEditOptions): Promise<Channel> {
+    return this.socket.call("channels/update", id, options);
   }
   delete(id: string): Promise<void> {
     return this.socket.call("channels/delete", id);

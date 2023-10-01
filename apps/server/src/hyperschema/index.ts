@@ -1,12 +1,13 @@
 import { h } from './core';
-import { ChannelService } from './services/ChannelService';
-import { SpaceService } from './services/SpaceService';
+import { ChannelService, MemberService, SpaceService } from './services';
 
 export * from './models';
+export * from './services';
 
 export const MainService = h
   .service({
     channels: ChannelService,
     spaces: SpaceService,
+    members: MemberService,
   })
   .root();

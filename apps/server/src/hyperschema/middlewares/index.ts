@@ -1,6 +1,6 @@
 import { NotFoundError, UnauthorizedError } from '@hyperschema/core';
 import { checkPermission, permissions } from '@mikoto-io/permcheck';
-import { Channel } from '@prisma/client';
+import { Channel, SpaceUser } from '@prisma/client';
 
 import { HSContext } from '../core';
 
@@ -21,7 +21,7 @@ export async function assertSpaceMembership<
 
 export async function assertChannelMembership<
   T extends HSContext & { channelId: string },
->(props: T): Promise<T & { channel: Channel }> {
+>(props: T): Promise<T & { channel: Channel; member: SpaceUser }> {
   const channel = await props.$p.channel.findUnique({
     where: { id: props.channelId },
   });
@@ -37,7 +37,7 @@ export async function assertChannelMembership<
 
   if (membership === null)
     throw new UnauthorizedError('Not a member of channel');
-  return { ...props, channel };
+  return { ...props, channel, member: membership };
 }
 
 export function requireSpacePerm<T extends HSContext & { spaceId: string }>(

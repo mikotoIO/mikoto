@@ -86,7 +86,7 @@ export type Document = z.infer<typeof Document>;
 export const TypingEvent = z.object({
   channelId: z.string(),
   userId: z.string(),
-  member: z.nullable(Member),
+  memberId: z.string(),
 });
 export type TypingEvent = z.infer<typeof TypingEvent>;
 

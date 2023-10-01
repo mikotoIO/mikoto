@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import { h } from '../core';
 import { assertChannelMembership } from '../middlewares';
-import { Message } from '../models';
+import { Message, TypingEvent } from '../models';
 import { authorInclude } from '../normalizer';
 
 export const MessageService = h.service({
@@ -36,13 +36,7 @@ export const MessageService = h.service({
     }),
 
   send: h
-    .fn(
-      {
-        channelId: z.string(),
-        content: z.string(),
-      },
-      Message,
-    )
+    .fn({ channelId: z.string(), content: z.string() }, Message)
     .use(assertChannelMembership)
     .do(async ({ $p, $r, channelId, content, state }) => {
       const channel = await $p.channel.findUnique({
@@ -95,4 +89,51 @@ export const MessageService = h.service({
       await $r.pub(`space:${channel.spaceId}`, 'updateMessage', newMessage);
       return newMessage;
     }),
+
+  delete: h
+    .fn({ channelId: z.string(), messageId: z.string() }, Message)
+    .use(assertChannelMembership)
+    .do(async ({ $p, $r, state, channel, messageId }) => {
+      const message = await $p.message.findUnique({
+        where: { id: messageId },
+        include: { author: authorInclude },
+      });
+      if (message === null) throw new NotFoundError('MessageNotFound');
+      if (message.authorId !== state.user.id) throw new UnauthorizedError();
+      await $p.message.delete({
+        where: { id: messageId },
+      });
+      await $r.pub(`space:${channel.spaceId}`, 'deleteMessage', message);
+      return message;
+    }),
+
+  onCreate: h.event(Message).emitter((emit, { $r }) => {
+    $r.on('createMessage', emit);
+  }),
+
+  onUpdate: h.event(Message).emitter((emit, { $r }) => {
+    $r.on('updateMessage', emit);
+  }),
+
+  onDelete: h.event(Message).emitter((emit, { $r }) => {
+    $r.on('deleteMessage', emit);
+  }),
+
+  // typing-related logics
+  startTyping: h
+    .fn({ channelId: z.string() }, TypingEvent)
+    .use(assertChannelMembership)
+    .do(async ({ $r, channel, member }) => {
+      const evt: TypingEvent = {
+        channelId: channel.id,
+        userId: member.userId,
+        memberId: member.id,
+      };
+      await $r.pub(`space:${channel.spaceId}`, 'startTyping', evt);
+      return evt;
+    }),
+
+  onTypingStart: h.event(TypingEvent).emitter((emit, { $r }) => {
+    $r.on('startTyping', emit);
+  }),
 });

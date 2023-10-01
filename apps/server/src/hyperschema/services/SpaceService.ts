@@ -1,24 +1,52 @@
-import { NotFoundError, UnauthorizedError } from '@hyperschema/core';
+import { NotFoundError } from '@hyperschema/core';
+import { permissions } from '@mikoto-io/permcheck';
+import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
 import { HSContext, h } from '../core';
+import { assertSpaceMembership, requireSpacePerm } from '../middlewares';
 import { Space } from '../models';
-import { spaceInclude } from '../normalizer';
+import { memberInclude, memberMap, spaceInclude } from '../normalizer';
 
-async function assertSpaceMembership<T extends HSContext & { spaceId: string }>(
-  props: T,
-): Promise<T> {
-  const membership = await props.$p.spaceUser.findUnique({
-    where: {
-      userId_spaceId: {
-        userId: props.state.user.id,
-        spaceId: props.spaceId,
-      },
+async function joinSpace(
+  $p: HSContext['$p'],
+  $r: HSContext['$r'],
+  userId: string,
+  space: Space,
+) {
+  const member = await $p.spaceUser.create({
+    data: {
+      spaceId: space.id,
+      userId,
     },
+    include: memberInclude,
   });
-  if (membership === null) throw new UnauthorizedError('Not a member of space');
-  return props;
+
+  await $r.pub(`user:${userId}`, 'createMember', memberMap(member));
+  await $r.pub(`space:${space.id}`, 'createSpace', space);
 }
+
+async function leaveSpace(
+  $p: HSContext['$p'],
+  $r: HSContext['$r'],
+  userId: string,
+  space: Space,
+) {
+  const member = await $p.spaceUser.delete({
+    where: {
+      userId_spaceId: { userId, spaceId: space.id },
+    },
+    include: memberInclude,
+  });
+
+  await $r.pub(`user:${userId}`, 'deleteMember', memberMap(member));
+  await $r.pub(`space:${space.id}`, 'deleteSpace', space);
+}
+
+export const SpaceUpdateOptions = z.object({
+  name: z.string().nullable(),
+  icon: z.string().nullable(),
+});
 
 export const SpaceService = h.service({
   // gets a single Space.
@@ -45,24 +73,144 @@ export const SpaceService = h.service({
     return list.map((x) => x.space);
   }),
 
-  create: h.fn({ name: z.string() }, Space).do(async ({ name, $p, state }) => {
-    const space = await $p.space.create({
-      data: {
-        name,
-        channels: { create: [{ name: 'general', order: 0 }] },
-        ownerId: state.user.id,
-        roles: {
-          create: [{ name: '@everyone', position: -1, permissions: '0' }],
+  create: h
+    .fn({ name: z.string() }, Space)
+    .do(async ({ name, $p, $r, state }) => {
+      const space = await $p.space.create({
+        data: {
+          name,
+          channels: { create: [{ name: 'general', order: 0 }] },
+          ownerId: state.user.id,
+          roles: {
+            create: [{ name: '@everyone', position: -1, permissions: '0' }],
+          },
         },
-      },
-      include: spaceInclude,
-    });
-    await $p.spaceUser.create({
-      data: {
-        spaceId: space.id,
-        userId: state.user.id,
-      },
-    });
-    return space;
-  }),
+        include: spaceInclude,
+      });
+      await $p.spaceUser.create({
+        data: {
+          spaceId: space.id,
+          userId: state.user.id,
+        },
+      });
+      joinSpace($p, $r, state.user.id, Space.parse(space));
+      return space;
+    }),
+
+  update: h
+    .fn({ spaceId: z.string(), options: SpaceUpdateOptions }, Space)
+    .use(requireSpacePerm(permissions.manageSpace))
+    .do(async ({ spaceId, options, $p, $r }) => {
+      const space = await $p.space.update({
+        where: { id: spaceId },
+        data: {
+          name: options.name ?? undefined,
+          icon: options.icon
+            ? new URL(options.icon).pathname.substring(1)
+            : undefined,
+        },
+        include: spaceInclude,
+      });
+      if (space === null) throw new NotFoundError();
+      $r.pub(`space:${spaceId}`, 'updateSpace', space);
+      return space;
+    }),
+
+  delete: h
+    .fn({ spaceId: z.string() }, Space)
+    .use(requireSpacePerm(permissions.superuser))
+    .do(async ({ spaceId, $p, $r }) => {
+      const space = await $p.space.findUnique({
+        where: { id: spaceId },
+        include: spaceInclude,
+      });
+      if (space === null) throw new NotFoundError();
+      await $p.space.delete({ where: { id: spaceId } });
+      await $r.pub(`space:${spaceId}`, 'deleteSpace', space);
+      return space;
+    }),
+
+  getSpaceFromInvite: h
+    .fn({ inviteCode: z.string() }, Space)
+    .do(async ({ inviteCode, $p }) => {
+      const invite = await $p.invite.findUnique({
+        where: { id: inviteCode },
+      });
+      if (invite === null) throw new NotFoundError();
+
+      const space = await $p.space.findUnique({
+        where: { id: invite?.spaceId },
+        include: spaceInclude,
+      });
+      if (space === null) throw new NotFoundError();
+
+      return space;
+    }),
+
+  join: h
+    .fn({ inviteCode: z.string() }, Space)
+    .do(async ({ inviteCode, $p, $r, state }) => {
+      const invite = await $p.invite.findUnique({
+        where: { id: inviteCode },
+      });
+      if (invite === null) throw new NotFoundError();
+
+      const space = await $p.space.findUnique({
+        where: { id: invite?.spaceId },
+        include: spaceInclude,
+      });
+      if (space === null) throw new NotFoundError();
+
+      await joinSpace($p, $r, state.user.id, Space.parse(space));
+      return space;
+    }),
+
+  leave: h
+    .fn({ spaceId: z.string() }, Space)
+    .use(assertSpaceMembership)
+    .do(async ({ spaceId, $p, $r, state }) => {
+      const space = await $p.space.findUnique({
+        where: { id: spaceId },
+        include: spaceInclude,
+      });
+      if (space === null) throw new NotFoundError();
+      await leaveSpace($p, $r, state.user.id, Space.parse(space));
+      return space;
+    }),
+
+  // invite management
+  createInvite: h
+    .fn({ spaceId: z.string() }, z.string())
+    .use(requireSpacePerm(permissions.manageSpace))
+    .do(async ({ spaceId, $p, state }) => {
+      const invite = await $p.invite.create({
+        data: {
+          id: nanoid(12),
+          spaceId,
+          creatorId: state.user.id,
+        },
+      });
+      return invite.id;
+    }),
+
+  listInvites: h
+    .fn({ spaceId: z.string() }, z.array(z.string()))
+    .use(requireSpacePerm(permissions.manageSpace))
+    .do(async ({ spaceId, $p }) => {
+      const invites = await $p.invite.findMany({
+        where: { spaceId },
+      });
+      return invites.map((x) => x.id);
+    }),
+
+  deleteInvite: h
+    .fn({ spaceId: z.string(), inviteCode: z.string() }, z.string())
+    .use(requireSpacePerm(permissions.manageSpace))
+    .do(async ({ inviteCode, $p }) => {
+      const invite = await $p.invite.delete({
+        where: { id: inviteCode },
+      });
+      if (invite === null) throw new NotFoundError();
+      return invite.id;
+    }),
 });

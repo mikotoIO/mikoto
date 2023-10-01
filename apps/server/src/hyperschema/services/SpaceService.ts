@@ -213,4 +213,24 @@ export const SpaceService = h.service({
       if (invite === null) throw new NotFoundError();
       return invite.id;
     }),
+
+  onCreate: h.event(Space).emitter((emit, { $r }) => {
+    $r.on('createSpace', (space) => {
+      $r.sub(`space:${space.id}`);
+      emit(space);
+    });
+  }),
+
+  onUpdate: h.event(Space).emitter((emit, { $r }) => {
+    $r.on('updateSpace', emit);
+  }),
+
+  onDelete: h.event(Space).emitter((emit, { $r }) => {
+    $r.on('deleteSpace', (space) => {
+      $r.unsub(`space:${space.id}`);
+      emit(space);
+    });
+  }),
 });
+
+const se = h.event(Space);

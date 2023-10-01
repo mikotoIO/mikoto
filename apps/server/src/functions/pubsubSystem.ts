@@ -47,6 +47,14 @@ export class PubSubSystem<M extends Record<string, z.ZodType>> {
     await this.receiver.subscribe(id);
   }
 
+  async unsub(id?: string) {
+    if (!id) {
+      await this.receiver.unsubscribe();
+      return;
+    }
+    this.receiver.unsubscribe(id);
+  }
+
   on<K extends keyof M>(evt: K, handler: (x: z.infer<M[K]>) => void) {
     this.handlers[evt].push(handler);
   }

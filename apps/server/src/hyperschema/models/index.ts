@@ -52,8 +52,8 @@ export type Member = z.infer<typeof Member>;
 export const Message = z.object({
   id: z.string(),
   content: z.string(),
-  timestamp: z.string(),
-  editedTimestamp: z.nullable(z.string()),
+  timestamp: hsDate(),
+  editedTimestamp: z.nullable(hsDate()),
   authorId: z.nullable(z.string()),
   author: z.nullable(User),
   channelId: z.string(),
@@ -102,3 +102,20 @@ export const VoiceToken = z.object({
   token: z.string(),
 });
 export type VoiceToken = z.infer<typeof VoiceToken>;
+
+// extras
+
+export const SpaceUpdateOptions = z.object({
+  name: z.string().nullable(),
+  icon: z.string().nullable(),
+});
+
+export const ChannelCreateOptions = z.object({
+  name: z.string(),
+  type: z.string(),
+  parentId: z.nullable(z.string()),
+});
+
+export const ChannelUpdateOptions = z.object({
+  name: z.nullable(z.string()),
+});

@@ -19,6 +19,15 @@ export const memberInclude = {
   },
 } satisfies Prisma.SpaceUserInclude;
 
+export const authorInclude = {
+  select: {
+    id: true,
+    avatar: true,
+    name: true,
+    category: true,
+  },
+};
+
 export function memberMap<T extends { roles: { id: string }[] }>({
   roles,
   ...rest

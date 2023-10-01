@@ -1,7 +1,12 @@
-import { HyperRPC } from '@hyperschema/core';
-
 import { h } from './core';
+import { ChannelService } from './services/ChannelService';
+import { SpaceService } from './services/SpaceService';
 
 export * from './models';
 
-const MainService = h.service({}).root();
+export const MainService = h
+  .service({
+    channels: ChannelService,
+    spaces: SpaceService,
+  })
+  .root();

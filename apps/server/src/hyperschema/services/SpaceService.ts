@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import { HSContext, h } from '../core';
 import { assertSpaceMembership, requireSpacePerm } from '../middlewares';
-import { Space } from '../models';
+import { Space, SpaceUpdateOptions } from '../models';
 import { memberInclude, memberMap, spaceInclude } from '../normalizer';
 
 async function joinSpace(
@@ -43,11 +43,6 @@ async function leaveSpace(
   await $r.pub(`space:${space.id}`, 'deleteSpace', space);
 }
 
-export const SpaceUpdateOptions = z.object({
-  name: z.string().nullable(),
-  icon: z.string().nullable(),
-});
-
 export const SpaceService = h.service({
   // gets a single Space.
   // must be a member of the space to fetch.
@@ -63,7 +58,7 @@ export const SpaceService = h.service({
       return space;
     }),
 
-  list: h.fn({}, z.array(Space)).do(async ({ $p, state }) => {
+  list: h.fn({}, Space.array()).do(async ({ $p, state }) => {
     const list = await $p.spaceUser.findMany({
       where: { userId: state.user.id },
       include: {
@@ -232,5 +227,3 @@ export const SpaceService = h.service({
     });
   }),
 });
-
-const se = h.event(Space);

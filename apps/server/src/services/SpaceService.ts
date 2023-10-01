@@ -45,8 +45,6 @@ export class SpaceService extends AbstractSpaceService {
         space: { include: spaceInclude },
       },
     });
-    // TODO: move this to the init function when async inits are possible
-    list.forEach((x) => ctx.join(`space/${x.space.id}`));
     return serializeDates(list.map((x) => x.space));
   }
 
@@ -78,7 +76,9 @@ export class SpaceService extends AbstractSpaceService {
       where: { id },
       data: {
         name: options.name ?? undefined,
-        icon: options.icon ? new URL(options.icon).pathname.substring(1) : undefined,
+        icon: options.icon
+          ? new URL(options.icon).pathname.substring(1)
+          : undefined,
       },
       include: spaceInclude,
     });

@@ -40,6 +40,7 @@
   "dependencies": {
     "@axiomhq/axiom-node": "^0.12.0",
     "@hocuspocus/cli": "^2.4.0",
+    "@hyperschema/core": "^0.0.2",
     "@mikoto-io/permcheck": "*",
     "@prisma/client": "^4.16.2",
     "@sophon-js/cli": "^0.0.9",
@@ -72,7 +73,7 @@
     "typedi": "^0.10.0",
     "uuid": "^8.3.2",
     "winston": "^3.9.0",
-    "zod": "^3.21.4"
+    "zod": "^3.22.2"
   },
   "bundledDependencies": [
     "eslint-config"

@@ -21,7 +21,9 @@ export const emitterModel = {
   updateRole: Role,
   deleteRole: Role,
 
+  createUser: User,
   updateUser: User,
+  deleteUser: User,
 
   startTyping: TypingEvent,
 };

@@ -26,6 +26,7 @@
     "@typescript-eslint/return-await": "off",
     "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/no-redeclare": "off",
     "no-use-before-define": "off",
     "react/style-prop-object": "off"
   }

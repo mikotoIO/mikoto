@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 
 import type { MikotoClient } from '../MikotoClient';
-import { Channel } from '../schema';
+import { Channel, ChannelUpdateOptions } from '../hs-client';
 import { Store } from './base';
 import { ClientMessage } from './message';
 
@@ -23,7 +23,8 @@ export class ClientChannel implements Channel {
   }
 
   async listMessages(limit: number, cursor: string | null) {
-    const msgs = await this.client.client.messages.list(this.id, {
+    const msgs = await this.client.client.messages.list({
+      channelId: this.id,
       limit,
       cursor,
     });
@@ -35,12 +36,31 @@ export class ClientChannel implements Channel {
     Object.assign(this, data);
     makeAutoObservable(this, { id: false, client: false });
   }
+
+  async update(options: ChannelUpdateOptions) {
+    await this.client.client.channels.update({
+      channelId: this.id,
+      options,
+    });
+  }
+
+  async delete() {
+    await this.client.client.channels.delete({ channelId: this.id });
+  }
+
+  async sendMessage(content: string) {
+    await this.client.client.messages.send({
+      channelId: this.id,
+      content,
+    });
+  }
 }
 
 export class ChannelStore extends Store<Channel, ClientChannel> {
   async fetch(id: string, data?: Channel) {
     if (this.has(id)) return this.getAndUpdate(id, data);
-    const cData = data ?? (await this.client.client.channels.get(id));
+    const cData =
+      data ?? (await this.client.client.channels.get({ channelId: id }));
     return this.produce(cData);
   }
 

@@ -69,4 +69,16 @@ export const RoleService = h.service({
       await $r.pub(`space:${spaceId}`, 'deleteRole', role);
       return role;
     }),
+
+  onCreate: h.event(Role).emitter((emit, { $r }) => {
+    $r.on('createRole', emit);
+  }),
+
+  onUpdate: h.event(Role).emitter((emit, { $r }) => {
+    $r.on('updateRole', emit);
+  }),
+
+  onDelete: h.event(Role).emitter((emit, { $r }) => {
+    $r.on('deleteRole', emit);
+  }),
 });

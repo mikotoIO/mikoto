@@ -4045,15 +4045,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hyperschema/core@npm:^0.0.4":
-  version: 0.0.4
-  resolution: "@hyperschema/core@npm:0.0.4"
+"@hyperschema/core@npm:^0.0.5":
+  version: 0.0.5
+  resolution: "@hyperschema/core@npm:0.0.5"
   dependencies:
     json-stringify-pretty-compact: 3.0.0
     prettier: ^3.0.3
     socket.io: ^4.7.2
     zod: "*"
-  checksum: d2c9e55eedcc61a41e501c96522b2fd7763fda1fbd8a796e21df3adce3bc59b9c23ef28c4f37ace610c74bfa52a988ec6f6fb8932a3c55a0d4370bd9c210449a
+  checksum: 0b8b7442be942f1791f43026c11cd7a56a78c79c59638e449e487ddacb0ce3f03bd8cb485910a905187fc8b1562e4ab05db50675c988bb6007497b38f599af61
   languageName: node
   linkType: hard
 
@@ -14499,24 +14499,6 @@ __metadata:
     engine.io-parser: ~2.2.0
     ws: ~7.4.2
   checksum: 7dd9eddc79aedf61a63141e6208ee89936c659445378f965bff6d5eb3e9cb4815aff735f2b1886487e2be51116a343e89d972ae5790bf2ac9fdcb2572baf8935
-  languageName: node
-  linkType: hard
-
-"engine.io@npm:~6.5.0":
-  version: 6.5.0
-  resolution: "engine.io@npm:6.5.0"
-  dependencies:
-    "@types/cookie": ^0.4.1
-    "@types/cors": ^2.8.12
-    "@types/node": ">=10.0.0"
-    accepts: ~1.3.4
-    base64id: 2.0.0
-    cookie: ~0.4.1
-    cors: ~2.8.5
-    debug: ~4.3.1
-    engine.io-parser: ~5.1.0
-    ws: ~8.11.0
-  checksum: 1b4550409591133267c8afdaeb2e6ab1e8e1fe7c7e5219baea1b874bc200db21701cf02c30d3a1e73be81a5131146893c23f1a45707f603405bb4cd59d4dee2a
   languageName: node
   linkType: hard
 
@@ -28421,7 +28403,7 @@ __metadata:
   dependencies:
     "@axiomhq/axiom-node": ^0.12.0
     "@hocuspocus/cli": ^2.4.0
-    "@hyperschema/core": ^0.0.4
+    "@hyperschema/core": ^0.0.5
     "@mikoto-io/permcheck": "*"
     "@prisma/client": ^4.16.2
     "@sophon-js/cli": ^0.0.9
@@ -28464,7 +28446,7 @@ __metadata:
     routing-controllers: ^0.9.0
     sharp: ^0.30.7
     socket-controllers: ^0.0.5
-    socket.io: ^4.5.1
+    socket.io: ^4.7.2
     ts-dotenv: ^0.9.1
     ts-jest: ^28.0.8
     ts-node: ^10.9.1
@@ -28950,21 +28932,6 @@ __metadata:
     socket.io-client: 2.5.0
     socket.io-parser: ~3.4.0
   checksum: 6f20a413352cb0a8bb13063249fe425c81fb54beca1bdd71221262305cf21232e6a37fdd4a232b5695dbd4d3204281a9313829c9c373c5ba01c5bd7218edd094
-  languageName: node
-  linkType: hard
-
-"socket.io@npm:^4.5.1":
-  version: 4.7.0
-  resolution: "socket.io@npm:4.7.0"
-  dependencies:
-    accepts: ~1.3.4
-    base64id: ~2.0.0
-    cors: ~2.8.5
-    debug: ~4.3.2
-    engine.io: ~6.5.0
-    socket.io-adapter: ~2.5.2
-    socket.io-parser: ~4.2.4
-  checksum: 99e4a40d13b1f04e2febddd484870a3ea85e7cc310bf8dbb35adc8111a29fee416a3c01a2c1fd7d06a1bee5ede765e181966753fd28b718331744ef67c83a961
   languageName: node
   linkType: hard
 

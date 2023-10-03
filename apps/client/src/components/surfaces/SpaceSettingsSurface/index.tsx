@@ -26,7 +26,10 @@ function AddBotModal({ space }: { space: ClientSpace }) {
     <Modal>
       <Form
         onSubmit={form.handleSubmit(async (data) => {
-          await mikoto.client.members.create(space.id, data.botId);
+          await mikoto.client.members.create({
+            spaceId: space.id,
+            userId: data.botId,
+          });
           setModal(null);
         })}
       >
@@ -60,7 +63,8 @@ function Overview({ space }: { space: ClientSpace }) {
               '/spaceicon',
               file,
             );
-            await mikoto.client.spaces.update(space.id, {
+
+            await space.update({
               icon: data.url,
               name: null,
             });
@@ -108,7 +112,7 @@ function Invites({ space }: { space: Space }) {
   const [invites, setInvites] = useState<Invite[] | null>(null);
 
   useEffect(() => {
-    mikoto.client.spaces.listInvites(space.id).then((x) => {
+    mikoto.client.spaces.listInvites({ spaceId: space.id }).then((x) => {
       setInvites(x);
     });
   }, [space.id]);
@@ -125,9 +129,11 @@ function Invites({ space }: { space: Space }) {
             <Button
               variant="danger"
               onClick={() => {
-                mikoto.client.spaces.deleteInvite(invite.code).then(() => {
-                  setInvites(invites.filter((x) => x.code !== invite.code));
-                });
+                mikoto.client.spaces
+                  .deleteInvite({ spaceId: space.id, inviteCode: invite.code })
+                  .then(() => {
+                    setInvites(invites.filter((x) => x.code !== invite.code));
+                  });
               }}
             >
               Delete

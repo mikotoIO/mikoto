@@ -67,9 +67,13 @@ function InviteModal({ space }: { space: Space }) {
           <Button
             type="button"
             onClick={() => {
-              mikoto.client.spaces.createInvite(space.id).then((x) => {
-                setInvite(x);
-              });
+              mikoto.client.spaces
+                .createInvite({
+                  spaceId: space.id,
+                })
+                .then((x) => {
+                  setInvite(x);
+                });
             }}
           >
             Generate
@@ -106,7 +110,7 @@ function InviteModal({ space }: { space: Space }) {
   );
 }
 
-function ServerIconContextMenu({ space }: { space: Space }) {
+function ServerIconContextMenu({ space }: { space: ClientSpace }) {
   const mikoto = useMikoto();
   const tabkit = useTabkit();
   const setModal = useSetRecoilState(modalState);
@@ -143,7 +147,7 @@ function ServerIconContextMenu({ space }: { space: Space }) {
       </ContextMenu.Link>
       <ContextMenu.Link
         onClick={async () => {
-          await mikoto.client.spaces.leave(space.id);
+          await space.leave();
         }}
       >
         Leave Space

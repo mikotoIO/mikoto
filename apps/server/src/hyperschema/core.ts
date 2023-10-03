@@ -12,10 +12,25 @@ export const h = new HyperRPC().context(async ({ $meta }) => {
   const user = await prisma.user.findUnique({
     where: { id: j.sub },
   });
+
   if (user === null) throw new UnauthorizedError('Not logged in');
+  const spaces = await prisma.spaceUser
+    .findMany({
+      where: { userId: user.id },
+      include: {
+        space: true,
+      },
+    })
+    .then((xs) => xs.map((x) => x.space));
+
+  const $r = new PubSubSystem(redis, emitterModel);
+  const toSub = [`user:${user.id}`, ...spaces.map((x) => `space:${x.id}`)];
+  if (toSub.length > 0) {
+    await $r.sub(toSub);
+  }
   return {
     $p: prisma,
-    $r: new PubSubSystem(redis, emitterModel),
+    $r,
     state: {
       user,
     },

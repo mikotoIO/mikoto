@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 
 import type { MikotoClient } from '../MikotoClient';
-import { Member, User } from '../schema';
+import { Member, MemberUpdateOptions, User } from '../hs-client';
 import { Store, normalizedAssign } from './base';
 
 export class ClientMember implements Member {
@@ -37,6 +37,21 @@ export class ClientMember implements Member {
       }
     }
     return undefined;
+  }
+
+  async update(options: MemberUpdateOptions) {
+    await this.client.client.members.update({
+      spaceId: this.spaceId,
+      userId: this.userId,
+      options,
+    });
+  }
+
+  async kick() {
+    await this.client.client.members.delete({
+      spaceId: this.spaceId,
+      userId: this.userId,
+    });
   }
 }
 

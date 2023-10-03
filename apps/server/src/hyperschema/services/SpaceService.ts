@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import { HSContext, h } from '../core';
 import { assertSpaceMembership, requireSpacePerm } from '../middlewares';
-import { Space, SpaceUpdateOptions } from '../models';
+import { Invite, Space, SpaceUpdateOptions } from '../models';
 import { memberInclude, memberMap, spaceInclude } from '../normalizer';
 
 async function joinSpace(
@@ -193,7 +193,7 @@ export const SpaceService = h.service({
 
   // invite management
   createInvite: h
-    .fn({ spaceId: z.string() }, z.string())
+    .fn({ spaceId: z.string() }, Invite)
     .use(requireSpacePerm(permissions.manageSpace))
     .do(async ({ spaceId, $p, state }) => {
       const invite = await $p.invite.create({
@@ -203,17 +203,17 @@ export const SpaceService = h.service({
           creatorId: state.user.id,
         },
       });
-      return invite.id;
+      return { code: invite.id };
     }),
 
   listInvites: h
-    .fn({ spaceId: z.string() }, z.array(z.string()))
+    .fn({ spaceId: z.string() }, Invite.array())
     .use(requireSpacePerm(permissions.manageSpace))
     .do(async ({ spaceId, $p }) => {
       const invites = await $p.invite.findMany({
         where: { spaceId },
       });
-      return invites.map((x) => x.id);
+      return invites.map((x) => ({ code: x.id }));
     }),
 
   deleteInvite: h

@@ -51,9 +51,13 @@ export function VoiceView({ channelId }: { channelId: string }) {
 
   const [voiceConfig, setVoiceConfig] = useState<VoiceToken | null>(null);
   useEffect(() => {
-    mikoto.client.voice.join(channel.id).then((x) => {
-      setVoiceConfig(x);
-    });
+    mikoto.client.voice
+      .join({
+        channelId: channel.id,
+      })
+      .then((x) => {
+        setVoiceConfig(x);
+      });
   }, []);
 
   return (

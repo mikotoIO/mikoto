@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 
 import type { MikotoClient } from '../MikotoClient';
-import { Message, User } from '../schema';
+import { Message, User } from '../hs-client';
 
 export class ClientMessage implements Message {
   id!: string;
@@ -24,5 +24,21 @@ export class ClientMessage implements Message {
   constructor(public client: MikotoClient, data: Message) {
     Object.assign(this, data);
     makeAutoObservable(this, { id: false, client: false });
+  }
+
+  delete() {
+    return this.client.client.messages.delete({
+      channelId: this.channelId,
+      messageId: this.id,
+    });
+  }
+
+  async edit(content: string) {
+    const msg = await this.client.client.messages.edit({
+      channelId: this.channelId,
+      messageId: this.id,
+      content,
+    });
+    Object.assign(this, msg);
   }
 }

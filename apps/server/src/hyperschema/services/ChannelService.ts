@@ -31,21 +31,22 @@ export const ChannelService = h.service({
       {
         spaceId: z.string(),
         name: z.string(),
-        options: ChannelCreateOptions,
+        parentId: z.string().nullable(),
+        type: z.string(),
       },
       Channel,
     )
     .use(requireSpacePerm(permissions.manageChannels))
-    .do(async ({ $p, $r, spaceId, name, options }) => {
+    .do(async ({ $p, $r, spaceId, name, type, parentId }) => {
       const channel = await $p.channel.create({
         data: {
           name,
           spaceId,
-          parentId: options.parentId,
-          type: options.type as ChannelType,
+          parentId,
+          type: type as ChannelType,
           order: 0,
           Document:
-            options.type === 'DOCUMENT'
+            type === 'DOCUMENT'
               ? {
                   create: {
                     content: `{"type":"doc","content":[{"type":"paragraph"}]}`,

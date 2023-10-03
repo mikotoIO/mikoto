@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import { h } from '../core';
 import { assertChannelMembership } from '../middlewares';
-import { Message, TypingEvent } from '../models';
+import { Message, TypingEvent, Unread } from '../models';
 import { authorInclude } from '../normalizer';
 
 export const MessageService = h.service({
@@ -136,4 +136,42 @@ export const MessageService = h.service({
   onTypingStart: h.event(TypingEvent).emitter((emit, { $r }) => {
     $r.on('startTyping', emit);
   }),
+
+  ack: h
+    .fn({ channelId: z.string(), timestamp: z.string() }, Unread)
+    // .use(assertChannelMembership)
+    .do(async ({ $p, state, channelId, timestamp }) => {
+      const unread = await $p.channelUnread.upsert({
+        create: {
+          channelId,
+          userId: state.user.id,
+          timestamp: new Date(timestamp),
+        },
+        update: {
+          timestamp: new Date(timestamp),
+        },
+        where: {
+          channelId_userId: {
+            channelId,
+            userId: state.user.id,
+          },
+        },
+      });
+      return {
+        channelId: unread.channelId,
+        timestamp: unread.timestamp.toISOString(),
+      };
+    }),
+
+  listUnread: h
+    .fn({ spaceId: z.string() }, Unread.array())
+    .do(async ({ $p, state, spaceId }) => {
+      const unreads = await $p.channelUnread.findMany({
+        where: { userId: state.user.id, channel: { spaceId } },
+      });
+      return unreads.map((u) => ({
+        channelId: u.channelId,
+        timestamp: u.timestamp.toISOString(),
+      }));
+    }),
 });

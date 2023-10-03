@@ -32,9 +32,13 @@ export function SpaceInviteViewInner() {
   const { inviteCode } = useParams<{ inviteCode: string }>();
 
   useEffect(() => {
-    mikoto.client.spaces.getSpaceFromInvite(inviteCode ?? '').then((x) => {
-      setSpace(x);
-    });
+    mikoto.client.spaces
+      .getSpaceFromInvite({
+        inviteCode: inviteCode ?? '',
+      })
+      .then((x) => {
+        setSpace(x);
+      });
   }, [inviteCode ?? '']);
 
   return (
@@ -50,7 +54,9 @@ export function SpaceInviteViewInner() {
               variant="primary"
               onClick={async () => {
                 // TODO: Proper fix for malformed invite links
-                await mikoto.client.spaces.join(inviteCode ?? '');
+                await mikoto.client.spaces.join({
+                  inviteCode: inviteCode ?? '',
+                });
                 window.location.href = `/`;
               }}
             >

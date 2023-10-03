@@ -109,8 +109,10 @@ function NameChangeModal() {
       <Form
         onSubmit={handleSubmit(async (form) => {
           await mikoto.client.users.update({
-            name: form.name,
-            avatar: null,
+            options: {
+              name: form.name,
+              avatar: null,
+            },
           });
           setModal(null);
         })}
@@ -147,8 +149,10 @@ const Overview = observer(() => {
                   file,
                 );
                 await mikoto.client.users.update({
-                  avatar: data.url,
-                  name: null,
+                  options: {
+                    avatar: data.url,
+                    name: null,
+                  },
                 });
               }}
             />

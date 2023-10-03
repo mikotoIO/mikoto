@@ -14,6 +14,7 @@ export const UserService = h.service({
     const user = await $p.user.findUnique({
       where: { id: state.user.id },
     });
+
     if (!user) throw new NotFoundError();
     return user;
   }),
@@ -33,15 +34,15 @@ export const UserService = h.service({
       return user;
     }),
 
-    onCreate: h.event(User).emitter((emit, { $r }) => {
-      $r.on('createUser', emit);
-    }),
-  
-    onUpdate: h.event(User).emitter((emit, { $r }) => {
-      $r.on('updateUser', emit);
-    }),
-  
-    onDelete: h.event(User).emitter((emit, { $r }) => {
-      $r.on('deleteUser', emit);
-    }),
+  onCreate: h.event(User).emitter((emit, { $r }) => {
+    $r.on('createUser', emit);
+  }),
+
+  onUpdate: h.event(User).emitter((emit, { $r }) => {
+    $r.on('updateUser', emit);
+  }),
+
+  onDelete: h.event(User).emitter((emit, { $r }) => {
+    $r.on('deleteUser', emit);
+  }),
 });

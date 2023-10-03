@@ -1,13 +1,7 @@
 import { Checkbox } from '@mantine/core';
 import { Flex } from '@mikoto-io/lucid';
 import { permissions } from '@mikoto-io/permcheck';
-import {
-  ClientMember,
-  Member,
-  Role,
-  User,
-  checkMemberPermission,
-} from 'mikotojs';
+import { ClientMember, Role, User, checkMemberPermission } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
@@ -47,7 +41,13 @@ const AvatarContextWrapper = styled.div`
   }
 `;
 
-function RoleSetter({ roles, member }: { roles: Role[]; member: Member }) {
+function RoleSetter({
+  roles,
+  member,
+}: {
+  roles: Role[];
+  member: ClientMember;
+}) {
   const mikoto = useMikoto();
 
   const [selectedRoles, setSelectedRoles] = useState<Record<string, boolean>>(
@@ -78,15 +78,11 @@ function RoleSetter({ roles, member }: { roles: Role[]; member: Member }) {
                 };
                 setSelectedRoles(newSelectedRoles);
 
-                await mikoto.client.members.update(
-                  member.spaceId,
-                  member.user.id,
-                  {
-                    roleIds: Object.keys(newSelectedRoles).filter(
-                      (id) => newSelectedRoles[id],
-                    ),
-                  },
-                );
+                await member.update({
+                  roleIds: Object.keys(newSelectedRoles).filter(
+                    (id) => newSelectedRoles[id],
+                  ),
+                });
               }}
             />
           );

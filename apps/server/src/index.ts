@@ -22,7 +22,6 @@ import { logger } from './functions/logger';
 import './functions/prismaRecursive';
 import { redis } from './functions/redis';
 import * as hs from './hyperschema';
-import { boot } from './services/sophon';
 
 const app = express();
 
@@ -68,12 +67,14 @@ async function main() {
   );
 
   server.listen(env.AUTH_PORT, () => {
-    logger.info(`Mikoto server started on http://0.0.0.0:${env.AUTH_PORT}`);
+    logger.info(`Mikoto auth started on http://0.0.0.0:${env.AUTH_PORT}`);
   });
 
   // set up a sophon server as well
-  boot(env.SERVER_PORT, () => {
-    logger.info(`Mikoto Sophon listening on http://0.0.0.0:${env.SERVER_PORT}`);
+  hs.boot(() => {
+    logger.info(
+      `Mikoto hyperschema listening on http://0.0.0.0:${env.SERVER_PORT}`,
+    );
   });
 }
 

@@ -1,7 +1,7 @@
 import { ObservableMap, makeAutoObservable, runInAction } from 'mobx';
 
 import type { MikotoClient } from '../MikotoClient';
-import { Space } from '../schema';
+import { Space, SpaceUpdateOptions } from '../hs-client';
 import { Store, normalizedAssign } from './base';
 import { ClientChannel } from './channel';
 import { ClientMember } from './member';
@@ -46,7 +46,9 @@ export class ClientSpace implements Space {
 
   async fetchMembers(forceSync?: boolean) {
     if (this.members && !forceSync) return;
-    const members = await this.client.client.members.list(this.id);
+    const members = await this.client.client.members.list({
+      spaceId: this.id,
+    });
 
     runInAction(() => {
       this.members = new ObservableMap(
@@ -54,12 +56,40 @@ export class ClientSpace implements Space {
       );
     });
   }
+
+  async createChannel(data: {
+    name: string;
+    parentId: string | null;
+    type: string;
+  }) {
+    return await this.client.client.channels.create({
+      name: data.name,
+      spaceId: this.id,
+      parentId: data.parentId,
+      type: data.type,
+    });
+  }
+
+  update(options: SpaceUpdateOptions) {
+    return this.client.client.spaces.update({
+      spaceId: this.id,
+      options,
+    });
+  }
+
+  leave() {
+    return this.client.client.spaces.leave({ spaceId: this.id });
+  }
 }
 
 export class SpaceStore extends Store<Space, ClientSpace> {
   async fetch(id: string, data?: Space) {
     if (this.has(id)) return this.getAndUpdate(id, data);
-    const cData = data ?? (await this.client.client.spaces.get(id));
+    const cData =
+      data ??
+      (await this.client.client.spaces.get({
+        spaceId: id,
+      }));
     return this.produce(cData);
   }
 
@@ -70,7 +100,7 @@ export class SpaceStore extends Store<Space, ClientSpace> {
 
   async list(reload?: boolean) {
     if (reload) {
-      const a = await this.client.client.spaces.list();
+      const a = await this.client.client.spaces.list({});
       const list = a.map((x) => this.fetch(x.id, x));
       await Promise.all(list);
     }

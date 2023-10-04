@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
 
-import { Channel, Message, Space } from '../models';
+import { Channel, Message, Space } from '../hs-client';
 
 export type EmitterEvents<T> = {
   [key: `create/${string}`]: (message: T) => void;

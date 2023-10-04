@@ -156,7 +156,7 @@ function DocumentEditor({ channel, content }: DocumentEditorProps) {
   const save = (edt: Editor) => {
     const contentString = JSON.stringify(edt.getJSON());
     mikoto.client.documents
-      .update(channel.id, contentString)
+      .update({ channelId: channel.id, content: contentString })
       .then(() => setChanged(false))
       .catch(() => setChanged(true));
   };
@@ -181,7 +181,7 @@ export function DocumentSurface({ channelId }: { channelId: string }) {
   const [content, setContent] = useState<string | null>(null);
 
   useEffect(() => {
-    mikoto.client.documents.get(channelId).then((x) => {
+    mikoto.client.documents.get({ channelId }).then((x) => {
       setContent(x.content);
     });
   }, [channelId]);

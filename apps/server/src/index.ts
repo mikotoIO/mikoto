@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 
+import { writeTypeScriptClient } from '@hyperschema/core';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 import express from 'express';
@@ -20,7 +21,7 @@ import Minio from './functions/Minio';
 import { logger } from './functions/logger';
 import './functions/prismaRecursive';
 import { redis } from './functions/redis';
-import { boot } from './services/sophon';
+import * as hs from './hyperschema';
 
 const app = express();
 
@@ -59,13 +60,25 @@ useExpressServer(app, {
 async function main() {
   await redis.connect();
 
+  // setup Hyperschema
+  if (env.MIKOTO_ENV === 'DEV') {
+    logger.info('Generating Hyperschema...');
+    await writeTypeScriptClient(
+      path.join(__dirname, '../../../packages/mikotojs/src/hs-client.ts'),
+      hs,
+    );
+    logger.info('Hyperschema generated!');
+  }
+
   server.listen(env.AUTH_PORT, () => {
-    logger.info(`Mikoto server started on http://0.0.0.0:${env.AUTH_PORT}`);
+    logger.info(`Mikoto auth started on http://0.0.0.0:${env.AUTH_PORT}`);
   });
 
   // set up a sophon server as well
-  boot(env.SERVER_PORT, () => {
-    logger.info(`Mikoto Sophon listening on http://0.0.0.0:${env.SERVER_PORT}`);
+  hs.boot(() => {
+    logger.info(
+      `Mikoto hyperschema listening on http://0.0.0.0:${env.SERVER_PORT}`,
+    );
   });
 }
 

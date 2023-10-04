@@ -33,7 +33,7 @@ function General({ channel }: { channel: ClientChannel }) {
       <Heading>Overview</Heading>
       <Form
         onSubmit={form.handleSubmit(async (data) => {
-          await mikoto.client.channels.update(channel.id, data);
+          await channel.update(data);
         })}
       >
         <Input labelName="Channel Name" {...form.register('name')} />

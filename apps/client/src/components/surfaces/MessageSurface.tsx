@@ -1,12 +1,6 @@
 import { faHashtag } from '@fortawesome/free-solid-svg-icons';
 import { throttle } from 'lodash';
-import {
-  Channel,
-  ClientChannel,
-  ClientMessage,
-  Member,
-  Message,
-} from 'mikotojs';
+import { Channel, ClientChannel, ClientMessage, Message } from 'mikotojs';
 import { runInAction } from 'mobx';
 import { Observer, observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState, useRef } from 'react';
@@ -88,7 +82,7 @@ const OtherInner = styled.div`
 
 function useTyping() {
   const [currentTypers, setCurrentTypers] = useState<
-    { timestamp: number; member: Member }[]
+    { timestamp: number; userId: string }[]
   >([]);
 
   useInterval(() => {
@@ -110,17 +104,19 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
   const [currentTypers, setCurrentTypers] = useTyping();
   const [messageEditState] = useState(() => new MessageEditState());
 
+  // TODO: When I wrote this code, only God and I understood what I was doing
+  // At this point, I don't think God understands it either
   useEffect(
     () =>
-      mikoto.client.channels.onTypingStart((ev) => {
+      mikoto.client.messages.onTypingStart((ev) => {
         if (ev.channelId !== channel.id) return;
-        if (ev.member!.user.id === mikoto.me.id) return;
+        // if (ev.userId === mikoto.me.id) return;
 
         setCurrentTypers((cts) => {
           const ct = [...cts];
           let exists = false;
           ct.forEach((x) => {
-            if (x.member.id === ev.member!.id) {
+            if (x.userId === ev.userId) {
               exists = true;
               x.timestamp = Date.now() + 5000;
             }
@@ -128,7 +124,7 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
           if (!exists) {
             ct.push({
               timestamp: Date.now() + 5000,
-              member: ev.member!,
+              userId: ev.userId,
             });
           }
           return ct;
@@ -139,7 +135,11 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
 
   const typing = useCallback(
     throttle(() => {
-      mikoto.client.channels.startTyping(channel.id, 5000).then();
+      mikoto.client.messages
+        .startTyping({
+          channelId: channel.id,
+        })
+        .then();
     }, 3000),
     [],
   );
@@ -164,10 +164,13 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
   const createFn = (x: Message) => {
     setMsgs((xs) => {
       if (xs === null) return null;
-      setCurrentTypers((ts) =>
-        ts.filter((y) => y.member.user.id !== x.author?.id),
-      );
-      mikoto.client.messages.ack(channel.id, x.timestamp).then(() => {});
+      setCurrentTypers((ts) => ts.filter((y) => y.userId !== x.author?.id));
+      mikoto.client.messages
+        .ack({
+          channelId: channel.id,
+          timestamp: x.timestamp,
+        })
+        .then(() => {});
       setScrollToBottom(true);
       return [...xs, new ClientMessage(mikoto, x)];
     });
@@ -265,9 +268,9 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
                 runInAction(() => {
                   messageEditState.message = null;
                 });
-                await mikoto.client.messages.edit(channel.id, m.id, msg);
+                await m.edit(msg);
               } else {
-                await mikoto.client.messages.send(channel.id, msg);
+                await channel.sendMessage(msg);
               }
             }}
           />
@@ -277,7 +280,13 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
             <div>
               <TypingDots />
               <strong>
-                {currentTypers.map((x) => x.member.user.name).join(', ')}
+                {currentTypers
+                  .map(
+                    (x) =>
+                      mikoto.spaces.get(channel.spaceId)?.members?.get(x.userId)
+                        ?.user.name ?? 'Unknown',
+                  )
+                  .join(', ')}
               </strong>{' '}
               is typing...
             </div>

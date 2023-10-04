@@ -168,7 +168,13 @@ const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
       h="100%"
       onSubmit={form.handleSubmit((d) => {
         const data = { ...d, permissions: perms, color };
-        mikoto.client.roles.edit(role.id, data).then((x) => {});
+        mikoto.client.roles
+          .edit({
+            spaceId: space.id,
+            roleId: role.id,
+            options: data,
+          })
+          .then(() => {});
       })}
     >
       <h2>Edit {role.name}</h2>
@@ -197,7 +203,12 @@ const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
             type="button"
             variant="danger"
             onClick={() => {
-              mikoto.client.roles.delete(role.id).then(() => {});
+              mikoto.client.roles
+                .delete({
+                  spaceId: space.id,
+                  roleId: role.id,
+                })
+                .then(() => {});
             }}
           >
             Delete Role
@@ -222,7 +233,10 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
             m={{ y: 16 }}
             variant="primary"
             onClick={async () => {
-              await mikoto.client.roles.create(space.id, 'New Role');
+              await mikoto.client.roles.create({
+                spaceId: space.id,
+                name: 'New Role',
+              });
             }}
           >
             <FontAwesomeIcon icon={faCirclePlus} />

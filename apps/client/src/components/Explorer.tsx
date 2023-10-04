@@ -117,7 +117,9 @@ function CreateChannelModal({ channel }: { channel?: Channel }) {
         <Form
           onSubmit={handleSubmit(async (formData) => {
             try {
-              await mikoto.client.channels.create(spaceId, {
+              const space = mikoto.spaces.get(spaceId)!;
+
+              space.createChannel({
                 name: formData.name,
                 type: channelType,
                 parentId: channel?.id ?? null,
@@ -250,7 +252,7 @@ function DeleteChannelModal({ channel }: { channel: ClientChannel }) {
         <Button
           variant="danger"
           onClick={async () => {
-            await mikoto.client.channels.delete(channel.id);
+            await channel.delete();
             setModal(null);
           }}
         >
@@ -340,7 +342,7 @@ export const Explorer = observer(({ space }: { space: ClientSpace }) => {
   const [acks, setAcks] = useState<Record<string, Date>>({});
 
   useEffect(() => {
-    mikoto.client.messages.listUnread(space.id).then((ur) => {
+    mikoto.client.messages.listUnread({ spaceId: space.id }).then((ur) => {
       setAcks(
         Object.fromEntries(ur.map((u) => [u.channelId, new Date(u.timestamp)])),
       );
@@ -369,9 +371,14 @@ export const Explorer = observer(({ space }: { space: ClientSpace }) => {
     onClick(ev) {
       tabkit.openTab(channelToTab(channel), ev.ctrlKey);
       const now = new Date();
-      mikoto.client.messages.ack(channel.id, now.toISOString()).then(() => {
-        setAcks((xs) => ({ ...xs, [channel.id]: now }));
-      });
+      mikoto.client.messages
+        .ack({
+          channelId: channel.id,
+          timestamp: now.toISOString(),
+        })
+        .then(() => {
+          setAcks((xs) => ({ ...xs, [channel.id]: now }));
+        });
     },
     onContextMenu: nodeContextMenu(() => (
       <ChannelContextMenu channel={channel} />

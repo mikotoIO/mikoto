@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 
 import type { MikotoClient } from '../MikotoClient';
-import { Role } from '../schema';
+import { Role } from '../hs-client';
 import { Store, normalizedAssign } from './base';
 
 export class ClientRole implements Role {

@@ -58,4 +58,8 @@ export class PubSubSystem<M extends Record<string, z.ZodType>> {
   on<K extends keyof M>(evt: K, handler: (x: z.infer<M[K]>) => void) {
     this.handlers[evt].push(handler);
   }
+
+  async close() {
+    await this.receiver.quit();
+  }
 }

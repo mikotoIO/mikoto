@@ -1,12 +1,6 @@
 import { faHashtag } from '@fortawesome/free-solid-svg-icons';
 import { throttle } from 'lodash';
-import {
-  Channel,
-  ClientChannel,
-  ClientMessage,
-  Member,
-  Message,
-} from 'mikotojs';
+import { Channel, ClientChannel, ClientMessage, Message } from 'mikotojs';
 import { runInAction } from 'mobx';
 import { Observer, observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState, useRef } from 'react';
@@ -88,7 +82,7 @@ const OtherInner = styled.div`
 
 function useTyping() {
   const [currentTypers, setCurrentTypers] = useState<
-    { timestamp: number; memberId: string }[]
+    { timestamp: number; userId: string }[]
   >([]);
 
   useInterval(() => {
@@ -110,17 +104,19 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
   const [currentTypers, setCurrentTypers] = useTyping();
   const [messageEditState] = useState(() => new MessageEditState());
 
+  // TODO: When I wrote this code, only God and I understood what I was doing
+  // At this point, I don't think God understands it either
   useEffect(
     () =>
       mikoto.client.messages.onTypingStart((ev) => {
         if (ev.channelId !== channel.id) return;
-        if (ev.memberId === mikoto.me.id) return;
+        // if (ev.userId === mikoto.me.id) return;
 
         setCurrentTypers((cts) => {
           const ct = [...cts];
           let exists = false;
           ct.forEach((x) => {
-            if (x.memberId === ev.memberId) {
+            if (x.userId === ev.userId) {
               exists = true;
               x.timestamp = Date.now() + 5000;
             }
@@ -128,7 +124,7 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
           if (!exists) {
             ct.push({
               timestamp: Date.now() + 5000,
-              memberId: ev.memberId,
+              userId: ev.userId,
             });
           }
           return ct;
@@ -168,7 +164,7 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
   const createFn = (x: Message) => {
     setMsgs((xs) => {
       if (xs === null) return null;
-      setCurrentTypers((ts) => ts.filter((y) => y.memberId !== x.author?.id));
+      setCurrentTypers((ts) => ts.filter((y) => y.userId !== x.author?.id));
       mikoto.client.messages
         .ack({
           channelId: channel.id,
@@ -287,9 +283,8 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
                 {currentTypers
                   .map(
                     (x) =>
-                      mikoto.spaces
-                        .get(channel.spaceId)!
-                        .members?.get(x.memberId)!,
+                      mikoto.spaces.get(channel.spaceId)?.members?.get(x.userId)
+                        ?.user.name ?? 'Unknown',
                   )
                   .join(', ')}
               </strong>{' '}

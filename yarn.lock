@@ -4045,15 +4045,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hyperschema/core@npm:^0.0.5":
-  version: 0.0.5
-  resolution: "@hyperschema/core@npm:0.0.5"
+"@hyperschema/core@npm:^0.0.6":
+  version: 0.0.6
+  resolution: "@hyperschema/core@npm:0.0.6"
   dependencies:
     json-stringify-pretty-compact: 3.0.0
     prettier: ^3.0.3
     socket.io: ^4.7.2
     zod: "*"
-  checksum: 0b8b7442be942f1791f43026c11cd7a56a78c79c59638e449e487ddacb0ce3f03bd8cb485910a905187fc8b1562e4ab05db50675c988bb6007497b38f599af61
+  checksum: f9331d19dd676a3475e12e8a152645389e3d1004744ccaa66a3e1876b0196b0edde2a4a213190de20403eb754b778af088c19ac85b619a442f9d8ac1ee8b7942
   languageName: node
   linkType: hard
 
@@ -28403,7 +28403,7 @@ __metadata:
   dependencies:
     "@axiomhq/axiom-node": ^0.12.0
     "@hocuspocus/cli": ^2.4.0
-    "@hyperschema/core": ^0.0.5
+    "@hyperschema/core": ^0.0.6
     "@mikoto-io/permcheck": "*"
     "@prisma/client": ^4.16.2
     "@sophon-js/cli": ^0.0.9

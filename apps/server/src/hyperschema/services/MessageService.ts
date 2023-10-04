@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { h } from '../core';
 import { assertChannelMembership } from '../middlewares';
 import { Message, TypingEvent, Unread } from '../models';
+import { emitterModel } from '../models/emitter';
 import { authorInclude } from '../normalizer';
 
 export const MessageService = h.service({
@@ -109,6 +110,10 @@ export const MessageService = h.service({
 
   onCreate: h.event(Message).emitter((emit, { $r }) => {
     $r.on('createMessage', emit);
+
+    return () => {
+      $r.close();
+    };
   }),
 
   onUpdate: h.event(Message).emitter((emit, { $r }) => {

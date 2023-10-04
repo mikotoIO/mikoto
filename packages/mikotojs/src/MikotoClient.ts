@@ -47,6 +47,7 @@ export class MikotoClient {
         authToken: accessToken,
       }),
     );
+    this.setupClient();
 
     this.client.onReady(() => {
       onReady?.(this);

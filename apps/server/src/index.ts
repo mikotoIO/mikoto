@@ -61,10 +61,14 @@ async function main() {
   await redis.connect();
 
   // setup Hyperschema
-  await writeTypeScriptClient(
-    path.join(__dirname, '../../../packages/mikotojs/src/hs-client.ts'),
-    hs,
-  );
+  if (env.MIKOTO_ENV === 'DEV') {
+    logger.info('Generating Hyperschema...');
+    await writeTypeScriptClient(
+      path.join(__dirname, '../../../packages/mikotojs/src/hs-client.ts'),
+      hs,
+    );
+    logger.info('Hyperschema generated!');
+  }
 
   server.listen(env.AUTH_PORT, () => {
     logger.info(`Mikoto auth started on http://0.0.0.0:${env.AUTH_PORT}`);

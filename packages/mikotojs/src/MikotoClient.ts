@@ -1,7 +1,8 @@
+import { SocketIOClientTransport } from '@hyperschema/client';
 import { runInAction } from 'mobx';
 
 import { ChannelEmitter, MessageEmitter, SpaceEmitter } from './emitters';
-import { createClient, MainServiceClient } from './schema';
+import { MainService } from './hs-client';
 import {
   ChannelStore,
   ClientChannel,
@@ -22,7 +23,7 @@ interface MikotoClientOptions {
 
 export class MikotoClient {
   // spaces: SpaceEngine = new SpaceEngine(this);
-  client!: MainServiceClient;
+  client!: MainService;
 
   // screw all of the above, we're rewriting the entire thing
   messageEmitter = new MessageEmitter();
@@ -40,18 +41,24 @@ export class MikotoClient {
     accessToken: string,
     { onReady, onConnect, onDisconnect }: MikotoClientOptions,
   ) {
-    createClient({
-      url: sophonUrl,
-      params: {
-        accessToken,
-      },
-      onReady: (client) => {
-        this.client = client;
-        this.setupClient();
-        onReady?.(this);
-      },
-      onConnect,
-      onDisconnect,
+    this.client = new MainService(
+      new SocketIOClientTransport({
+        url: sophonUrl,
+        authToken: accessToken,
+      }),
+    );
+    this.setupClient();
+
+    this.client.onReady(() => {
+      onReady?.(this);
+    });
+
+    this.client.onConnect(() => {
+      onConnect?.();
+    });
+
+    this.client.onDisconnect(() => {
+      onDisconnect?.();
     });
   }
 
@@ -70,8 +77,8 @@ export class MikotoClient {
       this.messageEmitter.emit(`update/${message.channelId}`, message);
     });
 
-    this.client.messages.onDelete(({ messageId, channelId }) => {
-      this.messageEmitter.emit(`delete/${channelId}`, messageId);
+    this.client.messages.onDelete(({ id, channelId }) => {
+      this.messageEmitter.emit(`delete/${channelId}`, id);
     });
 
     this.client.channels.onCreate((channel) => {
@@ -109,7 +116,7 @@ export class MikotoClient {
 
   async getMe() {
     if (this.me) return this.me;
-    this.me = new ClientUser(this, await this.client.users.me());
+    this.me = new ClientUser(this, await this.client.users.me({}));
     return this.me;
   }
 }

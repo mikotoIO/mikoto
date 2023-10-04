@@ -8,5 +8,5 @@ export interface TokenPair {
   refreshToken: string;
 }
 
-export * from '../schema';
+export * from '../hs-client';
 export * from './permissions';

@@ -30,7 +30,7 @@ export function UserContextMenu({ user, member }: UserContextMenuProps) {
         checkMemberPermission(member.space.member!, permissions.ban) && (
           <ContextMenu.Link
             onClick={async () => {
-              await mikoto.client.members.delete(member.spaceId, member.userId);
+              await member.kick();
             }}
           >
             Kick {user.name}

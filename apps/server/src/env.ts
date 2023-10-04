@@ -1,6 +1,10 @@
 import { load } from 'ts-dotenv';
 
 export const env = load({
+  MIKOTO_ENV: {
+    type: String,
+    default: 'PROD',
+  },
   SECRET: String,
   REDIS_URL: String,
   AUTH_PORT: Number,

@@ -15,6 +15,7 @@
     "react/destructuring-assignment": "off",
     "react/require-default-props": "off",
     "react/jsx-props-no-spreading": "off",
+    "arrow-body-style": "off",
     // ""react-hooks/exhaustive-deps"": off,
     "class-methods-use-this": "off",
     "import/prefer-default-export": "off",
@@ -25,6 +26,7 @@
     "@typescript-eslint/return-await": "off",
     "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/no-redeclare": "off",
     "no-use-before-define": "off",
     "react/style-prop-object": "off"
   }

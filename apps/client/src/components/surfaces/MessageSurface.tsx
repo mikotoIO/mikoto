@@ -110,7 +110,7 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
     () =>
       mikoto.client.messages.onTypingStart((ev) => {
         if (ev.channelId !== channel.id) return;
-        // if (ev.userId === mikoto.me.id) return;
+        if (ev.userId === mikoto.me.id) return;
 
         setCurrentTypers((cts) => {
           const ct = [...cts];

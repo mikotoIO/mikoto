@@ -11,19 +11,19 @@ class Client:
         self.sio = socketio.AsyncClient()
 
     async def call(self, event: str, payload) -> Any:
-        res = await self.sio.call(event, payload)
+        res: Any = await self.sio.call(event, payload)
         if "err" in res:
             raise Exception(res["err"])
         return res.get("ok")
 
-    def on(self, event: str, callback=None):
+    def on(self, event: str, callback=None) -> Any:
         return self.sio.on(event, callback)
 
     def ready(self, fn):
         return self.sio.on("ready", fn)
 
-    async def boot(self, url: str):
-        await self.sio.connect(url)
+    async def boot(self, url: str, auth_token: str):
+        await self.sio.connect(url, auth={"token": auth_token})
         await self.sio.wait()
 
 

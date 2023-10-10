@@ -3,7 +3,7 @@
   "trailingComma": "all",
   "importOrderSeparation": true,
   "importOrder": [
-    "^(reflect-metadata)|(dotenv/config)$",
+    "^(reflect-metadata)|(react-native-get-random-values)|(dotenv/config)$",
     "<THIRD_PARTY_MODULES>",
     "^[./]"
   ],

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mikoto.py"
-version = "0.0.4"
+version = "0.0.5"
 description = "The Python framework for interacting with Mikoto"
 authors = ["TheCactusBlue <cactus@mikoto.io>"]
 license = "MIT"

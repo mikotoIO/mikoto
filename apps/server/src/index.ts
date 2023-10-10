@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { writeTypeScriptClient } from '@hyperschema/core';
+import { writeTypeScriptClient, writeHyperschema } from '@hyperschema/core';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 import express from 'express';
@@ -67,6 +67,7 @@ async function main() {
       path.join(__dirname, '../../../packages/mikotojs/src/hs-client.ts'),
       hs,
     );
+    await writeHyperschema(path.join(__dirname, '../hyperschema.json'), hs);
     logger.info('Hyperschema generated!');
   }
 

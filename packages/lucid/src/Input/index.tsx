@@ -5,7 +5,7 @@ import { Switch, Listbox } from '@headlessui/react';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { BoxProps, boxCss } from './Layout';
+import { BoxProps, boxCss } from '../Layout';
 
 const baseInputCss = css`
   height: 44px;
@@ -22,12 +22,12 @@ const baseInputCss = css`
   font-family: var(--font-main);
 `;
 
-export const SInput = styled.input`
+export const BaseInput = styled.input`
   ${baseInputCss}
   ${boxCss}
 `;
 
-export const STextArea = styled.textarea`
+export const BaseTextArea = styled.textarea`
   ${baseInputCss}
   ${boxCss}
   padding: 16px 16px;
@@ -44,19 +44,18 @@ const Label = styled.label`
 
 type InputProps = {
   labelName?: string;
-  textarea?: boolean;
 } & BoxProps &
   React.InputHTMLAttributes<HTMLInputElement>;
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ textarea, labelName, ...props }, ref) => {
+  ({ labelName, ...props }, ref) => {
     if (!labelName) {
-      return <SInput {...props} />;
+      return <BaseInput {...props} />;
     }
     return (
       <Label>
         <div className="label">{labelName}</div>
-        <SInput {...props} ref={ref} />
+        <BaseInput {...props} ref={ref} />
       </Label>
     );
   },
@@ -64,74 +63,64 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
 type TextAreaProps = {
   labelName?: string;
-  textarea?: boolean;
 } & BoxProps &
   React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
 export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
-  ({ textarea, labelName, ...props }, ref) => {
+  ({ labelName, ...props }, ref) => {
     if (!labelName) {
-      return <STextArea {...props} />;
+      return <BaseTextArea {...props} />;
     }
     return (
       <Label>
         <div className="label">{labelName}</div>
-        <STextArea {...props} ref={ref} />
+        <BaseTextArea {...props} ref={ref} />
       </Label>
     );
   },
 );
 
-type SelectProps = {
+export type ComboData = (string | { name: string; value: string })[];
+
+type SelectInputProps = {
   labelName?: string;
-  children?: React.ReactNode;
-};
+  data: ComboData;
+} & BoxProps &
+  React.InputHTMLAttributes<HTMLSelectElement>;
 
-const BaseSelectInput = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ labelName, children }, ref) => {
-    if (!labelName) {
-      return <Listbox />;
-    }
+export const SelectInput = React.forwardRef<
+  HTMLSelectElement,
+  SelectInputProps
+>(({ labelName, ...props }, ref) => {
+  if (!labelName) {
     return (
-      <Label>
-        <div className="label">{labelName}</div>
-        <Listbox ref={ref}>{children}</Listbox>
-      </Label>
+      <BaseInput {...props} as="select">
+        {props.data.map((item) => {
+          if (typeof item === 'string') {
+            return (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            );
+          }
+          return (
+            <option key={item.value} value={item.value}>
+              {item.name}
+            </option>
+          );
+        })}
+      </BaseInput>
     );
-  },
-);
-
-const StyledSelectInputButton = styled(Listbox.Button)`
-  ${baseInputCss}
-  ${boxCss}
-`;
-
-export function SelectInputButton(
-  props: React.HTMLAttributes<HTMLButtonElement>,
-) {
-  return <StyledSelectInputButton {...props} />;
-}
-
-export function SelectInputOptions(
-  props: React.HTMLAttributes<HTMLUListElement>,
-) {
-  return <Listbox.Options {...props} />;
-}
-
-export function SelectInputOption(
-  props: React.LiHTMLAttributes<HTMLLIElement> & {
-    disabled?: boolean | undefined;
-    value: string;
-  },
-) {
-  return <Listbox.Option {...props} />;
-}
-
-export const SelectInput = Object.assign(BaseSelectInput, {
-  Button: SelectInputButton,
-  Options: SelectInputOptions,
-  Option: SelectInputOption,
+  }
+  return (
+    <Label>
+      <div className="label">{labelName}</div>
+      <SelectInput {...props} ref={ref} />
+    </Label>
+  );
 });
+
+// toggle
 
 type ToggleProps = Partial<{
   checked: boolean;

@@ -20,7 +20,6 @@ export function ThemesSubsurface() {
       <h1>{t('accountSettings.themes.title')}</h1>
       <Form
         onSubmit={form.handleSubmit((data) => {
-          console.log(data);
           setThemeSettings(data);
         })}
       >

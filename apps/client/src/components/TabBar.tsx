@@ -50,7 +50,8 @@ const StyledTab = styled.div<{ active?: boolean }>`
   padding: 0 8px 0 20px;
   display: flex;
   flex-shrink: 0;
-  border-bottom: 2px solid ${(p) => (p.active ? 'var(--B700)' : 'transparent')};
+  border-bottom: 2px solid
+    ${(p) => (p.active ? 'var(--color-primary)' : 'transparent')};
   align-items: center;
   justify-content: center;
 

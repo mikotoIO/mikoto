@@ -8,7 +8,11 @@ export class LocalDB<T> {
     private key: string,
     private schema: z.ZodType<T>,
     private init: () => T,
-  ) {}
+  ) {
+    if (!localStorage.getItem(this.key)) {
+      this.set(this.init());
+    }
+  }
 
   get(): T {
     const value = localStorage.getItem(this.key);

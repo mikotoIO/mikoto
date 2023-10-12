@@ -40,8 +40,7 @@ export function Message() {
       />
       <View style={styles.content}>
         <Text style={styles.name}>CactusBlue</Text>
-
-        <Text style={styles.text}>This is a message</Text>
+        <Text style={styles.text}>This is a message!!!</Text>
       </View>
     </View>
   );

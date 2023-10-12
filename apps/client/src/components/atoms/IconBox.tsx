@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import { Tabable } from '../../store/surface';
 
 const StyledIcon = styled.span<{ size?: number }>`
-  background-color: #3b83ff;
+  background-color: var(--color-primary);
   color: white;
   border-radius: 3px;
   text-align: center;

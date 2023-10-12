@@ -1,5 +1,8 @@
+// prettier-ignore
 import 'react-native-get-random-values';
+
 import { registerRootComponent } from 'expo';
+import 'react-native-gesture-handler';
 
 import App from './App';
 

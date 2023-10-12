@@ -44,7 +44,7 @@ function unitToPixel(unit?: string | number): string | undefined {
 }
 
 function computeColor(color: string): string {
-  if (/^[A-Z]\d+$/i.test(color)) {
+  if (/^[^#]/i.test(color)) {
     return `var(--${color})`;
   }
   return color;

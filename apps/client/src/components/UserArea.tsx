@@ -17,9 +17,11 @@ export const userState = atom<User | null>({
 function UserAreaMenu() {
   const tabkit = useTabkit();
   const modal = useModalKit();
+  const mikoto = useMikoto();
 
   return (
-    <ContextMenu>
+    <ContextMenu style={{ width: '280px' }}>
+      <Avatar src={mikoto.me.avatar ?? undefined} size={64} />
       <ContextMenu.Link
         onClick={() => {
           tabkit.openTab({ kind: 'welcome', key: 'welcome' }, false);

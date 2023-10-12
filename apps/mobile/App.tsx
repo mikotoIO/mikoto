@@ -1,5 +1,7 @@
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
@@ -15,59 +17,6 @@ import {
 import { Message } from './components/Message';
 import { SafeAreaView } from './components/SafeAreaView';
 import { theme } from './lucid/theme';
-
-function MessageInput() {
-  const [text, setText] = useState('');
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        gap: 8,
-        width: '100%',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <TextInput
-        style={styles.input}
-        value={text}
-        onChangeText={setText}
-        placeholder="Type a message"
-        placeholderTextColor={theme.colors.N400}
-      />
-      <TouchableHighlight
-        onPress={() => {
-          setText('');
-        }}
-      >
-        <View style={styles.sendButton}>
-          <FontAwesomeIcon icon={faPaperPlane} color={theme.colors.N0} />
-        </View>
-      </TouchableHighlight>
-    </View>
-  );
-}
-export default function App() {
-  return (
-    <SafeAreaView>
-      <StatusBar
-        backgroundColor={theme.colors.N1100}
-        barStyle="light-content"
-      />
-      <View style={styles.container}>
-        <View style={styles.messages}>
-          <View style={styles.messageInner}>
-            <Message />
-            <Message />
-            <Message />
-          </View>
-        </View>
-        <ExpoStatusBar style="auto" />
-        <MessageInput />
-      </View>
-    </SafeAreaView>
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -110,3 +59,65 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+function MessageInput() {
+  const [text, setText] = useState('');
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        gap: 8,
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Type a message"
+        placeholderTextColor={theme.colors.N400}
+      />
+      <TouchableHighlight
+        onPress={() => {
+          setText('');
+        }}
+      >
+        <View style={styles.sendButton}>
+          <FontAwesomeIcon icon={faPaperPlane} color={theme.colors.N0} />
+        </View>
+      </TouchableHighlight>
+    </View>
+  );
+}
+
+function MessageSurface() {
+  return (
+    <View style={styles.container}>
+      <View style={styles.messages}>
+        <View style={styles.messageInner}>
+          <Message />
+          <Message />
+          <Message />
+        </View>
+      </View>
+      <ExpoStatusBar style="auto" />
+      <MessageInput />
+    </View>
+  );
+}
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <SafeAreaView>
+        <StatusBar
+          backgroundColor={theme.colors.N1100}
+          barStyle="light-content"
+        />
+        <MessageSurface />
+      </SafeAreaView>
+    </NavigationContainer>
+  );
+}

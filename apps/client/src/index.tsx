@@ -14,6 +14,7 @@ import { StyleSheetManager, ThemeProvider } from 'styled-components';
 // eslint-disable-next-line import/no-relative-packages
 import '../../../packages/lucid/src/fonts.css';
 import App from './App';
+import { UserThemeProvider } from './components/UserThemeProvider';
 import { env } from './env';
 import './i18n';
 import reportWebVitals from './reportWebVitals';
@@ -43,6 +44,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <RecoilRoot>
     <StyleSheetManager disableCSSOMInjection>
       <LucidProvider>
+        <UserThemeProvider />
         <ThemeProvider theme={theme}>
           <MantineProvider theme={{ colorScheme: 'dark' }}>
             <DndProvider backend={HTML5Backend}>

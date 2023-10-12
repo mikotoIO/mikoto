@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import { useLocalStorage } from 'usehooks-ts';
 import { z } from 'zod';
 
 /**
@@ -5,9 +7,9 @@ import { z } from 'zod';
  */
 export class LocalDB<T> {
   constructor(
-    private key: string,
-    private schema: z.ZodType<T>,
-    private init: () => T,
+    public key: string,
+    public schema: z.ZodType<T>,
+    public init: () => T,
   ) {
     if (!localStorage.getItem(this.key)) {
       this.set(this.init());
@@ -35,4 +37,8 @@ export class LocalDB<T> {
     }
     localStorage.setItem(this.key, JSON.stringify(this.schema.parse(value)));
   }
+}
+
+export function useLocalDB<T>(db: LocalDB<T>) {
+  return useLocalStorage(db.key, db.init());
 }

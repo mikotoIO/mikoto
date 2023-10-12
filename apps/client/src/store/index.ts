@@ -2,8 +2,10 @@ import { Space } from 'mikotojs';
 import React from 'react';
 import { atom, useSetRecoilState } from 'recoil';
 import { recoilPersist } from 'recoil-persist';
+import { z } from 'zod';
 
 import { modalState } from '../components/ContextMenu';
+import { LocalDB } from './LocalDB';
 
 // spaceId, not space
 const spaceIdPersist = recoilPersist({
@@ -65,3 +67,23 @@ export const onlineState = atom<boolean>({
   key: 'online',
   default: true,
 });
+
+// themePersist
+interface ThemeState {
+  theme: string;
+  accent: string;
+}
+
+export const DEFAULT_THEME_SETTINGS = {
+  theme: 'dark',
+  accent: '#3b83ff',
+};
+
+export const themeDB = new LocalDB(
+  'theme',
+  z.object({
+    theme: z.enum(['dark', 'light']),
+    accent: z.string().regex(/^#[0-9a-f]{6}$/i),
+  }),
+  () => DEFAULT_THEME_SETTINGS,
+);

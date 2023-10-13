@@ -16,7 +16,7 @@ export class ClientMember implements Member {
   }
 
   get isSpaceOwner() {
-    return this.space.ownerId === this.userId;
+    return this.space.ownerId === this.user.id;
   }
 
   constructor(public client: MikotoClient, data: Member) {

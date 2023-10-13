@@ -7,7 +7,6 @@ import { Store, normalizedAssign } from './base';
 export class ClientMember implements Member {
   id!: string;
   spaceId!: string;
-  userId!: string;
   roleIds!: string[];
   user!: User;
 
@@ -42,7 +41,7 @@ export class ClientMember implements Member {
   async update(options: MemberUpdateOptions) {
     await this.client.client.members.update({
       spaceId: this.spaceId,
-      userId: this.userId,
+      userId: this.user.id,
       options,
     });
   }
@@ -50,7 +49,7 @@ export class ClientMember implements Member {
   async kick() {
     await this.client.client.members.delete({
       spaceId: this.spaceId,
-      userId: this.userId,
+      userId: this.user.id,
     });
   }
 }

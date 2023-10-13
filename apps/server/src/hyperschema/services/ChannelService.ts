@@ -49,7 +49,7 @@ export const ChannelService = h.service({
             type === 'DOCUMENT'
               ? {
                   create: {
-                    content: `{"type":"doc","content":[{"type":"paragraph"}]}`,
+                    content: '',
                   },
                 }
               : undefined,

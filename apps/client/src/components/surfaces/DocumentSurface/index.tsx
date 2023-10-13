@@ -23,6 +23,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { ClientChannel } from 'mikotojs';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { Markdown } from 'tiptap-markdown';
 
 import { useInterval, useMikoto } from '../../../hooks';
 import { TabName } from '../../TabBar';
@@ -139,6 +140,7 @@ const extensions = [
     includeChildren: true,
   }),
   YouTube,
+  Markdown,
 ] satisfies Extensions;
 
 function DocumentEditor({ channel, content }: DocumentEditorProps) {
@@ -150,11 +152,11 @@ function DocumentEditor({ channel, content }: DocumentEditorProps) {
     onUpdate() {
       setChanged(true);
     },
-    content: JSON.parse(content),
+    content,
   });
 
   const save = (edt: Editor) => {
-    const contentString = JSON.stringify(edt.getJSON());
+    const contentString: string = edt.storage.markdown.getMarkdown();
     mikoto.client.documents
       .update({ channelId: channel.id, content: contentString })
       .then(() => setChanged(false))

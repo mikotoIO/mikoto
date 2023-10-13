@@ -4,6 +4,7 @@ import { Button, Buttons, Form, Input, Modal } from '@mikoto-io/lucid';
 import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
@@ -36,6 +37,7 @@ function BotCard({ id, name, secret }: BotProps) {
         <Button
           onClick={() => {
             navigator.clipboard.writeText(`${id}:${secret}`);
+            toast.success('Copied bot token to clipboard!');
           }}
           type="button"
         >

@@ -5,8 +5,6 @@
   "types": "dist/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "generate:server": "sophon generate ./schema.sophon -t ts-socketio-server -o ../../apps/server/src/services/schema.ts",
-    "generate:client": "sophon generate ./schema.sophon -t ts-socketio-client -o ./src/schema.ts",
     "generate": "npm run generate:server && npm run generate:client",
     "typecheck": "tsc --noEmit",
     "build": "tsc --build"

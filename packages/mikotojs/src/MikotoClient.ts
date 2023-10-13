@@ -37,13 +37,13 @@ export class MikotoClient {
   me!: ClientUser;
 
   constructor(
-    sophonUrl: string,
+    hyperRPCUrl: string,
     accessToken: string,
     { onReady, onConnect, onDisconnect }: MikotoClientOptions,
   ) {
     this.client = new MainService(
       new SocketIOClientTransport({
-        url: sophonUrl,
+        url: hyperRPCUrl,
         authToken: accessToken,
       }),
     );
@@ -68,7 +68,6 @@ export class MikotoClient {
     this.members.subscribe(this.client.members);
     this.roles.subscribe(this.client.roles);
 
-    // rewrite io to use sophon
     this.client.messages.onCreate((message) => {
       this.messageEmitter.emit(`create/${message.channelId}`, message);
     });

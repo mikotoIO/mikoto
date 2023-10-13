@@ -75,7 +75,7 @@ async function main() {
     logger.info(`Mikoto auth started on http://0.0.0.0:${env.AUTH_PORT}`);
   });
 
-  // set up a sophon server as well
+  // set up a HyperRPC server as well
   hs.boot(() => {
     logger.info(
       `Mikoto hyperschema listening on http://0.0.0.0:${env.SERVER_PORT}`,

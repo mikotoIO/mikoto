@@ -15,6 +15,7 @@ import {
   uploadFileWithAxios,
 } from '../../molecules/AvatarEditor';
 import { BaseSettingsSurface } from '../BaseSettingSurface';
+import { BansSubsurface } from './Bans';
 import { EmojiSubsurface } from './Emojis';
 import { RolesSubsurface } from './Roles';
 
@@ -48,11 +49,6 @@ function Overview({ space }: { space: ClientSpace }) {
 
   return (
     <SettingsView>
-      <TabName
-        name={t('spaceSettings.settingsForSpace', {
-          name: space.name,
-        })}
-      />
       <Form>
         <h1>{t('spaceSettings.spaceOverview')}</h1>
         <AvatarEditor
@@ -154,6 +150,8 @@ function Switch({ nav, space }: { nav: string; space: ClientSpace }) {
       return <RolesSubsurface space={space} />;
     case 'emojis':
       return <EmojiSubsurface />;
+    case 'bans':
+      return <BansSubsurface />;
     default:
       return null;
   }
@@ -164,6 +162,7 @@ const SPACE_SETTING_CATEGORIES = [
   { code: 'invites', tkey: 'spaceSettings.invites.title' },
   { code: 'roles', tkey: 'spaceSettings.roles.title' },
   { code: 'emojis', tkey: 'spaceSettings.emojis.title' },
+  { code: 'bans', tkey: 'spaceSettings.bans.title' },
 ];
 
 export function SpaceSettingsView({ spaceId }: { spaceId: string }) {

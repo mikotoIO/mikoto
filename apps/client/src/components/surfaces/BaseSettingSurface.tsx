@@ -1,3 +1,4 @@
+import { faCog } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -33,7 +34,10 @@ export function BaseSettingsSurface({
           </SettingsView.Nav>
         ))}
       </SettingsView.Sidebar>
-      <TabName name={t(categories.find((x) => x.code === nav)?.tkey!)} />
+      <TabName
+        name={t(categories.find((x) => x.code === nav)?.tkey!)}
+        icon={faCog}
+      />
       {switcher(nav)}
     </SettingsView.Container>
   );

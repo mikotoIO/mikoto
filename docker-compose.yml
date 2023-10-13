@@ -42,21 +42,13 @@ services:
       - '1025:1025'
     logging:
       driver: none
-  weaviate:
-    command: ['--host', '0.0.0.0', '--port', '4020', '--scheme', 'http']
-    image: semitechnologies/weaviate:1.21.1
+  meilisearch:
+    image: getmeili/meilisearch:v1.4
     ports:
-      - 4020:4020
+      - 7700:7700
     volumes:
-      - weaviate_data:/var/lib/weaviate
+      - meilisearch:/meili_data
     restart: on-failure:0
-    environment:
-      QUERY_DEFAULTS_LIMIT: 25
-      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
-      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
-      DEFAULT_VECTORIZER_MODULE: 'none'
-      ENABLE_MODULES: 'text2vec-cohere,text2vec-huggingface,text2vec-palm,text2vec-openai,generative-openai,generative-cohere,generative-palm,ref2vec-centroid,reranker-cohere,qna-openai'
-      CLUSTER_HOSTNAME: 'node1'
   caddy:
     image: caddy
     restart: always
@@ -74,4 +66,4 @@ volumes:
   cockroach2:
   redis:
     driver: local
-  weaviate_data:
+  meilisearch:

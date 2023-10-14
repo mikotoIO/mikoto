@@ -5,7 +5,7 @@ import {
   faStrikethrough,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Heading } from '@mikoto-io/lucid';
+import { Box, Flex, Heading } from '@mikoto-io/lucid';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -171,10 +171,44 @@ function DocumentEditor({ channel, content }: DocumentEditorProps) {
 
   return (
     <>
+      <div>
+        <Flex
+          w="100%"
+          h={32}
+          bg="N900"
+          rounded={4}
+          p={16}
+          m={{ bottom: 16 }}
+          style={{
+            alignItems: 'center',
+          }}
+        >
+          <Flex gap={8}>
+            <Flex
+              rounded={32}
+              bg={changed ? 'Y700' : 'G700'}
+              w={12}
+              h={12}
+              center
+            />
+          </Flex>
+        </Flex>
+      </div>
       {editor && <NoteBubbleMenu editor={editor} />}
       <EditorContent editor={editor} />
     </>
   );
+}
+
+const StyledEditorHeader = styled.div`
+  display: block;
+  height: 40px;
+  width: 100%;
+  background-color: var(--N1000);
+`;
+
+function EditorHeader() {
+  return <StyledEditorHeader>lol</StyledEditorHeader>;
 }
 
 export function DocumentSurface({ channelId }: { channelId: string }) {
@@ -189,14 +223,22 @@ export function DocumentSurface({ channelId }: { channelId: string }) {
   }, [channelId]);
 
   return (
-    <ViewContainer padded scroll>
+    <ViewContainer scroll>
       <TabName name={channel.name} icon={faFileLines} />
-      <Heading>{channel.name}</Heading>
-      <EditorContentWrapper>
-        {content !== null && (
-          <DocumentEditor channel={channel} content={content} />
-        )}
-      </EditorContentWrapper>
+
+      <Box p={32}>
+        <Heading fs={28} txt="N200">
+          <Box as="span" txt="N400">
+            #
+          </Box>
+          {channel.name}
+        </Heading>
+        <EditorContentWrapper>
+          {content !== null && (
+            <DocumentEditor channel={channel} content={content} />
+          )}
+        </EditorContentWrapper>
+      </Box>
     </ViewContainer>
   );
 }

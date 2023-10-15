@@ -43,6 +43,9 @@
     },
     "emojis": {
       "title": "Emojis"
+    },
+    "bans": {
+      "title": "Bans"
     }
   },
   "channelSettings": {

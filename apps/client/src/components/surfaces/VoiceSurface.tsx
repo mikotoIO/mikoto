@@ -62,7 +62,7 @@ export function VoiceView({ channelId }: { channelId: string }) {
 
   return (
     <ViewContainer data-lk-theme="default">
-      <TabName name={`Voice: ${channel.name}`} icon={faMicrophone} />
+      <TabName name={channel.name} icon={faMicrophone} />
       {voiceConfig && (
         <LiveKitRoom
           serverUrl={voiceConfig.url}

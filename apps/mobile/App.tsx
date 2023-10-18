@@ -1,6 +1,6 @@
+import SideMenu from '@chakrahq/react-native-side-menu';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { useState } from 'react';
@@ -11,7 +11,6 @@ import {
   TextInput,
   TouchableHighlight,
   StatusBar,
-  Dimensions,
 } from 'react-native';
 
 import { Message } from './components/Message';

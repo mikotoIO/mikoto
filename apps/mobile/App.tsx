@@ -13,6 +13,7 @@ import {
   StatusBar,
 } from 'react-native';
 
+import { Explorer } from './components/Explorer';
 import { Message } from './components/Message';
 import { SafeAreaView } from './components/SafeAreaView';
 import { theme } from './lucid/theme';
@@ -115,7 +116,12 @@ export default function App() {
           backgroundColor={theme.colors.N1100}
           barStyle="light-content"
         />
-        <MessageSurface />
+        <View style={{ flex: 1, backgroundColor: theme.colors.N900 }}>
+          {/* @ts-expect-error */}
+          <SideMenu menu={<Explorer />} edgeHitWidth={400}>
+            <MessageSurface />
+          </SideMenu>
+        </View>
       </SafeAreaView>
     </NavigationContainer>
   );

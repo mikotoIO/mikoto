@@ -1,6 +1,6 @@
+import SideMenu from '@chakrahq/react-native-side-menu';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { useState } from 'react';
@@ -11,9 +11,9 @@ import {
   TextInput,
   TouchableHighlight,
   StatusBar,
-  Dimensions,
 } from 'react-native';
 
+import { Explorer } from './components/Explorer';
 import { Message } from './components/Message';
 import { SafeAreaView } from './components/SafeAreaView';
 import { theme } from './lucid/theme';
@@ -116,7 +116,12 @@ export default function App() {
           backgroundColor={theme.colors.N1100}
           barStyle="light-content"
         />
-        <MessageSurface />
+        <View style={{ flex: 1, backgroundColor: theme.colors.N900 }}>
+          {/* @ts-expect-error */}
+          <SideMenu menu={<Explorer />} edgeHitWidth={400}>
+            <MessageSurface />
+          </SideMenu>
+        </View>
       </SafeAreaView>
     </NavigationContainer>
   );

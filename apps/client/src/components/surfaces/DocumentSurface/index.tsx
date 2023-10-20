@@ -75,6 +75,7 @@ const EditorContentWrapper = styled.div`
 interface DocumentEditorProps {
   channel: ClientChannel;
   content: string;
+  onChange?(): void;
 }
 
 const BubbleMenuContainer = styled.div`
@@ -143,13 +144,14 @@ const extensions = [
   Markdown,
 ] satisfies Extensions;
 
-function DocumentEditor({ channel, content }: DocumentEditorProps) {
+function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
   const [changed, setChanged] = useState(false);
   const mikoto = useMikoto();
 
   const editor = useEditor({
     extensions,
     onUpdate() {
+      onChange?.();
       setChanged(true);
     },
     content,

@@ -1,10 +1,11 @@
 import { NotFoundError, UnauthorizedError } from '@hyperschema/core';
+import { permissions } from '@mikoto-io/permcheck';
 import { z } from 'zod';
 
+import { assertPermission } from '../../functions/permissions';
 import { h } from '../core';
 import { assertChannelMembership } from '../middlewares';
 import { Message, TypingEvent, Unread } from '../models';
-import { emitterModel } from '../models/emitter';
 import { authorInclude } from '../normalizer';
 
 export const MessageService = h.service({
@@ -100,7 +101,14 @@ export const MessageService = h.service({
         include: { author: authorInclude },
       });
       if (message === null) throw new NotFoundError('MessageNotFound');
-      if (message.authorId !== state.user.id) throw new UnauthorizedError();
+      const isAuthor = message.authorId === state.user.id;
+      if (!isAuthor) {
+        await assertPermission(
+          state.user.id,
+          channel.spaceId,
+          permissions.manageMessages,
+        );
+      }
       await $p.message.delete({
         where: { id: messageId },
       });

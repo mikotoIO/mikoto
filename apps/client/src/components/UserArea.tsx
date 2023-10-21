@@ -1,3 +1,4 @@
+import { Box, Flex, Heading } from '@mikoto-io/lucid';
 import { User } from 'mikotojs';
 import { useEffect } from 'react';
 import { atom, useRecoilState } from 'recoil';
@@ -21,7 +22,18 @@ function UserAreaMenu() {
 
   return (
     <ContextMenu style={{ width: '280px' }}>
-      <Avatar src={mikoto.me.avatar ?? undefined} size={64} />
+      <Flex
+        gap={8}
+        bg="N900"
+        p={8}
+        rounded={4}
+        style={{
+          alignItems: 'center',
+        }}
+      >
+        <Avatar src={mikoto.me.avatar ?? undefined} size={64} />
+        <Heading fs={20}>{mikoto.me.name}</Heading>
+      </Flex>
       <ContextMenu.Link
         onClick={() => {
           tabkit.openTab({ kind: 'welcome', key: 'welcome' }, false);

@@ -5,15 +5,11 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSetRecoilState } from 'recoil';
 
+import { uploadFile } from '../../../functions/fileUpload';
 import { useMikoto } from '../../../hooks';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
 import { modalState } from '../../ContextMenu';
-import { TabName } from '../../TabBar';
-import {
-  AvatarEditor,
-  mediaServerAxios,
-  uploadFileWithAxios,
-} from '../../molecules/AvatarEditor';
+import { AvatarEditor } from '../../molecules/AvatarEditor';
 import { BaseSettingsSurface } from '../BaseSettingSurface';
 import { BansSubsurface } from './Bans';
 import { EmojiSubsurface } from './Emojis';
@@ -44,7 +40,6 @@ function AddBotModal({ space }: { space: ClientSpace }) {
 function Overview({ space }: { space: ClientSpace }) {
   const { t } = useTranslation();
   const [spaceName, setSpaceName] = useState(space.name);
-  const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
 
   return (
@@ -54,11 +49,7 @@ function Overview({ space }: { space: ClientSpace }) {
         <AvatarEditor
           avatar={space.icon ?? undefined}
           onDrop={async (file) => {
-            const { data } = await uploadFileWithAxios<{ url: string }>(
-              mediaServerAxios,
-              '/spaceicon',
-              file,
-            );
+            const { data } = await uploadFile('/spaceicon', file);
 
             await space.update({
               icon: data.url,

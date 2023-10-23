@@ -1,23 +1,7 @@
-import axios, { AxiosInstance } from 'axios';
 import { useDropzone } from 'react-dropzone';
 import styled from 'styled-components';
 
-import { env } from '../../env';
 import { Avatar } from '../atoms/Avatar';
-
-export const mediaServerAxios = axios.create({
-  baseURL: env.PUBLIC_MEDIASERVER_URL,
-});
-
-export function uploadFileWithAxios<T>(ax: AxiosInstance, path: string, file: File) {
-  const formData = new FormData();
-  formData.append('file', file);
-  return ax.post<T>(path, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-}
 
 const AvatarWrapper = styled.a`
   position: relative;

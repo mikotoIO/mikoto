@@ -111,7 +111,7 @@
         ]
       }
     },
-    {"name": "Relations", "type": {"kind": "struct", "fields": []}},
+    {"name": "Relation", "type": {"kind": "struct", "fields": []}},
     {
       "name": "Document",
       "type": {

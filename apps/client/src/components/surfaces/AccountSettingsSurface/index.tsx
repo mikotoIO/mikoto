@@ -15,16 +15,13 @@ import { useTranslation } from 'react-i18next';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
+import { uploadFile } from '../../../functions/fileUpload';
 import { useAuthClient, useMikoto } from '../../../hooks';
 import { useErrorElement } from '../../../hooks/useErrorElement';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
 import { modalState } from '../../ContextMenu';
 import { userState } from '../../UserArea';
-import {
-  AvatarEditor,
-  mediaServerAxios,
-  uploadFileWithAxios,
-} from '../../molecules/AvatarEditor';
+import { AvatarEditor } from '../../molecules/AvatarEditor';
 import { BaseSettingsSurface } from '../BaseSettingSurface';
 import { BotsSurface } from './bots';
 import { LanguageSurface } from './language';
@@ -143,11 +140,7 @@ const Overview = observer(() => {
             <AvatarEditor
               avatar={user?.avatar ?? undefined}
               onDrop={async (file) => {
-                const { data } = await uploadFileWithAxios<{ url: string }>(
-                  mediaServerAxios,
-                  '/avatar',
-                  file,
-                );
+                const { data } = await uploadFile('/avatar', file);
                 await mikoto.client.users.update({
                   options: {
                     avatar: data.url,

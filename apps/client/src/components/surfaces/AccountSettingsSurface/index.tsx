@@ -200,6 +200,8 @@ const Overview = observer(() => {
           {t('accountSettings.general.deleteAccount')}
         </Button>
       </Buttons>
+      <h2>Debug</h2>
+      <Button>Open Design Palette</Button>
       <Box m={{ bottom: 80 }} />
     </SettingsView>
   );

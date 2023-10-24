@@ -23,6 +23,7 @@
     "fastify": "^4.17.0",
     "mime-types": "^2.1.35",
     "minio": "^7.1.0",
+    "nanoid": "3.3.4",
     "sharp": "^0.32.1",
     "ts-dotenv": "^0.9.1"
   }

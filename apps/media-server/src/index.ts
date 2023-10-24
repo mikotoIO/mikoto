@@ -13,7 +13,7 @@ server.register(cors, { origin: '*' });
 
 server.get('/', async () => ({ hello: 'world' }));
 
-server.get('/:storeName/:fileName', serve);
+server.get('/:storeName/*', serve);
 server.post('/:storeName', upload);
 
 const start = async () => {

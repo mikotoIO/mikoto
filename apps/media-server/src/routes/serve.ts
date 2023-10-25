@@ -18,9 +18,9 @@ async function stream2buffer(stream: Stream): Promise<Buffer> {
 }
 
 export async function serve(req: FastifyRequest, res: FastifyReply) {
-  const { storeName, fileName } = req.params as {
+  const { storeName, '*': fileName } = req.params as {
     storeName: string;
-    fileName: string;
+    '*': string;
   };
   const contentType = mime.contentType(fileName) || 'application/octet-stream';
   const fileBuffer = await storage.fetch(`${storeName}/${fileName}`);

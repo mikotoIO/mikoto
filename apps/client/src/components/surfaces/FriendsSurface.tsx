@@ -14,6 +14,8 @@ export function FriendsSurface() {
         <Button type="submit" variant="success">
           Search for Friend
         </Button>
+        <Heading as="h2">Incoming Requests</Heading>
+        <Heading as="h2">Outgoing Requests</Heading>
       </Form>
     </ViewContainer>
   );

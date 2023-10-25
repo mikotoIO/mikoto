@@ -71,8 +71,8 @@ export const Unread = z.object({
 });
 export type Unread = z.infer<typeof Unread>;
 
-export const Relations = z.object({});
-export type Relations = z.infer<typeof Relations>;
+export const Relation = z.object({});
+export type Relation = z.infer<typeof Relation>;
 
 export const Document = z.object({
   id: z.string(),

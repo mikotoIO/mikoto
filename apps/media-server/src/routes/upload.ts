@@ -1,6 +1,6 @@
-import crypto from 'crypto';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import mime from 'mime-types';
+import { nanoid } from 'nanoid';
 import sharp from 'sharp';
 
 import { env } from '../env';
@@ -57,7 +57,7 @@ export async function upload(req: FastifyRequest, res: FastifyReply) {
         break;
     }
   }
-  const path = `${storeName}/${crypto.randomUUID()}.${extension}`;
+  const path = `${storeName}/${nanoid(16)}.${extension}`;
   await storage.upload(path, fileBuffer);
   return { url: `${env.PUBLIC_MEDIASERVER_URL}/${path}` };
 }

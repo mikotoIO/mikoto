@@ -1,5 +1,6 @@
 import { Input, Form, Button, Buttons, Modal, Box } from '@mikoto-io/lucid';
 import { ClientSpace, Invite, Space } from 'mikotojs';
+import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +38,7 @@ function AddBotModal({ space }: { space: ClientSpace }) {
   );
 }
 
-function Overview({ space }: { space: ClientSpace }) {
+const Overview = observer(({ space }: { space: ClientSpace }) => {
   const { t } = useTranslation();
   const [spaceName, setSpaceName] = useState(space.name);
   const setModal = useSetRecoilState(modalState);
@@ -92,8 +93,7 @@ function Overview({ space }: { space: ClientSpace }) {
       </Form>
     </SettingsView>
   );
-}
-
+});
 function Invites({ space }: { space: Space }) {
   const mikoto = useMikoto();
   const [invites, setInvites] = useState<Invite[] | null>(null);

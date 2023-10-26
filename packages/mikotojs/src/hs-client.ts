@@ -269,6 +269,13 @@ export class MessageService {
   }): Promise<Message> {
     return this.client.call("messages/edit", input);
   }
+  editUncommitted(input: {
+    channelId: string;
+    messageId: string;
+    content: string;
+  }): Promise<Message> {
+    return this.client.call("messages/editUncommitted", input);
+  }
   delete(input: { channelId: string; messageId: string }): Promise<Message> {
     return this.client.call("messages/delete", input);
   }

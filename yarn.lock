@@ -12496,7 +12496,7 @@ __metadata:
     y-prosemirror: ^1.2.1
     y-websocket: ^1.5.0
     yjs: ^13.6.7
-    zod: ^3.21.4
+    zod: ^3.22.3
   languageName: unknown
   linkType: soft
 
@@ -23425,7 +23425,7 @@ __metadata:
     socket.io-client: ^4.5.1
     typed-emitter: ^2.1.0
     typescript: ^5.0.4
-    zod: ^3.22.1
+    zod: ^3.22.3
   languageName: unknown
   linkType: soft
 
@@ -28745,7 +28745,7 @@ __metadata:
     typescript: ^5.1.6
     uuid: ^8.3.2
     winston: ^3.9.0
-    zod: ^3.22.2
+    zod: ^3.22.3
   languageName: unknown
   linkType: soft
 
@@ -33267,24 +33267,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:*, zod@npm:^3.22.2":
+"zod@npm:*":
   version: 3.22.2
   resolution: "zod@npm:3.22.2"
   checksum: 231e2180c8eabb56e88680d80baff5cf6cbe6d64df3c44c50ebe52f73081ecd0229b1c7215b9552537f537a36d9e36afac2737ddd86dc14e3519bdbc777e82b9
   languageName: node
   linkType: hard
 
-"zod@npm:^3.21.4":
-  version: 3.21.4
-  resolution: "zod@npm:3.21.4"
-  checksum: f185ba87342ff16f7a06686767c2b2a7af41110c7edf7c1974095d8db7a73792696bcb4a00853de0d2edeb34a5b2ea6a55871bc864227dace682a0a28de33e1f
-  languageName: node
-  linkType: hard
-
-"zod@npm:^3.22.1":
-  version: 3.22.1
-  resolution: "zod@npm:3.22.1"
-  checksum: 05b62cc1069da6e6349ad2325ec6b7d0c00699f0796e0fd071bcc2b44ac711679e52ad00bc563019504c7e64bbf0bf73737f31366d882a856962cd6e2882cf0e
+"zod@npm:^3.22.3":
+  version: 3.22.4
+  resolution: "zod@npm:3.22.4"
+  checksum: 80bfd7f8039b24fddeb0718a2ec7c02aa9856e4838d6aa4864335a047b6b37a3273b191ef335bf0b2002e5c514ef261ffcda5a589fb084a48c336ffc4cdbab7f
   languageName: node
   linkType: hard
 

@@ -433,6 +433,17 @@
             }
           },
           {
+            "name": "editUncommitted",
+            "fn": {
+              "input": [
+                {"name": "channelId", "type": "string"},
+                {"name": "messageId", "type": "string"},
+                {"name": "content", "type": "string"}
+              ],
+              "output": "Message"
+            }
+          },
+          {
             "name": "delete",
             "fn": {
               "input": [

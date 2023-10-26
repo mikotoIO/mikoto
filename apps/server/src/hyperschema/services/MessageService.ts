@@ -1,4 +1,4 @@
-import { NotFoundError, UnauthorizedError } from '@hyperschema/core';
+import { BaseError, NotFoundError, UnauthorizedError } from '@hyperschema/core';
 import { permissions } from '@mikoto-io/permcheck';
 import { z } from 'zod';
 
@@ -90,6 +90,32 @@ export const MessageService = h.service({
       });
       await $r.pub(`space:${channel.spaceId}`, 'updateMessage', newMessage);
       return newMessage;
+    }),
+
+  // sends edit event to client without updating database
+  editUncommitted: h
+    .fn(
+      {
+        channelId: z.string(),
+        messageId: z.string(),
+        content: z.string(),
+      },
+      Message,
+    )
+    .use(assertChannelMembership)
+    .do(async ({ $p, $r, state, channel, messageId, content }) => {
+      const message = await $p.message.findUnique({
+        where: { id: messageId },
+        include: { author: authorInclude },
+      });
+      if (message === null) throw new NotFoundError('MessageNotFound');
+      if (message.authorId !== state.user.id) throw new UnauthorizedError();
+
+      await $r.pub(`space:${channel.spaceId}`, 'updateMessage', {
+        ...message,
+        content,
+      });
+      return { ...message, content };
     }),
 
   delete: h

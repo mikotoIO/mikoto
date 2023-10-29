@@ -30,10 +30,10 @@ model User {
   Bot           Bot?
   Bots          Bot[]           @relation("Bots")
 
-  alphaRelation Relationship[] @relation("AlphaRelation")
-  betaRelation  Relationship[] @relation("BetaRelation")
-  Ban           Ban[]
-  Invite        Invite[]
+  RelationFrom Relationship[] @relation("RelationFrom")
+  RelationTo   Relationship[] @relation("RelationTo")
+  Ban          Ban[]
+  Invite       Invite[]
 }
 
 // factor out email and password
@@ -189,27 +189,28 @@ model Invite {
 }
 
 model Relationship {
-  id        String @id @default(uuid()) @db.Uuid
-  alphaId   String @db.Uuid
-  alphaUser User?  @relation("AlphaRelation", fields: [alphaId], references: [id], onDelete: NoAction)
-  betaId    String @db.Uuid
-  betaUser  User?  @relation("BetaRelation", fields: [betaId], references: [id], onDelete: NoAction)
+  id         String @id @default(uuid()) @db.Uuid
+  userId     String @db.Uuid
+  user       User?  @relation("RelationFrom", fields: [userId], references: [id], onDelete: NoAction)
+  relationId String @db.Uuid
+  relation   User?  @relation("RelationTo", fields: [relationId], references: [id], onDelete: NoAction)
 
   // yes, every DM gets their own space
   spaceId String @unique @db.Uuid
   space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 
-  aToB RelationState
-  bToA RelationState
+  state RelationState
 
-  @@unique([alphaId, betaId])
-  @@index([betaId])
+  @@unique([userId, relationId])
+  @@index([relationId])
 }
 
 enum RelationState {
   NONE
   FRIEND
   BLOCKED
+  INCOMING_REQUEST
+  OUTGOING_REQUEST
 }
 
 model Ban {

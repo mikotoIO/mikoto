@@ -1,76 +1,89 @@
-import { atom, useRecoilState } from 'recoil';
-import { Channel, Space } from '../models';
+import { Space } from 'mikotojs';
+import React from 'react';
+import { atom, useSetRecoilState } from 'recoil';
+import { recoilPersist } from 'recoil-persist';
+import { z } from 'zod';
 
-export const treebarSpaceState = atom<Space | null>({
+import { modalState } from '../components/ContextMenu';
+import { LocalDB } from './LocalDB';
+
+// spaceId, not space
+const spaceIdPersist = recoilPersist({
+  key: 'spaceId',
+});
+
+export const treebarSpaceState = atom<string | null>({
   key: 'treebarSpace',
   default: null,
+  dangerouslyAllowMutability: true, // we like to live dangerously
+  effects_UNSTABLE: [spaceIdPersist.persistAtom],
 });
 
-type TabBaseType =
-  | { kind: 'textChannel'; channel: Channel }
-  | { kind: 'spaceSettings'; space: Space }
-  | { kind: 'unknown' };
+// surface systems
 
-export type Tabable = TabBaseType & {
-  key: string;
-  name: string;
+export function useModalKit() {
+  const set = useSetRecoilState(modalState);
+  const w = (elem: React.ReactNode) => {
+    set({ elem });
+  };
+  return w;
+}
+
+// some local contexts
+export const CurrentSpaceContext = React.createContext<Space | undefined>(
+  undefined,
+);
+
+export const rightBarOpenState = atom<boolean>({
+  key: 'rightBarOpen',
+  default: false,
+});
+
+interface Workspace {
+  left: number;
+  leftOpen: boolean;
+  right: number;
+  rightOpen: boolean;
+}
+
+const workspacePersist = recoilPersist({
+  key: 'workspace',
+});
+
+export const workspaceState = atom<Workspace>({
+  key: 'workspace',
+  default: {
+    left: 300,
+    leftOpen: true,
+    right: 300,
+    rightOpen: true,
+  },
+  effects_UNSTABLE: [workspacePersist.persistAtom],
+});
+
+// online status
+
+export const onlineState = atom<boolean>({
+  key: 'online',
+  default: true,
+});
+
+// themePersist
+interface ThemeState {
+  theme: string;
+  accent: string;
+}
+
+export const DEFAULT_THEME_SETTINGS = {
+  theme: 'dark',
+  accent: '#3b83ff',
 };
 
-export const tabbedState = atom<{
-  index: number;
-  tabs: Tabable[];
-}>({
-  key: 'tabbedChannels',
-  default: {
-    index: 0,
-    tabs: [],
-  },
-});
-
-export function useTabkit() {
-  const [tabbed, setTabbed] = useRecoilState(tabbedState);
-
-  function openNewChannel(ch: Tabable) {
-    if (!tabbed.tabs.some((x) => x.kind === ch.kind && x.key === ch.key)) {
-      setTabbed(({ index, tabs }) => ({
-        index,
-        tabs: [...tabs, ch],
-      }));
-    }
-    setTabbed(({ tabs }) => ({
-      index: tabbed.tabs.length,
-      tabs,
-    }));
-  }
-
-  return {
-    openNewChannel,
-    openTab(tab: Tabable, openNew: boolean) {
-      if (tabbed.tabs.length === 0) {
-        openNewChannel(tab);
-        return;
-      }
-
-      const idx = tabbed.tabs.findIndex(
-        (n) => n.kind === tab.kind && n.key === tab.key,
-      );
-      if (idx !== -1) {
-        setTabbed(({ tabs }) => ({
-          index: idx,
-          tabs,
-        }));
-      } else if (openNew) {
-        openNewChannel(tab);
-      } else {
-        setTabbed(({ tabs, index }) => {
-          const xsn = [...tabs];
-          xsn[index] = tab;
-          return {
-            index,
-            tabs: xsn,
-          };
-        });
-      }
-    },
-  };
-}
+export const themeDB = new LocalDB(
+  'theme',
+  z.object({
+    theme: z.enum(['dark', 'light']),
+    accent: z.string().regex(/^#[0-9a-f]{6}$/i),
+  }),
+  () => DEFAULT_THEME_SETTINGS,
+);

@@ -7,6 +7,9 @@
     "lint": {
       "outputs": []
     },
+    "typecheck": {
+      "outputs": []
+    },
     "start": {
       "cache": false
     }

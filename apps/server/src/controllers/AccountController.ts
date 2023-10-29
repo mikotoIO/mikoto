@@ -1,19 +1,28 @@
-import { User, PrismaClient } from '@prisma/client';
+import { Account, Bot, PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import {
   Body,
+  CurrentUser,
+  Get,
   JsonController,
   Post,
   UnauthorizedError,
+  UploadedFile,
 } from 'routing-controllers';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { Service } from 'typedi';
-import crypto from 'crypto';
 import { promisify } from 'util';
 
+import { AccountJwt } from '../auth';
+import { env } from '../env';
+import Mailer from '../functions/Mailer';
+import Minio from '../functions/Minio';
+import { logger } from '../functions/logger';
+
 const randomBytes = promisify(crypto.randomBytes);
-async function generateRandomToken() {
-  const b = await randomBytes(128);
+async function generateRandomToken(size = 32) {
+  const b = await randomBytes(size);
   return b.toString('base64url');
 }
 
@@ -37,13 +46,28 @@ interface ChangePasswordPayload {
 @JsonController()
 @Service()
 export class AccountController {
-  constructor(private prisma: PrismaClient) {}
+  constructor(
+    private prisma: PrismaClient,
+    private minio: Minio,
+    private mailer: Mailer,
+  ) {}
 
-  private async createTokenPair(account: User, oldToken?: string) {
-    const accessToken = jwt.sign({}, process.env.SECRET!, {
+  @Get('/')
+  async index() {
+    return {
+      name: 'MikotoAuth',
+    };
+  }
+
+  private createToken(account: Account | Bot): string {
+    return jwt.sign({}, env.SECRET, {
       expiresIn: '1h',
       subject: account.id,
     });
+  }
+
+  private async createTokenPair(account: Account, oldToken?: string) {
+    const accessToken = this.createToken(account);
     const refreshToken = await generateRandomToken();
     const expiresAt = new Date(Date.now() + 86400000 * 30);
 
@@ -58,9 +82,10 @@ export class AccountController {
 
       return { accessToken, refreshToken };
     }
+
     await this.prisma.refreshToken.create({
       data: {
-        userId: account.id,
+        accountId: account.id,
         token: refreshToken,
         expiresAt,
       },
@@ -70,22 +95,30 @@ export class AccountController {
 
   @Post('/account/register')
   async register(@Body() body: RegisterPayload) {
-    return this.prisma.user.create({
+    await this.prisma.user.create({
       data: {
         name: body.name,
-        email: body.email,
-        passhash: await bcrypt.hash(body.password, 10),
+        Account: {
+          create: {
+            email: body.email,
+            passhash: await bcrypt.hash(body.password, 10),
+          },
+        },
       },
     });
+    const account = await this.prisma.account.findUnique({
+      where: { email: body.email },
+    });
+    return await this.createTokenPair(account!);
   }
 
   @Post('/account/login')
   async login(@Body() body: LoginPayload) {
-    const account = await this.prisma.user.findUnique({
+    const account = await this.prisma.account.findUnique({
       where: { email: body.email },
     });
     if (account && (await bcrypt.compare(body.password, account.passhash))) {
-      return this.createTokenPair(account);
+      return await this.createTokenPair(account);
     }
     throw new UnauthorizedError('Incorrect Credentials');
   }
@@ -95,24 +128,175 @@ export class AccountController {
     await this.prisma;
     const account = await this.prisma.refreshToken
       .findUnique({ where: { token: body.refreshToken } })
-      .user();
+      .account();
     if (account === null) {
       throw new UnauthorizedError('Invalid Token');
     }
     return this.createTokenPair(account, body.refreshToken);
   }
 
-  @Post('/account/change_pasword')
+  @Post('/account/change_password')
   async changePassword(@Body() body: ChangePasswordPayload) {
-    const account = await this.prisma.user.findUnique({
+    const account = await this.prisma.account.findUnique({
       where: { id: body.id },
     });
 
-    if (account && (await bcrypt.compare(body.oldPassword, account.passhash))) {
-      await this.prisma.user.update({
-        where: { id: account.id },
-        data: { passhash: await bcrypt.hash(body.newPassword, 10) },
-      });
+    if (!account) throw new UnauthorizedError('Invalid Account');
+    if (!(await bcrypt.compare(body.oldPassword, account.passhash)))
+      throw new UnauthorizedError('Invalid Password');
+
+    // delete all refresh tokens as well
+    await this.prisma.refreshToken.deleteMany({
+      where: { accountId: account.id },
+    });
+
+    await this.prisma.account.update({
+      where: { id: account.id },
+      data: { passhash: await bcrypt.hash(body.newPassword, 10) },
+    });
+    return await this.createTokenPair(account);
+  }
+
+  @Post('/account/reset_password')
+  async resetPassword(@Body() body: { email: string }) {
+    const account = await this.prisma.account.findUnique({
+      where: { email: body.email },
+      include: { user: true },
+    });
+    if (account === null) {
+      throw new UnauthorizedError('Invalid Email');
     }
+
+    const verification = await this.prisma.verification.create({
+      data: {
+        userId: account.id,
+        token: await generateRandomToken(),
+        category: 'PASSWORD_RESET', // FIXME make this an enum
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+      },
+    });
+
+    const resetLink = `${env.WEB_CLIENT}/forgotpassword/${
+      verification.token
+    }`;
+
+    await this.mailer.sendMail(
+      body.email,
+      'Reset Password',
+      'reset-password.ejs',
+      {
+        name: account.user.name,
+        link: resetLink,
+        expiry: verification.expiresAt.toISOString(),
+      },
+    );
+    logger.info(`Sent password reset to ${body.email}`);
+    return {};
+  }
+
+  @Post('/account/reset_password/submit')
+  async resetPasswordVerify(
+    @Body() body: { token: string; newPassword: string },
+  ) {
+    const verification = await this.prisma.verification.findUnique({
+      where: { token: body.token },
+    });
+    if (verification === null) {
+      throw new UnauthorizedError('Invalid Token');
+    }
+    if (verification.expiresAt < new Date()) {
+      throw new UnauthorizedError('Token Expired');
+    }
+
+    if (verification.category !== 'PASSWORD_RESET') {
+      throw new UnauthorizedError('Invalid Token');
+    }
+
+    const account = await this.prisma.user.findUnique({
+      where: { id: verification.userId! },
+    });
+
+    if (account === null) {
+      throw new UnauthorizedError('Account does not exist');
+    }
+
+    await this.prisma.account.update({
+      where: { id: account.id },
+      data: { passhash: await bcrypt.hash(body.newPassword, 10) },
+    });
+
+    return {
+      status: 'ok',
+    };
+  }
+
+  @Post('/account/avatar')
+  async uploadAvatar(
+    @CurrentUser() account: AccountJwt,
+    @UploadedFile('avatar') avatar: Express.Multer.File,
+  ) {
+    const uploaded = await this.minio.uploadImage('avatar', avatar);
+    await this.prisma.user.update({
+      where: { id: account.sub },
+      data: { avatar: uploaded.url },
+    });
+
+    return {
+      status: 'ok',
+    };
+  }
+
+  // Bots
+
+  // show list of bots for user
+  @Get('/bots')
+  async listBots(@CurrentUser() account: AccountJwt) {
+    const bots = await this.prisma.bot.findMany({
+      where: { ownerId: account.sub },
+    });
+    return bots;
+  }
+
+  // create a bot
+  @Post('/bots')
+  async createBot(
+    @CurrentUser() account: AccountJwt,
+    @Body() body: { name: string },
+  ) {
+    const secret = await generateRandomToken();
+
+    const bot = await this.prisma.user.create({
+      data: {
+        name: body.name,
+        category: 'BOT',
+        Bot: {
+          create: {
+            name: body.name,
+            ownerId: account.sub,
+            secret,
+          },
+        },
+      },
+      include: { Bot: true },
+    });
+
+    return bot.Bot;
+  }
+
+  @Post('/bots/auth')
+  async botAuth(@Body() body: { botKey: string }) {
+    const botKey = body.botKey.split(':');
+    if (botKey.length !== 2) {
+      throw new UnauthorizedError('Invalid Bot Key');
+    }
+    const [botId, secret] = botKey;
+    const bot = await this.prisma.bot.findUnique({
+      where: { id: botId },
+    });
+    if (bot === null || bot.secret !== secret) {
+      throw new UnauthorizedError('Invalid Bot Key');
+    }
+
+    return { accessToken: this.createToken(bot) };
   }
 }

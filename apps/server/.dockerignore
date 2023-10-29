@@ -1,6 +1,12 @@
-node_modules
-# Keep environment variables out of version control
+**/node_modules/
+**/dist
+.git
+npm-debug.log
+.coverage
+.coverage.*
 .env
-dist/
+.aws
+
 .idea/
 .data/
+data/

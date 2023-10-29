@@ -1,10 +1,13 @@
-import React from 'react';
-import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { LoginView, RegisterView } from './views/AuthView';
+
+import {
+  LoginView,
+  RegisterView,
+  ResetPasswordView,
+  ResetChangePasswordView,
+} from './views/AuthView';
 import MainView from './views/MainView';
-import { ContextMenuKit } from './components/ContextMenu';
-import { RoomPage } from './components/LiveKitPlayground';
+import { MikotoApiLoader } from './views/MikotoApiLoader';
 import { SpaceInviteView } from './views/SpaceInviteView';
 
 function App() {
@@ -14,10 +17,20 @@ function App() {
         <Route path="/" element={<MainView />} />
         <Route path="/login" element={<LoginView />} />
         <Route path="/register" element={<RegisterView />} />
-        <Route path="/invite" element={<SpaceInviteView />} />
-        <Route path="/livekit" element={<RoomPage />} />
+        <Route path="/forgotpassword" element={<ResetPasswordView />} />
+        <Route
+          path="/forgotpassword/:token"
+          element={<ResetChangePasswordView />}
+        />
+        <Route
+          path="/invite/:inviteCode"
+          element={
+            <MikotoApiLoader>
+              <SpaceInviteView />
+            </MikotoApiLoader>
+          }
+        />
       </Routes>
-      <ContextMenuKit />
     </BrowserRouter>
   );
 }

@@ -1,36 +1,79 @@
-# Mikoto
+<p align="center">
+  <img src="./apps/client/public/logo/logo-mono.svg" width="64px">
+</p>
 
-This is the Turborepo setup for Mikoto.
+<h1 align="center">
+  Mikoto
+</h1>
 
-## What's inside?
+<p align="center">The Most Overkill Chat App in the World.</p>
+<p align="center">
+  <a href='https://mikoto.io'>Website</a> · 
+  <a href='https://alpha.mikoto.io'>Alpha</a> ·
+  <a href='https://docs.mikoto.io'>Docs</a> ·
+  <a href='https://blog.mikoto.io'>Blog</a> ·
+  <a href='https://twitter.com/mikotoIO'>Twitter</a>
+</p>
+<br>
 
-This turborepo uses [Yarn](https://classic.yarnpkg.com/lang/en/) as a package manager. It includes the following packages/apps:
+Mikoto is an messaging service designed for building online communities. It uses a thread-based structure for text messaging, voice/video chat, and real-time collaborative wiki editing.
 
-- `apps/client`: the Mikoto front-end
-- `apps/server`: the Mikoto back-end and API
+<p align="center">
+  <img src="./screenshots/img2.png" width="800px">
+</p>
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+## Features
+
+> Note: Mikoto is still in early development. Some of these features are not fully implemented.
+
+- ✨ Open Source (with proprietary extensions for enterprise support)
+- 🪐 Decentralized, using [Decentralized Identifiers](https://www.w3.org/TR/did-core/)
+- 🧵 Threading system suitable for AI agent management
+- 🔍 Semantic search to fight against the black hole of information
+- ⚡️ Superuser friendly features, like tab view, zen mode and, keyboard shortcuts and more
+- 🔒 Fully E2E encrypted DMs and Group DMs
+- 🏡 Threaded DMs and group DMs
+- 🎨 Customizable themes and appearances
+- 🔌 Pluggable architecture for custom extensions
+- 🛒 A marketplace for extensions and integrations
+- 🌎 Built-in community finder
+- 🥸 A system to handle multiple personas and identities
+- 📡 Voice, video, and screen sharing
+- 📝 Real-time collaborative wiki channels
+
+...and more, yet to be announced!
 
 ## Setup
 
+```sh
+# install dependencies
+yarn install
+
+# start services (CockroachDB, Redis, MinIO, etc.)
+docker-compose up
+
+# set up database
+cd apps/server
+npx prisma migrate dev
+```
+
 ### Development
 
-#### Prerequisites:
+Mikoto uses a turborepo-based monorepo.
 
-- A PostgreSQL database (I think CockroachDB works as well)
-  - there exists a compose file at `apps/server/docker-compose.development.yml` to help with this.
-- `.env` file in `apps/server` (see the provided example file for details)
-- As of now, that's about it.
+Use Docker Compose to run the necessary services.
 
 To develop all apps and packages, run the following command:
 
-```
+```sh
 yarn start
 ```
 
 To browse/edit the Database run the following command:
 
-```
+Check Dockerfiles and Github Actions for more details, until more documentation is added.
+
+```sh
 cd apps/server
 prisma studio
 ```
@@ -39,43 +82,23 @@ prisma studio
 
 To build all apps and packages, run the following command:
 
-```
+```sh
 yarn build
 ```
 
-## Utilities
+## Project Structure
 
-This turborepo has some additional tools already setup for you:
+| Package              | Description               | Stack                                      |
+| -------------------- | ------------------------- | ------------------------------------------ |
+| `apps/server`        | Core server for Mikoto    | NodeJS + TypeScript + HyperSchema + Prisma |
+| `apps/media-server`  | S3 Proxy                  | NodeJS + TypeScript                        |
+| `apps/client`        | The web client for Mikoto | React + MobX                               |
+| `apps/mobile`        | Mobile client for Mikoto  | React Native + MobX                        |
+| `apps/desktop`       | Desktop client for Mikoto | Electron                                   |
+| `packages/mikotojs`  | Mikoto API for JS         | TypeScript                                 |
+| `packages/permcheck` | Permisson Calculator      | TypeScript                                 |
+| `packages/lucid`     | UI Framework              | React + TypeScript + Styled Components     |
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+## License
 
-### Remote Caching
-
-Turborepo can use a technique known as [Remote Caching (Beta)](https://turborepo.org/docs/features/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching (Beta) you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
-
-```
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your turborepo:
-
-```
-npx turbo link
-```
-
-### Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Pipelines](https://turborepo.org/docs/features/pipelines)
-- [Caching](https://turborepo.org/docs/features/caching)
-- [Remote Caching (Beta)](https://turborepo.org/docs/features/remote-caching)
-- [Scoped Tasks](https://turborepo.org/docs/features/scopes)
-- [Configuration Options](https://turborepo.org/docs/reference/configuration)
-- [CLI Usage](https://turborepo.org/docs/reference/command-line-reference)
+While we're still an early-stage project and the licensing may change in the future, Mikoto is currently dual licensed under AGPL core and a proprietary license. Please email cactus (at) mikoto.io if you are interested in enterprise uses for Mikoto.

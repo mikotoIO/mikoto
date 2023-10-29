@@ -1,31 +1,37 @@
-import React, { useRef } from 'react';
-import styled from 'styled-components';
-import { useDrag, useDrop } from 'react-dnd';
+import {
+  faX,
+  faBarsStaggered,
+  faQuestion,
+  IconDefinition,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faX } from '@fortawesome/free-solid-svg-icons';
-import { useRecoilState } from 'recoil';
+import { Flex, Grid } from '@mikoto-io/lucid';
+import { action, runInAction } from 'mobx';
+import { observer } from 'mobx-react-lite';
+import React, { useContext, useEffect, useRef } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
+import { Helmet } from 'react-helmet';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import styled, { css } from 'styled-components';
 
-import { getTabIcon, TabIcon } from './TabIcon';
-import { Tabable, tabbedState } from '../store';
+import { useMikoto } from '../hooks';
+import { workspaceState } from '../store';
+import {
+  SurfaceLeaf,
+  TabContext,
+  Tabable,
+  pruneNode,
+  splitNode,
+  surfaceStore,
+  tabNameFamily,
+} from '../store/surface';
+import { ContextMenu, useContextMenu } from './ContextMenu';
+import { channelToTab } from './Explorer';
+import { NodeObject } from './ExplorerNext';
+import { IconBox } from './atoms/IconBox';
 
-const TabbedViewContainer = styled.div`
-  flex: 1;
-  background-color: ${(p) => p.theme.colors.N1000};
-  display: grid;
-  grid-template-rows: 40px calc(100vh - 40px);
-`;
-
-const TabBar = styled.div`
-  font-size: 14px;
-  height: 40px;
-  display: flex;
-`;
-
-const CloseButton = styled.div<{ active?: boolean }>`
+const StyledCloseButton = styled(Flex)<{ active?: boolean }>`
   margin-left: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border-radius: 4px;
   width: 20px;
   height: 20px;
@@ -38,129 +44,179 @@ const CloseButton = styled.div<{ active?: boolean }>`
   }
 `;
 
-const TabItemElement = styled.div<{ active?: boolean }>`
+const StyledTab = styled.div<{ active?: boolean }>`
   user-select: none;
   cursor: pointer;
-  height: 100%;
   padding: 0 8px 0 20px;
   display: flex;
+  flex-shrink: 0;
+  border-bottom: 2px solid
+    ${(p) => (p.active ? 'var(--color-primary)' : 'transparent')};
   align-items: center;
   justify-content: center;
 
-  background-color: ${(p) =>
-    p.active ? p.theme.colors.N800 : p.theme.colors.N900};
+  background-color: ${(p) => (p.active ? 'var(--N800)' : 'var(--N900)')};
 
   &:hover {
-    background-color: ${(p) => p.theme.colors.N700};
+    background-color: var(--N700);
   }
-
-  // ${(p) => p.active && 'border-left: 4px solid #3b83ff;'}
-  border-right: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
-interface TabItemProps {
+interface TabProps {
   tab: Tabable;
   index: number;
+  surfaceNode: SurfaceLeaf;
 }
 
-interface TabDndItem {
+interface TabDnd {
   tab: Tabable;
+  surfaceLeaf: SurfaceLeaf;
   dragIndex: number;
 }
 
-function useReorderable() {
-  const [tabbed, setTabbed] = useRecoilState(tabbedState);
+function useReorderable(destinationSurface: SurfaceLeaf) {
+  return (dragIndex: number, dropIndex: number, originSurface: SurfaceLeaf) => {
+    // if (dragIndex === dropIndex) return;
 
-  return (dragIndex: number, dropIndex: number) => {
-    if (dragIndex === dropIndex) return;
+    runInAction(() => {
+      const nt = originSurface.tabs.splice(dragIndex, 1)[0];
 
-    const filteredTabs = [...tabbed.tabs];
-    const nt = filteredTabs.splice(dragIndex, 1)[0];
+      originSurface.index = 0;
 
-    if (dropIndex === -1) {
-      setTabbed(({ tabs }) => ({
-        index: tabs.length - 1,
-        tabs: [...filteredTabs, nt],
-      }));
-    } else {
-      filteredTabs.splice(dropIndex, 0, nt);
-      setTabbed({
-        index: dropIndex,
-        tabs: filteredTabs,
-      });
-    }
+      if (dropIndex === -1) {
+        destinationSurface.index = destinationSurface.tabs.length;
+        destinationSurface.tabs.push(nt);
+      } else {
+        destinationSurface.tabs.splice(dropIndex, 0, nt);
+        destinationSurface.index = dropIndex;
+      }
+
+      pruneNode(surfaceStore.node);
+    });
   };
 }
 
-function TabItem({ tab, index }: TabItemProps) {
-  const [tabbed, setTabbed] = useRecoilState(tabbedState);
+interface TabNameProps {
+  name: string;
+  icon?: IconDefinition;
+}
 
-  const reorderFn = useReorderable();
+// TODO: This is still bugged. Cause unknown. Please fix.
+export function TabName({ name, icon }: TabNameProps) {
+  const tabInfo = useContext(TabContext);
+  const [tabName, setTabName] = useRecoilState(tabNameFamily(tabInfo.key));
+  useEffect(() => {
+    if (tabName.name !== name) {
+      setTabName({
+        ...tabName,
+        name,
+        icon,
+      });
+    }
+  }, [name]);
+
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  return <></>;
+}
+
+function Tab({ tab, index, surfaceNode }: TabProps) {
+  const reorderFn = useReorderable(surfaceNode);
+  const tabName = useRecoilValue(tabNameFamily(`${tab.kind}/${tab.key}`));
 
   const ref = useRef<HTMLDivElement>(null);
-  const [, drag] = useDrag<TabDndItem>({
-    type: 'CHANNEL',
-    item: { tab, dragIndex: index },
+  const [, drag] = useDrag<TabDnd>({
+    type: 'TAB',
+    item: { tab, dragIndex: index, surfaceLeaf: surfaceNode },
   });
-  const [, drop] = useDrop<TabDndItem>({
-    accept: 'CHANNEL',
+  const [, drop] = useDrop<TabDnd>({
+    accept: 'TAB',
     drop(item) {
-      reorderFn(item.dragIndex, index);
+      reorderFn(item.dragIndex, index, item.surfaceLeaf);
     },
   });
   drag(drop(ref));
 
-  const active = index === tabbed.index;
+  const active = index === surfaceNode.index;
+
+  const closeTab = action(() => {
+    surfaceNode.tabs.splice(index, 1);
+
+    if (index <= surfaceNode.index) {
+      surfaceNode.index = Math.max(0, index - 1);
+    }
+    pruneNode(surfaceStore.node);
+  });
+
+  const contextMenu = useContextMenu(() => (
+    <ContextMenu>
+      <ContextMenu.Link
+        onClick={() => {
+          closeTab();
+        }}
+      >
+        Close
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={action(() => {
+          surfaceNode.tabs = [];
+          surfaceNode.index = -1;
+          pruneNode(surfaceStore.node);
+        })}
+      >
+        Close All
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          splitNode();
+        }}
+      >
+        Split Tab
+      </ContextMenu.Link>
+    </ContextMenu>
+  ));
 
   return (
-    <TabItemElement
+    <StyledTab
       ref={ref}
       key={tab.key}
       active={active}
-      onClick={() => {
-        setTabbed(({ tabs }) => ({ index, tabs }));
-      }}
+      onContextMenu={contextMenu}
+      onClick={action(() => {
+        surfaceNode.index = index;
+      })}
+      onAuxClick={() => {}}
     >
-      <TabIcon size={20} icon={getTabIcon(tab)} />
-      <div>{tab.name}</div>
-      <CloseButton
+      <IconBox size={20} icon={tabName.icon ?? faQuestion} />
+      <div>{tabName.name}</div>
+      <StyledCloseButton
+        center
         active={active}
         onClick={(ev) => {
           ev.stopPropagation(); // close button shouldn't reset tab index
-          setTabbed(({ tabs, index: idx }) => {
-            const xsc = [...tabs];
-            xsc.splice(index, 1);
-            return {
-              index: idx,
-              tabs: xsc,
-            };
-          });
-          if (index <= tabbed.index) {
-            setTabbed(({ tabs }) => ({
-              index: Math.max(0, index - 1),
-              tabs,
-            }));
-          }
+          closeTab();
         }}
       >
         <FontAwesomeIcon icon={faX} />
-      </CloseButton>
-    </TabItemElement>
+      </StyledCloseButton>
+      {active && <Helmet title={tabName.name} />}
+    </StyledTab>
   );
 }
 
 interface TabbedViewProps {
   tabs: Tabable[];
   children: React.ReactNode;
+  surfaceNode: SurfaceLeaf;
+  leftBorder?: boolean;
 }
 
 // noinspection CssUnknownProperty
-const DropRest = styled.div`
+const StyledRest = styled.div`
   flex-grow: 1;
   -webkit-app-region: drag;
 `;
 
-const WelcomeContainer = styled.div`
+const StyledWelcome = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -170,36 +226,91 @@ const WelcomeContainer = styled.div`
 
 const MikotoLogo = styled.img`
   width: 220px;
+  mix-blend-mode: overlay;
+  opacity: 0.4;
 `;
 
 function WelcomeToMikoto() {
   return (
-    <WelcomeContainer>
-      <MikotoLogo src="/logo.svg" />
-      <h1>Welcome to Mikoto!</h1>
-    </WelcomeContainer>
+    <StyledWelcome>
+      <MikotoLogo src="/logo/logo.svg" />
+      {/* <h1>Welcome to Mikoto!</h1> */}
+    </StyledWelcome>
   );
 }
 
-export function TabbedView({ children, tabs }: TabbedViewProps) {
-  const reorderFn = useReorderable();
+export const TabBarButton = styled.button`
+  border: none;
+  margin: 4px 8px 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
 
-  const [, drop] = useDrop<TabDndItem>({
-    accept: 'CHANNEL',
-    drop(item) {
-      reorderFn(item.dragIndex, -1);
-    },
-  });
+  color: var(--N400);
+  background-color: transparent;
+  &:hover {
+    background-color: var(--N800);
+  }
+`;
 
-  return (
-    <TabbedViewContainer>
-      <TabBar>
-        {tabs.map((tab, index) => (
-          <TabItem tab={tab} index={index} key={`${tab.kind}/${tab.key}`} />
-        ))}
-        <DropRest ref={drop} />
-      </TabBar>
-      {tabs.length ? children : <WelcomeToMikoto />}
-    </TabbedViewContainer>
-  );
-}
+const TabsFlex = styled(Flex)`
+  overflow-x: scroll;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+`;
+
+export const TabbedView = observer(
+  ({ children, tabs, surfaceNode }: TabbedViewProps) => {
+    const mikoto = useMikoto();
+    const reorderFn = useReorderable(surfaceNode);
+    const setWorkspace = useSetRecoilState(workspaceState);
+
+    const [, drop] = useDrop<TabDnd | NodeObject>({
+      accept: ['TAB', 'CHANNEL'],
+      drop(item) {
+        if ('tab' in item) {
+          reorderFn(item.dragIndex, -1, item.surfaceLeaf);
+        } else {
+          surfaceNode.tabs.push(channelToTab(mikoto.channels.get(item.id)!));
+          surfaceNode.index = surfaceNode.tabs.length - 1;
+        }
+      },
+    });
+
+    return (
+      <Grid
+        trow="40px calc(100% - 40px)"
+        h="100%"
+        bg="N1000"
+        style={{ flex: 1 }}
+      >
+        <Helmet titleTemplate="Mikoto | %s" defaultTitle="Mikoto" />
+        <TabsFlex h={40} fs={14}>
+          {tabs.map((tab, index) => (
+            <Tab
+              tab={tab}
+              index={index}
+              key={`${tab.kind}/${tab.key}`}
+              surfaceNode={surfaceNode}
+            />
+          ))}
+          <StyledRest ref={drop} />
+          <TabBarButton
+            onClick={() => {
+              setWorkspace((ws) => ({
+                ...ws,
+                rightOpen: !ws.rightOpen,
+              }));
+            }}
+          >
+            <FontAwesomeIcon icon={faBarsStaggered} />
+          </TabBarButton>
+        </TabsFlex>
+        {tabs.length ? children : <WelcomeToMikoto />}
+      </Grid>
+    );
+  },
+);

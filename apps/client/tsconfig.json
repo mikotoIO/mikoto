@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2020",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
+    "types": ["vitest/globals", "vite/client"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -18,7 +19,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "paths": {
+      // "@/*": ["./src/*"],
+      "@mikoto-io/lucid": ["../../packages/lucid/src/index.ts"],
+      "@mikoto-io/permcheck": ["../../packages/permcheck/src/index.ts"],
+      "mikotojs": ["../../packages/mikotojs/src/index.ts"]
+    }
   },
   "include": [
     "src"

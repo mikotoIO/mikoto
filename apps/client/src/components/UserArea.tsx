@@ -1,66 +1,98 @@
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { Avatar } from './Avatar';
-import { useMikoto } from '../api';
-import { User } from '../models';
+import { Box, Flex, Heading } from '@mikoto-io/lucid';
+import { User } from 'mikotojs';
+import { useEffect } from 'react';
+import { atom, useRecoilState } from 'recoil';
 
-const SidebarElement = styled.div`
-  display: grid;
-  grid-template-rows: 1fr 64px;
-  width: 270px;
-  height: 100%;
-`;
+import { useMikoto } from '../hooks';
+import { useModalKit } from '../store';
+import { useTabkit } from '../store/surface';
+import { ContextMenu, useContextMenu } from './ContextMenu';
+import { Avatar } from './atoms/Avatar';
+import { SetStatusModal } from './modals/Status';
 
-const UserAreaItem = styled.div`
-  padding-left: 16px;
-  display: flex;
-  align-items: center;
-  height: 64px;
-  background-color: ${(p) => p.theme.colors.N1000};
-`;
+export const userState = atom<User | null>({
+  default: null,
+  key: 'user',
+});
 
-const UserInfo = styled.div`
-  margin-left: 10px;
-  h1,
-  h2 {
-    margin: 2px;
-  }
-  h1 {
-    font-size: 16px;
-  }
-  h2 {
-    font-size: 12px;
-    font-weight: normal;
-  }
-`;
-
-export function UserArea() {
+function UserAreaMenu() {
+  const tabkit = useTabkit();
+  const modal = useModalKit();
   const mikoto = useMikoto();
-  const [user, setUser] = useState<User | null>();
-  useEffect(() => {
-    mikoto.getCurrentUser().then(setUser);
-  }, []);
 
   return (
-    <UserAreaItem>
-      {user && (
-        <>
-          <Avatar src={user.avatar} />
-          <UserInfo>
-            <h1>{user.name}</h1>
-            <h2>Tinkering on stuff</h2>
-          </UserInfo>
-        </>
-      )}
-    </UserAreaItem>
+    <ContextMenu style={{ width: '280px' }}>
+      <Flex
+        gap={8}
+        bg="N900"
+        p={8}
+        rounded={4}
+        style={{
+          alignItems: 'center',
+        }}
+      >
+        <Avatar src={mikoto.me.avatar ?? undefined} size={64} />
+        <Heading fs={20}>{mikoto.me.name}</Heading>
+      </Flex>
+      <ContextMenu.Link
+        onClick={() => {
+          tabkit.openTab({ kind: 'welcome', key: 'welcome' }, false);
+        }}
+      >
+        Open Welcome
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          tabkit.openTab({ kind: 'palette', key: 'main' }, false);
+        }}
+      >
+        Open Palette
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          modal(<SetStatusModal />);
+        }}
+      >
+        Set Status
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          tabkit.openTab({ kind: 'accountSettings', key: 'main' }, false);
+        }}
+      >
+        User Settings
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          localStorage.removeItem('REFRESH_TOKEN');
+          window.location.reload();
+        }}
+      >
+        Log out
+      </ContextMenu.Link>
+    </ContextMenu>
   );
 }
 
-export function Sidebar({ children }: { children: React.ReactNode }) {
+export function UserAreaAvatar() {
+  const mikoto = useMikoto();
+  const [user, setUser] = useRecoilState(userState);
+  const contextMenu = useContextMenu(() => <UserAreaMenu />, {
+    top: 48,
+    left: 80,
+  });
+  useEffect(() => {
+    mikoto.client.users.me({}).then(setUser);
+  }, []);
+
   return (
-    <SidebarElement>
-      {children}
-      <UserArea />
-    </SidebarElement>
+    user && (
+      <Avatar
+        size={28}
+        style={{ marginTop: '6px' }}
+        onClick={contextMenu}
+        src={user.avatar ?? undefined}
+      />
+    )
   );
 }

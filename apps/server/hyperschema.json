@@ -1,0 +1,668 @@
+{
+  "types": [
+    {
+      "name": "User",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "id", "type": "string"},
+          {"name": "name", "type": "string"},
+          {"name": "avatar", "type": {"type": "nullable", "param": ["string"]}},
+          {
+            "name": "category",
+            "type": {"type": "nullable", "param": ["string"]}
+          }
+        ]
+      }
+    },
+    {
+      "name": "Role",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "id", "type": "string"},
+          {"name": "name", "type": "string"},
+          {"name": "color", "type": {"type": "nullable", "param": ["string"]}},
+          {"name": "spaceId", "type": "string"},
+          {"name": "permissions", "type": "string"},
+          {"name": "position", "type": "int32"}
+        ]
+      }
+    },
+    {
+      "name": "Channel",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "id", "type": "string"},
+          {"name": "spaceId", "type": "string"},
+          {
+            "name": "parentId",
+            "type": {"type": "nullable", "param": ["string"]}
+          },
+          {"name": "name", "type": "string"},
+          {"name": "order", "type": "int32"},
+          {
+            "name": "lastUpdated",
+            "type": {"type": "nullable", "param": ["string"]}
+          },
+          {"name": "type", "type": "string"}
+        ]
+      }
+    },
+    {
+      "name": "Space",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "id", "type": "string"},
+          {"name": "name", "type": "string"},
+          {"name": "icon", "type": {"type": "nullable", "param": ["string"]}},
+          {"name": "channels", "type": {"type": "array", "param": ["Channel"]}},
+          {"name": "roles", "type": {"type": "array", "param": ["Role"]}},
+          {"name": "ownerId", "type": {"type": "nullable", "param": ["string"]}}
+        ]
+      }
+    },
+    {
+      "name": "Member",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "id", "type": "string"},
+          {"name": "spaceId", "type": "string"},
+          {"name": "user", "type": "User"},
+          {"name": "roleIds", "type": {"type": "array", "param": ["string"]}}
+        ]
+      }
+    },
+    {
+      "name": "Message",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "id", "type": "string"},
+          {"name": "content", "type": "string"},
+          {"name": "timestamp", "type": "string"},
+          {
+            "name": "editedTimestamp",
+            "type": {"type": "nullable", "param": ["string"]}
+          },
+          {
+            "name": "authorId",
+            "type": {"type": "nullable", "param": ["string"]}
+          },
+          {"name": "author", "type": {"type": "nullable", "param": ["User"]}},
+          {"name": "channelId", "type": "string"}
+        ]
+      }
+    },
+    {
+      "name": "Invite",
+      "type": {"kind": "struct", "fields": [{"name": "code", "type": "string"}]}
+    },
+    {
+      "name": "Unread",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "channelId", "type": "string"},
+          {"name": "timestamp", "type": "string"}
+        ]
+      }
+    },
+    {"name": "Relation", "type": {"kind": "struct", "fields": []}},
+    {
+      "name": "Document",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "id", "type": "string"},
+          {"name": "channelId", "type": "string"},
+          {"name": "content", "type": "string"}
+        ]
+      }
+    },
+    {
+      "name": "TypingEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "channelId", "type": "string"},
+          {"name": "userId", "type": "string"},
+          {"name": "memberId", "type": "string"}
+        ]
+      }
+    },
+    {
+      "name": "MessageDeleteEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "messageId", "type": "string"},
+          {"name": "channelId", "type": "string"}
+        ]
+      }
+    },
+    {
+      "name": "VoiceToken",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "url", "type": "string"},
+          {"name": "channelId", "type": "string"},
+          {"name": "token", "type": "string"}
+        ]
+      }
+    },
+    {
+      "name": "SpaceUpdateOptions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "name", "type": {"type": "nullable", "param": ["string"]}},
+          {"name": "icon", "type": {"type": "nullable", "param": ["string"]}}
+        ]
+      }
+    },
+    {
+      "name": "ChannelCreateOptions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "name", "type": "string"},
+          {"name": "type", "type": "string"},
+          {
+            "name": "parentId",
+            "type": {"type": "nullable", "param": ["string"]}
+          }
+        ]
+      }
+    },
+    {
+      "name": "ChannelUpdateOptions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "name", "type": {"type": "nullable", "param": ["string"]}}
+        ]
+      }
+    },
+    {
+      "name": "MemberUpdateOptions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "roleIds", "type": {"type": "array", "param": ["string"]}}
+        ]
+      }
+    },
+    {
+      "name": "RoleEditPayload",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "name", "type": {"type": "nullable", "param": ["string"]}},
+          {"name": "color", "type": {"type": "nullable", "param": ["string"]}},
+          {
+            "name": "permissions",
+            "type": {"type": "nullable", "param": ["string"]}
+          },
+          {"name": "position", "type": {"type": "nullable", "param": ["int32"]}}
+        ]
+      }
+    },
+    {
+      "name": "UserUpdateOptions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "name", "type": {"type": "nullable", "param": ["string"]}},
+          {"name": "avatar", "type": {"type": "nullable", "param": ["string"]}}
+        ]
+      }
+    }
+  ],
+  "services": [
+    {
+      "name": "MainService",
+      "service": {
+        "path": "",
+        "subservices": [
+          {"name": "channels", "service": "ChannelService"},
+          {"name": "documents", "service": "DocumentService"},
+          {"name": "spaces", "service": "SpaceService"},
+          {"name": "members", "service": "MemberService"},
+          {"name": "users", "service": "UserService"},
+          {"name": "messages", "service": "MessageService"},
+          {"name": "roles", "service": "RoleService"},
+          {"name": "voice", "service": "VoiceService"}
+        ],
+        "functions": [],
+        "events": []
+      }
+    },
+    {
+      "name": "ChannelService",
+      "service": {
+        "path": "channels",
+        "subservices": [],
+        "functions": [
+          {
+            "name": "get",
+            "fn": {
+              "input": [{"name": "channelId", "type": "string"}],
+              "output": "Channel"
+            }
+          },
+          {
+            "name": "list",
+            "fn": {
+              "input": [{"name": "spaceId", "type": "string"}],
+              "output": {"type": "array", "param": ["Channel"]}
+            }
+          },
+          {
+            "name": "create",
+            "fn": {
+              "input": [
+                {"name": "spaceId", "type": "string"},
+                {"name": "name", "type": "string"},
+                {
+                  "name": "parentId",
+                  "type": {"type": "nullable", "param": ["string"]}
+                },
+                {"name": "type", "type": "string"}
+              ],
+              "output": "Channel"
+            }
+          },
+          {
+            "name": "update",
+            "fn": {
+              "input": [
+                {"name": "channelId", "type": "string"},
+                {"name": "options", "type": "ChannelUpdateOptions"}
+              ],
+              "output": "Channel"
+            }
+          },
+          {
+            "name": "delete",
+            "fn": {
+              "input": [{"name": "channelId", "type": "string"}],
+              "output": "Channel"
+            }
+          }
+        ],
+        "events": [
+          {"name": "onCreate", "event": "Channel"},
+          {"name": "onUpdate", "event": "Channel"},
+          {"name": "onDelete", "event": "Channel"}
+        ]
+      }
+    },
+    {
+      "name": "DocumentService",
+      "service": {
+        "path": "documents",
+        "subservices": [],
+        "functions": [
+          {
+            "name": "get",
+            "fn": {
+              "input": [{"name": "channelId", "type": "string"}],
+              "output": "Document"
+            }
+          },
+          {
+            "name": "update",
+            "fn": {
+              "input": [
+                {"name": "channelId", "type": "string"},
+                {"name": "content", "type": "string"}
+              ],
+              "output": "Document"
+            }
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "name": "MemberService",
+      "service": {
+        "path": "members",
+        "subservices": [],
+        "functions": [
+          {
+            "name": "get",
+            "fn": {
+              "input": [
+                {"name": "spaceId", "type": "string"},
+                {"name": "userId", "type": "string"}
+              ],
+              "output": "Member"
+            }
+          },
+          {
+            "name": "list",
+            "fn": {
+              "input": [{"name": "spaceId", "type": "string"}],
+              "output": {"type": "array", "param": ["Member"]}
+            }
+          },
+          {
+            "name": "create",
+            "fn": {
+              "input": [
+                {"name": "spaceId", "type": "string"},
+                {"name": "userId", "type": "string"}
+              ],
+              "output": "Member"
+            }
+          },
+          {
+            "name": "update",
+            "fn": {
+              "input": [
+                {"name": "spaceId", "type": "string"},
+                {"name": "userId", "type": "string"},
+                {"name": "options", "type": "MemberUpdateOptions"}
+              ],
+              "output": "Member"
+            }
+          },
+          {
+            "name": "delete",
+            "fn": {
+              "input": [
+                {"name": "spaceId", "type": "string"},
+                {"name": "userId", "type": "string"}
+              ],
+              "output": "Member"
+            }
+          }
+        ],
+        "events": [
+          {"name": "onCreate", "event": "Member"},
+          {"name": "onUpdate", "event": "Member"},
+          {"name": "onDelete", "event": "Member"}
+        ]
+      }
+    },
+    {
+      "name": "MessageService",
+      "service": {
+        "path": "messages",
+        "subservices": [],
+        "functions": [
+          {
+            "name": "list",
+            "fn": {
+              "input": [
+                {"name": "channelId", "type": "string"},
+                {
+                  "name": "cursor",
+                  "type": {"type": "nullable", "param": ["string"]}
+                },
+                {"name": "limit", "type": "int32"}
+              ],
+              "output": {"type": "array", "param": ["Message"]}
+            }
+          },
+          {
+            "name": "send",
+            "fn": {
+              "input": [
+                {"name": "channelId", "type": "string"},
+                {"name": "content", "type": "string"}
+              ],
+              "output": "Message"
+            }
+          },
+          {
+            "name": "edit",
+            "fn": {
+              "input": [
+                {"name": "channelId", "type": "string"},
+                {"name": "messageId", "type": "string"},
+                {"name": "content", "type": "string"}
+              ],
+              "output": "Message"
+            }
+          },
+          {
+            "name": "editUncommitted",
+            "fn": {
+              "input": [
+                {"name": "channelId", "type": "string"},
+                {"name": "messageId", "type": "string"},
+                {"name": "content", "type": "string"}
+              ],
+              "output": "Message"
+            }
+          },
+          {
+            "name": "delete",
+            "fn": {
+              "input": [
+                {"name": "channelId", "type": "string"},
+                {"name": "messageId", "type": "string"}
+              ],
+              "output": "Message"
+            }
+          },
+          {
+            "name": "startTyping",
+            "fn": {
+              "input": [{"name": "channelId", "type": "string"}],
+              "output": "TypingEvent"
+            }
+          },
+          {
+            "name": "ack",
+            "fn": {
+              "input": [
+                {"name": "channelId", "type": "string"},
+                {"name": "timestamp", "type": "string"}
+              ],
+              "output": "Unread"
+            }
+          },
+          {
+            "name": "listUnread",
+            "fn": {
+              "input": [{"name": "spaceId", "type": "string"}],
+              "output": {"type": "array", "param": ["Unread"]}
+            }
+          }
+        ],
+        "events": [
+          {"name": "onCreate", "event": "Message"},
+          {"name": "onUpdate", "event": "Message"},
+          {"name": "onDelete", "event": "Message"},
+          {"name": "onTypingStart", "event": "TypingEvent"}
+        ]
+      }
+    },
+    {
+      "name": "RoleService",
+      "service": {
+        "path": "roles",
+        "subservices": [],
+        "functions": [
+          {
+            "name": "create",
+            "fn": {
+              "input": [
+                {"name": "spaceId", "type": "string"},
+                {"name": "name", "type": "string"}
+              ],
+              "output": "Role"
+            }
+          },
+          {
+            "name": "edit",
+            "fn": {
+              "input": [
+                {"name": "spaceId", "type": "string"},
+                {"name": "roleId", "type": "string"},
+                {"name": "options", "type": "RoleEditPayload"}
+              ],
+              "output": "Role"
+            }
+          },
+          {
+            "name": "delete",
+            "fn": {
+              "input": [
+                {"name": "spaceId", "type": "string"},
+                {"name": "roleId", "type": "string"}
+              ],
+              "output": "Role"
+            }
+          }
+        ],
+        "events": [
+          {"name": "onCreate", "event": "Role"},
+          {"name": "onUpdate", "event": "Role"},
+          {"name": "onDelete", "event": "Role"}
+        ]
+      }
+    },
+    {
+      "name": "SpaceService",
+      "service": {
+        "path": "spaces",
+        "subservices": [],
+        "functions": [
+          {
+            "name": "get",
+            "fn": {
+              "input": [{"name": "spaceId", "type": "string"}],
+              "output": "Space"
+            }
+          },
+          {
+            "name": "list",
+            "fn": {"input": [], "output": {"type": "array", "param": ["Space"]}}
+          },
+          {
+            "name": "create",
+            "fn": {
+              "input": [{"name": "name", "type": "string"}],
+              "output": "Space"
+            }
+          },
+          {
+            "name": "update",
+            "fn": {
+              "input": [
+                {"name": "spaceId", "type": "string"},
+                {"name": "options", "type": "SpaceUpdateOptions"}
+              ],
+              "output": "Space"
+            }
+          },
+          {
+            "name": "delete",
+            "fn": {
+              "input": [{"name": "spaceId", "type": "string"}],
+              "output": "Space"
+            }
+          },
+          {
+            "name": "getSpaceFromInvite",
+            "fn": {
+              "input": [{"name": "inviteCode", "type": "string"}],
+              "output": "Space"
+            }
+          },
+          {
+            "name": "join",
+            "fn": {
+              "input": [{"name": "inviteCode", "type": "string"}],
+              "output": "Space"
+            }
+          },
+          {
+            "name": "leave",
+            "fn": {
+              "input": [{"name": "spaceId", "type": "string"}],
+              "output": "Space"
+            }
+          },
+          {
+            "name": "createInvite",
+            "fn": {
+              "input": [{"name": "spaceId", "type": "string"}],
+              "output": "Invite"
+            }
+          },
+          {
+            "name": "listInvites",
+            "fn": {
+              "input": [{"name": "spaceId", "type": "string"}],
+              "output": {"type": "array", "param": ["Invite"]}
+            }
+          },
+          {
+            "name": "deleteInvite",
+            "fn": {
+              "input": [
+                {"name": "spaceId", "type": "string"},
+                {"name": "inviteCode", "type": "string"}
+              ],
+              "output": "string"
+            }
+          }
+        ],
+        "events": [
+          {"name": "onCreate", "event": "Space"},
+          {"name": "onUpdate", "event": "Space"},
+          {"name": "onDelete", "event": "Space"}
+        ]
+      }
+    },
+    {
+      "name": "UserService",
+      "service": {
+        "path": "users",
+        "subservices": [],
+        "functions": [
+          {"name": "me", "fn": {"input": [], "output": "User"}},
+          {
+            "name": "update",
+            "fn": {
+              "input": [{"name": "options", "type": "UserUpdateOptions"}],
+              "output": "User"
+            }
+          }
+        ],
+        "events": [
+          {"name": "onCreate", "event": "User"},
+          {"name": "onUpdate", "event": "User"},
+          {"name": "onDelete", "event": "User"}
+        ]
+      }
+    },
+    {
+      "name": "VoiceService",
+      "service": {
+        "path": "voice",
+        "subservices": [],
+        "functions": [
+          {
+            "name": "join",
+            "fn": {
+              "input": [{"name": "channelId", "type": "string"}],
+              "output": "VoiceToken"
+            }
+          }
+        ],
+        "events": []
+      }
+    }
+  ]
+}

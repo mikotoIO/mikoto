@@ -1,0 +1,26 @@
+{
+  "name": "mikotojs",
+  "version": "0.0.5",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "generate": "npm run generate:server && npm run generate:client",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --build"
+  },
+  "devDependencies": {
+    "@types/events": "^3.0.0",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "@hyperschema/client": "^0.0.1",
+    "@mikoto-io/permcheck": "0.0.1",
+    "axios": "^0.27.2",
+    "events": "^3.3.0",
+    "mobx": "^6.10.0",
+    "socket.io-client": "^4.5.1",
+    "typed-emitter": "^2.1.0",
+    "zod": "^3.22.2"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "media-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Randomness",
+  "scripts": {
+    "start": "tsc && node ./dist",
+    "build": "tsc",
+    "run": "node ./dist",
+    "test": "jest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/mime-types": "^2.1.1",
+    "@types/minio": "^7.0.18",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "@fastify/cors": "^8.2.1",
+    "@fastify/multipart": "^7.6.0",
+    "fastify": "^4.17.0",
+    "mime-types": "^2.1.35",
+    "minio": "^7.1.0",
+    "nanoid": "^3.0.0",
+    "sharp": "^0.32.1",
+    "ts-dotenv": "^0.9.1"
+  }
+}

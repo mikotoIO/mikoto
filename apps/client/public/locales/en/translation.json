@@ -1,0 +1,59 @@
+{
+  "accountSettings": {
+    "title": "Account Settings",
+    "general": {
+      "title": "My Account",
+      "authentication": "Authentication",
+      "dangerous": "Dangerous Actions",
+      "changePassword": "Change Password",
+      "logOutOfAllDevices": "Log out of all devices",
+      "deleteAccount": "Delete Account"
+    },
+    "bots": {
+      "title": "Bots and API",
+      "createBot": "Create Bot"
+    },
+    "language": {
+      "title": "Language"
+    },
+    "notifications": {
+      "title": "Notifications"
+    },
+    "connections": {
+      "title": "Connections"
+    },
+    "themes": {
+      "title": "Themes"
+    }
+  },
+  "spaceSettings": {
+    "spaceOverview": "Space Overview",
+    "settingsForSpace": "Settings for {{name}}",
+    "overview": {
+      "title": "Overview"
+    },
+    "invites": {
+      "title": "Invites"
+    },
+    "roles": {
+      "title": "Roles"
+    },
+    "members": {
+      "title": "Members"
+    },
+    "emojis": {
+      "title": "Emojis"
+    },
+    "bans": {
+      "title": "Bans"
+    }
+  },
+  "channelSettings": {
+    "general": {
+      "title": "General"
+    },
+    "permissions": {
+      "title": "Permissions"
+    }
+  }
+}

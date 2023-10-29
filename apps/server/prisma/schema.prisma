@@ -10,25 +10,60 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserCategory {
+  BOT
+  UNVERIFIED
+}
+
 model User {
+  id       String        @id @default(uuid()) @db.Uuid
+  name     String
+  avatar   String?
+  category UserCategory?
+
+  SpaceUser     SpaceUser[]
+  Message       Message[]
+  Space         Space[]
+  ChannelUnread ChannelUnread[]
+  Verification  Verification[]
+  Account       Account?
+  Bot           Bot?
+  Bots          Bot[]           @relation("Bots")
+
+  RelationFrom Relationship[] @relation("RelationFrom")
+  RelationTo   Relationship[] @relation("RelationTo")
+  Ban          Ban[]
+  Invite       Invite[]
+}
+
+// factor out email and password
+model Account {
   id           String         @id @default(uuid()) @db.Uuid
   email        String         @unique
-  name         String
-  avatar       String?
   passhash     String
-  SpaceUser    SpaceUser[]
+  user         User           @relation(fields: [id], references: [id], onDelete: Cascade)
   RefreshToken RefreshToken[]
-  Message      Message[]
+}
+
+model Bot {
+  id   String @id @default(uuid()) @db.Uuid
+  name String
+  user User   @relation(fields: [id], references: [id], onDelete: Cascade)
+
+  ownerId String @db.Uuid
+  owner   User   @relation("Bots", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  secret String
 }
 
 model RefreshToken {
   id        String   @id @default(uuid()) @db.Uuid
   token     String   @unique
   expiresAt DateTime
-  userId    String   @db.Uuid
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId String   @db.Uuid
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
+  @@index([accountId])
 }
 
 model SpaceUser {
@@ -48,21 +83,37 @@ model SpaceUser {
 model Role {
   id          String      @id @default(uuid()) @db.Uuid
   name        String
-  color       String
+  color       String? // hex color
   permissions String
+  position    Int
   users       SpaceUser[]
 
   spaceId String @db.Uuid
   space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
   @@index([spaceId])
 }
 
+enum SpaceType {
+  NONE // regular
+  DM
+  GROUP
+}
+
 model Space {
-  id      String      @id @default(uuid()) @db.Uuid
+  id      String    @id @default(uuid()) @db.Uuid
   name    String
-  User    SpaceUser[]
-  Channel Channel[]
-  Role    Role[]
+  icon    String?
+  ownerId String?   @db.Uuid
+  owner   User?     @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  type    SpaceType @default(NONE)
+
+  users        SpaceUser[]
+  channels     Channel[]
+  roles        Role[]
+  Invite       Invite[]
+  Relationship Relationship?
+  Ban          Ban[]
 }
 
 model Channel {
@@ -72,32 +123,111 @@ model Channel {
   parentId String?   @db.Uuid
   parent   Channel?  @relation("NestedChannel", fields: [parentId], references: [id], onDelete: Cascade)
   children Channel[] @relation("NestedChannel")
+  order    Int       @default(0)
 
-  name    String
-  spaceId String    @db.Uuid
-  space   Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  Message Message[]
+  name        String
+  spaceId     String    @db.Uuid
+  space       Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  Message     Message[]
+  lastUpdated DateTime?
+
+  channelUnread ChannelUnread[]
+  Document      Document?
 
   @@index([spaceId])
+}
+
+model ChannelUnread {
+  channelId String   @db.Uuid
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  timestamp DateTime
+
+  @@id([channelId, userId])
 }
 
 enum ChannelType {
   TEXT
   VOICE
+  DOCUMENT
+  APPLICATION
   THREAD
   CATEGORY
 }
 
 model Message {
-  id        String   @id @default(uuid()) @db.Uuid
-  content   String
-  timestamp DateTime
+  id              String    @id @default(uuid()) @db.Uuid
+  content         String
+  timestamp       DateTime
+  editedTimestamp DateTime?
 
   authorId  String? @db.Uuid
   author    User?   @relation(fields: [authorId], references: [id])
   channelId String  @db.Uuid
   channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
 
-  @@index([channelId])
-  @@index([timestamp])
+  @@index([channelId, timestamp])
+}
+
+model Verification {
+  id        String   @id @default(uuid()) @db.Uuid
+  category  String
+  token     String   @unique
+  userId    String?  @db.Uuid
+  expiresAt DateTime
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model Invite {
+  id        String   @id // use NanoID instead
+  spaceId   String   @db.Uuid
+  space     Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  creatorId String?  @db.Uuid
+  creator   User?    @relation(fields: [creatorId], references: [id], onDelete: SetNull)
+}
+
+model Relationship {
+  id         String @id @default(uuid()) @db.Uuid
+  userId     String @db.Uuid
+  user       User?  @relation("RelationFrom", fields: [userId], references: [id], onDelete: NoAction)
+  relationId String @db.Uuid
+  relation   User?  @relation("RelationTo", fields: [relationId], references: [id], onDelete: NoAction)
+
+  // yes, every DM gets their own space
+  spaceId String @unique @db.Uuid
+  space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  state RelationState
+
+  @@unique([userId, relationId])
+  @@index([relationId])
+}
+
+enum RelationState {
+  NONE
+  FRIEND
+  BLOCKED
+  INCOMING_REQUEST
+  OUTGOING_REQUEST
+}
+
+model Ban {
+  id      String @id @default(uuid()) @db.Uuid
+  userId  String @db.Uuid
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceId String @db.Uuid
+  space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  reason String?
+
+  @@unique([spaceId, userId])
+}
+
+model Document {
+  id        String  @id @default(uuid()) @db.Uuid
+  channelId String  @unique @db.Uuid
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  content   String // JSON
 }

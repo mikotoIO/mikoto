@@ -230,22 +230,6 @@ export class AccountController {
     };
   }
 
-  @Post('/account/avatar')
-  async uploadAvatar(
-    @CurrentUser() account: AccountJwt,
-    @UploadedFile('avatar') avatar: Express.Multer.File,
-  ) {
-    const uploaded = await this.minio.uploadImage('avatar', avatar);
-    await this.prisma.user.update({
-      where: { id: account.sub },
-      data: { avatar: uploaded.url },
-    });
-
-    return {
-      status: 'ok',
-    };
-  }
-
   // Bots
 
   // show list of bots for user

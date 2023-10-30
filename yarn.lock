@@ -12159,7 +12159,7 @@ __metadata:
     dotenv: ^16.0.3
     draft-js: ^0.11.7
     draftjs-utils: ^0.10.2
-    electron: 25.4.0
+    electron: 25.8.4
     emoji-mart: ^5.5.2
     eslint: ^8.39.0
     eslint-config-airbnb: ^19.0.4
@@ -13658,7 +13658,7 @@ __metadata:
     "@electron-forge/maker-zip": ^6.2.1
     "@electron-forge/plugin-auto-unpack-natives": ^6.2.1
     "@types/electron-squirrel-startup": ^1.0.0
-    electron: 25.4.0
+    electron: 25.8.4
     electron-squirrel-startup: ^1.0.0
     typescript: ^5.2.2
   languageName: unknown
@@ -14207,16 +14207,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:25.4.0":
-  version: 25.4.0
-  resolution: "electron@npm:25.4.0"
+"electron@npm:25.8.4":
+  version: 25.8.4
+  resolution: "electron@npm:25.8.4"
   dependencies:
     "@electron/get": ^2.0.0
     "@types/node": ^18.11.18
     extract-zip: ^2.0.1
   bin:
     electron: cli.js
-  checksum: a1c667dfc52e33a08a396b710a436bada4552bb3b622501e27abc85081c4c07965ce1620bb9d87f77f0d80df5d93d0e8dd169f8df17f6313c77ceff28c58420e
+  checksum: 1e021cf83747d73d1629027a82a344ed22c9256309f712cf785eec622a9112c53936209a74ef8de546c28fa9961e831d03dc66a8115ce3835c7616dc7a6d2293
   languageName: node
   linkType: hard
 

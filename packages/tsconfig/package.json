@@ -4,8 +4,6 @@
   "private": true,
   "main": "index.js",
   "files": [
-    "base.json",
-    "nextjs.json",
-    "react-library.json"
+    "server.tsconfig.json"
   ]
 }

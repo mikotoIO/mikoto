@@ -21786,6 +21786,7 @@ __metadata:
     sharp: ^0.32.1
     ts-dotenv: ^0.9.1
     ts-jest: ^29.1.0
+    tsconfig: "*"
     typescript: ^5.2.2
   languageName: unknown
   linkType: soft
@@ -28036,6 +28037,7 @@ __metadata:
     ts-jest: ^29.1.0
     ts-node: ^10.9.1
     ts-node-dev: ^2.0.0
+    tsconfig: "*"
     tslib: ^2.4.0
     typedi: ^0.10.0
     typescript: ^5.2.2
@@ -30255,6 +30257,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tsconfig@*, tsconfig@workspace:packages/tsconfig":
+  version: 0.0.0-use.local
+  resolution: "tsconfig@workspace:packages/tsconfig"
+  languageName: unknown
+  linkType: soft
+
 "tsconfig@npm:^7.0.0":
   version: 7.0.0
   resolution: "tsconfig@npm:7.0.0"
@@ -30266,12 +30274,6 @@ __metadata:
   checksum: 8bce05e93c673defd56d93d83d4055e49651d3947c076339c4bc15d47b7eb5029bed194087e568764213a2e4bf45c477ba9f4da16adfd92cd901af7c09e4517e
   languageName: node
   linkType: hard
-
-"tsconfig@workspace:packages/tsconfig":
-  version: 0.0.0-use.local
-  resolution: "tsconfig@workspace:packages/tsconfig"
-  languageName: unknown
-  linkType: soft
 
 "tslib@npm:^1.8.1, tslib@npm:^1.9.3":
   version: 1.14.1

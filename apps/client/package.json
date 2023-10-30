@@ -104,7 +104,7 @@
     "tippy.js": "^6.3.7",
     "tiptap-markdown": "^0.8.2",
     "typed-emitter": "^2.1.0",
-    "typescript": "^5.1.6",
+    "typescript": "^5.2.2",
     "unified": "^10.1.2",
     "unist-util-visit": "^4.1.2",
     "usehooks-ts": "^2.6.0",

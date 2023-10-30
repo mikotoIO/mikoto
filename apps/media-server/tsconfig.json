@@ -1,14 +1,3 @@
 {
-  "compilerOptions": {
-    "target": "es2020",
-    "lib": ["es2020", "esnext.asynciterable"],
-    "module": "CommonJS",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "outDir": "./dist"
-  }
+  "extends": "tsconfig/server.tsconfig.json"
 }

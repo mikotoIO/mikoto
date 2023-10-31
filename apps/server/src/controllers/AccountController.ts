@@ -176,9 +176,7 @@ export class AccountController {
       },
     });
 
-    const resetLink = `${env.WEB_CLIENT}/forgotpassword/${
-      verification.token
-    }`;
+    const resetLink = `${env.WEB_CLIENT}/forgotpassword/${verification.token}`;
 
     await this.mailer.sendMail(
       body.email,

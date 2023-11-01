@@ -162,6 +162,7 @@ function CreateChannelModal({ channel }: { channel?: Channel }) {
 
 function TreebarContextMenu({ space }: { space: ClientSpace }) {
   const setModal = useSetRecoilState(modalState);
+  const tabkit = useTabkit();
   return (
     <ContextMenu>
       <ContextMenu.Link
@@ -172,6 +173,20 @@ function TreebarContextMenu({ space }: { space: ClientSpace }) {
         Create Channel
       </ContextMenu.Link>
       <ContextMenu.Link>Invite People</ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          tabkit.openTab(
+            {
+              kind: 'search',
+              key: 'search',
+              spaceId: space.id,
+            },
+            true,
+          );
+        }}
+      >
+        Search
+      </ContextMenu.Link>
     </ContextMenu>
   );
 }

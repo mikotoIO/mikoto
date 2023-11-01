@@ -8,6 +8,7 @@ type TabBaseType =
   | { kind: 'voiceChannel'; channelId: string }
   | { kind: 'documentChannel'; channelId: string }
   | { kind: 'applicationChannel'; channelId: string }
+  | { kind: 'search'; spaceId: string }
   | { kind: 'spaceSettings'; spaceId: string }
   | { kind: 'channelSettings'; channelId: string }
   | { kind: 'accountSettings' }

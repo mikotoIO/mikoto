@@ -25,6 +25,8 @@ import { AvatarEditor } from '../../molecules/AvatarEditor';
 import { BaseSettingsSurface } from '../BaseSettingSurface';
 import { BotsSurface } from './bots';
 import { LanguageSurface } from './language';
+import { NotificationSurface } from './notification';
+import { SafetySurface } from './safety';
 import { ThemesSubsurface } from './themes';
 
 const bgUrl = '/images/artworks/1.jpg';
@@ -199,15 +201,6 @@ const Overview = observer(() => {
     </SettingsView>
   );
 });
-function NotificationSubsurface() {
-  const { t } = useTranslation();
-
-  return (
-    <SettingsView>
-      <h1>{t('accountSettings.notifications.title')}</h1>
-    </SettingsView>
-  );
-}
 
 function Switch({ nav }: { nav: string }) {
   switch (nav) {
@@ -218,9 +211,11 @@ function Switch({ nav }: { nav: string }) {
     case 'language':
       return <LanguageSurface />;
     case 'notifications':
-      return <NotificationSubsurface />;
+      return <NotificationSurface />;
     case 'themes':
       return <ThemesSubsurface />;
+    case 'safety':
+      return <SafetySurface />;
     default:
       return null;
   }
@@ -228,9 +223,10 @@ function Switch({ nav }: { nav: string }) {
 
 const ACCOUNT_SETTING_CATEGORIES = [
   { code: 'general', tkey: 'accountSettings.general.title' },
+  { code: 'safety', tkey: 'accountSettings.safety.title' },
+  { code: 'notifications', tkey: 'accountSettings.notifications.title' },
   { code: 'bots', tkey: 'accountSettings.bots.title' },
   { code: 'language', tkey: 'accountSettings.language.title' },
-  { code: 'notifications', tkey: 'accountSettings.notifications.title' },
   { code: 'connections', tkey: 'accountSettings.connections.title' },
   { code: 'themes', tkey: 'accountSettings.themes.title' },
 ];

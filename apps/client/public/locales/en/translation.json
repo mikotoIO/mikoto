@@ -24,6 +24,9 @@
     },
     "themes": {
       "title": "Themes"
+    },
+    "safety": {
+      "title": "Safety"
     }
   },
   "spaceSettings": {

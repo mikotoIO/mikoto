@@ -9,7 +9,6 @@ import {
   JsonController,
   Post,
   UnauthorizedError,
-  UploadedFile,
 } from 'routing-controllers';
 import { Service } from 'typedi';
 import { promisify } from 'util';
@@ -17,7 +16,6 @@ import { promisify } from 'util';
 import { AccountJwt } from '../auth';
 import { env } from '../env';
 import Mailer from '../functions/Mailer';
-import Minio from '../functions/Minio';
 import { logger } from '../functions/logger';
 
 const randomBytes = promisify(crypto.randomBytes);
@@ -46,11 +44,7 @@ interface ChangePasswordPayload {
 @JsonController()
 @Service()
 export class AccountController {
-  constructor(
-    private prisma: PrismaClient,
-    private minio: Minio,
-    private mailer: Mailer,
-  ) {}
+  constructor(private prisma: PrismaClient, private mailer: Mailer) {}
 
   @Get('/')
   async index() {
@@ -176,9 +170,7 @@ export class AccountController {
       },
     });
 
-    const resetLink = `${env.WEB_CLIENT}/forgotpassword/${
-      verification.token
-    }`;
+    const resetLink = `${env.WEB_CLIENT}/forgotpassword/${verification.token}`;
 
     await this.mailer.sendMail(
       body.email,

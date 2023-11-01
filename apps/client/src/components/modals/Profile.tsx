@@ -1,3 +1,5 @@
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Buttons, Flex, Modal } from '@mikoto-io/lucid';
 import { User } from 'mikotojs';
 import styled from 'styled-components';
@@ -64,6 +66,9 @@ export function ProfileModal({ user }: { user: User }) {
               {mikoto.me.id !== user.id && (
                 <Buttons>
                   <Button variant="success">Send Friend Request</Button>
+                  <Button>
+                    <FontAwesomeIcon icon={faEnvelope} />
+                  </Button>
                 </Buttons>
               )}
             </div>

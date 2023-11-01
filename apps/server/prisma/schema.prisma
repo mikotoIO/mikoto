@@ -112,7 +112,7 @@ model Space {
   channels     Channel[]
   roles        Role[]
   Invite       Invite[]
-  Relationship Relationship?
+  Relationship Relationship[]
   Ban          Ban[]
 }
 
@@ -196,7 +196,7 @@ model Relationship {
   relation   User?  @relation("RelationTo", fields: [relationId], references: [id], onDelete: NoAction)
 
   // yes, every DM gets their own space
-  spaceId String @unique @db.Uuid
+  spaceId String @db.Uuid
   space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 
   state RelationState

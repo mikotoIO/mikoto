@@ -15,13 +15,14 @@ import {
 import socketio from 'socket.io';
 import { Container } from 'typedi';
 
+import { AccountController } from './controllers/AccountController';
 import { env } from './env';
 import Mailer from './functions/Mailer';
-import Minio from './functions/Minio';
 import { logger } from './functions/logger';
 import './functions/prismaRecursive';
 import { redis } from './functions/redis';
 import * as hs from './hyperschema';
+import { CustomErrorHandler } from './middlewares/CustomErrorHandler';
 
 const app = express();
 
@@ -35,7 +36,6 @@ const prisma = new PrismaClient({
 });
 Container.set(PrismaClient, prisma);
 Container.set(socketio.Server, io);
-Container.set(Minio, new Minio(env.MINIO));
 Container.set(Mailer, new Mailer());
 
 app.use(cors());
@@ -43,8 +43,8 @@ app.use(cors());
 useContainer(Container);
 
 useExpressServer(app, {
-  controllers: [path.join(`${__dirname}/controllers/*.{js,ts}`)],
-  middlewares: [path.join(`${__dirname}/middlewares/*.{js,ts}`)],
+  controllers: [AccountController],
+  middlewares: [CustomErrorHandler],
   defaultErrorHandler: false,
   currentUserChecker: (action) => {
     let authHeader = action.request.headers.authorization as string;

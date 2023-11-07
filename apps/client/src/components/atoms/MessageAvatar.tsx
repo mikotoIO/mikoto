@@ -1,5 +1,4 @@
-import { Checkbox } from '@mantine/core';
-import { Flex } from '@mikoto-io/lucid';
+import { Flex, Checkbox } from '@mikoto-io/lucid';
 import { permissions } from '@mikoto-io/permcheck';
 import { ClientMember, Role, User, checkMemberPermission } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
@@ -68,7 +67,7 @@ function RoleSetter({
           if (x.name === '@everyone') return null;
           return (
             <Checkbox
-              label={x.name}
+              labelName={x.name}
               key={x.id}
               checked={selectedRoles[x.id]}
               onChange={async (e) => {

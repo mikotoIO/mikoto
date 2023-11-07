@@ -62,6 +62,7 @@ export type BoxProps = Partial<{
   bg: string;
   txt: string;
   fs: number;
+  position: CSS.Property.Position;
   mix: CSS.Properties[];
   rounded: number | string;
   gap: number | string;
@@ -114,6 +115,9 @@ export const boxCss = css<BoxProps>((props): StyledObject<object> => {
         break;
       case 'fs':
         cssObject.fontSize = unitToPixel(props.fs);
+        break;
+      case 'position':
+        cssObject.position = props.position;
         break;
       case 'rounded':
         cssObject.borderRadius = unitToPixel(props.rounded);

@@ -3,6 +3,7 @@ import { permissions } from '@mikoto-io/permcheck';
 import { z } from 'zod';
 
 import { assertPermission } from '../../functions/permissions';
+import { prisma } from '../../functions/prisma';
 import { h } from '../core';
 import { assertChannelMembership } from '../middlewares';
 import { Message, TypingEvent, Unread } from '../models';
@@ -19,8 +20,8 @@ export const MessageService = h.service({
       Message.array(),
     )
     .use(assertChannelMembership)
-    .do(async ({ channelId, cursor, limit, $p }) => {
-      const messages = await $p.message.findMany({
+    .do(async ({ channelId, cursor, limit }) => {
+      const messages = await prisma.message.findMany({
         where: { channelId },
 
         include: { author: authorInclude },
@@ -40,8 +41,8 @@ export const MessageService = h.service({
   send: h
     .fn({ channelId: z.string(), content: z.string() }, Message)
     .use(assertChannelMembership)
-    .do(async ({ $p, $r, channelId, content, state }) => {
-      const channel = await $p.channel.findUnique({
+    .do(async ({ $r, channelId, content, state }) => {
+      const channel = await prisma.channel.findUnique({
         where: { id: channelId },
       });
       if (channel === null) throw new NotFoundError('ChannelNotFound');
@@ -49,7 +50,7 @@ export const MessageService = h.service({
       const now = new Date();
 
       const [message] = await Promise.all([
-        $p.message.create({
+        prisma.message.create({
           data: {
             channelId,
             timestamp: now,
@@ -58,7 +59,7 @@ export const MessageService = h.service({
           },
           include: { author: authorInclude },
         }),
-        $p.channel.update({
+        prisma.channel.update({
           where: { id: channelId },
           data: { lastUpdated: now },
         }),
@@ -77,13 +78,13 @@ export const MessageService = h.service({
       Message,
     )
     .use(assertChannelMembership)
-    .do(async ({ $p, $r, state, channel, messageId, content }) => {
-      const message = await $p.message.findUnique({
+    .do(async ({  $r, state, channel, messageId, content }) => {
+      const message = await prisma.message.findUnique({
         where: { id: messageId },
       });
       if (message === null) throw new NotFoundError('MessageNotFound');
       if (message.authorId !== state.user.id) throw new UnauthorizedError();
-      const newMessage = await $p.message.update({
+      const newMessage = await prisma.message.update({
         where: { id: messageId },
         data: { content, editedTimestamp: new Date() },
         include: { author: authorInclude },
@@ -103,8 +104,8 @@ export const MessageService = h.service({
       Message,
     )
     .use(assertChannelMembership)
-    .do(async ({ $p, $r, state, channel, messageId, content }) => {
-      const message = await $p.message.findUnique({
+    .do(async ({  $r, state, channel, messageId, content }) => {
+      const message = await prisma.message.findUnique({
         where: { id: messageId },
         include: { author: authorInclude },
       });
@@ -121,8 +122,8 @@ export const MessageService = h.service({
   delete: h
     .fn({ channelId: z.string(), messageId: z.string() }, Message)
     .use(assertChannelMembership)
-    .do(async ({ $p, $r, state, channel, messageId }) => {
-      const message = await $p.message.findUnique({
+    .do(async ({  $r, state, channel, messageId }) => {
+      const message = await prisma.message.findUnique({
         where: { id: messageId },
         include: { author: authorInclude },
       });
@@ -135,7 +136,7 @@ export const MessageService = h.service({
           permissions.manageMessages,
         );
       }
-      await $p.message.delete({
+      await prisma.message.delete({
         where: { id: messageId },
       });
       await $r.pub(`space:${channel.spaceId}`, 'deleteMessage', message);
@@ -179,8 +180,8 @@ export const MessageService = h.service({
   ack: h
     .fn({ channelId: z.string(), timestamp: z.string() }, Unread)
     // .use(assertChannelMembership)
-    .do(async ({ $p, state, channelId, timestamp }) => {
-      const unread = await $p.channelUnread.upsert({
+    .do(async ({ state, channelId, timestamp }) => {
+      const unread = await prisma.channelUnread.upsert({
         create: {
           channelId,
           userId: state.user.id,
@@ -204,8 +205,8 @@ export const MessageService = h.service({
 
   listUnread: h
     .fn({ spaceId: z.string() }, Unread.array())
-    .do(async ({ $p, state, spaceId }) => {
-      const unreads = await $p.channelUnread.findMany({
+    .do(async ({ state, spaceId }) => {
+      const unreads = await prisma.channelUnread.findMany({
         where: { userId: state.user.id, channel: { spaceId } },
       });
       return unreads.map((u) => ({

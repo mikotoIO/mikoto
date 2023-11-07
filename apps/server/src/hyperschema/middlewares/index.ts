@@ -2,12 +2,13 @@ import { NotFoundError, UnauthorizedError } from '@hyperschema/core';
 import { checkPermission, permissions } from '@mikoto-io/permcheck';
 import { Channel, SpaceUser } from '@prisma/client';
 
+import { prisma } from '../../functions/prisma';
 import { HSContext } from '../core';
 
 export async function assertSpaceMembership<
   T extends HSContext & { spaceId: string },
 >(props: T): Promise<T> {
-  const membership = await props.$p.spaceUser.findUnique({
+  const membership = await prisma.spaceUser.findUnique({
     where: {
       userId_spaceId: {
         userId: props.state.user.id,
@@ -22,11 +23,11 @@ export async function assertSpaceMembership<
 export async function assertChannelMembership<
   T extends HSContext & { channelId: string },
 >(props: T): Promise<T & { channel: Channel; member: SpaceUser }> {
-  const channel = await props.$p.channel.findUnique({
+  const channel = await prisma.channel.findUnique({
     where: { id: props.channelId },
   });
   if (channel === null) throw new NotFoundError('Channel not found');
-  const membership = await props.$p.spaceUser.findUnique({
+  const membership = await prisma.spaceUser.findUnique({
     where: {
       userId_spaceId: {
         userId: props.state.user.id,
@@ -47,12 +48,12 @@ export function requireSpacePerm<T extends HSContext & { spaceId: string }>(
   return async (props: T): Promise<T> => {
     let r = typeof rule === 'string' ? BigInt(rule) : rule;
 
-    const spc = await props.$p.space.findUnique({
+    const spc = await prisma.space.findUnique({
       where: { id: props.spaceId },
     });
     if (spc === null) throw new NotFoundError('Space not found');
     if (spc.ownerId === props.state.user.id) return props;
-    const member = await props.$p.spaceUser.findUnique({
+    const member = await prisma.spaceUser.findUnique({
       where: {
         userId_spaceId: { userId: props.state.user.id, spaceId: props.spaceId },
       },

@@ -3,18 +3,14 @@ import { permissions } from '@mikoto-io/permcheck';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
+import { prisma } from '../../functions/prisma';
 import { HSContext, h } from '../core';
 import { assertSpaceMembership, requireSpacePerm } from '../middlewares';
 import { Invite, Space, SpaceUpdateOptions } from '../models';
 import { memberInclude, memberMap, spaceInclude } from '../normalizer';
 
-async function joinSpace(
-  $p: HSContext['$p'],
-  $r: HSContext['$r'],
-  userId: string,
-  space: Space,
-) {
-  const member = await $p.spaceUser.create({
+async function joinSpace($r: HSContext['$r'], userId: string, space: Space) {
+  const member = await prisma.spaceUser.create({
     data: {
       spaceId: space.id,
       userId,
@@ -26,13 +22,8 @@ async function joinSpace(
   await $r.pub(`space:${space.id}`, 'createSpace', space);
 }
 
-async function leaveSpace(
-  $p: HSContext['$p'],
-  $r: HSContext['$r'],
-  userId: string,
-  space: Space,
-) {
-  const member = await $p.spaceUser.delete({
+async function leaveSpace($r: HSContext['$r'], userId: string, space: Space) {
+  const member = await prisma.spaceUser.delete({
     where: {
       userId_spaceId: { userId, spaceId: space.id },
     },
@@ -49,8 +40,8 @@ export const SpaceService = h.service({
   get: h
     .fn({ spaceId: z.string() }, Space)
     .use(assertSpaceMembership)
-    .do(async ({ spaceId, $p }) => {
-      const space = await $p.space.findUnique({
+    .do(async ({ spaceId }) => {
+      const space = await prisma.space.findUnique({
         where: { id: spaceId },
         include: spaceInclude,
       });
@@ -58,8 +49,8 @@ export const SpaceService = h.service({
       return space;
     }),
 
-  list: h.fn({}, Space.array()).do(async ({ $p, state }) => {
-    const list = await $p.spaceUser.findMany({
+  list: h.fn({}, Space.array()).do(async ({ state }) => {
+    const list = await prisma.spaceUser.findMany({
       where: { userId: state.user.id },
       include: {
         space: { include: spaceInclude },
@@ -68,35 +59,33 @@ export const SpaceService = h.service({
     return list.map((x) => x.space);
   }),
 
-  create: h
-    .fn({ name: z.string() }, Space)
-    .do(async ({ name, $p, $r, state }) => {
-      const space = await $p.space.create({
-        data: {
-          name,
-          channels: { create: [{ name: 'general', order: 0 }] },
-          ownerId: state.user.id,
-          roles: {
-            create: [{ name: '@everyone', position: -1, permissions: '0' }],
-          },
+  create: h.fn({ name: z.string() }, Space).do(async ({ name, $r, state }) => {
+    const space = await prisma.space.create({
+      data: {
+        name,
+        channels: { create: [{ name: 'general', order: 0 }] },
+        ownerId: state.user.id,
+        roles: {
+          create: [{ name: '@everyone', position: -1, permissions: '0' }],
         },
-        include: spaceInclude,
-      });
-      await $p.spaceUser.create({
-        data: {
-          spaceId: space.id,
-          userId: state.user.id,
-        },
-      });
-      joinSpace($p, $r, state.user.id, Space.parse(space));
-      return space;
-    }),
+      },
+      include: spaceInclude,
+    });
+    await prisma.spaceUser.create({
+      data: {
+        spaceId: space.id,
+        userId: state.user.id,
+      },
+    });
+    joinSpace($r, state.user.id, Space.parse(space));
+    return space;
+  }),
 
   update: h
     .fn({ spaceId: z.string(), options: SpaceUpdateOptions }, Space)
     .use(requireSpacePerm(permissions.manageSpace))
-    .do(async ({ spaceId, options, $p, $r }) => {
-      const space = await $p.space.update({
+    .do(async ({ spaceId, options, $r }) => {
+      const space = await prisma.space.update({
         where: { id: spaceId },
         data: {
           name: options.name ?? undefined,
@@ -114,13 +103,13 @@ export const SpaceService = h.service({
   delete: h
     .fn({ spaceId: z.string() }, Space)
     .use(requireSpacePerm(permissions.superuser))
-    .do(async ({ spaceId, $p, $r }) => {
-      const space = await $p.space.findUnique({
+    .do(async ({ spaceId, $r }) => {
+      const space = await prisma.space.findUnique({
         where: { id: spaceId },
         include: spaceInclude,
       });
       if (space === null) throw new NotFoundError();
-      await $p.space.delete({ where: { id: spaceId } });
+      await prisma.space.delete({ where: { id: spaceId } });
       await $r.pub(`space:${spaceId}`, 'deleteSpace', space);
       return space;
     }),
@@ -145,13 +134,13 @@ export const SpaceService = h.service({
 
   getSpaceFromInvite: h
     .fn({ inviteCode: z.string() }, Space)
-    .do(async ({ inviteCode, $p }) => {
-      const invite = await $p.invite.findUnique({
+    .do(async ({ inviteCode }) => {
+      const invite = await prisma.invite.findUnique({
         where: { id: inviteCode },
       });
       if (invite === null) throw new NotFoundError();
 
-      const space = await $p.space.findUnique({
+      const space = await prisma.space.findUnique({
         where: { id: invite?.spaceId },
         include: spaceInclude,
       });
@@ -162,32 +151,32 @@ export const SpaceService = h.service({
 
   join: h
     .fn({ inviteCode: z.string() }, Space)
-    .do(async ({ inviteCode, $p, $r, state }) => {
-      const invite = await $p.invite.findUnique({
+    .do(async ({ inviteCode, $r, state }) => {
+      const invite = await prisma.invite.findUnique({
         where: { id: inviteCode },
       });
       if (invite === null) throw new NotFoundError();
 
-      const space = await $p.space.findUnique({
+      const space = await prisma.space.findUnique({
         where: { id: invite?.spaceId },
         include: spaceInclude,
       });
       if (space === null) throw new NotFoundError();
 
-      await joinSpace($p, $r, state.user.id, Space.parse(space));
+      await joinSpace($r, state.user.id, Space.parse(space));
       return space;
     }),
 
   leave: h
     .fn({ spaceId: z.string() }, Space)
     .use(assertSpaceMembership)
-    .do(async ({ spaceId, $p, $r, state }) => {
-      const space = await $p.space.findUnique({
+    .do(async ({ spaceId, $r, state }) => {
+      const space = await prisma.space.findUnique({
         where: { id: spaceId },
         include: spaceInclude,
       });
       if (space === null) throw new NotFoundError();
-      await leaveSpace($p, $r, state.user.id, Space.parse(space));
+      await leaveSpace($r, state.user.id, Space.parse(space));
       return space;
     }),
 
@@ -195,8 +184,8 @@ export const SpaceService = h.service({
   createInvite: h
     .fn({ spaceId: z.string() }, Invite)
     .use(requireSpacePerm(permissions.manageSpace))
-    .do(async ({ spaceId, $p, state }) => {
-      const invite = await $p.invite.create({
+    .do(async ({ spaceId, state }) => {
+      const invite = await prisma.invite.create({
         data: {
           id: nanoid(12),
           spaceId,
@@ -209,8 +198,8 @@ export const SpaceService = h.service({
   listInvites: h
     .fn({ spaceId: z.string() }, Invite.array())
     .use(requireSpacePerm(permissions.manageSpace))
-    .do(async ({ spaceId, $p }) => {
-      const invites = await $p.invite.findMany({
+    .do(async ({ spaceId }) => {
+      const invites = await prisma.invite.findMany({
         where: { spaceId },
       });
       return invites.map((x) => ({ code: x.id }));
@@ -219,8 +208,8 @@ export const SpaceService = h.service({
   deleteInvite: h
     .fn({ spaceId: z.string(), inviteCode: z.string() }, z.string())
     .use(requireSpacePerm(permissions.manageSpace))
-    .do(async ({ inviteCode, $p }) => {
-      const invite = await $p.invite.delete({
+    .do(async ({ inviteCode }) => {
+      const invite = await prisma.invite.delete({
         where: { id: inviteCode },
       });
       if (invite === null) throw new NotFoundError();

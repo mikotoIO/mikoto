@@ -1,6 +1,7 @@
 import { NotFoundError } from 'routing-controllers';
 import { z } from 'zod';
 
+import { prisma } from '../../functions/prisma';
 import { h } from '../core';
 import { User } from '../models';
 
@@ -10,8 +11,8 @@ export const UserUpdateOptions = z.object({
 });
 
 export const UserService = h.service({
-  me: h.fn({}, User).do(async ({ $p, state }) => {
-    const user = await $p.user.findUnique({
+  me: h.fn({}, User).do(async ({ state }) => {
+    const user = await prisma.user.findUnique({
       where: { id: state.user.id },
     });
 
@@ -21,8 +22,8 @@ export const UserService = h.service({
 
   update: h
     .fn({ options: UserUpdateOptions }, User)
-    .do(async ({ $p, state, options }) => {
-      const user = await $p.user.update({
+    .do(async ({ state, options }) => {
+      const user = await prisma.user.update({
         where: { id: state.user.id },
         data: {
           name: options.name ?? undefined,

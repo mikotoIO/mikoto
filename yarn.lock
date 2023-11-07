@@ -4857,29 +4857,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mantine/hooks@npm:^6.0.16":
-  version: 6.0.16
-  resolution: "@mantine/hooks@npm:6.0.16"
-  peerDependencies:
-    react: ">=16.8.0"
-  checksum: 070546fd11dda57f29650af534e35a5ca95b47c38ddfc6646be9a58ed3cd8f671a376f0203be7832a7b29eaf97091cf0a7899223e5993dfacf775edf5c7325c6
-  languageName: node
-  linkType: hard
-
-"@mantine/modals@npm:^5.2.3":
-  version: 5.10.5
-  resolution: "@mantine/modals@npm:5.10.5"
-  dependencies:
-    "@mantine/utils": 5.10.5
-  peerDependencies:
-    "@mantine/core": 5.10.5
-    "@mantine/hooks": 5.10.5
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
-  checksum: 609820545bf4ccbd58143ced12d48fcf12eb763de372de5c69308848ec212bc19995d10ebc8ebab5bafb5185eeaa19e43e0b9aeea478b9e9b6fa0086342a281c
-  languageName: node
-  linkType: hard
-
 "@mantine/styles@npm:5.10.5":
   version: 5.10.5
   resolution: "@mantine/styles@npm:5.10.5"
@@ -12107,8 +12084,6 @@ __metadata:
     "@livekit/components-styles": ^1.0.6
     "@livekit/react-core": ^1.0.2
     "@mantine/core": ^5.2.3
-    "@mantine/hooks": ^6.0.16
-    "@mantine/modals": ^5.2.3
     "@marsidev/react-turnstile": ^0.2.2
     "@mdx-js/react": ^1.6.22
     "@mikoto-io/lucid": 0.0.20

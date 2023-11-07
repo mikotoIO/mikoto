@@ -6,7 +6,7 @@
   Mikoto
 </h1>
 
-<p align="center">The Most Overkill Chat App in the World.</p>
+<p align="center">The Most Overkill Messaging App in the World.</p>
 <p align="center">
   <a href='https://mikoto.io'>Website</a> · 
   <a href='https://alpha.mikoto.io'>Alpha</a> ·
@@ -27,9 +27,9 @@ Mikoto is an messaging service designed for building online communities. It uses
 > Note: Mikoto is still in early development. Some of these features are not fully implemented.
 
 - ✨ Open Source (with proprietary extensions for enterprise support)
-- 🪐 Decentralized, using [Decentralized Identifiers](https://www.w3.org/TR/did-core/)
-- 🧵 Threading system suitable for AI agent management
-- 🔍 Semantic search to fight against the black hole of information
+- 🪐 [DID-based](https://www.w3.org/TR/did-core/) usernames
+- 🧵 Next-generation thread management
+- 🔍 Semantic search across all channels
 - ⚡️ Superuser friendly features, like tab view, zen mode and, keyboard shortcuts and more
 - 🔒 Fully E2E encrypted DMs and Group DMs
 - 🏡 Threaded DMs and group DMs

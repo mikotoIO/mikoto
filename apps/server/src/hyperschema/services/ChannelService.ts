@@ -2,13 +2,14 @@ import { permissions } from '@mikoto-io/permcheck';
 import { ChannelType } from '@prisma/client';
 import { z } from 'zod';
 
+import { prisma } from '../../functions/prisma';
 import { h } from '../core';
 import {
   assertChannelMembership,
   assertSpaceMembership,
   requireSpacePerm,
 } from '../middlewares';
-import { Channel, ChannelCreateOptions, ChannelUpdateOptions } from '../models';
+import { Channel, ChannelUpdateOptions } from '../models';
 
 export const ChannelService = h.service({
   get: h
@@ -21,8 +22,8 @@ export const ChannelService = h.service({
   list: h
     .fn({ spaceId: z.string() }, Channel.array())
     .use(assertSpaceMembership)
-    .do(async ({ $p, spaceId }) => {
-      const channels = await $p.channel.findMany({ where: { spaceId } });
+    .do(async ({ spaceId }) => {
+      const channels = await prisma.channel.findMany({ where: { spaceId } });
       return channels;
     }),
 
@@ -37,8 +38,8 @@ export const ChannelService = h.service({
       Channel,
     )
     .use(requireSpacePerm(permissions.manageChannels))
-    .do(async ({ $p, $r, spaceId, name, type, parentId }) => {
-      const channel = await $p.channel.create({
+    .do(async ({ $r, spaceId, name, type, parentId }) => {
+      const channel = await prisma.channel.create({
         data: {
           name,
           spaceId,
@@ -68,9 +69,9 @@ export const ChannelService = h.service({
       Channel,
     )
     .use(assertChannelMembership)
-    .do(async ({ channelId, options, $p, $r }) => {
+    .do(async ({ channelId, options, $r }) => {
       // FIXME: proper permissions
-      const channel = await $p.channel.update({
+      const channel = await prisma.channel.update({
         where: { id: channelId },
         data: {
           name: options.name ?? undefined,
@@ -83,8 +84,8 @@ export const ChannelService = h.service({
   delete: h
     .fn({ channelId: z.string() }, Channel)
     .use(assertChannelMembership)
-    .do(async ({ channel, $p, $r }) => {
-      await $p.channel.delete({ where: { id: channel.id } });
+    .do(async ({ channel, $r }) => {
+      await prisma.channel.delete({ where: { id: channel.id } });
       await $r.pub(`space:${channel.spaceId}`, 'deleteChannel', channel);
       return channel;
     }),

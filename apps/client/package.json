@@ -18,8 +18,6 @@
     "@livekit/components-styles": "^1.0.6",
     "@livekit/react-core": "^1.0.2",
     "@mantine/core": "^5.2.3",
-    "@mantine/hooks": "^6.0.16",
-    "@mantine/modals": "^5.2.3",
     "@marsidev/react-turnstile": "^0.2.2",
     "@mikoto-io/lucid": "0.0.20",
     "@mikoto-io/permcheck": "0.0.1",

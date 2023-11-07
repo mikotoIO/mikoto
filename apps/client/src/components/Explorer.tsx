@@ -115,12 +115,12 @@ function CreateChannelModal({ channel }: { channel?: Channel }) {
         </h1>
         {channel && <p className="subchannelinfo">In #{channel.name}</p>}
         <Form
-          onSubmit={handleSubmit(async (formData) => {
+          onSubmit={handleSubmit(async (data) => {
             try {
               const space = mikoto.spaces.get(spaceId)!;
 
               space.createChannel({
-                name: formData.name,
+                name: data.name,
                 type: channelType,
                 parentId: channel?.id ?? null,
               });
@@ -162,6 +162,7 @@ function CreateChannelModal({ channel }: { channel?: Channel }) {
 
 function TreebarContextMenu({ space }: { space: ClientSpace }) {
   const setModal = useSetRecoilState(modalState);
+  const tabkit = useTabkit();
   return (
     <ContextMenu>
       <ContextMenu.Link
@@ -172,6 +173,20 @@ function TreebarContextMenu({ space }: { space: ClientSpace }) {
         Create Channel
       </ContextMenu.Link>
       <ContextMenu.Link>Invite People</ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          tabkit.openTab(
+            {
+              kind: 'search',
+              key: 'search',
+              spaceId: space.id,
+            },
+            true,
+          );
+        }}
+      >
+        Search
+      </ContextMenu.Link>
     </ContextMenu>
   );
 }
@@ -240,7 +255,6 @@ function channelToStructuredTree(
 
 function DeleteChannelModal({ channel }: { channel: ClientChannel }) {
   const setModal = useSetRecoilState(modalState);
-  const mikoto = useMikoto();
 
   return (
     <Modal>

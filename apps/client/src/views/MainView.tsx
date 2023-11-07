@@ -36,6 +36,7 @@ import {
 } from '../store/surface';
 import { MikotoApiLoader } from './MikotoApiLoader';
 import { DesignStory } from './Palette';
+import { SearchSurface } from '../components/surfaces/SearchSurface';
 
 const AppContainer = styled.div`
   background-color: var(--N900);
@@ -60,6 +61,8 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
       return <VoiceView channelId={tab.channelId} />;
     case 'documentChannel':
       return <DocumentSurface channelId={tab.channelId} />;
+    case 'search':
+      return <SearchSurface spaceId={tab.spaceId}/>
     case 'spaceSettings':
       return <SpaceSettingsView spaceId={tab.spaceId} />;
     case 'accountSettings':

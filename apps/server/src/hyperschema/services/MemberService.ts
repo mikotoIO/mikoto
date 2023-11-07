@@ -2,6 +2,7 @@ import { NotFoundError } from '@hyperschema/core';
 import { permissions } from '@mikoto-io/permcheck';
 import { z } from 'zod';
 
+import { prisma } from '../../functions/prisma';
 import { h } from '../core';
 import { assertSpaceMembership, requireSpacePerm } from '../middlewares';
 import { Member } from '../models';
@@ -15,8 +16,8 @@ export const MemberService = h.service({
   get: h
     .fn({ spaceId: z.string(), userId: z.string() }, Member)
     .use(assertSpaceMembership)
-    .do(async ({ $p, spaceId, userId }) => {
-      const member = await $p.spaceUser.findUnique({
+    .do(async ({ spaceId, userId }) => {
+      const member = await prisma.spaceUser.findUnique({
         where: { userId_spaceId: { userId, spaceId } },
         include: memberInclude,
       });
@@ -29,8 +30,8 @@ export const MemberService = h.service({
   list: h
     .fn({ spaceId: z.string() }, Member.array())
     .use(assertSpaceMembership)
-    .do(async ({ $p, spaceId }) => {
-      const members = await $p.spaceUser.findMany({
+    .do(async ({ spaceId }) => {
+      const members = await prisma.spaceUser.findMany({
         where: { spaceId },
         include: memberInclude,
       });
@@ -40,14 +41,14 @@ export const MemberService = h.service({
   create: h
     .fn({ spaceId: z.string(), userId: z.string() }, Member)
     .use(assertSpaceMembership)
-    .do(async ({ $p, $r, spaceId, userId }) => {
-      const user = await $p.user.findUnique({
+    .do(async ({ $r, spaceId, userId }) => {
+      const user = await prisma.user.findUnique({
         where: { id: userId },
       });
       if (!user) throw new NotFoundError();
       if (user.category !== 'BOT') throw new NotFoundError('User is not a bot');
 
-      const member = await $p.spaceUser.create({
+      const member = await prisma.spaceUser.create({
         data: {
           userId,
           spaceId,
@@ -65,12 +66,12 @@ export const MemberService = h.service({
       Member,
     )
     .use(requireSpacePerm(permissions.manageRoles))
-    .do(async ({ $p, $r, spaceId, userId, options }) => {
+    .do(async ({ $r, spaceId, userId, options }) => {
       // TODO: probably a cleaner method to do this
 
       const roleIds = new Set(options.roleIds);
       const rolesList =
-        (await $p.spaceUser
+        (await prisma.spaceUser
           .findUnique({
             where: { userId_spaceId: { userId, spaceId } },
           })
@@ -79,7 +80,7 @@ export const MemberService = h.service({
       const oldRoleIds = new Set(rolesList.map((x) => x.id));
       const roleIdsToCreate = [...roleIds].filter((x) => !oldRoleIds.has(x));
       const roleIdsToDelete = [...oldRoleIds].filter((x) => !roleIds.has(x));
-      const member = await $p.spaceUser.update({
+      const member = await prisma.spaceUser.update({
         where: { userId_spaceId: { userId, spaceId } },
         data: {
           roles: {
@@ -97,8 +98,8 @@ export const MemberService = h.service({
   delete: h
     .fn({ spaceId: z.string(), userId: z.string() }, Member)
     .use(requireSpacePerm(permissions.ban))
-    .do(async ({ $p, $r, spaceId, userId }) => {
-      const member = await $p.spaceUser.delete({
+    .do(async ({ $r, spaceId, userId }) => {
+      const member = await prisma.spaceUser.delete({
         where: {
           userId_spaceId: { userId, spaceId },
         },

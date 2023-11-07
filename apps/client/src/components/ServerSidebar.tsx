@@ -111,7 +111,6 @@ function InviteModal({ space }: { space: Space }) {
 }
 
 function ServerIconContextMenu({ space }: { space: ClientSpace }) {
-  const mikoto = useMikoto();
   const tabkit = useTabkit();
   const setModal = useSetRecoilState(modalState);
 

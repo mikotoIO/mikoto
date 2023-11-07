@@ -3,14 +3,15 @@ import { AccessToken } from 'livekit-server-sdk';
 import { z } from 'zod';
 
 import { env } from '../../env';
+import { prisma } from '../../functions/prisma';
 import { h } from '../core';
 import { VoiceToken } from '../models';
 
 export const VoiceService = h.service({
   join: h
     .fn({ channelId: z.string() }, VoiceToken)
-    .do(async ({ $p, channelId, state }) => {
-      const user = await $p.user.findUnique({
+    .do(async ({ channelId, state }) => {
+      const user = await prisma.user.findUnique({
         where: { id: state.user.id },
       });
       if (user === null) {

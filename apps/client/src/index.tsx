@@ -1,4 +1,3 @@
-import { MantineProvider } from '@mantine/core';
 import { GlobalStyle, LucidProvider, theme } from '@mikoto-io/lucid';
 import * as Sentry from '@sentry/react';
 import { DndProvider } from 'react-dnd';
@@ -46,20 +45,18 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <LucidProvider>
         <UserThemeProvider />
         <ThemeProvider theme={theme}>
-          <MantineProvider theme={{ colorScheme: 'dark' }}>
-            <DndProvider backend={HTML5Backend}>
-              <>
-                <Helmet>
-                  {env.DEV && (
-                    <link rel="icon" type="image/png" href="/favicon-dev.ico" />
-                  )}
-                </Helmet>
-                <GlobalStyle />
-                <App />
-                <ToastContainer theme="dark" limit={3} />
-              </>
-            </DndProvider>
-          </MantineProvider>
+          <DndProvider backend={HTML5Backend}>
+            <>
+              <Helmet>
+                {env.DEV && (
+                  <link rel="icon" type="image/png" href="/favicon-dev.ico" />
+                )}
+              </Helmet>
+              <GlobalStyle />
+              <App />
+              <ToastContainer theme="dark" limit={3} />
+            </>
+          </DndProvider>
         </ThemeProvider>
       </LucidProvider>
     </StyleSheetManager>

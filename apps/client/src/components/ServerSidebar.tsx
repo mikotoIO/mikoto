@@ -1,5 +1,5 @@
-import { Tooltip } from '@mantine/core';
 import { Button, Form, Input, Modal, Image } from '@mikoto-io/lucid';
+import Tippy from '@tippyjs/react';
 import { AxiosError } from 'axios';
 import { ClientSpace, Invite, Space, SpaceStore } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
@@ -8,7 +8,6 @@ import { useDrag, useDrop } from 'react-dnd';
 import { useForm } from 'react-hook-form';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
-import { useHover } from 'usehooks-ts';
 
 import { env } from '../env';
 import { useMikoto } from '../hooks';
@@ -164,10 +163,18 @@ const StyledIconWrapper = styled.div`
   width: 68px;
 `;
 
+const Tooltip = styled.div`
+  color: var(--N0);
+  background-color: var(--N1200);
+  border-radius: 4px;
+  padding: 4px 8px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 8px 24px;
+`;
+
 function SidebarSpaceIcon({ space }: { space: ClientSpace }) {
   const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
   const isActive = stateSpace === space.id;
-  const [workspace, setWorkspace] = useRecoilState(workspaceState);
+  const setWorkspace = useSetRecoilState(workspaceState);
 
   const [, drag] = useDrag(
     () => ({
@@ -185,13 +192,18 @@ function SidebarSpaceIcon({ space }: { space: ClientSpace }) {
 
   const ref = useRef<HTMLDivElement>(null);
   drag(drop(ref));
-  const isHover = useHover(ref);
   const contextMenu = useContextMenu(() => (
     <ServerIconContextMenu space={space} />
   ));
 
   return (
-    <Tooltip label={space.name} opened={isHover} position="right" withArrow>
+    <Tippy
+      animation={false}
+      content={<Tooltip>{space.name}</Tooltip>}
+      placement="right"
+      offset={[0, 0]}
+      interactive
+    >
       <StyledIconWrapper>
         <Pill h={isActive ? 32 : 8} />
         <StyledSpaceIcon
@@ -210,7 +222,7 @@ function SidebarSpaceIcon({ space }: { space: ClientSpace }) {
           {space.icon === null ? space.name[0] : ''}
         </StyledSpaceIcon>
       </StyledIconWrapper>
-    </Tooltip>
+    </Tippy>
   );
 }
 

@@ -1,9 +1,8 @@
 /* eslint-disable react/prop-types */
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { Switch, Listbox } from '@headlessui/react';
+import { Switch } from '@headlessui/react';
 import React from 'react';
-import { HexColorInput, HexColorPicker } from 'react-colorful';
 import styled, { css } from 'styled-components';
 
 import { BoxProps, boxCss } from '../Layout';
@@ -162,3 +161,37 @@ export function Toggle({ checked, onChange }: ToggleProps) {
     </StyledToggle>
   );
 }
+
+const BaseCheckbox = styled.input`
+  width: 16px;
+  height: 16px;
+  &:checked {
+    background-color: var(--B700);
+  }
+
+  ${boxCss}
+`;
+
+const CheckboxLabel = styled.label`
+  color: var(--N200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .label {
+    margin-bottom: 8px;
+  }
+`;
+
+export const Checkbox = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ labelName, ...props }, ref) => {
+    if (!labelName) {
+      return <BaseCheckbox type="checkbox" {...props} />;
+    }
+    return (
+      <CheckboxLabel>
+        <div className="label">{labelName}</div>
+        <BaseCheckbox type="checkbox" {...props} ref={ref} />
+      </CheckboxLabel>
+    );
+  },
+);

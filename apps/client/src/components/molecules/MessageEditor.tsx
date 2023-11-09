@@ -10,14 +10,14 @@ import { init } from 'emoji-mart';
 import { runInAction } from 'mobx';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useSetRecoilState } from 'recoil';
 import { createEditor, Transforms, Node } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import styled from 'styled-components';
 
 import { contextMenuState } from '../ContextMenu';
-import { MessageEditState, messageEditIdState } from './Message';
+import { MessageEditState } from './Message';
 
 init({ data: emojiData });
 

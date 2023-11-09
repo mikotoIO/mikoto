@@ -11979,7 +11979,7 @@ __metadata:
     remark-gfm: ^3.0.1
     remark-math: ^5.1.1
     rollup-plugin-analyzer: ^4.0.0
-    rollup-plugin-visualizer: ^5.8.0
+    rollup-plugin-visualizer: ^5.9.2
     serve: ^14.0.1
     slate: ^0.94.1
     slate-history: ^0.93.0
@@ -27176,7 +27176,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rollup-plugin-visualizer@npm:^5.8.0":
+"rollup-plugin-visualizer@npm:^5.9.2":
   version: 5.9.2
   resolution: "rollup-plugin-visualizer@npm:5.9.2"
   dependencies:

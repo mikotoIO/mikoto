@@ -8,8 +8,13 @@ edition = "2021"
 [dependencies]
 dotenv = "0.15.0"
 lazy_static = "1.4.0"
-rocket = "=0.5.0-rc.4"
+mime = "0.3.17"
+mime_guess = "2.0.4"
 rust-s3 = "0.33.0"
 serde = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0.108"
 url = "2.4.1"
+
+[dependencies.rocket]
+version = "=0.5.0-rc.4"
+features = ["json"]

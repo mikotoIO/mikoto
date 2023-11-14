@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 dotenv = "0.15.0"
 lazy_static = "1.4.0"
+maplit = "1.0.2"
 mime = "0.3.17"
 mime_guess = "2.0.4"
 rust-s3 = "0.33.0"

@@ -29,6 +29,13 @@ impl<'r> Responder<'r, 'r> for FileResponse {
     }
 }
 
+fn get_content_type(path: &str) -> ContentType {
+    let mime = mime_guess::from_path(path)
+        .first()
+        .unwrap_or(mime::APPLICATION_OCTET_STREAM);
+    ContentType::new(mime.type_().to_string(), mime.subtype().to_string())
+}
+
 #[get("/<store>/<path..>")]
 pub async fn serve(store: &str, path: PathBuf) -> Result<FileResponse, Error> {
     let path = path.to_str().unwrap();
@@ -38,11 +45,8 @@ pub async fn serve(store: &str, path: PathBuf) -> Result<FileResponse, Error> {
         .await
         .map_err(|_| Error::StorageError)?;
 
-    let data = data.bytes().to_vec();
-
-    let mime = mime_guess::from_path(path)
-        .first()
-        .unwrap_or(mime::APPLICATION_OCTET_STREAM);
-    let mime = ContentType::new(mime.type_().to_string(), mime.subtype().to_string());
-    Ok(FileResponse::new(data, mime))
+    Ok(FileResponse::new(
+        data.bytes().to_vec(),
+        get_content_type(path),
+    ))
 }

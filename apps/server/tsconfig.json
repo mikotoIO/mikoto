@@ -1,4 +1,7 @@
 {
   "extends": "tsconfig/server.tsconfig.json",
-  "references": [{ "path": "../../packages/permcheck" }]
+  "references": [{ "path": "../../packages/permcheck" }],
+  "compilerOptions": {
+    "outDir": "./dist"
+  }
 }

@@ -1,4 +1,4 @@
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 RUN apk add --no-cache libc6-compat
 RUN apk update
 
@@ -7,7 +7,7 @@ RUN yarn global add turbo
 COPY . .
 RUN turbo prune --scope=server --docker
 
-FROM node:18-alpine AS installer
+FROM node:20-alpine AS installer
 RUN apk add --no-cache libc6-compat
 RUN apk update
 WORKDIR /mikoto
@@ -24,7 +24,7 @@ WORKDIR /mikoto/apps/server
 RUN npx prisma generate
 RUN yarn build
 
-FROM node:18-alpine AS runner
+FROM node:20-alpine AS runner
 COPY --from=installer /mikoto /mikoto
 WORKDIR /mikoto/apps/server
 

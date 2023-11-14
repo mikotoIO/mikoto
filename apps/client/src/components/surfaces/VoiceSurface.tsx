@@ -45,7 +45,7 @@ const VoiceViewWrapper = styled.div`
   }
 `;
 
-export function VoiceView({ channelId }: { channelId: string }) {
+export default function VoiceSurface({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
   const channel = mikoto.channels.get(channelId)!;
 

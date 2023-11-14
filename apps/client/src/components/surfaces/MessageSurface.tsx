@@ -1,5 +1,5 @@
 import { faHashtag } from '@fortawesome/free-solid-svg-icons';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import { Channel, ClientChannel, ClientMessage, Message } from 'mikotojs';
 import { runInAction } from 'mobx';
 import { Observer, observer } from 'mobx-react-lite';

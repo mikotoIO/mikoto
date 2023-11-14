@@ -1,14 +1,11 @@
-import emojiData from '@emoji-mart/data/sets/14/twitter.json';
-import Picker from '@emoji-mart/react';
 import {
   faFaceSmileWink,
   faFileArrowUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Flex } from '@mikoto-io/lucid';
-import { init } from 'emoji-mart';
 import { runInAction } from 'mobx';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useSetRecoilState } from 'recoil';
 import { createEditor, Transforms, Node } from 'slate';
@@ -19,7 +16,7 @@ import styled from 'styled-components';
 import { contextMenuState } from '../ContextMenu';
 import { MessageEditState } from './Message';
 
-init({ data: emojiData });
+const EmojiPicker = lazy(() => import('./EmojiPicker'));
 
 // TODO: Fix the two-pixel snap
 const StyledEditable = styled(Editable)`
@@ -314,14 +311,13 @@ export function MessageEditor({
               ev.stopPropagation();
               setContextMenu({
                 elem: (
-                  <Picker
-                    data={emojiData}
-                    set="twitter"
-                    noCountryFlags={false}
-                    onEmojiSelect={(x: any) => {
-                      editor.insertText(x.shortcodes);
-                    }}
-                  />
+                  <Suspense>
+                    <EmojiPicker
+                      onEmojiSelect={(x) => {
+                        editor.insertText(x);
+                      }}
+                    />
+                  </Suspense>
                 ),
                 position: {
                   right: window.innerWidth - bounds.right,

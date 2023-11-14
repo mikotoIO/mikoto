@@ -1,6 +1,7 @@
 use rocket::serde::json::Json;
 
 pub mod serve;
+pub mod upload;
 
 #[derive(Serialize)]
 pub struct Hello {}

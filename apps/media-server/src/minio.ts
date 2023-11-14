@@ -1,7 +1,4 @@
-import { MultipartFile } from '@fastify/multipart';
-import crypto from 'crypto';
 import * as minio from 'minio';
-import sharp from 'sharp';
 
 import { env } from './env';
 

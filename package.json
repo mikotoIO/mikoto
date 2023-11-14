@@ -29,7 +29,7 @@
     "npm": ">=7.0.0",
     "node": ">=14.0.0"
   },
-  "packageManager": "yarn@3.6.1",
+  "packageManager": "yarn@4.0.2",
   "dependencies": {
     "winston-transport": "^4.5.0"
   }

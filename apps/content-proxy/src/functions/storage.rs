@@ -8,7 +8,7 @@ lazy_static! {
             .unwrap();
     static ref MINIO_REGION: s3::Region = s3::Region::Custom {
         region: "".to_owned(),
-        endpoint: MINIO.host_str().unwrap().to_owned(),
+        endpoint: MINIO.origin().unicode_serialization(),
     };
     static ref MINIO_CRED: s3::creds::Credentials = s3::creds::Credentials {
         access_key: Some(MINIO.username().to_owned()),
@@ -18,5 +18,7 @@ lazy_static! {
         expiration: None,
     };
     pub static ref MAIN_BUCKET: Bucket =
-        Bucket::new("mikoto", MINIO_REGION.clone(), MINIO_CRED.clone()).unwrap();
+        Bucket::new("mikoto", MINIO_REGION.clone(), MINIO_CRED.clone())
+            .unwrap()
+            .with_path_style();
 }

@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Flex } from '@mikoto-io/lucid';
 import { observer } from 'mobx-react-lite';
 import { Resizable } from 're-resizable';
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
@@ -23,8 +23,8 @@ import { DiscoverySurface } from '../components/surfaces/DiscoverySurface';
 import { DocumentSurface } from '../components/surfaces/DocumentSurface';
 import { FriendsSurface } from '../components/surfaces/FriendsSurface';
 import { MessageView } from '../components/surfaces/MessageSurface';
+import { SearchSurface } from '../components/surfaces/SearchSurface';
 import { SpaceSettingsView } from '../components/surfaces/SpaceSettingsSurface';
-import { VoiceView } from '../components/surfaces/VoiceSurface';
 import { WelcomeSurface } from '../components/surfaces/WelcomeSurface';
 import { useMikoto } from '../hooks';
 import { treebarSpaceState, workspaceState } from '../store';
@@ -36,7 +36,6 @@ import {
 } from '../store/surface';
 import { MikotoApiLoader } from './MikotoApiLoader';
 import { DesignStory } from './Palette';
-import { SearchSurface } from '../components/surfaces/SearchSurface';
 
 const AppContainer = styled.div`
   background-color: var(--N900);
@@ -53,16 +52,18 @@ function ErrorBoundaryPage({ children }: { children: React.ReactNode }) {
   );
 }
 
+const VoiceSurface = lazy(() => import('../components/surfaces/VoiceSurface'));
+
 function TabViewSwitch({ tab }: { tab: Tabable }) {
   switch (tab.kind) {
     case 'textChannel':
       return <MessageView channelId={tab.channelId} />;
     case 'voiceChannel':
-      return <VoiceView channelId={tab.channelId} />;
+      return <VoiceSurface channelId={tab.channelId} />;
     case 'documentChannel':
       return <DocumentSurface channelId={tab.channelId} />;
     case 'search':
-      return <SearchSurface spaceId={tab.spaceId}/>
+      return <SearchSurface spaceId={tab.spaceId} />;
     case 'spaceSettings':
       return <SpaceSettingsView spaceId={tab.spaceId} />;
     case 'accountSettings':
@@ -134,7 +135,9 @@ const SurfaceGroup = observer(
                   idx !== surfaceNode.index ? { display: 'none' } : undefined
                 }
               >
-                <TabViewSwitch tab={tab} />
+                <Suspense>
+                  <TabViewSwitch tab={tab} />
+                </Suspense>
               </div>
             </TabContext.Provider>
           ))}

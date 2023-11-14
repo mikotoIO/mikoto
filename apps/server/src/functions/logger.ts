@@ -1,4 +1,4 @@
-import { WinstonTransport as AxiomTransport } from '@axiomhq/axiom-node';
+import { WinstonTransport as AxiomTransport } from '@axiomhq/winston';
 import winston, { format } from 'winston';
 import type WinstonTransport from 'winston-transport';
 

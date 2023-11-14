@@ -34,15 +34,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@axiomhq/axiom-node@npm:^0.12.0":
-  version: 0.12.0
-  resolution: "@axiomhq/axiom-node@npm:0.12.0"
+"@axiomhq/js@npm:1.0.0-rc.1":
+  version: 1.0.0-rc.1
+  resolution: "@axiomhq/js@npm:1.0.0-rc.1"
   dependencies:
-    axios: "npm:^1.2.0"
-    axios-retry: "npm:^3.3.1"
-    to-time: "npm:^1.0.2"
+    fetch-retry: "npm:^5.0.3"
+    uuid: "npm:^8.3.2"
+  checksum: 2b6c393385e310c7951381e080e649212fcf344c0f0ee2569c32f509ac19b9c85903fc6feef04baa797f69f4578ed0fc9ff1720d0713088f21dd57a6427e9864
+  languageName: node
+  linkType: hard
+
+"@axiomhq/winston@npm:^1.0.0-rc.1":
+  version: 1.0.0-rc.1
+  resolution: "@axiomhq/winston@npm:1.0.0-rc.1"
+  dependencies:
+    "@axiomhq/js": "npm:1.0.0-rc.1"
     winston-transport: "npm:^4.5.0"
-  checksum: 09b5c964fc3aa790fe69807da86c6aaaea5cad9a2d5932e091c830451959f0dea732520d10baf9fdeb26250e27a2f9046268422a5fac273b9a62112a3066dc03
+  checksum: 729b4a51685ee817579173665567250a9cd45110ea07557c18871cc5427b4605874bdf85950a9c9478ebd9e3021d176a8c83095accd7a99b15332e4fe60fee0a
   languageName: node
   linkType: hard
 
@@ -2233,7 +2241,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.17.8, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.20.0, @babel/runtime@npm:^7.20.7, @babel/runtime@npm:^7.21.5, @babel/runtime@npm:^7.3.1, @babel/runtime@npm:^7.5.0, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.6.2, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.7.6, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.9.2":
+"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.17.8, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.20.0, @babel/runtime@npm:^7.20.7, @babel/runtime@npm:^7.21.5, @babel/runtime@npm:^7.3.1, @babel/runtime@npm:^7.5.0, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.6.2, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.7.6, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.9.2":
   version: 7.22.5
   resolution: "@babel/runtime@npm:7.22.5"
   dependencies:
@@ -4759,17 +4767,6 @@ __metadata:
   version: 1.0.6
   resolution: "@livekit/components-styles@npm:1.0.6"
   checksum: aa07c25f826064c0afea325a9c8e01c2116a5acb12a4fe0c10eec138985902b118dac54cd550dfc90e22aabf13422884b59ecd3171f701203961394b8b882dfb
-  languageName: node
-  linkType: hard
-
-"@livekit/react-core@npm:^1.0.2":
-  version: 1.1.0
-  resolution: "@livekit/react-core@npm:1.1.0"
-  peerDependencies:
-    livekit-client: ^1.3.2
-    react: ">=15"
-    react-dom: ">=15"
-  checksum: 9caaab71e80f5826e524b3ac307ace07213a4be53e53a3ffec7649b6becd9f57b0d03108ae300c2e665242cbfbd190e9e8cec6adf67ed859db302559984513a3
   languageName: node
   linkType: hard
 
@@ -10144,27 +10141,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios-retry@npm:^3.3.1":
-  version: 3.5.1
-  resolution: "axios-retry@npm:3.5.1"
+"axios@npm:^1.2.2":
+  version: 1.5.0
+  resolution: "axios@npm:1.5.0"
   dependencies:
-    "@babel/runtime": "npm:^7.15.4"
-    is-retry-allowed: "npm:^2.2.0"
-  checksum: 3ff8d4a5350abf356dd65749e31c6b34cbe3ecfab59e8631a188bc0fef524a67ddf112c60abd8fa92a766bfda23b3a82c9a74d384870e2f32a4bd212baadd9b2
-  languageName: node
-  linkType: hard
-
-"axios@npm:^0.27.2":
-  version: 0.27.2
-  resolution: "axios@npm:0.27.2"
-  dependencies:
-    follow-redirects: "npm:^1.14.9"
+    follow-redirects: "npm:^1.15.0"
     form-data: "npm:^4.0.0"
-  checksum: 2efaf18dd0805f7bc772882bc86f004abd92d51007b54c5081f74db0d08ce3593e2c010261896d25a14318eeaa2e966fd825e34f810e8a3339dc64b9d177cf70
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 128433020b1fe9a460121735016f377adc6109a1f62b61795b1a80704de0a70affb0d580c8abd057e28af5f343cb4fb9a17a0b2512ea7f314578bbe492851a23
   languageName: node
   linkType: hard
 
-"axios@npm:^1.2.0, axios@npm:^1.3.6":
+"axios@npm:^1.3.6":
   version: 1.4.0
   resolution: "axios@npm:1.4.0"
   dependencies:
@@ -10175,14 +10163,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.2.2":
-  version: 1.5.0
-  resolution: "axios@npm:1.5.0"
+"axios@npm:^1.6.1":
+  version: 1.6.1
+  resolution: "axios@npm:1.6.1"
   dependencies:
     follow-redirects: "npm:^1.15.0"
     form-data: "npm:^4.0.0"
     proxy-from-env: "npm:^1.1.0"
-  checksum: 128433020b1fe9a460121735016f377adc6109a1f62b61795b1a80704de0a70affb0d580c8abd057e28af5f343cb4fb9a17a0b2512ea7f314578bbe492851a23
+  checksum: fb091af3ad47d70fdcba5e71654b9e3c56947d93d8b2375dd0b4db63de9982adab6235aebc514488aa289c7faf103b09e8911280e6f6b1112d1604fe5f111f71
   languageName: node
   linkType: hard
 
@@ -10643,13 +10631,6 @@ __metadata:
   version: 5.2.2
   resolution: "big.js@npm:5.2.2"
   checksum: c04416aeb084f4aa1c5857722439c327cc0ada9bd99ab80b650e3f30e2e4f1b92a04527ed1e7df8ffcd7c0ea311745a04af12d53e2f091bf09a06f1292003827
-  languageName: node
-  linkType: hard
-
-"bignumber.js@npm:^2.4.0":
-  version: 2.4.0
-  resolution: "bignumber.js@npm:2.4.0"
-  checksum: c43dd8f0ace26d6a07ab3c2a127e9b0c8428592e7ea79d2569ffc3e73d274e52c213b19e1759d74a27384b4ace34ffb3c440e396fbf68a2917b58a8376eeeb99
   languageName: node
   linkType: hard
 
@@ -11870,7 +11851,6 @@ __metadata:
     "@khanacademy/simple-markdown": "npm:^0.9.2"
     "@livekit/components-react": "npm:^1.1.8"
     "@livekit/components-styles": "npm:^1.0.6"
-    "@livekit/react-core": "npm:^1.0.2"
     "@marsidev/react-turnstile": "npm:^0.2.2"
     "@mdx-js/react": "npm:^1.6.22"
     "@mikoto-io/lucid": "npm:0.0.20"
@@ -11916,7 +11896,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:^5.9.0"
     "@use-it/event-listener": "npm:^0.1.7"
     "@vitejs/plugin-react": "npm:^4.0.3"
-    axios: "npm:^0.27.2"
+    axios: "npm:^1.6.1"
     babel-loader: "npm:^8.3.0"
     babel-plugin-styled-components: "npm:^2.1.4"
     dotenv: "npm:^16.0.3"
@@ -15957,7 +15937,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fetch-retry@npm:^5.0.2":
+"fetch-retry@npm:^5.0.2, fetch-retry@npm:^5.0.3":
   version: 5.0.6
   resolution: "fetch-retry@npm:5.0.6"
   checksum: 9d64b37f9d179fecf486725ada210d169375803b731304a9500754e094a2a6aa81630d946adbb313d7f9d54457ad0d17c3ed5c115034961a719e8a65faa8b77c
@@ -16294,7 +16274,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.14.9, follow-redirects@npm:^1.15.0":
+"follow-redirects@npm:^1.15.0":
   version: 1.15.2
   resolution: "follow-redirects@npm:1.15.2"
   peerDependenciesMeta:
@@ -18707,13 +18687,6 @@ __metadata:
     call-bind: "npm:^1.0.2"
     has-tostringtag: "npm:^1.0.0"
   checksum: 36d9174d16d520b489a5e9001d7d8d8624103b387be300c50f860d9414556d0485d74a612fdafc6ebbd5c89213d947dcc6b6bff6b2312093f71ea03cbb19e564
-  languageName: node
-  linkType: hard
-
-"is-retry-allowed@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "is-retry-allowed@npm:2.2.0"
-  checksum: 6d8685530871f0b040346cc72322d90122473e921149affa16de363d6c2a6e46bc76abdfaac3259b93994ec8e7f70fbe67bbb080190e440533ff728e6a64494d
   languageName: node
   linkType: hard
 
@@ -21535,7 +21508,7 @@ __metadata:
     sharp: "npm:^0.32.1"
     ts-dotenv: "npm:^0.9.1"
     ts-jest: "npm:^29.1.0"
-    tsconfig: "npm:*"
+    tsconfig: "npm:0.0.0"
     typescript: "npm:^5.2.2"
   languageName: unknown
   linkType: soft
@@ -22436,7 +22409,7 @@ __metadata:
     "@hyperschema/client": "npm:^0.0.1"
     "@mikoto-io/permcheck": "npm:0.0.1"
     "@types/events": "npm:^3.0.0"
-    axios: "npm:^0.27.2"
+    axios: "npm:^1.6.1"
     events: "npm:^3.3.0"
     mobx: "npm:^6.10.0"
     socket.io-client: "npm:^4.5.1"
@@ -27727,7 +27700,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "server@workspace:apps/server"
   dependencies:
-    "@axiomhq/axiom-node": "npm:^0.12.0"
+    "@axiomhq/winston": "npm:^1.0.0-rc.1"
     "@hocuspocus/cli": "npm:^2.4.0"
     "@hyperschema/core": "npm:^0.0.6"
     "@mikoto-io/permcheck": "npm:0.0.1"
@@ -27772,11 +27745,10 @@ __metadata:
     ts-jest: "npm:^29.1.0"
     ts-node: "npm:^10.9.1"
     ts-node-dev: "npm:^2.0.0"
-    tsconfig: "npm:*"
+    tsconfig: "npm:0.0.0"
     tslib: "npm:^2.4.0"
     typedi: "npm:^0.10.0"
     typescript: "npm:^5.2.2"
-    uuid: "npm:^8.3.2"
     winston: "npm:^3.9.0"
     zod: "npm:^3.22.2"
   languageName: unknown
@@ -29733,15 +29705,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"to-time@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "to-time@npm:1.0.2"
-  dependencies:
-    bignumber.js: "npm:^2.4.0"
-  checksum: cccfe5d925f92c6aea7f067b634dfe44bbfce490ef4165347bfed57becfe1ac4775459870004786f290dacf855384e2aa818ce1ffd154c1d9ed57499cbdcea16
-  languageName: node
-  linkType: hard
-
 "toidentifier@npm:1.0.1":
   version: 1.0.1
   resolution: "toidentifier@npm:1.0.1"
@@ -29985,7 +29948,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsconfig@npm:*, tsconfig@workspace:packages/tsconfig":
+"tsconfig@npm:0.0.0, tsconfig@workspace:packages/tsconfig":
   version: 0.0.0-use.local
   resolution: "tsconfig@workspace:packages/tsconfig"
   languageName: unknown

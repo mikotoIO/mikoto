@@ -10,9 +10,9 @@ export function FriendsSurface() {
       <TabName name="Friends" icon={faUserGroup} />
       <Heading>Friends</Heading>
       <Form>
-        <Input placeholder="Friend Name" />
+        <Input placeholder="Friend ID" />
         <Button type="submit" variant="success">
-          Search for Friend
+          Send Friend Request
         </Button>
         <Heading as="h2">Incoming Requests</Heading>
         <Heading as="h2">Outgoing Requests</Heading>

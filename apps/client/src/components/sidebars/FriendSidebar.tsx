@@ -59,7 +59,7 @@ export function FriendSidebar() {
         <span>Discover</span>
       </StyledButtonBase>
       <Heading fs={14} p={{ left: 8 }} txt="N300">
-        Direct Messaging
+        Direct Messages
       </Heading>
       <StyledButtonBase>
         <Avatar size={32} />

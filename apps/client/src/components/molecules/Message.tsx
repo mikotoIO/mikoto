@@ -166,6 +166,13 @@ export const MessageItem = observer(
             Edit Message
           </ContextMenu.Link>
         )}
+        <ContextMenu.Link
+          onClick={async () => {
+            await navigator.clipboard.writeText(message.content);
+          }}
+        >
+          Copy Markdown
+        </ContextMenu.Link>
         <ContextMenu.Link>Pin Message</ContextMenu.Link>
         <ContextMenu.Link
           onClick={async () => {

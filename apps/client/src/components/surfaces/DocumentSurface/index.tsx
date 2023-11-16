@@ -202,18 +202,7 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
   );
 }
 
-const StyledEditorHeader = styled.div`
-  display: block;
-  height: 40px;
-  width: 100%;
-  background-color: var(--N1000);
-`;
-
-function EditorHeader() {
-  return <StyledEditorHeader>lol</StyledEditorHeader>;
-}
-
-export function DocumentSurface({ channelId }: { channelId: string }) {
+export default function DocumentSurface({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
   const channel = mikoto.channels.get(channelId)!;
   const [content, setContent] = useState<string | null>(null);

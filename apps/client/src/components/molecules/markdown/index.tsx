@@ -1,6 +1,6 @@
 import SimpleMarkdown, { SingleASTNode } from '@khanacademy/simple-markdown';
 import { Anchor } from '@mikoto-io/lucid';
-import Highlight from 'react-highlight';
+import { Suspense, lazy } from 'react';
 import styled, { css } from 'styled-components';
 
 import { emojiRule } from './Emoji';
@@ -8,6 +8,8 @@ import { MessageImage } from './Image';
 import { objectRule } from './Object';
 import { spoilerRule } from './Spoiler';
 import { createRule } from './rules';
+
+const CodeHighlight = lazy(() => import('./CodeHighlight'));
 
 function isUrl(s: string) {
   let url;
@@ -25,7 +27,7 @@ function isUrlImage(url: string): boolean {
   return url.match(/\.(jpeg|jpg|gif|png)$/) !== null;
 }
 
-const Pre = styled.div`
+const CodeBlock = styled.div`
   pre {
     margin: 0;
     text-wrap: wrap;
@@ -103,9 +105,17 @@ const rules = {
     ...SimpleMarkdown.defaultRules.codeBlock,
     react(node: any, _: any, state: any) {
       return (
-        <Pre key={state.key}>
-          <Highlight className={node.lang}>{node.content}</Highlight>
-        </Pre>
+        <CodeBlock key={state.key}>
+          <Suspense
+            fallback={
+              <pre>
+                <code>{node.content}</code>
+              </pre>
+            }
+          >
+            <CodeHighlight language={node.lang} content={node.content} />
+          </Suspense>
+        </CodeBlock>
       );
     },
   },

@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Flex } from '@mikoto-io/lucid';
 import { observer } from 'mobx-react-lite';
 import { Resizable } from 're-resizable';
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
@@ -17,15 +17,7 @@ import { UserAreaAvatar } from '../components/UserArea';
 import { Sidebar } from '../components/sidebars/Base';
 import { FriendSidebar } from '../components/sidebars/FriendSidebar';
 import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
-import { AccountSettingsSurface } from '../components/surfaces/AccountSettingsSurface';
-import { ChannelSettingsSurface } from '../components/surfaces/ChannelSettingsSurface';
-import { DiscoverySurface } from '../components/surfaces/DiscoverySurface';
-import { DocumentSurface } from '../components/surfaces/DocumentSurface';
-import { FriendsSurface } from '../components/surfaces/FriendsSurface';
-import { MessageView } from '../components/surfaces/MessageSurface';
-import { SearchSurface } from '../components/surfaces/SearchSurface';
-import { SpaceSettingsView } from '../components/surfaces/SpaceSettingsSurface';
-import { WelcomeSurface } from '../components/surfaces/WelcomeSurface';
+import { surfaceMap } from '../components/surfaces';
 import { useMikoto } from '../hooks';
 import { treebarSpaceState, workspaceState } from '../store';
 import {
@@ -35,7 +27,6 @@ import {
   TabContext,
 } from '../store/surface';
 import { MikotoApiLoader } from './MikotoApiLoader';
-import { DesignStory } from './Palette';
 
 const AppContainer = styled.div`
   background-color: var(--N900);
@@ -52,35 +43,13 @@ function ErrorBoundaryPage({ children }: { children: React.ReactNode }) {
   );
 }
 
-const VoiceSurface = lazy(() => import('../components/surfaces/VoiceSurface'));
-
 function TabViewSwitch({ tab }: { tab: Tabable }) {
-  switch (tab.kind) {
-    case 'textChannel':
-      return <MessageView channelId={tab.channelId} />;
-    case 'voiceChannel':
-      return <VoiceSurface channelId={tab.channelId} />;
-    case 'documentChannel':
-      return <DocumentSurface channelId={tab.channelId} />;
-    case 'search':
-      return <SearchSurface spaceId={tab.spaceId} />;
-    case 'spaceSettings':
-      return <SpaceSettingsView spaceId={tab.spaceId} />;
-    case 'accountSettings':
-      return <AccountSettingsSurface />;
-    case 'channelSettings':
-      return <ChannelSettingsSurface channelId={tab.channelId} />;
-    case 'friends':
-      return <FriendsSurface />;
-    case 'discovery':
-      return <DiscoverySurface />;
-    case 'palette':
-      return <DesignStory />;
-    case 'welcome':
-      return <WelcomeSurface />;
-    default:
-      return null;
+  const Selected = surfaceMap[tab.kind] as any; // TODO: type this
+  if (!Selected) {
+    return null;
   }
+  const { kind, ...rest } = tab;
+  return <Selected {...rest} />;
 }
 
 const LeftBar = styled(Flex)`

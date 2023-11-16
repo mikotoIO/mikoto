@@ -297,7 +297,7 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
   );
 });
 
-export function MessageView({ channelId }: { channelId: string }) {
+export function MessageSurface({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
   const channel = mikoto.channels.get(channelId)!;
 

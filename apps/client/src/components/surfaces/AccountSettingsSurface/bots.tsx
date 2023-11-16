@@ -1,6 +1,6 @@
-import { faCopy, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faCopy, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Buttons, Form, Input, Modal } from '@mikoto-io/lucid';
+import { Box, Button, Buttons, Form, Input, Modal } from '@mikoto-io/lucid';
 import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -9,12 +9,16 @@ import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useAuthClient } from '../../../hooks';
+import { useTabkit } from '../../../store/surface';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
 import { modalState } from '../../ContextMenu';
+import { Avatar } from '../../atoms/Avatar';
 
 const BotCardContainer = styled.div`
   background-color: var(--N1000);
-  margin: 16px 0;
+  display: flex;
+  gap: 16px;
+  margin: 16px 0 0;
   padding: 16px;
   border-radius: 8px;
   width: 800px;
@@ -29,24 +33,31 @@ interface BotProps {
 }
 
 function BotCard({ id, name, secret }: BotProps) {
+  const tabkit = useTabkit();
   return (
     <BotCardContainer>
-      <h2>{name}</h2>
-      <p>Bot ID: {id}</p>
-      <Buttons>
-        <Button
-          onClick={() => {
-            navigator.clipboard.writeText(`${id}:${secret}`);
-            toast.success('Copied bot token to clipboard!');
-          }}
-          type="button"
-        >
-          <FontAwesomeIcon icon={faCopy} /> Copy Bot Token
-        </Button>
-        <Button type="button" variant="danger">
-          <FontAwesomeIcon icon={faTrash} /> Delete Bot
-        </Button>
-      </Buttons>
+      <Avatar size={64} />
+      <Box>
+        <h2>{name}</h2>
+        {/* <p>Bot ID: {id}</p> */}
+        <Buttons>
+          <Button onClick={() => {}} variant="primary" type="button">
+            <FontAwesomeIcon icon={faCog} /> Manage Bot
+          </Button>
+          <Button
+            onClick={() => {
+              navigator.clipboard.writeText(`${id}:${secret}`);
+              toast.success('Copied bot token to clipboard!');
+            }}
+            type="button"
+          >
+            <FontAwesomeIcon icon={faCopy} /> Copy Bot Token
+          </Button>
+          <Button type="button" variant="danger">
+            <FontAwesomeIcon icon={faTrash} /> Delete Bot
+          </Button>
+        </Buttons>
+      </Box>
     </BotCardContainer>
   );
 }

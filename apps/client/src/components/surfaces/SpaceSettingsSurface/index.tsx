@@ -156,7 +156,7 @@ const SPACE_SETTING_CATEGORIES = [
   { code: 'bans', tkey: 'spaceSettings.bans.title' },
 ];
 
-export function SpaceSettingsView({ spaceId }: { spaceId: string }) {
+export function SpaceSettingsSurface({ spaceId }: { spaceId: string }) {
   const mikoto = useMikoto();
   const space = mikoto.spaces.get(spaceId)!;
 

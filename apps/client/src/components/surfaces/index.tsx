@@ -5,7 +5,6 @@ import { DesignStory } from '../../views/Palette';
 import { AccountSettingsSurface } from './AccountSettingsSurface';
 import { ChannelSettingsSurface } from './ChannelSettingsSurface';
 import { DiscoverySurface } from './DiscoverySurface';
-import { DocumentSurface } from './DocumentSurface';
 import { FriendsSurface } from './FriendsSurface';
 import { MessageSurface } from './MessageSurface';
 import { SearchSurface } from './SearchSurface';
@@ -15,7 +14,7 @@ import { WelcomeSurface } from './WelcomeSurface';
 export const surfaceMap = {
   textChannel: MessageSurface,
   voiceChannel: lazy(() => import('./VoiceSurface')),
-  documentChannel: DocumentSurface,
+  documentChannel: lazy(() => import('./DocumentSurface')),
   search: SearchSurface,
   spaceSettings: SpaceSettingsSurface,
   accountSettings: AccountSettingsSurface,

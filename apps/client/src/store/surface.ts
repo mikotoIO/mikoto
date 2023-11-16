@@ -3,21 +3,7 @@ import { action, autorun, makeAutoObservable, runInAction } from 'mobx';
 import { createContext } from 'react';
 import { atomFamily } from 'recoil';
 
-type TabBaseType =
-  | { kind: 'textChannel'; channelId: string }
-  | { kind: 'voiceChannel'; channelId: string }
-  | { kind: 'documentChannel'; channelId: string }
-  | { kind: 'applicationChannel'; channelId: string }
-  | { kind: 'search'; spaceId: string }
-  | { kind: 'spaceSettings'; spaceId: string }
-  | { kind: 'channelSettings'; channelId: string }
-  | { kind: 'accountSettings' }
-  | { kind: 'friends' }
-  | { kind: 'discovery' }
-  | { kind: 'palette' }
-  | { kind: 'friends' }
-  | { kind: 'welcome' }
-  | { kind: 'unknown' };
+import type { TabBaseType } from '../components/surfaces';
 
 export type Tabable = TabBaseType & {
   key: string;

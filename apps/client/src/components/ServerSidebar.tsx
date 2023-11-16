@@ -202,7 +202,6 @@ function SidebarSpaceIcon({ space }: { space: ClientSpace }) {
       content={<Tooltip>{space.name}</Tooltip>}
       placement="right"
       offset={[0, 0]}
-      interactive
     >
       <StyledIconWrapper>
         <Pill h={isActive ? 32 : 8} />

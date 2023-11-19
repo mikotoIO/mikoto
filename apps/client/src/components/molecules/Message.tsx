@@ -2,7 +2,7 @@ import { Flex } from '@mikoto-io/lucid';
 import { ClientMessage } from 'mikotojs';
 import { makeAutoObservable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { atom, useSetRecoilState } from 'recoil';
+import { atom } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../hooks';

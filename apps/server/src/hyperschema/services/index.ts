@@ -6,3 +6,4 @@ export * from './RoleService';
 export * from './SpaceService';
 export * from './UserService';
 export * from './VoiceService';
+export * from './RelationService';

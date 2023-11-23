@@ -252,13 +252,15 @@ function SpaceCreateForm({ closeModal }: { closeModal: () => void }) {
 function SpaceJoinForm({ closeModal }: { closeModal: () => void }) {
   const mikoto = useMikoto();
 
-  const { register, handleSubmit, reset } = useForm({});
+  const { register, handleSubmit, reset } = useForm();
   const error = useErrorElement();
   return (
     <Form
       onSubmit={handleSubmit(async (data) => {
         try {
-          await mikoto.client.spaces.join(data.spaceId);
+          await mikoto.client.spaces.join({
+            inviteCode: data.inviteCode,
+          });
           closeModal();
           reset();
         } catch (e) {
@@ -267,7 +269,7 @@ function SpaceJoinForm({ closeModal }: { closeModal: () => void }) {
       })}
     >
       {error.el}
-      <Input labelName="Space ID" {...register('spaceId')} />
+      <Input labelName="Invite Link/Code" {...register('inviteCode')} />
       <Button>Join Space</Button>
     </Form>
   );

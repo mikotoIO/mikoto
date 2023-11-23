@@ -15,6 +15,7 @@ import {
   SpaceService,
   UserService,
   VoiceService,
+  RelationService,
 } from './services';
 
 export * from './models';
@@ -30,6 +31,7 @@ export const MainService = h
     messages: MessageService,
     roles: RoleService,
     voice: VoiceService,
+    relations: RelationService,
   })
   .root();
 

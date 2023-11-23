@@ -66,7 +66,14 @@ export function ProfileModal({ user }: { user: User }) {
               {mikoto.me.id !== user.id && (
                 <Buttons>
                   <Button variant="success">Send Friend Request</Button>
-                  <Button>
+                  <Button
+                    onClick={async () => {
+                      const dm = await mikoto.client.relations.openDm({
+                        relationId: user.id,
+                      });
+                      console.log(dm);
+                    }}
+                  >
                     <FontAwesomeIcon icon={faEnvelope} />
                   </Button>
                 </Buttons>

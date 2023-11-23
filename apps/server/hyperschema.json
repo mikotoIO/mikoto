@@ -246,7 +246,8 @@
           {"name": "users", "service": "UserService"},
           {"name": "messages", "service": "MessageService"},
           {"name": "roles", "service": "RoleService"},
-          {"name": "voice", "service": "VoiceService"}
+          {"name": "voice", "service": "VoiceService"},
+          {"name": "relations", "service": "RelationService"}
         ],
         "functions": [],
         "events": []
@@ -668,6 +669,30 @@
             "fn": {
               "input": [{"name": "channelId", "type": "string"}],
               "output": "VoiceToken"
+            }
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "name": "RelationService",
+      "service": {
+        "path": "relations",
+        "subservices": [],
+        "functions": [
+          {
+            "name": "list",
+            "fn": {
+              "input": [],
+              "output": {"type": "array", "param": ["Relation"]}
+            }
+          },
+          {
+            "name": "openDm",
+            "fn": {
+              "input": [{"name": "relationId", "type": "string"}],
+              "output": "Relation"
             }
           }
         ],

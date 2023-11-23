@@ -41,8 +41,13 @@ export abstract class Store<
   foreignUpdate(item: T): void {}
   foreignDelete(item: T): void {}
 
-  // errors if ID is not found w/o data
-  // updates the object if ID is found w/ data
+  /**
+   * updates the object if ID is found in cache and data is present.
+   * throws if object with ID is not found in cache.
+   * @param id Object ID
+   * @param data
+   * @returns ClientEntity
+   */
   getAndUpdate(id: string, data?: B) {
     const entity = this.get(id)!;
     if (data) {
@@ -51,8 +56,12 @@ export abstract class Store<
     }
     return entity;
   }
-  // creates a new object if ID is not found
-  // updates the object if ID is found
+  /**
+   * Creates a new object if ID is not found in cache.
+   * Updates the object in-cache, if ID is found.
+   * @param data Plain data object
+   * @returns ClientEntity
+   */
   produce(data: B): T {
     if (this.has(data.id)) {
       const entity = this.get(data.id)!;

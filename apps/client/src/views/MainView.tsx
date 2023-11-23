@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import { CommandMenuKit } from '../components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
 import { Explorer } from '../components/Explorer';
-import { ServerSidebar } from '../components/ServerSidebar';
+import { SpaceSidebar } from '../components/SpaceSidebar';
 import { TabBarButton, TabbedView } from '../components/TabBar';
 import { UserAreaAvatar } from '../components/UserArea';
 import { Sidebar } from '../components/sidebars/Base';
@@ -140,7 +140,7 @@ const AppView = observer(() => {
           {workspace.leftOpen && <UserAreaAvatar />}
         </div>
         <div className="bars">
-          <ServerSidebar spaces={mikoto.spaces} />
+          <SpaceSidebar spaces={mikoto.spaces} />
           {workspace.leftOpen && (
             <Sidebar
               position="left"

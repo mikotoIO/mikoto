@@ -6,9 +6,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Heading } from '@mikoto-io/lucid';
 import { Relation } from 'mikotojs';
 import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../hooks';
+import { treebarSpaceState } from '../../store';
 import { useTabkit } from '../../store/surface';
 import { Avatar } from '../atoms/Avatar';
 
@@ -33,6 +35,8 @@ export function FriendSidebar() {
   const tabkit = useTabkit();
   const mikoto = useMikoto();
   const [friends, setFriends] = useState<Relation[]>([]);
+  const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
+
   useEffect(() => {
     mikoto.client.relations.list({}).then(setFriends);
   }, []);
@@ -71,7 +75,12 @@ export function FriendSidebar() {
         Direct Messages
       </Heading>
       {friends.map((friend) => (
-        <StyledButtonBase key={friend.id}>
+        <StyledButtonBase
+          key={friend.id}
+          onClick={() => {
+            setSpace(friend?.space?.id ?? null);
+          }}
+        >
           <Avatar size={32} src={friend?.relation?.avatar ?? undefined} />
           <div>{friend?.relation?.name ?? 'Deleted User'}</div>
         </StyledButtonBase>

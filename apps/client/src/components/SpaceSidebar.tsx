@@ -19,7 +19,7 @@ import { normalizeMediaUrl } from './atoms/Avatar';
 import { Pill } from './atoms/Pill';
 import { StyledSpaceIcon } from './atoms/SpaceIcon';
 
-const StyledServerSidebar = styled.div`
+const StyledSpaceSidebar = styled.div`
   background-color: var(--N1000);
   align-items: center;
   box-sizing: border-box;
@@ -172,6 +172,7 @@ const Tooltip = styled.div`
 `;
 
 function SidebarSpaceIcon({ space }: { space: ClientSpace }) {
+  // TF is this name?
   const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
   const isActive = stateSpace === space.id;
   const setWorkspace = useSetRecoilState(workspaceState);
@@ -331,14 +332,14 @@ const Seperator = styled.hr`
   border-color: var(--N500);
 `;
 
-export const ServerSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
+export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
   const setModal = useSetRecoilState(modalState);
   const [spaceId, setSpaceId] = useRecoilState(treebarSpaceState);
 
   const contextMenu = useContextMenu(() => <ServerSidebarContextMenu />);
 
   return (
-    <StyledServerSidebar onContextMenu={contextMenu}>
+    <StyledSpaceSidebar onContextMenu={contextMenu}>
       <StyledIconWrapper>
         <Pill h={spaceId === null ? 32 : 8} />
         <StyledSpaceIcon
@@ -375,6 +376,6 @@ export const ServerSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
           +
         </StyledSpaceIcon>
       </StyledIconWrapper>
-    </StyledServerSidebar>
+    </StyledSpaceSidebar>
   );
 });

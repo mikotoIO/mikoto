@@ -7,7 +7,7 @@ import { Helmet } from 'react-helmet';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { RecoilRoot, RecoilEnv } from 'recoil';
+import { RecoilEnv, RecoilRoot } from 'recoil';
 import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
 // eslint-disable-next-line import/no-relative-packages

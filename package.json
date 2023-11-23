@@ -18,10 +18,10 @@
     "dev": "yarn compose && yarn workspaces foreach -ptRvi --from '{server,client}' run dev"
   },
   "devDependencies": {
-    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "eslint": "^8.39.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
-    "prettier": "^3.1.0",
+    "prettier": "^2.8.8",
     "syncpack": "^11.2.1",
     "turbo": "^1.10.16"
   },

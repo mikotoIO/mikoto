@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { boxCss, BoxProps } from './Layout';
+import { BoxProps, boxCss } from './Layout';
 
 export const Anchor = styled.a<BoxProps>`
   &:visited {

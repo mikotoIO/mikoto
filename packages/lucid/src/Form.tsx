@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { Grid, Flex } from './Layout';
+import { Flex, Grid } from './Layout';
 
 export const Form = styled(Flex).attrs(() => ({
   as: 'form',

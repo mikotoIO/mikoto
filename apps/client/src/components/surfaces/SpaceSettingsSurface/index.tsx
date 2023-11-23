@@ -1,4 +1,4 @@
-import { Input, Form, Button, Buttons, Modal, Box } from '@mikoto-io/lucid';
+import { Box, Button, Buttons, Form, Input, Modal } from '@mikoto-io/lucid';
 import { ClientSpace, Invite, Space } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';

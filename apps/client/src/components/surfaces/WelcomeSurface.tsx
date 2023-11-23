@@ -1,4 +1,4 @@
-import { Heading, Image, Box, Flex } from '@mikoto-io/lucid';
+import { Box, Flex, Heading, Image } from '@mikoto-io/lucid';
 
 import { TabName } from '../TabBar';
 import { ViewContainer } from '../ViewContainer';

@@ -57,6 +57,7 @@
         "fields": [
           {"name": "id", "type": "string"},
           {"name": "name", "type": "string"},
+          {"name": "type", "type": "string"},
           {"name": "icon", "type": {"type": "nullable", "param": ["string"]}},
           {"name": "channels", "type": {"type": "array", "param": ["Channel"]}},
           {"name": "roles", "type": {"type": "array", "param": ["Role"]}},

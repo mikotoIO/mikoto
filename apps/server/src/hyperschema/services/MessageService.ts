@@ -78,7 +78,7 @@ export const MessageService = h.service({
       Message,
     )
     .use(assertChannelMembership)
-    .do(async ({  $r, state, channel, messageId, content }) => {
+    .do(async ({ $r, state, channel, messageId, content }) => {
       const message = await prisma.message.findUnique({
         where: { id: messageId },
       });
@@ -104,7 +104,7 @@ export const MessageService = h.service({
       Message,
     )
     .use(assertChannelMembership)
-    .do(async ({  $r, state, channel, messageId, content }) => {
+    .do(async ({ $r, state, channel, messageId, content }) => {
       const message = await prisma.message.findUnique({
         where: { id: messageId },
         include: { author: authorInclude },
@@ -122,7 +122,7 @@ export const MessageService = h.service({
   delete: h
     .fn({ channelId: z.string(), messageId: z.string() }, Message)
     .use(assertChannelMembership)
-    .do(async ({  $r, state, channel, messageId }) => {
+    .do(async ({ $r, state, channel, messageId }) => {
       const message = await prisma.message.findUnique({
         where: { id: messageId },
         include: { author: authorInclude },

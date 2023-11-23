@@ -13,11 +13,11 @@ import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
 import YouTube from '@tiptap/extension-youtube';
 import {
-  useEditor,
-  EditorContent,
   BubbleMenu,
   Editor,
+  EditorContent,
   Extensions,
+  useEditor,
 } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { ClientChannel } from 'mikotojs';

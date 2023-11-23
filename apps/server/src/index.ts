@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { writeTypeScriptClient, writeHyperschema } from '@hyperschema/core';
+import { writeHyperschema, writeTypeScriptClient } from '@hyperschema/core';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 import express from 'express';

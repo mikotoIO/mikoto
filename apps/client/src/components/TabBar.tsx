@@ -1,8 +1,8 @@
 import {
-  faX,
+  IconDefinition,
   faBarsStaggered,
   faQuestion,
-  IconDefinition,
+  faX,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Flex, Grid } from '@mikoto-io/lucid';

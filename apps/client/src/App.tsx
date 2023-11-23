@@ -3,8 +3,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import {
   LoginView,
   RegisterView,
-  ResetPasswordView,
   ResetChangePasswordView,
+  ResetPasswordView,
 } from './views/AuthView';
 import MainView from './views/MainView';
 import { MikotoApiLoader } from './views/MikotoApiLoader';

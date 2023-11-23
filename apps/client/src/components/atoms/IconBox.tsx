@@ -2,8 +2,8 @@ import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import {
   faCog,
   faHashtag,
-  faQuestion,
   faHeadphones,
+  faQuestion,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styled from 'styled-components';

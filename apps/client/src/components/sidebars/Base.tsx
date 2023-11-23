@@ -1,4 +1,4 @@
-import { Resizable, NumberSize } from 're-resizable';
+import { NumberSize, Resizable } from 're-resizable';
 
 interface SidebarProps {
   position: 'left' | 'right';

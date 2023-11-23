@@ -1,13 +1,13 @@
 import {
-  Input,
-  Form,
+  Box,
   Button,
   Buttons,
-  Modal,
-  Box,
-  backgroundMix,
   Flex,
+  Form,
+  Input,
+  Modal,
   TextArea,
+  backgroundMix,
 } from '@mikoto-io/lucid';
 import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';

@@ -1,4 +1,4 @@
-import { Channel, Member, Message, Role, Space, User, TypingEvent } from '.';
+import { Channel, Member, Message, Role, Space, TypingEvent, User } from '.';
 
 export const emitterModel = {
   createSpace: Space,

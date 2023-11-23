@@ -1,5 +1,6 @@
-import SimpleMarkdown from "@khanacademy/simple-markdown";
-import { createRule } from "./rules";
+import SimpleMarkdown from '@khanacademy/simple-markdown';
+
+import { createRule } from './rules';
 
 const EMOJI_REGEX = /^:(\+1|[-\w]+):/;
 

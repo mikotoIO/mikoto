@@ -11,11 +11,11 @@ import {
   DocumentService,
   MemberService,
   MessageService,
+  RelationService,
   RoleService,
   SpaceService,
   UserService,
   VoiceService,
-  RelationService,
 } from './services';
 
 export * from './models';

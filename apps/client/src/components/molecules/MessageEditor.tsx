@@ -8,7 +8,7 @@ import { runInAction } from 'mobx';
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useSetRecoilState } from 'recoil';
-import { createEditor, Transforms, Node } from 'slate';
+import { Node, Transforms, createEditor } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import styled from 'styled-components';

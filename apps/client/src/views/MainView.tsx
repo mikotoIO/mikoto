@@ -22,9 +22,9 @@ import { useMikoto } from '../hooks';
 import { treebarSpaceState, workspaceState } from '../store';
 import {
   SurfaceNode,
-  surfaceStore,
-  Tabable,
   TabContext,
+  Tabable,
+  surfaceStore,
 } from '../store/surface';
 import { MikotoApiLoader } from './MikotoApiLoader';
 

@@ -1,8 +1,8 @@
 import {
-  StyleSheet,
-  SafeAreaView as SAV,
   Platform,
+  SafeAreaView as SAV,
   StatusBar,
+  StyleSheet,
 } from 'react-native';
 
 const styles = StyleSheet.create({

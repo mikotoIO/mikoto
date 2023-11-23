@@ -3,6 +3,7 @@ import type { ComponentProps } from 'react';
 
 import { DesignStory } from '../../views/Palette';
 import { AccountSettingsSurface } from './AccountSettingsSurface';
+import { BotSettingSurface } from './BotSettingSurface';
 import { ChannelSettingsSurface } from './ChannelSettingsSurface';
 import { DiscoverySurface } from './DiscoverySurface';
 import { FriendsSurface } from './FriendsSurface';
@@ -19,6 +20,7 @@ export const surfaceMap = {
   spaceSettings: SpaceSettingsSurface,
   accountSettings: AccountSettingsSurface,
   channelSettings: ChannelSettingsSurface,
+  botSettings: BotSettingSurface,
   friends: FriendsSurface,
   discovery: DiscoverySurface,
   palette: DesignStory,

@@ -8,7 +8,7 @@
     "@headlessui/react": "*",
     "react": "*",
     "react-dom": "*",
-    "styled-components": "^6.0.5"
+    "styled-components": "^6.1.1"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.2.1",
@@ -23,9 +23,9 @@
     "babel-plugin-styled-components": "^2.1.4",
     "csstype": "^3.1.2",
     "rollup-plugin-typescript2": "^0.35.0",
-    "styled-components": "^6.0.5",
+    "styled-components": "^6.1.1",
     "typescript": "^5.2.2",
-    "vite": "^4.4.6"
+    "vite": "^5.0.0"
   },
   "scripts": {
     "build": "vite build && tsc --emitDeclarationOnly",

@@ -9,7 +9,11 @@ import { assertSpaceMembership, requireSpacePerm } from '../middlewares';
 import { Invite, Space, SpaceUpdateOptions } from '../models';
 import { memberInclude, memberMap, spaceInclude } from '../normalizer';
 
-async function joinSpace($r: HSContext['$r'], userId: string, space: Space) {
+export async function joinSpace(
+  $r: HSContext['$r'],
+  userId: string,
+  space: Space,
+) {
   const member = await prisma.spaceUser.create({
     data: {
       spaceId: space.id,

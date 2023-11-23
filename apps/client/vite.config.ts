@@ -16,6 +16,9 @@ export default ({ mode }: { mode: string }) =>
     build: {
       target: 'es2020',
     },
+    esbuild: {
+      legalComments: 'none',
+    },
     resolve: {
       alias: {
         '@/*': fileURLToPath(new URL('./src', import.meta.url)),

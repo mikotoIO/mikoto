@@ -121,6 +121,8 @@ const AppView = observer(() => {
   const mikoto = useMikoto();
   const [workspace, setWorkspace] = useRecoilState(workspaceState);
 
+  const space = spaceId ? mikoto.spaces.get(spaceId) : undefined;
+
   return (
     <AppContainer>
       <LeftBar dir="column">
@@ -150,11 +152,7 @@ const AppView = observer(() => {
                 }));
               }}
             >
-              {spaceId ? (
-                <Explorer space={mikoto.spaces.get(spaceId)!} />
-              ) : (
-                <FriendSidebar />
-              )}
+              {space ? <Explorer space={space} /> : <FriendSidebar />}
             </Sidebar>
           )}
         </div>
@@ -171,7 +169,7 @@ const AppView = observer(() => {
             }));
           }}
         >
-          {spaceId && <MemberListSidebar space={mikoto.spaces.get(spaceId)!} />}
+          {space && <MemberListSidebar space={space} />}
         </Sidebar>
       )}
     </AppContainer>

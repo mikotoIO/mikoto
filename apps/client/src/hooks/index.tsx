@@ -24,4 +24,3 @@ export const useFetchMember = (space: ClientSpace) => {
     space.fetchMembers();
   }, [space.id]);
 };
-

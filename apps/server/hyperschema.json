@@ -111,7 +111,17 @@
         ]
       }
     },
-    {"name": "Relation", "type": {"kind": "struct", "fields": []}},
+    {
+      "name": "Relation",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "id", "type": "string"},
+          {"name": "relation", "type": {"type": "nullable", "param": ["User"]}},
+          {"name": "space", "type": {"type": "nullable", "param": ["Space"]}}
+        ]
+      }
+    },
     {
       "name": "Document",
       "type": {
@@ -236,7 +246,8 @@
           {"name": "users", "service": "UserService"},
           {"name": "messages", "service": "MessageService"},
           {"name": "roles", "service": "RoleService"},
-          {"name": "voice", "service": "VoiceService"}
+          {"name": "voice", "service": "VoiceService"},
+          {"name": "relations", "service": "RelationService"}
         ],
         "functions": [],
         "events": []
@@ -658,6 +669,30 @@
             "fn": {
               "input": [{"name": "channelId", "type": "string"}],
               "output": "VoiceToken"
+            }
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "name": "RelationService",
+      "service": {
+        "path": "relations",
+        "subservices": [],
+        "functions": [
+          {
+            "name": "list",
+            "fn": {
+              "input": [],
+              "output": {"type": "array", "param": ["Relation"]}
+            }
+          },
+          {
+            "name": "openDm",
+            "fn": {
+              "input": [{"name": "relationId", "type": "string"}],
+              "output": "Relation"
             }
           }
         ],

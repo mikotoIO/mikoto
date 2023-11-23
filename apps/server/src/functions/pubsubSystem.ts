@@ -1,5 +1,6 @@
 import Redis from 'ioredis';
 import { z } from 'zod';
+import { logger } from './logger';
 
 export class PubSubSystem<M extends Record<string, z.ZodType>> {
   sender: Redis;

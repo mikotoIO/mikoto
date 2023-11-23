@@ -71,7 +71,11 @@ export const Unread = z.object({
 });
 export type Unread = z.infer<typeof Unread>;
 
-export const Relation = z.object({});
+export const Relation = z.object({
+  id: z.string(),
+  relation: z.nullable(User),
+  space: z.nullable(Space),
+});
 export type Relation = z.infer<typeof Relation>;
 
 export const Document = z.object({
@@ -148,6 +152,7 @@ export class MainService extends RootService {
   readonly messages = new MessageService(this.client);
   readonly roles = new RoleService(this.client);
   readonly voice = new VoiceService(this.client);
+  readonly relations = new RelationService(this.client);
 
   constructor(protected client: HyperschemaClient) {
     super();
@@ -159,6 +164,7 @@ export class MainService extends RootService {
     this.messages = new MessageService(this.client);
     this.roles = new RoleService(this.client);
     this.voice = new VoiceService(this.client);
+    this.relations = new RelationService(this.client);
   }
 }
 
@@ -415,5 +421,17 @@ export class VoiceService {
   constructor(protected client: HyperschemaClient) {}
   join(input: { channelId: string }): Promise<VoiceToken> {
     return this.client.call("voice/join", input);
+  }
+}
+
+export class RelationService {
+  readonly PATH = "relations";
+
+  constructor(protected client: HyperschemaClient) {}
+  list(input: {}): Promise<Array<Relation>> {
+    return this.client.call("relations/list", input);
+  }
+  openDm(input: { relationId: string }): Promise<Relation> {
+    return this.client.call("relations/openDm", input);
   }
 }

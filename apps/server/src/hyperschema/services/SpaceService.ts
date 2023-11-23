@@ -22,8 +22,8 @@ export async function joinSpace(
     include: memberInclude,
   });
 
-  await $r.pub(`user:${userId}`, 'createMember', memberMap(member));
-  await $r.pub(`space:${space.id}`, 'createSpace', space);
+  await $r.pub(`space:${space.id}`, 'createMember', memberMap(member));
+  await $r.pub(`user:${userId}`, 'createSpace', space);
 }
 
 async function leaveSpace($r: HSContext['$r'], userId: string, space: Space) {

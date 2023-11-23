@@ -1,5 +1,5 @@
 import { faUserGroup } from '@fortawesome/free-solid-svg-icons';
-import { Button, Input, Heading, Form } from '@mikoto-io/lucid';
+import { Button, Form, Heading, Input } from '@mikoto-io/lucid';
 
 import { TabName } from '../TabBar';
 import { ViewContainer } from '../ViewContainer';

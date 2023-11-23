@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Image } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 
 import { theme } from '../lucid/theme';
 

@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box } from '@mikoto-io/lucid';
 import { ClientMember, ClientSpace } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 

@@ -10,6 +10,7 @@ import { ClientRole } from './role';
 export class ClientSpace implements Space {
   id!: string;
   name!: string;
+  type!: string;
   icon!: string | null;
   ownerId!: string | null;
 

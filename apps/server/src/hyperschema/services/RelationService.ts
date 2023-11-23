@@ -20,6 +20,7 @@ async function createRelation(
   const space = await prisma.space.create({
     data: {
       name: 'Direct Messages',
+      type: 'DM',
       channels: { create: [{ name: 'general', order: 0 }] },
       roles: {
         create: [{ name: '@everyone', position: -1, permissions: '0' }],

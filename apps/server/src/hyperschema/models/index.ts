@@ -34,6 +34,7 @@ export type Channel = z.infer<typeof Channel>;
 export const Space = z.object({
   id: z.string(),
   name: z.string(),
+  type: z.string(),
   icon: z.string().nullable(),
   channels: Channel.array(),
   roles: Role.array(),

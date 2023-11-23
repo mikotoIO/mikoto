@@ -1,5 +1,5 @@
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { Heading, Form, Input } from '@mikoto-io/lucid';
+import { Form, Heading, Input } from '@mikoto-io/lucid';
 
 import { TabName } from '../TabBar';
 import { ViewContainer } from '../ViewContainer';

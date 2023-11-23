@@ -1,4 +1,4 @@
-import { Flex, Checkbox } from '@mikoto-io/lucid';
+import { Checkbox, Flex } from '@mikoto-io/lucid';
 import { permissions } from '@mikoto-io/permcheck';
 import { ClientMember, Role, User, checkMemberPermission } from 'mikotojs';
 import { observer } from 'mobx-react-lite';

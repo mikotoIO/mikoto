@@ -5,7 +5,7 @@ import {
   faMicrophone,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Form, Input, Button, Modal, Buttons, Box } from '@mikoto-io/lucid';
+import { Box, Button, Buttons, Form, Input, Modal } from '@mikoto-io/lucid';
 import { permissions } from '@mikoto-io/permcheck';
 import {
   Channel,
@@ -14,7 +14,7 @@ import {
   checkMemberPermission,
 } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';

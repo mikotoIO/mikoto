@@ -1,7 +1,7 @@
 import { theme } from '@mikoto-io/lucid';
 import { createGlobalStyle } from 'styled-components';
 
-import { themeDB, DEFAULT_THEME_SETTINGS } from '../store';
+import { DEFAULT_THEME_SETTINGS, themeDB } from '../store';
 import { useLocalDB } from '../store/LocalDB';
 
 function colorWithFallback(color: string, fallback: string) {

@@ -1,4 +1,4 @@
-import { Button, Form, Input, Modal, Image } from '@mikoto-io/lucid';
+import { Button, Form, Image, Input, Modal } from '@mikoto-io/lucid';
 import Tippy from '@tippyjs/react';
 import { AxiosError } from 'axios';
 import { ClientSpace, Invite, Space, SpaceStore } from 'mikotojs';
@@ -359,9 +359,11 @@ export const ServerSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
       </StyledIconWrapper>
       <Seperator />
 
-      {Array.from(spaces.values()).map((space) => (
-        <SidebarSpaceIcon space={space} key={space.id} />
-      ))}
+      {Array.from(spaces.values())
+        .filter((x) => x.type === 'NONE') // TODO: filter this on the server
+        .map((space) => (
+          <SidebarSpaceIcon space={space} key={space.id} />
+        ))}
       <StyledIconWrapper>
         <StyledSpaceIcon
           onClick={() => {

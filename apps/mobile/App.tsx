@@ -5,12 +5,12 @@ import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
+  StatusBar,
   StyleSheet,
   Text,
-  View,
   TextInput,
   TouchableHighlight,
-  StatusBar,
+  View,
 } from 'react-native';
 
 import { Explorer } from './components/Explorer';

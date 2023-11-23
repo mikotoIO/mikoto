@@ -3,7 +3,7 @@ import throttle from 'lodash/throttle';
 import { Channel, ClientChannel, ClientMessage, Message } from 'mikotojs';
 import { runInAction } from 'mobx';
 import { Observer, observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import styled from 'styled-components';
 

@@ -15,10 +15,7 @@ export class ClientThing implements Thing {
   // ...rest of your data goes here
   // keep in mind that non-null assertions are required, TypeScript is not smart enough
 
-  constructor(
-    public client: MikotoClient,
-    data: Thing,
-  ) {
+  constructor(public client: MikotoClient, data: Thing) {
     Object.assign(this, data);
     makeAutoObservable(this, { id: false, client: false });
   }

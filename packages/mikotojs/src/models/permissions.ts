@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import { permissions, checkPermission } from '@mikoto-io/permcheck';
+import { checkPermission, permissions } from '@mikoto-io/permcheck';
 
 import { ClientMember } from '../store';
 

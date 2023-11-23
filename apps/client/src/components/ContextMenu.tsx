@@ -1,6 +1,6 @@
 import { ModalView } from '@mikoto-io/lucid';
 import useEventListener from '@use-it/event-listener';
-import React, { useRef, useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { atom, useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 

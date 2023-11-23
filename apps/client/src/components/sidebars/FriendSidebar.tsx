@@ -4,8 +4,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Heading } from '@mikoto-io/lucid';
+import { Relation } from 'mikotojs';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
+import { useMikoto } from '../../hooks';
 import { useTabkit } from '../../store/surface';
 import { Avatar } from '../atoms/Avatar';
 
@@ -28,6 +31,12 @@ const StyledButtonBase = styled.div`
 
 export function FriendSidebar() {
   const tabkit = useTabkit();
+  const mikoto = useMikoto();
+  const [friends, setFriends] = useState<Relation[]>([]);
+  useEffect(() => {
+    mikoto.client.relations.list({}).then(setFriends);
+  }, []);
+
   return (
     <Box p={8}>
       <StyledButtonBase
@@ -61,10 +70,12 @@ export function FriendSidebar() {
       <Heading fs={14} p={{ left: 8 }} txt="N300">
         Direct Messages
       </Heading>
-      <StyledButtonBase>
-        <Avatar size={32} />
-        <div>FriendName</div>
-      </StyledButtonBase>
+      {friends.map((friend) => (
+        <StyledButtonBase key={friend.id}>
+          <Avatar size={32} src={friend?.relation?.avatar ?? undefined} />
+          <div>{friend?.relation?.name ?? 'Deleted User'}</div>
+        </StyledButtonBase>
+      ))}
     </Box>
   );
 }

@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 import react from '@vitejs/plugin-react';
 import * as dotenv from 'dotenv';
-import { fileURLToPath, URL } from 'node:url';
+import { URL, fileURLToPath } from 'node:url';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 

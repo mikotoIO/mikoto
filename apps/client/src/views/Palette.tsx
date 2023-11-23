@@ -1,6 +1,6 @@
 import { faChevronRight, faStar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Form, Button, Buttons, Input, colors, Toggle } from '@mikoto-io/lucid';
+import { Button, Buttons, Form, Input, Toggle, colors } from '@mikoto-io/lucid';
 import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';

@@ -191,9 +191,9 @@ model Invite {
 model Relationship {
   id         String @id @default(uuid()) @db.Uuid
   userId     String @db.Uuid
-  user       User?  @relation("RelationFrom", fields: [userId], references: [id], onDelete: NoAction)
+  user       User?  @relation("RelationFrom", fields: [userId], references: [id], onDelete: Cascade)
   relationId String @db.Uuid
-  relation   User?  @relation("RelationTo", fields: [relationId], references: [id], onDelete: NoAction)
+  relation   User?  @relation("RelationTo", fields: [relationId], references: [id], onDelete: Cascade)
 
   // yes, every DM gets their own space
   spaceId String @db.Uuid

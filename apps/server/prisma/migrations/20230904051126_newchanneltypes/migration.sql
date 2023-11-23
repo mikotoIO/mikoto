@@ -1,3 +1,0 @@
--- AlterEnum
-ALTER TYPE "ChannelType" ADD VALUE 'DOCUMENT';
-ALTER TYPE "ChannelType" ADD VALUE 'APPLICATION';

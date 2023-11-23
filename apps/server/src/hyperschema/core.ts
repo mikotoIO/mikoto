@@ -29,7 +29,6 @@ export const h = new HyperRPC().context(async ({ $meta }) => {
     await $r.sub(toSub);
   }
   return {
-    $p: prisma,
     $r,
     state: {
       user,

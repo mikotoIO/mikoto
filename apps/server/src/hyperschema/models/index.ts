@@ -34,10 +34,10 @@ export type Channel = z.infer<typeof Channel>;
 export const Space = z.object({
   id: z.string(),
   name: z.string(),
-  icon: z.nullable(z.string()),
-  channels: z.array(Channel),
-  roles: z.array(Role),
-  ownerId: z.nullable(z.string()),
+  icon: z.string().nullable(),
+  channels: Channel.array(),
+  roles: Role.array(),
+  ownerId: z.string().nullable(),
 });
 export type Space = z.infer<typeof Space>;
 
@@ -54,7 +54,7 @@ export const Message = z.object({
   content: z.string(),
   timestamp: hsDate(),
   editedTimestamp: z.nullable(hsDate()),
-  authorId: z.nullable(z.string()),
+  authorId: z.string().nullable(),
   author: z.nullable(User),
   channelId: z.string(),
 });
@@ -71,7 +71,11 @@ export const Unread = z.object({
 });
 export type Unread = z.infer<typeof Unread>;
 
-export const Relation = z.object({});
+export const Relation = z.object({
+  id: z.string(),
+  relation: User.nullable(),
+  space: Space.nullable(),
+});
 export type Relation = z.infer<typeof Relation>;
 
 export const Document = z.object({

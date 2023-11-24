@@ -28,10 +28,12 @@ export function checkMemberPermission(
   if (superuserOverride) {
     act |= permissions.superuser;
   }
-  const totalPerms = subject.roles.reduce(
-    (acc, x) => acc | BigInt(x.permissions),
-    0n,
-  );
+  const totalPerms =
+    subject.roles.reduce((acc, x) => acc | BigInt(x.permissions), 0n) |
+    BigInt(
+      subject.space.roles.filter((x) => x.name === '@everyone').at(-1)
+        ?.permissions ?? 0n,
+    );
 
   return checkPermission(act, totalPerms);
 }

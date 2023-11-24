@@ -2,8 +2,10 @@ import { NotFoundError, UnauthorizedError } from '@hyperschema/core';
 import { checkPermission, permissions } from '@mikoto-io/permcheck';
 import { Channel, SpaceUser } from '@prisma/client';
 
+import { logger } from '../../functions/logger';
 import { prisma } from '../../functions/prisma';
 import { HSContext } from '../core';
+import { spaceInclude } from '../normalizer';
 
 export async function assertSpaceMembership<
   T extends HSContext & { spaceId: string },
@@ -48,11 +50,12 @@ export function requireSpacePerm<T extends HSContext & { spaceId: string }>(
   return async (props: T): Promise<T> => {
     let r = typeof rule === 'string' ? BigInt(rule) : rule;
 
-    const spc = await prisma.space.findUnique({
+    const space = await prisma.space.findUnique({
       where: { id: props.spaceId },
+      include: spaceInclude,
     });
-    if (spc === null) throw new NotFoundError('Space not found');
-    if (spc.ownerId === props.state.user.id) return props;
+    if (space === null) throw new NotFoundError('Space not found');
+    if (space.ownerId === props.state.user.id) return { ...props, space };
     const member = await prisma.spaceUser.findUnique({
       where: {
         userId_spaceId: { userId: props.state.user.id, spaceId: props.spaceId },
@@ -61,17 +64,20 @@ export function requireSpacePerm<T extends HSContext & { spaceId: string }>(
     });
     if (member === null) throw new NotFoundError('Not a member of space');
 
-    const totalPerms = member.roles.reduce(
-      (acc, x) => acc | BigInt(x.permissions),
-      0n,
-    );
+    // actual permission checking
+    const totalPerms =
+      member.roles.reduce((acc, x) => acc | BigInt(x.permissions), 0n) |
+      BigInt(space.roles.at(-1)?.permissions ?? 0n);
 
     if (superuserOverride) {
       r |= permissions.superuser;
     }
     const res = checkPermission(r, totalPerms);
-    if (!res) throw new UnauthorizedError('Insufficient permissions');
+    if (!res) {
+      logger.warn(`Permission engine: expected ${r}, got ${totalPerms}`);
+      throw new UnauthorizedError('Insufficient permissions');
+    }
 
-    return props;
+    return { ...props, space };
   };
 }

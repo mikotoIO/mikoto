@@ -8,6 +8,7 @@ export const spaceInclude = {
 export const memberInclude = {
   roles: {
     select: { id: true },
+    orderBy: { position: 'desc' },
   },
   user: {
     select: {

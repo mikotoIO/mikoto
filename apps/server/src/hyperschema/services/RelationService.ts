@@ -23,7 +23,8 @@ async function createRelation(
       type: 'DM',
       channels: { create: [{ name: 'general', order: 0 }] },
       roles: {
-        create: [{ name: '@everyone', position: -1, permissions: '0' }],
+        // @everyone is a superuser in DMs
+        create: [{ name: '@everyone', position: -1, permissions: '1' }],
       },
       Relationship: {
         createMany: {

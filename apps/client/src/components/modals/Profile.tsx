@@ -2,9 +2,12 @@ import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Buttons, Flex, Modal } from '@mikoto-io/lucid';
 import { User } from 'mikotojs';
+import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../hooks';
+import { treebarSpaceState } from '../../store';
+import { modalState } from '../ContextMenu';
 import { Avatar } from '../atoms/Avatar';
 import { Tag } from '../atoms/BotTag';
 
@@ -50,6 +53,9 @@ const ProfileContainer = styled.div`
 
 export function ProfileModal({ user }: { user: User }) {
   const mikoto = useMikoto();
+  const setSpace = useSetRecoilState(treebarSpaceState);
+  const setModal = useSetRecoilState(modalState);
+
   return (
     <Modal style={{ padding: 0 }}>
       <ProfileContainer>
@@ -71,7 +77,11 @@ export function ProfileModal({ user }: { user: User }) {
                       const dm = await mikoto.client.relations.openDm({
                         relationId: user.id,
                       });
-                      console.log(dm);
+                      const spaceId = dm.space?.id;
+                      if (spaceId) {
+                        setSpace(spaceId);
+                      }
+                      setModal(null);
                     }}
                   >
                     <FontAwesomeIcon icon={faEnvelope} />

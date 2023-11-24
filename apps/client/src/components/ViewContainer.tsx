@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 export const ViewContainer = styled.div<{ padded?: boolean; scroll?: boolean }>`
+  border-radius: 8px;
   flex: 1;
   background-color: var(--N800);
   height: 100%;

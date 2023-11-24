@@ -1,3 +1,4 @@
+import { Box } from '@mikoto-io/lucid';
 import { NumberSize, Resizable } from 're-resizable';
 
 interface SidebarProps {
@@ -17,12 +18,24 @@ export function Sidebar({ children, position, size, onResize }: SidebarProps) {
       minWidth={200}
       maxWidth="50vw"
       maxHeight="100%"
+      style={{
+        padding: 8,
+      }}
       size={{ width: size, height: '100%' }}
       onResizeStop={(_, _1, _2, d) => {
         onResize?.(d);
       }}
     >
-      {children}
+      <Box
+        style={{
+          height: '100%',
+          overflowY: 'auto',
+        }}
+        bg="N800"
+        rounded={8}
+      >
+        {children}
+      </Box>
     </Resizable>
   );
 }

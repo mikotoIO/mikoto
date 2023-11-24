@@ -193,14 +193,12 @@ function TreebarContextMenu({ space }: { space: ClientSpace }) {
 
 const TreeHead = styled.div`
   padding: 4px 16px;
-  background-color: var(--N900);
 
   h1 {
     padding-top: 8px;
     font-size: 16px;
   }
 `;
-
 
 function getIconFromChannelType(type: Channel['type']) {
   switch (type) {

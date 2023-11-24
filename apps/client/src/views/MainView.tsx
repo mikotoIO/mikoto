@@ -1,6 +1,6 @@
 import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Flex } from '@mikoto-io/lucid';
+import { Box, Flex } from '@mikoto-io/lucid';
 import { observer } from 'mobx-react-lite';
 import { Resizable } from 're-resizable';
 import React, { Suspense } from 'react';
@@ -71,7 +71,8 @@ const SurfaceGroupContainer = styled.div`
   height: 100%;
   flex: 1;
   & > div:not(:first-child) {
-    border-left: 1px solid var(--N700);
+    margin-left: 8px;
+    // border-left: 1px solid var(--N700);
   }
 `;
 
@@ -104,9 +105,11 @@ const SurfaceGroup = observer(
                   idx !== surfaceNode.index ? { display: 'none' } : undefined
                 }
               >
-                <Suspense>
-                  <TabViewSwitch tab={tab} />
-                </Suspense>
+                <Box p={{ y: 8 }} h="100%">
+                  <Suspense>
+                    <TabViewSwitch tab={tab} />
+                  </Suspense>
+                </Box>
               </div>
             </TabContext.Provider>
           ))}

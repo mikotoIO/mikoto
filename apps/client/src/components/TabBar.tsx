@@ -262,6 +262,8 @@ const TabsFlex = styled(Flex)`
   }
 `;
 
+const TAB_HEIGHT = 36;
+
 export const TabbedView = observer(
   ({ children, tabs, surfaceNode }: TabbedViewProps) => {
     const mikoto = useMikoto();
@@ -282,13 +284,12 @@ export const TabbedView = observer(
 
     return (
       <Grid
-        trow="40px calc(100% - 40px)"
+        trow={`${TAB_HEIGHT}px calc(100% - ${TAB_HEIGHT}px)`}
         h="100%"
-        bg="N1000"
         style={{ flex: 1 }}
       >
         <Helmet titleTemplate="Mikoto | %s" defaultTitle="Mikoto" />
-        <TabsFlex h={40} fs={14}>
+        <TabsFlex h={TAB_HEIGHT} fs={14}>
           {tabs.map((tab, index) => (
             <Tab
               tab={tab}

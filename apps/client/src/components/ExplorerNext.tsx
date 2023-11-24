@@ -11,7 +11,7 @@ import styled from 'styled-components';
 
 export const StyledTreeBody = styled.div`
   margin: 0;
-  padding: 10px;
+  padding: 4px;
   min-height: min-content;
   max-height: 100%;
   flex: 1;

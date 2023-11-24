@@ -145,15 +145,15 @@ export type UserUpdateOptions = z.infer<typeof UserUpdateOptions>;
 
 export class MainService extends RootService {
   readonly PATH = "";
-  readonly channels = new ChannelService(this.client);
-  readonly documents = new DocumentService(this.client);
-  readonly spaces = new SpaceService(this.client);
-  readonly members = new MemberService(this.client);
-  readonly users = new UserService(this.client);
-  readonly messages = new MessageService(this.client);
-  readonly roles = new RoleService(this.client);
-  readonly voice = new VoiceService(this.client);
-  readonly relations = new RelationService(this.client);
+  readonly channels: ChannelService;
+  readonly documents: DocumentService;
+  readonly spaces: SpaceService;
+  readonly members: MemberService;
+  readonly users: UserService;
+  readonly messages: MessageService;
+  readonly roles: RoleService;
+  readonly voice: VoiceService;
+  readonly relations: RelationService;
 
   constructor(protected client: HyperschemaClient) {
     super();

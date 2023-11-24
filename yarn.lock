@@ -4116,15 +4116,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hyperschema/core@npm:^0.0.6":
-  version: 0.0.6
-  resolution: "@hyperschema/core@npm:0.0.6"
+"@hyperschema/core@npm:^0.0.7":
+  version: 0.0.7
+  resolution: "@hyperschema/core@npm:0.0.7"
   dependencies:
     json-stringify-pretty-compact: "npm:3.0.0"
     prettier: "npm:^3.0.3"
     socket.io: "npm:^4.7.2"
     zod: "npm:*"
-  checksum: 81ae2a3aa51f8b54846dca48ca0e7e31ab09b7bc64985745ffa184cd7540e3ee81f2a0261d61683d1a48dc6bb0335811d4ca610343d57a4191cd0d02e2f8c60c
+  checksum: 393ac3cecfc4f92701e040f35cb239e9f155f7a04e9a2c0510e0d7f072bdc39617bb563bb33c6c472aa08300c146c6ac02c9791c8f43a07a6147e31de6ede042
   languageName: node
   linkType: hard
 
@@ -24713,7 +24713,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^2.8.7, prettier@npm:^2.8.8":
+"prettier@npm:^2.8.8":
   version: 2.8.8
   resolution: "prettier@npm:2.8.8"
   bin:
@@ -27693,7 +27693,7 @@ __metadata:
   dependencies:
     "@axiomhq/winston": "npm:^1.0.0-rc.1"
     "@hocuspocus/cli": "npm:^2.4.0"
-    "@hyperschema/core": "npm:^0.0.6"
+    "@hyperschema/core": "npm:^0.0.7"
     "@mikoto-io/permcheck": "npm:0.0.1"
     "@prisma/client": "npm:^4.16.2"
     "@types/bcrypt": "npm:^5.0.0"
@@ -27726,7 +27726,7 @@ __metadata:
     nanoid: "npm:^3.0.0"
     node-notifier: "npm:^10.0.1"
     nodemailer: "npm:^6.8.0"
-    prettier: "npm:^2.8.7"
+    prettier: "npm:^2.8.8"
     prisma: "npm:^4.16.2"
     reflect-metadata: "npm:^0.1.13"
     routing-controllers: "npm:^0.9.0"

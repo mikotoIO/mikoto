@@ -201,12 +201,6 @@ const TreeHead = styled.div`
   }
 `;
 
-const TreeBanner = styled.div`
-  background: url(images/discovery-banner.jpg) no-repeat center center;
-  background-size: cover;
-  height: 100px;
-  text-shadow: 0px 0px 4px rgba(0, 0, 0, 1);
-`;
 
 function getIconFromChannelType(type: Channel['type']) {
   switch (type) {

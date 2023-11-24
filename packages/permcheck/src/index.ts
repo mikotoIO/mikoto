@@ -20,6 +20,12 @@ export const permissions = {
   manageSubChannels: 1n << 14n,
 };
 
+/**
+ * Check if a permission is set in a permission set
+ * @param rule The permission to check against
+ * @param perms The total permission bitset of the user
+ * @returns True if the user is authorized
+ */
 export function checkPermission(rule: bigint, perms: bigint | string) {
   const p = typeof perms === 'string' ? BigInt(perms) : perms;
   return (rule & p) !== 0n;

@@ -34,8 +34,8 @@ async function leaveSpace($r: HSContext['$r'], userId: string, space: Space) {
     include: memberInclude,
   });
 
-  await $r.pub(`user:${userId}`, 'deleteMember', memberMap(member));
-  await $r.pub(`space:${space.id}`, 'deleteSpace', space);
+  await $r.pub(`space:${space.id}`, 'deleteMember', memberMap(member));
+  await $r.pub(`user:${userId}`, 'deleteSpace', space);
 }
 
 export const SpaceService = h.service({

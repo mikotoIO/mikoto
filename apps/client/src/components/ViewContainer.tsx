@@ -1,13 +1,18 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-export const ViewContainer = styled.div<{ padded?: boolean; scroll?: boolean }>`
-  border-radius: 8px;
+export const viewContainerCss = css`
+  box-sizing: border-box;
   flex: 1;
-  background-color: var(--N800);
+  border-radius: 8px;
+  background-color: var(--color-surface);
   height: 100%;
   display: flex;
   flex-direction: column;
+`;
+
+export const ViewContainer = styled.div<{ padded?: boolean; scroll?: boolean }>`
+  ${viewContainerCss}
+
   padding: ${(p) => (p.padded ? '32px' : '0')};
   overflow-y: ${(p) => (p.scroll ? 'scroll' : 'hidden')};
-  box-sizing: border-box;
 `;

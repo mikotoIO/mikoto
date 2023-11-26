@@ -1,14 +1,12 @@
 import styled from 'styled-components';
 
+import { viewContainerCss } from '../components/ViewContainer';
+
 const SettingsViewBase = styled.div`
-  box-sizing: border-box;
-  flex: 1;
-  background-color: var(--N800);
+  ${viewContainerCss}
+
   padding: 8px 32px;
   overflow-y: scroll;
-  height: 100%;
-  flex-direction: column;
-  display: flex;
 `;
 
 const Sidebar = styled.div`

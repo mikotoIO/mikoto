@@ -31,7 +31,7 @@ export function Sidebar({ children, position, size, onResize }: SidebarProps) {
           height: '100%',
           overflowY: 'auto',
         }}
-        bg="N800"
+        bg="color-surface"
         rounded={8}
       >
         {children}

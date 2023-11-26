@@ -111,6 +111,7 @@ export const colors = {
 
 const darkTheme = {
   'color-text': neutrals.N0,
+  // 'color-surface': 'blue',
   'color-surface': neutrals.N800,
   'color-subsurface': neutrals.N900,
 };

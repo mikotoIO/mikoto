@@ -109,6 +109,12 @@ export const colors = {
   pinks,
 };
 
+const darkTheme = {
+  'color-text': neutrals.N0,
+  'color-surface': neutrals.N800,
+  'color-subsurface': neutrals.N900,
+};
+
 export const theme = {
   colors: {
     ...neutrals,
@@ -118,6 +124,7 @@ export const theme = {
     ...yellows,
     ...reds,
     ...pinks,
+    ...darkTheme,
   },
 };
 

@@ -29,8 +29,8 @@ import {
 import { MikotoApiLoader } from './MikotoApiLoader';
 
 const AppContainer = styled.div`
-  background-color: var(--N900);
-  color: white;
+  background-color: var(--color-subsurface);
+  color: var(--color-text);
   display: flex;
   flex-direction: row;
   height: 100vh;

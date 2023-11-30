@@ -20,7 +20,6 @@ import { Pill } from './atoms/Pill';
 import { StyledSpaceIcon } from './atoms/SpaceIcon';
 
 const StyledSpaceSidebar = styled.div`
-  background-color: var(--N1000);
   align-items: center;
   box-sizing: border-box;
   width: 68px;

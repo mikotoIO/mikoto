@@ -61,7 +61,7 @@ function UserAreaMenu() {
         }}
       >
         User Settings
-      </ContextMenu.Link>
+    </ContextMenu.Link>
       <ContextMenu.Link
         onClick={() => {
           localStorage.removeItem('REFRESH_TOKEN');

@@ -61,6 +61,7 @@ function ColorPalette({ colors: clrs }: { colors: Record<string, string> }) {
 
 const audio = new Audio('audio/notification/extralife.wav');
 audio.volume = 0.05;
+audio.load();
 
 export function DesignStory() {
   return (

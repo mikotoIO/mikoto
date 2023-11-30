@@ -41,7 +41,20 @@ function BotCard({ id, name, secret }: BotProps) {
         <h2>{name}</h2>
         {/* <p>Bot ID: {id}</p> */}
         <Buttons>
-          <Button onClick={() => {}} variant="primary" type="button">
+          <Button
+            onClick={() => {
+              tabkit.openTab(
+                {
+                  kind: 'botSettings',
+                  botId: id,
+                  key: id,
+                },
+                true,
+              );
+            }}
+            variant="primary"
+            type="button"
+          >
             <FontAwesomeIcon icon={faCog} /> Manage Bot
           </Button>
           <Button

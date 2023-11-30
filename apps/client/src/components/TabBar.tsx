@@ -55,7 +55,8 @@ const StyledTab = styled.div<{ active?: boolean }>`
   align-items: center;
   justify-content: center;
 
-  background-color: ${(p) => (p.active ? 'var(--N800)' : 'var(--N900)')};
+  background-color: ${(p) =>
+    p.active ? 'var(--color-surface)' : 'var(--N900)'};
 
   &:hover {
     background-color: var(--N700);

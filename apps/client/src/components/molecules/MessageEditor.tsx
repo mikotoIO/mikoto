@@ -36,7 +36,7 @@ const StyledEditable = styled(Editable)`
 `;
 
 const EditableContainer = styled.div`
-  background-color: var(--N700);
+  background-color: var(--color-input);
   padding: 16px 16px 4px;
   display: flex;
 `;

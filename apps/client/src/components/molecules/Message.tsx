@@ -5,10 +5,10 @@ import { observer } from 'mobx-react-lite';
 import { atom } from 'recoil';
 import styled from 'styled-components';
 
-import { useMikoto } from '../../hooks';
 import { ContextMenu, useContextMenu } from '../ContextMenu';
 import { BotTag } from '../atoms/BotTag';
 import { MessageAvatar } from '../atoms/MessageAvatar';
+import { TypingDots } from '../atoms/TypingDots';
 import { Markdown } from './markdown';
 
 const dateFormat = new Intl.DateTimeFormat('en', {
@@ -151,8 +151,6 @@ const EditedNote = styled.span`
 
 export const MessageItem = observer(
   ({ message, editState, isSimple }: MessageProps) => {
-    const mikoto = useMikoto();
-
     const menu = useContextMenu(() => (
       <ContextMenu>
         {message.authorId === message.client.me.id && (
@@ -214,3 +212,21 @@ export const MessageItem = observer(
     );
   },
 );
+
+export function GhostMessage() {
+  return (
+    <MessageContainer>
+      <MessageAvatar />
+      <MessageInner>
+        <NameBox style={{ opacity: '50%' }}>
+          <Name>Cactus</Name>
+        </NameBox>
+
+        <div style={{ opacity: '50%' }}>
+          <Markdown content="testing ghost message" />
+          <TypingDots />
+        </div>
+      </MessageInner>
+    </MessageContainer>
+  );
+}

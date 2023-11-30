@@ -225,6 +225,9 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
                     <MessagesLoading />
                   );
                 },
+                // Footer() {
+                //   return <GhostMessage />;
+                // },
               }}
               firstItemIndex={firstItemIndex}
               startReached={async () => {

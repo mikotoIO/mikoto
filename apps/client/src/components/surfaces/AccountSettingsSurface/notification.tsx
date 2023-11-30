@@ -8,6 +8,7 @@ export function NotificationSurface() {
   return (
     <SettingsView>
       <h1>{t('accountSettings.notifications.title')}</h1>
+      <h2>Enable Notifications</h2>
     </SettingsView>
   );
 }

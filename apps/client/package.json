@@ -55,6 +55,7 @@
     "jsonwebtoken": "^8.5.1",
     "jwt-decode": "^3.1.2",
     "livekit-client": "^1.13.3",
+    "localforage": "^1.10.0",
     "lodash": "^4.17.21",
     "markdown-draft-js": "^2.4.0",
     "mdast-util-find-and-replace": "^2.2.2",

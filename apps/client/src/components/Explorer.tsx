@@ -278,7 +278,6 @@ function DeleteChannelModal({ channel }: { channel: ClientChannel }) {
 
 const ChannelContextMenu = observer(
   ({ channel }: { channel: ClientChannel }) => {
-    const mikoto = useMikoto();
     const tabkit = useTabkit();
     const setModal = useSetRecoilState(modalState);
 

@@ -27,8 +27,8 @@ import {
 } from '../store/surface';
 import { ContextMenu, useContextMenu } from './ContextMenu';
 import { IconBox } from './atoms/IconBox';
-import { channelToTab } from './surfaces/Explorer';
 import type { NodeObject } from './surfaces/Explorer/ExplorerNext';
+import { channelToTab } from './surfaces/Explorer/channelToTab';
 
 const StyledCloseButton = styled(Flex)<{ active?: boolean }>`
   margin-left: 4px;

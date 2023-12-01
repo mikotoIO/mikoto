@@ -22,12 +22,12 @@ const baseInputCss = css`
   font-family: var(--font-main);
 `;
 
-export const BaseInput = styled.input`
+export const BaseInput = styled.input<BoxProps>`
   ${baseInputCss}
   ${boxCss}
 `;
 
-export const BaseTextArea = styled.textarea`
+export const BaseTextArea = styled.textarea<BoxProps>`
   ${baseInputCss}
   ${boxCss}
   padding: 16px 16px;
@@ -162,7 +162,7 @@ export function Toggle({ checked, onChange }: ToggleProps) {
   );
 }
 
-const BaseCheckbox = styled.input`
+const BaseCheckbox = styled.input<BoxProps>`
   width: 16px;
   height: 16px;
   &:checked {

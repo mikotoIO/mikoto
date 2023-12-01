@@ -10,7 +10,6 @@ import styled from 'styled-components';
 
 import { CommandMenuKit } from '../components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
-import { Explorer } from '../components/Explorer';
 import { SpaceSidebar } from '../components/SpaceSidebar';
 import { TabBarButton, TabbedView } from '../components/TabBar';
 import { UserAreaAvatar } from '../components/UserArea';
@@ -18,6 +17,7 @@ import { Sidebar } from '../components/sidebars/Base';
 import { FriendSidebar } from '../components/sidebars/FriendSidebar';
 import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
 import { surfaceMap } from '../components/surfaces';
+import { Explorer } from '../components/surfaces/Explorer';
 import { useMikoto } from '../hooks';
 import { treebarSpaceState, workspaceState } from '../store';
 import {

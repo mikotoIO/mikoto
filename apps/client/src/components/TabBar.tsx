@@ -12,7 +12,7 @@ import React, { useContext, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Helmet } from 'react-helmet';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { useMikoto } from '../hooks';
 import { workspaceState } from '../store';
@@ -26,9 +26,9 @@ import {
   tabNameFamily,
 } from '../store/surface';
 import { ContextMenu, useContextMenu } from './ContextMenu';
-import { channelToTab } from './Explorer';
-import { NodeObject } from './ExplorerNext';
 import { IconBox } from './atoms/IconBox';
+import type { NodeObject } from './surfaces/Explorer/ExplorerNext';
+import { channelToTab } from './surfaces/Explorer/channelToTab';
 
 const StyledCloseButton = styled(Flex)<{ active?: boolean }>`
   margin-left: 4px;

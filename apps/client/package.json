@@ -27,6 +27,7 @@
     "@tippyjs/react": "^4.2.6",
     "@tiptap/extension-bubble-menu": "^2.1.8",
     "@tiptap/extension-collaboration": "^2.1.8",
+    "@tiptap/extension-collaboration-cursor": "^2.1.13",
     "@tiptap/extension-image": "^2.1.7",
     "@tiptap/extension-link": "^2.1.7",
     "@tiptap/extension-placeholder": "^2.1.8",

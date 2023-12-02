@@ -3979,6 +3979,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hocuspocus/common@npm:^2.8.1":
+  version: 2.8.1
+  resolution: "@hocuspocus/common@npm:2.8.1"
+  dependencies:
+    lib0: "npm:^0.2.87"
+  checksum: 1164a6bde4631e961fe35fa6dabad8ec48357b17a9ebda9257e00aa4177bb3e77d418d9aa5ddd420df0efb220c6f93eef392612ab4b6d249246ecf04a927dcc6
+  languageName: node
+  linkType: hard
+
 "@hocuspocus/extension-database@npm:^2.4.0":
   version: 2.4.0
   resolution: "@hocuspocus/extension-database@npm:2.4.0"
@@ -4053,6 +4062,23 @@ __metadata:
     y-protocols: ^1.0.5
     yjs: ^13.6.4
   checksum: 4d02e89082c6235c5f2c871e41b49bb77555b653567368cc9caa4ec924dff3d235ababc4cfb1df7cace4cd833c732fc33d1bc3e8c523d45ea688061dedd2d3b9
+  languageName: node
+  linkType: hard
+
+"@hocuspocus/server@npm:^2.8.1":
+  version: 2.8.1
+  resolution: "@hocuspocus/server@npm:2.8.1"
+  dependencies:
+    "@hocuspocus/common": "npm:^2.8.1"
+    async-lock: "npm:^1.3.1"
+    kleur: "npm:^4.1.4"
+    lib0: "npm:^0.2.47"
+    uuid: "npm:^9.0.0"
+    ws: "npm:^8.5.0"
+  peerDependencies:
+    y-protocols: ^1.0.6
+    yjs: ^13.6.8
+  checksum: dd074fefc2b6999863bc85a97dc02fe9042b8036f4176df3d4863d576d96109e177f6677a20791743d03f9ceecdacba7ecb84693ad3b970d1f5182e9cabfeee0
   languageName: node
   linkType: hard
 
@@ -7158,6 +7184,16 @@ __metadata:
   peerDependencies:
     "@tiptap/core": ^2.0.0
   checksum: b93e342be482edf76f151d71bd3190e4888e51e818a8055e01fac27ef4e6add8f58484cf5a9a4e7ac1fdb0e6b99800bb0e5c77f08b8fec642db803ef973df6d1
+  languageName: node
+  linkType: hard
+
+"@tiptap/extension-collaboration-cursor@npm:^2.1.13":
+  version: 2.1.13
+  resolution: "@tiptap/extension-collaboration-cursor@npm:2.1.13"
+  peerDependencies:
+    "@tiptap/core": ^2.0.0
+    y-prosemirror: 1.0.20
+  checksum: eb3b3a8c790c14c0f65241caa893d16ff3143c125ed0c770270328ae75e38692e346325a2604e1cf616fddc521ed5993c0ae8d81d0a93dfb81921c7df7469d31
   languageName: node
   linkType: hard
 
@@ -11811,6 +11847,7 @@ __metadata:
     "@tippyjs/react": "npm:^4.2.6"
     "@tiptap/extension-bubble-menu": "npm:^2.1.8"
     "@tiptap/extension-collaboration": "npm:^2.1.8"
+    "@tiptap/extension-collaboration-cursor": "npm:^2.1.13"
     "@tiptap/extension-image": "npm:^2.1.7"
     "@tiptap/extension-link": "npm:^2.1.7"
     "@tiptap/extension-placeholder": "npm:^2.1.8"
@@ -20317,6 +20354,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lib0@npm:^0.2.87":
+  version: 0.2.88
+  resolution: "lib0@npm:0.2.88"
+  dependencies:
+    isomorphic.js: "npm:^0.2.4"
+  bin:
+    0gentesthtml: bin/gentesthtml.js
+    0serve: bin/0serve.js
+  checksum: 9539dcc3046305201747051a9d7f4af988fe539bf576b80fab47345f1f717e3867839c191b6fdeb6dde70c550340467b51ef69986a9e84e65f72ede67de0f9d5
+  languageName: node
+  linkType: hard
+
 "libphonenumber-js@npm:^1.9.43":
   version: 1.10.36
   resolution: "libphonenumber-js@npm:1.10.36"
@@ -22772,7 +22821,7 @@ __metadata:
     expo: "npm:~49.0.5"
     expo-status-bar: "npm:~1.6.0"
     react: "npm:*"
-    react-native: "npm:0.72.5"
+    react-native: "npm:0.72.6"
     react-native-gesture-handler: "npm:~2.12.0"
     react-native-get-random-values: "npm:^1.9.0"
     react-native-reanimated: "npm:~3.3.0"
@@ -25955,9 +26004,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native@npm:0.72.5":
-  version: 0.72.5
-  resolution: "react-native@npm:0.72.5"
+"react-native@npm:0.72.6":
+  version: 0.72.6
+  resolution: "react-native@npm:0.72.6"
   dependencies:
     "@jest/create-cache-key-function": "npm:^29.2.1"
     "@react-native-community/cli": "npm:11.3.7"
@@ -25999,7 +26048,7 @@ __metadata:
     react: 18.2.0
   bin:
     react-native: cli.js
-  checksum: b5f3f0c39acc437d174fd52f54dbcac6d91cfc639f41be65a159f919f36692c0448bcb3223df977bef6836c2bbb79c98365cf3bc05ea95536c4820b4d09f21ae
+  checksum: cf858b932d7af62d79adc573658bd51a752b92d4fa660eab079eac1fb88e60c560b647389732d8de537e52c75008437419adc9b9fc6705682445268ce966f19f
   languageName: node
   linkType: hard
 
@@ -27719,6 +27768,7 @@ __metadata:
   dependencies:
     "@axiomhq/winston": "npm:^1.0.0-rc.1"
     "@hocuspocus/cli": "npm:^2.4.0"
+    "@hocuspocus/server": "npm:^2.8.1"
     "@hyperschema/core": "npm:^0.0.7"
     "@mikoto-io/permcheck": "npm:0.0.1"
     "@prisma/client": "npm:^4.16.2"

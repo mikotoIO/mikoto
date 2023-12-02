@@ -2,7 +2,6 @@ import { permissions } from '@mikoto-io/permcheck';
 import { ClientMember, User, checkMemberPermission } from 'mikotojs';
 import { useSetRecoilState } from 'recoil';
 
-import { useMikoto } from '../../hooks';
 import { ContextMenu, modalState } from '../ContextMenu';
 import { ProfileModal } from './Profile';
 
@@ -13,7 +12,6 @@ interface UserContextMenuProps {
 
 export function UserContextMenu({ user, member }: UserContextMenuProps) {
   const setModal = useSetRecoilState(modalState);
-  const mikoto = useMikoto();
 
   return (
     <ContextMenu>

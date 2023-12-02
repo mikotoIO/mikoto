@@ -1,5 +1,4 @@
-import { faFile, faMicrophone } from '@fortawesome/free-solid-svg-icons';
-import { Channel, ClientChannel, ClientSpace } from 'mikotojs';
+import { ClientChannel, ClientSpace } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
@@ -59,6 +58,17 @@ const TreeHead = styled.div`
   }
 `;
 
+/**
+ * This function converts an array of channels into a structured tree of NodeObjects.
+ * Each NodeObject represents a channel and contains an id, text, and an array of descendants.
+ * The function uses a map to keep track of all NodeObjects by their id for easy lookup.
+ * If a channel has a parentId, it is added as a descendant of the corresponding parent NodeObject.
+ * If a channel does not have a parentId, it is added as a descendant of the root NodeObject.
+ *
+ * @param channels An array of channels to be converted into a structured tree.
+ * @param nodeObjectFactory A factory function that takes a channel and returns a NodeObject.
+ * @returns The root NodeObject of the structured tree.
+ */
 function channelToStructuredTree(
   channels: ClientChannel[],
   nodeObjectFactory: (ch: ClientChannel) => NodeObject,

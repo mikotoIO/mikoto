@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 
+import { Hocuspocus } from '@hocuspocus/server';
 import { writeHyperschema, writeTypeScriptClient } from '@hyperschema/core';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
@@ -80,6 +81,16 @@ async function main() {
     logger.info(
       `Mikoto hyperschema listening on http://0.0.0.0:${env.SERVER_PORT}`,
     );
+  });
+
+  // start hocuspocus
+  const hocuspocus = new Hocuspocus({
+    port: 1234,
+    quiet: true,
+  });
+
+  hocuspocus.listen(async () => {
+    logger.info(`Hocuspocus started!`);
   });
 }
 

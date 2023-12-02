@@ -38,6 +38,7 @@
   "dependencies": {
     "@axiomhq/winston": "^1.0.0-rc.1",
     "@hocuspocus/cli": "^2.4.0",
+    "@hocuspocus/server": "^2.8.1",
     "@hyperschema/core": "^0.0.7",
     "@mikoto-io/permcheck": "0.0.1",
     "@prisma/client": "^4.16.2",

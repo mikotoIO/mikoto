@@ -5,25 +5,23 @@ import {
   faStrikethrough,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { HocuspocusProvider } from '@hocuspocus/provider';
 import { Box, Flex, Heading } from '@mikoto-io/lucid';
+import Collaboration from '@tiptap/extension-collaboration';
+import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
 import YouTube from '@tiptap/extension-youtube';
-import {
-  BubbleMenu,
-  Editor,
-  EditorContent,
-  Extensions,
-  useEditor,
-} from '@tiptap/react';
+import { BubbleMenu, Editor, EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { ClientChannel } from 'mikotojs';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Markdown } from 'tiptap-markdown';
+import * as Y from 'yjs';
 
 import { useInterval, useMikoto } from '../../../hooks';
 import { TabName } from '../../TabBar';
@@ -69,6 +67,32 @@ const EditorContentWrapper = styled.div`
     float: left;
     height: 0;
     pointer-events: none;
+  }
+
+  .collaboration-cursor__caret {
+    border-left: 1px solid #0d0d0d;
+    border-right: 1px solid #0d0d0d;
+    margin-left: -1px;
+    margin-right: -1px;
+    pointer-events: none;
+    position: relative;
+    word-break: normal;
+  }
+
+  /* Render the username above the caret */
+  .collaboration-cursor__label {
+    border-radius: 3px 3px 3px 0;
+    color: #0d0d0d;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    left: -1px;
+    line-height: normal;
+    padding: 0.1rem 0.3rem;
+    position: absolute;
+    top: -1.4em;
+    user-select: none;
+    white-space: nowrap;
   }
 `;
 
@@ -129,27 +153,48 @@ function NoteBubbleMenu({ editor }: { editor: Editor }) {
   );
 }
 
-const extensions = [
-  StarterKit as any,
-  Link,
-  Image,
-  TaskList,
-  TaskItem,
-  SlashCommand,
-  Placeholder.configure({
-    placeholder: () => "press '/' for commands",
-    includeChildren: true,
-  }),
-  YouTube,
-  Markdown,
-] satisfies Extensions;
-
 function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
   const [changed, setChanged] = useState(false);
+  // const [ydoc] = useState(() => new Y.Doc());
+  // const [provider] = useState(
+  //   () =>
+  //     new HocuspocusProvider({
+  //       url: 'ws://localhost:1234',
+  //       name: channel.id,
+  //       document: ydoc,
+  //     }),
+  // );
   const mikoto = useMikoto();
 
   const editor = useEditor({
-    extensions,
+    extensions: [
+      StarterKit.configure({
+        history: false,
+      }) as any,
+      Link,
+      Image,
+      TaskList,
+      TaskItem,
+      SlashCommand,
+      Placeholder.configure({
+        placeholder: () => "press '/' for commands",
+        includeChildren: true,
+      }),
+      YouTube,
+      Markdown.configure({
+        html: false,
+      }),
+      // Collaboration.configure({
+      //   document: ydoc,
+      // }),
+      // CollaborationCursor.configure({
+      //   provider,
+      //   user: {
+      //     name: 'unknown',
+      //     color: '#00ffff',
+      //   },
+      // }),
+    ],
     onUpdate() {
       onChange?.();
       setChanged(true);

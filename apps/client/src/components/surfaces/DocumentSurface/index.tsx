@@ -1,5 +1,6 @@
 import {
   faBold,
+  faEllipsis,
   faFileLines,
   faItalic,
   faStrikethrough,
@@ -153,17 +154,35 @@ function NoteBubbleMenu({ editor }: { editor: Editor }) {
   );
 }
 
+const RANDOM_COLORS = [
+  '#ff9999',
+  '#ff9966',
+  '#ffff66',
+  '#99ff99',
+  '#99ffff',
+  '#9999ff',
+];
+
+function randomColor() {
+  return RANDOM_COLORS[Math.floor(Math.random() * RANDOM_COLORS.length)];
+}
+
+const IS_COLLABORATION = false;
+
 function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
   const [changed, setChanged] = useState(false);
-  // const [ydoc] = useState(() => new Y.Doc());
-  // const [provider] = useState(
-  //   () =>
-  //     new HocuspocusProvider({
-  //       url: 'ws://localhost:1234',
-  //       name: channel.id,
-  //       document: ydoc,
-  //     }),
-  // );
+  const [ydoc] = useState(() => new Y.Doc());
+  const [synced, setSynced] = useState(false);
+  const [cursorColor] = useState(randomColor);
+  const [provider] = useState(() =>
+    IS_COLLABORATION
+      ? new HocuspocusProvider({
+          url: 'ws://localhost:1234',
+          name: channel.id,
+          document: ydoc,
+        })
+      : null,
+  );
   const mikoto = useMikoto();
 
   const editor = useEditor({
@@ -184,23 +203,39 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
       Markdown.configure({
         html: false,
       }),
-      // Collaboration.configure({
-      //   document: ydoc,
-      // }),
-      // CollaborationCursor.configure({
-      //   provider,
-      //   user: {
-      //     name: 'unknown',
-      //     color: '#00ffff',
-      //   },
-      // }),
+      ...(IS_COLLABORATION
+        ? [
+            Collaboration.configure({
+              document: ydoc,
+            }),
+            CollaborationCursor.configure({
+              provider,
+              user: {
+                name: mikoto.me.name,
+                color: cursorColor,
+              },
+            }),
+          ]
+        : []),
     ],
     onUpdate() {
       onChange?.();
       setChanged(true);
     },
-    content,
+    content: IS_COLLABORATION ? undefined : content,
   });
+
+  useEffect(() => {
+    if (!provider) return;
+    if (!editor) return;
+
+    provider.on('synced', () => {
+      if (ydoc.store.clients.size === 0) {
+        editor.commands.setContent(content);
+      }
+      setSynced(true);
+    });
+  }, [editor]);
 
   const save = (edt: Editor) => {
     const contentString: string = edt.storage.markdown.getMarkdown();
@@ -228,6 +263,7 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
           m={{ bottom: 16 }}
           style={{
             alignItems: 'center',
+            justifyContent: 'space-between',
           }}
         >
           <Flex gap={8}>
@@ -239,10 +275,11 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
               center
             />
           </Flex>
+          <FontAwesomeIcon icon={faEllipsis} />
         </Flex>
       </div>
       {editor && <NoteBubbleMenu editor={editor} />}
-      <EditorContent editor={editor} />
+      {(synced || !IS_COLLABORATION) && <EditorContent editor={editor} />}
     </>
   );
 }

@@ -75,12 +75,6 @@ export const SpaceService = h.service({
       },
       include: spaceInclude,
     });
-    await prisma.spaceUser.create({
-      data: {
-        spaceId: space.id,
-        userId: state.user.id,
-      },
-    });
     joinSpace($r, state.user.id, Space.parse(space));
     return space;
   }),

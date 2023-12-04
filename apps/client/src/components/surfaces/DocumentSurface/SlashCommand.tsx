@@ -1,20 +1,117 @@
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import {
+  faHeading,
+  faImage,
+  faWandMagicSparkles,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Box, Flex, Heading } from '@mikoto-io/lucid';
 import { Editor, Extension, ReactRenderer } from '@tiptap/react';
 import Suggestion from '@tiptap/suggestion';
-import styled from 'styled-components';
+import { useEffect, useState } from 'react';
+import styled, { css } from 'styled-components';
 import tippy from 'tippy.js';
 
 const StyledCommandList = styled.div`
   background-color: var(--N1100);
   border: 1px solid var(--N600);
-  padding: 8px 16px;
+  padding: 8px;
   border-radius: 8px;
   width: 200px;
-  min-height: 300px;
+  max-height: 400px;
   color: var(--N0);
+  display: flex;
+  flex-direction: column;
 `;
 
+const CommandButton = styled.button<{ active?: boolean }>`
+  outline: none;
+  border: none;
+  background-color: transparent;
+  color: var(--N0);
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 4px;
+  ${(p) =>
+    p.active &&
+    css`
+      background-color: var(--N800);
+    `}
+`;
+
+interface Command {
+  name: string;
+  description: string;
+  icon?: IconProp;
+}
+
+const commands: Command[] = [
+  {
+    name: 'AI',
+    description: 'Generate writing with AI',
+    icon: faWandMagicSparkles,
+  },
+  {
+    name: 'Heading',
+    description: 'Add a heading',
+    icon: faHeading,
+  },
+  {
+    name: 'Image',
+    description: 'Add an image',
+    icon: faImage,
+  },
+];
+
 function CommandList() {
-  return <StyledCommandList>Slash menu goes here</StyledCommandList>;
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  useEffect(() => {
+    const navigationKeys = ['ArrowUp', 'ArrowDown', 'Enter'];
+    const keydownFn = (e: KeyboardEvent) => {
+      if (navigationKeys.includes(e.key)) {
+        e.preventDefault();
+        if (e.key === 'ArrowUp') {
+          setSelectedIndex(
+            (selectedIndex + commands.length - 1) % commands.length,
+          );
+          return true;
+        }
+        if (e.key === 'ArrowDown') {
+          setSelectedIndex((selectedIndex + 1) % commands.length);
+          return true;
+        }
+        if (e.key === 'Enter') {
+          return true;
+        }
+        return false;
+      }
+      return false;
+    };
+
+    document.addEventListener('keydown', keydownFn);
+    return () => {
+      document.removeEventListener('keydown', keydownFn);
+    };
+  });
+
+  return (
+    <StyledCommandList>
+      {commands.map((command, idx) => (
+        <CommandButton active={idx === selectedIndex}>
+          <Flex center w={40} h={40} bg="N900" rounded={4} key={command.name}>
+            {command.icon && <FontAwesomeIcon icon={command.icon} />}
+          </Flex>
+          <Box style={{ textAlign: 'left' }}>
+            <Heading fs={16} m={0}>
+              {command.name}
+            </Heading>
+            <Box fs={12}>{command.description}</Box>
+          </Box>
+        </CommandButton>
+      ))}
+    </StyledCommandList>
+  );
 }
 
 function renderItem() {

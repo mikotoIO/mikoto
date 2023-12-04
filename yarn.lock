@@ -20354,7 +20354,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lib0@npm:^0.2.87":
+"lib0@npm:^0.2.85, lib0@npm:^0.2.86, lib0@npm:^0.2.87":
   version: 0.2.88
   resolution: "lib0@npm:0.2.88"
   dependencies:
@@ -27817,6 +27817,8 @@ __metadata:
     typedi: "npm:^0.10.0"
     typescript: "npm:^5.2.2"
     winston: "npm:^3.9.0"
+    y-protocols: "npm:^1.0.6"
+    yjs: "npm:^13.6.10"
     zod: "npm:^3.22.2"
   languageName: unknown
   linkType: soft
@@ -32025,6 +32027,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"y-protocols@npm:^1.0.6":
+  version: 1.0.6
+  resolution: "y-protocols@npm:1.0.6"
+  dependencies:
+    lib0: "npm:^0.2.85"
+  peerDependencies:
+    yjs: ^13.0.0
+  checksum: 28dc27e1db98b496763fa083827c24c73c286f8a76649e0de09ddd9553cc2bf98fc9331dc0b206acfd1277d905d7e879f60fbe06c464bac4f3c8a9994b3a21f7
+  languageName: node
+  linkType: hard
+
 "y-websocket@npm:^1.5.0":
   version: 1.5.0
   resolution: "y-websocket@npm:1.5.0"
@@ -32190,6 +32203,15 @@ __metadata:
   version: 0.1.2
   resolution: "yeast@npm:0.1.2"
   checksum: 5536b5cfb3fc4ddf0c9eb4d2834a3a87e094d267bc40a2713d5b87a8da47c8615b8ffe475f3f92a085628e46be4704917ac0fea4827b3e8d27ac18b4230b6819
+  languageName: node
+  linkType: hard
+
+"yjs@npm:^13.6.10":
+  version: 13.6.10
+  resolution: "yjs@npm:13.6.10"
+  dependencies:
+    lib0: "npm:^0.2.86"
+  checksum: fe766c48ed450689d1b0ae6d96dbbbda9b1cf284bb4b67f774a3a075eeb5481b5990f804129edaf3ec9d6f462a9cd528f4cbd689e9dc996b1b55c51c4188549c
   languageName: node
   linkType: hard
 

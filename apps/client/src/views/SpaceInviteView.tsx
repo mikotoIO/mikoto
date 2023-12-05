@@ -50,7 +50,7 @@ export function SpaceInviteViewInner() {
             <StyledSpaceIcon
               size={100}
               active
-              icon={normalizeMediaUrl(space.icon)}
+              icon={normalizeMediaUrl(space.icon) ?? undefined}
             >
               {space.icon === null ? space.name[0] : ''}
             </StyledSpaceIcon>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { normalizeMediaUrl } from '../components/atoms/Avatar';
 import { StyledSpaceIcon } from '../components/atoms/SpaceIcon';
 import { Spinner } from '../components/atoms/Spinner';
 import { useMikoto } from '../hooks';
@@ -46,7 +47,11 @@ export function SpaceInviteViewInner() {
       <InvitationBox>
         {space ? (
           <>
-            <StyledSpaceIcon size={100} active icon={space.icon ?? undefined}>
+            <StyledSpaceIcon
+              size={100}
+              active
+              icon={normalizeMediaUrl(space.icon)}
+            >
               {space.icon === null ? space.name[0] : ''}
             </StyledSpaceIcon>
             <h1>{space.name}</h1>

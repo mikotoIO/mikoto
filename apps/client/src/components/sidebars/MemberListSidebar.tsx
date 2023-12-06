@@ -4,6 +4,7 @@ import { Box } from '@mikoto-io/lucid';
 import { ClientMember, ClientSpace } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
+import { Virtuoso } from 'react-virtuoso';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
@@ -79,20 +80,29 @@ const StyledMemberListSidebar = styled.div`
   height: 100%;
   overflow-y: auto;
   box-sizing: border-box;
-  padding-bottom: 32px;
 `;
 
 export const MemberListSidebar = observer(
   ({ space }: { space: ClientSpace }) => {
     useFetchMember(space);
 
+    const spaceMembers = Array.from(space.members?.values() ?? []);
+    const nm = [].concat(...Array(300).fill(spaceMembers));
+
     return (
       <StyledMemberListSidebar>
-        <Divider>Members</Divider>
-        {space.members &&
-          Array.from(space.members.values()).map((x) => (
-            <MemberElement key={x.id} member={x} />
-          ))}
+        {spaceMembers && (
+          <Virtuoso
+            components={{
+              Header() {
+                return <Divider>Members</Divider>;
+              },
+            }}
+            style={{ height: '100%', overflowX: 'hidden' }}
+            data={nm}
+            itemContent={(idx, member) => <MemberElement member={member} />}
+          />
+        )}
       </StyledMemberListSidebar>
     );
   },

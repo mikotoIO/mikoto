@@ -1,4 +1,8 @@
-import { NotFoundError, UnauthorizedError } from '@hyperschema/core';
+import {
+  NotFoundError,
+  PermissionDeniedError,
+  UnauthorizedError,
+} from '@hyperschema/core';
 import { checkPermission, permissions } from '@mikoto-io/permcheck';
 
 import { prisma } from './prisma';
@@ -27,7 +31,7 @@ export async function assertPermission(
     where: { userId_spaceId: { userId, spaceId } },
     include: { roles: true },
   });
-  if (member === null) throw new UnauthorizedError('Not a member of space');
+  if (member === null) throw new PermissionDeniedError('Not a member of space');
 
   const totalPerms = member.roles.reduce(
     (acc, x) => acc | BigInt(x.permissions),
@@ -38,7 +42,7 @@ export async function assertPermission(
     r |= permissions.superuser;
   }
   const res = checkPermission(r, totalPerms);
-  if (!res) throw new UnauthorizedError('Insufficient permissions');
+  if (!res) throw new PermissionDeniedError('Insufficient permissions');
 }
 
 export async function assertOwnership(userId: string, spaceId: string) {
@@ -46,5 +50,6 @@ export async function assertOwnership(userId: string, spaceId: string) {
     where: { id: spaceId },
   });
   if (spc === null) throw new NotFoundError('Space not found');
-  if (spc.ownerId !== userId) throw new UnauthorizedError('Not space owner');
+  if (spc.ownerId !== userId)
+    throw new PermissionDeniedError('Not space owner');
 }

@@ -12,7 +12,7 @@ function isUrl(string: string) {
   return true;
 }
 
-export function normalizeMediaUrl(url?: string, fallback = '') {
+export function normalizeMediaUrl(url?: string | null, fallback = '') {
   if (!url) {
     return fallback;
   }

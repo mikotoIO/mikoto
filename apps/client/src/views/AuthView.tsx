@@ -48,14 +48,15 @@ function Logo() {
 
 // not always a real captcha
 function Captcha() {
-  return (
-    <HCaptcha
-      sitekey={env.PUBLIC_CAPTCHA_KEY}
-      onVerify={(t) => {
-        console.log(t);
-      }}
-    />
-  );
+  return <div />;
+  // return (
+  //   <HCaptcha
+  //     sitekey={env.PUBLIC_CAPTCHA_KEY}
+  //     onVerify={(t) => {
+  //       console.log(t);
+  //     }}
+  //   />
+  // );
 }
 
 export function AuthView({ children }: { children: React.ReactNode }) {
@@ -106,7 +107,7 @@ export function LoginView() {
         <Anchor to="/forgotpassword" as={Link}>
           Forgot Password?
         </Anchor>
-        {/* <Captcha /> */}
+        <Captcha />
       </Form>
     </AuthView>
   );

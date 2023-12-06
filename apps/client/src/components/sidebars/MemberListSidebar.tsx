@@ -87,7 +87,6 @@ export const MemberListSidebar = observer(
     useFetchMember(space);
 
     const spaceMembers = Array.from(space.members?.values() ?? []);
-    const nm = [].concat(...Array(300).fill(spaceMembers));
 
     return (
       <StyledMemberListSidebar>
@@ -99,7 +98,7 @@ export const MemberListSidebar = observer(
               },
             }}
             style={{ height: '100%', overflowX: 'hidden' }}
-            data={nm}
+            data={spaceMembers}
             itemContent={(idx, member) => <MemberElement member={member} />}
           />
         )}

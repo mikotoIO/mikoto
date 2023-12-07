@@ -86,7 +86,9 @@ export const MemberListSidebar = observer(
   ({ space }: { space: ClientSpace }) => {
     useFetchMember(space);
 
-    const spaceMembers = Array.from(space.members?.values() ?? []);
+    const spaceMembers = Array.from(space.members?.values() ?? []).toSorted(
+      (a, b) => a.user.name.localeCompare(b.user.name),
+    );
 
     return (
       <StyledMemberListSidebar>

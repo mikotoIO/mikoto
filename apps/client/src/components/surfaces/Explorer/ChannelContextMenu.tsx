@@ -4,13 +4,12 @@ import {
   faMicrophone,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Button, Buttons, Input, Modal } from '@mikoto-io/lucid';
+import { Box, Button, Buttons, Form, Input, Modal } from '@mikoto-io/lucid';
 import { permissions } from '@mikoto-io/permcheck';
 import { Channel, ClientChannel, checkMemberPermission } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Form } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
@@ -78,7 +77,7 @@ export function CreateChannelModal({ channel }: { channel?: Channel }) {
         </h1>
         {channel && <p className="subchannelinfo">In #{channel.name}</p>}
         <Form
-          onSubmit={handleSubmit(async (data) => {
+          onSubmit={handleSubmit((data) => {
             try {
               const space = mikoto.spaces.get(spaceId)!;
 

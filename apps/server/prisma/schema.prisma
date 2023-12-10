@@ -17,8 +17,8 @@ enum UserCategory {
 
 model User {
   id       String        @id @default(uuid()) @db.Uuid
-  name     String
-  avatar   String?
+  name     String        @db.String(64)
+  avatar   String?       @db.String(256)
   category UserCategory?
 
   SpaceUser     SpaceUser[]
@@ -40,14 +40,14 @@ model User {
 model Account {
   id           String         @id @default(uuid()) @db.Uuid
   email        String         @unique
-  passhash     String
+  passhash     String         @db.String(256)
   user         User           @relation(fields: [id], references: [id], onDelete: Cascade)
   RefreshToken RefreshToken[]
 }
 
 model Bot {
   id   String @id @default(uuid()) @db.Uuid
-  name String
+  name String @db.String(64)
   user User   @relation(fields: [id], references: [id], onDelete: Cascade)
 
   ownerId String @db.Uuid
@@ -68,7 +68,7 @@ model RefreshToken {
 
 model SpaceUser {
   id      String  @id @default(uuid()) @db.Uuid
-  name    String?
+  name    String? @db.String(64)
   spaceId String  @db.Uuid
   space   Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 
@@ -82,9 +82,9 @@ model SpaceUser {
 
 model Role {
   id          String      @id @default(uuid()) @db.Uuid
-  name        String
+  name        String      @db.String(64)
   color       String? // hex color
-  permissions String
+  permissions String      @db.String(128)
   position    Int
   users       SpaceUser[]
 
@@ -102,8 +102,8 @@ enum SpaceType {
 
 model Space {
   id      String    @id @default(uuid()) @db.Uuid
-  name    String
-  icon    String?
+  name    String    @db.String(64)
+  icon    String?   @db.String(256)
   ownerId String?   @db.Uuid
   owner   User?     @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   type    SpaceType @default(NONE)
@@ -125,7 +125,7 @@ model Channel {
   children Channel[] @relation("NestedChannel")
   order    Int       @default(0)
 
-  name        String
+  name        String    @db.String(64)
   spaceId     String    @db.Uuid
   space       Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   Message     Message[]
@@ -158,7 +158,7 @@ enum ChannelType {
 
 model Message {
   id              String    @id @default(uuid()) @db.Uuid
-  content         String
+  content         String    @db.String(4096)
   timestamp       DateTime
   editedTimestamp DateTime?
 
@@ -229,5 +229,5 @@ model Document {
   id        String  @id @default(uuid()) @db.Uuid
   channelId String  @unique @db.Uuid
   channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  content   String // JSON
+  content   String  @db.String(262144) // 256 KiB
 }

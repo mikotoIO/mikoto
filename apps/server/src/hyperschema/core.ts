@@ -8,7 +8,9 @@ import { redis } from '../functions/redis';
 import { emitterModel } from './models/emitter';
 
 export const h = new HyperRPC().context(async ({ $meta }) => {
-  const j = jwt.verify($meta.authToken ?? '', env.SECRET) as any;
+  const j = jwt.verify($meta.authToken ?? '', env.SECRET, {
+    
+  }) as any;
   const user = await prisma.user.findUnique({
     where: { id: j.sub },
   });

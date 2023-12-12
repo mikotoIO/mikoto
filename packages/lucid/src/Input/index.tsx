@@ -9,17 +9,21 @@ import { BoxProps, boxCss } from '../Layout';
 
 const baseInputCss = css`
   height: 44px;
-  font-size: 16px;
-  border: none;
-  border-radius: 4px;
+  font-size: 14px;
+  border-radius: 6px;
   box-sizing: border-box;
   width: 100%;
   padding: 4px 16px;
   color: var(--N200);
-  background-color: var(--N1100);
+  border: 1px solid var(--N600);
+  background-color: var(--N1000);
   outline: none;
   resize: none;
   font-family: var(--font-main);
+
+  &:focus {
+    outline: 2px solid var(--B300);
+  }
 `;
 
 export const BaseInput = styled.input<BoxProps>`

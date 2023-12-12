@@ -14,7 +14,6 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { env } from '../env';
 import { useErrorElement } from '../hooks/useErrorElement';
 import { authClient } from '../store/authClient';
 

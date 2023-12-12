@@ -99,7 +99,7 @@ const Name = styled.div<{ color?: string | null }>`
 `;
 
 const StyledTimestamp = styled.div`
-  color: #9f9e9e;
+  color: var(--N400);
   font-size: 12px;
 `;
 

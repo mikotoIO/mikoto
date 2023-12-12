@@ -22,12 +22,12 @@ import {
 // };
 
 export const neutrals = {
-  N1200: 'hsl(225, 12%, 11%)', // darkest
-  N1100: 'hsl(225, 12%, 15%)', // darkest
-  N1000: 'hsl(225, 12%, 17%)', // darkest
-  N900: 'hsl(225, 12%, 20%)', // darker
-  N800: 'hsl(225, 12%, 23%)', // backgrounds
-  N700: 'hsl(225, 12%, 27%)', // backgrounds
+  N1200: 'hsl(225, 12%, 6%)', // darkest
+  N1100: 'hsl(225, 12%, 10%)', // darkest
+  N1000: 'hsl(225, 12%, 15%)', // darkest
+  N900: 'hsl(225, 12%, 18%)', // darker
+  N800: 'hsl(225, 12%, 20%)', // backgrounds
+  N700: 'hsl(225, 12%, 25%)', // backgrounds
   N600: 'hsl(225, 16%, 31%)',
   N500: 'hsl(225, 16%, 42%)',
   N400: 'hsl(225, 16%, 60%)',

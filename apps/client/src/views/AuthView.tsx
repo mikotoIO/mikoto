@@ -5,7 +5,6 @@ import {
   Button,
   Flex,
   Form,
-  Grid,
   Input,
   backgroundMix,
 } from '@mikoto-io/lucid';
@@ -17,17 +16,8 @@ import styled from 'styled-components';
 import { useErrorElement } from '../hooks/useErrorElement';
 import { authClient } from '../store/authClient';
 
-const AuthViewInner = styled.div`
-  color: white;
-  background-color: var(--N800);
-  ${Form} {
-    width: 300px;
-    margin: 0 auto;
-  }
-`;
-
 const StyledLogo = styled.img`
-  width: 72px;
+  width: 32px;
 `;
 
 function Logo() {
@@ -35,10 +25,10 @@ function Logo() {
     <Flex
       center
       bg="N1100"
-      w={128}
-      h={128}
-      rounded={32}
-      m={{ x: 'auto', bottom: 20 }}
+      w={64}
+      h={64}
+      rounded={16}
+      m={{ x: 'auto', bottom: 8 }}
     >
       <StyledLogo src="/logo/logo-mono.svg" />
     </Flex>
@@ -58,17 +48,31 @@ function Captcha() {
   // );
 }
 
+const Art = styled(Box)`
+  display: none;
+  @media screen and (min-width: 1000px) {
+    display: block;
+  }
+`;
+
 export function AuthView({ children }: { children: React.ReactNode }) {
   return (
-    <Grid tcol="520px auto" h="100vh">
-      <AuthViewInner>
-        <Flex center dir="column" h="100%">
-          <Logo />
-          {children}
-        </Flex>
-      </AuthViewInner>
-      <Box mix={[backgroundMix('/images/artworks/1.jpg')]} />
-    </Grid>
+    <Flex h="100vh" center bg="N1000">
+      <Flex
+        rounded={8}
+        style={{
+          overflow: 'hidden',
+        }}
+      >
+        <Box txt="N0" bg="N800" p={32}>
+          <Flex center dir="column" h="100%">
+            <Logo />
+            {children}
+          </Flex>
+        </Box>
+        <Art mix={[backgroundMix('/images/artworks/1.jpg')]} w={600} />
+      </Flex>
+    </Flex>
   );
 }
 
@@ -79,6 +83,7 @@ export function LoginView() {
   return (
     <AuthView>
       <Form
+        w={360}
         onSubmit={handleSubmit(async (formData) => {
           try {
             const tk = await authClient.login(
@@ -120,6 +125,7 @@ export function RegisterView() {
     <AuthView>
       {error.el}
       <Form
+        w={360}
         onSubmit={handleSubmit(async (data) => {
           try {
             const tk = await authClient.register(
@@ -157,6 +163,7 @@ export function ResetPasswordView() {
   return (
     <AuthView>
       <Form
+        w={360}
         onSubmit={handleSubmit(async (data) => {
           await authClient.resetPassword(data.email);
           setSent(true);
@@ -196,6 +203,7 @@ export function ResetChangePasswordView() {
     <AuthView>
       {error.el}
       <Form
+        w={360}
         onSubmit={handleSubmit(async (data) => {
           if (data.password !== data.passwordConfirm) {
             // TODO checkother password conditions

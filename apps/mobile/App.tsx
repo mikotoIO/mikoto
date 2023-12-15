@@ -4,14 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import {
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableHighlight,
-  View,
-} from 'react-native';
+import { StyleSheet, TextInput, TouchableHighlight, View } from 'react-native';
 
 import { Explorer } from './components/Explorer';
 import { Message } from './components/Message';
@@ -77,6 +70,7 @@ function MessageInput() {
         value={text}
         onChangeText={setText}
         placeholder="Type a message"
+        selectionColor={theme.colors.B300}
         placeholderTextColor={theme.colors.N400}
       />
       <TouchableHighlight
@@ -102,7 +96,6 @@ function MessageSurface() {
           <Message />
         </View>
       </View>
-      <ExpoStatusBar style="auto" />
       <MessageInput />
     </View>
   );
@@ -112,10 +105,12 @@ export default function App() {
   return (
     <NavigationContainer>
       <SafeAreaView>
-        <StatusBar
+        {/* <StatusBar
           backgroundColor={theme.colors.N1100}
-          barStyle="light-content"
-        />
+          barStyle="dark-content"
+        /> */}
+        <ExpoStatusBar backgroundColor={theme.colors.N1000} style="light" />
+
         <View style={{ flex: 1, backgroundColor: theme.colors.N900 }}>
           {/* @ts-expect-error */}
           <SideMenu menu={<Explorer />} edgeHitWidth={400}>

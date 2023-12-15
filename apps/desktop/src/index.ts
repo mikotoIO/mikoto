@@ -27,7 +27,9 @@ const createWindow = () => {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadURL('https://alpha.mikoto.io/');
+  mainWindow.loadURL(
+    app.isPackaged ? 'https://alpha.mikoto.io/' : 'http://localhost:5173/',
+  );
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();

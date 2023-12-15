@@ -47,6 +47,7 @@ yarn-error.log*
 
 # rust
 debug/
+!android/app/src/debug/
 target/
 
 # Remove Cargo.lock from gitignore if creating an executable, leave it for libraries

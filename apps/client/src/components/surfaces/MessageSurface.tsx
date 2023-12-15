@@ -33,13 +33,63 @@ function MessagesLoading() {
   );
 }
 
-function isMessageSimple(message: Message, prevMessage: Message) {
+function isMessageSimple(message: Message, prevMessage?: Message) {
   return (
     prevMessage &&
     prevMessage.author?.id === message.author?.id &&
     new Date(message.timestamp).getTime() -
       new Date(prevMessage.timestamp).getTime() <
       5 * 60 * 1000
+  );
+}
+
+const DAYS_OF_WEEK = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+];
+
+const StyledDateSeparator = styled.div`
+  text-align: center;
+  margin: 4px 0;
+  color: var(--N300);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+
+  &:before,
+  &:after {
+    content: '';
+    display: block;
+    flex-grow: 1;
+    height: 0.5px;
+    display: block;
+    margin: 0 16px;
+    background-color: var(--N300);
+    opacity: 0.1;
+  }
+`;
+
+function DateSeparator({ date }: { date: Date }) {
+  return (
+    <StyledDateSeparator>
+      {DAYS_OF_WEEK[date.getDay()]} {date.toLocaleDateString()}
+    </StyledDateSeparator>
+  );
+}
+
+function showDateSeparator(message: Message, prevMessage?: Message) {
+  if (!prevMessage) return true;
+  const prevDate = new Date(prevMessage.timestamp);
+  const currDate = new Date(message.timestamp);
+  return (
+    prevDate.getFullYear() !== currDate.getFullYear() ||
+    prevDate.getMonth() !== currDate.getMonth() ||
+    prevDate.getDate() !== currDate.getDate()
   );
 }
 
@@ -244,15 +294,21 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
               itemContent={(index, msg) => (
                 <Observer>
                   {() => (
-                    <MessageItem
-                      editState={messageEditState}
-                      message={msg}
-                      // message={new ClientMessage(mikoto, msg)}
-                      isSimple={isMessageSimple(
+                    <>
+                      {showDateSeparator(
                         msg,
                         msgs[index - firstItemIndex - 1],
-                      )}
-                    />
+                      ) && <DateSeparator date={new Date(msg.timestamp)} />}
+                      <MessageItem
+                        editState={messageEditState}
+                        message={msg}
+                        // message={new ClientMessage(mikoto, msg)}
+                        isSimple={isMessageSimple(
+                          msg,
+                          msgs[index - firstItemIndex - 1],
+                        )}
+                      />
+                    </>
                   )}
                 </Observer>
               )}

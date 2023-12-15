@@ -5,8 +5,8 @@
   "scripts": {
     "start": "expo start",
     "typecheck": "tsc --noEmit",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "clean-cache": "expo start -c",
     "build": "eas build --platform android --local"
@@ -19,7 +19,8 @@
     "@fortawesome/react-native-fontawesome": "^0.3.0",
     "@react-navigation/drawer": "^6.6.4",
     "@react-navigation/native": "^6.1.8",
-    "expo": "~49.0.5",
+    "expo": "~49.0.21",
+    "expo-splash-screen": "~0.20.5",
     "expo-status-bar": "~1.6.0",
     "react": "*",
     "react-native": "0.72.6",

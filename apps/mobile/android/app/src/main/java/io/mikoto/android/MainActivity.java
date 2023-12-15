@@ -1,4 +1,4 @@
-package com.mobile;
+package io.mikoto.android;
 
 import android.os.Build;
 import android.os.Bundle;

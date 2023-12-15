@@ -81,9 +81,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.mobile"
+    namespace "io.mikoto.android"
     defaultConfig {
-        applicationId "com.mobile"
+        applicationId "io.mikoto.android"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

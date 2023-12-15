@@ -4,6 +4,8 @@ import 'react-native-get-random-values';
 import { registerRootComponent } from 'expo';
 import 'react-native-gesture-handler';
 
+// this is just eslint being silly
+// eslint-disable-next-line import/extensions
 import App from './App';
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);

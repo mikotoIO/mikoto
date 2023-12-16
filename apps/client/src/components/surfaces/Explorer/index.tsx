@@ -26,7 +26,7 @@ function TreebarContextMenu({ space }: { space: ClientSpace }) {
     <ContextMenu>
       <ContextMenu.Link
         onClick={() => {
-          setModal({ elem: <CreateChannelModal /> });
+          setModal({ elem: <CreateChannelModal space={space} /> });
         }}
       >
         Create Channel
@@ -140,3 +140,10 @@ export const Explorer = observer(({ space }: { space: ClientSpace }) => {
     </StyledTree>
   );
 });
+
+export function ExplorerSurface({ spaceId }: { spaceId: string }) {
+  const mikoto = useMikoto();
+  const space = mikoto.spaces.get(spaceId);
+  if (space === undefined) return null;
+  return <Explorer space={space} />;
+}

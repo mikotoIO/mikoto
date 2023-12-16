@@ -6,6 +6,7 @@ import { AccountSettingsSurface } from './AccountSettingsSurface';
 import { BotSettingSurface } from './BotSettingSurface';
 import { ChannelSettingsSurface } from './ChannelSettingsSurface';
 import { DiscoverySurface } from './DiscoverySurface';
+import { ExplorerSurface } from './Explorer';
 import { FriendsSurface } from './FriendsSurface';
 import { MessageSurface } from './MessageSurface';
 import { SearchSurface } from './SearchSurface';
@@ -25,6 +26,7 @@ export const surfaceMap = {
   discovery: DiscoverySurface,
   palette: DesignStory,
   welcome: WelcomeSurface,
+  explorer: ExplorerSurface,
 };
 
 type SurfaceMap = {

@@ -27,8 +27,8 @@ import {
 } from '../store/surface';
 import { ContextMenu, useContextMenu } from './ContextMenu';
 import { IconBox } from './atoms/IconBox';
-import type { NodeObject } from './surfaces/Explorer/ExplorerNext';
 import { channelToTab } from './surfaces/Explorer/channelToTab';
+import type { ExplorerNode } from './surfaces/Explorer/explorerNode';
 
 const StyledCloseButton = styled(Flex)<{ active?: boolean }>`
   margin-left: 4px;
@@ -271,7 +271,7 @@ export const TabbedView = observer(
     const reorderFn = useReorderable(surfaceNode);
     const setWorkspace = useSetRecoilState(workspaceState);
 
-    const [, drop] = useDrop<TabDnd | NodeObject>({
+    const [, drop] = useDrop<TabDnd | ExplorerNode>({
       accept: ['TAB', 'CHANNEL'],
       drop(item) {
         if ('tab' in item) {

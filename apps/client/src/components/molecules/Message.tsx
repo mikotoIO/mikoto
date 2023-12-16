@@ -1,4 +1,4 @@
-import { Flex } from '@mikoto-io/lucid';
+import { Box, Flex } from '@mikoto-io/lucid';
 import { ClientMessage } from 'mikotojs';
 import { makeAutoObservable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
@@ -98,17 +98,12 @@ const Name = styled.div<{ color?: string | null }>`
   }
 `;
 
-const StyledTimestamp = styled.div`
-  color: var(--N400);
-  font-size: 12px;
-`;
-
 function Timestamp({ time }: { time: Date }) {
   return (
-    <StyledTimestamp>
+    <Box txt="N400" fs={12}>
       {isToday(time) ? 'Today at ' : dateFormat.format(time)}{' '}
       {padTime(time.getHours())}:{padTime(time.getMinutes())}
-    </StyledTimestamp>
+    </Box>
   );
 }
 

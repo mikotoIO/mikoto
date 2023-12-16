@@ -3,6 +3,7 @@ import cors from 'cors';
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import { z } from 'zod';
 
 import { env } from '../env';
 import { h } from './core';
@@ -32,6 +33,8 @@ export const MainService = h
     roles: RoleService,
     voice: VoiceService,
     relations: RelationService,
+
+    ping: h.fn({}, z.string()).do(async () => 'pong'),
   })
   .root();
 

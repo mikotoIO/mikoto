@@ -167,6 +167,9 @@ export class MainService extends RootService {
     this.voice = new VoiceService(this.client);
     this.relations = new RelationService(this.client);
   }
+  ping(input: {}): Promise<string> {
+    return this.client.call("ping", input);
+  }
 }
 
 export class ChannelService {

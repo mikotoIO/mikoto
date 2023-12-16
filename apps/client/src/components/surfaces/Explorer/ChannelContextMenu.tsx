@@ -6,16 +6,20 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Button, Buttons, Form, Input, Modal } from '@mikoto-io/lucid';
 import { permissions } from '@mikoto-io/permcheck';
-import { Channel, ClientChannel, checkMemberPermission } from 'mikotojs';
+import {
+  Channel,
+  ClientChannel,
+  ClientSpace,
+  checkMemberPermission,
+} from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../../hooks';
 import { useErrorElement } from '../../../hooks/useErrorElement';
-import { treebarSpaceState } from '../../../store';
 import { useTabkit } from '../../../store/surface';
 import { ContextMenu, modalState } from '../../ContextMenu';
 import { channelToTab } from './channelToTab';
@@ -60,10 +64,15 @@ const ChannelTypeButton = styled.button<{ active?: boolean }>`
   transition: border-color 0.1s ease-in-out;
 `;
 
-export function CreateChannelModal({ channel }: { channel?: Channel }) {
+export function CreateChannelModal({
+  space,
+  channel,
+}: {
+  space: ClientSpace;
+  channel?: Channel;
+}) {
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
-  const spaceId = useRecoilValue(treebarSpaceState)!;
   const { register, handleSubmit } = useForm();
 
   const [channelType, setChannelType] = useState('TEXT');
@@ -79,8 +88,6 @@ export function CreateChannelModal({ channel }: { channel?: Channel }) {
         <Form
           onSubmit={handleSubmit((data) => {
             try {
-              const space = mikoto.spaces.get(spaceId)!;
-
               space.createChannel({
                 name: data.name,
                 type: channelType,
@@ -190,7 +197,13 @@ export const ChannelContextMenu = observer(
             <ContextMenu.Link
               onClick={() => {
                 setModal({
-                  elem: <CreateChannelModal channel={channel} />,
+                  elem: (
+                    // TODO: get rid of the ! here
+                    <CreateChannelModal
+                      space={channel.space!}
+                      channel={channel}
+                    />
+                  ),
                 });
               }}
             >

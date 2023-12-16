@@ -26,7 +26,7 @@ function TreebarContextMenu({ space }: { space: ClientSpace }) {
     <ContextMenu>
       <ContextMenu.Link
         onClick={() => {
-          setModal({ elem: <CreateChannelModal /> });
+          setModal({ elem: <CreateChannelModal space={space} /> });
         }}
       >
         Create Channel

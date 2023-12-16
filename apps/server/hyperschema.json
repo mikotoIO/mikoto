@@ -250,7 +250,9 @@
           {"name": "voice", "service": "VoiceService"},
           {"name": "relations", "service": "RelationService"}
         ],
-        "functions": [],
+        "functions": [
+          {"name": "ping", "fn": {"input": [], "output": "string"}}
+        ],
         "events": []
       }
     },

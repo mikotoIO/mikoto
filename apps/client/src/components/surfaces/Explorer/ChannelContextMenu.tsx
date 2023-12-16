@@ -18,7 +18,6 @@ import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
-import { useMikoto } from '../../../hooks';
 import { useErrorElement } from '../../../hooks/useErrorElement';
 import { useTabkit } from '../../../store/surface';
 import { ContextMenu, modalState } from '../../ContextMenu';
@@ -71,7 +70,6 @@ export function CreateChannelModal({
   space: ClientSpace;
   channel?: Channel;
 }) {
-  const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
   const { register, handleSubmit } = useForm();
 

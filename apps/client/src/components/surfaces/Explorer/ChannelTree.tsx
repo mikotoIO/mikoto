@@ -1,4 +1,3 @@
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import {
   faChevronDown,
   faChevronRight,
@@ -8,6 +7,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import styled from 'styled-components';
+
+import { ExplorerNode, nodeSort } from './explorerNode';
 
 export const StyledTreeBody = styled.div`
   margin: 0;
@@ -39,20 +40,6 @@ const StyledNode = styled.a<{ unread?: boolean; isDndHover?: boolean }>`
   ${(p) => p.isDndHover && `color: var(--B700)`}
 `;
 
-export interface NodeObject {
-  id: string;
-  text: string;
-  icon?: IconDefinition;
-  descendant?: NodeObject[];
-  unread?: boolean;
-  onClick?(ev: React.MouseEvent): void;
-  onContextMenu?(ev: React.MouseEvent): void;
-}
-
-interface NodeProps extends NodeObject {
-  path: string[];
-}
-
 const ChevronWrapper = styled.div`
   opacity: 0.3;
   font-size: 10px;
@@ -67,16 +54,16 @@ export const StyledSubtree = styled.div`
   border-left: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
-function Node(props: NodeProps) {
+function Node(props: ExplorerNode & { path: string[] }) {
   const [open, setOpen] = useState(false);
   const isLeaf = props.descendant === undefined;
 
   const ref = useRef<HTMLAnchorElement>(null);
-  const [, drag] = useDrag<NodeObject>({
+  const [, drag] = useDrag<ExplorerNode>({
     type: 'CHANNEL',
     item: props,
   });
-  const [{ isOver }, drop] = useDrop<NodeObject, any, { isOver: boolean }>({
+  const [{ isOver }, drop] = useDrop<ExplorerNode, any, { isOver: boolean }>({
     accept: 'CHANNEL',
     async drop(item) {
       // console.log(`Dropped ${item.text} on ${props.text}`);
@@ -132,17 +119,12 @@ function Node(props: NodeProps) {
   );
 }
 
-interface ExplorerNextProps extends React.HTMLAttributes<HTMLDivElement> {
-  nodes: NodeObject[];
-}
-
-function nodeSort(nodes?: NodeObject[]) {
-  // sort by name
-  if (nodes === undefined) return undefined;
-  return [...nodes].sort((a, b) => (a.text > b.text ? 1 : -1));
-}
-
-export function ExplorerNext({ nodes, ...props }: ExplorerNextProps) {
+export function ChannelTree({
+  nodes,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement> & {
+  nodes: ExplorerNode[];
+}) {
   return (
     <StyledTreeBody {...props}>
       {nodeSort(nodes)?.map((x) => (

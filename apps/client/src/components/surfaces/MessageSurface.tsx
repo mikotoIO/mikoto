@@ -56,7 +56,7 @@ const DAYS_OF_WEEK = [
 const StyledDateSeparator = styled.div`
   text-align: center;
   margin: 4px 0;
-  color: var(--N300);
+  color: var(--N400);
   font-size: 12px;
   display: flex;
   align-items: center;

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 interface SpaceIconProps {
-  active?: boolean;
+  active?: boolean | null;
   icon?: string;
   size?: number;
 }

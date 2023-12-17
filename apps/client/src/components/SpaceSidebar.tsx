@@ -172,8 +172,11 @@ const Tooltip = styled.div`
 
 function SidebarSpaceIcon({ space }: { space: ClientSpace }) {
   // TF is this name?
-  const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
-  const isActive = stateSpace === space.id;
+  const [leftSidebar, setLeftSidebar] = useRecoilState(treebarSpaceState);
+  const isActive =
+    leftSidebar &&
+    leftSidebar.kind === 'explorer' &&
+    leftSidebar.spaceId === space.id;
   const setWorkspace = useSetRecoilState(workspaceState);
 
   const [, drag] = useDrag(
@@ -214,7 +217,11 @@ function SidebarSpaceIcon({ space }: { space: ClientSpace }) {
             setWorkspace((x) => ({ ...x, leftOpen: !x.leftOpen }));
           }}
           onClick={() => {
-            setSpace(space.id);
+            setLeftSidebar({
+              kind: 'explorer',
+              key: `explorer/${space.id}`,
+              spaceId: space.id,
+            });
             space.fetchMembers().then();
           }}
         >

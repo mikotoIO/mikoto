@@ -432,6 +432,9 @@ export class RelationService {
   readonly PATH = "relations";
 
   constructor(protected client: HyperschemaClient) {}
+  get(input: { relationId: string }): Promise<Relation> {
+    return this.client.call("relations/get", input);
+  }
   list(input: {}): Promise<Array<Relation>> {
     return this.client.call("relations/list", input);
   }

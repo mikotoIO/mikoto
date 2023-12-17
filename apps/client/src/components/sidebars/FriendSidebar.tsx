@@ -35,10 +35,10 @@ export function FriendSidebar() {
   const tabkit = useTabkit();
   const mikoto = useMikoto();
   const [friends, setFriends] = useState<Relation[]>([]);
-  const [stateSpace, setSpace] = useRecoilState(treebarSpaceState);
+  const [, setLeftSidebar] = useRecoilState(treebarSpaceState);
 
   useEffect(() => {
-    mikoto.client.relations.list({}).then(setFriends);
+    mikoto.relations.list(true).then(setFriends);
   }, []);
 
   return (
@@ -74,11 +74,21 @@ export function FriendSidebar() {
       <Heading fs={14} p={{ left: 8 }} txt="N300">
         Direct Messages
       </Heading>
-      {friends.map((friend) => (
+      {Array.from(mikoto.relations.values()).map((friend) => (
         <StyledButtonBase
           key={friend.id}
           onClick={() => {
-            setSpace(friend?.space?.id ?? null);
+            const friendSpaceId = friend?.space?.id;
+            setLeftSidebar(
+              friendSpaceId
+                ? {
+                    kind: 'dmExplorer',
+                    key: `dmExplorer/${friendSpaceId}`,
+                    spaceId: friendSpaceId,
+                    relationId: friend.id,
+                  }
+                : null,
+            );
           }}
         >
           <Avatar size={32} src={friend?.relation?.avatar ?? undefined} />

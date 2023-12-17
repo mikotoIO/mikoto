@@ -79,7 +79,11 @@ export function ProfileModal({ user }: { user: User }) {
                       });
                       const spaceId = dm.space?.id;
                       if (spaceId) {
-                        setSpace(spaceId);
+                        setSpace({
+                          kind: 'explorer',
+                          key: `explorer/${spaceId}`,
+                          spaceId,
+                        });
                       }
                       setModal(null);
                     }}

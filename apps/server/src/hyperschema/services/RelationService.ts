@@ -50,6 +50,19 @@ async function createRelation(
 }
 
 export const RelationService = h.service({
+  get: h.fn({ relationId: z.string() }, Relation).do(async ({ relationId }) => {
+    const relation = await prisma.relationship.findUnique({
+      where: { id: relationId },
+      include: relationshipInclude,
+    });
+
+    if (relation === null) {
+      throw new Error('Relation not found');
+    }
+
+    return relation;
+  }),
+
   list: h.fn({}, Relation.array()).do(async ({ state }) => {
     const relationships = await prisma.relationship.findMany({
       where: { userId: state.user.id },

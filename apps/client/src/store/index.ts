@@ -6,14 +6,15 @@ import { z } from 'zod';
 
 import { modalState } from '../components/ContextMenu';
 import { LocalDB } from './LocalDB';
+import { Tabable } from './surface';
 
 // spaceId, not space
 const spaceIdPersist = recoilPersist({
-  key: 'spaceId',
+  key: 'leftSidebar',
 });
 
-export const treebarSpaceState = atom<string | null>({
-  key: 'treebarSpace',
+export const treebarSpaceState = atom<Tabable | null>({
+  key: 'leftSidebar',
   default: null,
   dangerouslyAllowMutability: true, // we like to live dangerously
   effects_UNSTABLE: [spaceIdPersist.persistAtom],

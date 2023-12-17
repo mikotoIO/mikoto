@@ -685,6 +685,13 @@
         "subservices": [],
         "functions": [
           {
+            "name": "get",
+            "fn": {
+              "input": [{"name": "relationId", "type": "string"}],
+              "output": "Relation"
+            }
+          },
+          {
             "name": "list",
             "fn": {
               "input": [],

@@ -7,10 +7,12 @@ import {
   ChannelStore,
   ClientChannel,
   ClientMember,
+  ClientRelation,
   ClientRole,
   ClientSpace,
   ClientUser,
   MemberStore,
+  RelationStore,
   RoleStore,
   SpaceStore,
 } from './store';
@@ -34,6 +36,7 @@ export class MikotoClient {
   channels = new ChannelStore(this, ClientChannel);
   members = new MemberStore(this, ClientMember);
   roles = new RoleStore(this, ClientRole);
+  relations = new RelationStore(this, ClientRelation);
   me!: ClientUser;
 
   constructor(

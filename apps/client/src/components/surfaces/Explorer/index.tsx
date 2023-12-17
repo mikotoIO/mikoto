@@ -1,4 +1,4 @@
-import { ClientChannel, ClientSpace } from 'mikotojs';
+import { ClientChannel, ClientRelation, ClientSpace } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { useFetchMember, useMikoto } from '../../../hooks';
 import { useTabkit } from '../../../store/surface';
 import { ContextMenu, modalState, useContextMenuX } from '../../ContextMenu';
+import { Avatar } from '../../atoms/Avatar';
 import { ChannelContextMenu, CreateChannelModal } from './ChannelContextMenu';
 import { ChannelTree } from './ChannelTree';
 import { channelToTab, getIconFromChannelType } from './channelToTab';
@@ -105,7 +106,7 @@ function useAcks(space: ClientSpace) {
   };
 }
 
-export const Explorer = observer(({ space }: { space: ClientSpace }) => {
+const ExplorerInner = observer(({ space }: { space: ClientSpace }) => {
   useFetchMember(space);
   const tabkit = useTabkit();
   const { acks, ackChannel } = useAcks(space);
@@ -125,6 +126,12 @@ export const Explorer = observer(({ space }: { space: ClientSpace }) => {
     )),
   }));
 
+  return <ChannelTree nodes={channelTree.descendant ?? []} />;
+});
+
+export const Explorer = observer(({ space }: { space: ClientSpace }) => {
+  const nodeContextMenu = useContextMenuX();
+
   // TODO: return loading indicator
   if (space === null) return null;
 
@@ -136,14 +143,51 @@ export const Explorer = observer(({ space }: { space: ClientSpace }) => {
         <h1>{space.name}</h1>
       </TreeHead>
       {/* <TreeBanner /> */}
-      <ChannelTree nodes={channelTree.descendant ?? []} />
+      <ExplorerInner space={space} />
     </StyledTree>
   );
 });
+
+export const DMExplorer = observer(
+  ({ space, relation }: { space: ClientSpace; relation: ClientRelation }) => {
+    const nodeContextMenu = useContextMenuX();
+
+    // TODO: return loading indicator
+    if (space === null) return null;
+
+    return (
+      <StyledTree
+        onContextMenu={nodeContextMenu(<TreebarContextMenu space={space} />)}
+      >
+        <TreeHead>
+          <Avatar src={relation.relation?.avatar ?? undefined} size={64} />
+          <h1>{relation.relation?.name ?? 'Unknown User'}</h1>
+        </TreeHead>
+        {/* <TreeBanner /> */}
+        <ExplorerInner space={space} />
+      </StyledTree>
+    );
+  },
+);
 
 export function ExplorerSurface({ spaceId }: { spaceId: string }) {
   const mikoto = useMikoto();
   const space = mikoto.spaces.get(spaceId);
   if (space === undefined) return null;
   return <Explorer space={space} />;
+}
+
+export function DMExplorerSurface({
+  spaceId,
+  relationId,
+}: {
+  spaceId: string;
+  relationId: string;
+}) {
+  const mikoto = useMikoto();
+  const space = mikoto.spaces.get(spaceId);
+  const relation = mikoto.relations.get(relationId);
+
+  if (space === undefined || relation === undefined) return null;
+  return <DMExplorer space={space} relation={relation} />;
 }

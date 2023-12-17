@@ -120,9 +120,14 @@ const SurfaceGroup = observer(
 );
 
 const AppView = observer(() => {
-  const spaceId = useRecoilValue(treebarSpaceState);
+  const leftSidebar = useRecoilValue(treebarSpaceState);
   const mikoto = useMikoto();
   const [workspace, setWorkspace] = useRecoilState(workspaceState);
+
+  const spaceId =
+    leftSidebar && leftSidebar.kind === 'explorer'
+      ? leftSidebar.spaceId
+      : undefined;
 
   const space = spaceId ? mikoto.spaces.get(spaceId) : undefined;
 
@@ -155,7 +160,11 @@ const AppView = observer(() => {
                 }));
               }}
             >
-              {space ? <Explorer space={space} /> : <FriendSidebar />}
+              {leftSidebar ? (
+                <TabViewSwitch tab={leftSidebar} />
+              ) : (
+                <FriendSidebar />
+              )}
             </Sidebar>
           )}
         </div>

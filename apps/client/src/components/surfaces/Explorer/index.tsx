@@ -1,3 +1,4 @@
+import { Box, Flex, Heading } from '@mikoto-io/lucid';
 import { ClientChannel, ClientRelation, ClientSpace } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
@@ -139,9 +140,9 @@ export const Explorer = observer(({ space }: { space: ClientSpace }) => {
     <StyledTree
       onContextMenu={nodeContextMenu(<TreebarContextMenu space={space} />)}
     >
-      <TreeHead>
-        <h1>{space.name}</h1>
-      </TreeHead>
+      <Box p={16}>
+        <Heading fs={16}>{space.name}</Heading>
+      </Box>
       {/* <TreeBanner /> */}
       <ExplorerInner space={space} />
     </StyledTree>
@@ -159,11 +160,12 @@ export const DMExplorer = observer(
       <StyledTree
         onContextMenu={nodeContextMenu(<TreebarContextMenu space={space} />)}
       >
-        <TreeHead>
-          <Avatar src={relation.relation?.avatar ?? undefined} size={64} />
-          <h1>{relation.relation?.name ?? 'Unknown User'}</h1>
-        </TreeHead>
-        {/* <TreeBanner /> */}
+        <Flex p={16} style={{ alignItems: 'center' }}>
+          <Avatar src={relation.relation?.avatar ?? undefined} size={32} />
+          <Heading fs={16} m={{ left: 8 }}>
+            {relation.relation?.name ?? 'Unknown User'}
+          </Heading>
+        </Flex>
         <ExplorerInner space={space} />
       </StyledTree>
     );

@@ -4,8 +4,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Heading } from '@mikoto-io/lucid';
-import { Relation } from 'mikotojs';
-import { useEffect, useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 
@@ -31,14 +31,13 @@ const StyledButtonBase = styled.div`
   }
 `;
 
-export function FriendSidebar() {
+export const FriendSidebar = observer(() => {
   const tabkit = useTabkit();
   const mikoto = useMikoto();
-  const [friends, setFriends] = useState<Relation[]>([]);
   const [, setLeftSidebar] = useRecoilState(treebarSpaceState);
 
   useEffect(() => {
-    mikoto.relations.list(true).then(setFriends);
+    mikoto.relations.list(true);
   }, []);
 
   return (
@@ -97,4 +96,4 @@ export function FriendSidebar() {
       ))}
     </Box>
   );
-}
+});

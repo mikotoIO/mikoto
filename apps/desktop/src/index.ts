@@ -1,4 +1,4 @@
-import { BrowserWindow, app } from 'electron';
+import { BrowserWindow, app, shell } from 'electron';
 import path from 'path';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -11,6 +11,10 @@ import('electron-squirrel-startup').then((electronSquirrelStartup) => {
 let mainWindow: BrowserWindow | undefined;
 
 const createWindow = () => {
+  const APP_URL_PATH = app.isPackaged
+    ? 'https://alpha.mikoto.io/'
+    : 'http://localhost:5173/';
+
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 800,
@@ -27,9 +31,19 @@ const createWindow = () => {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadURL(
-    app.isPackaged ? 'https://alpha.mikoto.io/' : 'http://localhost:5173/',
-  );
+  mainWindow.webContents.on('will-navigate', (ev) => {
+    if (!ev.url.startsWith(APP_URL_PATH)) {
+      ev.preventDefault();
+      shell.openExternal(ev.url);
+    }
+  });
+
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
+
+  mainWindow.loadURL(APP_URL_PATH);
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();

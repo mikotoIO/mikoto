@@ -13,6 +13,7 @@ import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
 import { SpaceSidebar } from '../components/SpaceSidebar';
 import { TabBarButton, TabbedView } from '../components/TabBar';
 import { UserAreaAvatar } from '../components/UserArea';
+import { PingCheck } from '../components/atoms/PingCheck';
 import { Sidebar } from '../components/sidebars/Base';
 import { FriendSidebar } from '../components/sidebars/FriendSidebar';
 import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
@@ -133,6 +134,7 @@ const AppView = observer(() => {
 
   return (
     <AppContainer>
+      <PingCheck /> {/* this may be unstable */}
       <LeftBar dir="column">
         <div className="top">
           <TabBarButton

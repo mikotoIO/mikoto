@@ -52,15 +52,6 @@ function TreebarContextMenu({ space }: { space: ClientSpace }) {
   );
 }
 
-const TreeHead = styled.div`
-  padding: 4px 16px;
-
-  h1 {
-    padding-top: 8px;
-    font-size: 16px;
-  }
-`;
-
 function isUnread(lastUpdate: Date | null, ack: Date | null) {
   if (lastUpdate === null || ack === null) return false;
   return lastUpdate.getTime() > ack.getTime();

@@ -1,4 +1,4 @@
-import { Button, Form, Image, Input, Modal } from '@mikoto-io/lucid';
+import { Button, Form, Heading, Image, Input, Modal } from '@mikoto-io/lucid';
 import Tippy from '@tippyjs/react';
 import { AxiosError } from 'axios';
 import { ClientSpace, Invite, Space, SpaceStore } from 'mikotojs';
@@ -295,9 +295,9 @@ export function SpaceJoinModal() {
   return (
     <Modal>
       <SpaceJoinModalWrapper>
-        <h1 className="inviteheader" style={{ marginTop: 0 }}>
+        <Heading className="inviteheader" m={{ top:0 }}>
           Create a Space
-        </h1>
+        </Heading>
         <SpaceCreateForm
           closeModal={() => {
             setModal(null);

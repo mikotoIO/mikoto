@@ -4,7 +4,15 @@ import {
   faMicrophone,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Button, Buttons, Form, Input, Modal } from '@mikoto-io/lucid';
+import {
+  Box,
+  Button,
+  Buttons,
+  Form,
+  Heading,
+  Input,
+  Modal,
+} from '@mikoto-io/lucid';
 import { permissions } from '@mikoto-io/permcheck';
 import {
   Channel,
@@ -79,9 +87,9 @@ export function CreateChannelModal({
   return (
     <Modal>
       <StyledCreateChannelModal>
-        <h1 style={{ margin: 0 }}>
+        <Heading m={{ top: 0 }}>
           {channel ? 'Create Subchannel' : 'Create Channel'}
-        </h1>
+        </Heading>
         {channel && <p className="subchannelinfo">In #{channel.name}</p>}
         <Form
           onSubmit={handleSubmit((data) => {

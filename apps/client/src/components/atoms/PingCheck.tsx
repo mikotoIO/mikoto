@@ -17,7 +17,7 @@ export function PingCheck() {
       console.error('Ping failed, websocket timeout');
       window.location.reload();
     });
-  }, 15 * 1000);
+  }, 30 * 1000);
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return <></>;
 }

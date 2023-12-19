@@ -171,6 +171,16 @@ const MarkdownWrapper = styled.div<{ emojiSize: string }>`
     padding-left: 8px;
     border-left: 3px solid var(--N400);
   }
+
+  table {
+    border-collapse: collapse;
+
+    th,
+    td {
+      border: 1px solid var(--N600);
+      padding: 8px 12px;
+    }
+  }
 `;
 
 function emojiFest(nodes: SingleASTNode[]) {

@@ -10,6 +10,9 @@ import { AuthContext, MikotoContext } from '../hooks';
 import { onlineState } from '../store';
 import { authClient } from '../store/authClient';
 
+// This exists to "cheat" React Strict Mode
+let clientLock = false;
+
 export function MikotoApiLoader({ children }: { children: React.ReactNode }) {
   const [mikoto, setMikoto] = useState<MikotoClient | null>(null);
   const [err, setErr] = useState<AxiosError | null>(null);
@@ -17,6 +20,9 @@ export function MikotoApiLoader({ children }: { children: React.ReactNode }) {
 
   // TODO: Try suspense
   useEffect(() => {
+    if (clientLock) return;
+    clientLock = true;
+
     refreshAuth(authClient)
       .then((token) =>
         constructMikoto({

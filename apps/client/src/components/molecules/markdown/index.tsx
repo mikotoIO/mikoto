@@ -165,6 +165,12 @@ const MarkdownWrapper = styled.div<{ emojiSize: string }>`
   display: flex;
   flex-direction: column;
   ${emojiSizing}
+
+  blockquote {
+    margin: 0;
+    padding-left: 8px;
+    border-left: 3px solid var(--N400);
+  }
 `;
 
 function emojiFest(nodes: SingleASTNode[]) {

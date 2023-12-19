@@ -34,6 +34,16 @@ model User {
   RelationTo   Relationship[] @relation("RelationTo")
   Ban          Ban[]
   Invite       Invite[]
+  Settings     Settings?
+}
+
+model Settings {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @unique @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // setting data, formatted as JSON
+  data String @db.String(262144) // 256 KiB
 }
 
 // factor out email and password

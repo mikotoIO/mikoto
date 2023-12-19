@@ -190,9 +190,33 @@ const AppView = observer(() => {
   );
 });
 
+const MikotoLogo = styled.img`
+  width: 240px;
+  max-width: 50vw;
+  mix-blend-mode: overlay;
+  opacity: 0.4;
+`;
+
+function Fallback() {
+  return (
+    <Flex
+      center
+      w="100vw"
+      h="100vh"
+      txt="N0"
+      style={{ flexDirection: 'column' }}
+    >
+      <MikotoLogo src="/logo/logo.svg" />
+      <Box fs={20} m={{ top: 16 }}>
+        Loading...
+      </Box>
+    </Flex>
+  );
+}
+
 export default function MainView() {
   return (
-    <MikotoApiLoader>
+    <MikotoApiLoader fallback={<Fallback />}>
       <AppView />
       <CommandMenuKit />
       <ContextMenuKit />

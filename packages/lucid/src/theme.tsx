@@ -180,7 +180,7 @@ export const GlobalStyle = createGlobalStyle`
     height: 100%;
     min-height: 100%;
     margin: 0;
-    background-color: #2f3237;
+    background-color: ${(p) => p.theme.colors.N800};
     font-family: var(--font-main);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

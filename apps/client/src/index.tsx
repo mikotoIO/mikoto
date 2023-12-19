@@ -1,5 +1,6 @@
 import { GlobalStyle, LucidProvider, theme } from '@mikoto-io/lucid';
 import * as Sentry from '@sentry/react';
+import React from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import ReactDOM from 'react-dom/client';
@@ -40,27 +41,29 @@ if (SENTRY) {
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = !env.DEV;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <RecoilRoot>
-    <StyleSheetManager disableCSSOMInjection>
-      <LucidProvider>
-        <UserThemeProvider />
-        <ThemeProvider theme={theme}>
-          <DndProvider backend={HTML5Backend}>
-            <>
-              <Helmet>
-                {env.DEV && (
-                  <link rel="icon" type="image/png" href="/favicon-dev.ico" />
-                )}
-              </Helmet>
-              <GlobalStyle />
-              <App />
-              <ToastContainer theme="dark" limit={3} />
-            </>
-          </DndProvider>
-        </ThemeProvider>
-      </LucidProvider>
-    </StyleSheetManager>
-  </RecoilRoot>,
+  <React.StrictMode>
+    <RecoilRoot>
+      <StyleSheetManager disableCSSOMInjection>
+        <LucidProvider>
+          <UserThemeProvider />
+          <ThemeProvider theme={theme}>
+            <DndProvider backend={HTML5Backend}>
+              <>
+                <Helmet>
+                  {env.DEV && (
+                    <link rel="icon" type="image/png" href="/favicon-dev.ico" />
+                  )}
+                </Helmet>
+                <GlobalStyle />
+                <App />
+                <ToastContainer theme="dark" limit={3} />
+              </>
+            </DndProvider>
+          </ThemeProvider>
+        </LucidProvider>
+      </StyleSheetManager>
+    </RecoilRoot>
+  </React.StrictMode>,
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -289,7 +289,7 @@ export const TabbedView = observer(
         h="100%"
         style={{ flex: 1 }}
       >
-        <Helmet titleTemplate="Mikoto | %s" defaultTitle="Mikoto" />
+        <Helmet titleTemplate="%s | Mikoto" defaultTitle="Mikoto" />
         <TabsFlex h={TAB_HEIGHT} fs={14}>
           {tabs.map((tab, index) => (
             <Tab

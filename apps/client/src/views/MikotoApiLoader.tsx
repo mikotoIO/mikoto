@@ -13,7 +13,12 @@ import { authClient } from '../store/authClient';
 // This exists to "cheat" React Strict Mode
 let clientLock = false;
 
-export function MikotoApiLoader({ children }: { children: React.ReactNode }) {
+interface ApiLoaderProps {
+  fallback?: React.ReactNode;
+  children: React.ReactNode;
+}
+
+export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
   const [mikoto, setMikoto] = useState<MikotoClient | null>(null);
   const [err, setErr] = useState<AxiosError | null>(null);
   const setOnlineState = useSetRecoilState(onlineState);
@@ -45,7 +50,8 @@ export function MikotoApiLoader({ children }: { children: React.ReactNode }) {
     console.log(err);
     return <Navigate to="/login" />;
   }
-  if (mikoto === null) return null;
+  if (mikoto === null) return fallback;
+
   return (
     <MikotoContext.Provider value={mikoto}>
       <AuthContext.Provider value={authClient}>{children}</AuthContext.Provider>

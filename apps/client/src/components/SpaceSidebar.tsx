@@ -295,7 +295,7 @@ export function SpaceJoinModal() {
   return (
     <Modal>
       <SpaceJoinModalWrapper>
-        <Heading className="inviteheader" m={{ top:0 }}>
+        <Heading className="inviteheader" m={{ top: 0 }}>
           Create a Space
         </Heading>
         <SpaceCreateForm

@@ -8,6 +8,9 @@ function wait(ms: number) {
   });
 }
 
+// This implementation has a major flaw, in that if the ping fails AND the reload also fails,
+// the web page will just be a white screen. To fix this, we'll probably need to use service workers.
+
 export function PingCheck() {
   const mikoto = useMikoto();
 

@@ -13,6 +13,7 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@hcaptcha/react-hcaptcha": "^1.9.1",
     "@headlessui/react": "*",
+    "@hello-pangea/dnd": "^16.5.0",
     "@hocuspocus/provider": "^2.4.0",
     "@khanacademy/simple-markdown": "^0.9.2",
     "@livekit/components-react": "^1.1.8",

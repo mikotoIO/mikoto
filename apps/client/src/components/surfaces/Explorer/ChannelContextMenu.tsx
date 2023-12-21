@@ -202,14 +202,13 @@ export const ChannelContextMenu = observer(
           <>
             <ContextMenu.Link
               onClick={() => {
+                const { space } = channel;
+                if (!space) {
+                  console.error('channel has no space. probably a bug.');
+                  return;
+                }
                 setModal({
-                  elem: (
-                    // TODO: get rid of the ! here
-                    <CreateChannelModal
-                      space={channel.space!}
-                      channel={channel}
-                    />
-                  ),
+                  elem: <CreateChannelModal space={space} channel={channel} />,
                 });
               }}
             >

@@ -2,12 +2,14 @@ import { Button, Form, Heading, Image, Input, Modal } from '@mikoto-io/lucid';
 import Tippy from '@tippyjs/react';
 import { AxiosError } from 'axios';
 import { ClientSpace, Invite, Space, SpaceStore } from 'mikotojs';
+import { ObservableMap } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { useForm } from 'react-hook-form';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
+import { z } from 'zod';
 
 import { env } from '../env';
 import { useMikoto } from '../hooks';
@@ -170,7 +172,18 @@ const Tooltip = styled.div`
   box-shadow: rgba(0, 0, 0, 0.1) 0 8px 24px;
 `;
 
-function SidebarSpaceIcon({ space }: { space: ClientSpace }) {
+interface SidebarSpaceIconProps {
+  space: ClientSpace;
+  index: number;
+  onReorder?: (from: number, to: number) => void;
+}
+
+interface SpaceIconDragItem {
+  spaceId: string;
+  index: number;
+}
+
+function SidebarSpaceIcon({ space, index, onReorder }: SidebarSpaceIconProps) {
   // TF is this name?
   const [leftSidebar, setLeftSidebar] = useRecoilState(treebarSpaceState);
   const isActive =
@@ -182,14 +195,14 @@ function SidebarSpaceIcon({ space }: { space: ClientSpace }) {
   const [, drag] = useDrag(
     () => ({
       type: 'SPACE',
-      item: { spaceId: space.id },
+      item: { spaceId: space.id, index },
     }),
-    [space.id],
+    [space.id, index],
   );
   const [, drop] = useDrop({
     accept: 'SPACE',
-    drop: (item: { spaceId: string }) => {
-      console.log(item);
+    drop: (item: SpaceIconDragItem) => {
+      onReorder?.(item.index, index);
     },
   });
 
@@ -338,11 +351,54 @@ const Seperator = styled.hr`
   border-color: var(--N500);
 `;
 
+// order spaces in the same order as the array of IDs
+// if an ID is not in the array, put it at the end
+function orderSpaces(spaces: SpaceStore, order: string[]) {
+  const ordered: ClientSpace[] = [];
+  const unordered: ClientSpace[] = [];
+  const keys = new Set(spaces.keys());
+  order.forEach((id) => {
+    const space = spaces.get(id);
+    if (space && space.type === 'NONE') {
+      ordered.push(space);
+    }
+    keys.delete(id);
+  });
+
+  keys.forEach((id) => {
+    const space = spaces.get(id);
+    if (space && space.type === 'NONE') {
+      unordered.push(space);
+    }
+  });
+  const res = [...ordered, ...unordered];
+  return [res, unordered.length === 0] as const;
+}
+
+function reorder<T>(arr: T[], from: number, to: number) {
+  if (from === to) return arr;
+
+  const newArr = [...arr];
+  const [removed] = newArr.splice(from, 1);
+  newArr.splice(to, 0, removed);
+  return newArr;
+}
+
 export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
   const setModal = useSetRecoilState(modalState);
   const [spaceId, setSpaceId] = useRecoilState(treebarSpaceState);
 
   const contextMenu = useContextMenu(() => <ServerSidebarContextMenu />);
+
+  const [order, setOrder] = useState<string[]>(() =>
+    // TODO: persist to server
+    JSON.parse(localStorage.getItem('spaceOrder') ?? '[]'),
+  );
+  const [spaceArray, isOrdered] = orderSpaces(spaces, order);
+  if (!isOrdered) {
+    setOrder(spaceArray.map((x) => x.id));
+    return null;
+  }
 
   return (
     <StyledSpaceSidebar onContextMenu={contextMenu}>
@@ -366,10 +422,21 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
       </StyledIconWrapper>
       <Seperator />
 
-      {Array.from(spaces.values())
+      {spaceArray
         .filter((x) => x.type === 'NONE') // TODO: filter this on the server
-        .map((space) => (
-          <SidebarSpaceIcon space={space} key={space.id} />
+        .map((space, index) => (
+          <SidebarSpaceIcon
+            space={space}
+            index={index}
+            key={space.id}
+            onReorder={(from, to) => {
+              setOrder((x) => {
+                const reordered = reorder(x, from, to);
+                localStorage.setItem('spaceOrder', JSON.stringify(reordered));
+                return reordered;
+              });
+            }}
+          />
         ))}
       <StyledIconWrapper>
         <StyledSpaceIcon

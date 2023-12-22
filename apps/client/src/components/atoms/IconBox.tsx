@@ -1,14 +1,7 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import {
-  faCog,
-  faHashtag,
-  faHeadphones,
-  faQuestion,
-} from '@fortawesome/free-solid-svg-icons';
+import { faHashtag } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styled from 'styled-components';
-
-import { Tabable } from '../../store/surface';
 
 const StyledIcon = styled.span<{ size?: number }>`
   background-color: var(--color-primary);

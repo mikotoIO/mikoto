@@ -12,7 +12,7 @@ import React, { useContext, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Helmet } from 'react-helmet';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { useMikoto } from '../hooks';
 import { workspaceState } from '../store';
@@ -50,13 +50,19 @@ const StyledTab = styled.div<{ active?: boolean }>`
   padding: 0 8px 0 20px;
   display: flex;
   flex-shrink: 0;
-  border-bottom: 2px solid
-    ${(p) => (p.active ? 'var(--color-primary)' : 'transparent')};
+  border-bottom: 2px solid transparent;
   align-items: center;
   justify-content: center;
+  background-color: var(--N900);
+  color: var(--N400);
 
-  background-color: ${(p) =>
-    p.active ? 'var(--color-surface)' : 'var(--N900)'};
+  ${(p) =>
+    p.active &&
+    css`
+      color: var(--N100);
+      border-color: var(--color-primary);
+      background-color: var(--color-surface);
+    `}
 
   &:hover {
     background-color: var(--N700);

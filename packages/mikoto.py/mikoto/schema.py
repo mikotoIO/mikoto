@@ -23,7 +23,7 @@ class Client:
         return self.sio.on("ready", fn)
 
     async def boot(self, url: str, auth_token: str):
-        await self.sio.connect(url, auth={"token": auth_token})
+        await self.sio.connect(url, auth={"token": auth_token}, wait_timeout=10)
         await self.sio.wait()
 
 

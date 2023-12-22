@@ -13,6 +13,7 @@ import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { normalizeMediaUrl } from './atoms/Avatar';
 import { Pill } from './atoms/Pill';
 import { StyledSpaceIcon } from './atoms/SpaceIcon';
+import { Tooltip } from './atoms/Tooltip';
 import { InviteModal } from './modals/Invite';
 import { SpaceJoinModal } from './modals/SpaceJoin';
 
@@ -81,14 +82,6 @@ const StyledIconWrapper = styled.div`
   align-items: center;
   margin-bottom: 8px;
   width: 68px;
-`;
-
-const Tooltip = styled.div`
-  color: var(--N0);
-  background-color: var(--N1200);
-  border-radius: 4px;
-  padding: 4px 8px;
-  box-shadow: rgba(0, 0, 0, 0.1) 0 8px 24px;
 `;
 
 interface SidebarSpaceIconProps {

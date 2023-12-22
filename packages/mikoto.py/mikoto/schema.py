@@ -56,6 +56,7 @@ class Channel(BaseModel):
 class Space(BaseModel):
     id: str
     name: str
+    type: str
     icon: Optional[str]
     channels: List[Channel]
     roles: List[Role]
@@ -88,8 +89,10 @@ class Unread(BaseModel):
     timestamp: str
 
 
-class Relations:
-    pass
+class Relation(BaseModel):
+    id: str
+    relation: Optional[User]
+    space: Optional[Space]
 
 
 class Document(BaseModel):
@@ -155,6 +158,7 @@ class MainService:
     messages: MessageService
     roles: RoleService
     voice: VoiceService
+    relations: RelationService
     client: Client
 
     def __init__(self, client: Client):
@@ -167,6 +171,13 @@ class MainService:
         self.messages = MessageService(client)
         self.roles = RoleService(client)
         self.voice = VoiceService(client)
+        self.relations = RelationService(client)
+
+    async def ping(
+        self,
+    ) -> str:
+        payload = {}
+        return TypeAdapter(str).validate_python(await self.client.call("ping", payload))
 
 
 class ChannelService:
@@ -367,6 +378,18 @@ class MessageService:
         }
         return TypeAdapter(Message).validate_python(
             await self.client.call("messages/edit", payload)
+        )
+
+    async def edit_uncommitted(
+        self, channelId: str, messageId: str, content: str
+    ) -> Message:
+        payload = {
+            "channelId": TypeAdapter(str).dump_python(channelId),
+            "messageId": TypeAdapter(str).dump_python(messageId),
+            "content": TypeAdapter(str).dump_python(content),
+        }
+        return TypeAdapter(Message).validate_python(
+            await self.client.call("messages/editUncommitted", payload)
         )
 
     async def delete(self, channelId: str, messageId: str) -> Message:
@@ -638,4 +661,31 @@ class VoiceService:
         payload = {"channelId": TypeAdapter(str).dump_python(channelId)}
         return TypeAdapter(VoiceToken).validate_python(
             await self.client.call("voice/join", payload)
+        )
+
+
+class RelationService:
+    client: Client
+
+    def __init__(self, client: Client):
+        self.client = client
+
+    async def get(self, relationId: str) -> Relation:
+        payload = {"relationId": TypeAdapter(str).dump_python(relationId)}
+        return TypeAdapter(Relation).validate_python(
+            await self.client.call("relations/get", payload)
+        )
+
+    async def list(
+        self,
+    ) -> List[Relation]:
+        payload = {}
+        return TypeAdapter(List[Relation]).validate_python(
+            await self.client.call("relations/list", payload)
+        )
+
+    async def open_dm(self, relationId: str) -> Relation:
+        payload = {"relationId": TypeAdapter(str).dump_python(relationId)}
+        return TypeAdapter(Relation).validate_python(
+            await self.client.call("relations/openDm", payload)
         )

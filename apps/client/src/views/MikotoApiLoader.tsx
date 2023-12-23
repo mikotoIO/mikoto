@@ -25,7 +25,7 @@ export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
 
   // TODO: Try suspense
   useEffect(() => {
-    if (clientLock) return;
+    if (clientLock) return undefined;
     clientLock = true;
 
     refreshAuth(authClient)
@@ -43,6 +43,14 @@ export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
       )
       .then((mi) => setMikoto(mi))
       .catch((e) => setErr(e as AxiosError));
+
+    const interval = setInterval(() => {
+      refreshAuth(authClient);
+    }, 10 * 60 * 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   if (err !== null) {

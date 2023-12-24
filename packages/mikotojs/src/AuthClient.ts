@@ -14,6 +14,20 @@ export class AuthClient {
     this.axios = axios.create({
       baseURL: baseUrl,
     });
+
+    // interceptor for refreshing tokens
+    // if it has been longer than 15 minutes since the last refresh, refresh
+    let lastRefresh = Date.now();
+    this.axios.interceptors.request.use(async (config) => {
+      if (Date.now() - lastRefresh > 15 * 60 * 1000) {
+        lastRefresh = Date.now();
+        const { refreshToken } = await this.refresh(
+          localStorage.getItem('REFRESH_TOKEN')!,
+        );
+        localStorage.setItem('REFRESH_TOKEN', refreshToken);
+      }
+      return config;
+    });
   }
 
   async register(name: string, email: string, password: string) {

@@ -34,11 +34,14 @@ export async function serve(req: FastifyRequest, res: FastifyReply) {
         .resize(width, height)
         .toBuffer();
       res.header('Content-Type', 'image/png');
-      res.header('Cache-Control', 'public, max-age=31536000, must-revalidate, immutable')
       return image;
     }
   }
 
   res.header('Content-Type', contentType);
+  res.header(
+    'Cache-Control',
+    'public, max-age=31536000, must-revalidate, immutable',
+  );
   return fileBuffer;
 }

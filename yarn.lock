@@ -12433,7 +12433,7 @@ __metadata:
     web-vitals: "npm:^3.0.0"
     y-prosemirror: "npm:^1.2.1"
     y-websocket: "npm:^1.5.0"
-    yjs: "npm:^13.6.7"
+    yjs: "npm:^13.6.10"
     zod: "npm:^3.22.2"
   languageName: unknown
   linkType: soft
@@ -21105,7 +21105,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lib0@npm:^0.2.31, lib0@npm:^0.2.42, lib0@npm:^0.2.47, lib0@npm:^0.2.52, lib0@npm:^0.2.74":
+"lib0@npm:^0.2.31, lib0@npm:^0.2.42, lib0@npm:^0.2.47, lib0@npm:^0.2.52":
   version: 0.2.83
   resolution: "lib0@npm:0.2.83"
   dependencies:
@@ -33247,15 +33247,6 @@ __metadata:
   dependencies:
     lib0: "npm:^0.2.86"
   checksum: fe766c48ed450689d1b0ae6d96dbbbda9b1cf284bb4b67f774a3a075eeb5481b5990f804129edaf3ec9d6f462a9cd528f4cbd689e9dc996b1b55c51c4188549c
-  languageName: node
-  linkType: hard
-
-"yjs@npm:^13.6.7":
-  version: 13.6.7
-  resolution: "yjs@npm:13.6.7"
-  dependencies:
-    lib0: "npm:^0.2.74"
-  checksum: 47d96fcebfed41b09ca762416ff4a51afd9e6343f116b98b1494ee73962a4abc6a9ec27bc5ff6fbef0f7c493d962764970be35f095b69d5b21c2f767e28b9d1a
   languageName: node
   linkType: hard
 

@@ -59,8 +59,8 @@ function ColorPalette({ colors: clrs }: { colors: Record<string, string> }) {
   );
 }
 
-const audio = new Audio('audio/notification/extralife.wav');
-audio.volume = 0.05;
+const audio = new Audio('audio/notification/ping.ogg');
+audio.volume = 0.3;
 audio.load();
 
 export function DesignStory() {
@@ -84,7 +84,7 @@ export function DesignStory() {
             onClick={() => {
               const notification = new Notification('Cactus (#general)', {
                 body: 'This is a message that I am testing',
-                icon: 'https://cdn.alpha.mikoto.io/spaceicon/927eec40-9274-45b3-8d1c-393aa7186cce.png',
+                // icon: 'https://cdn.alpha.mikoto.io/spaceicon/927eec40-9274-45b3-8d1c-393aa7186cce.png',
                 silent: true,
               });
               notification.onshow = () => {

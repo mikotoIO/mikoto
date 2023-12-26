@@ -17,6 +17,8 @@ async function stream2buffer(stream: Stream): Promise<Buffer> {
   });
 }
 
+const CACHE_CONTROL = 'public, max-age=31536000, must-revalidate, immutable';
+
 export async function serve(req: FastifyRequest, res: FastifyReply) {
   const { storeName, '*': fileName } = req.params as {
     storeName: string;
@@ -34,14 +36,12 @@ export async function serve(req: FastifyRequest, res: FastifyReply) {
         .resize(width, height)
         .toBuffer();
       res.header('Content-Type', 'image/png');
+      res.header('Cache-Control', CACHE_CONTROL);
       return image;
     }
   }
 
   res.header('Content-Type', contentType);
-  res.header(
-    'Cache-Control',
-    'public, max-age=31536000, must-revalidate, immutable',
-  );
+  res.header('Cache-Control', CACHE_CONTROL);
   return fileBuffer;
 }

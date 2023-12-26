@@ -1,7 +1,7 @@
 use std::{io::Cursor, path::PathBuf};
 
 use rocket::{
-    http::{ContentType, Status},
+    http::{ContentType, Header, Status},
     response::Responder,
     Response,
 };
@@ -23,6 +23,10 @@ impl<'r> Responder<'r, 'r> for FileResponse {
     fn respond_to(self, _: &rocket::Request) -> rocket::response::Result<'r> {
         Response::build()
             .header(self.content_type)
+            .header(Header::new(
+                "Cache-Control",
+                "public, max-age=86400, must-revalidate",
+            ))
             .sized_body(self.data.len(), Cursor::new(self.data))
             .status(Status::Ok)
             .ok()

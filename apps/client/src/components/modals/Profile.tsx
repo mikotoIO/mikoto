@@ -71,7 +71,18 @@ export function ProfileModal({ user }: { user: User }) {
             <div>
               {mikoto.me.id !== user.id && (
                 <Buttons>
-                  <Button variant="success">Send Friend Request</Button>
+                  <Button
+                    variant="success"
+                    onClick={async () => {
+                      await mikoto.client.relations.openDm({
+                        relationId: '2a36685a-6236-4fbe-92bf-b3025fd92cfb',
+                      });
+
+                      setModal(null);
+                    }}
+                  >
+                    Send Friend Request
+                  </Button>
                   <Button
                     onClick={async () => {
                       const dm = await mikoto.client.relations.openDm({

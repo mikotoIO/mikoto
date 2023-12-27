@@ -1,18 +1,16 @@
 use s3::Bucket;
-use std::env;
 use url::Url;
+
+use crate::env::MINIO;
 
 lazy_static! {
     pub static ref MAIN_BUCKET: Bucket = {
         let minio =
-            Url::parse(&env::var("MINIO").expect("environment variable MINIO is not provided"))
-                .unwrap();
+            Url::parse(&MINIO).unwrap();
         let region = s3::Region::Custom {
             region: "".to_owned(),
             endpoint: minio.origin().unicode_serialization(),
         };
-
-        dbg!(minio.origin().unicode_serialization());
 
         let credentials = s3::creds::Credentials {
             access_key: Some(minio.username().to_owned()),

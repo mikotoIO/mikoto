@@ -21,7 +21,6 @@ const ACCOUNT_SETTING_CATEGORIES = [
 ];
 
 function General({ channel }: { channel: ClientChannel }) {
-  const mikoto = useMikoto();
   const form = useForm({
     defaultValues: {
       name: channel.name,

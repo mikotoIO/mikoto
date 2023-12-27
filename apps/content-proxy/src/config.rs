@@ -2,10 +2,7 @@ use std::collections::HashMap;
 
 use s3::request::ResponseData;
 
-use crate::{
-    error::Error,
-    functions::storage::{self, MAIN_BUCKET},
-};
+use crate::{error::Error, functions::storage::MAIN_BUCKET};
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
@@ -13,17 +10,26 @@ pub struct Config {
 }
 
 #[derive(Debug, Deserialize)]
-#[serde(tag = "id")]
-pub enum Transformation {
-    #[serde(rename = "resize")]
-    Resize { width: u32, height: u32 },
+pub enum StoreType {
+    #[serde(rename = "attachment")]
+    Attachment,
+    #[serde(rename = "image")]
+    Image,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Store {
-    pub max_size: Option<u64>,
-    pub filetype: Option<String>,
-    pub transformations: Vec<Transformation>,
+    pub max_size: u64,
+    pub store_type: StoreType,
+
+    // image options
+    pub image_resize: Option<Resize>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Resize {
+    pub width: u32,
+    pub height: u32,
 }
 
 impl Store {

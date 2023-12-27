@@ -8,17 +8,19 @@ extern crate serde;
 extern crate serde_json;
 
 pub mod config;
+pub mod env;
 pub mod error;
 pub mod functions;
 pub mod routes;
 
+use config::CONFIG;
 use dotenv::dotenv;
 
 #[launch]
 fn rocket() -> _ {
     dotenv().ok();
 
-    dbg!(config::CONFIG.get("avatar").unwrap());
+    let _ = CONFIG.len();
 
     rocket::build()
         .configure(rocket::Config::figment().merge(("port", 9502)))

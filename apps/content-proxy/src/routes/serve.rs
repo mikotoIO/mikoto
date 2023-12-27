@@ -1,7 +1,6 @@
 use std::{io::Cursor, path::PathBuf};
 
 use rocket::{
-    form::Form,
     http::{ContentType, Header, Status},
     response::Responder,
     Response,

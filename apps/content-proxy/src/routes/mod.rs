@@ -1,5 +1,6 @@
 use rocket::serde::json::Json;
 
+pub mod proxy;
 pub mod serve;
 pub mod upload;
 

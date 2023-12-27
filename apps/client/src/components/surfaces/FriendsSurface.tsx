@@ -25,7 +25,11 @@ export function FriendsSurface() {
           });
         })}
       >
-        <Input placeholder="Friend ID" {...form.register('friendId')} />
+        <Input
+          labelName="Friend ID"
+          placeholder="Friend ID"
+          {...form.register('friendId')}
+        />
         <Button type="submit" variant="success">
           Send Friend Request (Debug)
         </Button>

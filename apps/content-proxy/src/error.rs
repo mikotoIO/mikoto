@@ -5,13 +5,16 @@ use std::io::Cursor;
 use rocket::http::{ContentType, Status};
 use rocket::request::Request;
 use rocket::response::{self, Responder, Response};
+use s3::error::S3Error;
 
 #[derive(Serialize, Debug)]
 #[serde(tag = "type")]
 pub enum Error {
     StorageError,
+    BadRequest,
     NotFound,
     InternalServerError,
+    ImageError,
 }
 
 // implement Responder for Error
@@ -28,5 +31,17 @@ impl<'r> Responder<'r, 'r> for Error {
             .sized_body(string.len(), Cursor::new(string))
             .status(status)
             .ok()
+    }
+}
+
+impl From<S3Error> for Error {
+    fn from(_: S3Error) -> Self {
+        Error::StorageError
+    }
+}
+
+impl From<image::ImageError> for Error {
+    fn from(_: image::ImageError) -> Self {
+        Error::ImageError
     }
 }

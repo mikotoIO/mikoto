@@ -6,8 +6,6 @@ extern crate lazy_static;
 extern crate serde;
 #[macro_use]
 extern crate serde_json;
-#[macro_use]
-extern crate maplit;
 
 pub mod config;
 pub mod error;
@@ -20,7 +18,7 @@ use dotenv::dotenv;
 fn rocket() -> _ {
     dotenv().ok();
 
-    // dbg!(functions::storage::MINIO.to_string());
+    dbg!(config::CONFIG.get("avatar").unwrap());
 
     rocket::build()
         .configure(rocket::Config::figment().merge(("port", 9502)))

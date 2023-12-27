@@ -1,6 +1,7 @@
 use std::{io::Cursor, path::PathBuf};
 
 use rocket::{
+    form::Form,
     http::{ContentType, Header, Status},
     response::Responder,
     Response,
@@ -40,17 +41,30 @@ fn get_content_type(path: &str) -> ContentType {
     ContentType::new(mime.type_().to_string(), mime.subtype().to_string())
 }
 
-#[get("/<store>/<path..>")]
-pub async fn serve(store: &str, path: PathBuf) -> Result<FileResponse, Error> {
+#[derive(Debug, FromForm)]
+
+pub struct ServeParams {
+    pub w: Option<u32>,
+    pub h: Option<u32>,
+}
+
+#[get("/<store>/<path..>?<params..>")]
+pub async fn serve(store: &str, path: PathBuf, params: ServeParams) -> Result<FileResponse, Error> {
     let path = path.to_str().unwrap();
 
     let data = MAIN_BUCKET
         .get_object(format!("/{}/{}", store, path))
-        .await
-        .map_err(|_| Error::StorageError)?;
+        .await?;
 
-    Ok(FileResponse::new(
-        data.bytes().to_vec(),
-        get_content_type(path),
-    ))
+    let resp = match (params.w, params.h) {
+        (Some(w), Some(h)) => {
+            let image = image::load_from_memory(&data.bytes())?.thumbnail(w, h);
+            let mut buf = Vec::new();
+            image.write_to(&mut Cursor::new(&mut buf), image::ImageOutputFormat::Png)?;
+            FileResponse::new(buf, ContentType::PNG)
+        }
+        _ => FileResponse::new(data.bytes().to_vec(), get_content_type(path)),
+    };
+
+    Ok(resp)
 }

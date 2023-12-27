@@ -32,12 +32,17 @@ export async function serve(req: FastifyRequest, res: FastifyReply) {
     const width = parseInt(w as string, 10);
     const height = parseInt(h as string, 10);
     if (width && height) {
-      const image = await sharp(await stream2buffer(fileBuffer))
-        .resize(width, height)
+      const image = sharp(await stream2buffer(fileBuffer));
+      const metadata = await image.metadata();
+      const resized = image
+        .resize(
+          Math.min(width, metadata.width ?? 4096),
+          Math.min(height, metadata.height ?? 4096),
+        )
         .toBuffer();
       res.header('Content-Type', 'image/png');
       res.header('Cache-Control', CACHE_CONTROL);
-      return image;
+      return resized;
     }
   }
 

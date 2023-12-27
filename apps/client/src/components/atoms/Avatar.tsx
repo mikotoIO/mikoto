@@ -22,7 +22,7 @@ export function normalizeMediaUrl(url?: string | null, fallback = '') {
 export const Avatar = styled.img.attrs<{ size?: number | string }>((p) => ({
   src:
     normalizeMediaUrl(p.src, '/images/default_avatar.png') +
-    (typeof p.size === 'number' ? `?w=${p.size}&h=${p.size}` : ''),
+    (typeof p.size === 'number' ? `?w=${p.size * 2}&h=${p.size * 2}` : ''),
   size: p.size ?? 40,
 }))`
   user-select: none;

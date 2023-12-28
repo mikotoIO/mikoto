@@ -64,6 +64,13 @@ function UserAreaMenu() {
       </ContextMenu.Link>
       <ContextMenu.Link
         onClick={() => {
+          navigator.clipboard.writeText(mikoto.me.id);
+        }}
+      >
+        Copy My User ID
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
           localStorage.removeItem('REFRESH_TOKEN');
           window.location.reload();
         }}

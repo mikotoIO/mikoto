@@ -46,12 +46,12 @@ export class SurfaceStore {
 
 export const surfaceStore = new SurfaceStore();
 
-interface TabName {
+export interface TabNameProps {
   name: string;
-  icon?: IconDefinition;
+  icon?: IconDefinition | string;
 }
 
-export const tabNameFamily = atomFamily<TabName, string>({
+export const tabNameFamily = atomFamily<TabNameProps, string>({
   key: 'tabName',
   default: {
     name: '',

@@ -1,11 +1,10 @@
 import {
-  IconDefinition,
   faBarsStaggered,
   faQuestion,
   faX,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Flex, Grid } from '@mikoto-io/lucid';
+import { Box, Flex, Grid } from '@mikoto-io/lucid';
 import { action, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useContext, useEffect, useRef } from 'react';
@@ -19,6 +18,7 @@ import { workspaceState } from '../store';
 import {
   SurfaceLeaf,
   TabContext,
+  TabNameProps,
   Tabable,
   pruneNode,
   splitNode,
@@ -26,6 +26,7 @@ import {
   tabNameFamily,
 } from '../store/surface';
 import { ContextMenu, useContextMenu } from './ContextMenu';
+import { Avatar } from './atoms/Avatar';
 import { IconBox } from './atoms/IconBox';
 import { channelToTab } from './surfaces/Explorer/channelToTab';
 import type { ExplorerNode } from './surfaces/Explorer/explorerNode';
@@ -44,15 +45,16 @@ const StyledCloseButton = styled(Flex)<{ active?: boolean }>`
   }
 `;
 
-const StyledTab = styled.div<{ active?: boolean }>`
-  user-select: none;
-  cursor: pointer;
-  padding: 0 8px 0 20px;
-  display: flex;
-  flex-shrink: 0;
-  border-bottom: 2px solid transparent;
+const StyledTab = styled(Flex)<{ active?: boolean }>`
   align-items: center;
   justify-content: center;
+
+  user-select: none;
+  cursor: pointer;
+  padding: 0 8px 0 16px;
+  gap: 6px;
+  flex-shrink: 0;
+  border-bottom: 2px solid transparent;
   background-color: var(--N900);
   color: var(--N400);
 
@@ -101,11 +103,6 @@ function useReorderable(destinationSurface: SurfaceLeaf) {
       pruneNode(surfaceStore.node);
     });
   };
-}
-
-interface TabNameProps {
-  name: string;
-  icon?: IconDefinition;
 }
 
 // TODO: This is still bugged. Cause unknown. Please fix.
@@ -193,7 +190,12 @@ function Tab({ tab, index, surfaceNode }: TabProps) {
       })}
       onAuxClick={() => {}}
     >
-      <IconBox size={20} icon={tabName.icon ?? faQuestion} />
+      {typeof tabName.icon !== 'string' ? (
+        <IconBox size={20} icon={tabName.icon ?? faQuestion} />
+      ) : (
+        <Avatar size={24} src={tabName.icon} />
+      )}
+
       <div>{tabName.name}</div>
       <StyledCloseButton
         center

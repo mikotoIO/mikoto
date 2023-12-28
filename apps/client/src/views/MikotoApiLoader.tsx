@@ -42,9 +42,10 @@ export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
           setOnlineState(false);
         },
       });
-      return setMikoto(mi);
+      setMikoto(mi);
     } catch (e) {
-      return setErr(e as AxiosError);
+      setMikoto(null);
+      setErr(e as AxiosError);
     }
   };
 
@@ -61,6 +62,7 @@ export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
 
     Promise.race([wait(15 * 1000), mikoto.client.ping({})]).catch(() => {
       console.error('Ping failed, websocket timeout');
+      setMikoto(null);
       buildMikotoClient().then();
     });
   }, 30 * 1000);
@@ -72,6 +74,7 @@ export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
   }
   if (mikoto === null) return fallback;
 
+  // TODO: Connection ID key, garbage collection for event emitters, proper .cleanup() for MikotoJS
   return (
     <MikotoContext.Provider value={mikoto}>
       <AuthContext.Provider value={authClient}>{children}</AuthContext.Provider>

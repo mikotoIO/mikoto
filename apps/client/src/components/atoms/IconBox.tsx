@@ -8,7 +8,6 @@ const StyledIcon = styled.span<{ size?: number }>`
   color: white;
   border-radius: 3px;
   text-align: center;
-  margin-right: 6px;
   width: ${(p) => p.size ?? 24}px;
   height: ${(p) => p.size ?? 24}px;
   align-items: center;

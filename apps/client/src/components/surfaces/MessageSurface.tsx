@@ -254,7 +254,7 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
 
   return (
     <ViewContainer key={channel.id}>
-      <TabName name={channel.name} icon={faHashtag} />
+      <TabName name={channel.name} icon={channel.space?.icon ?? faHashtag} />
       <MessagingContainerInner>
         <OtherInner>
           {msgs === null ? (

@@ -96,6 +96,7 @@
     "remark-math": "^5.1.1",
     "rollup-plugin-visualizer": "^5.9.2",
     "serve": "^14.0.1",
+    "shiki": "^0.14.7",
     "slate": "^0.94.1",
     "slate-history": "^0.93.0",
     "slate-react": "^0.97.1",

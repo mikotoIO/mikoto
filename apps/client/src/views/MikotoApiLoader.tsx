@@ -5,10 +5,17 @@ import { Navigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 
 import { env } from '../env';
+import { notifyFromMessage } from '../functions/notify';
 import { refreshAuth } from '../functions/refreshAuth';
 import { AuthContext, MikotoContext, useInterval } from '../hooks';
 import { onlineState } from '../store';
 import { authClient } from '../store/authClient';
+
+function registerNotifications(mikoto: MikotoClient) {
+  mikoto.client.messages.onCreate((msg) => {
+    notifyFromMessage(mikoto, msg);
+  });
+}
 
 interface ApiLoaderProps {
   fallback?: React.ReactNode;
@@ -42,6 +49,7 @@ export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
           setOnlineState(false);
         },
       });
+      registerNotifications(mi);
       setMikoto(mi);
     } catch (e) {
       setMikoto(null);

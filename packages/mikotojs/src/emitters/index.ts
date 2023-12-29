@@ -21,6 +21,7 @@ export class ChannelEmitter extends (EventEmitter as unknown as new () => TypedE
   // ...
 }
 
+// the scope is always "@"
 export class SpaceEmitter extends (EventEmitter as unknown as new () => TypedEmitter<
   EmitterEvents<Space>
 >) {

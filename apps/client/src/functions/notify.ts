@@ -8,12 +8,13 @@ audio.load();
 
 export function notifyFromMessage(mikoto: MikotoClient, message: Message) {
   if (message.authorId === mikoto.me.id) return;
-  const ch = mikoto.channels.get(message.channelId);
-
-  const channelDescriptor = ch ? ` (#${ch.name})` : '';
+  const channel = mikoto.channels.get(message.channelId);
+  if (!channel) return;
+  const space = mikoto.spaces.get(channel.spaceId);
+  if (!space) return;
 
   const notification = new Notification(
-    `${message.author?.name}${channelDescriptor}`,
+    `${message.author?.name} (#${channel.name}, ${space.name})`,
     {
       body: message.content,
       icon: normalizeMediaUrl(message.author?.avatar),

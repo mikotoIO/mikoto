@@ -41,8 +41,8 @@ const StyledNode = styled.a<{ unread?: boolean; isDndHover?: boolean }>`
 `;
 
 const ChevronWrapper = styled.div`
-  opacity: 0.3;
-  font-size: 10px;
+  opacity: 0.4;
+  font-size: 12px;
   width: 10px;
   margin-right: 8px;
   text-align: center;

@@ -6,6 +6,9 @@ on:
       - apps/desktop/**
     branches: ['main']
 
+env:
+  GITHUB_TOKEN: ${{ secrets.github_token }}
+
 jobs:
   release:
     runs-on: ${{ matrix.os }}

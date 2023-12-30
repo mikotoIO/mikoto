@@ -8,20 +8,27 @@ module.exports = {
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
+      platforms: ['win32'],
       config: {},
     },
     {
-      name: '@electron-forge/maker-zip',
+      name: '@electron-forge/maker-dmg',
       platforms: ['darwin'],
+      config: {},
     },
     {
       name: '@electron-forge/maker-deb',
+      platforms: ['linux'],
       config: {},
     },
-    {
-      name: '@electron-forge/maker-rpm',
-      config: {},
-    },
+    // {
+    //   name: '@electron-forge/maker-zip',
+    //   platforms: ['darwin'],
+    // },
+    // {
+    //   name: '@electron-forge/maker-rpm',
+    //   config: {},
+    // },
   ],
   plugins: [
     {

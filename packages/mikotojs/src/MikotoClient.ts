@@ -26,6 +26,7 @@ interface MikotoClientOptions {
 export class MikotoClient {
   // spaces: SpaceEngine = new SpaceEngine(this);
   client!: MainService;
+  transport!: SocketIOClientTransport;
 
   // screw all of the above, we're rewriting the entire thing
   messageEmitter = new MessageEmitter();
@@ -44,12 +45,12 @@ export class MikotoClient {
     accessToken: string,
     { onReady, onConnect, onDisconnect }: MikotoClientOptions,
   ) {
-    this.client = new MainService(
-      new SocketIOClientTransport({
-        url: hyperRPCUrl,
-        authToken: accessToken,
-      }),
-    );
+    this.transport = new SocketIOClientTransport({
+      url: hyperRPCUrl,
+      authToken: accessToken,
+    });
+
+    this.client = new MainService(this.transport);
     this.setupClient();
 
     this.client.onReady(() => {
@@ -114,6 +115,13 @@ export class MikotoClient {
         });
       }
     });
+  }
+
+  disconnect() {
+    this.transport.disconnect();
+    this.spaceEmitter.removeAllListeners();
+    this.channelEmitter.removeAllListeners();
+    this.messageEmitter.removeAllListeners();
   }
 
   async getMe() {

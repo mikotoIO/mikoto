@@ -30,6 +30,8 @@ import { ViewContainer } from '../../ViewContainer';
 import { SlashCommand } from './SlashCommand';
 
 const EditorContentWrapper = styled.div`
+  font-size: 14px;
+  line-height: 1.6;
   .tiptap {
     outline: none;
   }
@@ -188,7 +190,7 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        history: false,
+        history: IS_COLLABORATION && {},
       }) as any,
       Link,
       Image,

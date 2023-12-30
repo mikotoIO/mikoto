@@ -70,6 +70,7 @@ export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
 
     Promise.race([wait(15 * 1000), mikoto.client.ping({})]).catch(() => {
       console.error('Ping failed, websocket timeout');
+      mikoto.disconnect();
       setMikoto(null);
       buildMikotoClient().then();
     });

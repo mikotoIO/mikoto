@@ -12,11 +12,11 @@ module.exports = {
       platforms: ['win32'],
       config: {},
     },
-    // {
-    //   name: '@electron-forge/maker-dmg',
-    //   platforms: ['darwin'],
-    //   config: {},
-    // },
+    {
+      name: '@electron-forge/maker-dmg',
+      platforms: ['darwin'],
+      config: {},
+    },
     {
       name: '@electron-forge/maker-deb',
       platforms: ['linux'],

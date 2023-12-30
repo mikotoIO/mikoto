@@ -39,7 +39,7 @@ module.exports = {
       config: {
         repository: {
           owner: 'mikotoIO',
-          name: 'desktop'
+          name: 'mikoto',
         },
       }
     }

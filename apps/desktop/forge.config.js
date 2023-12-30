@@ -4,6 +4,7 @@ module.exports = {
     prune: false,
     icon: 'assets/icon.png',
   },
+
   rebuildConfig: {},
   makers: [
     {
@@ -19,7 +20,9 @@ module.exports = {
     {
       name: '@electron-forge/maker-deb',
       platforms: ['linux'],
-      config: {},
+      config: {
+        bin: 'Mikoto',
+      },
     },
     // {
     //   name: '@electron-forge/maker-zip',

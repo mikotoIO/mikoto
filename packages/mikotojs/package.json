@@ -14,7 +14,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@hyperschema/client": "^0.0.1",
+    "@hyperschema/client": "^0.0.2",
     "@mikoto-io/permcheck": "0.0.1",
     "axios": "^1.6.1",
     "events": "^3.3.0",

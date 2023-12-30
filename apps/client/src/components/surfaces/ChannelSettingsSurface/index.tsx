@@ -9,6 +9,7 @@ import {
 } from '@mikoto-io/lucid';
 import { ClientChannel } from 'mikotojs';
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 
 import { useMikoto } from '../../../hooks';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
@@ -33,6 +34,7 @@ function General({ channel }: { channel: ClientChannel }) {
       <Form
         onSubmit={form.handleSubmit(async (data) => {
           await channel.update(data);
+          toast.success('Updated channel');
         })}
       >
         <Input labelName="Channel Name" {...form.register('name')} />

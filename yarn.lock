@@ -4356,13 +4356,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hyperschema/client@npm:^0.0.1":
-  version: 0.0.1
-  resolution: "@hyperschema/client@npm:0.0.1"
+"@hyperschema/client@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "@hyperschema/client@npm:0.0.2"
   dependencies:
     socket.io-client: "npm:^4.7.2"
     zod: "npm:*"
-  checksum: e35049652408cbe07492009bbf1357e6cee92ee511ccb9e164f925b0f0328129078aaffd4e09bb71a560b5e3ea325e4ff506999ed3eeb1448193a30a566fcfd0
+  checksum: 5adaa6d0fc1dfb0f1fe5254b970eb22851ef53ebf62c44da299376a5ea8f55feab61a6b663330b9e439cfed1da37b421ee22d66bab0c785104ea2af120675b3f
   languageName: node
   linkType: hard
 
@@ -23177,7 +23177,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "mikotojs@workspace:packages/mikotojs"
   dependencies:
-    "@hyperschema/client": "npm:^0.0.1"
+    "@hyperschema/client": "npm:^0.0.2"
     "@mikoto-io/permcheck": "npm:0.0.1"
     "@types/events": "npm:^3.0.0"
     axios: "npm:^1.6.1"

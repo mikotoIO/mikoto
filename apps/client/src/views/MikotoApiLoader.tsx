@@ -2,13 +2,11 @@ import { AxiosError } from 'axios';
 import { MikotoClient, constructMikoto } from 'mikotojs';
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useSetRecoilState } from 'recoil';
 
 import { env } from '../env';
 import { notifyFromMessage } from '../functions/notify';
 import { refreshAuth } from '../functions/refreshAuth';
 import { AuthContext, MikotoContext, useInterval } from '../hooks';
-import { onlineState } from '../store';
 import { authClient } from '../store/authClient';
 
 function registerNotifications(mikoto: MikotoClient) {
@@ -31,10 +29,15 @@ function wait(ms: number) {
 // exists to "cheat" React Strict Mode
 let clientLock = false;
 
+type MikotoConnectionState =
+  | MikotoClient
+  | 'connecting'
+  | 'reconnecting'
+  | 'disconnected';
+
 export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
-  const [mikoto, setMikoto] = useState<MikotoClient | null>(null);
+  const [mikoto, setMikoto] = useState<MikotoConnectionState>('connecting');
   const [err, setErr] = useState<AxiosError | null>(null);
-  const setOnlineState = useSetRecoilState(onlineState);
 
   const buildMikotoClient = async () => {
     try {
@@ -42,22 +45,19 @@ export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
       const mi = await constructMikoto({
         token,
         url: env.PUBLIC_SERVER_URL,
-        onConnect() {
-          setOnlineState(true);
-        },
-        onDisconnect() {
-          setOnlineState(false);
-        },
+        onConnect() {},
+        onDisconnect() {},
       });
       registerNotifications(mi);
       setMikoto(mi);
     } catch (e) {
-      setMikoto(null);
+      console.error('Failed to connect to Mikoto API');
+      console.error(e);
+      setMikoto('disconnected');
       setErr(e as AxiosError);
     }
   };
 
-  // TODO: Try suspense
   useEffect(() => {
     if (clientLock) return;
     clientLock = true;
@@ -66,12 +66,17 @@ export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
   }, []);
 
   useInterval(() => {
-    if (mikoto === null) return; // must have loaded at least once
+    if (!(mikoto instanceof MikotoClient)) {
+      console.log(`current client state: ${mikoto}: reconnecting`);
+      buildMikotoClient().then();
+      return;
+    }
 
     Promise.race([wait(15 * 1000), mikoto.client.ping({})]).catch(() => {
-      console.error('Ping failed, websocket timeout');
+      console.warn('Ping failed, websocket timeout');
+      // clean up the old client to avoid memory leaks, before reconnecting
       mikoto.disconnect();
-      setMikoto(null);
+      setMikoto('reconnecting');
       buildMikotoClient().then();
     });
   }, 30 * 1000);
@@ -81,9 +86,9 @@ export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
     console.log(err);
     return <Navigate to="/login" />;
   }
-  if (mikoto === null) return fallback;
+  if (!(mikoto instanceof MikotoClient)) return fallback;
 
-  // TODO: Connection ID key, garbage collection for event emitters, proper .cleanup() for MikotoJS
+  // TODO: Connection ID key, garbage collection for event emitters
   return (
     <MikotoContext.Provider value={mikoto}>
       <AuthContext.Provider value={authClient}>{children}</AuthContext.Provider>

@@ -7,8 +7,8 @@
   "scripts": {
     "start": "tsc && electron-forge start",
     "package": "tsc && electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish",
+    "make": "tsc && electron-forge make",
+    "publish": "tsc && electron-forge publish",
     "lint": "echo \"No linting configured\""
   },
   "keywords": [],

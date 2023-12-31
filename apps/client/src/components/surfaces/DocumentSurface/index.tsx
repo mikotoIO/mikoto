@@ -25,6 +25,7 @@ import styled from 'styled-components';
 import { Markdown } from 'tiptap-markdown';
 import * as Y from 'yjs';
 
+import { env } from '../../../env';
 import { useInterval, useMikoto } from '../../../hooks';
 import { ContextMenu, useContextMenuX } from '../../ContextMenu';
 import { TabName } from '../../TabBar';
@@ -171,7 +172,7 @@ function randomColor() {
   return RANDOM_COLORS[Math.floor(Math.random() * RANDOM_COLORS.length)];
 }
 
-const IS_COLLABORATION = false;
+const IS_COLLABORATION = true;
 
 function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
   const [changed, setChanged] = useState(false);
@@ -181,7 +182,7 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
   const [provider] = useState(() =>
     IS_COLLABORATION
       ? new HocuspocusProvider({
-          url: 'ws://localhost:1234',
+          url: env.PUBLIC_COLLABORATION_URL,
           name: channel.id,
           document: ydoc,
         })

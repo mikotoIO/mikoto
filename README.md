@@ -16,7 +16,7 @@
 </p>
 <br>
 
-Mikoto is an messaging service designed for building online communities. It uses a thread-based structure for text messaging, voice/video chat, and real-time collaborative wiki editing.
+Mikoto is an messaging platform designed for building online communities. It uses a thread-based structure for text messaging, voice/video chat, and real-time collaborative wiki editing.
 
 <p align="center">
   <img src="./screenshots/img2.png" width="800px">
@@ -27,21 +27,22 @@ Mikoto is an messaging service designed for building online communities. It uses
 > Note: Mikoto is still in early development. Some of these features are not fully implemented.
 
 - ✨ Open Source (with proprietary extensions for enterprise support)
-- 🪐 [DID-based](https://www.w3.org/TR/did-core/) usernames
-- 🧵 Next-generation thread management
-- 🔍 Semantic search across all channels
 - ⚡️ Superuser friendly features, like tab view, zen mode and, keyboard shortcuts and more
-- 🔒 Fully E2E encrypted DMs and Group DMs
+- 📡 Voice, video, and screen sharing
+- 📝 Real-time collaborative wiki channels
+- 🧵 Next-generation thread management
 - 🏡 Threaded DMs and group DMs
 - 🎨 Customizable themes and appearances
+
+and upcoming features:
+
+- 🪐 [DID-based](https://www.w3.org/TR/did-core/) usernames
+- 🔒 E2E encrypted DMs and Group DMs
+- 🔍 Semantic search across all channels
 - 🔌 Pluggable architecture for custom extensions
 - 🛒 A marketplace for extensions and integrations
 - 🌎 Built-in community finder
 - 🥸 A system to handle multiple personas and identities
-- 📡 Voice, video, and screen sharing
-- 📝 Real-time collaborative wiki channels
-
-...and more, yet to be announced!
 
 ## Setup
 

@@ -193,7 +193,7 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        history: IS_COLLABORATION && {},
+        history: false,
       }) as any,
       Link,
       Image,

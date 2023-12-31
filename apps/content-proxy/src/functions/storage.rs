@@ -20,8 +20,10 @@ lazy_static! {
             expiration: None,
         };
 
-        Bucket::new("mikoto", region.clone(), credentials.clone())
-            .unwrap()
+        // remove the leading slash
+        let bucket_name = minio.path().strip_prefix("/").expect("The URL path must start with a slash");
+        Bucket::new(bucket_name, region.clone(), credentials.clone())
+            .expect("Failed to create bucket")
             .with_path_style()
     };
 }

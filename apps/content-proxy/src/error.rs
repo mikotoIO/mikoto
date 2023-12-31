@@ -8,13 +8,13 @@ use rocket::response::{self, Responder, Response};
 use s3::error::S3Error;
 
 #[derive(Serialize, Debug)]
-#[serde(tag = "type")]
+#[serde(tag = "code")]
 pub enum Error {
-    StorageError,
+    StorageError { internal: String },
     BadRequest,
     NotFound,
     InternalServerError,
-    ImageError,
+    ImageError { internal: String },
 }
 
 // implement Responder for Error
@@ -35,13 +35,18 @@ impl<'r> Responder<'r, 'r> for Error {
 }
 
 impl From<S3Error> for Error {
-    fn from(_: S3Error) -> Self {
-        Error::StorageError
+    fn from(err: S3Error) -> Self {
+        Error::StorageError {
+            internal: err.to_string(),
+        }
     }
 }
 
 impl From<image::ImageError> for Error {
-    fn from(_: image::ImageError) -> Self {
-        Error::ImageError
+    fn from(err: image::ImageError) -> Self {
+        err.to_string();
+        Error::ImageError {
+            internal: err.to_string(),
+        }
     }
 }

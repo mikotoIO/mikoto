@@ -26,6 +26,9 @@ function wait(ms: number) {
   });
 }
 
+const PING_INTERVAL = 15 * 1000;
+const PING_TIMEOUT = 10 * 1000;
+
 // exists to "cheat" React Strict Mode
 let clientLock = false;
 
@@ -72,14 +75,14 @@ export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
       return;
     }
 
-    Promise.race([wait(15 * 1000), mikoto.client.ping({})]).catch(() => {
+    Promise.race([wait(PING_TIMEOUT), mikoto.client.ping({})]).catch(() => {
       console.warn('Ping failed, websocket timeout');
       // clean up the old client to avoid memory leaks, before reconnecting
       mikoto.disconnect();
       setMikoto('reconnecting');
       buildMikotoClient().then();
     });
-  }, 30 * 1000);
+  }, PING_INTERVAL);
 
   if (err !== null) {
     console.log('this should only redirect auth-related errors');

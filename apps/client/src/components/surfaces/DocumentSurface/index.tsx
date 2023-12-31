@@ -20,11 +20,13 @@ import { BubbleMenu, Editor, EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { ClientChannel } from 'mikotojs';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { Markdown } from 'tiptap-markdown';
 import * as Y from 'yjs';
 
 import { useInterval, useMikoto } from '../../../hooks';
+import { ContextMenu, useContextMenuX } from '../../ContextMenu';
 import { TabName } from '../../TabBar';
 import { ViewContainer } from '../../ViewContainer';
 import { SlashCommand } from './SlashCommand';
@@ -253,6 +255,8 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
     }
   }, 5000);
 
+  const contextMenu = useContextMenuX();
+
   return (
     <>
       <div>
@@ -268,6 +272,23 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
             justifyContent: 'space-between',
           }}
         >
+          <FontAwesomeIcon
+            icon={faEllipsis}
+            onClick={contextMenu(() => (
+              <ContextMenu>
+                <ContextMenu.Link
+                  onClick={() => {
+                    if (!editor) return;
+                    const text: string = editor.storage.markdown.getMarkdown();
+                    navigator.clipboard.writeText(text);
+                    toast('Copied Markdown to clipboard');
+                  }}
+                >
+                  Copy Markdown
+                </ContextMenu.Link>
+              </ContextMenu>
+            ))}
+          />
           <Flex gap={8}>
             <Flex
               rounded={32}
@@ -277,7 +298,6 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
               center
             />
           </Flex>
-          <FontAwesomeIcon icon={faEllipsis} />
         </Flex>
       </div>
       {editor && <NoteBubbleMenu editor={editor} />}

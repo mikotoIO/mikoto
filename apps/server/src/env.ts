@@ -9,6 +9,8 @@ export const env = load({
   REDIS_URL: String,
   AUTH_PORT: Number,
   SERVER_PORT: Number,
+  COLLAB_PORT: Number,
+
   MINIO: String,
   LIVEKIT_SERVER: String,
   LIVEKIT_KEY: String,

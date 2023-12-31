@@ -85,7 +85,7 @@ async function main() {
 
   // start hocuspocus
   const hocuspocus = new Hocuspocus({
-    port: 1234,
+    port: env.COLLAB_PORT,
     quiet: true,
   });
 

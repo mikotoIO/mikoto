@@ -216,8 +216,16 @@ export const ChannelContextMenu = observer(
             </ContextMenu.Link>
             <ContextMenu.Link
               onClick={() => {
+                navigator.clipboard.writeText(
+                  `${window.location.origin}/?m=${channel.id}`,
+                );
+              }}
+            >
+              Copy Channel Link
+            </ContextMenu.Link>
+            <ContextMenu.Link
+              onClick={() => {
                 setModal({ elem: <DeleteChannelModal channel={channel} /> });
-                // await mikoto.client.channels.delete(channel.id);
               }}
             >
               Delete Channel

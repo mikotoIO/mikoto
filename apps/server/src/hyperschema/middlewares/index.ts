@@ -1,6 +1,6 @@
 import { NotFoundError, UnauthorizedError } from '@hyperschema/core';
 import { checkPermission, permissions } from '@mikoto-io/permcheck';
-import { Channel, SpaceUser } from '@prisma/client';
+import { Channel, Role, Space, SpaceUser } from '@prisma/client';
 
 import { logger } from '../../functions/logger';
 import { prisma } from '../../functions/prisma';
@@ -22,9 +22,15 @@ export async function assertSpaceMembership<
   return props;
 }
 
+interface EnforceChannelMembershipOutput {
+  channel: Channel;
+  spaceId: string;
+  member: SpaceUser;
+}
+
 export async function assertChannelMembership<
   T extends HSContext & { channelId: string },
->(props: T): Promise<T & { channel: Channel; member: SpaceUser }> {
+>(props: T): Promise<T & EnforceChannelMembershipOutput> {
   const channel = await prisma.channel.findUnique({
     where: { id: props.channelId },
   });
@@ -40,16 +46,52 @@ export async function assertChannelMembership<
 
   if (membership === null)
     throw new UnauthorizedError('Not a member of channel');
-  return { ...props, channel, member: membership };
+  return { ...props, channel, spaceId: channel.spaceId, member: membership };
 }
 
-export function requireSpacePerm<T extends HSContext & { spaceId: string }>(
+/**
+ *
+ * @param memberRoles The role of the member
+ * @param defaultRole The default role of the space
+ * @param rule a bitset representing the rule to enforce.
+ * @param superuserOverride
+ */
+function assertSpacePermission(
+  memberRoles: { permissions: string }[],
+  defaultRole: { permissions: string } | undefined,
+  rule: bigint,
+  superuserOverride: boolean,
+) {
+  let r = typeof rule === 'string' ? BigInt(rule) : rule;
+
+  // apply all roles into a single permission set
+  const totalPerms =
+    memberRoles.reduce((acc, x) => acc | BigInt(x.permissions), 0n) |
+    BigInt(defaultRole?.permissions ?? 0n); // apply @everyone role
+
+  // FIXME: Is this correct? I am not exactly sure because of the complex implementation of permcheck
+  if (superuserOverride) {
+    r |= permissions.superuser;
+  }
+  const res = checkPermission(r, totalPerms);
+
+  if (!res) {
+    logger.warn(`Permission engine: expected ${r}, got ${totalPerms}`);
+    throw new UnauthorizedError('Insufficient permissions');
+  }
+}
+
+/**
+ * Guard for enforcing space permissions. requires a spaceId in the input.
+ * @param rule
+ * @param superuserOverride
+ * @returns
+ */
+export function enforceSpacePerm<T extends HSContext & { spaceId: string }>(
   rule: bigint,
   superuserOverride = true,
 ) {
   return async (props: T): Promise<T> => {
-    let r = typeof rule === 'string' ? BigInt(rule) : rule;
-
     const space = await prisma.space.findUnique({
       where: { id: props.spaceId },
       include: spaceInclude,
@@ -65,19 +107,12 @@ export function requireSpacePerm<T extends HSContext & { spaceId: string }>(
     if (member === null) throw new NotFoundError('Not a member of space');
 
     // actual permission checking
-    const totalPerms =
-      member.roles.reduce((acc, x) => acc | BigInt(x.permissions), 0n) |
-      BigInt(space.roles.at(-1)?.permissions ?? 0n);
-
-    if (superuserOverride) {
-      r |= permissions.superuser;
-    }
-    const res = checkPermission(r, totalPerms);
-    if (!res) {
-      logger.warn(`Permission engine: expected ${r}, got ${totalPerms}`);
-      throw new UnauthorizedError('Insufficient permissions');
-    }
-
+    assertSpacePermission(
+      member.roles,
+      space.roles.at(-1),
+      rule,
+      superuserOverride,
+    );
     return { ...props, space };
   };
 }

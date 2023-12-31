@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { prisma } from '../../functions/prisma';
 import { h } from '../core';
-import { assertSpaceMembership, requireSpacePerm } from '../middlewares';
+import { assertSpaceMembership, enforceSpacePerm } from '../middlewares';
 import { Member } from '../models';
 import { memberInclude, memberMap } from '../normalizer';
 
@@ -65,7 +65,7 @@ export const MemberService = h.service({
       { spaceId: z.string(), userId: z.string(), options: MemberUpdateOptions },
       Member,
     )
-    .use(requireSpacePerm(permissions.manageRoles))
+    .use(enforceSpacePerm(permissions.manageRoles))
     .do(async ({ $r, spaceId, userId, options }) => {
       // TODO: probably a cleaner method to do this
 
@@ -97,7 +97,7 @@ export const MemberService = h.service({
 
   delete: h
     .fn({ spaceId: z.string(), userId: z.string() }, Member)
-    .use(requireSpacePerm(permissions.ban))
+    .use(enforceSpacePerm(permissions.ban))
     .do(async ({ $r, spaceId, userId }) => {
       const member = await prisma.spaceUser.delete({
         where: {

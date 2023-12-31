@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import { prisma } from '../../functions/prisma';
 import { HSContext, h } from '../core';
-import { assertSpaceMembership, requireSpacePerm } from '../middlewares';
+import { assertSpaceMembership, enforceSpacePerm } from '../middlewares';
 import { Invite, Space, SpaceUpdateOptions } from '../models';
 import { memberInclude, memberMap, spaceInclude } from '../normalizer';
 
@@ -81,7 +81,7 @@ export const SpaceService = h.service({
 
   update: h
     .fn({ spaceId: z.string(), options: SpaceUpdateOptions }, Space)
-    .use(requireSpacePerm(permissions.manageSpace))
+    .use(enforceSpacePerm(permissions.manageSpace))
     .do(async ({ spaceId, options, $r }) => {
       const space = await prisma.space.update({
         where: { id: spaceId },
@@ -100,7 +100,7 @@ export const SpaceService = h.service({
 
   delete: h
     .fn({ spaceId: z.string() }, Space)
-    .use(requireSpacePerm(permissions.superuser))
+    .use(enforceSpacePerm(permissions.superuser))
     .do(async ({ spaceId, $r }) => {
       const space = await prisma.space.findUnique({
         where: { id: spaceId },
@@ -181,7 +181,7 @@ export const SpaceService = h.service({
   // invite management
   createInvite: h
     .fn({ spaceId: z.string() }, Invite)
-    .use(requireSpacePerm(permissions.manageSpace))
+    .use(enforceSpacePerm(permissions.manageSpace))
     .do(async ({ spaceId, state }) => {
       const invite = await prisma.invite.create({
         data: {
@@ -195,7 +195,7 @@ export const SpaceService = h.service({
 
   listInvites: h
     .fn({ spaceId: z.string() }, Invite.array())
-    .use(requireSpacePerm(permissions.manageSpace))
+    .use(enforceSpacePerm(permissions.manageSpace))
     .do(async ({ spaceId }) => {
       const invites = await prisma.invite.findMany({
         where: { spaceId },
@@ -205,7 +205,7 @@ export const SpaceService = h.service({
 
   deleteInvite: h
     .fn({ spaceId: z.string(), inviteCode: z.string() }, z.string())
-    .use(requireSpacePerm(permissions.manageSpace))
+    .use(enforceSpacePerm(permissions.manageSpace))
     .do(async ({ inviteCode }) => {
       const invite = await prisma.invite.delete({
         where: { id: inviteCode },

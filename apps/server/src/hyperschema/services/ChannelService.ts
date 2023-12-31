@@ -1,15 +1,26 @@
+import { NotFoundError } from '@hyperschema/core';
 import { permissions } from '@mikoto-io/permcheck';
 import { ChannelType } from '@prisma/client';
 import { z } from 'zod';
 
 import { prisma } from '../../functions/prisma';
-import { h } from '../core';
+import { HSContext, h } from '../core';
 import {
   assertChannelMembership,
   assertSpaceMembership,
-  requireSpacePerm,
+  enforceSpacePerm,
 } from '../middlewares';
 import { Channel, ChannelUpdateOptions } from '../models';
+
+function loadChannel<T extends HSContext & { channelId: string }>() {
+  return async (input: T) => {
+    const channel = await prisma.channel.findUnique({
+      where: { id: input.channelId },
+    });
+    if (channel === null) throw new NotFoundError('Channel not found');
+    return { ...input, channel };
+  };
+}
 
 export const ChannelService = h.service({
   get: h
@@ -37,7 +48,7 @@ export const ChannelService = h.service({
       },
       Channel,
     )
-    .use(requireSpacePerm(permissions.manageChannels))
+    .use(enforceSpacePerm(permissions.manageChannels))
     .do(async ({ $r, spaceId, name, type, parentId }) => {
       const channel = await prisma.channel.create({
         data: {
@@ -69,8 +80,8 @@ export const ChannelService = h.service({
       Channel,
     )
     .use(assertChannelMembership)
+    .use(enforceSpacePerm(permissions.manageChannels))
     .do(async ({ channelId, options, $r }) => {
-      // FIXME: proper permissions
       const channel = await prisma.channel.update({
         where: { id: channelId },
         data: {
@@ -84,6 +95,7 @@ export const ChannelService = h.service({
   delete: h
     .fn({ channelId: z.string() }, Channel)
     .use(assertChannelMembership)
+    .use(enforceSpacePerm(permissions.manageChannels))
     .do(async ({ channel, $r }) => {
       await prisma.channel.delete({ where: { id: channel.id } });
       await $r.pub(`space:${channel.spaceId}`, 'deleteChannel', channel);

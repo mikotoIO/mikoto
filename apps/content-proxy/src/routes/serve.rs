@@ -25,7 +25,7 @@ impl<'r> Responder<'r, 'r> for FileResponse {
             .header(self.content_type)
             .header(Header::new(
                 "Cache-Control",
-                "public, max-age=86400, must-revalidate",
+                "public, max-age=31536000, must-revalidate",
             ))
             .sized_body(self.data.len(), Cursor::new(self.data))
             .status(Status::Ok)

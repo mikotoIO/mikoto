@@ -22,7 +22,7 @@ export const permissions = {
 
 /**
  * Check if a permission is set in a permission set
- * @param rule The permission to check against
+ * @param rule The permission to check against. Usually has only one bit set.
  * @param perms The total permission bitset of the user
  * @returns True if the user is authorized
  */

@@ -1,26 +1,15 @@
-import { NotFoundError } from '@hyperschema/core';
 import { permissions } from '@mikoto-io/permcheck';
 import { ChannelType } from '@prisma/client';
 import { z } from 'zod';
 
 import { prisma } from '../../functions/prisma';
-import { HSContext, h } from '../core';
+import { h } from '../core';
 import {
   assertChannelMembership,
   assertSpaceMembership,
   enforceSpacePerm,
 } from '../middlewares';
 import { Channel, ChannelUpdateOptions } from '../models';
-
-function loadChannel<T extends HSContext & { channelId: string }>() {
-  return async (input: T) => {
-    const channel = await prisma.channel.findUnique({
-      where: { id: input.channelId },
-    });
-    if (channel === null) throw new NotFoundError('Channel not found');
-    return { ...input, channel };
-  };
-}
 
 export const ChannelService = h.service({
   get: h

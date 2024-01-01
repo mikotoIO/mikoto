@@ -1,6 +1,6 @@
 import { NotFoundError, UnauthorizedError } from '@hyperschema/core';
 import { checkPermission, permissions } from '@mikoto-io/permcheck';
-import { Channel, Role, Space, SpaceUser } from '@prisma/client';
+import { Channel, SpaceUser } from '@prisma/client';
 
 import { logger } from '../../functions/logger';
 import { prisma } from '../../functions/prisma';

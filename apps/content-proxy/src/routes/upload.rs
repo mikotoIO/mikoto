@@ -2,7 +2,7 @@ use std::io::Cursor;
 
 use crate::{
     config::{StoreType, CONFIG},
-    env::PUBLIC_CONTENT_PROXY_URL,
+    env::PUBLIC_MEDIASERVER_URL,
     error::Error,
     functions::storage::MAIN_BUCKET,
 };
@@ -61,6 +61,6 @@ pub async fn upload(
     MAIN_BUCKET.put_object(&path, &data).await?;
 
     Ok(Json(UploadResponse {
-        url: format!("{}/{}", PUBLIC_CONTENT_PROXY_URL.to_string(), &path),
+        url: format!("{}/{}", PUBLIC_MEDIASERVER_URL.to_string(), &path),
     }))
 }

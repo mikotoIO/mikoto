@@ -1,10 +1,10 @@
 [avatar]
-filetype = "image"
+store_type = "image"
 # 10 MB
 max_size = 10485760
-transformations = [{ id = "resize", width = 512, height = 512 }]
+image_resize = { width = 512, height = 512 }
 
 [spaceicon]
-filetype = "image"
+store_type = "image"
 max_size = 10485760
-transformations = [{ id = "resize", width = 512, height = 512 }]
+image_resize = { width = 512, height = 512 }

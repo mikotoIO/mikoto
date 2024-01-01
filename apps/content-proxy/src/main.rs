@@ -24,5 +24,8 @@ fn rocket() -> _ {
 
     rocket::build()
         .configure(rocket::Config::figment().merge(("port", 9502)))
-        .mount("/", routes![routes::hello, routes::serve::serve])
+        .mount(
+            "/",
+            routes![routes::hello, routes::serve::serve, routes::upload::upload],
+        )
 }

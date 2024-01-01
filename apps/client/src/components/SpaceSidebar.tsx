@@ -20,7 +20,6 @@ import { SpaceJoinModal } from './modals/SpaceJoin';
 const StyledSpaceSidebar = styled.div`
   align-items: center;
   box-sizing: border-box;
-  width: 68px;
 
   flex-grow: 1;
   overflow: scroll;
@@ -81,7 +80,8 @@ const StyledIconWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   margin-bottom: 8px;
-  width: 68px;
+  padding-left: 8px;
+  padding-right: 8px;
 `;
 
 interface SidebarSpaceIconProps {
@@ -132,7 +132,7 @@ function SidebarSpaceIcon({ space, index, onReorder }: SidebarSpaceIconProps) {
       offset={[0, 0]}
     >
       <StyledIconWrapper>
-        <Pill h={isActive ? 32 : 8} />
+        <Pill h={isActive ? 32 : 0} />
         <StyledSpaceIcon
           active={isActive}
           onContextMenu={contextMenu}
@@ -232,15 +232,14 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
 
   return (
     <StyledSpaceSidebar onContextMenu={contextMenu}>
-      <StyledIconWrapper>
-        <Pill h={spaceId === null ? 32 : 8} />
+      <StyledIconWrapper style={{ marginTop: '8px' }}>
+        <Pill h={spaceId === null ? 32 : 0} />
         <StyledSpaceIcon
           style={{
             background:
               spaceId === null
                 ? 'linear-gradient(133deg, #2298ff 0%, rgba(59,108,255,1) 100%)'
                 : undefined,
-            marginTop: '8px',
           }}
           active
           onClick={() => {

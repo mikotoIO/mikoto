@@ -10,10 +10,10 @@ use s3::error::S3Error;
 #[derive(Serialize, Debug)]
 #[serde(tag = "code")]
 pub enum Error {
-    StorageError { internal: String },
     BadRequest,
     NotFound,
     InternalServerError,
+    StorageError { internal: String },
     ImageError { internal: String },
 }
 
@@ -22,6 +22,7 @@ impl<'r> Responder<'r, 'r> for Error {
     fn respond_to(self, _: &Request) -> response::Result<'r> {
         let status = match self {
             Error::NotFound => Status::NotFound,
+            Error::BadRequest => Status::BadRequest,
             _ => Status::InternalServerError,
         };
 

@@ -34,13 +34,25 @@ module.exports = {
     // },
   ],
   publishers: [
+    // {
+    //   name: '@electron-forge/publisher-github',
+    //   config: {
+    //     repository: {
+    //       owner: 'mikotoIO',
+    //       name: 'desktop',
+    //     },
+    //   }
+    // }
+
     {
-      name: '@electron-forge/publisher-github',
+      name: '@electron-forge/publisher-gcs',
       config: {
-        repository: {
-          owner: 'mikotoIO',
-          name: 'mikoto',
+        storageOptions: {
+          projectId: 'agile-ratio-354703'
         },
+        bucket: 'mikoto-app',
+        folder: 'mikoto-desktop',
+        public: true
       }
     }
   ],

@@ -52,7 +52,7 @@ module.exports = {
         },
         bucket: 'mikoto-app',
         folder: 'mikoto-desktop',
-        public: true
+        public: true,
       }
     }
   ],

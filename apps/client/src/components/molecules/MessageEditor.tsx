@@ -37,7 +37,9 @@ const StyledEditable = styled(Editable)`
 
 const EditableContainer = styled.div`
   background-color: color-mix(in srgb, var(--color-input) 65%, transparent);
-  padding: 16px 16px 4px;
+  padding: 16px;
+  padding-right: 80px;
+  position: relative;
   display: flex;
 `;
 
@@ -71,6 +73,8 @@ interface MessageEditorProps {
 }
 
 const EditorButtons = styled(Flex)`
+  position: absolute;
+  right: 16px;
   transform: translateY(-8px);
   font-size: 24px;
 `;

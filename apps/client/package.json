@@ -21,6 +21,7 @@
     "@marsidev/react-turnstile": "^0.2.2",
     "@mikoto-io/lucid": "0.0.20",
     "@mikoto-io/permcheck": "0.0.1",
+    "@react-hook/resize-observer": "^1.2.6",
     "@sentry/react": "^7.51.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.3.0",

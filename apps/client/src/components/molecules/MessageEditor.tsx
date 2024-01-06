@@ -4,6 +4,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Flex } from '@mikoto-io/lucid';
+import useResizeObserver from '@react-hook/resize-observer';
 import { runInAction } from 'mobx';
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -37,7 +38,9 @@ const StyledEditable = styled(Editable)`
 
 const EditableContainer = styled.div`
   background-color: color-mix(in srgb, var(--color-input) 65%, transparent);
-  padding: 16px 16px 4px;
+  padding: 16px;
+  padding-right: 80px;
+  position: relative;
   display: flex;
 `;
 
@@ -68,9 +71,12 @@ interface MessageEditorProps {
   editState: MessageEditState;
   onSubmit: (content: string, files: FileUpload[]) => void;
   onTyping?: () => void;
+  onResize?: () => void;
 }
 
 const EditorButtons = styled(Flex)`
+  position: absolute;
+  right: 16px;
   transform: translateY(-8px);
   font-size: 24px;
 `;
@@ -181,6 +187,7 @@ export function MessageEditor({
   editState,
   onSubmit,
   onTyping,
+  onResize,
 }: MessageEditorProps) {
   const [editorValue, setEditorValue] = useState<Node[]>(() => [
     { children: [{ text: editState.message?.content ?? '' }] },
@@ -208,6 +215,9 @@ export function MessageEditor({
 
   const setContextMenu = useSetRecoilState(contextMenuState);
   const ref = useRef<HTMLDivElement>(null);
+  useResizeObserver(ref, () => {
+    onResize?.();
+  });
 
   useEffect(() => {
     ReactEditor.focus(editor);

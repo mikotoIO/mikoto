@@ -152,6 +152,7 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
   const [topLoaded, setTopLoaded] = useState(false);
 
   const [currentTypers, setCurrentTypers] = useTyping();
+  const [bottomState, setBottomState] = useState(false);
   const [messageEditState] = useState(() => new MessageEditState());
 
   // TODO: When I wrote this code, only God and I understood what I was doing
@@ -205,8 +206,11 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
   const [scrollToBottom, setScrollToBottom] = useState(false);
   useEffect(() => {
     if (virtuosoRef.current && scrollToBottom) {
+      virtuosoRef.current.scrollToIndex({
+        index: 'LAST',
+        align: 'start',
+      });
       virtuosoRef.current.autoscrollToBottom();
-      virtuosoRef.current.scrollToIndex({ index: msgs!.length - 1 });
       setScrollToBottom(false);
     }
   });
@@ -262,11 +266,18 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
           ) : (
             <Virtuoso
               ref={virtuosoRef}
+              increaseViewportBy={{
+                top: 200,
+                bottom: 200,
+              }}
               followOutput="auto"
               defaultItemHeight={28}
               style={{ flexGrow: 1, overflowX: 'hidden' }}
               initialTopMostItemIndex={msgs.length - 1}
               data={msgs}
+              atBottomStateChange={(atBottom) => {
+                setBottomState(atBottom);
+              }}
               components={{
                 Header() {
                   return topLoaded ? (
@@ -320,6 +331,15 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
             key={messageEditState.message?.id ?? 'base'}
             onTyping={() => {
               typing();
+            }}
+            onResize={() => {
+              if (bottomState && virtuosoRef.current) {
+                virtuosoRef.current.scrollToIndex({
+                  index: 'LAST',
+                  align: 'start',
+                });
+                virtuosoRef.current.autoscrollToBottom();
+              }
             }}
             onSubmit={async (msg) => {
               if (messageEditState.message) {

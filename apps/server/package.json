@@ -42,6 +42,7 @@
     "@hyperschema/core": "^0.0.8",
     "@mikoto-io/permcheck": "0.0.1",
     "@prisma/client": "^4.16.2",
+    "@types/bun": "^1.0.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.2",
     "class-transformer": "^0.5.1",

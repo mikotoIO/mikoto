@@ -8511,6 +8511,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/bun@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@types/bun@npm:1.0.0"
+  dependencies:
+    bun-types: "npm:1.0.18"
+  checksum: 3a84acc783c45ee1b19ebbbf96955c6454cf857f522be42c11afcd223f2f49891eafb0cac59cdcd8c7f68b47cce095020e3419d2931e737442be91fb86207d42
+  languageName: node
+  linkType: hard
+
 "@types/bunyan@npm:^1.8.8":
   version: 1.8.11
   resolution: "@types/bunyan@npm:1.8.11"
@@ -12073,6 +12082,13 @@ __metadata:
   dependencies:
     semver: "npm:^7.0.0"
   checksum: 90136fa0ba98b7a3aea33190b1262a5297164731efb6a323b0231acf60cc2ea0b2b1075dbf107038266b8b77d6045fa9631d1c3f90efc1c594ba61218fbfbb4c
+  languageName: node
+  linkType: hard
+
+"bun-types@npm:1.0.18":
+  version: 1.0.18
+  resolution: "bun-types@npm:1.0.18"
+  checksum: d8b897d96429f2dadd4cf74667835848678ece93882c7a3ff98f2ef36329ae1c014536c61f96ffb98b442d059a40218cecc303996ccbe299e9a516fe8ad84aa1
   languageName: node
   linkType: hard
 
@@ -29667,6 +29683,7 @@ __metadata:
     "@prisma/client": "npm:^4.16.2"
     "@types/bcrypt": "npm:^5.0.0"
     "@types/body-parser": "npm:^1.19.2"
+    "@types/bun": "npm:^1.0.0"
     "@types/cors": "npm:^2.8.12"
     "@types/ejs": "npm:^3.1.1"
     "@types/express": "npm:^4.17.13"

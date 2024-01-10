@@ -116,7 +116,7 @@
     "y-prosemirror": "^1.2.1",
     "y-websocket": "^1.5.0",
     "yjs": "^13.6.10",
-    "zod": "^3.22.2"
+    "zod": "^3.22.4"
   },
   "scripts": {
     "start": "vite",

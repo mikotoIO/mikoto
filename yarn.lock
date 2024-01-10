@@ -4618,25 +4618,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hyperschema/client@npm:^0.0.2":
-  version: 0.0.2
-  resolution: "@hyperschema/client@npm:0.0.2"
+"@hyperschema/client@npm:^0.0.3":
+  version: 0.0.3
+  resolution: "@hyperschema/client@npm:0.0.3"
   dependencies:
     socket.io-client: "npm:^4.7.2"
-    zod: "npm:*"
-  checksum: 5adaa6d0fc1dfb0f1fe5254b970eb22851ef53ebf62c44da299376a5ea8f55feab61a6b663330b9e439cfed1da37b421ee22d66bab0c785104ea2af120675b3f
+  peerDependencies:
+    zod: "*"
+  checksum: 78971ef3af4c8c83809a9232ecf536d93e52f7c3f7c09aa0ee5828801e18d6c5040f2ee32d38613530621a97c836003a818f0f7ee3102421d20c8c5f02120d7c
   languageName: node
   linkType: hard
 
-"@hyperschema/core@npm:^0.0.8":
-  version: 0.0.8
-  resolution: "@hyperschema/core@npm:0.0.8"
+"@hyperschema/core@npm:^0.0.9":
+  version: 0.0.9
+  resolution: "@hyperschema/core@npm:0.0.9"
   dependencies:
     json-stringify-pretty-compact: "npm:3.0.0"
     prettier: "npm:^3.0.3"
     socket.io: "npm:^4.7.2"
-    zod: "npm:*"
-  checksum: b7db3f2b00180b32baed36b6e7e38883b0b4bdf76256309af7bee5235cffcc4f61ef028888d9f51b1e3bcaaa64d319551835e75f836f9e415ddf7e640b17d53f
+  peerDependencies:
+    zod: "*"
+  checksum: d92f246ec3c3b4dee28fe8417ff3f090f7d25ae035a91b6c4bd5dc177018b7955ac445c5833c47f1aa730e3688eb47a7cd7c397327ec3c24337346018b63ee57
   languageName: node
   linkType: hard
 
@@ -23871,7 +23873,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "mikotojs@workspace:packages/mikotojs"
   dependencies:
-    "@hyperschema/client": "npm:^0.0.2"
+    "@hyperschema/client": "npm:^0.0.3"
     "@mikoto-io/permcheck": "npm:0.0.1"
     "@types/events": "npm:^3.0.0"
     axios: "npm:^1.6.1"
@@ -29484,7 +29486,7 @@ __metadata:
     "@axiomhq/winston": "npm:^1.0.0-rc.1"
     "@hocuspocus/cli": "npm:^2.4.0"
     "@hocuspocus/server": "npm:^2.8.1"
-    "@hyperschema/core": "npm:^0.0.8"
+    "@hyperschema/core": "npm:^0.0.9"
     "@mikoto-io/permcheck": "npm:0.0.1"
     "@prisma/client": "npm:^4.16.2"
     "@types/bcrypt": "npm:^5.0.0"
@@ -33989,7 +33991,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:*, zod@npm:^3.22.2":
+"zod@npm:^3.22.2":
   version: 3.22.2
   resolution: "zod@npm:3.22.2"
   checksum: bb39da97974b78c975bd1cbeb1a04ddc8ce69ac3100151e6ad1ee4763a8b3322fdbbcd98cd4b6bc2b40fb4d5bb86920f7c33515f430ca6aa439ce524a9c315c2

@@ -39,7 +39,7 @@
     "@axiomhq/winston": "^1.0.0-rc.1",
     "@hocuspocus/cli": "^2.4.0",
     "@hocuspocus/server": "^2.8.1",
-    "@hyperschema/core": "^0.0.8",
+    "@hyperschema/core": "^0.0.9",
     "@mikoto-io/permcheck": "0.0.1",
     "@prisma/client": "^4.16.2",
     "@types/bun": "^1.0.0",
@@ -67,7 +67,7 @@
     "winston": "^3.9.0",
     "y-protocols": "^1.0.6",
     "yjs": "^13.6.10",
-    "zod": "^3.22.2"
+    "zod": "^3.22.4"
   },
   "bundledDependencies": [
     "eslint-config"

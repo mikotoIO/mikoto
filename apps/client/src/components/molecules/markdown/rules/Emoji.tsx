@@ -1,11 +1,11 @@
 import SimpleMarkdown from '@khanacademy/simple-markdown';
 import React from 'react';
 
-import { createRule } from './rules';
+import { createRule } from '../rules';
 
 const EMOJI_REGEX = /^:(\+1|[-\w]+):/;
 
-const Emoji = React.lazy(() => import('./EmojiElement'));
+const Emoji = React.lazy(() => import('../EmojiElement'));
 
 export const emojiRule = createRule({
   order: SimpleMarkdown.defaultRules.em.order + 1,

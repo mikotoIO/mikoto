@@ -1,7 +1,7 @@
 import SimpleMarkdown from '@khanacademy/simple-markdown';
 import { Box } from '@mikoto-io/lucid';
 
-import { createRule } from './rules';
+import { createRule } from '../rules';
 
 const OBJECT_REGEX = /^<(\w+):([^\n]*)>/;
 

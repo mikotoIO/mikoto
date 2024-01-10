@@ -2,7 +2,7 @@ import SimpleMarkdown from '@khanacademy/simple-markdown';
 import { useState } from 'react';
 import styled from 'styled-components';
 
-import { createRule } from './rules';
+import { createRule } from '../rules';
 
 const SPOILER_REGEX = /^\|\|([\s\S]+?)\|\|(?!\|)/;
 

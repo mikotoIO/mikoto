@@ -1,8 +1,10 @@
+import SimpleMarkdown from '@khanacademy/simple-markdown';
 import { Anchor, Box, Modal } from '@mikoto-io/lucid';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
-import { modalState } from '../../ContextMenu';
+import { modalState } from '../../../ContextMenu';
+import { createRule } from '../rules';
 
 interface MessageImageProps {
   src?: string;
@@ -43,3 +45,10 @@ export function MessageImage({ src, alt }: MessageImageProps) {
     />
   );
 }
+
+export const imageRule = createRule({
+  ...SimpleMarkdown.defaultRules.image,
+  react: (node: any, _: any, state: any) => (
+    <MessageImage src={node.target} alt={node.alt} key={state.key} />
+  ),
+});

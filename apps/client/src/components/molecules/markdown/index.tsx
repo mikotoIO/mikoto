@@ -1,15 +1,13 @@
 import SimpleMarkdown, { SingleASTNode } from '@khanacademy/simple-markdown';
-import { Anchor } from '@mikoto-io/lucid';
-import { Suspense, lazy } from 'react';
 import styled, { css } from 'styled-components';
 
-import { emojiRule } from './Emoji';
-import { MessageImage } from './Image';
-import { objectRule } from './Object';
-import { spoilerRule } from './Spoiler';
-import { createRule } from './rules';
-
-const CodeHighlight = lazy(() => import('./CodeHighlight'));
+import { codeBlockRule } from './rules/CodeBlock';
+import { emojiRule } from './rules/Emoji';
+import { imageRule } from './rules/Image';
+import { linkRule } from './rules/Link';
+import { mentionRule } from './rules/Mention';
+import { objectRule } from './rules/Object';
+import { spoilerRule } from './rules/Spoiler';
 
 function isUrl(s: string) {
   let url;
@@ -27,39 +25,6 @@ function isUrlImage(url: string): boolean {
   return url.match(/\.(jpeg|jpg|gif|png)$/) !== null;
 }
 
-const CodeBlock = styled.div`
-  pre {
-    margin: 0;
-    text-wrap: wrap;
-  }
-  padding: 16px;
-  margin: 0;
-  background-color: var(--N1000);
-  color: var(--N300);
-  border-radius: 4px;
-  max-width: 800px;
-
-  .hljs-comment {
-    color: var(--N400);
-  }
-  .hljs-string {
-    color: var(--G700);
-  }
-  .hljs-keyword {
-    color: var(--V400);
-  }
-  .hljs-title.class_ {
-    color: var(--Y600);
-  }
-  .hljs-title {
-    color: var(--B500);
-  }
-
-  & > div {
-    padding: 0 !important;
-  }
-`;
-
 const Table = styled.table`
   border-collapse: collapse;
   &,
@@ -70,88 +35,21 @@ const Table = styled.table`
   }
 `;
 
-const Mention = styled.span`
-  background-color: #7591ff80;
-  border-radius: 4px;
-  padding: 0 2px;
-`;
-
-const mentionRule = createRule({
-  order: SimpleMarkdown.defaultRules.em.order + 1,
-  match(source: string) {
-    return /^@(\w+)/.exec(source);
-  },
-
-  parse(capture: string[]) {
-    return {
-      content: capture[1],
-    };
-  },
-
-  react(node, _, state) {
-    return <Mention key={state.key}>@{node.content}</Mention>;
-  },
-});
-
 const rules = {
   ...SimpleMarkdown.defaultRules,
-  image: {
-    ...SimpleMarkdown.defaultRules.image,
-    react: (node: any, _: any, state: any) => (
-      <MessageImage src={node.target} alt={node.alt} key={state.key} />
-    ),
-  },
-  codeBlock: {
-    ...SimpleMarkdown.defaultRules.codeBlock,
-    react(node: any, _: any, state: any) {
-      return (
-        <CodeBlock key={state.key}>
-          <Suspense
-            fallback={
-              <pre>
-                <code>{node.content}</code>
-              </pre>
-            }
-          >
-            <CodeHighlight language={node.lang} content={node.content} />
-          </Suspense>
-        </CodeBlock>
-      );
-    },
-  },
-
+  image: imageRule,
   paragraph: {
     ...SimpleMarkdown.defaultRules.paragraph,
     match: SimpleMarkdown.blockRegex(/^((?:[^\n])+)(?:\n *)+/),
   },
 
-  link: {
-    ...SimpleMarkdown.defaultRules.link,
-    react(node: any, output: any, state: any) {
-      return (
-        <Anchor
-          key={state.key}
-          href={SimpleMarkdown.sanitizeUrl(node.target) ?? '#'}
-          target="_blank"
-        >
-          {output(node.content, state)}
-        </Anchor>
-      );
-    },
-  },
-
+  link: linkRule,
+  codeBlock: codeBlockRule,
   object: objectRule,
   emoji: emojiRule,
   spoiler: spoilerRule,
   mention: mentionRule,
 };
-
-const rawBuiltParser = SimpleMarkdown.parserFor(rules as any);
-function parse(source: string) {
-  const blockSource = `${source}\n\n`;
-  return rawBuiltParser(blockSource, { inline: false });
-}
-const reactOutput = SimpleMarkdown.outputFor(rules, 'react');
 
 const emojiSizing = css<{ emojiSize: string }>`
   .emoji-mart-emoji img {
@@ -198,13 +96,16 @@ function emojiFest(nodes: SingleASTNode[]) {
   return '3em';
 }
 
+const rawBuiltParser = SimpleMarkdown.parserFor(rules as any);
+const reactOutput = SimpleMarkdown.outputFor(rules, 'react');
+
 export function Markdown({ content }: { content: string }) {
   const co =
     isUrl(content) && isUrlImage(content)
       ? `![Image Embed](${content})`
       : content;
 
-  const parsed = parse(co);
+  const parsed = rawBuiltParser(`${co}\n\n`, { inline: false });
   const output = reactOutput(parsed);
 
   return (

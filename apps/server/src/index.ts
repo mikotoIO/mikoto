@@ -35,6 +35,7 @@ const io = new socketio.Server(server, {
 const prisma = new PrismaClient({
   // log: ['error'],
 });
+
 Container.set(PrismaClient, prisma);
 Container.set(socketio.Server, io);
 Container.set(Mailer, new Mailer());

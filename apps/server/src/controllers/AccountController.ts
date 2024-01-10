@@ -18,6 +18,20 @@ import { env } from '../env';
 import Mailer from '../functions/Mailer';
 import { logger } from '../functions/logger';
 
+function bcryptHash(password: string) {
+  if (globalThis.Bun) {
+    return globalThis.Bun.password.hash(password, 'bcrypt');
+  }
+  return bcrypt.hash(password, 10);
+}
+
+function bcryptCompare(password: string, hash: string) {
+  if (globalThis.Bun) {
+    return globalThis.Bun.password.verify(password, hash);
+  }
+  return bcrypt.compare(password, hash);
+}
+
 const randomBytes = promisify(crypto.randomBytes);
 async function generateRandomToken(size = 32) {
   const b = await randomBytes(size);
@@ -95,7 +109,7 @@ export class AccountController {
         Account: {
           create: {
             email: body.email,
-            passhash: await bcrypt.hash(body.password, 10),
+            passhash: await bcryptHash(body.password),
           },
         },
       },
@@ -114,7 +128,7 @@ export class AccountController {
     if (account === null) {
       throw new UnauthorizedError('No user found with the given email');
     }
-    if (await bcrypt.compare(body.password, account.passhash)) {
+    if (await bcryptCompare(body.password, account.passhash)) {
       return await this.createTokenPair(account);
     }
     throw new UnauthorizedError('Incorrect Credentials');
@@ -139,7 +153,7 @@ export class AccountController {
     });
 
     if (!account) throw new UnauthorizedError('Invalid Account');
-    if (!(await bcrypt.compare(body.oldPassword, account.passhash)))
+    if (!(await bcryptCompare(body.oldPassword, account.passhash)))
       throw new UnauthorizedError('Invalid Password');
 
     // delete all refresh tokens as well
@@ -149,7 +163,7 @@ export class AccountController {
 
     await this.prisma.account.update({
       where: { id: account.id },
-      data: { passhash: await bcrypt.hash(body.newPassword, 10) },
+      data: { passhash: await bcryptHash(body.newPassword) },
     });
     return await this.createTokenPair(account);
   }
@@ -217,7 +231,7 @@ export class AccountController {
 
     await this.prisma.account.update({
       where: { id: account.id },
-      data: { passhash: await bcrypt.hash(body.newPassword, 10) },
+      data: { passhash: await bcryptHash(body.newPassword) },
     });
 
     return {

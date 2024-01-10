@@ -36,9 +36,6 @@ function constructMikotoSimple(options: MikotoConstructOptions) {
 export async function constructMikoto(options: MikotoConstructOptions) {
   const mikoto = await constructMikotoSimple(options);
   await Promise.all([mikoto.spaces.list(true), mikoto.getMe()]);
-  if (typeof window !== 'undefined') {
-    (window as any).client = mikoto;
-  }
   return mikoto;
 }
 

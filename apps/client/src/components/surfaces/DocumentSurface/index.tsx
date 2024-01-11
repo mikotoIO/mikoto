@@ -11,8 +11,9 @@ import { useInterval, useMikoto } from '../../../hooks';
 import { ContextMenu, useContextMenuX } from '../../ContextMenu';
 import { TabName } from '../../TabBar';
 import { ViewContainer } from '../../ViewContainer';
+import { Spinner } from '../../atoms/Spinner';
 import { NoteBubbleMenu } from './BubbleMenu';
-import { useNoteEditor } from './useNoteEditor';
+import { useNoteEditor, useNoteReader } from './useNoteEditor';
 
 const EditorContentWrapper = styled.div`
   font-size: 14px;
@@ -179,9 +180,28 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
         </Flex>
       </div>
       {editor && <NoteBubbleMenu editor={editor} />}
-      {synced && <EditorContent editor={editor} />}
+      {synced ? (
+        <EditorContent editor={editor} />
+      ) : (
+        <Flex p={{ top: 32 }} style={{ justifyContent: 'center' }}>
+          <Spinner />
+        </Flex>
+      )}
     </>
   );
+}
+
+interface DocumentReaderProps {
+  channel: ClientChannel;
+  content: string;
+}
+
+function DocumentReader({ channel, content }: DocumentReaderProps) {
+  const mikoto = useMikoto();
+
+  const { editor } = useNoteReader(content);
+
+  return <EditorContent editor={editor} />;
 }
 
 export default function DocumentSurface({ channelId }: { channelId: string }) {
@@ -205,6 +225,7 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
           </Box>
           {channel.name}
         </Heading>
+
         <EditorContentWrapper>
           {content !== null && (
             <DocumentEditor channel={channel} content={content} />

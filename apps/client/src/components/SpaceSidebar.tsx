@@ -1,3 +1,5 @@
+import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Image } from '@mikoto-io/lucid';
 import Tippy from '@tippyjs/react';
 import { ClientSpace, SpaceStore } from 'mikotojs';
@@ -95,6 +97,25 @@ interface SpaceIconDragItem {
   index: number;
 }
 
+function SpaceIconTooltip({
+  children,
+  tooltip,
+}: {
+  children: React.ReactElement;
+  tooltip: string;
+}) {
+  return (
+    <Tippy
+      animation={false}
+      content={<Tooltip>{tooltip}</Tooltip>}
+      placement="right"
+      offset={[0, 0]}
+    >
+      {children}
+    </Tippy>
+  );
+}
+
 function SidebarSpaceIcon({ space, index, onReorder }: SidebarSpaceIconProps) {
   // TF is this name?
   const [leftSidebar, setLeftSidebar] = useRecoilState(treebarSpaceState);
@@ -125,12 +146,7 @@ function SidebarSpaceIcon({ space, index, onReorder }: SidebarSpaceIconProps) {
   ));
 
   return (
-    <Tippy
-      animation={false}
-      content={<Tooltip>{space.name}</Tooltip>}
-      placement="right"
-      offset={[0, 0]}
-    >
+    <SpaceIconTooltip tooltip={space.name}>
       <StyledIconWrapper>
         <Pill h={isActive ? 32 : 0} />
         <StyledSpaceIcon
@@ -153,7 +169,7 @@ function SidebarSpaceIcon({ space, index, onReorder }: SidebarSpaceIconProps) {
           {space.icon === null ? space.name[0] : ''}
         </StyledSpaceIcon>
       </StyledIconWrapper>
-    </Tippy>
+    </SpaceIconTooltip>
   );
 }
 
@@ -267,17 +283,21 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
             }}
           />
         ))}
-      <StyledIconWrapper>
-        <StyledSpaceIcon
-          onClick={() => {
-            setModal({
-              elem: <SpaceJoinModal />,
-            });
-          }}
-        >
-          +
-        </StyledSpaceIcon>
-      </StyledIconWrapper>
+      <SpaceIconTooltip tooltip="Add / Join Space">
+        <StyledIconWrapper>
+          <StyledSpaceIcon
+            txt="B600"
+            fs={20}
+            onClick={() => {
+              setModal({
+                elem: <SpaceJoinModal />,
+              });
+            }}
+          >
+            <FontAwesomeIcon icon={faCirclePlus} />
+          </StyledSpaceIcon>
+        </StyledIconWrapper>
+      </SpaceIconTooltip>
     </StyledSpaceSidebar>
   );
 });

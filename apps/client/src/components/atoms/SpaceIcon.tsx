@@ -1,3 +1,4 @@
+import { Flex } from '@mikoto-io/lucid';
 import styled from 'styled-components';
 
 interface SpaceIconProps {
@@ -6,10 +7,9 @@ interface SpaceIconProps {
   size?: number;
 }
 
-export const StyledSpaceIcon = styled.div<SpaceIconProps>`
+export const StyledSpaceIcon = styled(Flex)<SpaceIconProps>`
   width: ${(p) => p.size ?? 48}px;
   height: ${(p) => p.size ?? 48}px;
-  display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
@@ -17,6 +17,6 @@ export const StyledSpaceIcon = styled.div<SpaceIconProps>`
   transition-duration: 100ms;
   background-image: url(${(p) => p.icon ?? 'none'});
   background-size: cover;
-  font-size: 14px;
+  font-size: ${(p) => p.fs ?? 14}px;
   cursor: pointer;
 `;

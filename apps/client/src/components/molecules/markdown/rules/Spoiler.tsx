@@ -29,7 +29,7 @@ function Spoiler({ children }: { children: React.ReactNode }) {
 }
 
 export const spoilerRule = createRule({
-  order: SimpleMarkdown.defaultRules.em.order + 1,
+  order: SimpleMarkdown.defaultRules.em.order,
   match(source: string) {
     return SPOILER_REGEX.exec(source);
   },

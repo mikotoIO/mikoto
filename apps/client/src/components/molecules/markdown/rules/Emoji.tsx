@@ -1,5 +1,5 @@
 import SimpleMarkdown from '@khanacademy/simple-markdown';
-import React from 'react';
+import React, { Suspense } from 'react';
 
 import { createRule } from '../rules';
 
@@ -18,6 +18,10 @@ export const emojiRule = createRule({
     };
   },
   react(node, _, state) {
-    return <Emoji emoji={node.emoji} key={state.key} />;
+    return (
+      <Suspense>
+        <Emoji emoji={node.emoji} key={state.key} />
+      </Suspense>
+    );
   },
 });

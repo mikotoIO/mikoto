@@ -105,7 +105,7 @@ export function Markdown({ content }: { content: string }) {
       ? `![Image Embed](${content})`
       : content;
 
-  const parsed = rawBuiltParser(`${co}\n\n`, { inline: false });
+  const parsed = rawBuiltParser(co, { inline: false });
   const output = reactOutput(parsed);
 
   return (

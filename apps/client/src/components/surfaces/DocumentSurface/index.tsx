@@ -1,36 +1,18 @@
-import {
-  faBold,
-  faEllipsis,
-  faFileLines,
-  faItalic,
-  faStrikethrough,
-} from '@fortawesome/free-solid-svg-icons';
+import { faEllipsis, faFileLines } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { HocuspocusProvider } from '@hocuspocus/provider';
 import { Box, Flex, Heading } from '@mikoto-io/lucid';
-import Collaboration from '@tiptap/extension-collaboration';
-import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
-import Image from '@tiptap/extension-image';
-import Link from '@tiptap/extension-link';
-import Placeholder from '@tiptap/extension-placeholder';
-import TaskItem from '@tiptap/extension-task-item';
-import TaskList from '@tiptap/extension-task-list';
-import YouTube from '@tiptap/extension-youtube';
-import { BubbleMenu, Editor, EditorContent, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
+import { Editor, EditorContent } from '@tiptap/react';
 import { ClientChannel } from 'mikotojs';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
-import { Markdown } from 'tiptap-markdown';
-import * as Y from 'yjs';
 
-import { env } from '../../../env';
 import { useInterval, useMikoto } from '../../../hooks';
 import { ContextMenu, useContextMenuX } from '../../ContextMenu';
 import { TabName } from '../../TabBar';
 import { ViewContainer } from '../../ViewContainer';
-import { SlashCommand } from './SlashCommand';
+import { NoteBubbleMenu } from './BubbleMenu';
+import { useNoteEditor } from './useNoteEditor';
 
 const EditorContentWrapper = styled.div`
   font-size: 14px;
@@ -108,57 +90,6 @@ interface DocumentEditorProps {
   onChange?(): void;
 }
 
-const BubbleMenuContainer = styled.div`
-  background-color: var(--N1100);
-  border: 1px solid var(--N600);
-  padding: 4px;
-  border-radius: 4px;
-
-  button {
-    background: none;
-    border: none;
-    color: var(--N400);
-    font-size: 16px;
-
-    &:hover {
-      color: var(--N0);
-    }
-  }
-`;
-
-function NoteBubbleMenu({ editor }: { editor: Editor }) {
-  return (
-    <BubbleMenu editor={editor} tippyOptions={{ duration: 100 }}>
-      <BubbleMenuContainer>
-        <button
-          type="button"
-          onClick={() => {
-            editor.chain().focus().toggleMark('bold').run();
-          }}
-        >
-          <FontAwesomeIcon icon={faBold} />
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            editor.chain().focus().toggleMark('italic').run();
-          }}
-        >
-          <FontAwesomeIcon icon={faItalic} />
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            editor.chain().focus().toggleMark('strike').run();
-          }}
-        >
-          <FontAwesomeIcon icon={faStrikethrough} />
-        </button>
-      </BubbleMenuContainer>
-    </BubbleMenu>
-  );
-}
-
 const RANDOM_COLORS = [
   '#ff9999',
   '#ff9966',
@@ -172,75 +103,21 @@ function randomColor() {
   return RANDOM_COLORS[Math.floor(Math.random() * RANDOM_COLORS.length)];
 }
 
-const IS_COLLABORATION = true;
-
 function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
   const [changed, setChanged] = useState(false);
-  const [ydoc] = useState(() => new Y.Doc());
-  const [synced, setSynced] = useState(false);
   const [cursorColor] = useState(randomColor);
-  const [provider] = useState(() =>
-    IS_COLLABORATION
-      ? new HocuspocusProvider({
-          url: env.PUBLIC_COLLABORATION_URL,
-          name: channel.id,
-          document: ydoc,
-        })
-      : null,
-  );
+
   const mikoto = useMikoto();
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        history: false,
-      }) as any,
-      Link,
-      Image,
-      TaskList,
-      TaskItem,
-      SlashCommand,
-      Placeholder.configure({
-        placeholder: () => "press '/' for commands",
-        includeChildren: true,
-      }),
-      YouTube,
-      Markdown.configure({
-        html: false,
-      }),
-      ...(IS_COLLABORATION
-        ? [
-            Collaboration.configure({
-              document: ydoc,
-            }),
-            CollaborationCursor.configure({
-              provider,
-              user: {
-                name: mikoto.me.name,
-                color: cursorColor,
-              },
-            }),
-          ]
-        : []),
-    ],
-    onUpdate() {
+  const { editor, synced } = useNoteEditor({
+    content,
+    channel,
+    cursorUser: { name: mikoto.me.name, color: cursorColor },
+    onChange() {
       onChange?.();
       setChanged(true);
     },
-    content: IS_COLLABORATION ? undefined : content,
   });
-
-  useEffect(() => {
-    if (!provider) return;
-    if (!editor) return;
-
-    provider.on('synced', () => {
-      if (ydoc.store.clients.size === 0) {
-        editor.commands.setContent(content);
-      }
-      setSynced(true);
-    });
-  }, [editor]);
 
   const save = (edt: Editor) => {
     const contentString: string = edt.storage.markdown.getMarkdown();
@@ -302,7 +179,7 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
         </Flex>
       </div>
       {editor && <NoteBubbleMenu editor={editor} />}
-      {(synced || !IS_COLLABORATION) && <EditorContent editor={editor} />}
+      {synced && <EditorContent editor={editor} />}
     </>
   );
 }
@@ -321,7 +198,6 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
   return (
     <ViewContainer scroll>
       <TabName name={channel.name} icon={faFileLines} />
-
       <Box p={32}>
         <Heading fs={28} txt="N200">
           <Box as="span" txt="N400">

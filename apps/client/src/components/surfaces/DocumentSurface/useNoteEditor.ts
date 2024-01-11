@@ -90,3 +90,13 @@ export function useNoteEditor({
 
   return { editor, synced };
 }
+
+export function useNoteReader(content: string) {
+  const editor = useEditor({
+    extensions: [...basicExtensions],
+    editable: false,
+    content,
+  });
+
+  return { editor };
+}

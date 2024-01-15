@@ -123,7 +123,6 @@ export function RegisterView() {
 
   return (
     <AuthView>
-      {error.el}
       <Form
         w={360}
         onSubmit={handleSubmit(async (data) => {
@@ -141,6 +140,7 @@ export function RegisterView() {
         })}
       >
         <h1>Register</h1>
+        {error.el}
         <Input labelName="Username" {...register('name')} />
         <Input labelName="Email" {...register('email')} />
         <Input labelName="Password" type="password" {...register('password')} />

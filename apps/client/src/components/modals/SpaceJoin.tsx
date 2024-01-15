@@ -29,7 +29,7 @@ function SpaceCreateForm({ closeModal }: { closeModal: () => void }) {
     >
       <Input
         labelName="Space Name"
-        placeholder="Awesomerino Space"
+        placeholder="Academy City"
         {...form.register('spaceName')}
       />
       <Button variant="primary" type="submit">

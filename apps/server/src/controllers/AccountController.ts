@@ -1,4 +1,4 @@
-import { Account, Bot, PrismaClient } from '@prisma/client';
+import { Account, Bot, Prisma, PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
@@ -103,21 +103,36 @@ export class AccountController {
 
   @Post('/account/register')
   async register(@Body() body: RegisterPayload) {
-    await this.prisma.user.create({
-      data: {
-        name: body.name,
-        Account: {
-          create: {
-            email: body.email,
-            passhash: await bcryptHash(body.password),
+    try {
+      await this.prisma.user.create({
+        data: {
+          name: body.name,
+          Account: {
+            create: {
+              email: body.email,
+              passhash: await bcryptHash(body.password),
+            },
           },
         },
-      },
-    });
-    const account = await this.prisma.account.findUnique({
-      where: { email: body.email },
-    });
-    return await this.createTokenPair(account!);
+      });
+      const account = await this.prisma.account.findUnique({
+        where: { email: body.email },
+      });
+      return await this.createTokenPair(account!);
+    } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2002'
+      ) {
+        if ((e?.meta?.target as any).includes('email')) {
+          throw new UnauthorizedError(
+            'There is already an account with the email; Please log in with this email.',
+          );
+        }
+        throw e;
+      }
+      throw e;
+    }
   }
 
   @Post('/account/login')

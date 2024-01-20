@@ -16,6 +16,42 @@
       }
     },
     {
+      "name": "UserStatus",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "presence",
+            "type": {"type": "nullable", "param": ["string"]}
+          },
+          {"name": "content", "type": {"type": "nullable", "param": ["string"]}}
+        ]
+      }
+    },
+    {
+      "name": "UserProfile",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "id", "type": "string"},
+          {"name": "name", "type": "string"},
+          {"name": "avatar", "type": {"type": "nullable", "param": ["string"]}},
+          {
+            "name": "category",
+            "type": {"type": "nullable", "param": ["string"]}
+          },
+          {
+            "name": "description",
+            "type": {"type": "nullable", "param": ["string"]}
+          },
+          {
+            "name": "status",
+            "type": {"type": "nullable", "param": ["UserStatus"]}
+          }
+        ]
+      }
+    },
+    {
       "name": "Role",
       "type": {
         "kind": "struct",

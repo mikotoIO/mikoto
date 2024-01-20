@@ -10,6 +10,22 @@ export const User = z.object({
 });
 export type User = z.infer<typeof User>;
 
+export const UserStatus = z.object({
+  presence: z.nullable(z.string()),
+  content: z.nullable(z.string()),
+});
+export type UserStatus = z.infer<typeof UserStatus>;
+
+export const UserProfile = z.object({
+  id: z.string(),
+  name: z.string(),
+  avatar: z.nullable(z.string()),
+  category: z.nullable(z.string()),
+  description: z.nullable(z.string()),
+  status: z.nullable(UserStatus),
+});
+export type UserProfile = z.infer<typeof UserProfile>;
+
 export const Role = z.object({
   id: z.string(),
   name: z.string(),

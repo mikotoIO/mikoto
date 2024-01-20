@@ -5,15 +5,30 @@ import { z } from 'zod';
 export const User = z.object({
   id: z.string(),
   name: z.string(),
-  avatar: z.nullable(z.string()),
-  category: z.nullable(z.string()),
+  avatar: z.string().nullable(),
+  category: z.string().nullable(),
 });
 export type User = z.infer<typeof User>;
+
+export const UserStatus = z.object({
+  presence: z.string().nullable(),
+  content: z.string().nullable(),
+});
+
+export const UserProfile = z.object({
+  id: z.string(),
+  name: z.string(),
+  avatar: z.string().nullable(),
+  category: z.string().nullable(),
+
+  description: z.string().nullable(),
+  status: UserStatus.nullable(),
+});
 
 export const Role = z.object({
   id: z.string(),
   name: z.string(),
-  color: z.nullable(z.string()),
+  color: z.string().nullable(),
   spaceId: z.string(),
   permissions: z.string(),
   position: z.number().int(),
@@ -23,7 +38,7 @@ export type Role = z.infer<typeof Role>;
 export const Channel = z.object({
   id: z.string(),
   spaceId: z.string(),
-  parentId: z.nullable(z.string()),
+  parentId: z.string().nullable(),
   name: z.string(),
   order: z.number().int(),
   lastUpdated: z.nullable(hsDate()),
@@ -46,7 +61,7 @@ export const Member = z.object({
   id: z.string(),
   spaceId: z.string(),
   user: User,
-  roleIds: z.array(z.string()),
+  roleIds: z.string().array(),
 });
 export type Member = z.infer<typeof Member>;
 
@@ -118,9 +133,9 @@ export const SpaceUpdateOptions = z.object({
 export const ChannelCreateOptions = z.object({
   name: z.string(),
   type: z.string(),
-  parentId: z.nullable(z.string()),
+  parentId: z.string().nullable(),
 });
 
 export const ChannelUpdateOptions = z.object({
-  name: z.nullable(z.string()),
+  name: z.string().nullable(),
 });

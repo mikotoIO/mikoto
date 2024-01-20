@@ -16,10 +16,13 @@ enum UserCategory {
 }
 
 model User {
-  id       String        @id @default(uuid()) @db.Uuid
-  name     String        @db.String(64)
-  avatar   String?       @db.String(256)
-  category UserCategory?
+  id          String        @id @default(uuid()) @db.Uuid
+  name        String        @db.String(64)
+  avatar      String?       @db.String(256)
+  description String?       @db.String(2048)
+  category    UserCategory?
+
+  status UserStatus?
 
   SpaceUser     SpaceUser[]
   Message       Message[]
@@ -35,7 +38,6 @@ model User {
   Ban          Ban[]
   Invite       Invite[]
   Settings     Settings?
-  UserStatus   UserStatus[]
 }
 
 model UserStatus {

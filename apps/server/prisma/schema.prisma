@@ -41,8 +41,8 @@ model User {
 model UserStatus {
   id        String   @id @default(uuid()) @db.Uuid
   user      User     @relation(fields: [id], references: [id], onDelete: Cascade)
-  presence  String
-  content   String
+  presence  String?
+  content   String?
   timestamp DateTime @default(now())
 }
 

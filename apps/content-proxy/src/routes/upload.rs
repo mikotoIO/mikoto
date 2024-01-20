@@ -1,5 +1,8 @@
 use std::io::Cursor;
 
+use rocket::{form::Form, fs::TempFile};
+use tokio::io::AsyncBufReadExt;
+
 use crate::{
     config::{StoreType, CONFIG},
     env::PUBLIC_MEDIASERVER_URL,
@@ -7,41 +10,40 @@ use crate::{
     functions::storage::MAIN_BUCKET,
 };
 use nanoid::nanoid;
-use rocket::{http::ContentType, serde::json::Json, Data};
-use rocket_multipart_form_data::{MultipartFormData, MultipartFormDataOptions};
+use rocket::{http::ContentType, serde::json::Json};
 
 #[derive(Debug, Serialize)]
 pub struct UploadResponse {
     pub url: String,
 }
 
+#[derive(FromForm)]
+pub struct Upload<'r> {
+    pub file: TempFile<'r>,
+}
+
 #[post("/<store>", data = "<data>")]
 pub async fn upload(
     content_type: &ContentType,
     store: String,
-    data: Data<'_>,
+    data: Form<Upload<'_>>,
 ) -> Result<Json<UploadResponse>, Error> {
-    let options = MultipartFormDataOptions::default();
-    let mut form_data = MultipartFormData::parse(content_type, data, options)
-        .await
-        .map_err(|_| Error::BadRequest)?;
-
-    let f = form_data
-        .raw
-        .remove(form_data.files.keys().next().ok_or(Error::BadRequest)?)
-        .ok_or(Error::BadRequest)?
-        .remove(0);
+    let f = &data.file;
     let store_config = CONFIG.get(&store).ok_or(Error::NotFound)?;
 
     // validate file size
-    if f.raw.len() > store_config.max_size as usize {
+    if f.len() > store_config.max_size {
         return Err(Error::BadRequest);
     }
+
+    // convert file to buffer
+    let mut f = f.open().await.map_err(|_| Error::BadRequest)?;
+    let buf = f.fill_buf().await.map_err(|_| Error::BadRequest)?;
 
     let (filename, data) = match store_config.store_type {
         StoreType::Image => {
             // validate if image
-            let mut image = image::load_from_memory(&f.raw)?;
+            let mut image = image::load_from_memory(buf)?;
             if let Some(resize) = &store_config.image_resize {
                 // resize image before upload
                 image = image.resize_exact(

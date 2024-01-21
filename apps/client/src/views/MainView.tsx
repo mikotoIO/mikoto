@@ -32,8 +32,8 @@ const AppContainer = styled.div`
   color: var(--color-text);
   display: flex;
   flex-direction: row;
-  height: 100vh;
-  width: 100vw;
+  width: 100%;
+  flex: 1;
 `;
 
 function ErrorBoundaryPage({ children }: { children: React.ReactNode }) {
@@ -56,7 +56,7 @@ const LeftBar = styled(Flex)`
 
   .top {
     display: flex;
-    background-color: var(--N1000);
+    background-color: var(--N900);
   }
   .bars {
     display: flex;

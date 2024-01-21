@@ -57,7 +57,7 @@ const Art = styled(Box)`
 
 export function AuthView({ children }: { children: React.ReactNode }) {
   return (
-    <Flex h="100vh" center bg="N1000">
+    <Flex h="100%" center bg="N1000">
       <Flex
         rounded={8}
         style={{

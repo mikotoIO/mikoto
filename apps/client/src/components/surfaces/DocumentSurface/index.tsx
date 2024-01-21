@@ -146,10 +146,8 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
           rounded={4}
           p={16}
           m={{ bottom: 16 }}
-          style={{
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
+          alignItems="center"
+          justifyContent="space-between"
         >
           <FontAwesomeIcon
             icon={faEllipsis}
@@ -183,7 +181,7 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
       {synced ? (
         <EditorContent editor={editor} />
       ) : (
-        <Flex p={{ top: 32 }} style={{ justifyContent: 'center' }}>
+        <Flex p={{ top: 32 }} justifyContent="center">
           <Spinner />
         </Flex>
       )}

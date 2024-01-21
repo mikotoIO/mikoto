@@ -151,7 +151,7 @@ export const DMExplorer = observer(
       <StyledTree
         onContextMenu={nodeContextMenu(<TreebarContextMenu space={space} />)}
       >
-        <Flex p={16} style={{ alignItems: 'center' }}>
+        <Flex p={16} alignItems="center">
           <Avatar src={relation.relation?.avatar ?? undefined} size={32} />
           <Heading fs={16} m={{ left: 8 }}>
             {relation.relation?.name ?? 'Unknown User'}

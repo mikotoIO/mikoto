@@ -63,7 +63,7 @@ export function ProfileModal({ user }: { user: User }) {
           <Avatar src={user.avatar ?? undefined} size={100} />
         </div>
         <div className="content">
-          <Flex style={{ justifyContent: 'space-between' }}>
+          <Flex justifyContent="space-between">
             <div>
               <h1>{user.name}</h1>
               <h2 className="mikotoid">@cactus.mikoto.io</h2>

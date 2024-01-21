@@ -56,7 +56,7 @@ function Permissions({ channel }: { channel: ClientChannel }) {
     <SettingsView>
       <Heading>Permissions</Heading>
       <Box p={{ y: 16 }}>
-        <Flex style={{ justifyContent: 'space-between' }}>
+        <Flex justifyContent="space-between">
           <Heading as="h3" m={0}>
             PermName
           </Heading>

@@ -130,7 +130,7 @@ type ToggleProps = Partial<{
   onChange: (checked: boolean) => void;
 }>;
 
-const StyledToggle = styled(Switch)`
+const StyledToggle = styled(Switch as any)`
   outline: none;
   border: none;
   border-radius: 40px;
@@ -161,7 +161,7 @@ const ToggleInner = styled.div<{ checked: boolean }>`
 export function Toggle({ checked, onChange }: ToggleProps) {
   return (
     <StyledToggle checked={checked} onChange={onChange}>
-      {(c) => <ToggleInner checked={c.checked} />}
+      {(c: any) => <ToggleInner checked={c.checked} />}
     </StyledToggle>
   );
 }

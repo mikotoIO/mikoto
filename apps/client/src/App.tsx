@@ -25,7 +25,7 @@ function App() {
   return (
     <BrowserRouter>
       <AppShell>
-        {IS_ELECTRON && <WindowBar />}
+        {/* {IS_ELECTRON && <WindowBar />} */}
         <Routes>
           <Route path="/" element={<MainView />} />
           <Route path="/login" element={<LoginView />} />

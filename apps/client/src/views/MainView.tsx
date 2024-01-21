@@ -197,7 +197,7 @@ const MikotoLogo = styled.img`
 
 function Fallback() {
   return (
-    <Flex center w="100vw" h="100vh" txt="N0" dir="column">
+    <Flex center w="100%" h="100%" txt="N0" dir="column">
       <MikotoLogo src="/logo/logo.svg" />
       <Box fs={20} m={{ top: 16 }}>
         Loading...

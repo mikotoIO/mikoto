@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+import React from 'react';
 import styled from 'styled-components';
 
 import { BoxProps, boxCss } from './Layout';
@@ -34,12 +36,14 @@ const variantMap = {
   },
 };
 
-export type ButtonProps = Partial<{
-  variant: keyof typeof variantMap;
-  transparent: boolean;
-}>;
-
-export const Button = styled.button<ButtonProps & BoxProps>`
+const StyledButton = styled.button<
+  Partial<{
+    variant: keyof typeof variantMap;
+    transparent: boolean;
+    loading: boolean;
+  }> &
+    BoxProps
+>`
   background-color: ${(p) =>
     p.transparent ? 'transparent' : variantMap[p.variant!].backgroundColor};
 
@@ -65,7 +69,7 @@ export const Button = styled.button<ButtonProps & BoxProps>`
   ${boxCss}
 `;
 
-Button.defaultProps = {
+StyledButton.defaultProps = {
   as: 'button',
   variant: 'default',
   p: {
@@ -75,3 +79,12 @@ Button.defaultProps = {
   fs: 14,
   rounded: 4,
 };
+
+export function Button({
+  children,
+  ...props
+}: React.ComponentProps<typeof StyledButton>) {
+  return (
+    <StyledButton {...props}>{props.loading ? null : children}</StyledButton>
+  );
+}

@@ -9,11 +9,11 @@ const anim = keyframes`
   25% {
     transform: translateX(${wanderDistance}) rotate(-90deg) scale(0.6);
   }
-  50% { /* Make FF rotate in the right direction */
+  50% { 
     transform: translateX(${wanderDistance}) translateY(${wanderDistance}) rotate(-179deg);
   }
   50.1% {
-    transform: translateX(${wanderDistance}) translateY${wanderDistance}) rotate(-180deg);
+    transform: translateX(${wanderDistance}) translateY(${wanderDistance}) rotate(-180deg);
   }
   75% {
     transform: translateX(0) translateY(${wanderDistance}) rotate(-270deg) scale(0.6);
@@ -23,13 +23,13 @@ const anim = keyframes`
   }
 `;
 
-const SpinnerElement = styled.div`
-  width: 64px;
-  height: 64px;
+const SpinnerElement = styled.div<SpinnerProps>`
+  width: ${(p) => p.size ?? '64px'};
+  height: ${(p) => p.size ?? '64px'};
   position: relative;
 
   .sk-wander-cube {
-    background-color: white;
+    background-color: ${(p) => p.color ?? 'white'};
     width: 30%;
     height: 30%;
     position: absolute;
@@ -40,13 +40,19 @@ const SpinnerElement = styled.div`
   }
   .sk-wander-cube:nth-child(2) {
     animation-delay: -1s;
-    background-color: #3b83ff;
+    background-color: ${(p) => p.color2 ?? '#3b83ff'};
   }
 `;
 
-export function Spinner() {
+export interface SpinnerProps {
+  size?: string;
+  color?: string;
+  color2?: string;
+}
+
+export function Spinner(props: SpinnerProps) {
   return (
-    <SpinnerElement>
+    <SpinnerElement {...props}>
       <div className="sk-wander-cube" />
       <div className="sk-wander-cube" />
     </SpinnerElement>

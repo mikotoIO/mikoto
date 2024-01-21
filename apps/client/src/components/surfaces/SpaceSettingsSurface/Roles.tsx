@@ -122,7 +122,7 @@ function RolePermissionEditor({
     <Box>
       {rolePermissionData.map((x) => (
         <Box p={{ y: 16 }} key={x.permission.toString()}>
-          <Flex style={{ justifyContent: 'space-between' }}>
+          <Flex justifyContent="space-between">
             <Heading as="h3" m={0}>
               {x.name}
             </Heading>

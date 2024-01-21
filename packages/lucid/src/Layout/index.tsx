@@ -22,12 +22,16 @@ export const Grid = styled.div<GridProps & BoxProps>`
 export type FlexProps = Partial<{
   dir: 'row' | 'column';
   center: boolean;
+  justifyContent: CSS.Properties['justifyContent'];
+  alignItems: CSS.Properties['alignItems'];
 }>;
 
 export const Flex = styled.div<FlexProps & BoxProps>`
   display: flex;
   ${(p) => p.dir && `flex-direction: ${p.dir};`}
   ${(p) => p.center && `align-items: center; justify-content: center;`}
+  ${(p) => p.justifyContent && `justify-content: ${p.justifyContent};`}
+  ${(p) => p.alignItems && `align-items: ${p.alignItems};`}
   ${boxCss}
 `;
 

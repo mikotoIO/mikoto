@@ -22,15 +22,7 @@ function UserAreaMenu() {
 
   return (
     <ContextMenu style={{ width: '280px' }}>
-      <Flex
-        gap={8}
-        bg="N900"
-        p={8}
-        rounded={4}
-        style={{
-          alignItems: 'center',
-        }}
-      >
+      <Flex gap={8} bg="N900" p={8} rounded={4} alignItems="center">
         <Avatar src={mikoto.me.avatar ?? undefined} size={64} />
         <Heading fs={20}>{mikoto.me.name}</Heading>
       </Flex>

@@ -24,14 +24,6 @@ module.exports = {
         bin: 'Mikoto',
       },
     },
-    // {
-    //   name: '@electron-forge/maker-zip',
-    //   platforms: ['darwin'],
-    // },
-    // {
-    //   name: '@electron-forge/maker-rpm',
-    //   config: {},
-    // },
   ],
   publishers: [
     // {

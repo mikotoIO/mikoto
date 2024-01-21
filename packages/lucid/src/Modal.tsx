@@ -5,7 +5,9 @@ import styled from 'styled-components';
 import { StyledComponent } from './types';
 
 // absolute center
-export const ModalBase: StyledComponent<HTMLDivElement> = styled(Dialog.Panel)`
+export const ModalBase: StyledComponent<HTMLDivElement> = styled(
+  Dialog.Panel as any, // TODO: TypeScript compiler hangs on this expr (???)
+)`
   background-color: var(--N800);
   color: var(--N0);
   position: absolute;

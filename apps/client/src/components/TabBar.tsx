@@ -4,7 +4,7 @@ import {
   faX,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Flex, Grid } from '@mikoto-io/lucid';
+import { Flex, Grid } from '@mikoto-io/lucid';
 import { action, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useContext, useEffect, useRef } from 'react';

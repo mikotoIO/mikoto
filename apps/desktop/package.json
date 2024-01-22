@@ -20,6 +20,7 @@
   "dependencies": {
     "@electron-forge/maker-dmg": "^7.2.0",
     "electron": "^27.0.3",
+    "electron-builder": "24.9.1",
     "electron-squirrel-startup": "^1.0.0"
   },
   "devDependencies": {

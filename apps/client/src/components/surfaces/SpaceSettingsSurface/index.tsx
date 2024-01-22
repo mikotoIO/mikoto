@@ -1,7 +1,7 @@
-import { Box, Button, Buttons, Form, Input, Modal } from '@mikoto-io/lucid';
-import { ClientSpace, Invite, Space } from 'mikotojs';
+import { Button, Buttons, Form, Input, Modal } from '@mikoto-io/lucid';
+import { ClientSpace } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSetRecoilState } from 'recoil';
@@ -14,6 +14,7 @@ import { AvatarEditor } from '../../molecules/AvatarEditor';
 import { BaseSettingsSurface } from '../BaseSettingSurface';
 import { BansSubsurface } from './Bans';
 import { EmojiSubsurface } from './Emojis';
+import { Invites } from './Invites';
 import { RolesSubsurface } from './Roles';
 
 function AddBotModal({ space }: { space: ClientSpace }) {
@@ -94,42 +95,6 @@ const Overview = observer(({ space }: { space: ClientSpace }) => {
     </SettingsView>
   );
 });
-function Invites({ space }: { space: Space }) {
-  const mikoto = useMikoto();
-  const [invites, setInvites] = useState<Invite[] | null>(null);
-
-  useEffect(() => {
-    mikoto.client.spaces.listInvites({ spaceId: space.id }).then((x) => {
-      setInvites(x);
-    });
-  }, [space.id]);
-
-  return (
-    <SettingsView>
-      <h1>Invites</h1>
-      {invites &&
-        invites.map((invite) => (
-          <Box key={invite.code} bg="N900" m={4} p={16} rounded={8}>
-            <Box bg="N1000" p={8} rounded={8}>
-              {invite.code}
-            </Box>
-            <Button
-              variant="danger"
-              onClick={() => {
-                mikoto.client.spaces
-                  .deleteInvite({ spaceId: space.id, inviteCode: invite.code })
-                  .then(() => {
-                    setInvites(invites.filter((x) => x.code !== invite.code));
-                  });
-              }}
-            >
-              Delete
-            </Button>
-          </Box>
-        ))}
-    </SettingsView>
-  );
-}
 
 function Switch({ nav, space }: { nav: string; space: ClientSpace }) {
   switch (nav) {

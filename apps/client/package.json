@@ -126,9 +126,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "analyze": "source-map-explorer ./build/static/js/*.js",
-    "eject": "react-scripts eject",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "eject": "react-scripts eject"
   },
   "browserslist": {
     "production": [
@@ -145,14 +143,6 @@
   "devDependencies": {
     "@babel/core": "^7.22.9",
     "@mdx-js/react": "^1.6.22",
-    "@storybook/addon-actions": "^6.5.16",
-    "@storybook/addon-docs": "^6.5.16",
-    "@storybook/addon-essentials": "^6.5.16",
-    "@storybook/addon-interactions": "^6.5.16",
-    "@storybook/addon-links": "^6.5.16",
-    "@storybook/builder-vite": "^0.3.0",
-    "@storybook/react": "^6.5.16",
-    "@storybook/testing-library": "^0.0.13",
     "@types/draft-js": "^0.11.9",
     "@types/events": "^3.0.0",
     "@types/jest": "^28.1.7",

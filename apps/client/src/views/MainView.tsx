@@ -119,6 +119,11 @@ const SurfaceGroup = observer(
   },
 );
 
+const SidebarRest = styled.div`
+  flex-grow: 1;
+  -webkit-app-region: drag;
+`;
+
 const AppView = observer(() => {
   const leftSidebar = useRecoilValue(treebarSpaceState);
   const mikoto = useMikoto();
@@ -146,6 +151,7 @@ const AppView = observer(() => {
             <FontAwesomeIcon icon={faBarsStaggered} />
           </TabBarButton>
           {workspace.leftOpen && <UserAreaAvatar />}
+          <SidebarRest />
         </div>
         <div className="bars">
           <SpaceSidebar spaces={mikoto.spaces} />

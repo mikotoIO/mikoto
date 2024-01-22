@@ -30,4 +30,5 @@ export const Avatar = styled.img.attrs<{ size?: number | string }>((p) => ({
   width: ${(p) => (typeof p.size === 'number' ? `${p.size}px` : p.size)};
   height: ${(p) => (typeof p.size === 'number' ? `${p.size}px` : p.size)};
   border-radius: 8px;
+  cursor: pointer;
 `;

@@ -10,7 +10,6 @@ import {
 import MainView from './views/MainView';
 import { MikotoApiLoader } from './views/MikotoApiLoader';
 import { SpaceInviteView } from './views/SpaceInviteView';
-import { WindowBar } from './views/WindowBar';
 
 const AppShell = styled.div`
   height: 100vh;

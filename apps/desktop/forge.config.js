@@ -26,16 +26,6 @@ module.exports = {
     },
   ],
   publishers: [
-    // {
-    //   name: '@electron-forge/publisher-github',
-    //   config: {
-    //     repository: {
-    //       owner: 'mikotoIO',
-    //       name: 'desktop',
-    //     },
-    //   }
-    // }
-
     {
       name: '@electron-forge/publisher-gcs',
       config: {

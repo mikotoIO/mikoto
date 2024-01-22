@@ -94,9 +94,15 @@ function showDateSeparator(message: Message, prevMessage?: Message) {
 }
 
 const StyledChannelHead = styled.div`
-  padding: 8px 64px;
+  padding: 16px 64px;
   h1 {
     font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: var(--N300);
+    margin: 0;
   }
 `;
 

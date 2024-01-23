@@ -45,14 +45,24 @@ export function WindowBar() {
     <StyledWindowBar>
       {IS_ELECTRON && (
         <StyledWindowButtons>
-          <StyledWindowButton color="var(--N700)">
+          <StyledWindowButton
+            color="var(--N700)"
+            onClick={() => {
+              (window as any).electronAPI.minimize();
+            }}
+          >
             <FontAwesomeIcon icon={faMinus} />
           </StyledWindowButton>
           <StyledWindowButton color="var(--N700)">
             <FontAwesomeIcon icon={faExpand} />
-          </StyledWindowButton>{' '}
+          </StyledWindowButton>
           <StyledWindowButton color="var(--R700)">
-            <FontAwesomeIcon icon={faClose} />
+            <FontAwesomeIcon
+              icon={faClose}
+              onClick={() => {
+                (window as any).electronAPI.close();
+              }}
+            />
           </StyledWindowButton>
         </StyledWindowButtons>
       )}

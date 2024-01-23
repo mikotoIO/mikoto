@@ -1,4 +1,4 @@
-import { BrowserWindow, app, shell } from 'electron';
+import { BrowserWindow, app, ipcMain, shell } from 'electron';
 import path from 'path';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -44,6 +44,18 @@ const createWindow = () => {
   });
 
   mainWindow.loadURL(APP_URL_PATH);
+
+  ipcMain.on('minimize', () => {
+    mainWindow?.minimize();
+  });
+
+  ipcMain.on('hide', () => {
+    mainWindow?.hide();
+  });
+
+  ipcMain.on('close', () => {
+    mainWindow?.close();
+  });
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();

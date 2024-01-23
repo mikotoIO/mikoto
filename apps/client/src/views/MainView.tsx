@@ -26,6 +26,7 @@ import {
   surfaceStore,
 } from '../store/surface';
 import { MikotoApiLoader } from './MikotoApiLoader';
+import { WindowBar } from './WindowBar';
 
 const AppContainer = styled.div`
   background-color: var(--color-subsurface);
@@ -177,18 +178,25 @@ const AppView = observer(() => {
       </LeftBar>
       <SurfaceGroup surfaceNode={surfaceStore.node} />
       {workspace.rightOpen && (
-        <Sidebar
-          position="right"
-          size={workspace.right}
-          onResize={(size) => {
-            setWorkspace((ws) => ({
-              ...ws,
-              right: ws.right + size.width,
-            }));
-          }}
-        >
-          {space && <MemberListSidebar space={space} />}
-        </Sidebar>
+        <LeftBar dir="column">
+          <div className="top">
+            <WindowBar />
+          </div>
+          <div className="bars">
+            <Sidebar
+              position="right"
+              size={workspace.right}
+              onResize={(size) => {
+                setWorkspace((ws) => ({
+                  ...ws,
+                  right: ws.right + size.width,
+                }));
+              }}
+            >
+              {space && <MemberListSidebar space={space} />}
+            </Sidebar>
+          </div>
+        </LeftBar>
       )}
     </AppContainer>
   );

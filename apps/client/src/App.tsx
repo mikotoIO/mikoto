@@ -18,13 +18,11 @@ const AppShell = styled.div`
   flex-direction: column;
 `;
 
-export const IS_ELECTRON = navigator.userAgent.indexOf('Electron') !== -1;
 
 function App() {
   return (
     <BrowserRouter>
       <AppShell>
-        {/* {IS_ELECTRON && <WindowBar />} */}
         <Routes>
           <Route path="/" element={<MainView />} />
           <Route path="/login" element={<LoginView />} />

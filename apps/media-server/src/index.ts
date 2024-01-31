@@ -4,15 +4,17 @@ import multipart from '@fastify/multipart';
 import Fastify from 'fastify';
 
 import { env } from './env';
+import { embed } from './routes/embed';
 import { serve } from './routes/serve';
 import { upload } from './routes/upload';
 
-const server = Fastify({ logger: true });
+const server = Fastify({ logger: false });
 server.register(multipart);
 server.register(cors, { origin: '*' });
 
 server.get('/', async () => ({ hello: 'world' }));
 
+server.get('/embed', embed);
 server.get('/:storeName/*', serve);
 server.post('/:storeName', upload);
 

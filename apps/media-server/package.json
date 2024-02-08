@@ -4,8 +4,8 @@
   "main": "index.js",
   "author": "Randomness",
   "scripts": {
-    "start": "tsc && node ./dist",
-    "build": "tsc",
+    "start": "tsc --build && node ./dist",
+    "build": "tsc --build",
     "run": "node ./dist",
     "test": "jest",
     "typecheck": "tsc --noEmit"

@@ -19952,10 +19952,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemailer@npm:^6.9.8":
-  version: 6.9.8
-  resolution: "nodemailer@npm:6.9.8"
-  checksum: 8c22b671bde4d507b6585758a323111aa2f7c97e0720fb91a645f1dee1da6661cdc4004bc42c63c95c712e7b1f7287518c623f9ac92e590f85b4d3f0f2ff7f65
+"nodemailer@npm:^6.9.9":
+  version: 6.9.9
+  resolution: "nodemailer@npm:6.9.9"
+  checksum: d81f8613c35785aeb60dd0e3ead2c2c0171c709381fde17ada112f5ac635630814ad09492dacaf0fd30158492ed834abb82d9c58b49e9b495e5c675fbc5fffef
   languageName: node
   linkType: hard
 
@@ -23465,7 +23465,7 @@ __metadata:
     multer: "npm:^1.4.5-lts.1"
     nanoid: "npm:^3.0.0"
     node-notifier: "npm:^10.0.1"
-    nodemailer: "npm:^6.9.8"
+    nodemailer: "npm:^6.9.9"
     prettier: "npm:^3.2.4"
     prisma: "npm:^4.16.2"
     reflect-metadata: "npm:^0.2.1"

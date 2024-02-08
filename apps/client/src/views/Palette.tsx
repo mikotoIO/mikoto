@@ -25,7 +25,7 @@ const ColorPaletteContainer = styled.div`
 `;
 
 const ColorItem = styled.div<{ clr: Color }>`
-  width: 70px;
+  width: 50px;
   .block {
     box-shadow: rgba(0, 0, 0, 0.2) 0px 7px 29px 0px;
     height: 55px;

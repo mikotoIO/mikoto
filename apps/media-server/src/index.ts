@@ -22,6 +22,7 @@ server.post('/:storeName', upload);
 
 const start = async () => {
   try {
+    console.log('server started!');
     await server.listen({
       host: '0.0.0.0',
       port: env.MEDIASERVER_PORT,

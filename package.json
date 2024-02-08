@@ -31,6 +31,6 @@
   },
   "packageManager": "yarn@4.0.2",
   "dependencies": {
-    "winston-transport": "^4.5.0"
+    "winston-transport": "^4.6.0"
   }
 }

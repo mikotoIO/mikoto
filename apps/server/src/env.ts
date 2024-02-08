@@ -20,6 +20,10 @@ export const env = load({
     type: String,
     default: 'info',
   },
+  AXIOM_DATASET: {
+    type: String,
+    optional: true,
+  },
   AXIOM_TOKEN: {
     type: String,
     optional: true,

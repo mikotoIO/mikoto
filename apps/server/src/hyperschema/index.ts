@@ -42,7 +42,7 @@ export function boot(cb: () => void) {
   const healthCheckApp = express();
   healthCheckApp.use(cors());
   healthCheckApp.get('/', (req, res) => {
-    res.json({ name: 'Mikoto' });
+    res.json({ name: 'Mikoto', protocol: 'hyperschema' });
   });
   const httpServer = createServer(healthCheckApp);
 

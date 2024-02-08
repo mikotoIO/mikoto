@@ -7,6 +7,7 @@ import { env } from './env';
 import { embed } from './routes/embed';
 import { serve } from './routes/serve';
 import { upload } from './routes/upload';
+import { proxy } from './routes/proxy';
 
 const server = Fastify({ logger: false });
 server.register(multipart);
@@ -15,11 +16,13 @@ server.register(cors, { origin: '*' });
 server.get('/', async () => ({ hello: 'world' }));
 
 server.get('/embed', embed);
+server.get('/proxy', proxy);
 server.get('/:storeName/*', serve);
 server.post('/:storeName', upload);
 
 const start = async () => {
   try {
+    console.log('server started!');
     await server.listen({
       host: '0.0.0.0',
       port: env.MEDIASERVER_PORT,

@@ -8620,6 +8620,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:^1.6.7":
+  version: 1.6.7
+  resolution: "axios@npm:1.6.7"
+  dependencies:
+    follow-redirects: "npm:^1.15.4"
+    form-data: "npm:^4.0.0"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: a1932b089ece759cd261f175d9ebf4d41c8994cf0c0767cda86055c7a19bcfdade8ae3464bf4cec4c8b142f4a657dc664fb77a41855e8376cf38b86d7a86518f
+  languageName: node
+  linkType: hard
+
 "axobject-query@npm:^3.2.1":
   version: 3.2.1
   resolution: "axobject-query@npm:3.2.1"
@@ -18349,6 +18360,7 @@ __metadata:
     "@fastify/multipart": "npm:^7.6.0"
     "@types/mime-types": "npm:^2.1.1"
     "@types/minio": "npm:^7.0.18"
+    axios: "npm:^1.6.7"
     fastify: "npm:^4.17.0"
     jest: "npm:^29.5.0"
     mime-types: "npm:^2.1.35"

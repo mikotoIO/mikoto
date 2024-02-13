@@ -71,7 +71,7 @@ export const Message = z.object({
   timestamp: hsDate(),
   editedTimestamp: z.nullable(hsDate()),
   authorId: z.string().nullable(),
-  author: z.nullable(User),
+  author: User.nullable(),
   channelId: z.string(),
 });
 export type Message = z.infer<typeof Message>;

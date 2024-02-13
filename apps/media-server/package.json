@@ -21,6 +21,7 @@
   "dependencies": {
     "@fastify/cors": "^8.2.1",
     "@fastify/multipart": "^7.6.0",
+    "axios": "^1.6.7",
     "fastify": "^4.17.0",
     "mime-types": "^2.1.35",
     "minio": "^7.1.0",

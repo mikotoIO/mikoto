@@ -15,6 +15,8 @@ const CommandInput = styled.input`
 `;
 
 function CommandMenu() {
+  const setModal = useSetRecoilState(modalState);
+
   return (
     <Modal
       noBackdrop
@@ -24,7 +26,15 @@ function CommandMenu() {
       }}
     >
       <Box w={600}>
-        <Input placeholder="> Type your command" />
+        <Input
+          placeholder="> Type your command"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              console.log('Run command');
+              setModal(null);
+            }
+          }}
+        />
       </Box>
     </Modal>
   );

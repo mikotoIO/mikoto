@@ -16,6 +16,7 @@ import { normalizeMediaUrl } from './atoms/Avatar';
 import { Pill } from './atoms/Pill';
 import { StyledSpaceIcon } from './atoms/SpaceIcon';
 import { Tooltip } from './atoms/Tooltip';
+import { faMikoto } from './icons/faMikoto';
 import { InviteModal } from './modals/Invite';
 import { SpaceJoinModal } from './modals/SpaceJoin';
 
@@ -262,7 +263,7 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
             setSpaceId(null);
           }}
         >
-          <Image src="/logo/logo.svg" w={20} />
+          <FontAwesomeIcon icon={faMikoto} fontSize="28px" />
         </StyledSpaceIcon>
       </StyledIconWrapper>
       <Seperator />

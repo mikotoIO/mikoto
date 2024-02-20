@@ -1,4 +1,5 @@
 import Tippy from '@tippyjs/react';
+
 import { Tooltip } from '../../atoms/Tooltip';
 import '../EmojiPicker';
 

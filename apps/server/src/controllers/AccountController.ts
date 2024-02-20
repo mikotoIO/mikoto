@@ -58,7 +58,10 @@ interface ChangePasswordPayload {
 @JsonController()
 @Service()
 export class AccountController {
-  constructor(private prisma: PrismaClient, private mailer: Mailer) {}
+  constructor(
+    private prisma: PrismaClient,
+    private mailer: Mailer,
+  ) {}
 
   @Get('/')
   async index() {

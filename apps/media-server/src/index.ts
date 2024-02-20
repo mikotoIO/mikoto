@@ -5,9 +5,9 @@ import Fastify from 'fastify';
 
 import { env } from './env';
 import { embed } from './routes/embed';
+import { proxy } from './routes/proxy';
 import { serve } from './routes/serve';
 import { upload } from './routes/upload';
-import { proxy } from './routes/proxy';
 
 const server = Fastify({ logger: false });
 server.register(multipart);

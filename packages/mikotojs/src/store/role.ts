@@ -12,7 +12,10 @@ export class ClientRole implements Role {
   permissions!: string;
   spaceId!: string;
 
-  constructor(public client: MikotoClient, data: Role) {
+  constructor(
+    public client: MikotoClient,
+    data: Role,
+  ) {
     normalizedAssign(this, data);
     makeAutoObservable(this, { id: false, client: false });
   }

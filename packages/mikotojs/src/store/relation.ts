@@ -9,7 +9,10 @@ export class ClientRelation implements Relation {
   space!: Space | null;
   relation!: User | null;
 
-  constructor(public client: MikotoClient, data: Relation) {
+  constructor(
+    public client: MikotoClient,
+    data: Relation,
+  ) {
     Object.assign(this, data);
     makeAutoObservable(this, { id: false, client: false });
   }

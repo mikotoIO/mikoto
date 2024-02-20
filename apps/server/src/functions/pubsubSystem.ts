@@ -8,7 +8,10 @@ export class PubSubSystem<M extends Record<string, z.ZodType>> {
   receiver: Redis;
   handlers: { [P in keyof M]: ((arg: z.infer<M[P]>) => void)[] } = {} as any;
 
-  constructor(redis: Redis, public messageMap: M) {
+  constructor(
+    redis: Redis,
+    public messageMap: M,
+  ) {
     this.sender = redis;
     this.receiver = redis.duplicate({ lazyConnect: true });
     Object.keys(messageMap).forEach((key) => {

@@ -18,7 +18,6 @@ const AppShell = styled.div`
   flex-direction: column;
 `;
 
-
 function App() {
   return (
     <BrowserRouter>

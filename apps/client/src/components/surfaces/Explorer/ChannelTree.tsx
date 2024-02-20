@@ -127,9 +127,7 @@ export function ChannelTree({
 }) {
   return (
     <StyledTreeBody {...props}>
-      {nodeSort(nodes)?.map((x) => (
-        <Node {...x} path={[x.id]} key={x.id} />
-      ))}
+      {nodeSort(nodes)?.map((x) => <Node {...x} path={[x.id]} key={x.id} />)}
     </StyledTreeBody>
   );
 }

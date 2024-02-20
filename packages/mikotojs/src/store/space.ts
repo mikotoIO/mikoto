@@ -20,7 +20,10 @@ export class ClientSpace implements Space {
   // null means members hasn't been fetched yet
   members: ObservableMap<string, ClientMember> | null = null;
 
-  constructor(public client: MikotoClient, data: Space) {
+  constructor(
+    public client: MikotoClient,
+    data: Space,
+  ) {
     normalizedAssign(this, data, { channels: 'channelIds', roles: 'roleIds' });
     makeAutoObservable(this, { id: false, client: false });
   }

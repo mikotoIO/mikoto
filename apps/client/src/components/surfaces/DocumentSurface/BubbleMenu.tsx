@@ -1,7 +1,11 @@
-import { faBold, faItalic, faStrikethrough } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { BubbleMenu, Editor } from "@tiptap/react";
-import styled from "styled-components";
+import {
+  faBold,
+  faItalic,
+  faStrikethrough,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { BubbleMenu, Editor } from '@tiptap/react';
+import styled from 'styled-components';
 
 const BubbleMenuContainer = styled.div`
   background-color: var(--N1100);
@@ -21,34 +25,36 @@ const BubbleMenuContainer = styled.div`
   }
 `;
 
+const BubbleButton = styled.button``;
+
 export function NoteBubbleMenu({ editor }: { editor: Editor }) {
   return (
     <BubbleMenu editor={editor} tippyOptions={{ duration: 100 }}>
       <BubbleMenuContainer>
-        <button
+        <BubbleButton
           type="button"
           onClick={() => {
             editor.chain().focus().toggleMark('bold').run();
           }}
         >
           <FontAwesomeIcon icon={faBold} />
-        </button>
-        <button
+        </BubbleButton>
+        <BubbleButton
           type="button"
           onClick={() => {
             editor.chain().focus().toggleMark('italic').run();
           }}
         >
           <FontAwesomeIcon icon={faItalic} />
-        </button>
-        <button
+        </BubbleButton>
+        <BubbleButton
           type="button"
           onClick={() => {
             editor.chain().focus().toggleMark('strike').run();
           }}
         >
           <FontAwesomeIcon icon={faStrikethrough} />
-        </button>
+        </BubbleButton>
       </BubbleMenuContainer>
     </BubbleMenu>
   );

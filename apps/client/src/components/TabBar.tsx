@@ -28,6 +28,7 @@ import {
 import { ContextMenu, useContextMenu } from './ContextMenu';
 import { Avatar } from './atoms/Avatar';
 import { IconBox } from './atoms/IconBox';
+import { faMikoto } from './icons/faMikoto';
 import { channelToTab } from './surfaces/Explorer/channelToTab';
 import type { ExplorerNode } from './surfaces/Explorer/explorerNode';
 
@@ -242,7 +243,7 @@ const MikotoLogo = styled.img`
 function WelcomeToMikoto() {
   return (
     <StyledWelcome>
-      <MikotoLogo src="/logo/logo.svg" />
+      <FontAwesomeIcon icon={faMikoto} fontSize="256px" opacity={0.1} />
       {/* <h1>Welcome to Mikoto!</h1> */}
     </StyledWelcome>
   );

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 export async function proxy(req: FastifyRequest, res: FastifyReply) {
   const { url } = req.query as { url: string };

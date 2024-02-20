@@ -18,7 +18,10 @@ export class ClientMember implements Member {
     return this.space.ownerId === this.user.id;
   }
 
-  constructor(public client: MikotoClient, data: Member) {
+  constructor(
+    public client: MikotoClient,
+    data: Member,
+  ) {
     normalizedAssign(this, data);
     makeAutoObservable(this, { id: false, client: false });
   }

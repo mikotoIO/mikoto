@@ -1,7 +1,11 @@
-import { faBold, faItalic, faStrikethrough } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { BubbleMenu, Editor } from "@tiptap/react";
-import styled from "styled-components";
+import {
+  faBold,
+  faItalic,
+  faStrikethrough,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { BubbleMenu, Editor } from '@tiptap/react';
+import styled from 'styled-components';
 
 const BubbleMenuContainer = styled.div`
   background-color: var(--N1100);

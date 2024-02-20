@@ -32,7 +32,10 @@ export class ClientChannel implements Channel {
     return msgs.map((x) => new ClientMessage(this.client, x));
   }
 
-  constructor(public client: MikotoClient, data: Channel) {
+  constructor(
+    public client: MikotoClient,
+    data: Channel,
+  ) {
     Object.assign(this, data);
     makeAutoObservable(this, { id: false, client: false });
   }

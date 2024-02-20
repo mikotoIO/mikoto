@@ -21,7 +21,10 @@ export class ClientMessage implements Message {
     return this.channel.space!.members?.get(this.authorId);
   }
 
-  constructor(public client: MikotoClient, data: Message) {
+  constructor(
+    public client: MikotoClient,
+    data: Message,
+  ) {
     Object.assign(this, data);
     makeAutoObservable(this, { id: false, client: false });
   }

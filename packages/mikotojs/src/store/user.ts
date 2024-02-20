@@ -10,7 +10,10 @@ export class ClientUser implements User {
   avatar!: string | null;
   category!: string | null;
 
-  constructor(public client: MikotoClient, data: User) {
+  constructor(
+    public client: MikotoClient,
+    data: User,
+  ) {
     normalizedAssign(this, data, {});
     makeAutoObservable(this, { id: false, client: false });
   }

@@ -24,11 +24,9 @@ function UserAreaMenu() {
     <ContextMenu style={{ width: '280px' }}>
       <Flex gap={8} bg="N900" p={{ x: 16, y: 12 }} rounded={4} dir="column">
         <Avatar src={mikoto.me.avatar ?? undefined} size={80} />
-        <div>
-          <Heading fs={18} m={{ bottom: 0 }}>
-            {mikoto.me.name}
-          </Heading>
-        </div>
+        <Heading fs={18} m={{ bottom: 0 }}>
+          {mikoto.me.name}
+        </Heading>
       </Flex>
       <ContextMenu.Link
         onClick={() => {

@@ -1,10 +1,18 @@
 import 'reflect-metadata';
 
 import { Hocuspocus } from '@hocuspocus/server';
-import { writeHyperschema, writeTypeScriptClient } from '@hyperschema/core';
+import {
+  HyperschemaServer,
+  JSONWriter,
+  SocketIOTransport,
+  TypeScriptWriter,
+  writeHyperschema,
+  writeTypeScriptClient,
+} from '@hyperschema/core';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 import express from 'express';
+import { createServer } from 'http';
 import * as http from 'http';
 import jwt from 'jsonwebtoken';
 import * as path from 'path';
@@ -59,6 +67,39 @@ useExpressServer(app, {
   },
 });
 
+// Hyperschema code
+// the above code deals with authentication, and is probably outdated
+// TODO: please refactor
+
+function boot(cb: () => void) {
+  const healthCheckApp = express();
+  healthCheckApp.use(cors());
+  healthCheckApp.get('/', (req, res) => {
+    res.json({ name: 'Mikoto', protocol: 'hyperschema' });
+  });
+  const httpServer = createServer(healthCheckApp);
+
+  const hss = new HyperschemaServer({
+    system: hs,
+    root: hs.MainService,
+    transports: [
+      new SocketIOTransport(
+        new socketio.Server(httpServer, {
+          cors: { origin: '*' },
+        }),
+      ),
+    ],
+    writers: [
+      new TypeScriptWriter(
+        path.join(__dirname, '../../../packages/mikotojs/src/hs-client.ts'),
+      ),
+      new JSONWriter(path.join(__dirname, '../hyperschema.json')),
+    ],
+  });
+
+  httpServer.listen(env.SERVER_PORT, cb);
+}
+
 async function main() {
   await redis.connect();
 
@@ -78,7 +119,7 @@ async function main() {
   });
 
   // set up a HyperRPC server as well
-  hs.boot(() => {
+  boot(() => {
     logger.info(
       `Mikoto hyperschema listening on http://0.0.0.0:${env.SERVER_PORT}`,
     );

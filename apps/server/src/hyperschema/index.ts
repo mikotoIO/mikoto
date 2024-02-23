@@ -1,11 +1,5 @@
-import { hostHyperRPC } from '@hyperschema/core';
-import cors from 'cors';
-import express from 'express';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
 import { z } from 'zod';
 
-import { env } from '../env';
 import { h } from './core';
 import {
   ChannelService,
@@ -37,22 +31,3 @@ export const MainService = h
     ping: h.fn({}, z.string()).do(async () => 'pong'),
   })
   .root();
-
-export function boot(cb: () => void) {
-  const healthCheckApp = express();
-  healthCheckApp.use(cors());
-  healthCheckApp.get('/', (req, res) => {
-    res.json({ name: 'Mikoto', protocol: 'hyperschema' });
-  });
-  const httpServer = createServer(healthCheckApp);
-
-  const io = new Server(httpServer, {
-    cors: {
-      origin: '*',
-    },
-  });
-
-  hostHyperRPC(io, MainService);
-
-  httpServer.listen(env.SERVER_PORT, cb);
-}

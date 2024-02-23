@@ -4157,9 +4157,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hyperschema/core@npm:^0.0.10":
-  version: 0.0.10
-  resolution: "@hyperschema/core@npm:0.0.10"
+"@hyperschema/core@npm:^0.0.11":
+  version: 0.0.11
+  resolution: "@hyperschema/core@npm:0.0.11"
   dependencies:
     fastify: "npm:^4.26.0"
     json-stringify-pretty-compact: "npm:3.0.0"
@@ -4168,7 +4168,7 @@ __metadata:
     ws: "npm:^8.16.0"
   peerDependencies:
     zod: "*"
-  checksum: 10/f138402b3e6cfc80517175d74a67e531e10211dd3037f58852547a811411521f126378c60e562b9b03ddcbf1e75b381d3b7cec42ea144a9fa7d75bd9b95b8f4a
+  checksum: 10/071db75e221c805027fba6a346e7873d221b350d38b4dbccbf49c34a513bdfbda722597cb7a142c6627de0c31c39315f8f9085286006d6c2abda557cff8d3b5c
   languageName: node
   linkType: hard
 
@@ -23503,7 +23503,7 @@ __metadata:
     "@axiomhq/winston": "npm:^1.0.0-rc.1"
     "@hocuspocus/cli": "npm:^2.9.0"
     "@hocuspocus/server": "npm:^2.9.0"
-    "@hyperschema/core": "npm:^0.0.10"
+    "@hyperschema/core": "npm:^0.0.11"
     "@mikoto-io/permcheck": "npm:0.0.1"
     "@prisma/client": "npm:^4.16.2"
     "@types/bcrypt": "npm:^5.0.0"

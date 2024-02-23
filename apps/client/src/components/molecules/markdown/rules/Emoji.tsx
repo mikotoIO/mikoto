@@ -19,7 +19,7 @@ export const emojiRule = createRule({
   },
   react(node, _, state) {
     return (
-      <Suspense>
+      <Suspense key={state.key}>
         <Emoji emoji={node.emoji} key={state.key} />
       </Suspense>
     );

@@ -33,6 +33,10 @@ import { redis } from './functions/redis';
 import * as hs from './hyperschema';
 import { CustomErrorHandler } from './middlewares/CustomErrorHandler';
 
+// Auth-related code
+// relies way too much on routing-controllers
+// TODO: please refactor
+
 const app = express();
 
 const server = new http.Server(app);
@@ -67,27 +71,23 @@ useExpressServer(app, {
   },
 });
 
-// Hyperschema code
-// the above code deals with authentication, and is probably outdated
-// TODO: please refactor
+// here we go
+async function main() {
+  await redis.connect();
 
-function boot(cb: () => void) {
-  const healthCheckApp = express();
-  healthCheckApp.use(cors());
-  healthCheckApp.get('/', (req, res) => {
-    res.json({ name: 'Mikoto', protocol: 'hyperschema' });
+  server.listen(env.AUTH_PORT, () => {
+    logger.info(`Mikoto auth started on http://0.0.0.0:${env.AUTH_PORT}`);
   });
-  const httpServer = createServer(healthCheckApp);
 
+  // set up a HyperRPC server as well
   const hss = new HyperschemaServer({
     system: hs,
     root: hs.MainService,
     transports: [
-      new SocketIOTransport(
-        new socketio.Server(httpServer, {
-          cors: { origin: '*' },
-        }),
-      ),
+      new SocketIOTransport({
+        port: env.SERVER_PORT,
+        meta: { name: 'Mikoto', protocol: 'hyperschema' },
+      }),
     ],
     writers: [
       new TypeScriptWriter(
@@ -96,30 +96,11 @@ function boot(cb: () => void) {
       new JSONWriter(path.join(__dirname, '../hyperschema.json')),
     ],
   });
-
-  httpServer.listen(env.SERVER_PORT, cb);
-}
-
-async function main() {
-  await redis.connect();
-
-  // setup Hyperschema
-  if (env.MIKOTO_ENV === 'DEV') {
-    logger.info('Generating Hyperschema...');
-    await writeTypeScriptClient(
-      path.join(__dirname, '../../../packages/mikotojs/src/hs-client.ts'),
-      hs,
-    );
-    await writeHyperschema(path.join(__dirname, '../hyperschema.json'), hs);
-    logger.info('Hyperschema generated!');
-  }
-
-  server.listen(env.AUTH_PORT, () => {
-    logger.info(`Mikoto auth started on http://0.0.0.0:${env.AUTH_PORT}`);
-  });
-
-  // set up a HyperRPC server as well
-  boot(() => {
+  const GENERATE_HYPERSCHEMA = env.MIKOTO_ENV === 'DEV';
+  hss.start({ generate: GENERATE_HYPERSCHEMA }).then(() => {
+    if (env.MIKOTO_ENV === 'DEV') {
+      logger.info('Hyperschema generated!');
+    }
     logger.info(
       `Mikoto hyperschema listening on http://0.0.0.0:${env.SERVER_PORT}`,
     );

@@ -1,7 +1,7 @@
 // set up fastify
 import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
-import Fastify from 'fastify';
+import fastify from 'fastify';
 
 import { env } from './env';
 import { embed } from './routes/embed';
@@ -9,7 +9,7 @@ import { proxy } from './routes/proxy';
 import { serve } from './routes/serve';
 import { upload } from './routes/upload';
 
-const server = Fastify({ logger: false });
+const server = fastify({ logger: false });
 server.register(multipart);
 server.register(cors, { origin: '*' });
 

@@ -39,7 +39,7 @@
     "@axiomhq/winston": "^1.0.0-rc.1",
     "@hocuspocus/cli": "^2.9.0",
     "@hocuspocus/server": "^2.9.0",
-    "@hyperschema/core": "^0.0.11",
+    "@hyperschema/core": "^0.0.12",
     "@mikoto-io/permcheck": "0.0.1",
     "@prisma/client": "^4.16.2",
     "@types/bun": "^1.0.0",

@@ -1,18 +1,10 @@
 import 'reflect-metadata';
 
 import { Hocuspocus } from '@hocuspocus/server';
-import {
-  HyperschemaServer,
-  JSONWriter,
-  SocketIOTransport,
-  TypeScriptWriter,
-  writeHyperschema,
-  writeTypeScriptClient,
-} from '@hyperschema/core';
+import * as hs from '@hyperschema/core';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 import express from 'express';
-import { createServer } from 'http';
 import * as http from 'http';
 import jwt from 'jsonwebtoken';
 import * as path from 'path';
@@ -30,7 +22,7 @@ import Mailer from './functions/Mailer';
 import { logger } from './functions/logger';
 import './functions/prismaRecursive';
 import { redis } from './functions/redis';
-import * as hs from './hyperschema';
+import * as root from './hyperschema';
 import { CustomErrorHandler } from './middlewares/CustomErrorHandler';
 
 // Auth-related code
@@ -80,25 +72,26 @@ async function main() {
   });
 
   // set up a HyperRPC server as well
-  const hss = new HyperschemaServer({
-    system: hs,
-    root: hs.MainService,
+  const hss = new hs.HyperschemaServer({
+    system: root,
+    root: root.MainService,
     transports: [
-      new SocketIOTransport({
+      new hs.SocketIOTransport({
         port: env.SERVER_PORT,
         meta: { name: 'Mikoto', protocol: 'hyperschema' },
       }),
     ],
     writers: [
-      new TypeScriptWriter(
+      new hs.TypeScriptWriter(
         path.join(__dirname, '../../../packages/mikotojs/src/hs-client.ts'),
       ),
-      new JSONWriter(path.join(__dirname, '../hyperschema.json')),
+      new hs.JSONWriter(path.join(__dirname, '../hyperschema.json')),
     ],
   });
+
   const GENERATE_HYPERSCHEMA = env.MIKOTO_ENV === 'DEV';
   hss.start({ generate: GENERATE_HYPERSCHEMA }).then(() => {
-    if (env.MIKOTO_ENV === 'DEV') {
+    if (GENERATE_HYPERSCHEMA) {
       logger.info('Hyperschema generated!');
     }
     logger.info(

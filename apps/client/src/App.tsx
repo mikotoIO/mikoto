@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import styled from 'styled-components';
 
 import {
@@ -18,30 +18,42 @@ const AppShell = styled.div`
   flex-direction: column;
 `;
 
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <MainView />,
+  },
+  {
+    path: '/login',
+    element: <LoginView />,
+  },
+  {
+    path: '/register',
+    element: <RegisterView />,
+  },
+  {
+    path: '/forgotpassword',
+    element: <ResetPasswordView />,
+  },
+  {
+    path: '/forgotpassword/:token',
+    element: <ResetChangePasswordView />,
+  },
+  {
+    path: '/invite/:inviteCode',
+    element: (
+      <MikotoApiLoader>
+        <SpaceInviteView />
+      </MikotoApiLoader>
+    ),
+  },
+]);
+
 function App() {
   return (
-    <BrowserRouter>
-      <AppShell>
-        <Routes>
-          <Route path="/" element={<MainView />} />
-          <Route path="/login" element={<LoginView />} />
-          <Route path="/register" element={<RegisterView />} />
-          <Route path="/forgotpassword" element={<ResetPasswordView />} />
-          <Route
-            path="/forgotpassword/:token"
-            element={<ResetChangePasswordView />}
-          />
-          <Route
-            path="/invite/:inviteCode"
-            element={
-              <MikotoApiLoader>
-                <SpaceInviteView />
-              </MikotoApiLoader>
-            }
-          />
-        </Routes>
-      </AppShell>
-    </BrowserRouter>
+    <AppShell>
+      <RouterProvider router={router} />
+    </AppShell>
   );
 }
 

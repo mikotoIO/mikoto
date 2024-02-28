@@ -9,6 +9,7 @@ import {
 } from './views/AuthView';
 import MainView from './views/MainView';
 import { MikotoApiLoader } from './views/MikotoApiLoader';
+import { NotFound } from './views/NotFoundPage';
 import { SpaceInviteView } from './views/SpaceInviteView';
 
 const AppShell = styled.div`
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
         <SpaceInviteView />
       </MikotoApiLoader>
     ),
+  },
+  {
+    path: '*',
+    element: <NotFound />,
   },
 ]);
 

@@ -54,9 +54,18 @@ export function SpaceInviteViewInner() {
             <Button
               variant="primary"
               onClick={async () => {
-                // TODO: Proper fix for malformed invite links
-                await mikoto.client.spaces.join({ inviteCode });
-                window.location.href = `/`;
+                // TODO: test for invalid links, links that have already been accepted
+                // links that have expired, etc.
+                // also add a loading indicator
+                // TODO: BEFORE THAT, improve Hyperschema error handling
+                // apparently I did not do a good enough job at it
+                try {
+                  await mikoto.client.spaces.join({ inviteCode });
+                  window.location.href = `/`;
+                } catch (e) {
+                  console.log('error joining space:');
+                  console.log(e);
+                }
               }}
             >
               Accept Invite

@@ -1,4 +1,4 @@
-import { NotFoundError } from '@hyperschema/core';
+import { AlreadyExistsError, NotFoundError } from '@hyperschema/core';
 import { permissions } from '@mikoto-io/permcheck';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
@@ -160,6 +160,14 @@ export const SpaceService = h.service({
         include: spaceInclude,
       });
       if (space === null) throw new NotFoundError();
+      // check if user is already a member
+      const member = await prisma.spaceUser.findFirst({
+        where: {
+          userId: state.user.id,
+          spaceId: space.id,
+        },
+      });
+      if (member) throw new AlreadyExistsError();
 
       await joinSpace($r, state.user.id, Space.parse(space));
       return space;

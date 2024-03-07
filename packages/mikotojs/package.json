@@ -11,12 +11,12 @@
   },
   "devDependencies": {
     "@types/events": "^3.0.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.4.2"
   },
   "dependencies": {
     "@hyperschema/client": "^0.0.3",
     "@mikoto-io/permcheck": "0.0.1",
-    "axios": "^1.6.1",
+    "axios": "^1.6.7",
     "events": "^3.3.0",
     "mobx": "^6.10.0",
     "socket.io-client": "^4.5.1",

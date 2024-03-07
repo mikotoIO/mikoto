@@ -9,14 +9,6 @@ services:
       - '5432:5432'
     volumes: 
       - postgres:/var/lib/postgresql/data
-  crdb:
-    image: cockroachdb/cockroach:latest-v23.1
-    ports:
-      - '26257:26257'
-      - '8080:8080'
-    command: start-single-node --insecure
-    volumes:
-      - 'cockroachdb:/cockroach/cockroach-data'
   redis:
     image: redis:6.2-alpine
     restart: always
@@ -72,9 +64,6 @@ services:
 
 volumes:
   postgres:
-  cockroachdb:
-  cockroach1:
-  cockroach2:
   redis:
     driver: local
   meilisearch:

@@ -13,18 +13,38 @@ CREATE TYPE "RelationState" AS ENUM ('NONE', 'FRIEND', 'BLOCKED', 'INCOMING_REQU
 -- CreateTable
 CREATE TABLE "User" (
     "id" UUID NOT NULL,
-    "name" STRING NOT NULL,
-    "avatar" STRING,
+    "name" VARCHAR(64) NOT NULL,
+    "avatar" VARCHAR(256),
+    "description" VARCHAR(2048),
     "category" "UserCategory",
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
+CREATE TABLE "UserStatus" (
+    "id" UUID NOT NULL,
+    "presence" TEXT,
+    "content" TEXT,
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "UserStatus_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Settings" (
+    "id" UUID NOT NULL,
+    "userId" UUID NOT NULL,
+    "data" VARCHAR(262144) NOT NULL,
+
+    CONSTRAINT "Settings_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Account" (
     "id" UUID NOT NULL,
-    "email" STRING NOT NULL,
-    "passhash" STRING NOT NULL,
+    "email" TEXT NOT NULL,
+    "passhash" VARCHAR(256) NOT NULL,
 
     CONSTRAINT "Account_pkey" PRIMARY KEY ("id")
 );
@@ -32,9 +52,9 @@ CREATE TABLE "Account" (
 -- CreateTable
 CREATE TABLE "Bot" (
     "id" UUID NOT NULL,
-    "name" STRING NOT NULL,
+    "name" VARCHAR(64) NOT NULL,
     "ownerId" UUID NOT NULL,
-    "secret" STRING NOT NULL,
+    "secret" TEXT NOT NULL,
 
     CONSTRAINT "Bot_pkey" PRIMARY KEY ("id")
 );
@@ -42,7 +62,7 @@ CREATE TABLE "Bot" (
 -- CreateTable
 CREATE TABLE "RefreshToken" (
     "id" UUID NOT NULL,
-    "token" STRING NOT NULL,
+    "token" TEXT NOT NULL,
     "expiresAt" TIMESTAMP(3) NOT NULL,
     "accountId" UUID NOT NULL,
 
@@ -52,7 +72,7 @@ CREATE TABLE "RefreshToken" (
 -- CreateTable
 CREATE TABLE "SpaceUser" (
     "id" UUID NOT NULL,
-    "name" STRING,
+    "name" VARCHAR(64),
     "spaceId" UUID NOT NULL,
     "userId" UUID NOT NULL,
 
@@ -62,10 +82,10 @@ CREATE TABLE "SpaceUser" (
 -- CreateTable
 CREATE TABLE "Role" (
     "id" UUID NOT NULL,
-    "name" STRING NOT NULL,
-    "color" STRING,
-    "permissions" STRING NOT NULL,
-    "position" INT4 NOT NULL,
+    "name" VARCHAR(64) NOT NULL,
+    "color" TEXT,
+    "permissions" VARCHAR(128) NOT NULL,
+    "position" INTEGER NOT NULL,
     "spaceId" UUID NOT NULL,
 
     CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
@@ -74,8 +94,8 @@ CREATE TABLE "Role" (
 -- CreateTable
 CREATE TABLE "Space" (
     "id" UUID NOT NULL,
-    "name" STRING NOT NULL,
-    "icon" STRING,
+    "name" VARCHAR(64) NOT NULL,
+    "icon" VARCHAR(256),
     "ownerId" UUID,
     "type" "SpaceType" NOT NULL DEFAULT 'NONE',
 
@@ -87,8 +107,8 @@ CREATE TABLE "Channel" (
     "id" UUID NOT NULL,
     "type" "ChannelType" NOT NULL DEFAULT 'TEXT',
     "parentId" UUID,
-    "order" INT4 NOT NULL DEFAULT 0,
-    "name" STRING NOT NULL,
+    "order" INTEGER NOT NULL DEFAULT 0,
+    "name" VARCHAR(64) NOT NULL,
     "spaceId" UUID NOT NULL,
     "lastUpdated" TIMESTAMP(3),
 
@@ -107,7 +127,7 @@ CREATE TABLE "ChannelUnread" (
 -- CreateTable
 CREATE TABLE "Message" (
     "id" UUID NOT NULL,
-    "content" STRING NOT NULL,
+    "content" VARCHAR(4096) NOT NULL,
     "timestamp" TIMESTAMP(3) NOT NULL,
     "editedTimestamp" TIMESTAMP(3),
     "authorId" UUID,
@@ -119,8 +139,8 @@ CREATE TABLE "Message" (
 -- CreateTable
 CREATE TABLE "Verification" (
     "id" UUID NOT NULL,
-    "category" STRING NOT NULL,
-    "token" STRING NOT NULL,
+    "category" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
     "userId" UUID,
     "expiresAt" TIMESTAMP(3) NOT NULL,
 
@@ -129,7 +149,7 @@ CREATE TABLE "Verification" (
 
 -- CreateTable
 CREATE TABLE "Invite" (
-    "id" STRING NOT NULL,
+    "id" TEXT NOT NULL,
     "spaceId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "creatorId" UUID,
@@ -153,7 +173,7 @@ CREATE TABLE "Ban" (
     "id" UUID NOT NULL,
     "userId" UUID NOT NULL,
     "spaceId" UUID NOT NULL,
-    "reason" STRING,
+    "reason" TEXT,
 
     CONSTRAINT "Ban_pkey" PRIMARY KEY ("id")
 );
@@ -162,7 +182,7 @@ CREATE TABLE "Ban" (
 CREATE TABLE "Document" (
     "id" UUID NOT NULL,
     "channelId" UUID NOT NULL,
-    "content" STRING NOT NULL,
+    "content" VARCHAR(262144) NOT NULL,
 
     CONSTRAINT "Document_pkey" PRIMARY KEY ("id")
 );
@@ -172,6 +192,9 @@ CREATE TABLE "_RoleToSpaceUser" (
     "A" UUID NOT NULL,
     "B" UUID NOT NULL
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Settings_userId_key" ON "Settings"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Account_email_key" ON "Account"("email");
@@ -217,6 +240,12 @@ CREATE UNIQUE INDEX "_RoleToSpaceUser_AB_unique" ON "_RoleToSpaceUser"("A", "B")
 
 -- CreateIndex
 CREATE INDEX "_RoleToSpaceUser_B_index" ON "_RoleToSpaceUser"("B");
+
+-- AddForeignKey
+ALTER TABLE "UserStatus" ADD CONSTRAINT "UserStatus_id_fkey" FOREIGN KEY ("id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Settings" ADD CONSTRAINT "Settings_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Account" ADD CONSTRAINT "Account_id_fkey" FOREIGN KEY ("id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -270,10 +299,10 @@ ALTER TABLE "Invite" ADD CONSTRAINT "Invite_spaceId_fkey" FOREIGN KEY ("spaceId"
 ALTER TABLE "Invite" ADD CONSTRAINT "Invite_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Relationship" ADD CONSTRAINT "Relationship_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE "Relationship" ADD CONSTRAINT "Relationship_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Relationship" ADD CONSTRAINT "Relationship_relationId_fkey" FOREIGN KEY ("relationId") REFERENCES "User"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE "Relationship" ADD CONSTRAINT "Relationship_relationId_fkey" FOREIGN KEY ("relationId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Relationship" ADD CONSTRAINT "Relationship_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES "Space"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -292,4 +321,3 @@ ALTER TABLE "_RoleToSpaceUser" ADD CONSTRAINT "_RoleToSpaceUser_A_fkey" FOREIGN 
 
 -- AddForeignKey
 ALTER TABLE "_RoleToSpaceUser" ADD CONSTRAINT "_RoleToSpaceUser_B_fkey" FOREIGN KEY ("B") REFERENCES "SpaceUser"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-

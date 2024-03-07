@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "cockroachdb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -17,9 +17,9 @@ enum UserCategory {
 
 model User {
   id          String        @id @default(uuid()) @db.Uuid
-  name        String        @db.String(64)
-  avatar      String?       @db.String(256)
-  description String?       @db.String(2048)
+  name        String        @db.VarChar(64)
+  avatar      String?       @db.VarChar(256)
+  description String?       @db.VarChar(2048)
   category    UserCategory?
 
   status UserStatus?
@@ -54,21 +54,21 @@ model Settings {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // setting data, formatted as JSON
-  data String @db.String(262144) // 256 KiB
+  data String @db.VarChar(262144) // 256 KiB
 }
 
 // factor out email and password
 model Account {
   id           String         @id @default(uuid()) @db.Uuid
   email        String         @unique
-  passhash     String         @db.String(256)
+  passhash     String         @db.VarChar(256)
   user         User           @relation(fields: [id], references: [id], onDelete: Cascade)
   RefreshToken RefreshToken[]
 }
 
 model Bot {
   id   String @id @default(uuid()) @db.Uuid
-  name String @db.String(64)
+  name String @db.VarChar(64)
   user User   @relation(fields: [id], references: [id], onDelete: Cascade)
 
   ownerId String @db.Uuid
@@ -89,7 +89,7 @@ model RefreshToken {
 
 model SpaceUser {
   id      String  @id @default(uuid()) @db.Uuid
-  name    String? @db.String(64)
+  name    String? @db.VarChar(64)
   spaceId String  @db.Uuid
   space   Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 
@@ -103,9 +103,9 @@ model SpaceUser {
 
 model Role {
   id          String      @id @default(uuid()) @db.Uuid
-  name        String      @db.String(64)
+  name        String      @db.VarChar(64)
   color       String? // hex color
-  permissions String      @db.String(128)
+  permissions String      @db.VarChar(128)
   position    Int
   users       SpaceUser[]
 
@@ -123,8 +123,8 @@ enum SpaceType {
 
 model Space {
   id      String    @id @default(uuid()) @db.Uuid
-  name    String    @db.String(64)
-  icon    String?   @db.String(256)
+  name    String    @db.VarChar(64)
+  icon    String?   @db.VarChar(256)
   ownerId String?   @db.Uuid
   owner   User?     @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   type    SpaceType @default(NONE)
@@ -146,7 +146,7 @@ model Channel {
   children Channel[] @relation("NestedChannel")
   order    Int       @default(0)
 
-  name        String    @db.String(64)
+  name        String    @db.VarChar(64)
   spaceId     String    @db.Uuid
   space       Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   Message     Message[]
@@ -179,7 +179,7 @@ enum ChannelType {
 
 model Message {
   id              String    @id @default(uuid()) @db.Uuid
-  content         String    @db.String(4096)
+  content         String    @db.VarChar(4096)
   timestamp       DateTime
   editedTimestamp DateTime?
 
@@ -250,5 +250,5 @@ model Document {
   id        String  @id @default(uuid()) @db.Uuid
   channelId String  @unique @db.Uuid
   channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  content   String  @db.String(262144) // 256 KiB
+  content   String  @db.VarChar(262144) // 256 KiB
 }

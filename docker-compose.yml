@@ -1,4 +1,14 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes: 
+      - postgres:/var/lib/postgresql/data
   crdb:
     image: cockroachdb/cockroach:latest-v23.1
     ports:
@@ -61,6 +71,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
 
 volumes:
+  postgres:
   cockroachdb:
   cockroach1:
   cockroach2:

@@ -13,6 +13,8 @@ pub enum Error {
     BadRequest,
     NotFound,
     InternalServerError,
+    FileTooLarge,
+    FileBufferError,
     StorageError { internal: String },
     ImageError { internal: String },
 }
@@ -23,13 +25,14 @@ impl<'r> Responder<'r, 'r> for Error {
         let status = match self {
             Error::NotFound => Status::NotFound,
             Error::BadRequest => Status::BadRequest,
+            Error::FileTooLarge => Status::PayloadTooLarge,
             _ => Status::InternalServerError,
         };
 
         let string = json!(self).to_string();
         Response::build()
-            .header(ContentType::new("application", "json"))
             .sized_body(string.len(), Cursor::new(string))
+            .header(ContentType::JSON)
             .status(status)
             .ok()
     }

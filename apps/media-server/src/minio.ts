@@ -1,4 +1,5 @@
 import * as minio from 'minio';
+import { getS3Endpoint } from 'minio/dist/main/internal/s3-endpoints';
 
 import { env } from './env';
 
@@ -14,21 +15,17 @@ export function mimeImageExtension(mime: string) {
 }
 export default class Minio {
   public client: minio.Client;
-  public host: string;
   public bucket: string;
 
-  constructor(url: string) {
-    const parsed = new URL(url);
-
-    this.bucket = parsed.pathname.slice(1);
+  constructor() {
+    this.bucket = env.S3_BUCKET;
     this.client = new minio.Client({
-      endPoint: parsed.hostname,
-      port: parseInt(parsed.port, 10),
-      useSSL: parsed.protocol === 'https:',
-      accessKey: parsed.username,
-      secretKey: parsed.password,
+      endPoint: env.S3_ENDPOINT,
+      port: env.S3_PORT,
+      accessKey: env.S3_ACCESS_KEY,
+      secretKey: env.S3_SECRET_KEY ?? '',
+      useSSL: env.S3_USE_SSL,
     });
-    this.host = `${parsed.protocol}//${parsed.host}`;
   }
 
   async upload(fileName: string, file: Buffer) {
@@ -42,4 +39,4 @@ export default class Minio {
   }
 }
 
-export const storage = new Minio(env.MINIO);
+export const storage = new Minio();

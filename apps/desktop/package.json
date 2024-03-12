@@ -34,6 +34,6 @@
     "@electron-forge/publisher-github": "^7.2.0",
     "@types/electron-squirrel-startup": "^1.0.0",
     "electron": "^27.0.3",
-    "typescript": "^5.2.2"
+    "typescript": "^5.4.2"
   }
 }

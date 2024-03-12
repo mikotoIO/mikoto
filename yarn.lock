@@ -13992,38 +13992,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-prettier@npm:^8.5.0":
-  version: 8.10.0
-  resolution: "eslint-config-prettier@npm:8.10.0"
-  peerDependencies:
-    eslint: ">=7.0.0"
-  bin:
-    eslint-config-prettier: bin/cli.js
-  checksum: 10/0a51ab1417cbf80fabcf7a406960a142663539c8140fdb0a187b78f3d708b9d137a62a4bc4e689150e290b667750ddabd1740a516623b0cb4adb6cc1962cfe2c
-  languageName: node
-  linkType: hard
-
 "eslint-config-react@npm:^1.1.7":
   version: 1.1.7
   resolution: "eslint-config-react@npm:1.1.7"
   checksum: 10/70e0d8c26ef1a75f0c2c6e4189d9cef99630d9ec846db3faa06036dd97bee6d0f61488844299bd857186ac0a77a2c921c3142c467bfaa35c21814f53b5c5eb2e
   languageName: node
   linkType: hard
-
-"eslint-config@workspace:packages/eslint-config":
-  version: 0.0.0-use.local
-  resolution: "eslint-config@workspace:packages/eslint-config"
-  dependencies:
-    "@typescript-eslint/eslint-plugin": "npm:^5.13.0"
-    "@typescript-eslint/parser": "npm:^5.9.0"
-    eslint-config-airbnb: "npm:^19.0.4"
-    eslint-config-prettier: "npm:^8.5.0"
-    eslint-plugin-import: "npm:^2.25.3"
-    eslint-plugin-jsx-a11y: "npm:^6.5.1"
-    eslint-plugin-react: "npm:^7.28.0"
-    eslint-plugin-react-hooks: "npm:^4.3.0"
-  languageName: unknown
-  linkType: soft
 
 "eslint-import-resolver-node@npm:^0.3.9":
   version: 0.3.9

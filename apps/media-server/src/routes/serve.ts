@@ -3,7 +3,7 @@ import mime from 'mime-types';
 import sharp from 'sharp';
 import { Stream } from 'stream';
 
-import { storage } from '../minio';
+import { storage } from '../bucket';
 
 async function stream2buffer(stream: Stream): Promise<Buffer> {
   return new Promise<Buffer>((resolve, reject) => {

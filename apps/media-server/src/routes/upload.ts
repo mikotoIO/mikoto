@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid';
 import sharp from 'sharp';
 
 import { env } from '../env';
-import { storage } from '../minio';
+import { storage } from '../bucket';
 import { storeConfig } from '../store';
 
 export async function upload(req: FastifyRequest, res: FastifyReply) {

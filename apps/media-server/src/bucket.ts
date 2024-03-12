@@ -1,5 +1,4 @@
 import * as minio from 'minio';
-import { getS3Endpoint } from 'minio/dist/main/internal/s3-endpoints';
 
 import { env } from './env';
 
@@ -13,7 +12,7 @@ export function mimeImageExtension(mime: string) {
       throw new Error('Only .png and .jpg supported');
   }
 }
-export default class Minio {
+export default class Bucket {
   public client: minio.Client;
   public bucket: string;
 
@@ -39,4 +38,4 @@ export default class Minio {
   }
 }
 
-export const storage = new Minio();
+export const storage = new Bucket();

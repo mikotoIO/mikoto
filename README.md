@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./apps/client/public/logo/logo-mono.svg" width="64px">
+  <img src="./screenshots/logo.png" width="128px">
 </p>
 
 <h1 align="center">

@@ -11,7 +11,6 @@ export const env = load({
   SERVER_PORT: Number,
   COLLAB_PORT: Number,
 
-  MINIO: String,
   LIVEKIT_SERVER: String,
   LIVEKIT_KEY: String,
   LIVEKIT_SECRET: String,

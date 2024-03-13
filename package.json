@@ -5,7 +5,8 @@
   "workspaces": [
     "apps/*",
     "packages/*",
-    "docs/*"
+    "docs/*",
+    "hyperschema/documentation"
   ],
   "scripts": {
     "compose": "docker compose up -d",

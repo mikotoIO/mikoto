@@ -17,15 +17,15 @@
   },
   "devDependencies": {
     "@headlessui/react": "*",
-    "@types/react": "~18.2.17",
-    "@types/react-dom": "^18.2.7",
-    "@vitejs/plugin-react": "^4.0.3",
+    "@types/react": "^18.2.64",
+    "@types/react-dom": "^18.2.21",
+    "@vitejs/plugin-react": "^4.2.1",
     "babel-plugin-styled-components": "^2.1.4",
     "csstype": "^3.1.2",
     "rollup-plugin-typescript2": "^0.35.0",
     "styled-components": "^6.1.1",
     "typescript": "^5.4.2",
-    "vite": "^5.0.10"
+    "vite": "^5.1.6"
   },
   "scripts": {
     "build": "vite build && tsc --emitDeclarationOnly",

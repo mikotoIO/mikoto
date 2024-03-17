@@ -4,6 +4,7 @@ import {
   Buttons,
   Flex,
   Form,
+  Heading,
   Input,
   Modal,
   TextArea,
@@ -33,13 +34,6 @@ const bgUrl = '/images/artworks/1.jpg';
 
 const AccountInfo = styled(Box)`
   max-width: 600px;
-`;
-
-const Content = styled(Flex)`
-  align-items: center;
-  h2 {
-    margin-left: 32px;
-  }
 `;
 
 export function PasswordChangeModal() {
@@ -138,7 +132,7 @@ const Overview = observer(() => {
       <Form>
         <AccountInfo rounded={8} bg="N900" w="100%">
           <Box txt="B700" h={160} mix={[backgroundMix(bgUrl)]} rounded={8} />
-          <Content p={16}>
+          <Flex p={16} alignItems="center">
             <AvatarEditor
               avatar={user?.avatar ?? undefined}
               onDrop={async (file) => {
@@ -151,8 +145,10 @@ const Overview = observer(() => {
                 });
               }}
             />
-            <h2>{user?.name}</h2>
-          </Content>
+            <Heading as="h2" m={{ left: 16 }}>
+              {user?.name}
+            </Heading>
+          </Flex>
           <Box p={16}>
             <Button
               type="button"

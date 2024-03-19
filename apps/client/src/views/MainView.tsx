@@ -1,6 +1,6 @@
+import { Box, Center } from '@chakra-ui/react';
 import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Flex } from '@mikoto-io/lucid';
 import { observer } from 'mobx-react-lite';
 import { Resizable } from 're-resizable';
 import React, { Suspense } from 'react';
@@ -54,7 +54,9 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
   return <Selected {...rest} />;
 }
 
-const LeftBar = styled(Flex)`
+const LeftBar = styled.div`
+  display: flex;
+  flex-direction: column;
   height: 100%;
 
   .top {
@@ -107,7 +109,7 @@ const SurfaceGroup = observer(
                   idx !== surfaceNode.index ? { display: 'none' } : undefined
                 }
               >
-                <Box p={{ y: 8 }} h="100%">
+                <Box py="8px" h="100%">
                   <Suspense>
                     <TabViewSwitch tab={tab} />
                   </Suspense>
@@ -140,7 +142,7 @@ const AppView = observer(() => {
 
   return (
     <AppContainer>
-      <LeftBar dir="column">
+      <LeftBar>
         <div className="top">
           <TabBarButton
             onClick={() => {
@@ -179,7 +181,7 @@ const AppView = observer(() => {
       </LeftBar>
       <SurfaceGroup surfaceNode={surfaceStore.node} />
       {workspace.rightOpen && (
-        <LeftBar dir="column">
+        <LeftBar>
           <div className="top">
             <WindowBar />
           </div>
@@ -212,12 +214,12 @@ const MikotoLogo = styled.img`
 
 function Fallback() {
   return (
-    <Flex center w="100%" h="100%" txt="N0" dir="column">
+    <Center w="100%" h="100%" color="white" flexDir="column">
       <FontAwesomeIcon icon={faMikoto} fontSize="10vw" />
-      <Box fs={20} m={{ top: 16 }}>
+      <Box fontSize="20px" mt="10px">
         Loading...
       </Box>
-    </Flex>
+    </Center>
   );
 }
 

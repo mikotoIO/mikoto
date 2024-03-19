@@ -1,36 +1,38 @@
-import { FormControl, FormLabel, Heading, Input } from '@chakra-ui/react';
-import HCaptcha from '@hcaptcha/react-hcaptcha';
 import {
-  Anchor,
+  Link as Anchor,
   Box,
   Button,
   Flex,
-  Form,
-  backgroundMix,
-} from '@mikoto-io/lucid';
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  chakra,
+} from '@chakra-ui/react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { faMikoto } from '../components/icons/faMikoto';
 import { useErrorElement } from '../hooks/useErrorElement';
 import { authClient } from '../store/authClient';
-
-const StyledLogo = styled.img`
-  width: 32px;
-`;
 
 function Logo() {
   return (
     <Flex
-      center
-      bg="N1100"
-      w={64}
-      h={64}
+      align="center"
+      justify="center"
+      bg="gray.900"
+      w="64px"
+      h="64px"
       rounded={16}
-      m={{ x: 'auto', bottom: 8 }}
+      mx="auto"
+      mb={0}
     >
-      <StyledLogo src="/logo/logo-mono.svg" />
+      <FontAwesomeIcon icon={faMikoto} color="#59e6ff" fontSize="36px" />
     </Flex>
   );
 }
@@ -48,42 +50,48 @@ function Captcha() {
   // );
 }
 
-const Art = styled(Box)`
+const Art = styled.div`
+  width: 600px;
   display: none;
   @media screen and (min-width: 1000px) {
     display: block;
   }
+  background: url('/images/artworks/1.jpg') no-repeat center center;
+  background-size: cover;
 `;
 
 export function AuthView({ children }: { children: React.ReactNode }) {
   return (
-    <Flex h="100%" center bg="N1000">
-      <Flex
-        rounded={8}
-        style={{
-          overflow: 'hidden',
-        }}
-      >
-        <Box txt="N0" bg="N800" p={32}>
-          <Flex center dir="column" h="100%">
+    <Flex h="100%" align="center" justify="center" bg="gray.900">
+      <Flex rounded="lg" overflow="hidden">
+        <Box p={8} bg="gray.700">
+          <Flex align="center" justify="center" direction="column" h="100%">
             <Logo />
             {children}
           </Flex>
         </Box>
-        <Art mix={[backgroundMix('/images/artworks/1.jpg')]} w={600} />
+        <Art />
       </Flex>
     </Flex>
   );
 }
 
+const AuthForm = chakra('form', {
+  baseStyle: {
+    w: '360px',
+    display: 'flex',
+    flexDir: 'column',
+    gap: 2,
+  },
+});
+
 export function LoginView() {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, formState } = useForm();
   const error = useErrorElement();
 
   return (
     <AuthView>
-      <Form
-        w={360}
+      <AuthForm
         onSubmit={handleSubmit(async (formData) => {
           try {
             const tk = await authClient.login(
@@ -109,7 +117,11 @@ export function LoginView() {
           <Input type="password" {...register('password')} />
         </FormControl>
 
-        <Button variant="primary" type="submit">
+        <Button
+          variant="primary"
+          type="submit"
+          isLoading={formState.isSubmitting}
+        >
           Log In
         </Button>
         <Anchor to="/register" as={Link}>
@@ -119,19 +131,18 @@ export function LoginView() {
           Forgot Password?
         </Anchor>
         <Captcha />
-      </Form>
+      </AuthForm>
     </AuthView>
   );
 }
 
 export function RegisterView() {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, formState } = useForm();
   const error = useErrorElement();
 
   return (
     <AuthView>
-      <Form
-        w={360}
+      <AuthForm
         onSubmit={handleSubmit(async (data) => {
           try {
             const tk = await authClient.register(
@@ -163,14 +174,18 @@ export function RegisterView() {
           <Input type="password" {...register('password')} />
         </FormControl>
 
-        <Button variant="primary" type="submit">
+        <Button
+          variant="primary"
+          type="submit"
+          isLoading={formState.isSubmitting}
+        >
           Register
         </Button>
         <Anchor to="/login" as={Link}>
           Log In
         </Anchor>
         <Captcha />
-      </Form>
+      </AuthForm>
     </AuthView>
   );
 }
@@ -181,8 +196,7 @@ export function ResetPasswordView() {
 
   return (
     <AuthView>
-      <Form
-        w={360}
+      <AuthForm
         onSubmit={handleSubmit(async (data) => {
           await authClient.resetPassword(data.email);
           setSent(true);
@@ -206,7 +220,7 @@ export function ResetPasswordView() {
             <Captcha />
           </>
         )}
-      </Form>
+      </AuthForm>
     </AuthView>
   );
 }
@@ -224,8 +238,7 @@ export function ResetChangePasswordView() {
   return (
     <AuthView>
       {error.el}
-      <Form
-        w={360}
+      <AuthForm
         onSubmit={handleSubmit(async (data) => {
           if (data.password !== data.passwordConfirm) {
             // TODO checkother password conditions
@@ -272,7 +285,7 @@ export function ResetChangePasswordView() {
             </Button>
           </>
         )}
-      </Form>
+      </AuthForm>
     </AuthView>
   );
 }

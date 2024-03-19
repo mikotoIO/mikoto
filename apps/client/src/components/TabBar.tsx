@@ -1,10 +1,10 @@
+import { Grid } from '@chakra-ui/react';
 import {
   faBarsStaggered,
   faQuestion,
   faX,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Flex, Grid } from '@mikoto-io/lucid';
 import { action, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useContext, useEffect, useRef } from 'react';
@@ -32,7 +32,10 @@ import { faMikoto } from './icons/faMikoto';
 import { channelToTab } from './surfaces/Explorer/channelToTab';
 import type { ExplorerNode } from './surfaces/Explorer/explorerNode';
 
-const StyledCloseButton = styled(Flex)<{ active?: boolean }>`
+const StyledCloseButton = styled.div<{ active?: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-left: 4px;
   border-radius: 4px;
   width: 20px;
@@ -46,7 +49,8 @@ const StyledCloseButton = styled(Flex)<{ active?: boolean }>`
   }
 `;
 
-const StyledTab = styled(Flex)<{ active?: boolean }>`
+const StyledTab = styled.div<{ active?: boolean }>`
+  display: flex;
   align-items: center;
   justify-content: center;
 
@@ -199,7 +203,6 @@ function Tab({ tab, index, surfaceNode }: TabProps) {
 
       <div>{tabName.name}</div>
       <StyledCloseButton
-        center
         active={active}
         onClick={(ev) => {
           ev.stopPropagation(); // close button shouldn't reset tab index
@@ -263,7 +266,12 @@ export const TabBarButton = styled.button`
   }
 `;
 
-const TabsFlex = styled(Flex)`
+const TAB_HEIGHT = 36;
+
+const TabsFlex = styled.div`
+  height: ${TAB_HEIGHT}px;
+  font-size: 14px;
+  display: flex;
   overflow-x: scroll;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -271,8 +279,6 @@ const TabsFlex = styled(Flex)`
     display: none; /* Safari and Chrome */
   }
 `;
-
-const TAB_HEIGHT = 36;
 
 export const TabbedView = observer(
   ({ children, tabs, surfaceNode }: TabbedViewProps) => {
@@ -294,12 +300,12 @@ export const TabbedView = observer(
 
     return (
       <Grid
-        trow={`${TAB_HEIGHT}px calc(100% - ${TAB_HEIGHT}px)`}
+        templateRows={`${TAB_HEIGHT}px calc(100% - ${TAB_HEIGHT}px)`}
         h="100%"
-        style={{ flex: 1 }}
+        flex={1}
       >
         <Helmet titleTemplate="%s | Mikoto" defaultTitle="Mikoto" />
-        <TabsFlex h={TAB_HEIGHT} fs={14}>
+        <TabsFlex>
           {tabs.map((tab, index) => (
             <Tab
               tab={tab}

@@ -1,4 +1,4 @@
-import { Box, Flex, Heading } from '@mikoto-io/lucid';
+import { Flex, Heading } from '@mikoto-io/lucid';
 import { User } from 'mikotojs';
 import { useEffect } from 'react';
 import { atom, useRecoilState } from 'recoil';

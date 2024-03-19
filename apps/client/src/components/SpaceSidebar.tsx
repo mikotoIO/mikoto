@@ -1,6 +1,5 @@
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Image } from '@mikoto-io/lucid';
 import Tippy from '@tippyjs/react';
 import { ClientSpace, SpaceStore } from 'mikotojs';
 import { observer } from 'mobx-react-lite';

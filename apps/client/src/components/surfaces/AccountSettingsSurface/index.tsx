@@ -1,20 +1,17 @@
 import {
   Box,
   Button,
-  Buttons,
   Flex,
-  Form,
-  Heading,
+  FormControl,
+  FormLabel,
   Input,
-  Modal,
-  TextArea,
-  backgroundMix,
-} from '@mikoto-io/lucid';
+  Textarea,
+} from '@chakra-ui/react';
+import { Form, Heading, Modal } from '@mikoto-io/lucid';
 import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
 
 import { uploadFile } from '../../../functions/fileUpload';
 import { useAuthClient, useMikoto } from '../../../hooks';
@@ -31,10 +28,6 @@ import { SafetySurface } from './safety';
 import { ThemesSubsurface } from './themes';
 
 const bgUrl = '/images/artworks/1.jpg';
-
-const AccountInfo = styled(Box)`
-  max-width: 600px;
-`;
 
 export function PasswordChangeModal() {
   const authClient = useAuthClient();
@@ -63,26 +56,30 @@ export function PasswordChangeModal() {
         <h1>Change Password</h1>
         {error.el}
 
-        <Input
-          labelName="Old Password"
-          type="password"
-          {...register('oldPassword', { required: true })}
-        />
-
-        <Input
-          labelName="New Password"
-          type="password"
-          {...register('newPassword', { required: true })}
-        />
-
-        <Input
-          labelName="Confirm New Password"
-          type="password"
-          {...register('confirmNewPassword', {
-            required: true,
-            validate: (value) => value === getValues('newPassword'),
-          })}
-        />
+        <FormControl>
+          <FormLabel>Old Password</FormLabel>
+          <Input
+            type="password"
+            {...register('oldPassword', { required: true })}
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel>New Password</FormLabel>
+          <Input
+            type="password"
+            {...register('newPassword', { required: true })}
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Confirm New Password</FormLabel>
+          <Input
+            type="password"
+            {...register('confirmNewPassword', {
+              required: true,
+              validate: (value) => value === getValues('newPassword'),
+            })}
+          />
+        </FormControl>
 
         <Button variant="primary" type="submit">
           Change Password
@@ -110,7 +107,10 @@ function NameChangeModal() {
           setModal(null);
         })}
       >
-        <Input labelName="New Name" {...register('name')} />
+        <FormControl>
+          <FormLabel>New Name</FormLabel>
+          <Input {...register('name')} />
+        </FormControl>
         <Button type="submit" variant="primary">
           Change Name
         </Button>
@@ -130,9 +130,14 @@ const Overview = observer(() => {
     <SettingsView>
       <h1>{t('accountSettings.general.title')}</h1>
       <Form>
-        <AccountInfo rounded={8} bg="N900" w="100%">
-          <Box txt="B700" h={160} mix={[backgroundMix(bgUrl)]} rounded={8} />
-          <Flex p={16} alignItems="center">
+        <Box rounded={8} bg="gray.800" w="100%" maxW="600px">
+          <Box
+            h={40}
+            bg={`url(${bgUrl}) no-repeat center center`}
+            bgSize="cover"
+            rounded={8}
+          />
+          <Flex p="16px" align="center">
             <AvatarEditor
               avatar={user?.avatar ?? undefined}
               onDrop={async (file) => {
@@ -149,7 +154,7 @@ const Overview = observer(() => {
               {user?.name}
             </Heading>
           </Flex>
-          <Box p={16}>
+          <Box p={4}>
             <Button
               type="button"
               onClick={() => {
@@ -161,14 +166,17 @@ const Overview = observer(() => {
               Edit Name
             </Button>
           </Box>
-        </AccountInfo>
-        <TextArea h={160} labelName="Bio" />
+        </Box>
+        <FormControl>
+          <FormLabel>Bio</FormLabel>
+          <Textarea h={160} />
+        </FormControl>
         <Button variant="primary">Save</Button>
       </Form>
 
       <h2>{t('accountSettings.general.authentication')}</h2>
 
-      <Buttons>
+      <Flex gap={2}>
         <Button
           onClick={() => {
             setModal({
@@ -178,22 +186,22 @@ const Overview = observer(() => {
         >
           {t('accountSettings.general.changePassword')}
         </Button>
-        <Button variant="warning" type="submit">
+        <Button variant="warning" type="submit" height="auto" blockSize="auto">
           {t('accountSettings.general.logOutOfAllDevices')}
         </Button>
-      </Buttons>
+      </Flex>
       <h2>{t('accountSettings.general.dangerous')}</h2>
-      <Box p={{ bottom: 16 }}>
+      <Box pb="16px">
         Warning: This action is irreversible. You will lose all your data.
       </Box>
-      <Buttons>
+      <Flex gap={2}>
         <Button variant="danger">
           {t('accountSettings.general.deleteAccount')}
         </Button>
-      </Buttons>
+      </Flex>
       <h2>Debug</h2>
-      <Button>Open Design Palette</Button>
-      <Box m={{ bottom: 80 }} />
+      <Button size="md">Open Design Palette</Button>
+      <Box mb="80px" />
     </SettingsView>
   );
 });

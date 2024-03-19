@@ -1,4 +1,4 @@
-import { Heading } from '@mikoto-io/lucid';
+import { Heading } from '@chakra-ui/react';
 
 import { TabName } from '../TabBar';
 import { ViewContainer } from '../ViewContainer';

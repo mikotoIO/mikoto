@@ -1,7 +1,6 @@
-import { Box } from '@mikoto-io/lucid';
+import { Box } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 
 import { SettingsView } from '../../../views/SettingsViewTemplate';
 
@@ -10,10 +9,6 @@ const languages = [
   { name: '日本語', code: 'ja' },
   { name: '한국어', code: 'ko' },
 ];
-
-const LanguageSelect = styled(Box)`
-  cursor: pointer;
-`;
 
 export function LanguageSurface() {
   const { t, i18n } = useTranslation();
@@ -26,13 +21,14 @@ export function LanguageSurface() {
       <h1>{t('accountSettings.language.title')}</h1>
       <div>
         {languages.map((lang) => (
-          <LanguageSelect
+          <Box
+            cursor="pointer"
             w="100%"
             key={lang.code}
-            bg={lang.code === language ? 'N600' : 'N1000'}
-            p={12}
-            m={8}
-            rounded={4}
+            bg={lang.code === language ? 'gray.600' : 'gray.800'}
+            p="12px"
+            m="8px"
+            rounded="md"
             onClick={() => {
               setLanguage(lang.code);
               localStorage.setItem('language', lang.code);
@@ -40,7 +36,7 @@ export function LanguageSurface() {
             }}
           >
             {lang.name}
-          </LanguageSelect>
+          </Box>
         ))}
       </div>
     </SettingsView>

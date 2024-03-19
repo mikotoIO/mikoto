@@ -1,4 +1,5 @@
-import { Button, Buttons, Form, Input, Modal } from '@mikoto-io/lucid';
+import { Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
+import { Buttons, Form, Modal } from '@mikoto-io/lucid';
 import { ClientSpace } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
@@ -32,8 +33,13 @@ function AddBotModal({ space }: { space: ClientSpace }) {
           setModal(null);
         })}
       >
-        <Input labelName="Bot ID" {...form.register('botId')} />
-        <Button type="submit">Submit</Button>
+        <FormControl>
+          <FormLabel>Bot ID</FormLabel>
+          <Input {...form.register('botId')} />
+        </FormControl>
+        <Button type="submit" variant="primary">
+          Submit
+        </Button>
       </Form>
     </Modal>
   );
@@ -60,11 +66,14 @@ const Overview = observer(({ space }: { space: ClientSpace }) => {
           }}
         />
 
-        <Input
-          labelName="Space Name"
-          value={spaceName}
-          onChange={(x) => setSpaceName(x.target.value)}
-        />
+        <FormControl>
+          <FormLabel>Space Name</FormLabel>
+          <Input
+            value={spaceName}
+            onChange={(x) => setSpaceName(x.target.value)}
+          />
+        </FormControl>
+
         <Buttons>
           <Button
             variant="primary"

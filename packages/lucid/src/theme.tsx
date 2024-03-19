@@ -174,6 +174,10 @@ export const GlobalStyle = createGlobalStyle`
     cursor: pointer;
   }
 
+  * {
+    box-sizing: border-box;
+  }
+
   button {
     border: none;
   }

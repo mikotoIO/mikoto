@@ -1,3 +1,4 @@
+import { FormControl, FormLabel, Heading, Input } from '@chakra-ui/react';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 import {
   Anchor,
@@ -5,7 +6,6 @@ import {
   Button,
   Flex,
   Form,
-  Input,
   backgroundMix,
 } from '@mikoto-io/lucid';
 import React, { useState } from 'react';
@@ -98,10 +98,17 @@ export function LoginView() {
           }
         })}
       >
-        <h1>Log In</h1>
+        <Heading size="lg">Log In</Heading>
         {error.el}
-        <Input labelName="Email" {...register('email')} />
-        <Input labelName="Password" type="password" {...register('password')} />
+        <FormControl>
+          <FormLabel>Email</FormLabel>
+          <Input {...register('email')} />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Password</FormLabel>
+          <Input type="password" {...register('password')} />
+        </FormControl>
+
         <Button variant="primary" type="submit">
           Log In
         </Button>
@@ -139,11 +146,23 @@ export function RegisterView() {
           }
         })}
       >
-        <h1>Register</h1>
+        <Heading size="lg">Register</Heading>
         {error.el}
-        <Input labelName="Username" {...register('name')} />
-        <Input labelName="Email" {...register('email')} />
-        <Input labelName="Password" type="password" {...register('password')} />
+        <FormControl>
+          <FormLabel>Username</FormLabel>
+          <Input {...register('name')} />
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Email</FormLabel>
+          <Input {...register('email')} />
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Password</FormLabel>
+          <Input type="password" {...register('password')} />
+        </FormControl>
+
         <Button variant="primary" type="submit">
           Register
         </Button>
@@ -171,13 +190,16 @@ export function ResetPasswordView() {
       >
         {sent ? (
           <div>
-            <h1>Instructions sent</h1>
+            <Heading size="lg">Instructions sent</Heading>
             <p>Check your inbox for instructions to reset your password.</p>
           </div>
         ) : (
           <>
-            <h1>Reset Password</h1>
-            <Input labelName="Email" {...register('email')} />
+            <Heading size="lg">Reset Password</Heading>
+            <FormControl>
+              <FormLabel>Email</FormLabel>
+              <Input {...register('email')} />
+            </FormControl>
             <Button variant="primary" type="submit">
               Send Password Reset Email
             </Button>
@@ -229,22 +251,22 @@ export function ResetChangePasswordView() {
       >
         {sent ? (
           <div>
-            <h1>Password changed successfully!</h1>
+            <Heading size="lg">Password changed successfully!</Heading>
             <p>Returning to login page...</p>
           </div>
         ) : (
           <>
-            <h1>Reset Password</h1>
-            <Input
-              labelName="New Password"
-              type="password"
-              {...register('password')}
-            />
-            <Input
-              labelName="Confirm New Password"
-              type="password"
-              {...register('passwordConfirm')}
-            />
+            <Heading size="lg">Reset Password</Heading>
+            <FormControl>
+              <FormLabel>New Password</FormLabel>
+              <Input type="password" {...register('password')} />
+            </FormControl>
+
+            <FormControl>
+              <FormLabel>Confirm New Password</FormLabel>
+              <Input type="password" {...register('passwordConfirm')} />
+            </FormControl>
+
             <Button variant="primary" type="submit">
               Confirm new password
             </Button>

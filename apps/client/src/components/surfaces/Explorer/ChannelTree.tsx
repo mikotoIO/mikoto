@@ -24,7 +24,7 @@ export const StyledTreeBody = styled.div`
 const StyledNode = styled.a<{ unread?: boolean; isDndHover?: boolean }>`
   position: relative;
   font-size: 14px;
-  height: 20px;
+  height: 32px;
   padding: 6px 8px;
   border-radius: 4px;
   display: flex;

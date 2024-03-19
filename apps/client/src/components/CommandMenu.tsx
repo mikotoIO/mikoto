@@ -1,4 +1,5 @@
-import { Box, Input, Modal } from '@mikoto-io/lucid';
+import { Box } from '@chakra-ui/react';
+import { Modal } from '@mikoto-io/lucid';
 import { useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -13,6 +14,7 @@ const CommandInput = styled.input`
   padding: 8px;
   border-radius: 4px;
   width: 100%;
+  box-sizing: border-box;
 `;
 
 function CommandMenu() {
@@ -26,7 +28,7 @@ function CommandMenu() {
         top: '80px',
       }}
     >
-      <Box w={600}>
+      <Box w="600px">
         <CommandInput
           placeholder="> Type your command"
           onKeyDown={(e) => {

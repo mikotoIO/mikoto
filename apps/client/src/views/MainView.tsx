@@ -13,6 +13,7 @@ import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
 import { SpaceSidebar } from '../components/SpaceSidebar';
 import { TabBarButton, TabbedView } from '../components/TabBar';
 import { UserAreaAvatar } from '../components/UserArea';
+import { faMikoto } from '../components/icons/faMikoto';
 import { Sidebar } from '../components/sidebars/Base';
 import { FriendSidebar } from '../components/sidebars/FriendSidebar';
 import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
@@ -212,7 +213,7 @@ const MikotoLogo = styled.img`
 function Fallback() {
   return (
     <Flex center w="100%" h="100%" txt="N0" dir="column">
-      <MikotoLogo src="/logo/logo.svg" />
+      <FontAwesomeIcon icon={faMikoto} fontSize="10vw" />
       <Box fs={20} m={{ top: 16 }}>
         Loading...
       </Box>

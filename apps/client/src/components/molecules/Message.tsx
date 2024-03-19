@@ -1,4 +1,4 @@
-import { Box, Flex } from '@mikoto-io/lucid';
+import { Box, Flex } from '@chakra-ui/react';
 import { ClientMessage } from 'mikotojs';
 import { makeAutoObservable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
@@ -100,20 +100,12 @@ const Name = styled.div<{ color?: string | null }>`
 
 function Timestamp({ time }: { time: Date }) {
   return (
-    <Box txt="N400" fs={12}>
+    <Box color="gray.400" fontSize="xs">
       {isToday(time) ? 'Today at ' : dateFormat.format(time)}{' '}
       {padTime(time.getHours())}:{padTime(time.getMinutes())}
     </Box>
   );
 }
-
-const NameBox = styled(Flex)`
-  margin-bottom: 4px;
-  gap: 6px;
-  & > * {
-    align-self: flex-end;
-  }
-`;
 
 const AvatarFiller = styled.div`
   margin: 0;
@@ -190,13 +182,13 @@ export const MessageItem = observer(
         )}
         <MessageInner>
           {!isSimple && (
-            <NameBox>
+            <Flex align="center" gap="8px" mb="6px">
               <Name color={message.member?.roleColor}>
                 {message.author?.name ?? 'Ghost'}
               </Name>
               {message.author?.category === 'BOT' && <BotTag />}
               <Timestamp time={new Date(message.timestamp)} />
-            </NameBox>
+            </Flex>
           )}
           <div>
             <Markdown content={message.content} />
@@ -213,9 +205,9 @@ export function GhostMessage() {
     <MessageContainer>
       <MessageAvatar />
       <MessageInner>
-        <NameBox style={{ opacity: '50%' }}>
+        <Flex align="center" gap="8px" mb="6px" opacity={0.5}>
           <Name>Cactus</Name>
-        </NameBox>
+        </Flex>
 
         <div style={{ opacity: '50%' }}>
           <Markdown content="testing ghost message" />

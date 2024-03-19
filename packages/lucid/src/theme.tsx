@@ -174,6 +174,10 @@ export const GlobalStyle = createGlobalStyle`
     cursor: pointer;
   }
 
+  button {
+    border: none;
+  }
+
   body {
     overscroll-behavior-x: none;
     overscroll-behavior-y: none;

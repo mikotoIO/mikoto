@@ -1,4 +1,4 @@
-import { Checkbox, Flex } from '@mikoto-io/lucid';
+import { Checkbox, Flex } from '@chakra-ui/react';
 import { permissions } from '@mikoto-io/permcheck';
 import { ClientMember, Role, User, checkMemberPermission } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
@@ -62,12 +62,11 @@ function RoleSetter({
 
   return (
     <AvatarContextWrapper>
-      <Flex dir="column" gap={8}>
+      <Flex direction="column" gap={8}>
         {roles.map((x) => {
           if (x.name === '@everyone') return null;
           return (
             <Checkbox
-              labelName={x.name}
               key={x.id}
               checked={selectedRoles[x.id]}
               onChange={async (e) => {
@@ -83,7 +82,9 @@ function RoleSetter({
                   ),
                 });
               }}
-            />
+            >
+              {x.name}
+            </Checkbox>
           );
         })}
       </Flex>

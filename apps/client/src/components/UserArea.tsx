@@ -1,4 +1,4 @@
-import { Flex, Heading } from '@mikoto-io/lucid';
+import { Flex, Heading } from '@chakra-ui/react';
 import { User } from 'mikotojs';
 import { useEffect } from 'react';
 import { atom, useRecoilState } from 'recoil';
@@ -74,9 +74,9 @@ function UserAreaMenu() {
 
   return (
     <ContextMenu style={{ width: '280px' }}>
-      <Flex gap={8} bg="N900" p={{ x: 16, y: 12 }} rounded={4} dir="column">
+      <Flex gap={2} bg="gray.800" p="16px" rounded="md" direction="column">
         <Avatar src={mikoto.me.avatar ?? undefined} size={80} />
-        <Heading fs={18} m={{ bottom: 0 }}>
+        <Heading fontSize="18px" mb={0}>
           {mikoto.me.name}
         </Heading>
       </Flex>

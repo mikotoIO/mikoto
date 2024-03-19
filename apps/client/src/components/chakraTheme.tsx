@@ -5,7 +5,7 @@ const Button = defineStyleConfig({
     whiteSpace: 'normal',
     height: 'auto',
     blockSize: 'auto',
-    fontWeight: 'bolder',
+    fontWeight: 'regular',
     py: '3',
     px: '6',
   },

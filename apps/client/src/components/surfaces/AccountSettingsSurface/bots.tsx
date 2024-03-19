@@ -1,6 +1,7 @@
+import { Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
 import { faCog, faCopy, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Button, Buttons, Form, Input, Modal } from '@mikoto-io/lucid';
+import { Box, Buttons, Form, Modal } from '@mikoto-io/lucid';
 import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -89,7 +90,10 @@ function BotCreateModal() {
         })}
       >
         <h1>Create Bot</h1>
-        <Input labelName="Bot Name" {...register('name', { required: true })} />
+        <FormControl>
+          <FormLabel>Bot Name</FormLabel>
+          <Input {...register('name', { required: true })} />
+        </FormControl>
         <Button variant="primary" type="submit">
           Create Bot
         </Button>

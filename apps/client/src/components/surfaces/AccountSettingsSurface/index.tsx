@@ -4,10 +4,11 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  Heading,
   Input,
   Textarea,
 } from '@chakra-ui/react';
-import { Form, Heading, Modal } from '@mikoto-io/lucid';
+import { Form, Modal } from '@mikoto-io/lucid';
 import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -150,7 +151,7 @@ const Overview = observer(() => {
                 });
               }}
             />
-            <Heading as="h2" m={{ left: 16 }}>
+            <Heading as="h2" ml="16px" fontSize="2xl">
               {user?.name}
             </Heading>
           </Flex>

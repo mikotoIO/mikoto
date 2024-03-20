@@ -1,22 +1,34 @@
-import { Flex } from '@mikoto-io/lucid';
-import styled from 'styled-components';
+import { Flex } from '@chakra-ui/react';
+import React from 'react';
 
 interface SpaceIconProps {
-  active?: boolean | null;
   icon?: string;
-  size?: number;
+  size?: string;
+  color?: string;
+  fontSize?: string;
 }
 
-export const StyledSpaceIcon = styled(Flex)<SpaceIconProps>`
-  width: ${(p) => p.size ?? 48}px;
-  height: ${(p) => p.size ?? 48}px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  background-color: var(--N800);
-  transition-duration: 100ms;
-  background-image: url(${(p) => p.icon ?? 'none'});
-  background-size: cover;
-  font-size: ${(p) => p.fs ?? 14}px;
-  cursor: pointer;
-`;
+export function StyledSpaceIcon({
+  icon,
+  size,
+  color,
+  fontSize,
+  ...rest
+}: SpaceIconProps & React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <Flex
+      w={size ?? '48px'}
+      h={size ?? '48px'}
+      align="center"
+      justify="center"
+      borderRadius={8}
+      bg="var(--N800)"
+      bgImage={icon ? `url(${icon})` : 'none'}
+      bgSize="cover"
+      cursor="pointer"
+      color={color}
+      fontSize={fontSize ?? '14px'}
+      {...rest}
+    />
+  );
+}

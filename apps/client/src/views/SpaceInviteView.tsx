@@ -43,11 +43,7 @@ export function SpaceInviteViewInner() {
       <InvitationBox>
         {space ? (
           <>
-            <StyledSpaceIcon
-              size={100}
-              active
-              icon={normalizeMediaUrl(space.icon)}
-            >
+            <StyledSpaceIcon size="100px" icon={normalizeMediaUrl(space.icon)}>
               {space.icon === null ? space.name[0] : ''}
             </StyledSpaceIcon>
             <h1>{space.name}</h1>

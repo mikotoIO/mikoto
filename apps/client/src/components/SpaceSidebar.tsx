@@ -147,12 +147,10 @@ function SidebarSpaceIcon({ space, index, onReorder }: SidebarSpaceIconProps) {
 
   return (
     <SpaceIconTooltip tooltip={space.name}>
-      <StyledIconWrapper>
+      <StyledIconWrapper ref={ref}>
         <Pill h={isActive ? 32 : 0} />
         <StyledSpaceIcon
-          active={isActive}
           onContextMenu={contextMenu}
-          ref={ref}
           icon={space.icon ? normalizeMediaUrl(space.icon) : undefined}
           onDoubleClick={() => {
             setWorkspace((x) => ({ ...x, leftOpen: !x.leftOpen }));
@@ -257,7 +255,6 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
                 ? 'linear-gradient(133deg, #2298ff 0%, rgba(59,108,255,1) 100%)'
                 : undefined,
           }}
-          active
           onClick={() => {
             setSpaceId(null);
           }}
@@ -286,8 +283,8 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
       <SpaceIconTooltip tooltip="Add / Join Space">
         <StyledIconWrapper>
           <StyledSpaceIcon
-            txt="B600"
-            fs={20}
+            color="blue.500"
+            fontSize="18px"
             onClick={() => {
               setModal({
                 elem: <SpaceJoinModal />,

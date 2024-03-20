@@ -15,7 +15,6 @@ import { StyleSheetManager, ThemeProvider } from 'styled-components';
 // eslint-disable-next-line import/no-relative-packages
 import '../../../packages/lucid/src/fonts.css';
 import App from './App';
-import { UserThemeProvider } from './components/UserThemeProvider';
 import { chakraTheme } from './components/chakraTheme';
 import { env } from './env';
 import './i18n';
@@ -48,7 +47,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <StyleSheetManager disableCSSOMInjection>
         <ChakraProvider theme={chakraTheme} resetCSS={false}>
           <LucidProvider>
-            <UserThemeProvider />
             <ThemeProvider theme={theme}>
               <DndProvider backend={HTML5Backend}>
                 <>

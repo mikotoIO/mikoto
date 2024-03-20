@@ -1,5 +1,6 @@
 import {
   Button,
+  ButtonGroup,
   FormControl,
   FormLabel,
   Heading,
@@ -11,7 +12,7 @@ import {
   faMicrophone,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Buttons, Form, Modal } from '@mikoto-io/lucid';
+import { Box, Form, Modal } from '@mikoto-io/lucid';
 import { permissions } from '@mikoto-io/permcheck';
 import {
   Channel,
@@ -143,7 +144,7 @@ function DeleteChannelModal({ channel }: { channel: ClientChannel }) {
         Are you sure you want to delete the channel{' '}
         <strong>#{channel.name}</strong>?
       </Box>
-      <Buttons>
+      <ButtonGroup>
         <Button
           variant="danger"
           onClick={async () => {
@@ -161,7 +162,7 @@ function DeleteChannelModal({ channel }: { channel: ClientChannel }) {
         >
           Cancel
         </Button>
-      </Buttons>
+      </ButtonGroup>
     </Modal>
   );
 }

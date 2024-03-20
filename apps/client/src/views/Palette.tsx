@@ -1,6 +1,7 @@
+import { ButtonGroup } from '@chakra-ui/react';
 import { faChevronRight, faStar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Buttons, Form, Input, Toggle, colors } from '@mikoto-io/lucid';
+import { Button, Form, Input, Toggle, colors } from '@mikoto-io/lucid';
 import styled from 'styled-components';
 
 import { TabName } from '../components/TabBar';
@@ -78,7 +79,7 @@ export function DesignStory() {
 
       <Form>
         <Input labelName="Test Input" />
-        <Buttons>
+        <ButtonGroup>
           <Button
             type="button"
             onClick={() => {
@@ -112,14 +113,14 @@ export function DesignStory() {
           <Button variant="danger" type="button">
             Danger Button
           </Button>
-        </Buttons>
+        </ButtonGroup>
 
-        <Buttons>
+        <ButtonGroup>
           <Button variant="primary" type="button" transparent>
             Transparent button
             <FontAwesomeIcon icon={faChevronRight} />
           </Button>
-        </Buttons>
+        </ButtonGroup>
         <div>
           <Triselector />
         </div>

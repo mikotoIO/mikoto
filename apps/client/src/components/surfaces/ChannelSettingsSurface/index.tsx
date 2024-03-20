@@ -8,13 +8,13 @@ import {
   Input,
   Textarea,
 } from '@chakra-ui/react';
-import { Form } from '@mikoto-io/lucid';
 import { ClientChannel } from 'mikotojs';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 import { useMikoto } from '../../../hooks';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
+import { Form } from '../../atoms';
 import { Triselector } from '../../atoms/Triselect';
 import { BaseSettingsSurface } from '../BaseSettingSurface';
 

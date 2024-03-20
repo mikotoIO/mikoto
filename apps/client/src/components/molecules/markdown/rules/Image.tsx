@@ -1,5 +1,6 @@
+import { Box, Link } from '@chakra-ui/react';
 import SimpleMarkdown from '@khanacademy/simple-markdown';
-import { Anchor, Box, Modal } from '@mikoto-io/lucid';
+import { Modal } from '@mikoto-io/lucid';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 
@@ -32,10 +33,10 @@ export function MessageImage({ src, alt }: MessageImageProps) {
         setModal({
           elem: (
             <Modal style={{ padding: 0, background: 'none' }}>
-              <Box m={{ bottom: 8 }}>
-                <Anchor href={src} target="_blank" txt="N200">
+              <Box mb={2}>
+                <Link href={src} target="_blank" color="gray.100">
                   Open in Browser
-                </Anchor>
+                </Link>
               </Box>
               <StyledMessageImage src={src} alt={alt} />
             </Modal>

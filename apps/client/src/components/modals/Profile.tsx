@@ -1,7 +1,7 @@
-import { Flex } from '@chakra-ui/react';
+import { Button, ButtonGroup, Flex } from '@chakra-ui/react';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Buttons, Modal } from '@mikoto-io/lucid';
+import { Modal } from '@mikoto-io/lucid';
 import { User } from 'mikotojs';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -21,7 +21,7 @@ const ProfileContainer = styled.div`
     padding: 16px;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
-    height: 100px;
+    height: 128px;
   }
   .content {
     padding: 48px 16px 16px;
@@ -71,7 +71,7 @@ export function ProfileModal({ user }: { user: User }) {
             </div>
             <div>
               {mikoto.me.id !== user.id && (
-                <Buttons>
+                <ButtonGroup>
                   <Button
                     variant="success"
                     onClick={async () => {
@@ -85,6 +85,7 @@ export function ProfileModal({ user }: { user: User }) {
                     Send Friend Request
                   </Button>
                   <Button
+                    variant="secondary"
                     onClick={async () => {
                       const dm = await mikoto.client.relations.openDm({
                         relationId: user.id,
@@ -102,7 +103,7 @@ export function ProfileModal({ user }: { user: User }) {
                   >
                     <FontAwesomeIcon icon={faEnvelope} />
                   </Button>
-                </Buttons>
+                </ButtonGroup>
               )}
             </div>
           </Flex>

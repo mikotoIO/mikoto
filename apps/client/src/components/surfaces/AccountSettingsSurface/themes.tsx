@@ -1,4 +1,6 @@
-import { Button, Buttons, Form, Input, SelectInput } from '@mikoto-io/lucid';
+import { ButtonGroup, FormControl, FormLabel } from '@chakra-ui/react';
+import { Form } from '@mikoto-io/lucid';
+import { Button, Input, SelectInput } from '@mikoto-io/lucid';
 import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -23,20 +25,22 @@ export function ThemesSubsurface() {
           setThemeSettings(data);
         })}
       >
-        <SelectInput
-          labelName="Theme"
-          data={['dark', 'light']}
-          {...form.register('theme')}
-        />
+        <FormControl>
+          <FormLabel>Theme</FormLabel>
+          <SelectInput data={['dark', 'light']} {...form.register('theme')} />
+        </FormControl>
 
-        <Input labelName="color" {...form.register('accent')} />
+        <FormControl>
+          <FormLabel>Color</FormLabel>
+          <Input {...form.register('accent')} />
+        </FormControl>
         <HexColorPicker
           color={form.getValues('accent')}
           onChange={(color) => {
             form.setValue('accent', color);
           }}
         />
-        <Buttons>
+        <ButtonGroup>
           <Button variant="primary" type="submit">
             Save
           </Button>
@@ -49,7 +53,7 @@ export function ThemesSubsurface() {
           >
             Reset
           </Button>
-        </Buttons>
+        </ButtonGroup>
       </Form>
     </SettingsView>
   );

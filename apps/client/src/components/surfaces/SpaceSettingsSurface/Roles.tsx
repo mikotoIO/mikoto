@@ -1,6 +1,7 @@
 /* eslint-disable no-bitwise */
 import {
   Button,
+  ButtonGroup,
   FormControl,
   FormLabel,
   Grid,
@@ -198,7 +199,7 @@ const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
       )}
 
       <RolePermissionEditor perms={perms} onChange={setPerms} />
-      <Buttons>
+      <ButtonGroup>
         <Button variant="primary" type="submit">
           Save Changes
         </Button>
@@ -218,7 +219,7 @@ const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
             Delete Role
           </Button>
         )}
-      </Buttons>
+      </ButtonGroup>
     </StyledRoleEditor>
   );
 });

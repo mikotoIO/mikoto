@@ -1,4 +1,4 @@
-import { Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
+import { Button, ButtonGroup, FormControl, FormLabel, Input } from '@chakra-ui/react';
 import { Buttons, Form, Modal } from '@mikoto-io/lucid';
 import { ClientSpace } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
@@ -74,7 +74,7 @@ const Overview = observer(({ space }: { space: ClientSpace }) => {
           />
         </FormControl>
 
-        <Buttons>
+        <ButtonGroup>
           <Button
             variant="primary"
             type="button"
@@ -95,11 +95,11 @@ const Overview = observer(({ space }: { space: ClientSpace }) => {
           >
             Add Bot
           </Button>
-        </Buttons>
+        </ButtonGroup>
         <h2>Dangerous</h2>
-        <Buttons>
+        <ButtonGroup>
           <Button variant="danger">Delete Space</Button>
-        </Buttons>
+        </ButtonGroup>
       </Form>
     </SettingsView>
   );

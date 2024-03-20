@@ -145,6 +145,13 @@ export const chakraTheme = extendTheme({
       50: 'hsl(350, 90%, 90%)',
     },
   },
+  semanticTokens: {
+    colors: {
+      text: 'gray.50',
+      surface: 'gray.700',
+      subsurface: 'gray.800',
+    },
+  },
   components: {
     Button,
     FormLabel,

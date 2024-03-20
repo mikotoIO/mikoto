@@ -1,6 +1,11 @@
-import { ButtonGroup, FormControl, FormLabel } from '@chakra-ui/react';
-import { Form } from '@mikoto-io/lucid';
-import { Button, Input, SelectInput } from '@mikoto-io/lucid';
+import {
+  Button,
+  ButtonGroup,
+  FormControl,
+  FormLabel,
+  Input,
+  Select,
+} from '@chakra-ui/react';
 import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { DEFAULT_THEME_SETTINGS, themeDB } from '../../../store';
 import { useLocalDB } from '../../../store/LocalDB';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
+import { Form } from '../../atoms';
 
 export function ThemesSubsurface() {
   const { t } = useTranslation();
@@ -27,7 +33,10 @@ export function ThemesSubsurface() {
       >
         <FormControl>
           <FormLabel>Theme</FormLabel>
-          <SelectInput data={['dark', 'light']} {...form.register('theme')} />
+          <Select {...form.register('theme')}>
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+          </Select>
         </FormControl>
 
         <FormControl>

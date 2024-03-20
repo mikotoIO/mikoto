@@ -1,4 +1,6 @@
-import { Button, Form, Heading, Input, Modal } from '@mikoto-io/lucid';
+import { Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
+import { Heading } from '@chakra-ui/react';
+import { Modal } from '@mikoto-io/lucid';
 import { AxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
@@ -7,6 +9,7 @@ import styled from 'styled-components';
 import { useMikoto } from '../../hooks';
 import { useErrorElement } from '../../hooks/useErrorElement';
 import { modalState } from '../ContextMenu';
+import { Form } from '../atoms';
 
 const SpaceJoinModalWrapper = styled.div`
   min-width: 400px;
@@ -27,11 +30,10 @@ function SpaceCreateForm({ closeModal }: { closeModal: () => void }) {
         form.reset();
       })}
     >
-      <Input
-        labelName="Space Name"
-        placeholder="Academy City"
-        {...form.register('spaceName')}
-      />
+      <FormControl>
+        <FormLabel>Space Name</FormLabel>
+        <Input placeholder="Academy City" {...form.register('spaceName')} />
+      </FormControl>
       <Button variant="primary" type="submit">
         Create Space
       </Button>
@@ -59,7 +61,10 @@ function SpaceJoinForm({ closeModal }: { closeModal: () => void }) {
       })}
     >
       {error.el}
-      <Input labelName="Invite Link/Code" {...register('inviteCode')} />
+      <FormControl>
+        <FormLabel>Invite Link/Code</FormLabel>
+        <Input {...register('inviteCode')} />
+      </FormControl>
       <Button>Join Space</Button>
     </Form>
   );
@@ -71,7 +76,7 @@ export function SpaceJoinModal() {
   return (
     <Modal>
       <SpaceJoinModalWrapper>
-        <Heading className="inviteheader" m={{ top: 0 }}>
+        <Heading fontSize="xl" className="inviteheader" mt={0}>
           Create a Space
         </Heading>
         <SpaceCreateForm

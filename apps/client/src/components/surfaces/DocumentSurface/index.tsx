@@ -1,6 +1,6 @@
+import { Box, Flex, Heading } from '@chakra-ui/react';
 import { faEllipsis, faFileLines } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Flex, Heading } from '@mikoto-io/lucid';
 import { Editor, EditorContent } from '@tiptap/react';
 import { ClientChannel } from 'mikotojs';
 import { useEffect, useState } from 'react';
@@ -141,13 +141,13 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
       <div>
         <Flex
           w="100%"
-          h={32}
-          bg="N900"
-          rounded={4}
-          p={16}
-          m={{ bottom: 16 }}
-          alignItems="center"
-          justifyContent="space-between"
+          h={8}
+          bg="gray.800"
+          rounded="md"
+          px={4}
+          mb={4}
+          align="center"
+          justify="space-between"
         >
           <FontAwesomeIcon
             icon={faEllipsis}
@@ -166,13 +166,12 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
               </ContextMenu>
             ))}
           />
-          <Flex gap={8}>
-            <Flex
-              rounded={32}
-              bg={changed ? 'Y700' : 'G700'}
-              w={12}
-              h={12}
-              center
+          <Flex gap={2}>
+            <Box
+              rounded="lg"
+              bg={changed ? 'yellow.500' : 'green.500'}
+              w={3}
+              h={3}
             />
           </Flex>
         </Flex>
@@ -216,9 +215,9 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
   return (
     <ViewContainer scroll>
       <TabName name={channel.name} icon={faFileLines} />
-      <Box p={32}>
-        <Heading fs={28} txt="N200">
-          <Box as="span" txt="N400">
+      <Box p={8}>
+        <Heading fontSize="28px" color="gray.100">
+          <Box as="span" color="gray.300">
             #
           </Box>
           {channel.name}

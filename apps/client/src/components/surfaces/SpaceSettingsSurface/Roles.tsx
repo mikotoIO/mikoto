@@ -1,7 +1,9 @@
 /* eslint-disable no-bitwise */
 import {
+  Box,
   Button,
   ButtonGroup,
+  Flex,
   FormControl,
   FormLabel,
   Grid,
@@ -11,7 +13,6 @@ import {
 } from '@chakra-ui/react';
 import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Buttons, Flex, Form } from '@mikoto-io/lucid';
 import { checkPermission, permissions } from '@mikoto-io/permcheck';
 import { ClientSpace, Role, Space } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
@@ -23,6 +24,7 @@ import styled from 'styled-components';
 import { useMikoto } from '../../../hooks';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
 import { useContextMenu } from '../../ContextMenu';
+import { Form } from '../../atoms';
 
 const SidebarButton = styled.a<{ selected?: boolean }>`
   display: block;
@@ -76,15 +78,16 @@ function RoleColorPicker({ value, onChange }: ColorPickerProps) {
     <StyledColorPicker color={value ?? '#006FFF'} onChange={onChange} />
   ));
   return (
-    <Flex p={{ y: 16 }} gap={8}>
-      <Box w={64} h={64} bg={value ?? 'N400'} rounded={4} onClick={menu} />
+    <Flex py={4} gap={2}>
+      <Box w={16} h={16} bg={value ?? 'gray.300'} rounded={4} onClick={menu} />
       <Flex
-        center
-        fs={32}
-        w={64}
-        h={64}
-        bg="N300"
-        txt="N400"
+        align="center"
+        justify="center"
+        fontSize="32px"
+        w="64px"
+        h="64px"
+        bg="gray.200"
+        color="gray.300"
         rounded={4}
         onClick={() => {
           onChange?.(null);
@@ -92,13 +95,13 @@ function RoleColorPicker({ value, onChange }: ColorPickerProps) {
       >
         <FontAwesomeIcon icon={faCircleXmark} />
       </Flex>
-      <Flex gap={8}>
+      <Flex gap={2}>
         {defaultColors.map((x) => (
           <Box
-            w={32}
-            h={32}
+            w={8}
+            h={8}
             bg={x}
-            rounded={4}
+            rounded="md"
             key={x}
             onClick={() => onChange?.(x)}
           />
@@ -120,7 +123,7 @@ function RolePermissionEditor({
   return (
     <Box>
       {rolePermissionData.map((x) => (
-        <Box p={{ y: 16 }} key={x.permission.toString()}>
+        <Box py={4} key={x.permission.toString()}>
           <Flex justifyContent="space-between">
             <Heading as="h3" m={0} fontSize="lg">
               {x.name}
@@ -140,7 +143,7 @@ function RolePermissionEditor({
               }}
             />
           </Flex>
-          <Box txt="N300">Description of the perm goes here.</Box>
+          <Box color="gray.200">Description of the perm goes here.</Box>
         </Box>
       ))}
     </Box>

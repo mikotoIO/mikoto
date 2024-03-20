@@ -1,4 +1,4 @@
-import { Button, Flex, Grid, backgroundMix } from '@mikoto-io/lucid';
+import { Button, Flex, Grid } from '@chakra-ui/react';
 import { Space } from 'mikotojs';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -39,7 +39,7 @@ export function SpaceInviteViewInner() {
   }, [inviteCode]);
 
   return (
-    <Grid tcol="400px 1fr" h="100vh">
+    <Grid templateColumns="400px 1fr" h="100vh">
       <InvitationBox>
         {space ? (
           <>
@@ -71,7 +71,10 @@ export function SpaceInviteViewInner() {
           <Spinner />
         )}
       </InvitationBox>
-      <Flex mix={[backgroundMix('/images/artworks/1.jpg')]} center />
+      <Flex
+        bgImage="url(/images/artworks/1.jpg) no-repeat center center"
+        bgSize="cover"
+      />
     </Grid>
   );
 }

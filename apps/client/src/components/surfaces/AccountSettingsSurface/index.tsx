@@ -8,7 +8,7 @@ import {
   Input,
   Textarea,
 } from '@chakra-ui/react';
-import { Form, Modal } from '@mikoto-io/lucid';
+import { Modal } from '@mikoto-io/lucid';
 import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +20,7 @@ import { useErrorElement } from '../../../hooks/useErrorElement';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
 import { modalState } from '../../ContextMenu';
 import { userState } from '../../UserArea';
+import { Form } from '../../atoms';
 import { AvatarEditor } from '../../molecules/AvatarEditor';
 import { BaseSettingsSurface } from '../BaseSettingSurface';
 import { BotsSurface } from './bots';

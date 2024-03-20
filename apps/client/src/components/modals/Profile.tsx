@@ -1,6 +1,7 @@
+import { Flex } from '@chakra-ui/react';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Buttons, Flex, Modal } from '@mikoto-io/lucid';
+import { Button, Buttons, Modal } from '@mikoto-io/lucid';
 import { User } from 'mikotojs';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';

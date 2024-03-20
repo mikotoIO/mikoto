@@ -1,4 +1,4 @@
-import { Box, Button } from '@mikoto-io/lucid';
+import { Box, Button } from '@chakra-ui/react';
 import { Invite, Space } from 'mikotojs';
 import { useEffect, useState } from 'react';
 
@@ -20,8 +20,8 @@ export function Invites({ space }: { space: Space }) {
       <h1>Invites</h1>
       {invites &&
         invites.map((invite) => (
-          <Box key={invite.code} bg="N900" m={4} p={16} rounded={8}>
-            <Box bg="N1000" p={8} rounded={8}>
+          <Box key={invite.code} bg="gray.800" m={1} p={4} rounded="md">
+            <Box bg="gray.900" p={2} rounded="md">
               {invite.code}
             </Box>
             <Button

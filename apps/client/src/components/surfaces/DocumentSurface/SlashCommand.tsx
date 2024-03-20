@@ -1,3 +1,4 @@
+import { Box, Flex, Heading } from '@chakra-ui/react';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import {
   faHeading,
@@ -5,7 +6,6 @@ import {
   faWandMagicSparkles,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Flex, Heading } from '@mikoto-io/lucid';
 import { Editor, Extension, ReactRenderer } from '@tiptap/react';
 import Suggestion from '@tiptap/suggestion';
 import { useEffect, useState } from 'react';
@@ -99,14 +99,22 @@ function CommandList() {
     <StyledCommandList>
       {commands.map((command, idx) => (
         <CommandButton active={idx === selectedIndex}>
-          <Flex center w={40} h={40} bg="N900" rounded={4} key={command.name}>
+          <Flex
+            align="center"
+            justify="center"
+            w="40px"
+            h="40px"
+            bg="gray.800"
+            rounded="4px"
+            key={command.name}
+          >
             {command.icon && <FontAwesomeIcon icon={command.icon} />}
           </Flex>
-          <Box style={{ textAlign: 'left' }}>
-            <Heading fs={16} m={0}>
+          <Box textAlign="left">
+            <Heading fontSize="16px" m={0}>
               {command.name}
             </Heading>
-            <Box fs={12}>{command.description}</Box>
+            <Box fontSize="12px">{command.description}</Box>
           </Box>
         </CommandButton>
       ))}

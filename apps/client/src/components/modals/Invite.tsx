@@ -1,4 +1,5 @@
-import { Button, Modal } from '@mikoto-io/lucid';
+import { Button } from '@chakra-ui/react';
+import { Modal } from '@mikoto-io/lucid';
 import { Invite, Space } from 'mikotojs';
 import { useState } from 'react';
 import styled from 'styled-components';
@@ -37,6 +38,7 @@ export function InviteModal({ space }: { space: Space }) {
       <InviteModalWrapper>
         {!invite ? (
           <Button
+            variant="primary"
             type="button"
             onClick={() => {
               mikoto.client.spaces

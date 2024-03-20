@@ -1,6 +1,6 @@
+import { Box } from '@chakra-ui/react';
 import { faCrown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box } from '@mikoto-io/lucid';
 import { ClientMember, ClientSpace } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
@@ -65,7 +65,7 @@ const MemberElement = observer(({ member }: { member: ClientMember }) => {
       onContextMenu={userContextMenu}
     >
       <Avatar size={32} src={member.user.avatar ?? undefined} />
-      <Box className="name" txt={member.roleColor}>
+      <Box className="name" color={member.roleColor}>
         {member.user.name}
       </Box>
       {member.isSpaceOwner && (

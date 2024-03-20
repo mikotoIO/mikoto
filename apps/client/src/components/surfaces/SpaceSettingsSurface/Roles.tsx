@@ -1,24 +1,22 @@
 /* eslint-disable no-bitwise */
-import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  Box,
   Button,
-  Buttons,
-  Flex,
-  Form,
+  FormControl,
+  FormLabel,
   Grid,
   Heading,
   Input,
-  Toggle,
-} from '@mikoto-io/lucid';
+  Switch,
+} from '@chakra-ui/react';
+import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Box, Buttons, Flex, Form } from '@mikoto-io/lucid';
 import { checkPermission, permissions } from '@mikoto-io/permcheck';
 import { ClientSpace, Role, Space } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
 import styled from 'styled-components';
 
 import { useMikoto } from '../../../hooks';
@@ -123,16 +121,17 @@ function RolePermissionEditor({
       {rolePermissionData.map((x) => (
         <Box p={{ y: 16 }} key={x.permission.toString()}>
           <Flex justifyContent="space-between">
-            <Heading as="h3" m={0}>
+            <Heading as="h3" m={0} fontSize="lg">
               {x.name}
             </Heading>
-            <Toggle
-              checked={checkPermission(x.permission, perm)}
+            <Switch
+              size="lg"
+              isChecked={checkPermission(x.permission, perm)}
               onChange={(t) => {
                 // if X is true, switch the bitset to 1
                 // if X is false, switch the bitset to 0
 
-                if (t) {
+                if (t.target.checked) {
                   onChange?.((perm | x.permission).toString());
                 } else {
                   onChange?.((perm & ~x.permission).toString());
@@ -181,14 +180,19 @@ const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
 
       {role.name !== '@everyone' && (
         <>
-          <Input labelName="Role Name" {...form.register('name')} />
-          <Input
-            labelName="Role Priority"
-            type="number"
-            min={0}
-            max={99}
-            {...form.register('position', { valueAsNumber: true })}
-          />
+          <FormControl>
+            <FormLabel>Role Name</FormLabel>
+            <Input {...form.register('name')} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Role Priority</FormLabel>
+            <Input
+              type="number"
+              min={0}
+              max={99}
+              {...form.register('position', { valueAsNumber: true })}
+            />
+          </FormControl>
           <RoleColorPicker value={color} onChange={setColor} />
         </>
       )}
@@ -227,10 +231,11 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
   // const role = rolesDelta.data.find((x) => x.id === selectedRoleId);
   return (
     <SettingsView style={{ paddingRight: 0 }}>
-      <Grid w="100%" h="100%" tcol="200px auto">
+      <Grid w="100%" h="100%" templateColumns="200px auto">
         <Box>
           <Button
-            m={{ y: 16 }}
+            my={4}
+            leftIcon={<FontAwesomeIcon icon={faCirclePlus} />}
             variant="primary"
             onClick={async () => {
               await mikoto.client.roles.create({
@@ -239,7 +244,6 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
               });
             }}
           >
-            <FontAwesomeIcon icon={faCirclePlus} />
             New Role
           </Button>
           {space.roles.map((r) => (

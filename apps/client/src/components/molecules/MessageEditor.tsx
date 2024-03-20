@@ -3,7 +3,6 @@ import {
   faFileArrowUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Flex } from '@mikoto-io/lucid';
 import useResizeObserver from '@react-hook/resize-observer';
 import { runInAction } from 'mobx';
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
@@ -74,8 +73,10 @@ interface MessageEditorProps {
   onResize?: () => void;
 }
 
-const EditorButtons = styled(Flex)`
+const EditorButtons = styled.div`
+  display: flex;
   position: absolute;
+  gap: 16px;
   right: 16px;
   transform: translateY(-8px);
   font-size: 24px;
@@ -303,7 +304,7 @@ export function MessageEditor({
             }}
           />
         </Slate>
-        <EditorButtons gap={16}>
+        <EditorButtons>
           {editState.message === null && (
             <EditorButton
               onClick={() => {

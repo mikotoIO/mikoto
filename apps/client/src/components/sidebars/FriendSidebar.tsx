@@ -1,9 +1,9 @@
+import { Box, Heading } from '@chakra-ui/react';
 import {
   faEarthAmericas,
   faUserGroup,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Heading } from '@mikoto-io/lucid';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
@@ -41,7 +41,7 @@ export const FriendSidebar = observer(() => {
   }, []);
 
   return (
-    <Box p={8}>
+    <Box p={2}>
       <StyledButtonBase
         onClick={() => {
           tabkit.openTab(
@@ -70,7 +70,7 @@ export const FriendSidebar = observer(() => {
         <FontAwesomeIcon icon={faEarthAmericas} fixedWidth />
         <span>Discover</span>
       </StyledButtonBase>
-      <Heading fs={14} p={{ left: 8 }} txt="N300">
+      <Heading fontSize="14px" pl="8px" color="gray.200">
         Direct Messages
       </Heading>
       {Array.from(mikoto.relations.values()).map((friend) => (

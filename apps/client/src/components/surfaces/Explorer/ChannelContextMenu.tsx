@@ -1,18 +1,17 @@
 import {
+  Button,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+} from '@chakra-ui/react';
+import {
   faFileAlt,
   faHashtag,
   faMicrophone,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  Box,
-  Button,
-  Buttons,
-  Form,
-  Heading,
-  Input,
-  Modal,
-} from '@mikoto-io/lucid';
+import { Box, Buttons, Form, Modal } from '@mikoto-io/lucid';
 import { permissions } from '@mikoto-io/permcheck';
 import {
   Channel,
@@ -87,7 +86,7 @@ export function CreateChannelModal({
   return (
     <Modal>
       <StyledCreateChannelModal>
-        <Heading m={{ top: 0 }}>
+        <Heading fontSize="xl" mt={0}>
           {channel ? 'Create Subchannel' : 'Create Channel'}
         </Heading>
         {channel && <p className="subchannelinfo">In #{channel.name}</p>}
@@ -121,11 +120,11 @@ export function CreateChannelModal({
               </ChannelTypeButton>
             ))}
           </div>
-          <Input
-            labelName="Channel Name"
-            placeholder="New Channel"
-            {...register('name')}
-          />
+          <FormControl>
+            <FormLabel>Channel Name</FormLabel>
+            <Input placeholder="New Channel" {...register('name')} />
+          </FormControl>
+
           <Button variant="primary" type="submit">
             Create Channel
           </Button>
@@ -155,6 +154,7 @@ function DeleteChannelModal({ channel }: { channel: ClientChannel }) {
           Delete
         </Button>
         <Button
+          variant="secondary"
           onClick={() => {
             setModal(null);
           }}

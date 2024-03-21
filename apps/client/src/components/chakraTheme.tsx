@@ -1,4 +1,5 @@
 import { defineStyleConfig, extendTheme } from '@chakra-ui/react';
+import { createGlobalStyle } from 'styled-components';
 
 const Button = defineStyleConfig({
   baseStyle: {
@@ -84,18 +85,6 @@ export const chakraTheme = extendTheme({
     useSystemColorMode: false,
   },
   colors: {
-    // gray: {
-    //   50: "hsl(204, 45%, 98%)",
-    //   100: "hsl(210, 38%, 95%)",
-    //   200: "hsl(214, 32%, 91%)",
-    //   300: "hsl(211, 25%, 84%)",
-    //   400: "hsl(214, 20%, 69%)",
-    //   500: "hsl(216, 15%, 52%)",
-    //   600: "hsl(218, 17%, 35%)",
-    //   700: "hsl(218, 23%, 23%)",
-    //   800: "hsl(220, 26%, 14%)",
-    //   900: "hsl(230, 21%, 11%)",
-    // },
     gray: {
       900: 'hsl(230, 12%, 11%)',
       850: 'hsl(230, 12%, 12.5%)',
@@ -179,5 +168,68 @@ export const chakraTheme = extendTheme({
   fonts: {
     heading: '"Open Sans", sans-serif',
     body: '"Open Sans", sans-serif',
+    code: '"JetBrains Mono", monospace',
   },
 });
+
+export const GlobalStyle = createGlobalStyle`
+  :root {
+    --font-main: 'Open Sans', sans-serif;
+    --font-code: 'JetBrains Mono', monospace;
+  }
+
+  background-color: var(--chakra-colors-subsurface);
+  color: var(--chakra-colors-text);
+
+  h1:first-child,
+  h2:first-child,
+  h3:first-child,
+  h4:first-child,
+  h5:first-child,
+  h6:first-child {
+    margin-top: 0;
+  }
+
+  button, a {
+    cursor: pointer;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  button {
+    border: none;
+  }
+
+  body {
+    overscroll-behavior-x: none;
+    overscroll-behavior-y: none;
+    height: 100%;
+    min-height: 100%;
+    margin: 0;
+    font-family: var(--chakra-fonts-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  code {
+    font-family: var(--chakra-fonts-code);
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: hsl(220, 7%, 17%);
+    border-radius: 4px;
+  }
+  `;

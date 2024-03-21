@@ -16,7 +16,7 @@ const InviteLink = styled.button`
   border: none;
   color: var(--chakra-colors-white);
   background-color: var(--chakra-colors-gray-800);
-  font-family: var(--font-mono);
+  font-family: var(--chakra-fonts-code);
 
   &:hover {
     background-color: var(--chakra-colors-gray-850);

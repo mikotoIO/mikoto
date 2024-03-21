@@ -1,5 +1,4 @@
 import { ChakraProvider } from '@chakra-ui/react';
-import { GlobalStyle, LucidProvider, theme } from '@mikoto-io/lucid';
 import * as Sentry from '@sentry/react';
 import React from 'react';
 import { DndProvider } from 'react-dnd';
@@ -15,7 +14,7 @@ import { StyleSheetManager, ThemeProvider } from 'styled-components';
 // eslint-disable-next-line import/no-relative-packages
 import '../../../packages/lucid/src/fonts.css';
 import App from './App';
-import { chakraTheme } from './components/chakraTheme';
+import { chakraTheme, GlobalStyle } from './components/chakraTheme';
 import { env } from './env';
 import './i18n';
 import reportWebVitals from './reportWebVitals';
@@ -46,26 +45,18 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <RecoilRoot>
       <StyleSheetManager disableCSSOMInjection>
         <ChakraProvider theme={chakraTheme} resetCSS={false}>
-          <LucidProvider>
-            <ThemeProvider theme={theme}>
-              <DndProvider backend={HTML5Backend}>
-                <>
-                  <Helmet>
-                    {env.DEV && (
-                      <link
-                        rel="icon"
-                        type="image/png"
-                        href="/favicon-dev.ico"
-                      />
-                    )}
-                  </Helmet>
-                  <GlobalStyle />
-                  <App />
-                  <ToastContainer theme="dark" limit={3} />
-                </>
-              </DndProvider>
-            </ThemeProvider>
-          </LucidProvider>
+          <DndProvider backend={HTML5Backend}>
+            <>
+              <Helmet>
+                {env.DEV && (
+                  <link rel="icon" type="image/png" href="/favicon-dev.ico" />
+                )}
+              </Helmet>
+              <GlobalStyle />
+              <App />
+              <ToastContainer theme="dark" limit={3} />
+            </>
+          </DndProvider>
         </ChakraProvider>
       </StyleSheetManager>
     </RecoilRoot>

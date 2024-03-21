@@ -156,9 +156,6 @@ export const GlobalStyle = createGlobalStyle`
   :root {
     --font-main: 'Open Sans', sans-serif;
     --font-code: 'JetBrains Mono', monospace;
-    ${Object.entries(theme.colors)
-      .map(([name, value]) => `--${name}: ${value};`)
-      .join('\n')}
   }
 
   h1:first-child,
@@ -190,13 +187,13 @@ export const GlobalStyle = createGlobalStyle`
     margin: 0;
     background-color: ${(p) => p.theme.colors.N800};
     color: ${(p) => p.theme.colors.N0};
-    font-family: var(--font-main);
+    font-family: var(--chakra-fonts-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   code {
-    font-family: var(--font-code);
+    font-family: var(--chakra-fonts-code);
   }
 
   ::-webkit-scrollbar {

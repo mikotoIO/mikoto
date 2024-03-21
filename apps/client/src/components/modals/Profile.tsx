@@ -46,7 +46,7 @@ const MikotoId = styled.h2`
   font-size: 20px;
   margin-top: 0;
   font-size: 14px;
-  font-family: var(--font-code);
+  font-family: var(--chakra-fonts-code);
   color: var(--chakra-colors-gray-500);
 `;
 

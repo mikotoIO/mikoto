@@ -26,7 +26,7 @@ const EditorContentWrapper = styled.div`
     outline: none;
   }
   a {
-    color: var(--B400);
+    color: var(--chakra-colors-blue-200);
   }
 
   img {

@@ -22,7 +22,7 @@ export function StyledSpaceIcon({
       align="center"
       justify="center"
       borderRadius={8}
-      bg="var(--N800)"
+      bg="surface"
       bgImage={icon ? `url(${icon})` : 'none'}
       bgSize="cover"
       cursor="pointer"

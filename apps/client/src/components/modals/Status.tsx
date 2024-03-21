@@ -4,8 +4,8 @@ import {
   FormLabel,
   Heading,
   Input,
+  ModalContent,
 } from '@chakra-ui/react';
-import { Modal } from '@mikoto-io/lucid';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
 
@@ -17,7 +17,7 @@ export function SetStatusModal() {
   const form = useForm();
 
   return (
-    <Modal>
+    <ModalContent rounded="md" p={4}>
       <Heading fontSize="xl">Set Status</Heading>
       <Form
         onSubmit={form.handleSubmit((data) => {
@@ -35,6 +35,6 @@ export function SetStatusModal() {
         </Button>
         <Button type="button">Clear Status</Button>
       </Form>
-    </Modal>
+    </ModalContent>
   );
 }

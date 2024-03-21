@@ -68,7 +68,7 @@ const StyledTab = styled.div<{ active?: boolean }>`
     css`
       color: var(--N100);
       border-color: var(--color-primary);
-      background-color: var(--color-surface);
+      background-color: var(--chakra-colors-surface);
     `}
 
   &:hover {

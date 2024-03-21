@@ -3,8 +3,6 @@ import styled from 'styled-components';
 import { viewContainerCss } from '../components/ViewContainer';
 
 const SettingsViewBase = styled.div`
-  ${viewContainerCss}
-
   padding: 8px 32px;
   overflow-y: scroll;
 `;
@@ -14,8 +12,9 @@ const Sidebar = styled.div`
 `;
 
 const Container = styled.div`
+  ${viewContainerCss}
+
   height: 100%;
-  background-color: var(--N800);
   display: grid;
   grid-template-columns: 200px 1fr;
 `;

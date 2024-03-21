@@ -1,5 +1,11 @@
-import { Button, ButtonGroup, FormControl, FormLabel, Input } from '@chakra-ui/react';
-import { Buttons, Form, Modal } from '@mikoto-io/lucid';
+import {
+  Button,
+  ButtonGroup,
+  FormControl,
+  FormLabel,
+  Input,
+  ModalContent,
+} from '@chakra-ui/react';
 import { ClientSpace } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
@@ -11,6 +17,7 @@ import { uploadFile } from '../../../functions/fileUpload';
 import { useMikoto } from '../../../hooks';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
 import { modalState } from '../../ContextMenu';
+import { Form } from '../../atoms';
 import { AvatarEditor } from '../../molecules/AvatarEditor';
 import { BaseSettingsSurface } from '../BaseSettingSurface';
 import { BansSubsurface } from './Bans';
@@ -23,7 +30,7 @@ function AddBotModal({ space }: { space: ClientSpace }) {
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
   return (
-    <Modal>
+    <ModalContent rounded="md" p={4}>
       <Form
         onSubmit={form.handleSubmit(async (data) => {
           await mikoto.client.members.create({
@@ -41,7 +48,7 @@ function AddBotModal({ space }: { space: ClientSpace }) {
           Submit
         </Button>
       </Form>
-    </Modal>
+    </ModalContent>
   );
 }
 

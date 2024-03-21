@@ -1,4 +1,4 @@
-import { ModalView } from '@mikoto-io/lucid';
+import { Modal, ModalOverlay } from '@chakra-ui/react';
 import useEventListener from '@use-it/event-listener';
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { atom, useRecoilState, useSetRecoilState } from 'recoil';
@@ -178,13 +178,14 @@ export function ModalKit() {
 
   // opened={modal !== null}
   return (
-    <ModalView
-      open={modal !== null}
+    <Modal
+      isOpen={modal !== null}
       onClose={() => {
         setModal(null);
       }}
     >
+      {modal && <ModalOverlay />}
       {modal?.elem}
-    </ModalView>
+    </Modal>
   );
 }

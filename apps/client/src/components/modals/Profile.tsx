@@ -1,7 +1,6 @@
-import { Button, ButtonGroup, Flex } from '@chakra-ui/react';
+import { Button, ButtonGroup, Flex, ModalContent } from '@chakra-ui/react';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Modal } from '@mikoto-io/lucid';
 import { User } from 'mikotojs';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -58,7 +57,7 @@ export function ProfileModal({ user }: { user: User }) {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <Modal style={{ padding: 0 }}>
+    <ModalContent rounded="md" p={0}>
       <ProfileContainer>
         <div className="banner">
           <Avatar src={user.avatar ?? undefined} size={100} />
@@ -111,6 +110,6 @@ export function ProfileModal({ user }: { user: User }) {
           <p>Bio Should go here. Lorem ipsum dolor sit amet consectetur.</p>
         </div>
       </ProfileContainer>
-    </Modal>
+    </ModalContent>
   );
 }

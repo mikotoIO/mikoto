@@ -30,7 +30,7 @@ import { MikotoApiLoader } from './MikotoApiLoader';
 import { WindowBar } from './WindowBar';
 
 const AppContainer = styled.div`
-  background-color: var(--color-subsurface);
+  background-color: var(--chakra-colors-subsurface);
   color: var(--color-text);
   display: flex;
   flex-direction: row;
@@ -61,7 +61,7 @@ const LeftBar = styled.div`
 
   .top {
     display: flex;
-    background-color: var(--N900);
+    background-color: var(--chakra-colors-subsurface);
   }
   .bars {
     display: flex;

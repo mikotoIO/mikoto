@@ -1,10 +1,12 @@
 import {
+  Box,
   Button,
   ButtonGroup,
   FormControl,
   FormLabel,
   Heading,
   Input,
+  ModalContent,
 } from '@chakra-ui/react';
 import {
   faFileAlt,
@@ -12,7 +14,6 @@ import {
   faMicrophone,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Form, Modal } from '@mikoto-io/lucid';
 import { permissions } from '@mikoto-io/permcheck';
 import {
   Channel,
@@ -29,6 +30,7 @@ import styled from 'styled-components';
 import { useErrorElement } from '../../../hooks/useErrorElement';
 import { useTabkit } from '../../../store/surface';
 import { ContextMenu, modalState } from '../../ContextMenu';
+import { Form } from '../../atoms';
 import { channelToTab } from './channelToTab';
 
 const channelTypes = [
@@ -85,7 +87,7 @@ export function CreateChannelModal({
   const error = useErrorElement();
 
   return (
-    <Modal>
+    <ModalContent rounded="md" p={4}>
       <StyledCreateChannelModal>
         <Heading fontSize="xl" mt={0}>
           {channel ? 'Create Subchannel' : 'Create Channel'}
@@ -131,7 +133,7 @@ export function CreateChannelModal({
           </Button>
         </Form>
       </StyledCreateChannelModal>
-    </Modal>
+    </ModalContent>
   );
 }
 
@@ -139,8 +141,8 @@ function DeleteChannelModal({ channel }: { channel: ClientChannel }) {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <Modal>
-      <Box p={{ bottom: 16 }}>
+    <ModalContent rounded="md" p={4}>
+      <Box pb={4}>
         Are you sure you want to delete the channel{' '}
         <strong>#{channel.name}</strong>?
       </Box>
@@ -163,7 +165,7 @@ function DeleteChannelModal({ channel }: { channel: ClientChannel }) {
           Cancel
         </Button>
       </ButtonGroup>
-    </Modal>
+    </ModalContent>
   );
 }
 

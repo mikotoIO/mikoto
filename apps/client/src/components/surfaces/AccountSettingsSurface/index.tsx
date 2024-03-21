@@ -6,9 +6,9 @@ import {
   FormLabel,
   Heading,
   Input,
+  ModalContent,
   Textarea,
 } from '@chakra-ui/react';
-import { Modal } from '@mikoto-io/lucid';
 import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -39,7 +39,7 @@ export function PasswordChangeModal() {
   const error = useErrorElement();
 
   return (
-    <Modal>
+    <ModalContent rounded="md" p={4}>
       <Form
         style={{ minWidth: 400 }}
         onSubmit={handleSubmit(async (form) => {
@@ -87,7 +87,7 @@ export function PasswordChangeModal() {
           Change Password
         </Button>
       </Form>
-    </Modal>
+    </ModalContent>
   );
 }
 
@@ -97,7 +97,7 @@ function NameChangeModal() {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <Modal>
+    <ModalContent rounded="md" p={4}>
       <Form
         onSubmit={handleSubmit(async (form) => {
           await mikoto.client.users.update({
@@ -117,7 +117,7 @@ function NameChangeModal() {
           Change Name
         </Button>
       </Form>
-    </Modal>
+    </ModalContent>
   );
 }
 

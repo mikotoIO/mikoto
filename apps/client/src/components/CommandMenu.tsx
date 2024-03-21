@@ -1,5 +1,4 @@
-import { Box } from '@chakra-ui/react';
-import { Modal } from '@mikoto-io/lucid';
+import { Box, ModalContent } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -21,14 +20,8 @@ function CommandMenu() {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <Modal
-      noBackdrop
-      style={{
-        backgroundColor: 'var(--N800)',
-        top: '80px',
-      }}
-    >
-      <Box w="600px">
+    <ModalContent rounded="md" p={4}>
+      <Box>
         <CommandInput
           placeholder="> Type your command"
           onKeyDown={(e) => {
@@ -39,7 +32,7 @@ function CommandMenu() {
           }}
         />
       </Box>
-    </Modal>
+    </ModalContent>
   );
 }
 

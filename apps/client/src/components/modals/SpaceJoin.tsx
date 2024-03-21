@@ -1,6 +1,11 @@
-import { Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  ModalContent,
+} from '@chakra-ui/react';
 import { Heading } from '@chakra-ui/react';
-import { Modal } from '@mikoto-io/lucid';
 import { AxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
@@ -74,7 +79,7 @@ export function SpaceJoinModal() {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <Modal>
+    <ModalContent rounded="md" p={4}>
       <SpaceJoinModalWrapper>
         <Heading fontSize="xl" className="inviteheader" mt={0}>
           Create a Space
@@ -91,6 +96,6 @@ export function SpaceJoinModal() {
           }}
         />
       </SpaceJoinModalWrapper>
-    </Modal>
+    </ModalContent>
   );
 }

@@ -1,13 +1,14 @@
 import {
+  Box,
   Button,
   ButtonGroup,
   FormControl,
   FormLabel,
   Input,
+  ModalContent,
 } from '@chakra-ui/react';
 import { faCog, faCopy, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Form, Modal } from '@mikoto-io/lucid';
 import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +20,7 @@ import { useAuthClient } from '../../../hooks';
 import { useTabkit } from '../../../store/surface';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
 import { modalState } from '../../ContextMenu';
+import { Form } from '../../atoms';
 import { Avatar } from '../../atoms/Avatar';
 
 const BotCardContainer = styled.div`
@@ -88,7 +90,7 @@ function BotCreateModal() {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <Modal>
+    <ModalContent rounded="md" p={4}>
       <Form
         onSubmit={handleSubmit(async (form) => {
           await authClient.createBot(form.name);
@@ -104,7 +106,7 @@ function BotCreateModal() {
           Create Bot
         </Button>
       </Form>
-    </Modal>
+    </ModalContent>
   );
 }
 

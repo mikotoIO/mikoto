@@ -1,3 +1,4 @@
+import { chakra } from '@chakra-ui/react';
 import { faClose, faExpand, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styled from 'styled-components';
@@ -14,15 +15,17 @@ const StyledWindowBar = styled.div`
   font-size: 16px;
 `;
 
-const StyledWindowButtons = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`;
+const StyledWindowButtons = chakra('div', {
+  baseStyle: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+});
 
 const StyledWindowButton = styled.div<{ color: string }>`
   -webkit-app-region: no-drag;
-  color: var(--N400);
+  color: var(--chakra-colors-gray-400);
   width: 32px;
   height: 24px;
   border-radius: 4px;
@@ -46,17 +49,17 @@ export function WindowBar() {
       {IS_ELECTRON && (
         <StyledWindowButtons>
           <StyledWindowButton
-            color="var(--N700)"
+            color="var(--chakra-colors-gray-600)"
             onClick={() => {
               (window as any).electronAPI.minimize();
             }}
           >
             <FontAwesomeIcon icon={faMinus} />
           </StyledWindowButton>
-          <StyledWindowButton color="var(--N700)">
+          <StyledWindowButton color="var(--chakra-colors-gray-600)">
             <FontAwesomeIcon icon={faExpand} />
           </StyledWindowButton>
-          <StyledWindowButton color="var(--R700)">
+          <StyledWindowButton color="var(--chakra-colors-red-500)">
             <FontAwesomeIcon
               icon={faClose}
               onClick={() => {

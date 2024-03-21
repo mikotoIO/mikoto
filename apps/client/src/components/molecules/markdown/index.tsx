@@ -30,7 +30,7 @@ const Table = styled.table`
   &,
   th,
   td {
-    border: 1px solid var(--N600);
+    border: 1px solid var(--chakra-colors-gray-650);
     padding: 8px 12px;
   }
 `;
@@ -75,7 +75,7 @@ const MarkdownWrapper = styled.div<{ emojiSize: string }>`
 
     th,
     td {
-      border: 1px solid var(--N600);
+      border: 1px solid var(--chakra-colors-gray-650);
       padding: 8px 12px;
     }
   }

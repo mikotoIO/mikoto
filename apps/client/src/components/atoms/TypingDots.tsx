@@ -5,7 +5,7 @@ const dotFlash = keyframes`
     background-color: var(--N300);
   }
   100% {
-    background-color: var(--N600);
+    background-color: var(--chakra-colors-gray-650);
   }
 `;
 

@@ -60,19 +60,18 @@ const StyledTab = styled.div<{ active?: boolean }>`
   gap: 6px;
   flex-shrink: 0;
   border-bottom: 2px solid transparent;
-  background-color: var(--N900);
-  color: var(--N400);
+  color: var(--chakra-colors-gray-300);
 
   ${(p) =>
     p.active &&
     css`
-      color: var(--N100);
+      color: var(--chakra-colors-gray-200);
       border-color: var(--color-primary);
       background-color: var(--chakra-colors-surface);
     `}
 
   &:hover {
-    background-color: var(--N700);
+    background-color: var(--chakra-colors-surface);
   }
 `;
 
@@ -252,10 +251,10 @@ export const TabBarButton = styled.button`
   height: 32px;
   border-radius: 4px;
 
-  color: var(--N400);
+  color: var(--chakra-colors-gray-300);
   background-color: transparent;
   &:hover {
-    background-color: var(--N800);
+    background-color: var(--chakra-colors-gray-700);
   }
 `;
 

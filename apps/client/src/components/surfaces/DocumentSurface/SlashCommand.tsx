@@ -13,8 +13,7 @@ import styled, { css } from 'styled-components';
 import tippy from 'tippy.js';
 
 const StyledCommandList = styled.div`
-  background-color: var(--N1100);
-  border: 1px solid var(--N600);
+  background-color: var(--chakra-colors-gray-900);
   padding: 8px;
   border-radius: 8px;
   width: 200px;
@@ -36,7 +35,7 @@ const CommandButton = styled.button<{ active?: boolean }>`
   ${(p) =>
     p.active &&
     css`
-      background-color: var(--N800);
+      background-color: var(--chakra-colors-gray-700);
     `}
 `;
 

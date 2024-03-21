@@ -31,7 +31,8 @@ const Nav = styled.a<{ active?: boolean }>`
   font-size: 14px;
   padding: 8px 16px;
   border-radius: 4px;
-  background-color: ${(p) => (p.active ? `var(--N600)` : 'transparent')};
+  background-color: ${(p) =>
+    p.active ? `var(--chakra-colors-gray-650)` : 'transparent'};
   color: var(--chakra-colors-white);
   user-select: none;
 `;

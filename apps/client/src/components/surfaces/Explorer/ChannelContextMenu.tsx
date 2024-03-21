@@ -39,23 +39,9 @@ const channelTypes = [
   { id: 'DOCUMENT', name: 'Note', icon: faFileAlt },
 ];
 
-const StyledCreateChannelModal = styled.div`
-  min-width: 400px;
-
-  .subchannelinfo {
-    color: var(--N300);
-    margin: 0;
-    font-size: 14px;
-  }
-
-  form {
-    margin-top: 16px;
-  }
-`;
-
 const ChannelTypeButton = styled.button<{ active?: boolean }>`
   background-color: var(--N900);
-  border: 2px solid ${(p) => (p.active ? 'var(--B700)' : 'var(--N600)')};
+  border: 2px solid ${(p) => (p.active ? 'var(--B700)' : 'var(--N650)')};
   color: var(--N100);
   font-size: 16px;
   border-radius: 8px;
@@ -88,12 +74,17 @@ export function CreateChannelModal({
 
   return (
     <ModalContent rounded="md" p={4} maxW="480px">
-      <StyledCreateChannelModal>
-        <Heading fontSize="xl" mt={0}>
+      <Box>
+        <Heading fontSize="xl" mt={0} mb={1}>
           {channel ? 'Create Subchannel' : 'Create Channel'}
         </Heading>
-        {channel && <p className="subchannelinfo">In #{channel.name}</p>}
+        {channel && (
+          <Box as="p" m={0} color="gray.300">
+            In #{channel.name}
+          </Box>
+        )}
         <Form
+          mt={4}
           onSubmit={handleSubmit((data) => {
             try {
               space.createChannel({
@@ -132,7 +123,7 @@ export function CreateChannelModal({
             Create Channel
           </Button>
         </Form>
-      </StyledCreateChannelModal>
+      </Box>
     </ModalContent>
   );
 }

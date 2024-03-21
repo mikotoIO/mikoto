@@ -8,7 +8,7 @@ export const BaseRoleBadge = chakra('div', {
     py: 1,
     border: '1px solid',
     borderColor: 'text',
-    bgColor: 'var(--N800)',
+    bgColor: 'gray.700',
     color: 'text',
     borderRadius: '4px',
     m: 1,

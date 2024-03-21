@@ -33,7 +33,8 @@ const SidebarButton = styled.a<{ selected?: boolean }>`
   font-size: 14px;
   padding: 8px 16px;
   border-radius: 4px;
-  background-color: ${(p) => (p.selected ? 'var(--N700)' : 'transparent')};
+  background-color: ${(p) =>
+    p.selected ? 'var(--chakra-colors-gray-650)' : 'transparent'};
   color: ${(p) => (p.selected ? 'white' : 'rgba(255,255,255,0.8)')};
   user-select: none;
 `;
@@ -228,7 +229,7 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
   return (
     <SettingsView style={{ paddingRight: 0 }}>
       <Grid w="100%" h="100%" templateColumns="200px auto">
-        <Box>
+        <Box pr={4}>
           <Button
             my={4}
             leftIcon={<FontAwesomeIcon icon={faCirclePlus} />}

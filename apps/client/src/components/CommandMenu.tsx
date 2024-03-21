@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { modalState } from './ContextMenu';
 
 const CommandInput = styled.input`
-  background-color: var(--N900);
+  background-color: var(--chakra-colors-gray-800);
   color: white;
   border: none;
   outline: none;

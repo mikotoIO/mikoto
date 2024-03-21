@@ -25,7 +25,7 @@ const StyledMember = styled.div`
   cursor: pointer;
 
   &:hover {
-    background-color: var(--N700);
+    background-color: var(--chakra-colors-gray-650);
   }
 `;
 

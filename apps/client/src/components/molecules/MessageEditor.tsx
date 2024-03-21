@@ -98,7 +98,7 @@ const EditorButton = chakra('div', {
 });
 
 const EditMode = styled.div`
-  background-color: var(--N1000);
+  background-color: var(--chakra-colors-gray-800);
   height: 32px;
   font-size: 14px;
   display: flex;
@@ -124,8 +124,12 @@ const UploadSection = styled.div`
   display: flex;
   padding: 8px;
   gap: 8px;
-  background-color: var(--N700);
-  border-bottom: 1px solid var(--N600);
+  border-bottom: 1px solid var(--chakra-colors-gray-600);
+  background-color: color-mix(
+    in srgb,
+    var(--chakra-colors-gray-650) 65%,
+    transparent
+  );
 `;
 
 const withFilePaste = (editor: ReactEditor, fileFn: (fs: FileList) => void) => {
@@ -147,7 +151,7 @@ const StyledFilePreview = styled.div`
   width: 160px;
   height: 140px;
   border-radius: 4px;
-  background-color: var(--N900);
+  background-color: var(--chakra-colors-gray-800);
   overflow: hidden;
 
   .preview {
@@ -159,7 +163,7 @@ const StyledFilePreview = styled.div`
   .filename {
     margin-top: 8px;
     font-size: 12px;
-    color: var(--N400);
+    color: var(--chakra-colors-gray-300);
   }
 `;
 

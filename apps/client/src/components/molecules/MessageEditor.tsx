@@ -1,3 +1,4 @@
+import { chakra } from '@chakra-ui/react';
 import {
   faFaceSmileWink,
   faFileArrowUp,
@@ -86,14 +87,15 @@ const EditorButtons = styled.div`
   font-size: 24px;
 `;
 
-const EditorButton = styled.div`
-  color: var(--N400);
-  cursor: pointer;
-
-  &:hover {
-    color: var(--N200);
-  }
-`;
+const EditorButton = chakra('div', {
+  baseStyle: {
+    color: 'gray.400',
+    cursor: 'pointer',
+    _hover: {
+      color: 'gray.200',
+    },
+  },
+});
 
 const EditMode = styled.div`
   background-color: var(--N1000);

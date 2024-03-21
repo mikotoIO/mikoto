@@ -33,7 +33,7 @@ const NodeBase = chakra('a', {
     display: 'flex',
     alignItems: 'center',
     fontWeight: 'inherit',
-    color: 'gray.200',
+    color: 'gray.350',
     cursor: 'pointer',
     userSelect: 'none',
     _hover: {

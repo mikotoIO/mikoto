@@ -1,5 +1,9 @@
-import { Box, Flex, Heading } from '@chakra-ui/react';
-import { faEllipsis, faFileLines } from '@fortawesome/free-solid-svg-icons';
+import { Box, Flex, Heading, Spinner } from '@chakra-ui/react';
+import {
+  faEllipsis,
+  faFileLines,
+  faSquareCheck,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Editor, EditorContent } from '@tiptap/react';
 import { ClientChannel } from 'mikotojs';
@@ -11,7 +15,7 @@ import { useInterval, useMikoto } from '../../../hooks';
 import { ContextMenu, useContextMenuX } from '../../ContextMenu';
 import { TabName } from '../../TabBar';
 import { ViewContainer } from '../../ViewContainer';
-import { Spinner } from '../../atoms/Spinner';
+import { Spinner as MikotoSpinner } from '../../atoms/Spinner';
 import { NoteBubbleMenu } from './BubbleMenu';
 import { useNoteEditor, useNoteReader } from './useNoteEditor';
 
@@ -167,12 +171,11 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
             ))}
           />
           <Flex gap={2}>
-            <Box
-              rounded="lg"
-              bg={changed ? 'yellow.500' : 'green.500'}
-              w={3}
-              h={3}
-            />
+            {changed ? (
+              <Spinner size="xs" speed="0.5s" />
+            ) : (
+              <FontAwesomeIcon icon={faSquareCheck} />
+            )}
           </Flex>
         </Flex>
       </div>
@@ -181,7 +184,7 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
         <EditorContent editor={editor} />
       ) : (
         <Flex p={{ top: 32 }} justifyContent="center">
-          <Spinner />
+          <MikotoSpinner />
         </Flex>
       )}
     </>

@@ -32,7 +32,7 @@ const Nav = styled.a<{ active?: boolean }>`
   padding: 8px 16px;
   border-radius: 4px;
   background-color: ${(p) => (p.active ? `var(--N600)` : 'transparent')};
-  color: var(--N0);
+  color: var(--chakra-colors-white);
   user-select: none;
 `;
 

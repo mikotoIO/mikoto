@@ -36,7 +36,7 @@ const ContextMenuBase = styled.div`
   padding: 8px;
   font-size: 14px;
   border-radius: 4px;
-  background-color: var(--N1100);
+  background-color: var(--chakra-colors-gray-900);
   box-shadow: rgba(0, 0, 0, 0.1) 0 8px 24px;
 `;
 
@@ -124,7 +124,7 @@ const StyledContextMenuLink = styled(ContextMenuLink)`
   width: 100%;
 
   &:hover {
-    background-color: var(--N800);
+    background-color: var(--chakra-colors-gray-700);
   }
 `;
 

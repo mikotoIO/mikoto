@@ -19,7 +19,7 @@ const StyledCommandList = styled.div`
   border-radius: 8px;
   width: 200px;
   max-height: 400px;
-  color: var(--N0);
+  color: var(--chakra-colors-white);
   display: flex;
   flex-direction: column;
 `;

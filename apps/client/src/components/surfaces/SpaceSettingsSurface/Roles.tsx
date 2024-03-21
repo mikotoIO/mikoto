@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Circle,
   Flex,
   FormControl,
   FormLabel,
@@ -35,15 +36,6 @@ const SidebarButton = styled.a<{ selected?: boolean }>`
   background-color: ${(p) => (p.selected ? 'var(--N700)' : 'transparent')};
   color: ${(p) => (p.selected ? 'white' : 'rgba(255,255,255,0.8)')};
   user-select: none;
-`;
-
-const ColorDot = styled.span<{ color?: string }>`
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  margin-right: 12px;
-  border-radius: 999px;
-  background-color: ${(p) => p.color ?? '#99AAB5'};
 `;
 
 const rolePermissionData = [
@@ -256,7 +248,12 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
               selected={selectedRoleId === r.id}
               onClick={() => setSelectedRoleId(r.id)}
             >
-              <ColorDot color={r.color ?? undefined} />
+              <Circle
+                display="inline-block"
+                size="12px"
+                mr="12px"
+                bg={r.color ?? '#99AAB5'}
+              />
               {r.name}
             </SidebarButton>
           ))}

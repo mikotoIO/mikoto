@@ -10,7 +10,7 @@ const dotFlash = keyframes`
 `;
 
 const dots = css`
-  background-color: var(--N0);
+  background-color: var(--chakra-colors-white);
   width: 8px;
   height: 8px;
   border-radius: 100%;

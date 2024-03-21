@@ -1,11 +1,13 @@
-import styled from 'styled-components';
+import { chakra } from '@chakra-ui/react';
 
-export const Tooltip = styled.div`
-  color: var(--N0);
-  background-color: var(--N1200);
-  border-radius: 4px;
-  padding: 6px 8px;
-  font-weight: 600;
-  font-size: 14px;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 8px 24px;
-`;
+export const Tooltip = chakra('div', {
+  baseStyle: {
+    color: 'white',
+    backgroundColor: 'gray.900',
+    borderRadius: '4px',
+    padding: '6px 8px',
+    fontWeight: '600',
+    fontSize: '14px',
+    boxShadow: 'rgba(0, 0, 0, 0.2) 0 8px 24px',
+  },
+});

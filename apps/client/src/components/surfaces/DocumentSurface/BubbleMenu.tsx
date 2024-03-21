@@ -1,3 +1,4 @@
+import { Box, chakra } from '@chakra-ui/react';
 import {
   faBold,
   faItalic,
@@ -7,30 +8,25 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { BubbleMenu, Editor } from '@tiptap/react';
 import styled from 'styled-components';
 
-const BubbleMenuContainer = styled.div`
-  background-color: var(--N1100);
-  border: 1px solid var(--N600);
-  padding: 4px;
-  border-radius: 4px;
-
-  button {
-    background: none;
-    border: none;
-    color: var(--N400);
-    font-size: 16px;
-
-    &:hover {
-      color: var(--N0);
-    }
-  }
-`;
-
-const BubbleButton = styled.button``;
+const BubbleButton = chakra('button', {
+  baseStyle: {
+    background: 'none',
+    color: 'gray.500',
+    fontSize: '16px',
+    _hover: { color: 'white' },
+  },
+});
 
 export function NoteBubbleMenu({ editor }: { editor: Editor }) {
   return (
     <BubbleMenu editor={editor} tippyOptions={{ duration: 100 }}>
-      <BubbleMenuContainer>
+      <Box
+        p={1}
+        borderRadius="md"
+        backgroundColor="gray.800"
+        border="1px solid"
+        borderColor="gray.600"
+      >
         <BubbleButton
           type="button"
           onClick={() => {
@@ -55,7 +51,7 @@ export function NoteBubbleMenu({ editor }: { editor: Editor }) {
         >
           <FontAwesomeIcon icon={faStrikethrough} />
         </BubbleButton>
-      </BubbleMenuContainer>
+      </Box>
     </BubbleMenu>
   );
 }

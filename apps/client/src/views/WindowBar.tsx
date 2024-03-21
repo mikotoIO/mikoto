@@ -33,7 +33,7 @@ const StyledWindowButton = styled.div<{ color: string }>`
   outline: none;
   cursor: pointer;
   &:hover {
-    color: var(--N0);
+    color: var(--chakra-colors-white);
     background-color: ${(p) => p.color};
   }
 `;

@@ -85,12 +85,8 @@ function Node(props: ExplorerNode & { path: string[] }) {
     <div>
       <StyledNode
         ref={ref}
-        onClick={(ev) => {
-          props.onClick?.(ev);
-        }}
-        onContextMenu={(ev) => {
-          props.onContextMenu?.(ev);
-        }}
+        onClick={props.onClick}
+        onContextMenu={props.onContextMenu}
         isDndHover={isOver}
         unread={props.unread}
       >

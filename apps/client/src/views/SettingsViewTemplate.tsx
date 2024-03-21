@@ -1,15 +1,21 @@
+import { chakra } from '@chakra-ui/react';
 import styled from 'styled-components';
 
 import { viewContainerCss } from '../components/ViewContainer';
 
-const SettingsViewBase = styled.div`
-  padding: 8px 32px;
-  overflow-y: scroll;
-`;
+const SettingsViewBase = chakra('div', {
+  baseStyle: {
+    px: '8px',
+    py: '32px',
+    overflowY: 'scroll',
+  },
+});
 
-const Sidebar = styled.div`
-  padding: 16px;
-`;
+const Sidebar = chakra('div', {
+  baseStyle: {
+    p: 4,
+  },
+});
 
 const Container = styled.div`
   ${viewContainerCss}

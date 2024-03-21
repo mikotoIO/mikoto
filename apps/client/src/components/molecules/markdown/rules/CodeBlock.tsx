@@ -18,22 +18,6 @@ const CodeBlock = styled.div`
   border-radius: 4px;
   max-width: 800px;
 
-  .hljs-comment {
-    color: var(--N400);
-  }
-  .hljs-string {
-    color: var(--G700);
-  }
-  .hljs-keyword {
-    color: var(--V400);
-  }
-  .hljs-title.class_ {
-    color: var(--Y600);
-  }
-  .hljs-title {
-    color: var(--B500);
-  }
-
   & > div {
     padding: 0 !important;
   }

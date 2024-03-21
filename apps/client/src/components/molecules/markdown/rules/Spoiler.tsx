@@ -1,30 +1,27 @@
+import { Box } from '@chakra-ui/react';
 import SimpleMarkdown from '@khanacademy/simple-markdown';
 import { useState } from 'react';
-import styled from 'styled-components';
 
 import { createRule } from '../rules';
 
 const SPOILER_REGEX = /^\|\|([\s\S]+?)\|\|(?!\|)/;
 
-const StyledSpoiler = styled.span<{ hide: boolean }>`
-  background-color: ${(p) => (p.hide ? 'var(--N1100)' : 'var(--N600)')};
-  color: ${(p) => (p.hide ? 'transparent' : 'var(--N0)')};
-  padding: 0px 4px;
-  border-radius: 4px;
-  cursor: pointer;
-`;
-
 function Spoiler({ children }: { children: React.ReactNode }) {
   const [hidden, setHidden] = useState(true);
   return (
-    <StyledSpoiler
-      hide={hidden}
+    <Box
+      display="inline-block"
+      backgroundColor={hidden ? 'var(--N1100)' : 'var(--N600)'}
+      color={hidden ? 'transparent' : 'text'}
+      px={1}
+      borderRadius="4px"
+      cursor="pointer"
       onClick={() => {
         setHidden(!hidden);
       }}
     >
       {children}
-    </StyledSpoiler>
+    </Box>
   );
 }
 

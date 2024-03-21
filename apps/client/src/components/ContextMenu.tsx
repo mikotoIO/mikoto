@@ -179,6 +179,7 @@ export function ModalKit() {
   // opened={modal !== null}
   return (
     <Modal
+      size="auto"
       isOpen={modal !== null}
       onClose={() => {
         setModal(null);

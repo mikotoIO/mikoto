@@ -90,7 +90,7 @@ function BotCreateModal() {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <ModalContent rounded="md" p={4}>
+    <ModalContent rounded="md" p={4} width="480px">
       <Form
         onSubmit={handleSubmit(async (form) => {
           await authClient.createBot(form.name);

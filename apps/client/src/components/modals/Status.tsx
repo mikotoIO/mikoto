@@ -17,7 +17,7 @@ export function SetStatusModal() {
   const form = useForm();
 
   return (
-    <ModalContent rounded="md" p={4}>
+    <ModalContent rounded="md" p={4} width="400px">
       <Heading fontSize="xl">Set Status</Heading>
       <Form
         onSubmit={form.handleSubmit((data) => {

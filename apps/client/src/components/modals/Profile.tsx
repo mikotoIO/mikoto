@@ -57,7 +57,7 @@ export function ProfileModal({ user }: { user: User }) {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <ModalContent rounded="md" p={0}>
+    <ModalContent rounded="md" p={0} width="640px">
       <ProfileContainer>
         <div className="banner">
           <Avatar src={user.avatar ?? undefined} size={100} />

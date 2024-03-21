@@ -39,7 +39,7 @@ export function PasswordChangeModal() {
   const error = useErrorElement();
 
   return (
-    <ModalContent rounded="md" p={4}>
+    <ModalContent rounded="md" p={4} width="480px">
       <Form
         style={{ minWidth: 400 }}
         onSubmit={handleSubmit(async (form) => {
@@ -97,7 +97,7 @@ function NameChangeModal() {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <ModalContent rounded="md" p={4}>
+    <ModalContent rounded="md" p={4} width="480px">
       <Form
         onSubmit={handleSubmit(async (form) => {
           await mikoto.client.users.update({

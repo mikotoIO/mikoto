@@ -20,7 +20,7 @@ function CommandMenu() {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <ModalContent rounded="md" p={4}>
+    <ModalContent rounded="md" p={4} width="480px">
       <Box>
         <CommandInput
           placeholder="> Type your command"

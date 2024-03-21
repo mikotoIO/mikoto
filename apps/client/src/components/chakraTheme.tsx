@@ -155,6 +155,7 @@ export const chakraTheme = extendTheme({
   },
   semanticTokens: {
     colors: {
+      primary: 'blue.500',
       text: 'gray.50',
       surface: 'gray.700',
       subsurface: 'gray.750',

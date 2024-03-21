@@ -26,7 +26,7 @@ export const Avatar = styled.img.attrs<{ size?: number | string }>((p) => ({
   size: p.size ?? 40,
 }))`
   user-select: none;
-  background-color: var(--N900);
+  background-color: var(--chakra-colors-gray-800);
   width: ${(p) => (typeof p.size === 'number' ? `${p.size}px` : p.size)};
   height: ${(p) => (typeof p.size === 'number' ? `${p.size}px` : p.size)};
   border-radius: 8px;

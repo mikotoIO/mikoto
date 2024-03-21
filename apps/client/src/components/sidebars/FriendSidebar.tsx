@@ -18,10 +18,10 @@ const StyledButtonBase = styled.div`
   display: flex;
   height: 40px;
   width: 100%;
-  color: var(--N300);
+  color: var(--chakra-colors-gray-300);
   cursor: pointer;
   &:hover {
-    background-color: var(--N700);
+    background-color: var(--chakra-colors-gray-650);
   }
   align-items: center;
   border-radius: 4px;

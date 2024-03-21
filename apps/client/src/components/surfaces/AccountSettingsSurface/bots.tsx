@@ -24,7 +24,7 @@ import { Form } from '../../atoms';
 import { Avatar } from '../../atoms/Avatar';
 
 const BotCardContainer = styled.div`
-  background-color: var(--N1000);
+  background-color: var(--chakra-colors-gray-800);
   display: flex;
   gap: 16px;
   margin: 16px 0 0;
@@ -63,8 +63,9 @@ function BotCard({ id, name, secret }: BotProps) {
             }}
             variant="primary"
             type="button"
+            leftIcon={<FontAwesomeIcon icon={faCog} />}
           >
-            <FontAwesomeIcon icon={faCog} /> Manage Bot
+            Manage Bot
           </Button>
           <Button
             onClick={() => {
@@ -72,11 +73,16 @@ function BotCard({ id, name, secret }: BotProps) {
               toast.success('Copied bot token to clipboard!');
             }}
             type="button"
+            leftIcon={<FontAwesomeIcon icon={faCopy} />}
           >
-            <FontAwesomeIcon icon={faCopy} /> Copy Bot Token
+            Copy Bot Token
           </Button>
-          <Button type="button" variant="danger">
-            <FontAwesomeIcon icon={faTrash} /> Delete Bot
+          <Button
+            type="button"
+            variant="danger"
+            leftIcon={<FontAwesomeIcon icon={faTrash} />}
+          >
+            Delete Bot
           </Button>
         </ButtonGroup>
       </Box>

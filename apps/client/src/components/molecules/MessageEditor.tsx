@@ -32,7 +32,7 @@ const StyledEditable = styled(Editable)`
   flex-grow: 1;
 
   ::selection {
-    background: var(--B700);
+    background: var(--chakra-colors-blue-500);
   }
 `;
 

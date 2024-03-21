@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 const StyledTriselector = styled.div`
-  background-color: var(--N1000);
+  background-color: var(--chakra-colors-gray-850);
   width: 120px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);

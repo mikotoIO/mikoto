@@ -11,7 +11,7 @@ function Spoiler({ children }: { children: React.ReactNode }) {
   return (
     <Box
       display="inline-block"
-      backgroundColor={hidden ? 'var(--N1100)' : 'var(--N600)'}
+      backgroundColor={hidden ? 'gray.900' : 'gray.650'}
       color={hidden ? 'transparent' : 'text'}
       px={1}
       borderRadius="4px"

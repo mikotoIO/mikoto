@@ -42,7 +42,7 @@ const EditorContentWrapper = styled.div`
       margin-right: 8px;
       width: 16px;
       height: 16px;
-      accent-color: var(--B700);
+      accent-color: var(--chakra-colors-blue-500);
     }
     div,
     p {
@@ -55,7 +55,7 @@ const EditorContentWrapper = styled.div`
   }
 
   p.is-empty::before {
-    color: var(--N500);
+    color: var(--chakra-colors-gray-500);
     content: attr(data-placeholder);
     float: left;
     height: 0;

@@ -31,7 +31,7 @@ import { WindowBar } from './WindowBar';
 
 const AppContainer = styled.div`
   background-color: var(--chakra-colors-subsurface);
-  color: var(--color-text);
+  color: var(--chakra-colors-text);
   display: flex;
   flex-direction: row;
   width: 100%;

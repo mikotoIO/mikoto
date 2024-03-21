@@ -49,7 +49,7 @@ const MessageContainer = styled.div<{ isSimple?: boolean }>`
   code {
     border-radius: 4px;
     padding: 2px;
-    background-color: var(--N1000);
+    background-color: var(--chakra-colors-gray-800);
   }
 
   .avatar {
@@ -132,7 +132,7 @@ export class MessageEditState {
 
 const EditedNote = styled.span`
   font-size: 12px;
-  color: var(--N400);
+  color: var(--chakra-colors-gray-400);
   margin-left: 4px;
 `;
 

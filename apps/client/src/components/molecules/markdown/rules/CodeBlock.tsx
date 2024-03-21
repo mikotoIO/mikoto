@@ -13,8 +13,8 @@ const CodeBlock = styled.div`
   }
   padding: 16px;
   margin: 0;
-  background-color: var(--N1000);
-  color: var(--N300);
+  background-color: var(--chakra-colors-gray-800);
+  color: var(--chakra-colors-gray-300);
   border-radius: 4px;
   max-width: 800px;
 

@@ -6,7 +6,7 @@ export const Tag = styled.span`
   border-radius: 4px;
   font-size: 10px;
   font-weight: 600;
-  background-color: var(--color-primary);
+  background-color: var(--chakra-colors-primary);
 `;
 
 export function BotTag() {

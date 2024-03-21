@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styled from 'styled-components';
 
 const StyledIcon = styled.span<{ size?: number }>`
-  background-color: var(--color-primary);
+  background-color: var(--chakra-colors-primary);
   color: white;
   border-radius: 3px;
   text-align: center;

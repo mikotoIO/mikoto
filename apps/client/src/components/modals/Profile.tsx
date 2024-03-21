@@ -1,4 +1,11 @@
-import { Button, ButtonGroup, Flex, ModalContent } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Flex,
+  Heading,
+  ModalContent,
+} from '@chakra-ui/react';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { User } from 'mikotojs';
@@ -16,7 +23,7 @@ const ProfileContainer = styled.div`
   height: 480px;
 
   .banner {
-    background-color: var(--N1000);
+    background-color: var(--chakra-colors-gray-800);
     padding: 16px;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
@@ -26,22 +33,6 @@ const ProfileContainer = styled.div`
     padding: 48px 16px 16px;
   }
 
-  h1 {
-    font-size: 24px;
-    margin-bottom: 0;
-  }
-
-  h2 {
-    font-size: 20px;
-  }
-
-  .mikotoid {
-    margin-top: 0;
-    font-size: 14px;
-    font-family: var(--font-code);
-    color: var(--N400);
-  }
-
   ${Tag} {
     font-size: 12px;
   }
@@ -49,6 +40,14 @@ const ProfileContainer = styled.div`
   ${Avatar} {
     transform: translateY(50%);
   }
+`;
+
+const MikotoId = styled.h2`
+  font-size: 20px;
+  margin-top: 0;
+  font-size: 14px;
+  font-family: var(--font-code);
+  color: var(--chakra-colors-gray-500);
 `;
 
 export function ProfileModal({ user }: { user: User }) {
@@ -62,11 +61,13 @@ export function ProfileModal({ user }: { user: User }) {
         <div className="banner">
           <Avatar src={user.avatar ?? undefined} size={100} />
         </div>
-        <div className="content">
+        <Box p={4} pt={12}>
           <Flex justifyContent="space-between">
             <div>
-              <h1>{user.name}</h1>
-              <h2 className="mikotoid">@cactus.mikoto.io</h2>
+              <Heading fontSize="24px" mb={0}>
+                {user.name}
+              </Heading>
+              <MikotoId>@cactus.mikoto.io</MikotoId>
             </div>
             <div>
               {mikoto.me.id !== user.id && (
@@ -106,9 +107,11 @@ export function ProfileModal({ user }: { user: User }) {
               )}
             </div>
           </Flex>
-          <h2>Bio</h2>
+          <Heading as="h2" fontSize="xl" mt={2}>
+            Bio
+          </Heading>
           <p>Bio Should go here. Lorem ipsum dolor sit amet consectetur.</p>
-        </div>
+        </Box>
       </ProfileContainer>
     </ModalContent>
   );

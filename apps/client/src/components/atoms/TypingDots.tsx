@@ -2,7 +2,7 @@ import styled, { css, keyframes } from 'styled-components';
 
 const dotFlash = keyframes`
   0% {
-    background-color: var(--N300);
+    background-color: var(--chakra-colors-gray-250);
   }
   100% {
     background-color: var(--chakra-colors-gray-650);

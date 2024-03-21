@@ -14,17 +14,12 @@ const InvitationBox = styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  background-color: var(--N900);
+  background-color: var(--chakra-colors-gray-800);
   box-sizing: border-box;
   text-align: center;
   padding: 32px;
   border-radius: 8px;
-  color: var(--chakra-colors-text);
-
-  .information {
-    margin-top: 32px;
-    color: var(--N300);
-  }
+  color: var(--N0);
 `;
 
 export function SpaceInviteViewInner() {
@@ -72,7 +67,7 @@ export function SpaceInviteViewInner() {
         )}
       </InvitationBox>
       <Flex
-        bgImage="url(/images/artworks/1.jpg) no-repeat center center"
+        bg="url('/images/artworks/1.jpg') no-repeat center center"
         bgSize="cover"
       />
     </Grid>

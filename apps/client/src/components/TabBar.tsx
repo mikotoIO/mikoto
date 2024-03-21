@@ -66,7 +66,7 @@ const StyledTab = styled.div<{ active?: boolean }>`
     p.active &&
     css`
       color: var(--chakra-colors-gray-200);
-      border-color: var(--color-primary);
+      border-color: var(--chakra-colors-primary);
       background-color: var(--chakra-colors-surface);
     `}
 

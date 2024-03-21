@@ -67,7 +67,7 @@ const MarkdownWrapper = styled.div<{ emojiSize: string }>`
   blockquote {
     margin: 0;
     padding-left: 8px;
-    border-left: 3px solid var(--N400);
+    border-left: 3px solid var(--chakra-colors-gray-500);
   }
 
   table {

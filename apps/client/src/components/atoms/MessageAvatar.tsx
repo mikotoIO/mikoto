@@ -20,7 +20,7 @@ interface AvatarProps {
 
 const AvatarContextWrapper = styled.div`
   position: relative;
-  background-color: var(--N1100);
+  background-color: var(--chakra-colors-gray-900);
   color: white;
   padding: 16px;
   border-radius: 4px;

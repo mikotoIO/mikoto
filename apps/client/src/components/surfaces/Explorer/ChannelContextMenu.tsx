@@ -40,9 +40,10 @@ const channelTypes = [
 ];
 
 const ChannelTypeButton = styled.button<{ active?: boolean }>`
-  background-color: var(--N900);
-  border: 2px solid ${(p) => (p.active ? 'var(--B700)' : 'var(--N650)')};
-  color: var(--N100);
+  background-color: var(--chakra-colors-gray-800);
+  border: 2px solid
+    ${(p) => (p.active ? 'var(--chakra-colors-blue-500)' : 'transparent')};
+  color: var(--chakra-colors-gray-200);
   font-size: 16px;
   border-radius: 8px;
   min-width: 100px;
@@ -53,7 +54,7 @@ const ChannelTypeButton = styled.button<{ active?: boolean }>`
   .icon {
     margin-bottom: 8px;
     font-size: 24px;
-    color: var(--N400);
+    color: var(--chakra-colors-gray-500);
   }
 
   transition: border-color 0.1s ease-in-out;

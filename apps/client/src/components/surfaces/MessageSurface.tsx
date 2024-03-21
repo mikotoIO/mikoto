@@ -56,7 +56,7 @@ const DAYS_OF_WEEK = [
 const StyledDateSeparator = styled.div`
   text-align: center;
   margin: 4px 0;
-  color: var(--N400);
+  color: var(--chakra-colors-gray-400);
   font-size: 12px;
   display: flex;
   align-items: center;
@@ -69,7 +69,7 @@ const StyledDateSeparator = styled.div`
     height: 0.5px;
     display: block;
     margin: 0 16px;
-    background-color: var(--N300);
+    background-color: var(--chakra-colors-gray-250);
     opacity: 0.1;
   }
 `;
@@ -101,7 +101,7 @@ const StyledChannelHead = styled.div`
   }
 
   p {
-    color: var(--N300);
+    color: var(--chakra-colors-gray-250);
     margin: 0;
   }
 `;

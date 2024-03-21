@@ -37,7 +37,7 @@ const ProfileContainer = styled.div`
     font-size: 12px;
   }
 
-  ${Avatar} {
+  .avatar {
     transform: translateY(50%);
   }
 `;
@@ -59,7 +59,11 @@ export function ProfileModal({ user }: { user: User }) {
     <ModalContent rounded="md" p={0} width="640px">
       <ProfileContainer>
         <div className="banner">
-          <Avatar src={user.avatar ?? undefined} size={100} />
+          <Avatar
+            className="avatar"
+            src={user.avatar ?? undefined}
+            size={100}
+          />
         </div>
         <Box p={4} pt={12}>
           <Flex justifyContent="space-between">

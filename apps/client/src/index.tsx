@@ -1,4 +1,5 @@
 import { ChakraProvider } from '@chakra-ui/react';
+import isPropValid from '@emotion/is-prop-valid';
 import * as Sentry from '@sentry/react';
 import React from 'react';
 import { DndProvider } from 'react-dnd';
@@ -14,7 +15,7 @@ import { StyleSheetManager, ThemeProvider } from 'styled-components';
 // eslint-disable-next-line import/no-relative-packages
 import '../../../packages/lucid/src/fonts.css';
 import App from './App';
-import { chakraTheme, GlobalStyle } from './components/chakraTheme';
+import { GlobalStyle, chakraTheme } from './components/chakraTheme';
 import { env } from './env';
 import './i18n';
 import reportWebVitals from './reportWebVitals';
@@ -43,7 +44,7 @@ RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = !env.DEV;
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <RecoilRoot>
-      <StyleSheetManager disableCSSOMInjection>
+      <StyleSheetManager shouldForwardProp={isPropValid} disableCSSOMInjection>
         <ChakraProvider theme={chakraTheme} resetCSS={false}>
           <DndProvider backend={HTML5Backend}>
             <>

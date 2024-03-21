@@ -157,7 +157,7 @@ interface MessageAvatarProps extends AvatarProps {
 
 export function MessageAvatar({ src, member, size }: MessageAvatarProps) {
   const setContextMenu = useSetRecoilState(contextMenuState);
-  const avatarRef = useRef<HTMLImageElement>(null);
+  const avatarRef = useRef<HTMLDivElement>(null);
 
   const user = member?.user;
 
@@ -166,24 +166,25 @@ export function MessageAvatar({ src, member, size }: MessageAvatarProps) {
   ));
 
   return (
-    <Avatar
-      className="avatar"
-      src={src}
-      size={size ?? 40}
-      ref={avatarRef}
-      onContextMenu={user && userContextMenu}
-      onClick={(ev) => {
-        if (!user) return;
-        ev.preventDefault();
-        ev.stopPropagation();
-        if (avatarRef.current === null) return;
-        const { top, right } = avatarRef.current.getBoundingClientRect();
+    <Box ref={avatarRef}>
+      <Avatar
+        className="avatar"
+        src={src}
+        size={size ?? 40}
+        onContextMenu={user && userContextMenu}
+        onClick={(ev) => {
+          if (!user) return;
+          ev.preventDefault();
+          ev.stopPropagation();
+          if (avatarRef.current === null) return;
+          const { top, right } = avatarRef.current.getBoundingClientRect();
 
-        setContextMenu({
-          position: { top, left: right + 8 },
-          elem: <MemberContextMenu member={member} user={user} />,
-        });
-      }}
-    />
+          setContextMenu({
+            position: { top, left: right + 8 },
+            elem: <MemberContextMenu member={member} user={user} />,
+          });
+        }}
+      />
+    </Box>
   );
 }

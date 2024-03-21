@@ -25,7 +25,8 @@ const StyledButtonBase = styled.div`
   }
   align-items: center;
   border-radius: 4px;
-  ${Avatar}, svg {
+  .avatar,
+  svg {
     margin-left: 8px;
     margin-right: 8px;
   }
@@ -90,7 +91,11 @@ export const FriendSidebar = observer(() => {
             );
           }}
         >
-          <Avatar size={32} src={friend?.relation?.avatar ?? undefined} />
+          <Avatar
+            className="avatar"
+            size={32}
+            src={friend?.relation?.avatar ?? undefined}
+          />
           <div>{friend?.relation?.name ?? 'Deleted User'}</div>
         </StyledButtonBase>
       ))}

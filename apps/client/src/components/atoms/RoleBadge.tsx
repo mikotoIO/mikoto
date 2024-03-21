@@ -1,33 +1,32 @@
+import { Circle, chakra } from '@chakra-ui/react';
 import { Role } from 'mikotojs';
-import styled from 'styled-components';
 
-const StyledRoleBadge = styled.div<{ color?: string }>`
-  display: inline-block;
-  padding: 4px 8px;
-  border: 1px solid ${(p) => p.color ?? 'var(--N0)'};
-  background-color: var(--N800);
-  color: var(--N0);
-  border-radius: 4px;
-  white-space: nowrap;
-  margin: 4px;
-
-  font-size: 12px;
-
-  .circle {
-    display: inline-block;
-    height: 10px;
-    width: 10px;
-    margin-right: 4px;
-    border-radius: 50%;
-    background-color: ${(p) => p.color ?? 'var(--N0)'};
-  }
-`;
+export const BaseRoleBadge = chakra('div', {
+  baseStyle: {
+    display: 'inline-block',
+    px: 2,
+    py: 1,
+    border: '1px solid',
+    borderColor: 'text',
+    bgColor: 'var(--N800)',
+    color: 'text',
+    borderRadius: '4px',
+    m: 1,
+    fontSize: '12px',
+  },
+});
 
 export function RoleBadge({ role }: { role: Role }) {
   return (
-    <StyledRoleBadge color={role.color ?? undefined}>
-      <span className="circle" />
+    <BaseRoleBadge borderColor={role.color ?? undefined}>
+      <Circle
+        display="inline-block"
+        mr={1}
+        size="10px"
+        className="circle"
+        bg={role.color ?? 'text'}
+      />
       {role.name}
-    </StyledRoleBadge>
+    </BaseRoleBadge>
   );
 }

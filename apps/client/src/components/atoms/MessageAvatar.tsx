@@ -1,4 +1,4 @@
-import { Checkbox, Flex } from '@chakra-ui/react';
+import { Box, Checkbox, Flex, chakra } from '@chakra-ui/react';
 import { permissions } from '@mikoto-io/permcheck';
 import { ClientMember, Role, User, checkMemberPermission } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
@@ -11,7 +11,7 @@ import { contextMenuState, modalState, useContextMenu } from '../ContextMenu';
 import { UserContextMenu } from '../modals/ContextMenus';
 import { ProfileModal } from '../modals/Profile';
 import { Avatar } from './Avatar';
-import { RoleBadge } from './RoleBadge';
+import { BaseRoleBadge, RoleBadge } from './RoleBadge';
 
 interface AvatarProps {
   src?: string;
@@ -92,18 +92,6 @@ function RoleSetter({
   );
 }
 
-const StyledPlusBadge = styled.div`
-  display: inline-block;
-  padding: 4px 8px;
-  border: 1px solid var(--N0);
-  background-color: var(--N800);
-  color: var(--N0);
-  border-radius: 4px;
-  margin: 4px;
-
-  font-size: 12px;
-`;
-
 export const MemberContextMenu = observer(
   ({ user, member }: { user: User; member?: ClientMember }) => {
     const setModal = useSetRecoilState(modalState);
@@ -133,7 +121,7 @@ export const MemberContextMenu = observer(
               {member && (
                 <>
                   <h2>Roles</h2>
-                  <div style={{ gap: '8px' }}>
+                  <Box gap={2}>
                     {member.roles.map(
                       (r) => r && <RoleBadge key={r.id} role={r} />,
                     )}
@@ -141,15 +129,14 @@ export const MemberContextMenu = observer(
                       member.space.member!,
                       permissions.manageRoles,
                     ) && (
-                      <StyledPlusBadge
-                        onClick={() => {
-                          setRoleEditorOpen((x) => !x);
-                        }}
+                      <BaseRoleBadge
+                        cursor="pointer"
+                        onClick={() => setRoleEditorOpen((x) => !x)}
                       >
                         +
-                      </StyledPlusBadge>
+                      </BaseRoleBadge>
                     )}
-                  </div>
+                  </Box>
                 </>
               )}
             </div>

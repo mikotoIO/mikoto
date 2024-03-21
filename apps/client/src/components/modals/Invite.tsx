@@ -6,22 +6,20 @@ import styled from 'styled-components';
 import { env } from '../../env';
 import { useMikoto } from '../../hooks';
 
-const InviteModalWrapper = styled.div`
-  .invite-link {
-    width: 100%;
-    font-size: 14px;
-    border-radius: 4px;
-    display: block;
-    padding: 16px;
-    margin-bottom: 8px;
-    border: none;
-    color: var(--N0);
-    background-color: var(--N1000);
-    font-family: var(--font-mono);
+const InviteLink = styled.button`
+  width: 100%;
+  font-size: 14px;
+  border-radius: 4px;
+  display: block;
+  padding: 16px;
+  margin-bottom: 8px;
+  border: none;
+  color: var(--N0);
+  background-color: var(--N1000);
+  font-family: var(--font-mono);
 
-    &:hover {
-      background-color: var(--N1100);
-    }
+  &:hover {
+    background-color: var(--N1100);
   }
 `;
 
@@ -34,7 +32,7 @@ export function InviteModal({ space }: { space: Space }) {
 
   return (
     <ModalContent rounded="md" p={4} minW="400px">
-      <InviteModalWrapper>
+      <div>
         {!invite ? (
           <Button
             variant="primary"
@@ -54,7 +52,7 @@ export function InviteModal({ space }: { space: Space }) {
         ) : (
           <>
             <h1>Invite Link</h1>
-            <button
+            <InviteLink
               className="invite-link"
               type="button"
               onClick={() => {
@@ -63,7 +61,7 @@ export function InviteModal({ space }: { space: Space }) {
               }}
             >
               {link}
-            </button>
+            </InviteLink>
             <Button
               type="button"
               variant="primary"
@@ -78,7 +76,7 @@ export function InviteModal({ space }: { space: Space }) {
             </Button>
           </>
         )}
-      </InviteModalWrapper>
+      </div>
     </ModalContent>
   );
 }

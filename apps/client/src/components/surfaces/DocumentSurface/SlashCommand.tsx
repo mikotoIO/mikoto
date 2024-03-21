@@ -28,7 +28,7 @@ const CommandButton = styled.button<{ active?: boolean }>`
   outline: none;
   border: none;
   background-color: transparent;
-  color: var(--N0);
+  color: var(--chakra-colors-text);
   display: flex;
   gap: 8px;
   padding: 8px;

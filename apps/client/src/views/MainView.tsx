@@ -76,7 +76,6 @@ const SurfaceGroupContainer = styled.div`
   flex: 1;
   & > div:not(:first-child) {
     margin-left: 8px;
-    // border-left: 1px solid var(--N700);
   }
 `;
 

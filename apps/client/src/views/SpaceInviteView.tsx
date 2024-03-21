@@ -19,7 +19,7 @@ const InvitationBox = styled.div`
   text-align: center;
   padding: 32px;
   border-radius: 8px;
-  color: var(--N0);
+  color: var(--chakra-colors-text);
 
   .information {
     margin-top: 32px;

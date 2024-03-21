@@ -31,7 +31,7 @@ const StyledContextMenuOverlay = styled.div`
 `;
 
 const ContextMenuBase = styled.div`
-  color: var(--N0);
+  color: var(--chakra-colors-text);
   width: 160px;
   padding: 8px;
   font-size: 14px;

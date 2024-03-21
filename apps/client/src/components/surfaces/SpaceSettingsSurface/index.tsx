@@ -30,7 +30,7 @@ function AddBotModal({ space }: { space: ClientSpace }) {
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
   return (
-    <ModalContent rounded="md" p={4} width="480px">
+    <ModalContent rounded="md" p={4} maxW="480px">
       <Form
         onSubmit={form.handleSubmit(async (data) => {
           await mikoto.client.members.create({

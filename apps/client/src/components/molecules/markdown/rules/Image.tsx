@@ -12,8 +12,7 @@ interface MessageImageProps {
 }
 
 const StyledMessageImage = styled.img`
-  max-width: 50vw;
-  max-height: 75vh;
+  width: 100%;
 `;
 
 const MImage = styled.img`
@@ -31,7 +30,7 @@ export function MessageImage({ src, alt }: MessageImageProps) {
       onClick={() => {
         setModal({
           elem: (
-            <ModalContent p={0} bg="transparent">
+            <ModalContent p={0} width="480px" bg="transparent">
               <Box mb={2}>
                 <Link href={src} target="_blank" color="gray.100">
                   Open in Browser

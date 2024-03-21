@@ -87,7 +87,7 @@ export function CreateChannelModal({
   const error = useErrorElement();
 
   return (
-    <ModalContent rounded="md" p={4} width="480px">
+    <ModalContent rounded="md" p={4} maxW="480px">
       <StyledCreateChannelModal>
         <Heading fontSize="xl" mt={0}>
           {channel ? 'Create Subchannel' : 'Create Channel'}
@@ -141,7 +141,7 @@ function DeleteChannelModal({ channel }: { channel: ClientChannel }) {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <ModalContent rounded="md" p={4} width="480px">
+    <ModalContent rounded="md" p={4} maxW="480px">
       <Box pb={4}>
         Are you sure you want to delete the channel{' '}
         <strong>#{channel.name}</strong>?

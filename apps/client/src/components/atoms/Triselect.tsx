@@ -20,17 +20,17 @@ const TriselectorInner = styled.div`
   cursor: pointer;
 
   &:hover {
-    background-color: var(--N700);
+    background-color: var(--chakra-colors-gray-600);
   }
 
   &.positive {
-    background-color: var(--G700);
+    background-color: var(--chakra-colors-green-500);
   }
   &.neutral {
-    background-color: var(--N500);
+    background-color: var(--chakra-colors-gray-500);
   }
   &.negative {
-    background-color: var(--R600);
+    background-color: var(--chakra-colors-red-500);
   }
 `;
 

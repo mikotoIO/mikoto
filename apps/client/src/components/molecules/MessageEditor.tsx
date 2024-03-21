@@ -36,7 +36,11 @@ const StyledEditable = styled(Editable)`
 `;
 
 const EditableContainer = styled.div`
-  background-color: color-mix(in srgb, var(--color-input) 65%, transparent);
+  background-color: color-mix(
+    in srgb,
+    var(--chakra-colors-gray-650) 65%,
+    transparent
+  );
   padding: 16px;
   padding-right: 80px;
   position: relative;

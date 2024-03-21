@@ -79,7 +79,7 @@ export function SpaceJoinModal() {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <ModalContent rounded="md" p={4} width="480px">
+    <ModalContent rounded="md" p={4} maxW="480px">
       <SpaceJoinModalWrapper>
         <Heading fontSize="xl" className="inviteheader" mt={0}>
           Create a Space

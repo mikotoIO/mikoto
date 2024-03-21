@@ -1,3 +1,4 @@
+import { Divider } from '@chakra-ui/react';
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Tippy from '@tippyjs/react';
@@ -189,12 +190,6 @@ function ServerSidebarContextMenu() {
   );
 }
 
-const Seperator = styled.hr`
-  border-width: 1px;
-  width: 28px;
-  border-color: var(--N500);
-`;
-
 // order spaces in the same order as the array of IDs
 // if an ID is not in the array, put it at the end
 function orderSpaces(spaces: SpaceStore, order: string[]) {
@@ -262,7 +257,7 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
           <FontAwesomeIcon icon={faMikoto} fontSize="28px" />
         </StyledSpaceIcon>
       </StyledIconWrapper>
-      <Seperator />
+      <Divider w={8} />
 
       {spaceArray
         .filter((x) => x.type === 'NONE') // TODO: filter this on the server

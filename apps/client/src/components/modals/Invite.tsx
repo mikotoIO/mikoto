@@ -14,12 +14,12 @@ const InviteLink = styled.button`
   padding: 16px;
   margin-bottom: 8px;
   border: none;
-  color: var(--N0);
-  background-color: var(--N1000);
+  color: var(--chakra-colors-white);
+  background-color: var(--chakra-colors-gray-800);
   font-family: var(--font-mono);
 
   &:hover {
-    background-color: var(--N1100);
+    background-color: var(--chakra-colors-gray-850);
   }
 `;
 
@@ -31,7 +31,7 @@ export function InviteModal({ space }: { space: Space }) {
     : undefined;
 
   return (
-    <ModalContent rounded="md" p={4} minW="400px">
+    <ModalContent rounded="md" p={4} maxW="400px">
       <div>
         {!invite ? (
           <Button

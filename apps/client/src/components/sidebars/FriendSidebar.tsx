@@ -13,18 +13,16 @@ import { useMikoto } from '../../hooks';
 import { treebarSpaceState } from '../../store';
 import { useTabkit } from '../../store/surface';
 import { Avatar } from '../atoms/Avatar';
+import { hoverableButtonLike } from '../design';
 
 const StyledButtonBase = styled.div`
   display: flex;
   height: 40px;
   width: 100%;
   color: var(--chakra-colors-gray-300);
-  cursor: pointer;
-  &:hover {
-    background-color: var(--chakra-colors-gray-650);
-  }
   align-items: center;
-  border-radius: 4px;
+
+  ${hoverableButtonLike}
   .avatar,
   svg {
     margin-left: 8px;

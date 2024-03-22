@@ -1,5 +1,4 @@
 import { ChakraProvider } from '@chakra-ui/react';
-import isPropValid from '@emotion/is-prop-valid';
 import { Global } from '@emotion/react';
 import * as Sentry from '@sentry/react';
 import React from 'react';

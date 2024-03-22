@@ -14,6 +14,7 @@ import { Avatar } from '../atoms/Avatar';
 import { BotTag } from '../atoms/BotTag';
 import { MemberContextMenu } from '../atoms/MessageAvatar';
 import { UserContextMenu } from '../modals/ContextMenus';
+import { hoverableButtonLike } from '../design';
 
 const StyledMember = styled.div`
   display: flex;
@@ -21,12 +22,7 @@ const StyledMember = styled.div`
   gap: 8px;
   margin: 0 8px;
   padding: 4px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: var(--chakra-colors-gray-650);
-  }
+  ${hoverableButtonLike}
 `;
 
 const MemberElement = observer(({ member }: { member: ClientMember }) => {

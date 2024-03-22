@@ -1,4 +1,4 @@
-import { Grid } from '@chakra-ui/react';
+import { Box, Button, Grid } from '@chakra-ui/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import {
@@ -234,7 +234,6 @@ const StyledWelcome = styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  color: rgba(255, 255, 255, 0.6);
 `;
 
 function WelcomeToMikoto() {

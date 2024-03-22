@@ -1,4 +1,5 @@
 import { Box, Center } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
@@ -6,7 +7,6 @@ import { Resizable } from 're-resizable';
 import React, { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import styled from '@emotion/styled';
 
 import { CommandMenuKit } from '../components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
@@ -203,13 +203,6 @@ const AppView = observer(() => {
     </AppContainer>
   );
 });
-
-const MikotoLogo = styled.img`
-  width: 240px;
-  max-width: 50vw;
-  mix-blend-mode: overlay;
-  opacity: 0.4;
-`;
 
 function Fallback() {
   return (

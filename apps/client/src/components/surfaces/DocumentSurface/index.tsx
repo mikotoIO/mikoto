@@ -9,7 +9,7 @@ import { Editor, EditorContent } from '@tiptap/react';
 import { ClientChannel } from 'mikotojs';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useInterval, useMikoto } from '../../../hooks';
 import { ContextMenu, useContextMenuX } from '../../ContextMenu';

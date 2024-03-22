@@ -1,5 +1,5 @@
 import { chakra } from '@chakra-ui/react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { viewContainerCss } from '../components/ViewContainer';
 

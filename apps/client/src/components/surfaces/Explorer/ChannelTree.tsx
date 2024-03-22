@@ -7,7 +7,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { ExplorerNode, nodeSort } from './explorerNode';
 

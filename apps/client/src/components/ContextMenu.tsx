@@ -2,7 +2,7 @@ import { Modal, ModalOverlay } from '@chakra-ui/react';
 import useEventListener from '@use-it/event-listener';
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { atom, useRecoilState, useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 interface Positions {
   top?: number;

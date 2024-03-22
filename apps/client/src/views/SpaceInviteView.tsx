@@ -2,7 +2,7 @@ import { Button, Flex, Grid } from '@chakra-ui/react';
 import { Space } from 'mikotojs';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { normalizeMediaUrl } from '../components/atoms/Avatar';
 import { StyledSpaceIcon } from '../components/atoms/SpaceIcon';

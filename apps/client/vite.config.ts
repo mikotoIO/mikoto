@@ -35,15 +35,7 @@ export default ({ mode }: { mode: string }) =>
     plugins: [
       react({
         babel: {
-          plugins: [
-            [
-              'babel-plugin-styled-components',
-              {
-                displayName: true,
-                fileName: false,
-              },
-            ],
-          ],
+          plugins: ['@emotion/babel-plugin'],
         },
       }),
       visualizer() as any,

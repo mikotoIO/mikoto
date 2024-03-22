@@ -4,7 +4,7 @@ import { ClientMember, Role, User, checkMemberPermission } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useMikoto } from '../../hooks';
 import { contextMenuState, modalState, useContextMenu } from '../ContextMenu';

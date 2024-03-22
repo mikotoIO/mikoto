@@ -10,7 +10,7 @@ import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { User } from 'mikotojs';
 import { useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useMikoto } from '../../hooks';
 import { treebarSpaceState } from '../../store';

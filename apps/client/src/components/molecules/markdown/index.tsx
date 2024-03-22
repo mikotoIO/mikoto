@@ -1,5 +1,5 @@
+import styled from '@emotion/styled';
 import SimpleMarkdown, { SingleASTNode } from '@khanacademy/simple-markdown';
-import styled, { css } from 'styled-components';
 
 import { codeBlockRule } from './rules/CodeBlock';
 import { emojiRule } from './rules/Emoji';
@@ -51,18 +51,14 @@ const rules = {
   mention: mentionRule,
 };
 
-const emojiSizing = css<{ emojiSize: string }>`
-  .emoji-mart-emoji img {
-    max-width: ${(p) => p.emojiSize} !important;
-    max-height: ${(p) => p.emojiSize} !important;
-  }
-`;
-
 const MarkdownWrapper = styled.div<{ emojiSize: string }>`
   gap: 8px;
   display: flex;
   flex-direction: column;
-  ${emojiSizing}
+  .emoji-mart-emoji img {
+    max-width: ${(p) => p.emojiSize} !important;
+    max-height: ${(p) => p.emojiSize} !important;
+  }
 
   blockquote {
     margin: 0;

@@ -14,7 +14,7 @@ import HCaptcha from '@hcaptcha/react-hcaptcha';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { faMikoto } from '../components/icons/faMikoto';
 import { useErrorElement } from '../hooks/useErrorElement';

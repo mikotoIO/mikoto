@@ -5,7 +5,7 @@ import { runInAction } from 'mobx';
 import { Observer, observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useFetchMember, useInterval, useMikoto } from '../../hooks';
 import { CurrentSpaceContext } from '../../store';

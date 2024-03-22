@@ -1,9 +1,9 @@
 import { Box, Flex } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import { ClientMessage } from 'mikotojs';
 import { makeAutoObservable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { atom } from 'recoil';
-import styled from 'styled-components';
 
 import { ContextMenu, useContextMenu } from '../ContextMenu';
 import { BotTag } from '../atoms/BotTag';
@@ -80,8 +80,8 @@ const MessageInner = styled.div`
     padding-inline-start: 24px;
   }
 
-  p:not(:first-child),
-  pre:not(:first-child) {
+  p:not(:first-of-type),
+  pre:not(:first-of-type) {
     margin-top: 8px;
   }
 `;

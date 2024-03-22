@@ -9,7 +9,7 @@ import { Heading } from '@chakra-ui/react';
 import { AxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useMikoto } from '../../hooks';
 import { useErrorElement } from '../../hooks/useErrorElement';

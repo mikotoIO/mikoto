@@ -1,7 +1,7 @@
 import { Button, ModalContent } from '@chakra-ui/react';
 import { Invite, Space } from 'mikotojs';
 import { useState } from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { env } from '../../env';
 import { useMikoto } from '../../hooks';

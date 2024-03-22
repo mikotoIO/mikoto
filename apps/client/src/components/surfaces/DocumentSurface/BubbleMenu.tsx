@@ -1,4 +1,5 @@
 import { Box, chakra } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import {
   faBold,
   faItalic,
@@ -6,7 +7,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { BubbleMenu, Editor } from '@tiptap/react';
-import styled from 'styled-components';
 
 const BubbleButton = chakra('button', {
   baseStyle: {

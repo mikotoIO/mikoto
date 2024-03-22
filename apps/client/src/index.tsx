@@ -1,22 +1,22 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import isPropValid from '@emotion/is-prop-valid';
+import { Global } from '@emotion/react';
 import * as Sentry from '@sentry/react';
 import React from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import ReactDOM from 'react-dom/client';
-import { Helmet } from 'react-helmet';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { RecoilEnv, RecoilRoot } from 'recoil';
-import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
-// eslint-disable-next-line import/no-relative-packages
-import '../../../packages/lucid/src/fonts.css';
 import App from './App';
-import { GlobalStyle, chakraTheme } from './components/chakraTheme';
+import { chakraTheme, globalCss } from './components/chakraTheme';
 import { env } from './env';
+// eslint-disable-next-line import/no-relative-packages
+import './fonts.css';
 import './i18n';
 import reportWebVitals from './reportWebVitals';
 
@@ -43,8 +43,8 @@ RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = !env.DEV;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <RecoilRoot>
-      <StyleSheetManager shouldForwardProp={isPropValid} disableCSSOMInjection>
+    <HelmetProvider>
+      <RecoilRoot>
         <ChakraProvider theme={chakraTheme} resetCSS={false}>
           <DndProvider backend={HTML5Backend}>
             <>
@@ -53,14 +53,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                   <link rel="icon" type="image/png" href="/favicon-dev.ico" />
                 )}
               </Helmet>
-              <GlobalStyle />
+              <Global styles={globalCss} />
               <App />
               <ToastContainer theme="dark" limit={3} />
             </>
           </DndProvider>
         </ChakraProvider>
-      </StyleSheetManager>
-    </RecoilRoot>
+      </RecoilRoot>
+    </HelmetProvider>
   </React.StrictMode>,
 );
 

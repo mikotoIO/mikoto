@@ -14,7 +14,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useAuthClient } from '../../../hooks';
 import { useTabkit } from '../../../store/surface';

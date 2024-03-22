@@ -1,4 +1,6 @@
 import { Grid } from '@chakra-ui/react';
+import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 import {
   faBarsStaggered,
   faQuestion,
@@ -9,9 +11,8 @@ import { action, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import styled, { css } from 'styled-components';
 
 import { useMikoto } from '../hooks';
 import { workspaceState } from '../store';

@@ -7,7 +7,7 @@ import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { treebarSpaceState, workspaceState } from '../store';
 import { useTabkit } from '../store/surface';

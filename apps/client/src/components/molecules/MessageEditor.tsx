@@ -12,7 +12,7 @@ import { useSetRecoilState } from 'recoil';
 import { Node, Transforms, createEditor } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { contextMenuState } from '../ContextMenu';
 import { MessageEditState } from './Message';
@@ -109,12 +109,12 @@ const EditMode = styled.div`
 const TopContainer = styled.div`
   margin: 16px 16px 4px;
 
-  & > *:first-child {
+  & > *:first-of-type {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
   }
 
-  & > *:last-child {
+  & > *:last-of-type {
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
   }

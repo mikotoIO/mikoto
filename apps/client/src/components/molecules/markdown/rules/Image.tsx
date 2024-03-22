@@ -1,7 +1,7 @@
 import { Box, Link, ModalContent } from '@chakra-ui/react';
 import SimpleMarkdown from '@khanacademy/simple-markdown';
 import { useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { modalState } from '../../../ContextMenu';
 import { createRule } from '../rules';

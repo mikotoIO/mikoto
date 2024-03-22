@@ -1,4 +1,6 @@
 import { Box, Flex, Heading } from '@chakra-ui/react';
+import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import {
   faHeading,
@@ -9,7 +11,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Editor, Extension, ReactRenderer } from '@tiptap/react';
 import Suggestion from '@tiptap/suggestion';
 import { useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
 import tippy from 'tippy.js';
 
 const StyledCommandList = styled.div`

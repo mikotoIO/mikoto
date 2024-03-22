@@ -6,7 +6,7 @@ import { Resizable } from 're-resizable';
 import React, { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { CommandMenuKit } from '../components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
@@ -74,7 +74,7 @@ const SurfaceGroupContainer = styled.div`
   display: flex;
   height: 100%;
   flex: 1;
-  & > div:not(:first-child) {
+  & > div:not(:first-of-type) {
     margin-left: 8px;
   }
 `;

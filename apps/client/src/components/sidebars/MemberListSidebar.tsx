@@ -6,7 +6,7 @@ import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import { useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useFetchMember } from '../../hooks';
 import { contextMenuState, useContextMenu } from '../ContextMenu';

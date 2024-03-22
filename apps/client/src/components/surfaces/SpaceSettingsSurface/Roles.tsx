@@ -20,7 +20,7 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useMikoto } from '../../../hooks';
 import { SettingsView } from '../../../views/SettingsViewTemplate';

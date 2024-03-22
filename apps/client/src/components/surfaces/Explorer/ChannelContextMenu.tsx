@@ -25,7 +25,7 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useErrorElement } from '../../../hooks/useErrorElement';
 import { useTabkit } from '../../../store/surface';

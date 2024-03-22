@@ -1,5 +1,5 @@
 import { useDropzone } from 'react-dropzone';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { Avatar } from '../atoms/Avatar';
 

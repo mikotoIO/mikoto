@@ -1,7 +1,7 @@
 import { Box, ModalContent } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { modalState } from './ContextMenu';
 

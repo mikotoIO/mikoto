@@ -1,18 +1,19 @@
+import { Box, Center } from '@chakra-ui/react';
 import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Flex } from '@mikoto-io/lucid';
 import { observer } from 'mobx-react-lite';
 import { Resizable } from 're-resizable';
 import React, { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { CommandMenuKit } from '../components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
 import { SpaceSidebar } from '../components/SpaceSidebar';
 import { TabBarButton, TabbedView } from '../components/TabBar';
 import { UserAreaAvatar } from '../components/UserArea';
+import { faMikoto } from '../components/icons/faMikoto';
 import { Sidebar } from '../components/sidebars/Base';
 import { FriendSidebar } from '../components/sidebars/FriendSidebar';
 import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
@@ -29,8 +30,8 @@ import { MikotoApiLoader } from './MikotoApiLoader';
 import { WindowBar } from './WindowBar';
 
 const AppContainer = styled.div`
-  background-color: var(--color-subsurface);
-  color: var(--color-text);
+  background-color: var(--chakra-colors-subsurface);
+  color: var(--chakra-colors-text);
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -53,12 +54,14 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
   return <Selected {...rest} />;
 }
 
-const LeftBar = styled(Flex)`
+const LeftBar = styled.div`
+  display: flex;
+  flex-direction: column;
   height: 100%;
 
   .top {
     display: flex;
-    background-color: var(--N900);
+    background-color: var(--chakra-colors-subsurface);
   }
   .bars {
     display: flex;
@@ -71,9 +74,8 @@ const SurfaceGroupContainer = styled.div`
   display: flex;
   height: 100%;
   flex: 1;
-  & > div:not(:first-child) {
+  & > div:not(:first-of-type) {
     margin-left: 8px;
-    // border-left: 1px solid var(--N700);
   }
 `;
 
@@ -106,7 +108,7 @@ const SurfaceGroup = observer(
                   idx !== surfaceNode.index ? { display: 'none' } : undefined
                 }
               >
-                <Box p={{ y: 8 }} h="100%">
+                <Box py="8px" h="100%">
                   <Suspense>
                     <TabViewSwitch tab={tab} />
                   </Suspense>
@@ -139,7 +141,7 @@ const AppView = observer(() => {
 
   return (
     <AppContainer>
-      <LeftBar dir="column">
+      <LeftBar>
         <div className="top">
           <TabBarButton
             onClick={() => {
@@ -178,7 +180,7 @@ const AppView = observer(() => {
       </LeftBar>
       <SurfaceGroup surfaceNode={surfaceStore.node} />
       {workspace.rightOpen && (
-        <LeftBar dir="column">
+        <LeftBar>
           <div className="top">
             <WindowBar />
           </div>
@@ -211,12 +213,12 @@ const MikotoLogo = styled.img`
 
 function Fallback() {
   return (
-    <Flex center w="100%" h="100%" txt="N0" dir="column">
-      <MikotoLogo src="/logo/logo.svg" />
-      <Box fs={20} m={{ top: 16 }}>
+    <Center w="100%" h="100%" color="white" flexDir="column">
+      <FontAwesomeIcon icon={faMikoto} fontSize="10vw" />
+      <Box fontSize="20px" mt="10px">
         Loading...
       </Box>
-    </Flex>
+    </Center>
   );
 }
 

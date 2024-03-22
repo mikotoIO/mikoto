@@ -2,17 +2,19 @@ import {
   Box,
   Button,
   Flex,
-  Form,
+  FormControl,
+  FormLabel,
   Heading,
   Input,
-  TextArea,
-} from '@mikoto-io/lucid';
+  Textarea,
+} from '@chakra-ui/react';
 import { ClientChannel } from 'mikotojs';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 import { useMikoto } from '../../../hooks';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
+import { Form } from '../../atoms';
 import { Triselector } from '../../atoms/Triselect';
 import { BaseSettingsSurface } from '../BaseSettingSurface';
 
@@ -37,12 +39,15 @@ function General({ channel }: { channel: ClientChannel }) {
           toast.success('Updated channel');
         })}
       >
-        <Input labelName="Channel Name" {...form.register('name')} />
-        <TextArea
-          labelName="Description"
-          h={200}
-          {...form.register('description')}
-        />
+        <FormControl>
+          <FormLabel>Channel Name</FormLabel>
+          <Input {...form.register('name')} />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Description</FormLabel>
+          <Textarea h={200} {...form.register('description')} />
+        </FormControl>
+
         <Button variant="primary" type="submit">
           Save
         </Button>
@@ -55,14 +60,14 @@ function Permissions({ channel }: { channel: ClientChannel }) {
   return (
     <SettingsView>
       <Heading>Permissions</Heading>
-      <Box p={{ y: 16 }}>
-        <Flex justifyContent="space-between">
-          <Heading as="h3" m={0}>
+      <Box py={4}>
+        <Flex justify="space-between">
+          <Heading as="h2" fontSize="xl" m={0}>
             PermName
           </Heading>
           <Triselector />
         </Flex>
-        <Box txt="N300">Description of the perm goes here.</Box>
+        <Box color="gray.200">Description of the perm goes here.</Box>
       </Box>
     </SettingsView>
   );

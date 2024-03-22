@@ -1,17 +1,17 @@
-import { Checkbox, Flex } from '@mikoto-io/lucid';
+import { Box, Checkbox, Flex, chakra } from '@chakra-ui/react';
 import { permissions } from '@mikoto-io/permcheck';
 import { ClientMember, Role, User, checkMemberPermission } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useMikoto } from '../../hooks';
 import { contextMenuState, modalState, useContextMenu } from '../ContextMenu';
 import { UserContextMenu } from '../modals/ContextMenus';
 import { ProfileModal } from '../modals/Profile';
 import { Avatar } from './Avatar';
-import { RoleBadge } from './RoleBadge';
+import { BaseRoleBadge, RoleBadge } from './RoleBadge';
 
 interface AvatarProps {
   src?: string;
@@ -20,7 +20,7 @@ interface AvatarProps {
 
 const AvatarContextWrapper = styled.div`
   position: relative;
-  background-color: var(--N1100);
+  background-color: var(--chakra-colors-gray-900);
   color: white;
   padding: 16px;
   border-radius: 4px;
@@ -62,12 +62,11 @@ function RoleSetter({
 
   return (
     <AvatarContextWrapper>
-      <Flex dir="column" gap={8}>
+      <Flex direction="column" gap={8}>
         {roles.map((x) => {
           if (x.name === '@everyone') return null;
           return (
             <Checkbox
-              labelName={x.name}
               key={x.id}
               checked={selectedRoles[x.id]}
               onChange={async (e) => {
@@ -83,25 +82,15 @@ function RoleSetter({
                   ),
                 });
               }}
-            />
+            >
+              {x.name}
+            </Checkbox>
           );
         })}
       </Flex>
     </AvatarContextWrapper>
   );
 }
-
-const StyledPlusBadge = styled.div`
-  display: inline-block;
-  padding: 4px 8px;
-  border: 1px solid var(--N0);
-  background-color: var(--N800);
-  color: var(--N0);
-  border-radius: 4px;
-  margin: 4px;
-
-  font-size: 12px;
-`;
 
 export const MemberContextMenu = observer(
   ({ user, member }: { user: User; member?: ClientMember }) => {
@@ -132,7 +121,7 @@ export const MemberContextMenu = observer(
               {member && (
                 <>
                   <h2>Roles</h2>
-                  <div style={{ gap: '8px' }}>
+                  <Box gap={2}>
                     {member.roles.map(
                       (r) => r && <RoleBadge key={r.id} role={r} />,
                     )}
@@ -140,15 +129,14 @@ export const MemberContextMenu = observer(
                       member.space.member!,
                       permissions.manageRoles,
                     ) && (
-                      <StyledPlusBadge
-                        onClick={() => {
-                          setRoleEditorOpen((x) => !x);
-                        }}
+                      <BaseRoleBadge
+                        cursor="pointer"
+                        onClick={() => setRoleEditorOpen((x) => !x)}
                       >
                         +
-                      </StyledPlusBadge>
+                      </BaseRoleBadge>
                     )}
-                  </div>
+                  </Box>
                 </>
               )}
             </div>
@@ -169,7 +157,7 @@ interface MessageAvatarProps extends AvatarProps {
 
 export function MessageAvatar({ src, member, size }: MessageAvatarProps) {
   const setContextMenu = useSetRecoilState(contextMenuState);
-  const avatarRef = useRef<HTMLImageElement>(null);
+  const avatarRef = useRef<HTMLDivElement>(null);
 
   const user = member?.user;
 
@@ -178,24 +166,25 @@ export function MessageAvatar({ src, member, size }: MessageAvatarProps) {
   ));
 
   return (
-    <Avatar
-      className="avatar"
-      src={src}
-      size={size ?? 40}
-      ref={avatarRef}
-      onContextMenu={user && userContextMenu}
-      onClick={(ev) => {
-        if (!user) return;
-        ev.preventDefault();
-        ev.stopPropagation();
-        if (avatarRef.current === null) return;
-        const { top, right } = avatarRef.current.getBoundingClientRect();
+    <Box ref={avatarRef}>
+      <Avatar
+        className="avatar"
+        src={src}
+        size={size ?? 40}
+        onContextMenu={user && userContextMenu}
+        onClick={(ev) => {
+          if (!user) return;
+          ev.preventDefault();
+          ev.stopPropagation();
+          if (avatarRef.current === null) return;
+          const { top, right } = avatarRef.current.getBoundingClientRect();
 
-        setContextMenu({
-          position: { top, left: right + 8 },
-          elem: <MemberContextMenu member={member} user={user} />,
-        });
-      }}
-    />
+          setContextMenu({
+            position: { top, left: right + 8 },
+            elem: <MemberContextMenu member={member} user={user} />,
+          });
+        }}
+      />
+    </Box>
   );
 }

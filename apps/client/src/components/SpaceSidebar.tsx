@@ -1,13 +1,13 @@
+import { Divider } from '@chakra-ui/react';
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Image } from '@mikoto-io/lucid';
 import Tippy from '@tippyjs/react';
 import { ClientSpace, SpaceStore } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { treebarSpaceState, workspaceState } from '../store';
 import { useTabkit } from '../store/surface';
@@ -148,12 +148,10 @@ function SidebarSpaceIcon({ space, index, onReorder }: SidebarSpaceIconProps) {
 
   return (
     <SpaceIconTooltip tooltip={space.name}>
-      <StyledIconWrapper>
+      <StyledIconWrapper ref={ref}>
         <Pill h={isActive ? 32 : 0} />
         <StyledSpaceIcon
-          active={isActive}
           onContextMenu={contextMenu}
-          ref={ref}
           icon={space.icon ? normalizeMediaUrl(space.icon) : undefined}
           onDoubleClick={() => {
             setWorkspace((x) => ({ ...x, leftOpen: !x.leftOpen }));
@@ -191,12 +189,6 @@ function ServerSidebarContextMenu() {
     </ContextMenu>
   );
 }
-
-const Seperator = styled.hr`
-  border-width: 1px;
-  width: 28px;
-  border-color: var(--N500);
-`;
 
 // order spaces in the same order as the array of IDs
 // if an ID is not in the array, put it at the end
@@ -258,7 +250,6 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
                 ? 'linear-gradient(133deg, #2298ff 0%, rgba(59,108,255,1) 100%)'
                 : undefined,
           }}
-          active
           onClick={() => {
             setSpaceId(null);
           }}
@@ -266,7 +257,7 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
           <FontAwesomeIcon icon={faMikoto} fontSize="28px" />
         </StyledSpaceIcon>
       </StyledIconWrapper>
-      <Seperator />
+      <Divider w={8} />
 
       {spaceArray
         .filter((x) => x.type === 'NONE') // TODO: filter this on the server
@@ -287,8 +278,8 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
       <SpaceIconTooltip tooltip="Add / Join Space">
         <StyledIconWrapper>
           <StyledSpaceIcon
-            txt="B600"
-            fs={20}
+            color="blue.500"
+            fontSize="18px"
             onClick={() => {
               setModal({
                 elem: <SpaceJoinModal />,

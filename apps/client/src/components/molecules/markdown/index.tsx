@@ -1,5 +1,5 @@
+import styled from '@emotion/styled';
 import SimpleMarkdown, { SingleASTNode } from '@khanacademy/simple-markdown';
-import styled, { css } from 'styled-components';
 
 import { codeBlockRule } from './rules/CodeBlock';
 import { emojiRule } from './rules/Emoji';
@@ -30,7 +30,7 @@ const Table = styled.table`
   &,
   th,
   td {
-    border: 1px solid var(--N600);
+    border: 1px solid var(--chakra-colors-gray-650);
     padding: 8px 12px;
   }
 `;
@@ -51,23 +51,19 @@ const rules = {
   mention: mentionRule,
 };
 
-const emojiSizing = css<{ emojiSize: string }>`
-  .emoji-mart-emoji img {
-    max-width: ${(p) => p.emojiSize} !important;
-    max-height: ${(p) => p.emojiSize} !important;
-  }
-`;
-
 const MarkdownWrapper = styled.div<{ emojiSize: string }>`
   gap: 8px;
   display: flex;
   flex-direction: column;
-  ${emojiSizing}
+  .emoji-mart-emoji img {
+    max-width: ${(p) => p.emojiSize} !important;
+    max-height: ${(p) => p.emojiSize} !important;
+  }
 
   blockquote {
     margin: 0;
     padding-left: 8px;
-    border-left: 3px solid var(--N400);
+    border-left: 3px solid var(--chakra-colors-gray-500);
   }
 
   table {
@@ -75,7 +71,7 @@ const MarkdownWrapper = styled.div<{ emojiSize: string }>`
 
     th,
     td {
-      border: 1px solid var(--N600);
+      border: 1px solid var(--chakra-colors-gray-650);
       padding: 8px 12px;
     }
   }

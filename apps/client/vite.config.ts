@@ -22,9 +22,6 @@ export default ({ mode }: { mode: string }) =>
     resolve: {
       alias: {
         '@/*': fileURLToPath(new URL('./src', import.meta.url)),
-        '@mikoto-io/lucid': fileURLToPath(
-          new URL('../../packages/lucid/src/index.ts', import.meta.url),
-        ),
 
         '@mikoto-io/permcheck': fileURLToPath(
           new URL('../../packages/permcheck/src/index.ts', import.meta.url),
@@ -38,15 +35,7 @@ export default ({ mode }: { mode: string }) =>
     plugins: [
       react({
         babel: {
-          plugins: [
-            [
-              'babel-plugin-styled-components',
-              {
-                displayName: true,
-                fileName: false,
-              },
-            ],
-          ],
+          plugins: ['@emotion/babel-plugin'],
         },
       }),
       visualizer() as any,

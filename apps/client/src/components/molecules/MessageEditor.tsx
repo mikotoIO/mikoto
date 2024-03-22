@@ -1,9 +1,9 @@
+import { chakra } from '@chakra-ui/react';
 import {
   faFaceSmileWink,
   faFileArrowUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Flex } from '@mikoto-io/lucid';
 import useResizeObserver from '@react-hook/resize-observer';
 import { runInAction } from 'mobx';
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
@@ -12,7 +12,7 @@ import { useSetRecoilState } from 'recoil';
 import { Node, Transforms, createEditor } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { contextMenuState } from '../ContextMenu';
 import { MessageEditState } from './Message';
@@ -32,12 +32,16 @@ const StyledEditable = styled(Editable)`
   flex-grow: 1;
 
   ::selection {
-    background: var(--B700);
+    background: var(--chakra-colors-blue-500);
   }
 `;
 
 const EditableContainer = styled.div`
-  background-color: color-mix(in srgb, var(--color-input) 65%, transparent);
+  background-color: color-mix(
+    in srgb,
+    var(--chakra-colors-gray-650) 65%,
+    transparent
+  );
   padding: 16px;
   padding-right: 80px;
   position: relative;
@@ -74,24 +78,27 @@ interface MessageEditorProps {
   onResize?: () => void;
 }
 
-const EditorButtons = styled(Flex)`
+const EditorButtons = styled.div`
+  display: flex;
   position: absolute;
+  gap: 16px;
   right: 16px;
   transform: translateY(-8px);
   font-size: 24px;
 `;
 
-const EditorButton = styled.div`
-  color: var(--N400);
-  cursor: pointer;
-
-  &:hover {
-    color: var(--N200);
-  }
-`;
+const EditorButton = chakra('div', {
+  baseStyle: {
+    color: 'gray.400',
+    cursor: 'pointer',
+    _hover: {
+      color: 'gray.200',
+    },
+  },
+});
 
 const EditMode = styled.div`
-  background-color: var(--N1000);
+  background-color: var(--chakra-colors-gray-800);
   height: 32px;
   font-size: 14px;
   display: flex;
@@ -102,12 +109,12 @@ const EditMode = styled.div`
 const TopContainer = styled.div`
   margin: 16px 16px 4px;
 
-  & > *:first-child {
+  & > *:first-of-type {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
   }
 
-  & > *:last-child {
+  & > *:last-of-type {
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
   }
@@ -117,8 +124,12 @@ const UploadSection = styled.div`
   display: flex;
   padding: 8px;
   gap: 8px;
-  background-color: var(--N700);
-  border-bottom: 1px solid var(--N600);
+  border-bottom: 1px solid var(--chakra-colors-gray-600);
+  background-color: color-mix(
+    in srgb,
+    var(--chakra-colors-gray-650) 65%,
+    transparent
+  );
 `;
 
 const withFilePaste = (editor: ReactEditor, fileFn: (fs: FileList) => void) => {
@@ -140,7 +151,7 @@ const StyledFilePreview = styled.div`
   width: 160px;
   height: 140px;
   border-radius: 4px;
-  background-color: var(--N900);
+  background-color: var(--chakra-colors-gray-800);
   overflow: hidden;
 
   .preview {
@@ -152,7 +163,7 @@ const StyledFilePreview = styled.div`
   .filename {
     margin-top: 8px;
     font-size: 12px;
-    color: var(--N400);
+    color: var(--chakra-colors-gray-300);
   }
 `;
 
@@ -303,7 +314,7 @@ export function MessageEditor({
             }}
           />
         </Slate>
-        <EditorButtons gap={16}>
+        <EditorButtons>
           {editState.message === null && (
             <EditorButton
               onClick={() => {

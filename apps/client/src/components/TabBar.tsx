@@ -1,17 +1,18 @@
+import { Grid } from '@chakra-ui/react';
+import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 import {
   faBarsStaggered,
   faQuestion,
   faX,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Flex, Grid } from '@mikoto-io/lucid';
 import { action, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import styled, { css } from 'styled-components';
 
 import { useMikoto } from '../hooks';
 import { workspaceState } from '../store';
@@ -32,7 +33,10 @@ import { faMikoto } from './icons/faMikoto';
 import { channelToTab } from './surfaces/Explorer/channelToTab';
 import type { ExplorerNode } from './surfaces/Explorer/explorerNode';
 
-const StyledCloseButton = styled(Flex)<{ active?: boolean }>`
+const StyledCloseButton = styled.div<{ active?: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-left: 4px;
   border-radius: 4px;
   width: 20px;
@@ -46,7 +50,8 @@ const StyledCloseButton = styled(Flex)<{ active?: boolean }>`
   }
 `;
 
-const StyledTab = styled(Flex)<{ active?: boolean }>`
+const StyledTab = styled.div<{ active?: boolean }>`
+  display: flex;
   align-items: center;
   justify-content: center;
 
@@ -56,19 +61,18 @@ const StyledTab = styled(Flex)<{ active?: boolean }>`
   gap: 6px;
   flex-shrink: 0;
   border-bottom: 2px solid transparent;
-  background-color: var(--N900);
-  color: var(--N400);
+  color: var(--chakra-colors-gray-300);
 
   ${(p) =>
     p.active &&
     css`
-      color: var(--N100);
-      border-color: var(--color-primary);
-      background-color: var(--color-surface);
+      color: var(--chakra-colors-gray-200);
+      border-color: var(--chakra-colors-primary);
+      background-color: var(--chakra-colors-surface);
     `}
 
   &:hover {
-    background-color: var(--N700);
+    background-color: var(--chakra-colors-surface);
   }
 `;
 
@@ -199,7 +203,6 @@ function Tab({ tab, index, surfaceNode }: TabProps) {
 
       <div>{tabName.name}</div>
       <StyledCloseButton
-        center
         active={active}
         onClick={(ev) => {
           ev.stopPropagation(); // close button shouldn't reset tab index
@@ -234,17 +237,10 @@ const StyledWelcome = styled.div`
   color: rgba(255, 255, 255, 0.6);
 `;
 
-const MikotoLogo = styled.img`
-  width: 220px;
-  mix-blend-mode: overlay;
-  opacity: 0.4;
-`;
-
 function WelcomeToMikoto() {
   return (
     <StyledWelcome>
       <FontAwesomeIcon icon={faMikoto} fontSize="256px" opacity={0.1} />
-      {/* <h1>Welcome to Mikoto!</h1> */}
     </StyledWelcome>
   );
 }
@@ -256,14 +252,19 @@ export const TabBarButton = styled.button`
   height: 32px;
   border-radius: 4px;
 
-  color: var(--N400);
+  color: var(--chakra-colors-gray-300);
   background-color: transparent;
   &:hover {
-    background-color: var(--N800);
+    background-color: var(--chakra-colors-gray-700);
   }
 `;
 
-const TabsFlex = styled(Flex)`
+const TAB_HEIGHT = 36;
+
+const TabsFlex = styled.div`
+  height: ${TAB_HEIGHT}px;
+  font-size: 14px;
+  display: flex;
   overflow-x: scroll;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -271,8 +272,6 @@ const TabsFlex = styled(Flex)`
     display: none; /* Safari and Chrome */
   }
 `;
-
-const TAB_HEIGHT = 36;
 
 export const TabbedView = observer(
   ({ children, tabs, surfaceNode }: TabbedViewProps) => {
@@ -294,12 +293,12 @@ export const TabbedView = observer(
 
     return (
       <Grid
-        trow={`${TAB_HEIGHT}px calc(100% - ${TAB_HEIGHT}px)`}
+        templateRows={`${TAB_HEIGHT}px calc(100% - ${TAB_HEIGHT}px)`}
         h="100%"
-        style={{ flex: 1 }}
+        flex={1}
       >
         <Helmet titleTemplate="%s | Mikoto" defaultTitle="Mikoto" />
-        <TabsFlex h={TAB_HEIGHT} fs={14}>
+        <TabsFlex>
           {tabs.map((tab, index) => (
             <Tab
               tab={tab}

@@ -1,16 +1,17 @@
-import styled, { css, keyframes } from 'styled-components';
+import { css, keyframes } from '@emotion/react';
+import styled from '@emotion/styled';
 
 const dotFlash = keyframes`
   0% {
-    background-color: var(--N300);
+    background-color: var(--chakra-colors-gray-250);
   }
   100% {
-    background-color: var(--N600);
+    background-color: var(--chakra-colors-gray-650);
   }
 `;
 
 const dots = css`
-  background-color: var(--N0);
+  background-color: var(--chakra-colors-white);
   width: 8px;
   height: 8px;
   border-radius: 100%;

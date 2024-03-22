@@ -1,17 +1,21 @@
-import { faEllipsis, faFileLines } from '@fortawesome/free-solid-svg-icons';
+import { Box, Flex, Heading, Spinner } from '@chakra-ui/react';
+import {
+  faEllipsis,
+  faFileLines,
+  faSquareCheck,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Flex, Heading } from '@mikoto-io/lucid';
 import { Editor, EditorContent } from '@tiptap/react';
 import { ClientChannel } from 'mikotojs';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useInterval, useMikoto } from '../../../hooks';
 import { ContextMenu, useContextMenuX } from '../../ContextMenu';
 import { TabName } from '../../TabBar';
 import { ViewContainer } from '../../ViewContainer';
-import { Spinner } from '../../atoms/Spinner';
+import { Spinner as MikotoSpinner } from '../../atoms/Spinner';
 import { NoteBubbleMenu } from './BubbleMenu';
 import { useNoteEditor, useNoteReader } from './useNoteEditor';
 
@@ -22,7 +26,7 @@ const EditorContentWrapper = styled.div`
     outline: none;
   }
   a {
-    color: var(--B400);
+    color: var(--chakra-colors-blue-200);
   }
 
   img {
@@ -38,7 +42,7 @@ const EditorContentWrapper = styled.div`
       margin-right: 8px;
       width: 16px;
       height: 16px;
-      accent-color: var(--B700);
+      accent-color: var(--chakra-colors-blue-500);
     }
     div,
     p {
@@ -51,7 +55,7 @@ const EditorContentWrapper = styled.div`
   }
 
   p.is-empty::before {
-    color: var(--N500);
+    color: var(--chakra-colors-gray-500);
     content: attr(data-placeholder);
     float: left;
     height: 0;
@@ -141,13 +145,13 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
       <div>
         <Flex
           w="100%"
-          h={32}
-          bg="N900"
-          rounded={4}
-          p={16}
-          m={{ bottom: 16 }}
-          alignItems="center"
-          justifyContent="space-between"
+          h={8}
+          bg="gray.800"
+          rounded="md"
+          px={4}
+          mb={4}
+          align="center"
+          justify="space-between"
         >
           <FontAwesomeIcon
             icon={faEllipsis}
@@ -166,14 +170,12 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
               </ContextMenu>
             ))}
           />
-          <Flex gap={8}>
-            <Flex
-              rounded={32}
-              bg={changed ? 'Y700' : 'G700'}
-              w={12}
-              h={12}
-              center
-            />
+          <Flex gap={2}>
+            {changed ? (
+              <Spinner size="xs" speed="0.5s" />
+            ) : (
+              <FontAwesomeIcon icon={faSquareCheck} />
+            )}
           </Flex>
         </Flex>
       </div>
@@ -182,7 +184,7 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
         <EditorContent editor={editor} />
       ) : (
         <Flex p={{ top: 32 }} justifyContent="center">
-          <Spinner />
+          <MikotoSpinner />
         </Flex>
       )}
     </>
@@ -216,9 +218,9 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
   return (
     <ViewContainer scroll>
       <TabName name={channel.name} icon={faFileLines} />
-      <Box p={32}>
-        <Heading fs={28} txt="N200">
-          <Box as="span" txt="N400">
+      <Box p={8}>
+        <Heading fontSize="28px" color="gray.100">
+          <Box as="span" color="gray.300">
             #
           </Box>
           {channel.name}

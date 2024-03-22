@@ -1,18 +1,19 @@
 import {
+  Box,
+  Button,
+  ButtonGroup,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  ModalContent,
+} from '@chakra-ui/react';
+import {
   faFileAlt,
   faHashtag,
   faMicrophone,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  Box,
-  Button,
-  Buttons,
-  Form,
-  Heading,
-  Input,
-  Modal,
-} from '@mikoto-io/lucid';
 import { permissions } from '@mikoto-io/permcheck';
 import {
   Channel,
@@ -24,11 +25,12 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useErrorElement } from '../../../hooks/useErrorElement';
 import { useTabkit } from '../../../store/surface';
 import { ContextMenu, modalState } from '../../ContextMenu';
+import { Form } from '../../atoms';
 import { channelToTab } from './channelToTab';
 
 const channelTypes = [
@@ -37,24 +39,11 @@ const channelTypes = [
   { id: 'DOCUMENT', name: 'Note', icon: faFileAlt },
 ];
 
-const StyledCreateChannelModal = styled.div`
-  min-width: 400px;
-
-  .subchannelinfo {
-    color: var(--N300);
-    margin: 0;
-    font-size: 14px;
-  }
-
-  form {
-    margin-top: 16px;
-  }
-`;
-
 const ChannelTypeButton = styled.button<{ active?: boolean }>`
-  background-color: var(--N900);
-  border: 2px solid ${(p) => (p.active ? 'var(--B700)' : 'var(--N600)')};
-  color: var(--N100);
+  background-color: var(--chakra-colors-gray-800);
+  border: 2px solid
+    ${(p) => (p.active ? 'var(--chakra-colors-blue-500)' : 'transparent')};
+  color: var(--chakra-colors-gray-200);
   font-size: 16px;
   border-radius: 8px;
   min-width: 100px;
@@ -65,7 +54,7 @@ const ChannelTypeButton = styled.button<{ active?: boolean }>`
   .icon {
     margin-bottom: 8px;
     font-size: 24px;
-    color: var(--N400);
+    color: var(--chakra-colors-gray-500);
   }
 
   transition: border-color 0.1s ease-in-out;
@@ -85,13 +74,18 @@ export function CreateChannelModal({
   const error = useErrorElement();
 
   return (
-    <Modal>
-      <StyledCreateChannelModal>
-        <Heading m={{ top: 0 }}>
+    <ModalContent rounded="md" p={4} maxW="480px">
+      <Box>
+        <Heading fontSize="xl" mt={0} mb={1}>
           {channel ? 'Create Subchannel' : 'Create Channel'}
         </Heading>
-        {channel && <p className="subchannelinfo">In #{channel.name}</p>}
+        {channel && (
+          <Box as="p" m={0} color="gray.300">
+            In #{channel.name}
+          </Box>
+        )}
         <Form
+          mt={4}
           onSubmit={handleSubmit((data) => {
             try {
               space.createChannel({
@@ -121,17 +115,17 @@ export function CreateChannelModal({
               </ChannelTypeButton>
             ))}
           </div>
-          <Input
-            labelName="Channel Name"
-            placeholder="New Channel"
-            {...register('name')}
-          />
+          <FormControl>
+            <FormLabel>Channel Name</FormLabel>
+            <Input placeholder="New Channel" {...register('name')} />
+          </FormControl>
+
           <Button variant="primary" type="submit">
             Create Channel
           </Button>
         </Form>
-      </StyledCreateChannelModal>
-    </Modal>
+      </Box>
+    </ModalContent>
   );
 }
 
@@ -139,12 +133,12 @@ function DeleteChannelModal({ channel }: { channel: ClientChannel }) {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <Modal>
-      <Box p={{ bottom: 16 }}>
+    <ModalContent rounded="md" p={4} maxW="480px">
+      <Box pb={4}>
         Are you sure you want to delete the channel{' '}
         <strong>#{channel.name}</strong>?
       </Box>
-      <Buttons>
+      <ButtonGroup>
         <Button
           variant="danger"
           onClick={async () => {
@@ -155,14 +149,15 @@ function DeleteChannelModal({ channel }: { channel: ClientChannel }) {
           Delete
         </Button>
         <Button
+          variant="secondary"
           onClick={() => {
             setModal(null);
           }}
         >
           Cancel
         </Button>
-      </Buttons>
-    </Modal>
+      </ButtonGroup>
+    </ModalContent>
   );
 }
 

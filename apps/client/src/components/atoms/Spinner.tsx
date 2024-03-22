@@ -1,4 +1,5 @@
-import styled, { keyframes } from 'styled-components';
+import { keyframes } from '@emotion/react';
+import styled from '@emotion/styled';
 
 const wanderDistance = '35px';
 
@@ -38,7 +39,7 @@ const SpinnerElement = styled.div<SpinnerProps>`
     --sk-wander-distance: calc(100px * 0.75);
     animation: ${anim} 2s ease-in-out -2s infinite both;
   }
-  .sk-wander-cube:nth-child(2) {
+  .sk-wander-cube:nth-of-type(2) {
     animation-delay: -1s;
     background-color: ${(p) => p.color2 ?? '#3b83ff'};
   }

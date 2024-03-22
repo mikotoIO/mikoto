@@ -1,29 +1,31 @@
 /* eslint-disable no-bitwise */
-import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   Box,
   Button,
-  Buttons,
+  ButtonGroup,
+  Circle,
   Flex,
-  Form,
+  FormControl,
+  FormLabel,
   Grid,
   Heading,
   Input,
-  Toggle,
-} from '@mikoto-io/lucid';
+  Switch,
+} from '@chakra-ui/react';
+import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { checkPermission, permissions } from '@mikoto-io/permcheck';
 import { ClientSpace, Role, Space } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useMikoto } from '../../../hooks';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
 import { useContextMenu } from '../../ContextMenu';
+import { Form } from '../../atoms';
 
 const SidebarButton = styled.a<{ selected?: boolean }>`
   display: block;
@@ -31,18 +33,10 @@ const SidebarButton = styled.a<{ selected?: boolean }>`
   font-size: 14px;
   padding: 8px 16px;
   border-radius: 4px;
-  background-color: ${(p) => (p.selected ? 'var(--N700)' : 'transparent')};
+  background-color: ${(p) =>
+    p.selected ? 'var(--chakra-colors-gray-650)' : 'transparent'};
   color: ${(p) => (p.selected ? 'white' : 'rgba(255,255,255,0.8)')};
   user-select: none;
-`;
-
-const ColorDot = styled.span<{ color?: string }>`
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  margin-right: 12px;
-  border-radius: 999px;
-  background-color: ${(p) => p.color ?? '#99AAB5'};
 `;
 
 const rolePermissionData = [
@@ -77,15 +71,16 @@ function RoleColorPicker({ value, onChange }: ColorPickerProps) {
     <StyledColorPicker color={value ?? '#006FFF'} onChange={onChange} />
   ));
   return (
-    <Flex p={{ y: 16 }} gap={8}>
-      <Box w={64} h={64} bg={value ?? 'N400'} rounded={4} onClick={menu} />
+    <Flex py={4} gap={2}>
+      <Box w={16} h={16} bg={value ?? 'gray.300'} rounded={4} onClick={menu} />
       <Flex
-        center
-        fs={32}
-        w={64}
-        h={64}
-        bg="N300"
-        txt="N400"
+        align="center"
+        justify="center"
+        fontSize="32px"
+        w="64px"
+        h="64px"
+        bg="gray.200"
+        color="gray.300"
         rounded={4}
         onClick={() => {
           onChange?.(null);
@@ -93,13 +88,13 @@ function RoleColorPicker({ value, onChange }: ColorPickerProps) {
       >
         <FontAwesomeIcon icon={faCircleXmark} />
       </Flex>
-      <Flex gap={8}>
+      <Flex gap={2}>
         {defaultColors.map((x) => (
           <Box
-            w={32}
-            h={32}
+            w={8}
+            h={8}
             bg={x}
-            rounded={4}
+            rounded="md"
             key={x}
             onClick={() => onChange?.(x)}
           />
@@ -121,18 +116,19 @@ function RolePermissionEditor({
   return (
     <Box>
       {rolePermissionData.map((x) => (
-        <Box p={{ y: 16 }} key={x.permission.toString()}>
+        <Box py={4} key={x.permission.toString()}>
           <Flex justifyContent="space-between">
-            <Heading as="h3" m={0}>
+            <Heading as="h3" m={0} fontSize="lg">
               {x.name}
             </Heading>
-            <Toggle
-              checked={checkPermission(x.permission, perm)}
+            <Switch
+              size="lg"
+              isChecked={checkPermission(x.permission, perm)}
               onChange={(t) => {
                 // if X is true, switch the bitset to 1
                 // if X is false, switch the bitset to 0
 
-                if (t) {
+                if (t.target.checked) {
                   onChange?.((perm | x.permission).toString());
                 } else {
                   onChange?.((perm & ~x.permission).toString());
@@ -140,7 +136,7 @@ function RolePermissionEditor({
               }}
             />
           </Flex>
-          <Box txt="N300">Description of the perm goes here.</Box>
+          <Box color="gray.200">Description of the perm goes here.</Box>
         </Box>
       ))}
     </Box>
@@ -181,20 +177,25 @@ const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
 
       {role.name !== '@everyone' && (
         <>
-          <Input labelName="Role Name" {...form.register('name')} />
-          <Input
-            labelName="Role Priority"
-            type="number"
-            min={0}
-            max={99}
-            {...form.register('position', { valueAsNumber: true })}
-          />
+          <FormControl>
+            <FormLabel>Role Name</FormLabel>
+            <Input {...form.register('name')} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Role Priority</FormLabel>
+            <Input
+              type="number"
+              min={0}
+              max={99}
+              {...form.register('position', { valueAsNumber: true })}
+            />
+          </FormControl>
           <RoleColorPicker value={color} onChange={setColor} />
         </>
       )}
 
       <RolePermissionEditor perms={perms} onChange={setPerms} />
-      <Buttons>
+      <ButtonGroup>
         <Button variant="primary" type="submit">
           Save Changes
         </Button>
@@ -214,7 +215,7 @@ const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
             Delete Role
           </Button>
         )}
-      </Buttons>
+      </ButtonGroup>
     </StyledRoleEditor>
   );
 });
@@ -227,10 +228,11 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
   // const role = rolesDelta.data.find((x) => x.id === selectedRoleId);
   return (
     <SettingsView style={{ paddingRight: 0 }}>
-      <Grid w="100%" h="100%" tcol="200px auto">
-        <Box>
+      <Grid w="100%" h="100%" templateColumns="200px auto">
+        <Box pr={4}>
           <Button
-            m={{ y: 16 }}
+            my={4}
+            leftIcon={<FontAwesomeIcon icon={faCirclePlus} />}
             variant="primary"
             onClick={async () => {
               await mikoto.client.roles.create({
@@ -239,7 +241,6 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
               });
             }}
           >
-            <FontAwesomeIcon icon={faCirclePlus} />
             New Role
           </Button>
           {space.roles.map((r) => (
@@ -248,7 +249,12 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
               selected={selectedRoleId === r.id}
               onClick={() => setSelectedRoleId(r.id)}
             >
-              <ColorDot color={r.color ?? undefined} />
+              <Circle
+                display="inline-block"
+                size="12px"
+                mr="12px"
+                bg={r.color ?? '#99AAB5'}
+              />
               {r.name}
             </SidebarButton>
           ))}

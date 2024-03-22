@@ -1,3 +1,6 @@
+import { Box, Flex, Heading } from '@chakra-ui/react';
+import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import {
   faHeading,
@@ -5,21 +8,18 @@ import {
   faWandMagicSparkles,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Flex, Heading } from '@mikoto-io/lucid';
 import { Editor, Extension, ReactRenderer } from '@tiptap/react';
 import Suggestion from '@tiptap/suggestion';
 import { useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
 import tippy from 'tippy.js';
 
 const StyledCommandList = styled.div`
-  background-color: var(--N1100);
-  border: 1px solid var(--N600);
+  background-color: var(--chakra-colors-gray-900);
   padding: 8px;
   border-radius: 8px;
   width: 200px;
   max-height: 400px;
-  color: var(--N0);
+  color: var(--chakra-colors-white);
   display: flex;
   flex-direction: column;
 `;
@@ -28,7 +28,7 @@ const CommandButton = styled.button<{ active?: boolean }>`
   outline: none;
   border: none;
   background-color: transparent;
-  color: var(--N0);
+  color: var(--chakra-colors-text);
   display: flex;
   gap: 8px;
   padding: 8px;
@@ -36,7 +36,7 @@ const CommandButton = styled.button<{ active?: boolean }>`
   ${(p) =>
     p.active &&
     css`
-      background-color: var(--N800);
+      background-color: var(--chakra-colors-gray-700);
     `}
 `;
 
@@ -99,14 +99,22 @@ function CommandList() {
     <StyledCommandList>
       {commands.map((command, idx) => (
         <CommandButton active={idx === selectedIndex}>
-          <Flex center w={40} h={40} bg="N900" rounded={4} key={command.name}>
+          <Flex
+            align="center"
+            justify="center"
+            w="40px"
+            h="40px"
+            bg="gray.800"
+            rounded="4px"
+            key={command.name}
+          >
             {command.icon && <FontAwesomeIcon icon={command.icon} />}
           </Flex>
-          <Box style={{ textAlign: 'left' }}>
-            <Heading fs={16} m={0}>
+          <Box textAlign="left">
+            <Heading fontSize="16px" m={0}>
               {command.name}
             </Heading>
-            <Box fs={12}>{command.description}</Box>
+            <Box fontSize="12px">{command.description}</Box>
           </Box>
         </CommandButton>
       ))}

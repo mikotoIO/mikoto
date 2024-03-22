@@ -1,13 +1,13 @@
+import { Box, Heading } from '@chakra-ui/react';
 import {
   faEarthAmericas,
   faUserGroup,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box, Heading } from '@mikoto-io/lucid';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useMikoto } from '../../hooks';
 import { treebarSpaceState } from '../../store';
@@ -18,14 +18,15 @@ const StyledButtonBase = styled.div`
   display: flex;
   height: 40px;
   width: 100%;
-  color: var(--N300);
+  color: var(--chakra-colors-gray-300);
   cursor: pointer;
   &:hover {
-    background-color: var(--N700);
+    background-color: var(--chakra-colors-gray-650);
   }
   align-items: center;
   border-radius: 4px;
-  ${Avatar}, svg {
+  .avatar,
+  svg {
     margin-left: 8px;
     margin-right: 8px;
   }
@@ -41,7 +42,7 @@ export const FriendSidebar = observer(() => {
   }, []);
 
   return (
-    <Box p={8}>
+    <Box p={2}>
       <StyledButtonBase
         onClick={() => {
           tabkit.openTab(
@@ -70,7 +71,7 @@ export const FriendSidebar = observer(() => {
         <FontAwesomeIcon icon={faEarthAmericas} fixedWidth />
         <span>Discover</span>
       </StyledButtonBase>
-      <Heading fs={14} p={{ left: 8 }} txt="N300">
+      <Heading fontSize="14px" pl="8px" color="gray.200">
         Direct Messages
       </Heading>
       {Array.from(mikoto.relations.values()).map((friend) => (
@@ -90,7 +91,11 @@ export const FriendSidebar = observer(() => {
             );
           }}
         >
-          <Avatar size={32} src={friend?.relation?.avatar ?? undefined} />
+          <Avatar
+            className="avatar"
+            size={32}
+            src={friend?.relation?.avatar ?? undefined}
+          />
           <div>{friend?.relation?.name ?? 'Deleted User'}</div>
         </StyledButtonBase>
       ))}

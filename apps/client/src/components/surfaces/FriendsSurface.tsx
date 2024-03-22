@@ -1,10 +1,17 @@
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+} from '@chakra-ui/react';
 import { faUserGroup } from '@fortawesome/free-solid-svg-icons';
-import { Button, Form, Heading, Input } from '@mikoto-io/lucid';
 import { useForm } from 'react-hook-form';
 
 import { useMikoto } from '../../hooks';
 import { TabName } from '../TabBar';
 import { ViewContainer } from '../ViewContainer';
+import { Form } from '../atoms';
 
 export function FriendsSurface() {
   const form = useForm({
@@ -25,16 +32,19 @@ export function FriendsSurface() {
           });
         })}
       >
-        <Input
-          labelName="Friend ID"
-          placeholder="Friend ID"
-          {...form.register('friendId')}
-        />
+        <FormControl>
+          <FormLabel>Friend ID</FormLabel>
+          <Input placeholder="Friend ID" {...form.register('friendId')} />
+        </FormControl>
         <Button type="submit" variant="success">
           Send Friend Request (Debug)
         </Button>
-        <Heading as="h2">Incoming Requests</Heading>
-        <Heading as="h2">Outgoing Requests</Heading>
+        <Heading as="h2" fontSize="xl">
+          Incoming Requests
+        </Heading>
+        <Heading as="h2" fontSize="xl">
+          Outgoing Requests
+        </Heading>
       </Form>
     </ViewContainer>
   );

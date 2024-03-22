@@ -1,4 +1,11 @@
-import { Button, Buttons, Form, Input, Modal } from '@mikoto-io/lucid';
+import {
+  Button,
+  ButtonGroup,
+  FormControl,
+  FormLabel,
+  Input,
+  ModalContent,
+} from '@chakra-ui/react';
 import { ClientSpace } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
@@ -10,6 +17,7 @@ import { uploadFile } from '../../../functions/fileUpload';
 import { useMikoto } from '../../../hooks';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
 import { modalState } from '../../ContextMenu';
+import { Form } from '../../atoms';
 import { AvatarEditor } from '../../molecules/AvatarEditor';
 import { BaseSettingsSurface } from '../BaseSettingSurface';
 import { BansSubsurface } from './Bans';
@@ -22,7 +30,7 @@ function AddBotModal({ space }: { space: ClientSpace }) {
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
   return (
-    <Modal>
+    <ModalContent rounded="md" p={4} maxW="480px">
       <Form
         onSubmit={form.handleSubmit(async (data) => {
           await mikoto.client.members.create({
@@ -32,10 +40,15 @@ function AddBotModal({ space }: { space: ClientSpace }) {
           setModal(null);
         })}
       >
-        <Input labelName="Bot ID" {...form.register('botId')} />
-        <Button type="submit">Submit</Button>
+        <FormControl>
+          <FormLabel>Bot ID</FormLabel>
+          <Input {...form.register('botId')} />
+        </FormControl>
+        <Button type="submit" variant="primary">
+          Submit
+        </Button>
       </Form>
-    </Modal>
+    </ModalContent>
   );
 }
 
@@ -60,12 +73,15 @@ const Overview = observer(({ space }: { space: ClientSpace }) => {
           }}
         />
 
-        <Input
-          labelName="Space Name"
-          value={spaceName}
-          onChange={(x) => setSpaceName(x.target.value)}
-        />
-        <Buttons>
+        <FormControl>
+          <FormLabel>Space Name</FormLabel>
+          <Input
+            value={spaceName}
+            onChange={(x) => setSpaceName(x.target.value)}
+          />
+        </FormControl>
+
+        <ButtonGroup>
           <Button
             variant="primary"
             type="button"
@@ -86,11 +102,11 @@ const Overview = observer(({ space }: { space: ClientSpace }) => {
           >
             Add Bot
           </Button>
-        </Buttons>
+        </ButtonGroup>
         <h2>Dangerous</h2>
-        <Buttons>
+        <ButtonGroup>
           <Button variant="danger">Delete Space</Button>
-        </Buttons>
+        </ButtonGroup>
       </Form>
     </SettingsView>
   );

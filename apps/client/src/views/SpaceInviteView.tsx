@@ -1,8 +1,8 @@
-import { Button, Flex, Grid, backgroundMix } from '@mikoto-io/lucid';
+import { Button, Flex, Grid } from '@chakra-ui/react';
 import { Space } from 'mikotojs';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { normalizeMediaUrl } from '../components/atoms/Avatar';
 import { StyledSpaceIcon } from '../components/atoms/SpaceIcon';
@@ -14,17 +14,12 @@ const InvitationBox = styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  background-color: var(--N900);
+  background-color: var(--chakra-colors-gray-800);
   box-sizing: border-box;
   text-align: center;
   padding: 32px;
   border-radius: 8px;
-  color: var(--N0);
-
-  .information {
-    margin-top: 32px;
-    color: var(--N300);
-  }
+  color: var(--chakra-colors-white);
 `;
 
 export function SpaceInviteViewInner() {
@@ -39,15 +34,11 @@ export function SpaceInviteViewInner() {
   }, [inviteCode]);
 
   return (
-    <Grid tcol="400px 1fr" h="100vh">
+    <Grid templateColumns="400px 1fr" h="100vh">
       <InvitationBox>
         {space ? (
           <>
-            <StyledSpaceIcon
-              size={100}
-              active
-              icon={normalizeMediaUrl(space.icon)}
-            >
+            <StyledSpaceIcon size="100px" icon={normalizeMediaUrl(space.icon)}>
               {space.icon === null ? space.name[0] : ''}
             </StyledSpaceIcon>
             <h1>{space.name}</h1>
@@ -75,7 +66,10 @@ export function SpaceInviteViewInner() {
           <Spinner />
         )}
       </InvitationBox>
-      <Flex mix={[backgroundMix('/images/artworks/1.jpg')]} center />
+      <Flex
+        bg="url('/images/artworks/1.jpg') no-repeat center center"
+        bgSize="cover"
+      />
     </Grid>
   );
 }

@@ -1,8 +1,8 @@
-import { ModalView } from '@mikoto-io/lucid';
+import { Modal, ModalOverlay } from '@chakra-ui/react';
 import useEventListener from '@use-it/event-listener';
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { atom, useRecoilState, useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 interface Positions {
   top?: number;
@@ -31,12 +31,12 @@ const StyledContextMenuOverlay = styled.div`
 `;
 
 const ContextMenuBase = styled.div`
-  color: var(--N0);
+  color: var(--chakra-colors-text);
   width: 160px;
   padding: 8px;
   font-size: 14px;
   border-radius: 4px;
-  background-color: var(--N1100);
+  background-color: var(--chakra-colors-gray-900);
   box-shadow: rgba(0, 0, 0, 0.1) 0 8px 24px;
 `;
 
@@ -124,7 +124,7 @@ const StyledContextMenuLink = styled(ContextMenuLink)`
   width: 100%;
 
   &:hover {
-    background-color: var(--N800);
+    background-color: var(--chakra-colors-gray-700);
   }
 `;
 
@@ -178,13 +178,15 @@ export function ModalKit() {
 
   // opened={modal !== null}
   return (
-    <ModalView
-      open={modal !== null}
+    <Modal
+      size="auto"
+      isOpen={modal !== null}
       onClose={() => {
         setModal(null);
       }}
     >
+      {modal && <ModalOverlay />}
       {modal?.elem}
-    </ModalView>
+    </Modal>
   );
 }

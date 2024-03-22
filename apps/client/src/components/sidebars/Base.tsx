@@ -1,4 +1,4 @@
-import { Box } from '@mikoto-io/lucid';
+import { Box } from '@chakra-ui/react';
 import { NumberSize, Resizable } from 're-resizable';
 
 interface SidebarProps {
@@ -26,14 +26,7 @@ export function Sidebar({ children, position, size, onResize }: SidebarProps) {
         onResize?.(d);
       }}
     >
-      <Box
-        style={{
-          height: '100%',
-          overflowY: 'auto',
-        }}
-        bg="color-surface"
-        rounded={8}
-      >
+      <Box height="100%" overflowY="auto" bg="surface" rounded="8px">
         {children}
       </Box>
     </Resizable>

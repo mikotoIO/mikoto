@@ -1,4 +1,5 @@
-import styled from 'styled-components';
+import React from 'react';
+import styled from '@emotion/styled';
 
 import { env } from '../../env';
 
@@ -19,16 +20,33 @@ export function normalizeMediaUrl(url?: string | null, fallback = '') {
   return isUrl(url) ? url : `${env.PUBLIC_MEDIASERVER_URL}/${url}`;
 }
 
-export const Avatar = styled.img.attrs<{ size?: number | string }>((p) => ({
-  src:
-    normalizeMediaUrl(p.src, '/images/default_avatar.png') +
-    (typeof p.size === 'number' ? `?w=${p.size * 2}&h=${p.size * 2}` : ''),
-  size: p.size ?? 40,
-}))`
+const StyledAvatar = styled.img<{ size?: number | string }>`
   user-select: none;
-  background-color: var(--N900);
+  background-color: var(--chakra-colors-gray-800);
   width: ${(p) => (typeof p.size === 'number' ? `${p.size}px` : p.size)};
   height: ${(p) => (typeof p.size === 'number' ? `${p.size}px` : p.size)};
   border-radius: 8px;
   cursor: pointer;
 `;
+
+interface AvatarProps {
+  src?: string | null;
+  size?: number;
+}
+
+export function Avatar({
+  src,
+  size,
+  ...rest
+}: AvatarProps & React.HTMLAttributes<HTMLImageElement>) {
+  return (
+    <StyledAvatar
+      src={
+        normalizeMediaUrl(src, '/images/default_avatar.png') +
+        (typeof size === 'number' ? `?w=${size * 2}&h=${size * 2}` : '')
+      }
+      size={`${size ?? 40}px`}
+      {...rest}
+    />
+  );
+}

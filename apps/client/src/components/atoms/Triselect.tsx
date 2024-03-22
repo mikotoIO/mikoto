@@ -1,10 +1,10 @@
 import { faCheck, faMinus, faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 const StyledTriselector = styled.div`
-  background-color: var(--N1000);
+  background-color: var(--chakra-colors-gray-850);
   width: 120px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -20,17 +20,17 @@ const TriselectorInner = styled.div`
   cursor: pointer;
 
   &:hover {
-    background-color: var(--N700);
+    background-color: var(--chakra-colors-gray-600);
   }
 
   &.positive {
-    background-color: var(--G700);
+    background-color: var(--chakra-colors-green-500);
   }
   &.neutral {
-    background-color: var(--N500);
+    background-color: var(--chakra-colors-gray-500);
   }
   &.negative {
-    background-color: var(--R600);
+    background-color: var(--chakra-colors-red-500);
   }
 `;
 

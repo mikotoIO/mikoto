@@ -1,7 +1,7 @@
+import { Box, Link, ModalContent } from '@chakra-ui/react';
 import SimpleMarkdown from '@khanacademy/simple-markdown';
-import { Anchor, Box, Modal } from '@mikoto-io/lucid';
 import { useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { modalState } from '../../../ContextMenu';
 import { createRule } from '../rules';
@@ -12,8 +12,7 @@ interface MessageImageProps {
 }
 
 const StyledMessageImage = styled.img`
-  max-width: 50vw;
-  max-height: 75vh;
+  width: 100%;
 `;
 
 const MImage = styled.img`
@@ -31,14 +30,14 @@ export function MessageImage({ src, alt }: MessageImageProps) {
       onClick={() => {
         setModal({
           elem: (
-            <Modal style={{ padding: 0, background: 'none' }}>
-              <Box m={{ bottom: 8 }}>
-                <Anchor href={src} target="_blank" txt="N200">
+            <ModalContent p={0} width="480px" bg="transparent">
+              <Box mb={2}>
+                <Link href={src} target="_blank" color="gray.100">
                   Open in Browser
-                </Anchor>
+                </Link>
               </Box>
               <StyledMessageImage src={src} alt={alt} />
-            </Modal>
+            </ModalContent>
           ),
         });
       }}

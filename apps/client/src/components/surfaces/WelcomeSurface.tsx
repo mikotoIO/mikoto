@@ -1,30 +1,20 @@
-import { Box, Flex, Heading, Image } from '@mikoto-io/lucid';
+import { Box, Flex, Heading } from '@chakra-ui/react';
 
 import { TabName } from '../TabBar';
 import { ViewContainer } from '../ViewContainer';
 
-function LinkButton() {
-  return (
-    <Box bg="N800" p={16} rounded={4}>
-      Join Town Hall
-    </Box>
-  );
-}
-
 export function WelcomeSurface() {
   return (
     <ViewContainer padded>
-      <Box p={32}>
-        <Flex center dir="column" gap={16}>
+      <Box p={8}>
+        <Flex direction="column" gap={4} align="center" justify="center">
           <TabName name="Welcome to Mikoto" />
-          <Image src="/logo/logo-mono.svg" w={100} />
-          <Heading fs={40} m={0}>
+          <Heading m={0} size="3xl">
             Welcome to Mikoto!
           </Heading>
-          <Heading as="h2" m={0} fs={20} txt="N400">
+          <Heading as="h2" m={0} size="md" opacity={0.5}>
             The most overkill messaging app in the world.
           </Heading>
-          <LinkButton />
         </Flex>
       </Box>
     </ViewContainer>

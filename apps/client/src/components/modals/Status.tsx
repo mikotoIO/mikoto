@@ -1,29 +1,40 @@
-import { Button, Form, Heading, Input, Modal } from '@mikoto-io/lucid';
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  ModalContent,
+} from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
 
 import { modalState } from '../ContextMenu';
+import { Form } from '../atoms';
 
 export function SetStatusModal() {
   const setModalState = useSetRecoilState(modalState);
   const form = useForm();
 
   return (
-    <Modal>
-      <Heading>Set Status</Heading>
+    <ModalContent rounded="md" p={4} maxW="400px">
+      <Heading fontSize="xl">Set Status</Heading>
       <Form
         onSubmit={form.handleSubmit((data) => {
           console.log(data);
           setModalState(null);
         })}
       >
-        <Input labelName="Your Status" {...form.register('status')} />
+        <FormControl>
+          <FormLabel>Your status</FormLabel>
+          <Input {...form.register('status')} />
+        </FormControl>
 
         <Button variant="primary" type="submit">
           Set status
         </Button>
         <Button type="button">Clear Status</Button>
       </Form>
-    </Modal>
+    </ModalContent>
   );
 }

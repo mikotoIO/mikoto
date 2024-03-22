@@ -1,3 +1,4 @@
+import { chakra } from '@chakra-ui/react';
 import {
   faChevronDown,
   faChevronRight,
@@ -6,7 +7,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { ExplorerNode, nodeSort } from './explorerNode';
 
@@ -21,24 +22,25 @@ export const StyledTreeBody = styled.div`
   box-sizing: border-box;
 `;
 
-const StyledNode = styled.a<{ unread?: boolean; isDndHover?: boolean }>`
-  position: relative;
-  font-size: 14px;
-  height: 20px;
-  padding: 6px 8px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  font-weight: ${(p) => (p.unread ? '600' : 'inherit')};
-  color: ${(p) => (p.unread ? 'white' : 'var(--N300)')};
-  cursor: pointer;
-  user-select: none;
-
-  &:hover {
-    background-color: var(--N700);
-  }
-  ${(p) => p.isDndHover && `color: var(--B700)`}
-`;
+const NodeBase = chakra('a', {
+  baseStyle: {
+    position: 'relative',
+    fontSize: '14px',
+    height: '32px',
+    px: '8px',
+    py: '6px',
+    borderRadius: '4px',
+    display: 'flex',
+    alignItems: 'center',
+    fontWeight: 'inherit',
+    color: 'gray.350',
+    cursor: 'pointer',
+    userSelect: 'none',
+    _hover: {
+      backgroundColor: 'gray.650',
+    },
+  },
+});
 
 const ChevronWrapper = styled.div`
   opacity: 0.4;
@@ -83,16 +85,12 @@ function Node(props: ExplorerNode & { path: string[] }) {
 
   return (
     <div>
-      <StyledNode
+      <NodeBase
         ref={ref}
-        onClick={(ev) => {
-          props.onClick?.(ev);
-        }}
-        onContextMenu={(ev) => {
-          props.onContextMenu?.(ev);
-        }}
-        isDndHover={isOver}
-        unread={props.unread}
+        onClick={props.onClick}
+        onContextMenu={props.onContextMenu}
+        color={props.unread ? 'text' : undefined}
+        fontWeight={props.unread ? '600' : undefined}
       >
         <ChevronWrapper
           onClick={(ev) => {
@@ -107,7 +105,7 @@ function Node(props: ExplorerNode & { path: string[] }) {
           )}
         </ChevronWrapper>
         <span>{props.text}</span>
-      </StyledNode>
+      </NodeBase>
       <StyledSubtree>
         {open &&
           !isLeaf &&

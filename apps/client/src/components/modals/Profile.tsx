@@ -1,9 +1,16 @@
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Flex,
+  Heading,
+  ModalContent,
+} from '@chakra-ui/react';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Buttons, Flex, Modal } from '@mikoto-io/lucid';
 import { User } from 'mikotojs';
 import { useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useMikoto } from '../../hooks';
 import { treebarSpaceState } from '../../store';
@@ -16,39 +23,31 @@ const ProfileContainer = styled.div`
   height: 480px;
 
   .banner {
-    background-color: var(--N1000);
+    background-color: var(--chakra-colors-gray-800);
     padding: 16px;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
-    height: 100px;
+    height: 128px;
   }
   .content {
     padding: 48px 16px 16px;
-  }
-
-  h1 {
-    font-size: 24px;
-    margin-bottom: 0;
-  }
-
-  h2 {
-    font-size: 20px;
-  }
-
-  .mikotoid {
-    margin-top: 0;
-    font-size: 14px;
-    font-family: var(--font-code);
-    color: var(--N400);
   }
 
   ${Tag} {
     font-size: 12px;
   }
 
-  ${Avatar} {
+  .avatar {
     transform: translateY(50%);
   }
+`;
+
+const MikotoId = styled.h2`
+  font-size: 20px;
+  margin-top: 0;
+  font-size: 14px;
+  font-family: var(--chakra-fonts-code);
+  color: var(--chakra-colors-gray-500);
 `;
 
 export function ProfileModal({ user }: { user: User }) {
@@ -57,20 +56,26 @@ export function ProfileModal({ user }: { user: User }) {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <Modal style={{ padding: 0 }}>
+    <ModalContent rounded="md" p={0} width="640px">
       <ProfileContainer>
         <div className="banner">
-          <Avatar src={user.avatar ?? undefined} size={100} />
+          <Avatar
+            className="avatar"
+            src={user.avatar ?? undefined}
+            size={100}
+          />
         </div>
-        <div className="content">
+        <Box p={4} pt={12}>
           <Flex justifyContent="space-between">
             <div>
-              <h1>{user.name}</h1>
-              <h2 className="mikotoid">@cactus.mikoto.io</h2>
+              <Heading fontSize="24px" mb={0}>
+                {user.name}
+              </Heading>
+              <MikotoId>@cactus.mikoto.io</MikotoId>
             </div>
             <div>
               {mikoto.me.id !== user.id && (
-                <Buttons>
+                <ButtonGroup>
                   <Button
                     variant="success"
                     onClick={async () => {
@@ -84,6 +89,7 @@ export function ProfileModal({ user }: { user: User }) {
                     Send Friend Request
                   </Button>
                   <Button
+                    variant="secondary"
                     onClick={async () => {
                       const dm = await mikoto.client.relations.openDm({
                         relationId: user.id,
@@ -101,14 +107,16 @@ export function ProfileModal({ user }: { user: User }) {
                   >
                     <FontAwesomeIcon icon={faEnvelope} />
                   </Button>
-                </Buttons>
+                </ButtonGroup>
               )}
             </div>
           </Flex>
-          <h2>Bio</h2>
+          <Heading as="h2" fontSize="xl" mt={2}>
+            Bio
+          </Heading>
           <p>Bio Should go here. Lorem ipsum dolor sit amet consectetur.</p>
-        </div>
+        </Box>
       </ProfileContainer>
-    </Modal>
+    </ModalContent>
   );
 }

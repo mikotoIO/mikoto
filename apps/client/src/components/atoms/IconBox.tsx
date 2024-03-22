@@ -1,10 +1,10 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faHashtag } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 const StyledIcon = styled.span<{ size?: number }>`
-  background-color: var(--color-primary);
+  background-color: var(--chakra-colors-primary);
   color: white;
   border-radius: 3px;
   text-align: center;

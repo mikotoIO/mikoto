@@ -1,6 +1,6 @@
 import SimpleMarkdown from '@khanacademy/simple-markdown';
 import { Suspense, lazy } from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { createRule } from '../rules';
 
@@ -13,26 +13,10 @@ const CodeBlock = styled.div`
   }
   padding: 16px;
   margin: 0;
-  background-color: var(--N1000);
-  color: var(--N300);
+  background-color: var(--chakra-colors-gray-800);
+  color: var(--chakra-colors-gray-300);
   border-radius: 4px;
   max-width: 800px;
-
-  .hljs-comment {
-    color: var(--N400);
-  }
-  .hljs-string {
-    color: var(--G700);
-  }
-  .hljs-keyword {
-    color: var(--V400);
-  }
-  .hljs-title.class_ {
-    color: var(--Y600);
-  }
-  .hljs-title {
-    color: var(--B500);
-  }
 
   & > div {
     padding: 0 !important;

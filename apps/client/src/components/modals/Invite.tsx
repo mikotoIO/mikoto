@@ -1,27 +1,25 @@
-import { Button, Modal } from '@mikoto-io/lucid';
+import { Button, ModalContent } from '@chakra-ui/react';
 import { Invite, Space } from 'mikotojs';
 import { useState } from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { env } from '../../env';
 import { useMikoto } from '../../hooks';
 
-const InviteModalWrapper = styled.div`
-  .invite-link {
-    width: 100%;
-    font-size: 14px;
-    border-radius: 4px;
-    display: block;
-    padding: 16px;
-    margin-bottom: 8px;
-    border: none;
-    color: var(--N0);
-    background-color: var(--N1000);
-    font-family: var(--font-mono);
+const InviteLink = styled.button`
+  width: 100%;
+  font-size: 14px;
+  border-radius: 4px;
+  display: block;
+  padding: 16px;
+  margin-bottom: 8px;
+  border: none;
+  color: var(--chakra-colors-white);
+  background-color: var(--chakra-colors-gray-800);
+  font-family: var(--chakra-fonts-code);
 
-    &:hover {
-      background-color: var(--N1100);
-    }
+  &:hover {
+    background-color: var(--chakra-colors-gray-850);
   }
 `;
 
@@ -33,10 +31,11 @@ export function InviteModal({ space }: { space: Space }) {
     : undefined;
 
   return (
-    <Modal style={{ minWidth: '400px' }}>
-      <InviteModalWrapper>
+    <ModalContent rounded="md" p={4} maxW="400px">
+      <div>
         {!invite ? (
           <Button
+            variant="primary"
             type="button"
             onClick={() => {
               mikoto.client.spaces
@@ -53,7 +52,7 @@ export function InviteModal({ space }: { space: Space }) {
         ) : (
           <>
             <h1>Invite Link</h1>
-            <button
+            <InviteLink
               className="invite-link"
               type="button"
               onClick={() => {
@@ -62,7 +61,7 @@ export function InviteModal({ space }: { space: Space }) {
               }}
             >
               {link}
-            </button>
+            </InviteLink>
             <Button
               type="button"
               variant="primary"
@@ -77,7 +76,7 @@ export function InviteModal({ space }: { space: Space }) {
             </Button>
           </>
         )}
-      </InviteModalWrapper>
-    </Modal>
+      </div>
+    </ModalContent>
   );
 }

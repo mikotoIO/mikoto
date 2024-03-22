@@ -1,9 +1,9 @@
-import { Box, Flex, Heading } from '@mikoto-io/lucid';
+import { Box, Flex, Heading } from '@chakra-ui/react';
 import { ClientChannel, ClientRelation, ClientSpace } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useFetchMember, useMikoto } from '../../../hooks';
 import { useTabkit } from '../../../store/surface';
@@ -131,8 +131,8 @@ export const Explorer = observer(({ space }: { space: ClientSpace }) => {
     <StyledTree
       onContextMenu={nodeContextMenu(<TreebarContextMenu space={space} />)}
     >
-      <Box p={16}>
-        <Heading fs={16}>{space.name}</Heading>
+      <Box p="16px">
+        <Heading fontSize="16px">{space.name}</Heading>
       </Box>
       {/* <TreeBanner /> */}
       <ExplorerInner space={space} />
@@ -151,9 +151,9 @@ export const DMExplorer = observer(
       <StyledTree
         onContextMenu={nodeContextMenu(<TreebarContextMenu space={space} />)}
       >
-        <Flex p={16} alignItems="center">
+        <Flex p="16px" align="center">
           <Avatar src={relation.relation?.avatar ?? undefined} size={32} />
-          <Heading fs={16} m={{ left: 8 }}>
+          <Heading fontSize="16px" ml={2}>
             {relation.relation?.name ?? 'Unknown User'}
           </Heading>
         </Flex>

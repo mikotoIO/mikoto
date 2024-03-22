@@ -1,21 +1,22 @@
-import { GlobalStyle, LucidProvider, theme } from '@mikoto-io/lucid';
+import { ChakraProvider } from '@chakra-ui/react';
+import isPropValid from '@emotion/is-prop-valid';
+import { Global } from '@emotion/react';
 import * as Sentry from '@sentry/react';
 import React from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import ReactDOM from 'react-dom/client';
-import { Helmet } from 'react-helmet';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { RecoilEnv, RecoilRoot } from 'recoil';
-import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
-// eslint-disable-next-line import/no-relative-packages
-import '../../../packages/lucid/src/fonts.css';
 import App from './App';
-import { UserThemeProvider } from './components/UserThemeProvider';
+import { chakraTheme, globalCss } from './components/chakraTheme';
 import { env } from './env';
+// eslint-disable-next-line import/no-relative-packages
+import './fonts.css';
 import './i18n';
 import reportWebVitals from './reportWebVitals';
 
@@ -42,27 +43,24 @@ RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = !env.DEV;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <RecoilRoot>
-      <StyleSheetManager disableCSSOMInjection>
-        <LucidProvider>
-          <UserThemeProvider />
-          <ThemeProvider theme={theme}>
-            <DndProvider backend={HTML5Backend}>
-              <>
-                <Helmet>
-                  {env.DEV && (
-                    <link rel="icon" type="image/png" href="/favicon-dev.ico" />
-                  )}
-                </Helmet>
-                <GlobalStyle />
-                <App />
-                <ToastContainer theme="dark" limit={3} />
-              </>
-            </DndProvider>
-          </ThemeProvider>
-        </LucidProvider>
-      </StyleSheetManager>
-    </RecoilRoot>
+    <HelmetProvider>
+      <RecoilRoot>
+        <ChakraProvider theme={chakraTheme} resetCSS={false}>
+          <DndProvider backend={HTML5Backend}>
+            <>
+              <Helmet>
+                {env.DEV && (
+                  <link rel="icon" type="image/png" href="/favicon-dev.ico" />
+                )}
+              </Helmet>
+              <Global styles={globalCss} />
+              <App />
+              <ToastContainer theme="dark" limit={3} />
+            </>
+          </DndProvider>
+        </ChakraProvider>
+      </RecoilRoot>
+    </HelmetProvider>
   </React.StrictMode>,
 );
 

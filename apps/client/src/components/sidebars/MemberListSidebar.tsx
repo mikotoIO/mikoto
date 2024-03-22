@@ -1,12 +1,12 @@
+import { Box } from '@chakra-ui/react';
 import { faCrown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Box } from '@mikoto-io/lucid';
 import { ClientMember, ClientSpace } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import { useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 import { useFetchMember } from '../../hooks';
 import { contextMenuState, useContextMenu } from '../ContextMenu';
@@ -25,18 +25,8 @@ const StyledMember = styled.div`
   cursor: pointer;
 
   &:hover {
-    background-color: var(--N700);
+    background-color: var(--chakra-colors-gray-650);
   }
-
-  .crown {
-    color: var(--Y700);
-  }
-`;
-
-const Divider = styled.div`
-  font-weight: bold;
-  padding: 16px;
-  color: var(--N300);
 `;
 
 const MemberElement = observer(({ member }: { member: ClientMember }) => {
@@ -65,11 +55,13 @@ const MemberElement = observer(({ member }: { member: ClientMember }) => {
       onContextMenu={userContextMenu}
     >
       <Avatar size={32} src={member.user.avatar ?? undefined} />
-      <Box className="name" txt={member.roleColor}>
+      <Box className="name" color={member.roleColor}>
         {member.user.name}
       </Box>
       {member.isSpaceOwner && (
-        <FontAwesomeIcon className="crown" icon={faCrown} />
+        <Box display="inline-block" color="yellow.500">
+          <FontAwesomeIcon className="crown" icon={faCrown} />
+        </Box>
       )}
       {member.user.category === 'BOT' && <BotTag />}
     </StyledMember>
@@ -96,7 +88,11 @@ export const MemberListSidebar = observer(
           <Virtuoso
             components={{
               Header() {
-                return <Divider>Members</Divider>;
+                return (
+                  <Box color="gray.200" p={4} fontWeight="bold">
+                    Members
+                  </Box>
+                );
               },
             }}
             style={{ height: '100%', overflowX: 'hidden' }}

@@ -98,7 +98,6 @@ yarn build
 | `apps/desktop`       | Desktop client for Mikoto | Electron                                   |
 | `packages/mikotojs`  | Mikoto API for JS         | TypeScript                                 |
 | `packages/permcheck` | Permisson Calculator      | TypeScript                                 |
-| `packages/lucid`     | UI Framework              | React + TypeScript + Styled Components     |
 
 ## License
 

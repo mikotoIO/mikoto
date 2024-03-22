@@ -1,9 +1,9 @@
-import { Box, Flex } from '@mikoto-io/lucid';
+import { Box, Flex } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import { ClientMessage } from 'mikotojs';
 import { makeAutoObservable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { atom } from 'recoil';
-import styled from 'styled-components';
 
 import { ContextMenu, useContextMenu } from '../ContextMenu';
 import { BotTag } from '../atoms/BotTag';
@@ -49,7 +49,7 @@ const MessageContainer = styled.div<{ isSimple?: boolean }>`
   code {
     border-radius: 4px;
     padding: 2px;
-    background-color: var(--N1000);
+    background-color: var(--chakra-colors-gray-800);
   }
 
   .avatar {
@@ -80,8 +80,8 @@ const MessageInner = styled.div`
     padding-inline-start: 24px;
   }
 
-  p:not(:first-child),
-  pre:not(:first-child) {
+  p:not(:first-of-type),
+  pre:not(:first-of-type) {
     margin-top: 8px;
   }
 `;
@@ -100,20 +100,12 @@ const Name = styled.div<{ color?: string | null }>`
 
 function Timestamp({ time }: { time: Date }) {
   return (
-    <Box txt="N400" fs={12}>
+    <Box color="gray.400" fontSize="xs">
       {isToday(time) ? 'Today at ' : dateFormat.format(time)}{' '}
       {padTime(time.getHours())}:{padTime(time.getMinutes())}
     </Box>
   );
 }
-
-const NameBox = styled(Flex)`
-  margin-bottom: 4px;
-  gap: 6px;
-  & > * {
-    align-self: flex-end;
-  }
-`;
 
 const AvatarFiller = styled.div`
   margin: 0;
@@ -140,7 +132,7 @@ export class MessageEditState {
 
 const EditedNote = styled.span`
   font-size: 12px;
-  color: var(--N400);
+  color: var(--chakra-colors-gray-400);
   margin-left: 4px;
 `;
 
@@ -190,13 +182,13 @@ export const MessageItem = observer(
         )}
         <MessageInner>
           {!isSimple && (
-            <NameBox>
+            <Flex align="center" gap="8px" mb="6px">
               <Name color={message.member?.roleColor}>
                 {message.author?.name ?? 'Ghost'}
               </Name>
               {message.author?.category === 'BOT' && <BotTag />}
               <Timestamp time={new Date(message.timestamp)} />
-            </NameBox>
+            </Flex>
           )}
           <div>
             <Markdown content={message.content} />
@@ -213,9 +205,9 @@ export function GhostMessage() {
     <MessageContainer>
       <MessageAvatar />
       <MessageInner>
-        <NameBox style={{ opacity: '50%' }}>
+        <Flex align="center" gap="8px" mb="6px" opacity={0.5}>
           <Name>Cactus</Name>
-        </NameBox>
+        </Flex>
 
         <div style={{ opacity: '50%' }}>
           <Markdown content="testing ghost message" />

@@ -1,5 +1,5 @@
+import { Box } from '@chakra-ui/react';
 import SimpleMarkdown from '@khanacademy/simple-markdown';
-import { Box } from '@mikoto-io/lucid';
 
 import { createRule } from '../rules';
 
@@ -7,7 +7,7 @@ const OBJECT_REGEX = /^<(\w+):([^\n]*)>/;
 
 function ObjectNotFound({ resource }: { resource: string }) {
   return (
-    <Box m={4} p={16} bg="N900" rounded={8} maxw={300}>
+    <Box m={1} p={4} bg="gray.800" rounded="md" maxW="300px">
       Object not found: {resource}
     </Box>
   );

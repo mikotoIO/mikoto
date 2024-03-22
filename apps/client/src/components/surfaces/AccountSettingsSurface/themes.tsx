@@ -1,4 +1,11 @@
-import { Button, Buttons, Form, Input, SelectInput } from '@mikoto-io/lucid';
+import {
+  Button,
+  ButtonGroup,
+  FormControl,
+  FormLabel,
+  Input,
+  Select,
+} from '@chakra-ui/react';
 import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { DEFAULT_THEME_SETTINGS, themeDB } from '../../../store';
 import { useLocalDB } from '../../../store/LocalDB';
 import { SettingsView } from '../../../views/SettingsViewTemplate';
+import { Form } from '../../atoms';
 
 export function ThemesSubsurface() {
   const { t } = useTranslation();
@@ -23,20 +31,25 @@ export function ThemesSubsurface() {
           setThemeSettings(data);
         })}
       >
-        <SelectInput
-          labelName="Theme"
-          data={['dark', 'light']}
-          {...form.register('theme')}
-        />
+        <FormControl>
+          <FormLabel>Theme</FormLabel>
+          <Select {...form.register('theme')}>
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+          </Select>
+        </FormControl>
 
-        <Input labelName="color" {...form.register('accent')} />
+        <FormControl>
+          <FormLabel>Color</FormLabel>
+          <Input {...form.register('accent')} />
+        </FormControl>
         <HexColorPicker
           color={form.getValues('accent')}
           onChange={(color) => {
             form.setValue('accent', color);
           }}
         />
-        <Buttons>
+        <ButtonGroup>
           <Button variant="primary" type="submit">
             Save
           </Button>
@@ -49,7 +62,7 @@ export function ThemesSubsurface() {
           >
             Reset
           </Button>
-        </Buttons>
+        </ButtonGroup>
       </Form>
     </SettingsView>
   );

@@ -1,21 +1,26 @@
-import styled from 'styled-components';
+import { chakra } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 
 import { viewContainerCss } from '../components/ViewContainer';
 
-const SettingsViewBase = styled.div`
-  ${viewContainerCss}
+const SettingsViewBase = chakra('div', {
+  baseStyle: {
+    px: '8px',
+    py: '32px',
+    overflowY: 'scroll',
+  },
+});
 
-  padding: 8px 32px;
-  overflow-y: scroll;
-`;
-
-const Sidebar = styled.div`
-  padding: 16px;
-`;
+const Sidebar = chakra('div', {
+  baseStyle: {
+    p: 4,
+  },
+});
 
 const Container = styled.div`
+  ${viewContainerCss}
+
   height: 100%;
-  background-color: var(--N800);
   display: grid;
   grid-template-columns: 200px 1fr;
 `;
@@ -26,8 +31,9 @@ const Nav = styled.a<{ active?: boolean }>`
   font-size: 14px;
   padding: 8px 16px;
   border-radius: 4px;
-  background-color: ${(p) => (p.active ? `var(--N600)` : 'transparent')};
-  color: var(--N0);
+  background-color: ${(p) =>
+    p.active ? `var(--chakra-colors-gray-650)` : 'transparent'};
+  color: var(--chakra-colors-white);
   user-select: none;
 `;
 

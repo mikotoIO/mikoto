@@ -25,16 +25,6 @@ function isUrlImage(url: string): boolean {
   return url.match(/\.(jpeg|jpg|gif|png)$/) !== null;
 }
 
-const Table = styled.table`
-  border-collapse: collapse;
-  &,
-  th,
-  td {
-    border: 1px solid var(--chakra-colors-gray-650);
-    padding: 8px 12px;
-  }
-`;
-
 const rules = {
   ...SimpleMarkdown.defaultRules,
   image: imageRule,

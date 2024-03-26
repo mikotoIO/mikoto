@@ -1,4 +1,5 @@
 import { Box, Heading } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import {
   faEarthAmericas,
   faUserGroup,
@@ -7,7 +8,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
-import styled from '@emotion/styled';
 
 import { useMikoto } from '../../hooks';
 import { treebarSpaceState } from '../../store';
@@ -39,6 +39,8 @@ export const FriendSidebar = observer(() => {
     mikoto.relations.list(true);
   }, []);
 
+  const friends = Array.from(mikoto.relations.values());
+
   return (
     <Box p={2}>
       <StyledButtonBase
@@ -69,24 +71,27 @@ export const FriendSidebar = observer(() => {
         <FontAwesomeIcon icon={faEarthAmericas} fixedWidth />
         <span>Discover</span>
       </StyledButtonBase>
-      <Heading fontSize="14px" pl="8px" color="gray.200">
+      <Heading fontSize="14px" p={2} color="gray.200">
         Direct Messages
       </Heading>
-      {Array.from(mikoto.relations.values()).map((friend) => (
+      {friends.length === 0 && (
+        <Box px={4} color="gray.500">
+          <Box>No DMs yet. Maybe add some friends?</Box>
+        </Box>
+      )}
+      {friends.map((friend) => (
         <StyledButtonBase
           key={friend.id}
           onClick={() => {
             const friendSpaceId = friend?.space?.id;
-            setLeftSidebar(
-              friendSpaceId
-                ? {
-                    kind: 'dmExplorer',
-                    key: `dmExplorer/${friendSpaceId}`,
-                    spaceId: friendSpaceId,
-                    relationId: friend.id,
-                  }
-                : null,
-            );
+            if (friendSpaceId) {
+              setLeftSidebar({
+                kind: 'dmExplorer',
+                key: `dmExplorer/${friendSpaceId}`,
+                spaceId: friendSpaceId,
+                relationId: friend.id,
+              });
+            }
           }}
         >
           <Avatar

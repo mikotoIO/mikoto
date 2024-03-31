@@ -50,7 +50,7 @@ and upcoming features:
 # install dependencies
 yarn install
 
-# start services (CockroachDB, Redis, MinIO, etc.)
+# start services (PostgreSQL, Redis, MinIO, etc.)
 docker-compose up
 
 # set up database

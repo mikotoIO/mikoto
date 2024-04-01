@@ -1,4 +1,5 @@
 import { chakra } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import {
   faFaceSmileWink,
   faFileArrowUp,
@@ -12,7 +13,6 @@ import { useSetRecoilState } from 'recoil';
 import { Node, Transforms, createEditor } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
-import styled from '@emotion/styled';
 
 import { contextMenuState } from '../ContextMenu';
 import { MessageEditState } from './Message';

@@ -30,7 +30,7 @@ services:
     restart: always
   livekit:
     image: livekit/livekit-server:v1.4.3
-    command: '--keys "devkey: secret"'
+    command: '--keys "devkey: secret1234567890abcdefghijklmnopqrtsuvwxyz"'
     ports:
       - '7880:7880'
       - '7881:7881'

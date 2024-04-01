@@ -4,7 +4,7 @@ import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import { Resizable } from 're-resizable';
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
@@ -18,6 +18,7 @@ import { Sidebar } from '../components/sidebars/Base';
 import { FriendSidebar } from '../components/sidebars/FriendSidebar';
 import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
 import { surfaceMap } from '../components/surfaces';
+import { ErrorSurface } from '../components/surfaces/ErrorSurface';
 import { useMikoto } from '../hooks';
 import { treebarSpaceState, workspaceState } from '../store';
 import {
@@ -38,12 +39,6 @@ const AppContainer = styled.div`
   height: 100%;
   flex: 1;
 `;
-
-function ErrorBoundaryPage({ children }: { children: React.ReactNode }) {
-  return (
-    <ErrorBoundary fallback={<div>lol error</div>}>{children}</ErrorBoundary>
-  );
-}
 
 function TabViewSwitch({ tab }: { tab: Tabable }) {
   const Selected = surfaceMap[tab.kind] as any; // TODO: type this
@@ -97,26 +92,26 @@ const SurfaceGroup = observer(
     }
     return (
       <TabbedView tabs={surfaceNode.tabs} surfaceNode={surfaceNode}>
-        <ErrorBoundaryPage>
-          {surfaceNode.tabs.map((tab, idx) => (
-            <TabContext.Provider
-              value={{ key: `${tab.kind}/${tab.key}` }}
-              key={`${tab.kind}/${tab.key}`}
+        {surfaceNode.tabs.map((tab, idx) => (
+          <TabContext.Provider
+            value={{ key: `${tab.kind}/${tab.key}` }}
+            key={`${tab.kind}/${tab.key}`}
+          >
+            <div
+              style={
+                idx !== surfaceNode.index ? { display: 'none' } : undefined
+              }
             >
-              <div
-                style={
-                  idx !== surfaceNode.index ? { display: 'none' } : undefined
-                }
-              >
-                <Box py="8px" h="100%">
+              <Box py="8px" h="100%">
+                <ErrorBoundary fallback={<ErrorSurface />}>
                   <Suspense>
                     <TabViewSwitch tab={tab} />
                   </Suspense>
-                </Box>
-              </div>
-            </TabContext.Provider>
-          ))}
-        </ErrorBoundaryPage>
+                </ErrorBoundary>
+              </Box>
+            </div>
+          </TabContext.Provider>
+        ))}
       </TabbedView>
     );
   },

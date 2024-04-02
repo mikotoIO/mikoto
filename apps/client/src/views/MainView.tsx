@@ -19,6 +19,7 @@ import { FriendSidebar } from '../components/sidebars/FriendSidebar';
 import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
 import { surfaceMap } from '../components/surfaces';
 import { ErrorSurface } from '../components/surfaces/ErrorSurface';
+import { LoadingSurface } from '../components/surfaces/LoadingSurface';
 import { useMikoto } from '../hooks';
 import { treebarSpaceState, workspaceState } from '../store';
 import {
@@ -104,7 +105,7 @@ const SurfaceGroup = observer(
             >
               <Box py="8px" h="100%">
                 <ErrorBoundary fallback={<ErrorSurface />}>
-                  <Suspense>
+                  <Suspense fallback={<LoadingSurface />}>
                     <TabViewSwitch tab={tab} />
                   </Suspense>
                 </ErrorBoundary>

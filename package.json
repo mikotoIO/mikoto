@@ -6,7 +6,7 @@
     "apps/*",
     "packages/*",
     "docs/*",
-    "hyperschema/documentation"
+    "hyperschema/*"
   ],
   "scripts": {
     "compose": "docker compose up -d",

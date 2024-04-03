@@ -5417,6 +5417,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hyperschema/core@workspace:hyperschema/typescript-core":
+  version: 0.0.0-use.local
+  resolution: "@hyperschema/core@workspace:hyperschema/typescript-core"
+  dependencies:
+    "@fastify/cors": "npm:9.0.1"
+    "@types/node": "npm:^20.7.0"
+    "@types/ws": "npm:^8.5.10"
+    fastify: "npm:^4.26.1"
+    json-stringify-pretty-compact: "npm:3.0.0"
+    prettier: "npm:^3.0.3"
+    socket.io: "npm:^4.7.2"
+    typescript: "npm:^5.2.2"
+    ws: "npm:^8.16.0"
+    zod: "npm:^3.22.4"
+  peerDependencies:
+    zod: "*"
+  languageName: unknown
+  linkType: soft
+
 "@img/sharp-darwin-arm64@npm:0.33.2":
   version: 0.33.2
   resolution: "@img/sharp-darwin-arm64@npm:0.33.2"
@@ -8432,6 +8451,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:^20.7.0":
+  version: 20.12.3
+  resolution: "@types/node@npm:20.12.3"
+  dependencies:
+    undici-types: "npm:~5.26.4"
+  checksum: 10/3f3c5c6ba118a18aa997c51cdc3c66259d69021f87475a99ed6c913a6956e22de49748e09843bf6447a7a63ae474e61945a6dbcca93e23b2359fc0b6f9914f7a
+  languageName: node
+  linkType: hard
+
 "@types/nodemailer@npm:^6.4.6":
   version: 6.4.14
   resolution: "@types/nodemailer@npm:6.4.14"
@@ -8661,7 +8689,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ws@npm:~8.5.10":
+"@types/ws@npm:^8.5.10, @types/ws@npm:~8.5.10":
   version: 8.5.10
   resolution: "@types/ws@npm:8.5.10"
   dependencies:
@@ -26420,7 +26448,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.3.3, typescript@npm:^5.4.2":
+"typescript@npm:^5.2.2, typescript@npm:^5.3.3, typescript@npm:^5.4.2":
   version: 5.4.3
   resolution: "typescript@npm:5.4.3"
   bin:
@@ -26430,7 +26458,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.3.3#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.4.2#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A^5.2.2#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.3.3#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.4.2#optional!builtin<compat/typescript>":
   version: 5.4.3
   resolution: "typescript@patch:typescript@npm%3A5.4.3#optional!builtin<compat/typescript>::version=5.4.3&hash=d69c25"
   bin:

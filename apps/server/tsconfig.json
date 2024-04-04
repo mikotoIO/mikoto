@@ -1,6 +1,9 @@
 {
   "extends": "tsconfig/server.tsconfig.json",
-  "references": [{ "path": "../../packages/permcheck" }],
+  "references": [
+    { "path": "../../packages/permcheck" },
+    { "path": "../../hyperschema/typescript-core" },
+  ],
   "compilerOptions": {
     "outDir": "./dist"
   }

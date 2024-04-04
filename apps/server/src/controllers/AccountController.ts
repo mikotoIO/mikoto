@@ -19,16 +19,16 @@ import Mailer from '../functions/Mailer';
 import { logger } from '../functions/logger';
 
 function bcryptHash(password: string) {
-  if (globalThis.Bun) {
-    return globalThis.Bun.password.hash(password, 'bcrypt');
-  }
+  // if (globalThis.Bun) {
+  //   return globalThis.Bun.password.hash(password, 'bcrypt');
+  // }
   return bcrypt.hash(password, 10);
 }
 
 function bcryptCompare(password: string, hash: string) {
-  if (globalThis.Bun) {
-    return globalThis.Bun.password.verify(password, hash);
-  }
+  // if (globalThis.Bun) {
+  //   return globalThis.Bun.password.verify(password, hash);
+  // }
   return bcrypt.compare(password, hash);
 }
 

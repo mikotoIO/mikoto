@@ -1,71 +1,82 @@
-use std::io::Cursor;
+use std::{env, io::Cursor};
 
-use rocket::{form::Form, fs::TempFile};
-use tokio::io::AsyncBufReadExt;
+use axum::{
+    extract::{Multipart, Path},
+    Json,
+};
+use image::imageops::FilterType;
+use nanoid::nanoid;
 
 use crate::{
-    config::{StoreType, CONFIG},
-    env::PUBLIC_MEDIASERVER_URL,
+    config::{config, StoreType},
     error::Error,
-    functions::storage::MAIN_BUCKET,
+    functions::storage::bucket,
 };
-use image::io::Reader as ImageReader;
-use nanoid::nanoid;
-use rocket::serde::json::Json;
+
+fn mime_to_ext(mime: &str) -> &'static str {
+    match mime {
+        "image/jpeg" => "jpg",
+        "image/png" => "png",
+        "image/gif" => "gif",
+        "image/webp" => "webp",
+        _ => "bin",
+    }
+}
 
 #[derive(Debug, Serialize)]
 pub struct UploadResponse {
     pub url: String,
 }
 
-#[derive(FromForm)]
-pub struct Upload<'r> {
-    pub file: TempFile<'r>,
-}
+pub async fn route(
+    Path(store_name): Path<String>,
+    mut form: Multipart,
+) -> Result<Json<UploadResponse>, Error> {
+    let store = config().stores.get(&store_name).ok_or(Error::NotFound)?;
 
-#[post("/<store>", data = "<data>")]
-pub async fn upload(store: &str, data: Form<Upload<'_>>) -> Result<Json<UploadResponse>, Error> {
-    let f = &data.file;
-    let store_config = CONFIG.get(store).ok_or(Error::NotFound)?;
+    let file = form
+        .next_field()
+        .await
+        .map_err(|_| Error::BadRequest)?
+        .ok_or(Error::NotFound)?;
 
-    // validate file size
-    if f.len() > store_config.max_size {
+    // TODO: This is very hacky. Allow the user to provide their own file types.
+    let mut ext = mime_to_ext(&file.content_type().unwrap_or(&"???"));
+
+    let mut buf = file.bytes().await.map_err(|_| Error::BadRequest)?.to_vec();
+
+    if buf.len() > store.max_size {
         return Err(Error::FileTooLarge);
     }
 
-    // convert file to buffer
-    let mut f = f.open().await.map_err(|_| Error::FileBufferError)?;
-    let buf = f.fill_buf().await.map_err(|_| Error::FileBufferError)?;
-
-    let (filename, data) = match store_config.store_type {
+    match store.store_type {
+        StoreType::Attachment => {}
         StoreType::Image => {
-            // validate if image
-            dbg!(&data.file.len());
-            let mut image = ImageReader::new(Cursor::new(buf))
-                .with_guessed_format()
-                .map_err(|_| Error::ImageError {
-                    internal: "could not guess image format".to_string(),
-                })?
-                .decode()?;
-            if let Some(resize) = &store_config.image_resize {
-                // resize image before upload
-                image = image.resize_exact(
-                    resize.width,
-                    resize.height,
-                    image::imageops::FilterType::Lanczos3,
-                );
-            }
-            let mut buf = Vec::new();
-            image.write_to(&mut Cursor::new(&mut buf), image::ImageOutputFormat::Png)?;
-            (format!("{}.png", nanoid!()), buf)
+            // TODO: validate if actually image
+            // should be unnecessary, but just in case
         }
-        _ => todo!(),
-    };
+    }
 
-    let path = format!("{}/{}", &store, &filename);
-    MAIN_BUCKET.put_object(&path, &data).await?;
+    if let Some(resize) = &store.image_resize {
+        let image = image::load_from_memory(&buf)?.resize_to_fill(
+            resize.width,
+            resize.height,
+            FilterType::Lanczos3,
+        );
+        buf = Vec::new();
+        image.write_to(&mut Cursor::new(&mut buf), image::ImageOutputFormat::Png)?;
+        ext = "png";
+    }
+
+    let store_path = format!("{}/{}.{}", store_name, nanoid!(16), ext);
+    bucket().put_object(&store_path, &buf).await?;
 
     Ok(Json(UploadResponse {
-        url: format!("{}/{}", PUBLIC_MEDIASERVER_URL.to_string(), &path),
+        url: format!(
+            "{}/{}",
+            env::var("PUBLIC_MEDIASERVER_URL")
+                .expect("environment variable PUBLIC_MEDIASERVER_URL is not provided"),
+            &store_path
+        ),
     }))
 }

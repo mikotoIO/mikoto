@@ -1,11 +1,19 @@
 use s3::Bucket;
 
-use std::env;
+use std::{env, sync::OnceLock};
 
-lazy_static! {
-    pub static ref MAIN_BUCKET: Bucket = {
+pub fn bucket() -> &'static Bucket {
+    static BUCKET: OnceLock<Bucket> = OnceLock::new();
+
+    BUCKET.get_or_init(|| {
         let protocol = match env::var("S3_USE_SSL") {
-            Ok(x) => if x == "true" { "https" } else { "http" },
+            Ok(x) => {
+                if x == "true" {
+                    "https"
+                } else {
+                    "http"
+                }
+            }
             Err(_) => "http",
         };
         let endpoint = env::var("S3_ENDPOINT").expect("S3_ENDPOINT is not provided");
@@ -27,10 +35,10 @@ lazy_static! {
             expiration: None,
         };
 
-        // remove the leading slash
         let bucket_name = env::var("S3_BUCKET").expect("S3_BUCKET is not provided");
+
         Bucket::new(&bucket_name, region.clone(), credentials.clone())
             .expect("Failed to create bucket")
             .with_path_style()
-    };
+    })
 }

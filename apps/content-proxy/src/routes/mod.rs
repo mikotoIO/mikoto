@@ -1,23 +1,20 @@
-use rocket::serde::json::Json;
+use axum::{
+    routing::{get, post},
+    Router,
+};
+use tower_http::cors::CorsLayer;
 
-pub mod proxy;
 pub mod serve;
 pub mod upload;
 
-#[derive(Serialize)]
-pub struct Hello {
-    pub name: String,
+pub async fn hello() -> &'static str {
+    "Hello, World!"
 }
 
-impl Default for Hello {
-    fn default() -> Self {
-        Self {
-            name: "contentproxy".to_string(),
-        }
-    }
-}
-
-#[get("/")]
-pub fn hello() -> Json<Hello> {
-    Json(Hello::default())
+pub fn router() -> Router {
+    Router::new()
+        .route("/", get(hello))
+        .route("/:store/*path", get(serve::route))
+        .route("/:store", post(upload::route))
+        .layer(CorsLayer::permissive())
 }

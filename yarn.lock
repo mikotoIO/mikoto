@@ -5401,6 +5401,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hyperschema/client@workspace:hyperschema/typescript-client":
+  version: 0.0.0-use.local
+  resolution: "@hyperschema/client@workspace:hyperschema/typescript-client"
+  dependencies:
+    socket.io-client: "npm:^4.7.2"
+    zod: "npm:^3.22.4"
+  peerDependencies:
+    zod: "*"
+  languageName: unknown
+  linkType: soft
+
 "@hyperschema/core@npm:^0.0.14, @hyperschema/core@workspace:hyperschema/typescript-core":
   version: 0.0.0-use.local
   resolution: "@hyperschema/core@workspace:hyperschema/typescript-core"

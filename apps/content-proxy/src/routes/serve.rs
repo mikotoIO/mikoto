@@ -1,68 +1,59 @@
-use std::{io::Cursor, path::PathBuf};
+use std::io::Cursor;
 
-use rocket::{
-    http::{ContentType, Header, Status},
-    response::Responder,
-    Response,
+use axum::{
+    extract::{Path, Query},
+    http::{header, HeaderMap, StatusCode},
+    response::{IntoResponse, Response},
 };
 
-use crate::{error::Error, functions::storage::MAIN_BUCKET};
+use crate::{
+    error::Error,
+    functions::{mime::get_content_type, storage::bucket},
+};
 
 pub struct FileResponse {
     pub data: Vec<u8>,
-    pub content_type: ContentType,
+    pub content_type: String,
+}
+
+impl IntoResponse for FileResponse {
+    fn into_response(self) -> Response {
+        let mut headers = HeaderMap::new();
+        headers.insert(
+            "Cache-Control",
+            "public, max-age=31536000, must-revalidate".parse().unwrap(),
+        );
+        headers.insert(header::CONTENT_TYPE, self.content_type.parse().unwrap());
+        (StatusCode::OK, headers, self.data).into_response()
+    }
 }
 
 impl FileResponse {
-    pub fn new(data: Vec<u8>, content_type: ContentType) -> Self {
+    pub fn new(data: Vec<u8>, content_type: String) -> Self {
         Self { data, content_type }
     }
 }
 
-impl<'r> Responder<'r, 'r> for FileResponse {
-    fn respond_to(self, _: &rocket::Request) -> rocket::response::Result<'r> {
-        Response::build()
-            .header(self.content_type)
-            .header(Header::new(
-                "Cache-Control",
-                "public, max-age=31536000, must-revalidate",
-            ))
-            .sized_body(self.data.len(), Cursor::new(self.data))
-            .status(Status::Ok)
-            .ok()
-    }
-}
-
-fn get_content_type(path: &str) -> ContentType {
-    let mime = mime_guess::from_path(path)
-        .first()
-        .unwrap_or(mime::APPLICATION_OCTET_STREAM);
-    ContentType::new(mime.type_().to_string(), mime.subtype().to_string())
-}
-
-#[derive(Debug, FromForm)]
-
+#[derive(Debug, Deserialize)]
 pub struct ServeParams {
     pub w: Option<u32>,
     pub h: Option<u32>,
 }
 
-#[get("/<store>/<path..>?<params..>")]
-pub async fn serve(store: &str, path: PathBuf, params: ServeParams) -> Result<FileResponse, Error> {
-    let path = path.to_str().unwrap();
-
-    let data = MAIN_BUCKET
-        .get_object(format!("/{}/{}", store, path))
-        .await?;
+pub async fn route(
+    Path((store, path)): Path<(String, String)>,
+    params: Query<ServeParams>,
+) -> Result<FileResponse, Error> {
+    let data = bucket().get_object(format!("/{}/{}", store, path)).await?;
 
     let resp = match (params.w, params.h) {
         (Some(w), Some(h)) => {
             let image = image::load_from_memory(&data.bytes())?.thumbnail(w, h);
             let mut buf = Vec::new();
             image.write_to(&mut Cursor::new(&mut buf), image::ImageOutputFormat::Png)?;
-            FileResponse::new(buf, ContentType::PNG)
+            FileResponse::new(buf, "image/png".to_owned())
         }
-        _ => FileResponse::new(data.bytes().to_vec(), get_content_type(path)),
+        _ => FileResponse::new(data.bytes().to_vec(), get_content_type(&path)),
     };
 
     Ok(resp)

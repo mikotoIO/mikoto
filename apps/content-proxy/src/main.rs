@@ -1,31 +1,20 @@
 #[macro_use]
-extern crate rocket;
-#[macro_use]
-extern crate lazy_static;
-#[macro_use]
 extern crate serde;
 #[macro_use]
 extern crate serde_json;
 
 pub mod config;
-pub mod env;
 pub mod error;
 pub mod functions;
 pub mod routes;
 
-use config::CONFIG;
-use dotenv::dotenv;
+#[tokio::main]
+async fn main() {
+    dotenv::dotenv().ok();
 
-#[launch]
-fn rocket() -> _ {
-    dotenv().ok();
+    let app = routes::router();
 
-    let _ = CONFIG.len();
-
-    rocket::build()
-        .configure(rocket::Config::figment().merge(("port", 9502)))
-        .mount(
-            "/",
-            routes![routes::hello, routes::serve::serve, routes::upload::upload],
-        )
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:9502").await.unwrap();
+    println!("Server started!");
+    axum::serve(listener, app).await.unwrap();
 }

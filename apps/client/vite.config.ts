@@ -27,6 +27,13 @@ export default ({ mode }: { mode: string }) =>
           new URL('../../packages/permcheck/src/index.ts', import.meta.url),
         ),
 
+        '@hyperschema/client': fileURLToPath(
+          new URL(
+            '../../hyperschema/typescript-client/src/index.ts',
+            import.meta.url,
+          ),
+        ),
+
         mikotojs: fileURLToPath(
           new URL('../../packages/mikotojs/src/index.ts', import.meta.url),
         ),

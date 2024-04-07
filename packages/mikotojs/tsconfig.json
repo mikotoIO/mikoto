@@ -14,8 +14,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./src"
   },
   "include": ["src"],
-  "references": [{ "path": "../permcheck" }]
+  "references": [
+    { "path": "../permcheck" },
+    { "path": "../../hyperschema/typescript-client" }
+  ]
 }

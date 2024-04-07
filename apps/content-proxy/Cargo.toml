@@ -22,3 +22,4 @@ toml = "0.8.8"
 nanoid = "0.4.0"
 axum = { version = "0.7.5", features = ["multipart"] }
 tower-http = { version = "0.5.2", features = ["cors"] }
+envy = "0.4.2"

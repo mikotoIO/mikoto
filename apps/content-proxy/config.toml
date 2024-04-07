@@ -1,10 +1,10 @@
-[avatar]
+[stores.avatar]
 store_type = "image"
 # 10 MB
 max_size = 10485760
 image_resize = { width = 512, height = 512 }
 
-[spaceicon]
+[stores.spaceicon]
 store_type = "image"
 max_size = 10485760
 image_resize = { width = 512, height = 512 }

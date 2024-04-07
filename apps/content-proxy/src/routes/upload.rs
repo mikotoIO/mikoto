@@ -1,4 +1,4 @@
-use std::{env, io::Cursor};
+use std::io::Cursor;
 
 use axum::{
     extract::{Multipart, Path},
@@ -9,6 +9,7 @@ use nanoid::nanoid;
 
 use crate::{
     config::{config, StoreType},
+    env::env,
     error::Error,
     functions::storage::bucket,
 };
@@ -72,11 +73,6 @@ pub async fn route(
     bucket().put_object(&store_path, &buf).await?;
 
     Ok(Json(UploadResponse {
-        url: format!(
-            "{}/{}",
-            env::var("PUBLIC_MEDIASERVER_URL")
-                .expect("environment variable PUBLIC_MEDIASERVER_URL is not provided"),
-            &store_path
-        ),
+        url: format!("{}/{}", env().public_mediaserver_url, &store_path),
     }))
 }

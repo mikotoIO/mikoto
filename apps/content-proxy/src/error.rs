@@ -1,10 +1,9 @@
 // define the error types
-
-use std::io::Cursor;
-
-use rocket::http::{ContentType, Status};
-use rocket::request::Request;
-use rocket::response::{self, Responder, Response};
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Json,
+};
 use s3::error::S3Error;
 
 #[derive(Serialize, Debug)]
@@ -19,22 +18,16 @@ pub enum Error {
     ImageError { internal: String },
 }
 
-// implement Responder for Error
-impl<'r> Responder<'r, 'r> for Error {
-    fn respond_to(self, _: &Request) -> response::Result<'r> {
+impl IntoResponse for Error {
+    fn into_response(self) -> Response {
         let status = match self {
-            Error::NotFound => Status::NotFound,
-            Error::BadRequest => Status::BadRequest,
-            Error::FileTooLarge => Status::PayloadTooLarge,
-            _ => Status::InternalServerError,
+            Error::NotFound => StatusCode::NOT_FOUND,
+            Error::BadRequest => StatusCode::BAD_REQUEST,
+            Error::FileTooLarge => StatusCode::PAYLOAD_TOO_LARGE,
+            _ => StatusCode::INTERNAL_SERVER_ERROR,
         };
 
-        let string = json!(self).to_string();
-        Response::build()
-            .sized_body(string.len(), Cursor::new(string))
-            .header(ContentType::JSON)
-            .status(status)
-            .ok()
+        (status, Json(json!(self).to_string())).into_response()
     }
 }
 

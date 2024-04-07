@@ -1,7 +1,12 @@
 FROM rust:1.74-alpine3.14 as builder
 
-COPY . /mikoto
-WORKDIR /mikoto/apps/content-proxy
+WORKDIR /mikoto
+COPY . .
 
-RUN cargo build
-CMD ["cargo", "run"]
+WORKDIR /mikoto/apps/content-proxy
+RUN cargo build --release
+
+FROM alpine:3.14
+RUN apk --no-cache add ca-certificates
+COPY --from=builder /mikoto/target/release/content-proxy content-proxy
+CMD ["./content-proxy"]

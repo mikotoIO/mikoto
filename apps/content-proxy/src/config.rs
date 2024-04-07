@@ -1,8 +1,8 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::OnceLock};
 
 use s3::request::ResponseData;
 
-use crate::{error::Error, functions::storage::MAIN_BUCKET};
+use crate::{error::Error, functions::storage::bucket};
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
@@ -19,7 +19,7 @@ pub enum StoreType {
 
 #[derive(Debug, Deserialize)]
 pub struct Store {
-    pub max_size: u64,
+    pub max_size: usize,
     pub store_type: StoreType,
 
     // image options
@@ -34,14 +34,15 @@ pub struct Resize {
 
 impl Store {
     pub async fn upload(data: Vec<u8>) -> Result<ResponseData, Error> {
-        let res = MAIN_BUCKET.put_object(format!("{}", "name"), &data).await?;
+        let res = bucket().put_object(format!("{}", "name"), &data).await?;
         Ok(res)
     }
 }
 
-lazy_static! {
-    pub static ref CONFIG: HashMap<String, Store> = {
+pub fn config() -> &'static Config {
+    static CONFIG: OnceLock<Config> = OnceLock::new();
+    CONFIG.get_or_init(|| {
         let config = std::fs::read_to_string("config.toml").unwrap();
         toml::from_str(&config).unwrap()
-    };
+    })
 }

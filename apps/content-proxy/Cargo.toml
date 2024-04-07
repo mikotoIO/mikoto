@@ -7,13 +7,11 @@ edition = "2021"
 
 [dependencies]
 # the basic dependencies
-tokio = "1.35.1"
+tokio = { version = "1.35.1", features = ["full"] }
 dotenv = "0.15.0"
-lazy_static = "1.4.0"
 serde = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0.108"
 native-tls = "0.2"
-maplit = "1.0.2"
 
 mime = "0.3.17"
 mime_guess = "2.0.4"
@@ -21,9 +19,7 @@ rust-s3 = { version = "0.34.0-rc3", features = ["tokio-native-tls"] }
 url = "2.4.1"
 image = "0.24.7"
 toml = "0.8.8"
-rocket-multipart-form-data = "0.10.7"
 nanoid = "0.4.0"
-
-[dependencies.rocket]
-version = "=0.5.0-rc.4"
-features = ["json"]
+axum = { version = "0.7.5", features = ["multipart"] }
+tower-http = { version = "0.5.2", features = ["cors"] }
+envy = "0.4.2"

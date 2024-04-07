@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "CommonJS",
     "moduleResolution": "node",
-    "target": "es2022",
+    "target": "es2020",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "sourceMap": true,
@@ -14,11 +14,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
   },
-  "include": ["src"],
-  "references": [
-    { "path": "../permcheck" },
-    { "path": "../../hyperschema/typescript-client" }
-  ]
+  "include": ["src"]
 }

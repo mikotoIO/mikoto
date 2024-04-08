@@ -2,13 +2,13 @@ name: Build Docker for Mikoto MediaServer
 on:
   push:
     paths:
-      - apps/media-server/**
+      - apps/content-proxy/**
     branches: ['main']
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: mikotoIO/mikoto-media-server
-  DOCKERFILE: ./apps/media-server/Dockerfile
+  DOCKERFILE: ./apps/content-proxy/Dockerfile
 
 jobs:
   build:

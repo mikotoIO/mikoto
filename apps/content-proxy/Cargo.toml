@@ -28,3 +28,8 @@ git = "https://github.com/ScuffleTV/rust-s3.git"
 branch = "troy/rustls"
 default-features = false
 features = ["tokio-rustls-tls"]
+
+[dependencies.reqwest]
+reqwest = "0.12.3"
+default-features = false
+features = ["charset", "http2", "rustls-tls"]

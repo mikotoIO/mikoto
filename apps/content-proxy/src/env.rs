@@ -18,6 +18,8 @@ pub struct Env {
 static ENV: OnceLock<Env> = OnceLock::new();
 
 pub fn env() -> &'static Env {
-    dotenv::dotenv().ok();
-    ENV.get_or_init(|| envy::from_env().unwrap_or_else(|err| panic!("{:#?}", err)))
+    ENV.get_or_init(|| {
+        dotenv::dotenv().ok();
+        envy::from_env().unwrap_or_else(|err| panic!("{:#?}", err))
+    })
 }

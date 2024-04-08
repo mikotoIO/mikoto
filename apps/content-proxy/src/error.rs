@@ -12,9 +12,11 @@ pub enum Error {
     BadRequest,
     NotFound,
     InternalServerError,
+    InvalidContentType,
     FileTooLarge,
     FileBufferError,
     StorageError { internal: String },
+    ProxyError { internal: String },
     ImageError { internal: String },
 }
 
@@ -43,6 +45,14 @@ impl From<image::ImageError> for Error {
     fn from(err: image::ImageError) -> Self {
         err.to_string();
         Error::ImageError {
+            internal: err.to_string(),
+        }
+    }
+}
+
+impl From<reqwest::Error> for Error {
+    fn from(err: reqwest::Error) -> Self {
+        Error::ProxyError {
             internal: err.to_string(),
         }
     }

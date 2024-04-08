@@ -6,6 +6,7 @@ use axum::{
 };
 use tower_http::cors::CorsLayer;
 
+pub mod proxy;
 pub mod serve;
 pub mod upload;
 
@@ -26,6 +27,7 @@ pub async fn index() -> Json<&'static IndexResponse> {
 pub fn router() -> Router {
     Router::new()
         .route("/", get(index))
+        .route("/proxy", get(proxy::route))
         .route("/:store/*path", get(serve::route))
         .route("/:store", post(upload::route))
         .layer(CorsLayer::permissive())

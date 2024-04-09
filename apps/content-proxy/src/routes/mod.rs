@@ -1,6 +1,7 @@
 use std::sync::OnceLock;
 
 use axum::{
+    extract::DefaultBodyLimit,
     routing::{get, post},
     Json, Router,
 };
@@ -30,5 +31,6 @@ pub fn router() -> Router {
         .route("/proxy", get(proxy::route))
         .route("/:store/*path", get(serve::route))
         .route("/:store", post(upload::route))
+        .layer(DefaultBodyLimit::max(500 * 1024 * 1024))
         .layer(CorsLayer::permissive())
 }

@@ -3,6 +3,7 @@ use log::info;
 #[macro_use]
 extern crate serde;
 
+pub mod entities;
 pub mod env;
 pub mod error;
 pub mod routes;

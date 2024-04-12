@@ -3,7 +3,6 @@ resolver = "2"
 members = [
     "apps/content-proxy",
     "apps/auth",
-    "apps/auth/migration",
     "packages/muonic/macros",
     "packages/muonic/core",
 ]

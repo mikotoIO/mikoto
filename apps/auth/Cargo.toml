@@ -18,8 +18,16 @@ axum = { version = "0.7.5", features = ["multipart"] }
 tower-http = { version = "0.5.2", features = ["cors"] }
 time =  { version = "0.3.36", features = ["serde"] }
 uuid = { version = "1.8.0", features = ["serde", "v4"]}
+itertools = "0.12.1"
 
 # database
-[dependencies.sea-orm]
-version="0.12"
-features = [ "sqlx-postgres", "runtime-tokio-rustls", "macros", "with-time", "with-uuid"]
+[dependencies.sqlx]
+version = "0.7"
+features = [ 
+    "runtime-tokio",
+    "tls-rustls",
+    "postgres",
+    "uuid",
+    "time",
+]
+

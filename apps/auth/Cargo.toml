@@ -1,5 +1,5 @@
 [package]
-name = "content-proxy"
+name = "superego"
 version = "0.1.0"
 edition = "2021"
 
@@ -16,22 +16,10 @@ pretty_env_logger = "0.5.0"
 # web server
 axum = { version = "0.7.5", features = ["multipart"] }
 tower-http = { version = "0.5.2", features = ["cors"] }
+time =  { version = "0.3.36", features = ["serde"] }
+uuid = { version = "1.8.0", features = ["serde", "v4"]}
 
-mime = "0.3.17"
-mime_guess = "2.0.4"
-
-url = "2.4.1"
-image = "0.24.7"
-toml = "0.8.8"
-nanoid = "0.4.0"
-
-[dependencies.rust-s3]
-git = "https://github.com/ScuffleTV/rust-s3.git"
-branch = "troy/rustls"
-default-features = false
-features = ["tokio-rustls-tls"]
-
-[dependencies.reqwest]
-version = "0.12.3"
-default-features = false
-features = ["charset", "http2", "rustls-tls"]
+# database
+[dependencies.sea-orm]
+version="0.12"
+features = [ "sqlx-postgres", "runtime-tokio-rustls", "macros", "with-time", "with-uuid"]

@@ -6,6 +6,7 @@ extern crate serde;
 pub mod entities;
 pub mod env;
 pub mod error;
+pub mod functions;
 pub mod routes;
 
 #[tokio::main]

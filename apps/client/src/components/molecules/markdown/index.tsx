@@ -50,6 +50,12 @@ const MarkdownWrapper = styled.div<{ emojiSize: string }>`
     max-height: ${(p) => p.emojiSize} !important;
   }
 
+  .paragraph code {
+    border-radius: 4px;
+    padding: 2px;
+    background-color: var(--chakra-colors-gray-800);
+  }
+
   blockquote {
     margin: 0;
     padding-left: 8px;

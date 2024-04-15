@@ -46,12 +46,6 @@ const MessageContainer = styled.div<{ isSimple?: boolean }>`
     margin: 0;
   }
 
-  code {
-    border-radius: 4px;
-    padding: 2px;
-    background-color: var(--chakra-colors-gray-800);
-  }
-
   .avatar {
     margin-top: 4px;
   }

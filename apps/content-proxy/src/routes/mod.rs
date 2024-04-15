@@ -19,10 +19,11 @@ pub struct IndexResponse {
 
 pub async fn index() -> Json<&'static IndexResponse> {
     static RESP: OnceLock<IndexResponse> = OnceLock::new();
-    Json(RESP.get_or_init(|| IndexResponse {
+    RESP.get_or_init(|| IndexResponse {
         name: "media-server".to_string(),
         version: "*".to_string(),
-    }))
+    })
+    .into()
 }
 
 pub fn router() -> Router {

@@ -8190,15 +8190,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-highlight@npm:^0.12.5":
-  version: 0.12.8
-  resolution: "@types/react-highlight@npm:0.12.8"
-  dependencies:
-    "@types/react": "npm:*"
-  checksum: 10/d0bb9bc37d621bee92487f08de39e32be6ede722757df2898b1e6639409a3fa2fb305a276ab1f8ea6f9e70fb7ba3ba40c3821512c61f38e4c053d2acf21dd4b3
-  languageName: node
-  linkType: hard
-
 "@types/react-syntax-highlighter@npm:^15.5.1":
   version: 15.5.11
   resolution: "@types/react-syntax-highlighter@npm:15.5.11"
@@ -10788,7 +10779,6 @@ __metadata:
     "@types/node": "npm:^16.11.26"
     "@types/react": "npm:^18.2.64"
     "@types/react-dom": "npm:^18.2.21"
-    "@types/react-highlight": "npm:^0.12.5"
     "@types/react-syntax-highlighter": "npm:^15.5.1"
     "@types/react-twemoji": "npm:^0.4.0"
     "@typescript-eslint/eslint-plugin": "npm:^7.1.1"
@@ -10839,7 +10829,6 @@ __metadata:
     react-dropzone: "npm:^14.2.3"
     react-error-boundary: "npm:^3.1.4"
     react-helmet-async: "npm:^2.0.4"
-    react-highlight: "npm:^0.15.0"
     react-hook-form: "npm:^7.34.2"
     react-i18next: "npm:^13.0.2"
     react-loading-skeleton: "npm:^3.1.0"
@@ -15576,7 +15565,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"highlight.js@npm:^10.4.1, highlight.js@npm:^10.5.0, highlight.js@npm:~10.7.0":
+"highlight.js@npm:^10.4.1, highlight.js@npm:~10.7.0":
   version: 10.7.3
   resolution: "highlight.js@npm:10.7.3"
   checksum: 10/db8d10a541936b058e221dbde77869664b2b45bca75d660aa98065be2cd29f3924755fbc7348213f17fd931aefb6e6597448ba6fe82afba6d8313747a91983ee
@@ -22145,15 +22134,6 @@ __metadata:
     react: ^16.6.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.6.0 || ^17.0.0 || ^18.0.0
   checksum: 10/8f18cb27e8f5821811d715906b5fe279d4ce7e1e0ef1a565d90d64db386d2e4676fe7f4182d27393eccf7b03ace7d65fb4c406f945d43de3b57acaaa54711831
-  languageName: node
-  linkType: hard
-
-"react-highlight@npm:^0.15.0":
-  version: 0.15.0
-  resolution: "react-highlight@npm:0.15.0"
-  dependencies:
-    highlight.js: "npm:^10.5.0"
-  checksum: 10/1f232930afb2ce37b5d01f13ba7d2c7f827cff5a10cb2d697661f6e11f4e9a86a25ed8930a62349cc154b86bde19828776f99e6d6854c57595f8fae47dd30803
   languageName: node
   linkType: hard
 

@@ -10857,7 +10857,7 @@ __metadata:
     typed-emitter: "npm:^2.1.0"
     typescript: "npm:^5.4.2"
     usehooks-ts: "npm:^2.6.0"
-    vite: "npm:^5.1.6"
+    vite: "npm:^5.2.6"
     vite-tsconfig-paths: "npm:^4.3.2"
     vitest: "npm:^0.18.0"
     web-vitals: "npm:^3.0.0"
@@ -12236,7 +12236,7 @@ __metadata:
     react: "npm:*"
     react-dom: "npm:*"
     typescript: "npm:^5.4.2"
-    vite: "npm:^5.1.6"
+    vite: "npm:^5.2.6"
   languageName: unknown
   linkType: soft
 
@@ -21264,7 +21264,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.4.18, postcss@npm:^8.4.36, postcss@npm:~8.4.32":
+"postcss@npm:^8.4.18, postcss@npm:^8.4.38, postcss@npm:~8.4.32":
   version: 8.4.38
   resolution: "postcss@npm:8.4.38"
   dependencies:
@@ -26492,13 +26492,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^5.1.6":
-  version: 5.2.3
-  resolution: "vite@npm:5.2.3"
+"vite@npm:^5.2.6":
+  version: 5.2.9
+  resolution: "vite@npm:5.2.9"
   dependencies:
     esbuild: "npm:^0.20.1"
     fsevents: "npm:~2.3.3"
-    postcss: "npm:^8.4.36"
+    postcss: "npm:^8.4.38"
     rollup: "npm:^4.13.0"
   peerDependencies:
     "@types/node": ^18.0.0 || >=20.0.0
@@ -26528,7 +26528,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: 10/5033a989462bc3127cb937ae5138024af68ec1b67accad07e07e116254b84fc6888a18d7a0358e3d3ce19fe160d72b6622259edc93e7fba47b84d042dcbe1e4e
+  checksum: 10/26342c8dde540e4161fdad2c9c8f2f0e23567f051c7a40abb8e4796d6c4292fbd118ab7a4ac252515e78c4f99525b557731e6117287b2bccde0ea61d73bcff27
   languageName: node
   linkType: hard
 

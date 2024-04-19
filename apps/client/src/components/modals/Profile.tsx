@@ -6,17 +6,17 @@ import {
   Heading,
   ModalContent,
 } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { User } from 'mikotojs';
 import { useSetRecoilState } from 'recoil';
-import styled from '@emotion/styled';
 
-import { useMikoto } from '../../hooks';
-import { treebarSpaceState } from '../../store';
-import { modalState } from '../ContextMenu';
-import { Avatar } from '../atoms/Avatar';
-import { Tag } from '../atoms/BotTag';
+import { modalState } from '@/components/ContextMenu';
+import { Avatar } from '@/components/atoms/Avatar';
+import { Tag } from '@/components/atoms/BotTag';
+import { useMikoto } from '@/hooks';
+import { treebarSpaceState } from '@/store';
 
 const ProfileContainer = styled.div`
   width: 640px;

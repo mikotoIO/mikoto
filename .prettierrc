@@ -5,6 +5,7 @@
   "importOrder": [
     "^(reflect-metadata)|(react-native-get-random-values)|(dotenv/config)$",
     "<THIRD_PARTY_MODULES>",
+    "^@/",
     "^[./]"
   ],
   "importOrderSeparation": true,

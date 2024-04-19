@@ -1,15 +1,16 @@
-import { Box, Checkbox, Flex, chakra } from '@chakra-ui/react';
+import { Box, Checkbox, Flex } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import { permissions } from '@mikoto-io/permcheck';
 import { ClientMember, Role, User, checkMemberPermission } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
-import styled from '@emotion/styled';
 
-import { useMikoto } from '../../hooks';
+import { UserContextMenu } from '@/components/modals/ContextMenus';
+import { ProfileModal } from '@/components/modals/Profile';
+import { useMikoto } from '@/hooks';
+
 import { contextMenuState, modalState, useContextMenu } from '../ContextMenu';
-import { UserContextMenu } from '../modals/ContextMenus';
-import { ProfileModal } from '../modals/Profile';
 import { Avatar } from './Avatar';
 import { BaseRoleBadge, RoleBadge } from './RoleBadge';
 

@@ -2,7 +2,8 @@ import styled from '@emotion/styled';
 import SimpleMarkdown from '@khanacademy/simple-markdown';
 import { Suspense, lazy } from 'react';
 
-import { createRule } from '../../rules';
+import { createRule } from '@/components/molecules/markdown/rules';
+
 import { highlightTheme } from './highlightTheme';
 
 const CodeHighlight = lazy(() => import('./CodeHighlight'));

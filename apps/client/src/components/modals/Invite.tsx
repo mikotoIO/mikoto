@@ -1,10 +1,10 @@
 import { Button, ModalContent } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import { Invite, Space } from 'mikotojs';
 import { useState } from 'react';
-import styled from '@emotion/styled';
 
-import { env } from '../../env';
-import { useMikoto } from '../../hooks';
+import { env } from '@/env';
+import { useMikoto } from '@/hooks';
 
 const InviteLink = styled.button`
   width: 100%;

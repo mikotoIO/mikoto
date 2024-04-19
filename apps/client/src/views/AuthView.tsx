@@ -9,16 +9,16 @@ import {
   Input,
   chakra,
 } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import styled from '@emotion/styled';
 
-import { faMikoto } from '../components/icons/faMikoto';
-import { useErrorElement } from '../hooks/useErrorElement';
-import { authClient } from '../store/authClient';
+import { faMikoto } from '@/components/icons/faMikoto';
+import { useErrorElement } from '@/hooks/useErrorElement';
+import { authClient } from '@/store/authClient';
 
 function Logo() {
   return (

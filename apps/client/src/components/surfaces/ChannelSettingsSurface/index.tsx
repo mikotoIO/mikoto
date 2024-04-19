@@ -12,11 +12,11 @@ import { ClientChannel } from 'mikotojs';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-import { useMikoto } from '../../../hooks';
-import { SettingsView } from '../../../views/SettingsViewTemplate';
-import { Form } from '../../atoms';
-import { Triselector } from '../../atoms/Triselect';
-import { BaseSettingsSurface } from '../BaseSettingSurface';
+import { Form } from '@/components/atoms';
+import { Triselector } from '@/components/atoms/Triselect';
+import { BaseSettingsSurface } from '@/components/surfaces/BaseSettingSurface';
+import { useMikoto } from '@/hooks';
+import { SettingsView } from '@/views/SettingsViewTemplate';
 
 const ACCOUNT_SETTING_CATEGORIES = [
   { code: 'general', tkey: 'channelSettings.general.title' },

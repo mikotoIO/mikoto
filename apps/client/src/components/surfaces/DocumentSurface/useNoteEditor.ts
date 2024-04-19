@@ -13,7 +13,8 @@ import { useEffect, useState } from 'react';
 import { Markdown } from 'tiptap-markdown';
 import * as Y from 'yjs';
 
-import { env } from '../../../env';
+import { env } from '@/env';
+
 import { SlashCommand } from './SlashCommand';
 
 const basicExtensions = [

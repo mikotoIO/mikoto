@@ -14,15 +14,16 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
-import { uploadFile } from '../../../functions/fileUpload';
-import { useAuthClient, useMikoto } from '../../../hooks';
-import { useErrorElement } from '../../../hooks/useErrorElement';
-import { SettingsView } from '../../../views/SettingsViewTemplate';
-import { modalState } from '../../ContextMenu';
-import { userState } from '../../UserArea';
-import { Form } from '../../atoms';
-import { AvatarEditor } from '../../molecules/AvatarEditor';
-import { BaseSettingsSurface } from '../BaseSettingSurface';
+import { modalState } from '@/components/ContextMenu';
+import { userState } from '@/components/UserArea';
+import { Form } from '@/components/atoms';
+import { AvatarEditor } from '@/components/molecules/AvatarEditor';
+import { BaseSettingsSurface } from '@/components/surfaces/BaseSettingSurface';
+import { uploadFile } from '@/functions/fileUpload';
+import { useAuthClient, useMikoto } from '@/hooks';
+import { useErrorElement } from '@/hooks/useErrorElement';
+import { SettingsView } from '@/views/SettingsViewTemplate';
+
 import { BotsSurface } from './bots';
 import { LanguageSurface } from './language';
 import { NotificationSurface } from './notification';

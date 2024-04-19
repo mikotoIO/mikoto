@@ -1,4 +1,5 @@
 import { Divider } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Tippy from '@tippyjs/react';
@@ -7,10 +8,10 @@ import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import styled from '@emotion/styled';
 
-import { treebarSpaceState, workspaceState } from '../store';
-import { useTabkit } from '../store/surface';
+import { treebarSpaceState, workspaceState } from '@/store';
+import { useTabkit } from '@/store/surface';
+
 import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
 import { normalizeMediaUrl } from './atoms/Avatar';
 import { Pill } from './atoms/Pill';

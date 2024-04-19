@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
 import { normalizeMediaUrl } from '../components/atoms/Avatar';
 import { StyledSpaceIcon } from '../components/atoms/SpaceIcon';
 import { Spinner } from '../components/atoms/Spinner';
-import { useMikoto } from '../hooks';
+import { useMikoto } from '@/hooks';
 
 const InvitationBox = styled.div`
   display: flex;

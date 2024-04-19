@@ -18,7 +18,8 @@ import { useDrag, useDrop } from 'react-dnd';
 import { Helmet } from 'react-helmet-async';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
-import { useMikoto } from '../hooks';
+import { useMikoto } from '@/hooks';
+
 import { workspaceState } from '../store';
 import {
   SurfaceLeaf,

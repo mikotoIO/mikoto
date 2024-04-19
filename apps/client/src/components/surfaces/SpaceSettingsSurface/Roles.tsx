@@ -12,6 +12,7 @@ import {
   Input,
   Switch,
 } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { checkPermission, permissions } from '@mikoto-io/permcheck';
@@ -20,11 +21,11 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
-import styled from '@emotion/styled';
 
-import { useMikoto } from '../../../hooks';
-import { SettingsView } from '../../../views/SettingsViewTemplate';
-import { useContextMenu } from '../../ContextMenu';
+import { useContextMenu } from '@/components/ContextMenu';
+import { useMikoto } from '@/hooks';
+import { SettingsView } from '@/views/SettingsViewTemplate';
+
 import { Form } from '../../atoms';
 
 const SidebarButton = styled.a<{ selected?: boolean }>`

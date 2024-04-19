@@ -8,6 +8,8 @@ import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
+import { useMikoto } from '@/hooks';
+
 import { CommandMenuKit } from '../components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
 import { SpaceSidebar } from '../components/SpaceSidebar';
@@ -20,7 +22,6 @@ import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
 import { surfaceMap } from '../components/surfaces';
 import { ErrorSurface } from '../components/surfaces/ErrorSurface';
 import { LoadingSurface } from '../components/surfaces/LoadingSurface';
-import { useMikoto } from '../hooks';
 import { treebarSpaceState, workspaceState } from '../store';
 import {
   SurfaceNode,

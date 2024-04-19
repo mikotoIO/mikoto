@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-import { maybeElectron } from '../../functions/maybeElectron';
+import { maybeElectron } from '@/functions/maybeElectron';
 
 const Button = styled.button``;
 

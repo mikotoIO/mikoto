@@ -8,6 +8,7 @@ import {
   Input,
   ModalContent,
 } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import {
   faFileAlt,
   faHashtag,
@@ -25,10 +26,10 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
-import styled from '@emotion/styled';
 
-import { useErrorElement } from '../../../hooks/useErrorElement';
-import { useTabkit } from '../../../store/surface';
+import { useErrorElement } from '@/hooks/useErrorElement';
+import { useTabkit } from '@/store/surface';
+
 import { ContextMenu, modalState } from '../../ContextMenu';
 import { Form } from '../../atoms';
 import { channelToTab } from './channelToTab';

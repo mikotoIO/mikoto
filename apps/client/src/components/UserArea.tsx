@@ -3,9 +3,10 @@ import { User } from 'mikotojs';
 import { useEffect } from 'react';
 import { atom, useRecoilState } from 'recoil';
 
-import { useMikoto } from '../hooks';
-import { useModalKit } from '../store';
-import { useTabkit } from '../store/surface';
+import { useMikoto } from '@/hooks';
+import { useModalKit } from '@/store';
+import { useTabkit } from '@/store/surface';
+
 import { ContextMenu, useContextMenu } from './ContextMenu';
 import { Avatar } from './atoms/Avatar';
 import { SetStatusModal } from './modals/Status';

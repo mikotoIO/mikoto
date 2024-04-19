@@ -1,7 +1,7 @@
-import React from 'react';
 import styled from '@emotion/styled';
+import React from 'react';
 
-import { env } from '../../env';
+import { env } from '@/env';
 
 function isUrl(string: string) {
   try {

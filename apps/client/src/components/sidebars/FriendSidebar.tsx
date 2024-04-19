@@ -9,9 +9,10 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 
-import { useMikoto } from '../../hooks';
-import { treebarSpaceState } from '../../store';
-import { useTabkit } from '../../store/surface';
+import { useMikoto } from '@/hooks';
+import { treebarSpaceState } from '@/store';
+import { useTabkit } from '@/store/surface';
+
 import { Avatar } from '../atoms/Avatar';
 import { hoverableButtonLike } from '../design';
 

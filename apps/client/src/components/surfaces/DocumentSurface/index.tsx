@@ -1,4 +1,5 @@
 import { Box, Flex, Heading, Spinner } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import {
   faEllipsis,
   faFileLines,
@@ -9,11 +10,11 @@ import { Editor, EditorContent } from '@tiptap/react';
 import { ClientChannel } from 'mikotojs';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import styled from '@emotion/styled';
 
-import { useInterval, useMikoto } from '../../../hooks';
+import { TabName } from '@/components/TabBar';
+import { useInterval, useMikoto } from '@/hooks';
+
 import { ContextMenu, useContextMenuX } from '../../ContextMenu';
-import { TabName } from '../../TabBar';
 import { ViewContainer } from '../../ViewContainer';
 import { Spinner as MikotoSpinner } from '../../atoms/Spinner';
 import { NoteBubbleMenu } from './BubbleMenu';

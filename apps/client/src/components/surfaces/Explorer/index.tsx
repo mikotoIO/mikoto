@@ -1,12 +1,13 @@
 import { Box, Flex, Heading } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import { ClientChannel, ClientRelation, ClientSpace } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
-import styled from '@emotion/styled';
 
-import { useFetchMember, useMikoto } from '../../../hooks';
-import { useTabkit } from '../../../store/surface';
+import { useFetchMember, useMikoto } from '@/hooks';
+import { useTabkit } from '@/store/surface';
+
 import { ContextMenu, modalState, useContextMenuX } from '../../ContextMenu';
 import { Avatar } from '../../atoms/Avatar';
 import { ChannelContextMenu, CreateChannelModal } from './ChannelContextMenu';

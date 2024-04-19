@@ -1,7 +1,7 @@
 import { faFile, faMicrophone } from '@fortawesome/free-solid-svg-icons';
 import { Channel } from 'mikotojs';
 
-import { Tabable } from '../../../store/surface';
+import { Tabable } from '@/store/surface';
 
 export function channelToTab(channel: Channel): Tabable {
   switch (channel.type) {

@@ -2,7 +2,8 @@ import { Box, Button } from '@chakra-ui/react';
 import { Invite, Space } from 'mikotojs';
 import { useEffect, useState } from 'react';
 
-import { useMikoto } from '../../../hooks';
+import { useMikoto } from '@/hooks';
+
 import { SettingsView } from '../../../views/SettingsViewTemplate';
 
 export function Invites({ space }: { space: Space }) {

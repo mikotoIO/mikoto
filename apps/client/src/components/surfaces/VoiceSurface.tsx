@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import { faMicrophone } from '@fortawesome/free-solid-svg-icons';
 import {
   ControlBar,
@@ -11,9 +12,9 @@ import '@livekit/components-styles';
 import { RoomEvent, Track } from 'livekit-client';
 import { VoiceToken } from 'mikotojs';
 import { useEffect, useState } from 'react';
-import styled from '@emotion/styled';
 
-import { useMikoto } from '../../hooks';
+import { useMikoto } from '@/hooks';
+
 import { TabName } from '../TabBar';
 import { ViewContainer } from '../ViewContainer';
 

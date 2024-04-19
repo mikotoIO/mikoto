@@ -1,9 +1,11 @@
 /// <reference types="vitest" />
 import react from '@vitejs/plugin-react';
 import * as dotenv from 'dotenv';
+import path from 'node:path';
 import { URL, fileURLToPath } from 'node:url';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 dotenv.config();
 
@@ -21,7 +23,8 @@ export default ({ mode }: { mode: string }) =>
     },
     resolve: {
       alias: {
-        '@/*': fileURLToPath(new URL('./src', import.meta.url)),
+        '@': path.resolve(__dirname, 'src'),
+        // '@/*': fileURLToPath(new URL('./src', import.meta.url)),
 
         '@mikoto-io/permcheck': fileURLToPath(
           new URL('../../packages/permcheck/src/index.ts', import.meta.url),
@@ -45,6 +48,7 @@ export default ({ mode }: { mode: string }) =>
           plugins: ['@emotion/babel-plugin'],
         },
       }),
+      // tsconfigPaths(),
       visualizer() as any,
     ],
     define: {

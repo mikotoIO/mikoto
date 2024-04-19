@@ -6,15 +6,15 @@ import {
   ModalContent,
 } from '@chakra-ui/react';
 import { Heading } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import { AxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
-import styled from '@emotion/styled';
 
-import { useMikoto } from '../../hooks';
-import { useErrorElement } from '../../hooks/useErrorElement';
-import { modalState } from '../ContextMenu';
-import { Form } from '../atoms';
+import { modalState } from '@/components/ContextMenu';
+import { Form } from '@/components/atoms';
+import { useMikoto } from '@/hooks';
+import { useErrorElement } from '@/hooks/useErrorElement';
 
 const SpaceJoinModalWrapper = styled.div`
   min-width: 400px;

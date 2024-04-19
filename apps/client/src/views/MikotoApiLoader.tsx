@@ -3,11 +3,12 @@ import { MikotoClient, constructMikoto } from 'mikotojs';
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
+import { notifyFromMessage } from '@/functions/notify';
+import { refreshAuth } from '@/functions/refreshAuth';
+import { AuthContext, MikotoContext, useInterval } from '@/hooks';
+import { authClient } from '@/store/authClient';
+
 import { env } from '../env';
-import { notifyFromMessage } from '../functions/notify';
-import { refreshAuth } from '../functions/refreshAuth';
-import { AuthContext, MikotoContext, useInterval } from '../hooks';
-import { authClient } from '../store/authClient';
 
 function registerNotifications(mikoto: MikotoClient) {
   mikoto.client.messages.onCreate((msg) => {

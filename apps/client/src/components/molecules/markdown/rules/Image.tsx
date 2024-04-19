@@ -1,9 +1,10 @@
 import { Box, Link, ModalContent } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import SimpleMarkdown from '@khanacademy/simple-markdown';
 import { useSetRecoilState } from 'recoil';
-import styled from '@emotion/styled';
 
-import { modalState } from '../../../ContextMenu';
+import { modalState } from '@/components/ContextMenu';
+
 import { createRule } from '../rules';
 
 interface MessageImageProps {

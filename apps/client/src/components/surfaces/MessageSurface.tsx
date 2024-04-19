@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import { faHashtag } from '@fortawesome/free-solid-svg-icons';
 import throttle from 'lodash/throttle';
 import { Channel, ClientChannel, ClientMessage, Message } from 'mikotojs';
@@ -5,10 +6,10 @@ import { runInAction } from 'mobx';
 import { Observer, observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
-import styled from '@emotion/styled';
 
-import { useFetchMember, useInterval, useMikoto } from '../../hooks';
-import { CurrentSpaceContext } from '../../store';
+import { useFetchMember, useInterval, useMikoto } from '@/hooks';
+import { CurrentSpaceContext } from '@/store';
+
 import { TabName } from '../TabBar';
 import { ViewContainer } from '../ViewContainer';
 import { Spinner } from '../atoms/Spinner';

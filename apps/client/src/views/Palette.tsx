@@ -1,5 +1,5 @@
-import { TabName } from '../components/TabBar';
-import { ViewContainer } from '../components/ViewContainer';
+import { TabName } from '@/components/TabBar';
+import { ViewContainer } from '@/components/ViewContainer';
 
 export function DesignStory() {
   return (

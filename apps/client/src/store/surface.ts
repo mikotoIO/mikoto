@@ -3,7 +3,7 @@ import { action, autorun, makeAutoObservable, runInAction } from 'mobx';
 import { createContext } from 'react';
 import { atomFamily } from 'recoil';
 
-import type { TabBaseType } from '../components/surfaces';
+import type { TabBaseType } from '@/components/surfaces';
 
 export type Tabable = TabBaseType & {
   key: string;

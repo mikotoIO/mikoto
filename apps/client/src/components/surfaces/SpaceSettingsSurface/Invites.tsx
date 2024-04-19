@@ -3,8 +3,7 @@ import { Invite, Space } from 'mikotojs';
 import { useEffect, useState } from 'react';
 
 import { useMikoto } from '@/hooks';
-
-import { SettingsView } from '../../../views/SettingsViewTemplate';
+import { SettingsView } from '@/views/SettingsViewTemplate';
 
 export function Invites({ space }: { space: Space }) {
   const mikoto = useMikoto();

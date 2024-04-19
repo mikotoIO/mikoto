@@ -27,11 +27,11 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
 
+import { ContextMenu, modalState } from '@/components/ContextMenu';
+import { Form } from '@/components/atoms';
 import { useErrorElement } from '@/hooks/useErrorElement';
 import { useTabkit } from '@/store/surface';
 
-import { ContextMenu, modalState } from '../../ContextMenu';
-import { Form } from '../../atoms';
 import { channelToTab } from './channelToTab';
 
 const channelTypes = [

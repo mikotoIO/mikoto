@@ -2,7 +2,7 @@ import { Box } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { SettingsView } from '../../../views/SettingsViewTemplate';
+import { SettingsView } from '@/views/SettingsViewTemplate';
 
 const languages = [
   { name: 'English', code: 'en' },

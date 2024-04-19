@@ -11,12 +11,12 @@ import { ClientChannel } from 'mikotojs';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
+import { ContextMenu, useContextMenuX } from '@/components/ContextMenu';
 import { TabName } from '@/components/TabBar';
+import { ViewContainer } from '@/components/ViewContainer';
+import { Spinner as MikotoSpinner } from '@/components/atoms/Spinner';
 import { useInterval, useMikoto } from '@/hooks';
 
-import { ContextMenu, useContextMenuX } from '../../ContextMenu';
-import { ViewContainer } from '../../ViewContainer';
-import { Spinner as MikotoSpinner } from '../../atoms/Spinner';
 import { NoteBubbleMenu } from './BubbleMenu';
 import { useNoteEditor, useNoteReader } from './useNoteEditor';
 

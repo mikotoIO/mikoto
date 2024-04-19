@@ -1,7 +1,7 @@
 // this isn't fully integrated into Mikoto.JS SDK yet, do that later
 import axios from 'axios';
 
-import { env } from '../env';
+import { env } from '@/env';
 
 const mediaServerAxios = axios.create({
   baseURL: env.PUBLIC_MEDIASERVER_URL,

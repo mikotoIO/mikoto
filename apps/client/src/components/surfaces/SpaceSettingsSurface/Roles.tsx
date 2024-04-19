@@ -25,7 +25,7 @@ import { useForm } from 'react-hook-form';
 import { useContextMenu } from '@/components/ContextMenu';
 import { Form } from '@/components/atoms';
 import { useMikoto } from '@/hooks';
-import { SettingsView } from '@/views/SettingsViewTemplate';
+import { SettingsView } from '@/views';
 
 const SidebarButton = styled.a<{ selected?: boolean }>`
   display: block;

@@ -6,11 +6,15 @@ import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 
+import {
+  contextMenuState,
+  modalState,
+  useContextMenu,
+} from '@/components/ContextMenu';
 import { UserContextMenu } from '@/components/modals/ContextMenus';
 import { ProfileModal } from '@/components/modals/Profile';
 import { useMikoto } from '@/hooks';
 
-import { contextMenuState, modalState, useContextMenu } from '../ContextMenu';
 import { Avatar } from './Avatar';
 import { BaseRoleBadge, RoleBadge } from './RoleBadge';
 

@@ -16,7 +16,7 @@ import { Form } from '@/components/atoms';
 import { Triselector } from '@/components/atoms/Triselect';
 import { BaseSettingsSurface } from '@/components/surfaces/BaseSettingSurface';
 import { useMikoto } from '@/hooks';
-import { SettingsView } from '@/views/SettingsViewTemplate';
+import { SettingsView } from '@/views';
 
 const ACCOUNT_SETTING_CATEGORIES = [
   { code: 'general', tkey: 'channelSettings.general.title' },

@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { Form } from '@/components/atoms';
 import { DEFAULT_THEME_SETTINGS, themeDB } from '@/store';
 import { useLocalDB } from '@/store/LocalDB';
-import { SettingsView } from '@/views/SettingsViewTemplate';
+import { SettingsView } from '@/views';
 
 export function ThemesSubsurface() {
   const { t } = useTranslation();

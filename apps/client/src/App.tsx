@@ -1,16 +1,16 @@
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import styled from '@emotion/styled';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import {
   LoginView,
   RegisterView,
   ResetChangePasswordView,
   ResetPasswordView,
-} from './views/AuthView';
-import MainView from './views/MainView';
-import { MikotoApiLoader } from './views/MikotoApiLoader';
-import { NotFound } from './views/NotFoundPage';
-import { SpaceInviteView } from './views/SpaceInviteView';
+} from '@/views/AuthView';
+import MainView from '@/views/MainView';
+import { MikotoApiLoader } from '@/views/MikotoApiLoader';
+import { NotFound } from '@/views/NotFoundPage';
+import { SpaceInviteView } from '@/views/SpaceInviteView';
 
 const AppShell = styled.div`
   height: 100vh;

@@ -2,10 +2,10 @@ import styled from '@emotion/styled';
 import SimpleMarkdown from '@khanacademy/simple-markdown';
 import { Suspense, lazy } from 'react';
 
-import { highlightTheme } from '../highlightTheme';
-import { createRule } from '../rules';
+import { createRule } from '../../rules';
+import { highlightTheme } from './highlightTheme';
 
-const CodeHighlight = lazy(() => import('../CodeHighlight'));
+const CodeHighlight = lazy(() => import('./CodeHighlight'));
 
 const CodeBlock = styled.div`
   pre {

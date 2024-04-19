@@ -22,7 +22,7 @@ import { BaseSettingsSurface } from '@/components/surfaces/BaseSettingSurface';
 import { uploadFile } from '@/functions/fileUpload';
 import { useAuthClient, useMikoto } from '@/hooks';
 import { useErrorElement } from '@/hooks/useErrorElement';
-import { SettingsView } from '@/views/SettingsViewTemplate';
+import { SettingsView } from '@/views';
 
 import { BotsSurface } from './bots';
 import { LanguageSurface } from './language';

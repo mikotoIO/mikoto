@@ -2,9 +2,8 @@ import { faCog } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { SettingsView } from '@/views/SettingsViewTemplate';
-
-import { TabName } from '../TabBar';
+import { TabName } from '@/components/TabBar';
+import { SettingsView } from '@/views';
 
 interface BaseSettingsSurfaceProps {
   categories: { code: string; tkey: string }[];

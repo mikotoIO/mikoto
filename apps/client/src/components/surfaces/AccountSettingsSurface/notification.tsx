@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { SettingsView } from '@/views/SettingsViewTemplate';
+import { SettingsView } from '@/views';
 
 export function NotificationSurface() {
   const { t } = useTranslation();

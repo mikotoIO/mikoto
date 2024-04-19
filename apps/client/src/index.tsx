@@ -11,9 +11,10 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { RecoilEnv, RecoilRoot } from 'recoil';
 
-import App from './App';
-import { chakraTheme, globalCss } from './components/chakraTheme';
-import { env } from './env';
+import App from '@/App';
+import { chakraTheme, globalCss } from '@/components/chakraTheme';
+import { env } from '@/env';
+
 // eslint-disable-next-line import/no-relative-packages
 import './fonts.css';
 import './i18n';

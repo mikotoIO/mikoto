@@ -21,7 +21,7 @@ import { Form } from '@/components/atoms';
 import { Avatar } from '@/components/atoms/Avatar';
 import { useAuthClient } from '@/hooks';
 import { useTabkit } from '@/store/surface';
-import { SettingsView } from '@/views/SettingsViewTemplate';
+import { SettingsView } from '@/views';
 
 const BotCardContainer = styled.div`
   background-color: var(--chakra-colors-gray-800);

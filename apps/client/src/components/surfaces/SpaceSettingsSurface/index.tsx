@@ -19,7 +19,7 @@ import { AvatarEditor } from '@/components/molecules/AvatarEditor';
 import { BaseSettingsSurface } from '@/components/surfaces/BaseSettingSurface';
 import { uploadFile } from '@/functions/fileUpload';
 import { useMikoto } from '@/hooks';
-import { SettingsView } from '@/views/SettingsViewTemplate';
+import { SettingsView } from '@/views';
 
 import { BansSubsurface } from './Bans';
 import { EmojiSubsurface } from './Emojis';

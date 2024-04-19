@@ -1,7 +1,8 @@
 import { lazy } from 'react';
 import type { ComponentProps } from 'react';
 
-import { DesignStory } from '../../views/Palette';
+import { DesignStory } from '@/views/Palette';
+
 import { AccountSettingsSurface } from './AccountSettingsSurface';
 import { BotSettingSurface } from './BotSettingSurface';
 import { ChannelSettingsSurface } from './ChannelSettingsSurface';

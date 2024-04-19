@@ -8,27 +8,27 @@ import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
+import { CommandMenuKit } from '@/components/CommandMenu';
+import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
+import { SpaceSidebar } from '@/components/SpaceSidebar';
+import { TabBarButton, TabbedView } from '@/components/TabBar';
+import { UserAreaAvatar } from '@/components/UserArea';
+import { faMikoto } from '@/components/icons/faMikoto';
+import { Sidebar } from '@/components/sidebars/Base';
+import { FriendSidebar } from '@/components/sidebars/FriendSidebar';
+import { MemberListSidebar } from '@/components/sidebars/MemberListSidebar';
+import { surfaceMap } from '@/components/surfaces';
+import { ErrorSurface } from '@/components/surfaces/ErrorSurface';
+import { LoadingSurface } from '@/components/surfaces/LoadingSurface';
 import { useMikoto } from '@/hooks';
-
-import { CommandMenuKit } from '../components/CommandMenu';
-import { ContextMenuKit, ModalKit } from '../components/ContextMenu';
-import { SpaceSidebar } from '../components/SpaceSidebar';
-import { TabBarButton, TabbedView } from '../components/TabBar';
-import { UserAreaAvatar } from '../components/UserArea';
-import { faMikoto } from '../components/icons/faMikoto';
-import { Sidebar } from '../components/sidebars/Base';
-import { FriendSidebar } from '../components/sidebars/FriendSidebar';
-import { MemberListSidebar } from '../components/sidebars/MemberListSidebar';
-import { surfaceMap } from '../components/surfaces';
-import { ErrorSurface } from '../components/surfaces/ErrorSurface';
-import { LoadingSurface } from '../components/surfaces/LoadingSurface';
-import { treebarSpaceState, workspaceState } from '../store';
+import { treebarSpaceState, workspaceState } from '@/store';
 import {
   SurfaceNode,
   TabContext,
   Tabable,
   surfaceStore,
-} from '../store/surface';
+} from '@/store/surface';
+
 import { MikotoApiLoader } from './MikotoApiLoader';
 import { WindowBar } from './WindowBar';
 

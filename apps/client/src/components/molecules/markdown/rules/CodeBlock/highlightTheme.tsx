@@ -1,6 +1,6 @@
 // modified version of the One Dark Theme
 // TOKENS
-import { chakraTheme } from '../../../../chakraTheme';
+import { chakraTheme } from '@/components/chakraTheme';
 
 const BACKGROUND = chakraTheme.colors.gray[800];
 const FOREGROUND = chakraTheme.colors.gray[300];

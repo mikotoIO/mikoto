@@ -1,6 +1,6 @@
 import { Message, MikotoClient } from 'mikotojs';
 
-import { normalizeMediaUrl } from '../components/atoms/Avatar';
+import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 
 const audio = new Audio('audio/notification/ping.ogg');
 audio.volume = 0.3;

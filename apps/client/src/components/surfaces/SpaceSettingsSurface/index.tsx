@@ -13,14 +13,14 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSetRecoilState } from 'recoil';
 
+import { modalState } from '@/components/ContextMenu';
+import { Form } from '@/components/atoms';
+import { AvatarEditor } from '@/components/molecules/AvatarEditor';
 import { BaseSettingsSurface } from '@/components/surfaces/BaseSettingSurface';
 import { uploadFile } from '@/functions/fileUpload';
 import { useMikoto } from '@/hooks';
 import { SettingsView } from '@/views/SettingsViewTemplate';
 
-import { modalState } from '../../ContextMenu';
-import { Form } from '../../atoms';
-import { AvatarEditor } from '../../molecules/AvatarEditor';
 import { BansSubsurface } from './Bans';
 import { EmojiSubsurface } from './Emojis';
 import { Invites } from './Invites';

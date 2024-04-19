@@ -1,12 +1,12 @@
 import { Button, Flex, Grid } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import { Space } from 'mikotojs';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import styled from '@emotion/styled';
 
-import { normalizeMediaUrl } from '../components/atoms/Avatar';
-import { StyledSpaceIcon } from '../components/atoms/SpaceIcon';
-import { Spinner } from '../components/atoms/Spinner';
+import { normalizeMediaUrl } from '@/components/atoms/Avatar';
+import { StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
+import { Spinner } from '@/components/atoms/Spinner';
 import { useMikoto } from '@/hooks';
 
 const InvitationBox = styled.div`

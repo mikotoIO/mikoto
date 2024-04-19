@@ -1,6 +1,6 @@
 import { Box, Button } from '@chakra-ui/react';
 
-import { SettingsView } from '../../../views/SettingsViewTemplate';
+import { SettingsView } from '@/views/SettingsViewTemplate';
 
 export function EmojiSubsurface() {
   return (

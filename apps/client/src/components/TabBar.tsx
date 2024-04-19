@@ -19,8 +19,7 @@ import { Helmet } from 'react-helmet-async';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { useMikoto } from '@/hooks';
-
-import { workspaceState } from '../store';
+import { workspaceState } from '@/store';
 import {
   SurfaceLeaf,
   TabContext,
@@ -30,7 +29,8 @@ import {
   splitNode,
   surfaceStore,
   tabNameFamily,
-} from '../store/surface';
+} from '@/store/surface';
+
 import { ContextMenu, useContextMenu } from './ContextMenu';
 import { Avatar } from './atoms/Avatar';
 import { IconBox } from './atoms/IconBox';

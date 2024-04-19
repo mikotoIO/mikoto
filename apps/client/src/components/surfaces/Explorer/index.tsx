@@ -5,11 +5,15 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 
+import {
+  ContextMenu,
+  modalState,
+  useContextMenuX,
+} from '@/components//ContextMenu';
+import { Avatar } from '@/components/atoms/Avatar';
 import { useFetchMember, useMikoto } from '@/hooks';
 import { useTabkit } from '@/store/surface';
 
-import { ContextMenu, modalState, useContextMenuX } from '../../ContextMenu';
-import { Avatar } from '../../atoms/Avatar';
 import { ChannelContextMenu, CreateChannelModal } from './ChannelContextMenu';
 import { ChannelTree } from './ChannelTree';
 import { channelToTab, getIconFromChannelType } from './channelToTab';

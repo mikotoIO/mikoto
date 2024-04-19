@@ -4,7 +4,7 @@ import { atom, useSetRecoilState } from 'recoil';
 import { recoilPersist } from 'recoil-persist';
 import { z } from 'zod';
 
-import { modalState } from '../components/ContextMenu';
+import { modalState } from '@/components/ContextMenu';
 import { LocalDB } from './LocalDB';
 import { Tabable } from './surface';
 

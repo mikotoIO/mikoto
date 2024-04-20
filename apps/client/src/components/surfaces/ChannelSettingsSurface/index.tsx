@@ -12,10 +12,9 @@ import { ClientChannel } from 'mikotojs';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-import { Form } from '@/components/atoms';
-import { Triselector } from '@/components/atoms/Triselect';
 import { BaseSettingsSurface } from '@/components/surfaces/BaseSettingSurface';
 import { useMikoto } from '@/hooks';
+import { Form, Triselector } from '@/ui';
 import { SettingsView } from '@/views';
 
 const ACCOUNT_SETTING_CATEGORIES = [

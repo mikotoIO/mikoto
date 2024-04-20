@@ -23,8 +23,8 @@ import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
 
 import { useContextMenu } from '@/components/ContextMenu';
-import { Form } from '@/components/atoms';
 import { useMikoto } from '@/hooks';
+import { Form } from '@/ui';
 import { SettingsView } from '@/views';
 
 const SidebarButton = styled.a<{ selected?: boolean }>`

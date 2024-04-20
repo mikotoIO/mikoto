@@ -17,10 +17,10 @@ import { toast } from 'react-toastify';
 import { useSetRecoilState } from 'recoil';
 
 import { modalState } from '@/components/ContextMenu';
-import { Form } from '@/components/atoms';
 import { Avatar } from '@/components/atoms/Avatar';
 import { useAuthClient } from '@/hooks';
 import { useTabkit } from '@/store/surface';
+import { Form } from '@/ui';
 import { SettingsView } from '@/views';
 
 const BotCardContainer = styled.div`

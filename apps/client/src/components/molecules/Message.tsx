@@ -8,8 +8,8 @@ import { atom } from 'recoil';
 import { ContextMenu, useContextMenu } from '@/components/ContextMenu';
 import { BotTag } from '@/components/atoms/BotTag';
 import { MessageAvatar } from '@/components/atoms/MessageAvatar';
-import { TypingDots } from '@/components/atoms/TypingDots';
 import { Markdown } from '@/components/molecules/markdown';
+import { TypingDots } from '@/ui';
 
 const dateFormat = new Intl.DateTimeFormat('en', {
   day: 'numeric',

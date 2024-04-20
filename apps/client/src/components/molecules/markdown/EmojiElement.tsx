@@ -1,6 +1,7 @@
 import Tippy from '@tippyjs/react';
 
-import { Tooltip } from '@/components/atoms/Tooltip';
+import { Tooltip } from '@/ui';
+
 import '../EmojiPicker';
 
 export default function Emoji({ emoji }: { emoji: string }) {

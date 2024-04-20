@@ -16,12 +16,12 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { modalState } from '@/components/ContextMenu';
 import { userState } from '@/components/UserArea';
-import { Form } from '@/components/atoms';
 import { AvatarEditor } from '@/components/molecules/AvatarEditor';
 import { BaseSettingsSurface } from '@/components/surfaces/BaseSettingSurface';
 import { uploadFile } from '@/functions/fileUpload';
 import { useAuthClient, useMikoto } from '@/hooks';
 import { useErrorElement } from '@/hooks/useErrorElement';
+import { Form } from '@/ui';
 import { SettingsView } from '@/views';
 
 import { BotsSurface } from './bots';

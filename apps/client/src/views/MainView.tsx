@@ -10,7 +10,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 
 import { CommandMenuKit } from '@/components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
-import { TabBarButton, TabbedView } from '@/components/TabBar';
+import { TabBarButton, TabbedView } from '@/components/TabList';
 import { UserAreaAvatar } from '@/components/UserArea';
 import { faMikoto } from '@/components/icons';
 import { Sidebar } from '@/components/sidebars/Base';

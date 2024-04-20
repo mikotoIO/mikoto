@@ -1,6 +1,6 @@
 import { Heading } from '@chakra-ui/react';
 
-import { TabName } from '@/components/TabBar';
+import { TabName } from '@/components/TabList';
 import { ViewContainer } from '@/components/ViewContainer';
 
 export function DiscoverySurface() {

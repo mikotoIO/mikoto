@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { ContextMenu, useContextMenuX } from '@/components/ContextMenu';
-import { TabName } from '@/components/TabBar';
+import { TabName } from '@/components/TabList';
 import { ViewContainer } from '@/components/ViewContainer';
 import { Spinner as MikotoSpinner } from '@/components/atoms/Spinner';
 import { useInterval, useMikoto } from '@/hooks';

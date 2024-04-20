@@ -2,7 +2,7 @@ import { faCog } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { TabName } from '@/components/TabBar';
+import { TabName } from '@/components/TabList';
 import { SettingsView } from '@/views';
 
 interface BaseSettingsSurfaceProps {

@@ -10,9 +10,9 @@ import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { Form } from '@/components/atoms';
 import { DEFAULT_THEME_SETTINGS, themeDB } from '@/store';
 import { useLocalDB } from '@/store/LocalDB';
+import { Form } from '@/ui';
 import { SettingsView } from '@/views';
 
 export function ThemesSubsurface() {

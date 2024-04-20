@@ -5,7 +5,6 @@ import {
   IconDefinition,
   faAtom,
   faBarsStaggered,
-  faBoltLightning,
   faChevronCircleRight,
   faQuestion,
   faX,

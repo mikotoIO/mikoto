@@ -13,7 +13,7 @@ import { RoomEvent, Track } from 'livekit-client';
 import { VoiceToken } from 'mikotojs';
 import { useEffect, useState } from 'react';
 
-import { TabName } from '@/components/TabBar';
+import { TabName } from '@/components/TabList';
 import { ViewContainer } from '@/components/ViewContainer';
 import { useMikoto } from '@/hooks';
 

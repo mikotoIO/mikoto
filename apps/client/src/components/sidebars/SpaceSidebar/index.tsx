@@ -16,12 +16,12 @@ import {
 } from '@/components/ContextMenu';
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import { StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
-import { Tooltip } from '@/components/atoms/Tooltip';
 import { faMikoto } from '@/components/icons';
 import { InviteModal } from '@/components/modals/Invite';
 import { SpaceJoinModal } from '@/components/modals/SpaceJoin';
 import { treebarSpaceState, workspaceState } from '@/store';
 import { useTabkit } from '@/store/surface';
+import { Tooltip } from '@/ui';
 
 import { Pill } from './Pill';
 

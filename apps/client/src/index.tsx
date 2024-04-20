@@ -14,11 +14,11 @@ import { RecoilEnv, RecoilRoot } from 'recoil';
 import App from '@/App';
 import { chakraTheme, globalCss } from '@/components/chakraTheme';
 import { env } from '@/env';
+import reportWebVitals from '@/reportWebVitals';
 
 // eslint-disable-next-line import/no-relative-packages
 import './fonts.css';
 import './i18n';
-import reportWebVitals from './reportWebVitals';
 
 /// global polyfill
 if (typeof (window as any).global === 'undefined') {

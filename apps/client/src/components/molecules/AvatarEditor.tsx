@@ -1,7 +1,7 @@
-import { useDropzone } from 'react-dropzone';
 import styled from '@emotion/styled';
+import { useDropzone } from 'react-dropzone';
 
-import { Avatar } from '../atoms/Avatar';
+import { Avatar } from '@/components/atoms/Avatar';
 
 const AvatarWrapper = styled.a`
   position: relative;

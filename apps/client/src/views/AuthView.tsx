@@ -16,7 +16,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
-import { faMikoto } from '@/components/icons/faMikoto';
+import { faMikoto } from '@/components/icons';
 import { useErrorElement } from '@/hooks/useErrorElement';
 import { authClient } from '@/store/authClient';
 

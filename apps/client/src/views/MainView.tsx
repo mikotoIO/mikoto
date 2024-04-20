@@ -13,7 +13,7 @@ import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
 import { SpaceSidebar } from '@/components/SpaceSidebar';
 import { TabBarButton, TabbedView } from '@/components/TabBar';
 import { UserAreaAvatar } from '@/components/UserArea';
-import { faMikoto } from '@/components/icons/faMikoto';
+import { faMikoto } from '@/components/icons';
 import { Sidebar } from '@/components/sidebars/Base';
 import { FriendSidebar } from '@/components/sidebars/FriendSidebar';
 import { MemberListSidebar } from '@/components/sidebars/MemberListSidebar';

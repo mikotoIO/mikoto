@@ -2,8 +2,8 @@ import { permissions } from '@mikoto-io/permcheck';
 import { ClientMember, User, checkMemberPermission } from 'mikotojs';
 import { useSetRecoilState } from 'recoil';
 
-import { ContextMenu, modalState } from '../ContextMenu';
-import { ProfileModal } from './Profile';
+import { ContextMenu, modalState } from '@/components/ContextMenu';
+import { ProfileModal } from '@/components/modals/Profile';
 
 interface UserContextMenuProps {
   user: User;

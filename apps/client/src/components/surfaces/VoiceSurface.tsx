@@ -13,10 +13,9 @@ import { RoomEvent, Track } from 'livekit-client';
 import { VoiceToken } from 'mikotojs';
 import { useEffect, useState } from 'react';
 
+import { TabName } from '@/components/TabBar';
+import { ViewContainer } from '@/components/ViewContainer';
 import { useMikoto } from '@/hooks';
-
-import { TabName } from '../TabBar';
-import { ViewContainer } from '../ViewContainer';
 
 function Stage() {
   const tracks = useTracks(

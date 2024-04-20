@@ -8,14 +8,13 @@ import { useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import { useSetRecoilState } from 'recoil';
 
+import { contextMenuState, useContextMenu } from '@/components/ContextMenu';
+import { Avatar } from '@/components/atoms/Avatar';
+import { BotTag } from '@/components/atoms/BotTag';
+import { MemberContextMenu } from '@/components/atoms/MessageAvatar';
+import { hoverableButtonLike } from '@/components/design';
+import { UserContextMenu } from '@/components/modals/ContextMenus';
 import { useFetchMember } from '@/hooks';
-
-import { contextMenuState, useContextMenu } from '../ContextMenu';
-import { Avatar } from '../atoms/Avatar';
-import { BotTag } from '../atoms/BotTag';
-import { MemberContextMenu } from '../atoms/MessageAvatar';
-import { hoverableButtonLike } from '../design';
-import { UserContextMenu } from '../modals/ContextMenus';
 
 const StyledMember = styled.div`
   display: flex;

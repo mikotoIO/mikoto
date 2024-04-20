@@ -9,17 +9,20 @@ import { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 
+import {
+  ContextMenu,
+  modalState,
+  useContextMenu,
+} from '@/components/ContextMenu';
+import { normalizeMediaUrl } from '@/components/atoms/Avatar';
+import { Pill } from '@/components/atoms/Pill';
+import { StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
+import { Tooltip } from '@/components/atoms/Tooltip';
+import { faMikoto } from '@/components/icons';
+import { InviteModal } from '@/components/modals/Invite';
+import { SpaceJoinModal } from '@/components/modals/SpaceJoin';
 import { treebarSpaceState, workspaceState } from '@/store';
 import { useTabkit } from '@/store/surface';
-
-import { ContextMenu, modalState, useContextMenu } from './ContextMenu';
-import { normalizeMediaUrl } from './atoms/Avatar';
-import { Pill } from './atoms/Pill';
-import { StyledSpaceIcon } from './atoms/SpaceIcon';
-import { Tooltip } from './atoms/Tooltip';
-import { faMikoto } from './icons/faMikoto';
-import { InviteModal } from './modals/Invite';
-import { SpaceJoinModal } from './modals/SpaceJoin';
 
 const StyledSpaceSidebar = styled.div`
   align-items: center;

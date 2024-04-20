@@ -18,6 +18,12 @@ import { useDrag, useDrop } from 'react-dnd';
 import { Helmet } from 'react-helmet-async';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
+import { ContextMenu, useContextMenu } from '@/components/ContextMenu';
+import { Avatar } from '@/components/atoms/Avatar';
+import { IconBox } from '@/components/atoms/IconBox';
+import { faMikoto } from '@/components/icons';
+import { channelToTab } from '@/components/surfaces/Explorer/channelToTab';
+import type { ExplorerNode } from '@/components/surfaces/Explorer/explorerNode';
 import { useMikoto } from '@/hooks';
 import { workspaceState } from '@/store';
 import {
@@ -30,13 +36,6 @@ import {
   surfaceStore,
   tabNameFamily,
 } from '@/store/surface';
-
-import { ContextMenu, useContextMenu } from './ContextMenu';
-import { Avatar } from './atoms/Avatar';
-import { IconBox } from './atoms/IconBox';
-import { faMikoto } from './icons/faMikoto';
-import { channelToTab } from './surfaces/Explorer/channelToTab';
-import type { ExplorerNode } from './surfaces/Explorer/explorerNode';
 
 const StyledCloseButton = styled.div<{ active?: boolean }>`
   display: flex;

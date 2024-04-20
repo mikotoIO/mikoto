@@ -1,7 +1,7 @@
 import { faRobot } from '@fortawesome/free-solid-svg-icons';
 
-import { TabName } from '../TabBar';
-import { ViewContainer } from '../ViewContainer';
+import { TabName } from '@/components/TabBar';
+import { ViewContainer } from '@/components/ViewContainer';
 
 export function BotSettingSurface({ botId }: { botId: string }) {
   return (

@@ -14,7 +14,8 @@ import { Node, Transforms, createEditor } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 
-import { contextMenuState } from '../ContextMenu';
+import { contextMenuState } from '@/components/ContextMenu';
+
 import { MessageEditState } from './Message';
 
 const EmojiPicker = lazy(() => import('./EmojiPicker'));

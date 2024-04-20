@@ -9,12 +9,11 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 
+import { Avatar } from '@/components/atoms/Avatar';
+import { hoverableButtonLike } from '@/components/design';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState } from '@/store';
 import { useTabkit } from '@/store/surface';
-
-import { Avatar } from '../atoms/Avatar';
-import { hoverableButtonLike } from '../design';
 
 const StyledButtonBase = styled.div`
   display: flex;

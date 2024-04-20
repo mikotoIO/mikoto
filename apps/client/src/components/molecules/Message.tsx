@@ -5,11 +5,11 @@ import { makeAutoObservable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { atom } from 'recoil';
 
-import { ContextMenu, useContextMenu } from '../ContextMenu';
-import { BotTag } from '../atoms/BotTag';
-import { MessageAvatar } from '../atoms/MessageAvatar';
-import { TypingDots } from '../atoms/TypingDots';
-import { Markdown } from './markdown';
+import { ContextMenu, useContextMenu } from '@/components/ContextMenu';
+import { BotTag } from '@/components/atoms/BotTag';
+import { MessageAvatar } from '@/components/atoms/MessageAvatar';
+import { TypingDots } from '@/components/atoms/TypingDots';
+import { Markdown } from '@/components/molecules/markdown';
 
 const dateFormat = new Intl.DateTimeFormat('en', {
   day: 'numeric',

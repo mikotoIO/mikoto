@@ -1,9 +1,9 @@
 import { Box, ModalContent } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import { useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
-import styled from '@emotion/styled';
 
-import { modalState } from './ContextMenu';
+import { modalState } from '@/components/ContextMenu';
 
 const CommandInput = styled.input`
   background-color: var(--chakra-colors-gray-800);

@@ -1,7 +1,7 @@
 import { Box, Flex, Heading } from '@chakra-ui/react';
 
-import { TabName } from '../TabBar';
-import { ViewContainer } from '../ViewContainer';
+import { TabName } from '@/components/TabBar';
+import { ViewContainer } from '@/components/ViewContainer';
 
 export function WelcomeSurface() {
   return (

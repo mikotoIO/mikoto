@@ -15,7 +15,6 @@ import {
   useContextMenu,
 } from '@/components/ContextMenu';
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
-import { Pill } from '@/components/atoms/Pill';
 import { StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
 import { Tooltip } from '@/components/atoms/Tooltip';
 import { faMikoto } from '@/components/icons';
@@ -23,6 +22,8 @@ import { InviteModal } from '@/components/modals/Invite';
 import { SpaceJoinModal } from '@/components/modals/SpaceJoin';
 import { treebarSpaceState, workspaceState } from '@/store';
 import { useTabkit } from '@/store/surface';
+
+import { Pill } from './Pill';
 
 const StyledSpaceSidebar = styled.div`
   align-items: center;

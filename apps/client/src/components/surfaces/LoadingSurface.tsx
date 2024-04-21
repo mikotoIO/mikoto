@@ -1,7 +1,7 @@
 import { Box, Center, Heading, Spinner } from '@chakra-ui/react';
 
-import { TabName } from '@/components/TabBar';
 import { ViewContainer } from '@/components/ViewContainer';
+import { TabName } from '@/components/tabs';
 
 export function LoadingSurface() {
   return (

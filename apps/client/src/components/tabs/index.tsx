@@ -5,7 +5,6 @@ import {
   IconDefinition,
   faAtom,
   faBarsStaggered,
-  faBoltLightning,
   faChevronCircleRight,
   faQuestion,
   faX,
@@ -20,7 +19,6 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { ContextMenu, useContextMenu } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';
-import { IconBox } from '@/components/atoms/IconBox';
 import { faMikoto } from '@/components/icons';
 import { channelToTab } from '@/components/surfaces/Explorer/channelToTab';
 import type { ExplorerNode } from '@/components/surfaces/Explorer/explorerNode';
@@ -36,6 +34,8 @@ import {
   surfaceStore,
   tabNameFamily,
 } from '@/store/surface';
+
+import { IconBox } from './IconBox';
 
 const StyledCloseButton = styled.div<{ active?: boolean }>`
   display: flex;
@@ -114,7 +114,6 @@ function useReorderable(destinationSurface: SurfaceLeaf) {
   };
 }
 
-// TODO: This is still bugged. Cause unknown. Please fix.
 export function TabName({ name, icon }: TabNameProps) {
   const tabInfo = useContext(TabContext);
   const [tabName, setTabName] = useRecoilState(tabNameFamily(tabInfo.key));

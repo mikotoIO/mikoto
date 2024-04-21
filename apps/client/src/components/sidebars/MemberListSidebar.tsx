@@ -1,4 +1,4 @@
-import { Box } from '@chakra-ui/react';
+import { Box, Tag } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faCrown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,7 +10,6 @@ import { useSetRecoilState } from 'recoil';
 
 import { contextMenuState, useContextMenu } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';
-import { BotTag } from '@/components/atoms/BotTag';
 import { MemberContextMenu } from '@/components/atoms/MessageAvatar';
 import { hoverableButtonLike } from '@/components/design';
 import { UserContextMenu } from '@/components/modals/ContextMenus';
@@ -59,7 +58,20 @@ const MemberElement = observer(({ member }: { member: ClientMember }) => {
           <FontAwesomeIcon className="crown" icon={faCrown} />
         </Box>
       )}
-      {member.user.category === 'BOT' && <BotTag />}
+
+      {member.user.category === 'BOT' && (
+        <Tag
+          size="sm"
+          fontSize="2xs"
+          px={1}
+          minH="18px"
+          variant="solid"
+          bg="primary"
+          color="white"
+        >
+          BOT
+        </Tag>
+      )}
     </StyledMember>
   );
 });

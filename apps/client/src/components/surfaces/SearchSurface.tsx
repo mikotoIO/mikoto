@@ -1,9 +1,9 @@
 import { Heading, Input } from '@chakra-ui/react';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 
-import { TabName } from '@/components/TabBar';
 import { ViewContainer } from '@/components/ViewContainer';
-import { Form } from '@/components/atoms';
+import { TabName } from '@/components/tabs';
+import { Form } from '@/ui';
 
 export function SearchSurface({ spaceId }: { spaceId: string }) {
   return (

@@ -1,7 +1,7 @@
 import { Box, Center, Heading } from '@chakra-ui/react';
 
-import { TabName } from '@/components/TabBar';
 import { ViewContainer } from '@/components/ViewContainer';
+import { TabName } from '@/components/tabs';
 
 export function ErrorSurface() {
   return (

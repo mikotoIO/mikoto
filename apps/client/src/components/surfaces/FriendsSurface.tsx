@@ -8,10 +8,10 @@ import {
 import { faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import { useForm } from 'react-hook-form';
 
-import { TabName } from '@/components/TabBar';
 import { ViewContainer } from '@/components/ViewContainer';
-import { Form } from '@/components/atoms';
+import { TabName } from '@/components/tabs';
 import { useMikoto } from '@/hooks';
+import { Form } from '@/ui';
 
 export function FriendsSurface() {
   const form = useForm({

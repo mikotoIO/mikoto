@@ -28,9 +28,9 @@ import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
 
 import { ContextMenu, modalState } from '@/components/ContextMenu';
-import { Form } from '@/components/atoms';
 import { useErrorElement } from '@/hooks/useErrorElement';
 import { useTabkit } from '@/store/surface';
+import { Form } from '@/ui';
 
 import { channelToTab } from './channelToTab';
 

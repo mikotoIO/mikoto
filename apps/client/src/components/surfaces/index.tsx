@@ -3,21 +3,21 @@ import type { ComponentProps } from 'react';
 
 import { DesignStory } from '@/views/Palette';
 
-import { AccountSettingsSurface } from './AccountSettingsSurface';
+import { AccountSettingsSurface } from './AccountSettings';
 import { BotSettingSurface } from './BotSettingSurface';
-import { ChannelSettingsSurface } from './ChannelSettingsSurface';
+import { ChannelSettingsSurface } from './ChannelSettings';
 import { DiscoverySurface } from './DiscoverySurface';
 import { DMExplorerSurface, ExplorerSurface } from './Explorer';
 import { FriendsSurface } from './FriendsSurface';
-import { MessageSurface } from './MessageSurface';
 import { SearchSurface } from './SearchSurface';
-import { SpaceSettingsSurface } from './SpaceSettingsSurface';
+import { SpaceSettingsSurface } from './SpaceSettings';
 import { WelcomeSurface } from './WelcomeSurface';
+import { MessageSurface } from './Messages';
 
 export const surfaceMap = {
   textChannel: MessageSurface,
   voiceChannel: lazy(() => import('./VoiceSurface')),
-  documentChannel: lazy(() => import('./DocumentSurface')),
+  documentChannel: lazy(() => import('./Documents')),
   search: SearchSurface,
   spaceSettings: SpaceSettingsSurface,
   accountSettings: AccountSettingsSurface,

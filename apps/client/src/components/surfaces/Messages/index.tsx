@@ -9,13 +9,13 @@ import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 import { ViewContainer } from '@/components/ViewContainer';
 import { Spinner } from '@/components/atoms/Spinner';
-import { MessageEditor } from '@/components/surfaces/MessageSurface/MessageEditor';
 import { TabName } from '@/components/tabs';
 import { useFetchMember, useInterval, useMikoto } from '@/hooks';
 import { CurrentSpaceContext } from '@/store';
 import { TypingDots } from '@/ui';
 
 import { MessageEditState, MessageItem } from './Message';
+import { MessageEditor } from './MessageEditor';
 
 const StyledMessagesLoading = styled.div`
   padding: 40px;

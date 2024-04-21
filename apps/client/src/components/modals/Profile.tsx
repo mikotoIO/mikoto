@@ -14,7 +14,6 @@ import { useSetRecoilState } from 'recoil';
 
 import { modalState } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';
-import { Tag } from '@/components/atoms/BotTag';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState } from '@/store';
 
@@ -31,10 +30,6 @@ const ProfileContainer = styled.div`
   }
   .content {
     padding: 48px 16px 16px;
-  }
-
-  ${Tag} {
-    font-size: 12px;
   }
 
   .avatar {

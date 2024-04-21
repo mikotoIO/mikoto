@@ -1,4 +1,4 @@
-import { Box, Flex } from '@chakra-ui/react';
+import { Box, Flex, Tag } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { ClientMessage } from 'mikotojs';
 import { makeAutoObservable, runInAction } from 'mobx';
@@ -6,7 +6,6 @@ import { observer } from 'mobx-react-lite';
 import { atom } from 'recoil';
 
 import { ContextMenu, useContextMenu } from '@/components/ContextMenu';
-import { BotTag } from '@/components/atoms/BotTag';
 import { MessageAvatar } from '@/components/atoms/MessageAvatar';
 import { Markdown } from '@/components/molecules/markdown';
 import { TypingDots } from '@/ui';
@@ -180,7 +179,20 @@ export const MessageItem = observer(
               <Name color={message.member?.roleColor}>
                 {message.author?.name ?? 'Ghost'}
               </Name>
-              {message.author?.category === 'BOT' && <BotTag />}
+
+              {message.author?.category === 'BOT' && (
+                <Tag
+                  size="sm"
+                  fontSize="2xs"
+                  px={1}
+                  minH="18px"
+                  variant="solid"
+                  bg="primary"
+                  color="white"
+                >
+                  BOT
+                </Tag>
+              )}
               <Timestamp time={new Date(message.timestamp)} />
             </Flex>
           )}

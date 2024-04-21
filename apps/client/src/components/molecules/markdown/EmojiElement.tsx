@@ -2,7 +2,7 @@ import Tippy from '@tippyjs/react';
 
 import { Tooltip } from '@/ui';
 
-import '../../surfaces/MessageSurface/EmojiPicker';
+import '../../surfaces/messages/EmojiPicker';
 
 export default function Emoji({ emoji }: { emoji: string }) {
   return (

@@ -1,3 +1,4 @@
+import { Box, Flex, Grid, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faHashtag } from '@fortawesome/free-solid-svg-icons';
 import throttle from 'lodash/throttle';
@@ -10,12 +11,13 @@ import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import { ViewContainer } from '@/components/ViewContainer';
 import { Spinner } from '@/components/atoms/Spinner';
 import { TabName } from '@/components/tabs';
-import { useFetchMember, useInterval, useMikoto } from '@/hooks';
+import { useFetchMember, useMikoto } from '@/hooks';
 import { CurrentSpaceContext } from '@/store';
-import { TypingDots } from '@/ui';
 
+import { DateSeparator, showDateSeparator } from './DateSeparator';
 import { MessageEditState, MessageItem } from './Message';
 import { MessageEditor } from './MessageEditor';
+import { TypingIndicator, useTyping } from './TypingIndicator';
 
 const StyledMessagesLoading = styled.div`
   padding: 40px;
@@ -44,110 +46,23 @@ function isMessageSimple(message: Message, prevMessage?: Message) {
   );
 }
 
-const DAYS_OF_WEEK = [
-  'Sunday',
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-];
-
-const StyledDateSeparator = styled.div`
-  text-align: center;
-  margin: 4px 0;
-  color: var(--chakra-colors-gray-400);
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-
-  &:before,
-  &:after {
-    content: '';
-    display: block;
-    flex-grow: 1;
-    height: 0.5px;
-    display: block;
-    margin: 0 16px;
-    background-color: var(--chakra-colors-gray-250);
-    opacity: 0.1;
-  }
-`;
-
-function DateSeparator({ date }: { date: Date }) {
-  return (
-    <StyledDateSeparator>
-      {DAYS_OF_WEEK[date.getDay()]} {date.toLocaleDateString()}
-    </StyledDateSeparator>
-  );
-}
-
-function showDateSeparator(message: Message, prevMessage?: Message) {
-  if (!prevMessage) return true;
-  const prevDate = new Date(prevMessage.timestamp);
-  const currDate = new Date(message.timestamp);
-  return (
-    prevDate.getFullYear() !== currDate.getFullYear() ||
-    prevDate.getMonth() !== currDate.getMonth() ||
-    prevDate.getDate() !== currDate.getDate()
-  );
-}
-
-const StyledChannelHead = styled.div`
-  padding: 16px 64px;
-  h1 {
-    font-size: 24px;
-    margin-bottom: 8px;
-  }
-
-  p {
-    color: var(--chakra-colors-gray-250);
-    margin: 0;
-  }
-`;
-
-const StyledTypingIndicatorContainer = styled.div`
-  font-size: 12px;
-  padding: 0 16px;
-`;
-
 function ChannelHead({ channel }: { channel: Channel }) {
   return (
-    <StyledChannelHead>
-      <h1>Welcome to #{channel.name}!</h1>
-      <p>This is the start of the channel.</p>
-    </StyledChannelHead>
+    <Box py={4} px={16}>
+      <Heading fontSize="24px" mb={2}>
+        Welcome to #{channel.name}!
+      </Heading>
+      <Box as="p" color="gray.250" m={0}>
+        This is the start of the channel.
+      </Box>
+    </Box>
   );
 }
-
-const MessagingContainerInner = styled.div`
-  display: grid;
-  grid-template-rows: auto 24px;
-  height: 100%;
-`;
 
 // Please laugh
 // Meant to be a large sentinel value to mark the last message (when loaded) position
 // as Virtuoso does not allow negative values
 const FUNNY_NUMBER = 69_420_000;
-
-const OtherInner = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-function useTyping() {
-  const [currentTypers, setCurrentTypers] = useState<
-    { timestamp: number; userId: string }[]
-  >([]);
-
-  useInterval(() => {
-    if (currentTypers.length === 0) return;
-    setCurrentTypers(currentTypers.filter((x) => x.timestamp > Date.now()));
-  }, 500);
-  return [currentTypers, setCurrentTypers] as const;
-}
 
 const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
   useFetchMember(channel.space!);
@@ -266,8 +181,8 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
   return (
     <ViewContainer key={channel.id}>
       <TabName name={channel.name} icon={channel.space?.icon ?? faHashtag} />
-      <MessagingContainerInner>
-        <OtherInner>
+      <Grid templateRows="auto 24px" h="100%">
+        <Flex direction="column">
           {msgs === null ? (
             <MessagesLoading />
           ) : (
@@ -287,15 +202,9 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
               }}
               components={{
                 Header() {
-                  return topLoaded ? (
-                    <ChannelHead channel={channel} />
-                  ) : (
-                    <MessagesLoading />
-                  );
+                  if (topLoaded) return <ChannelHead channel={channel} />;
+                  return <MessagesLoading />;
                 },
-                // Footer() {
-                //   return <GhostMessage />;
-                // },
               }}
               firstItemIndex={firstItemIndex}
               startReached={async () => {
@@ -360,25 +269,9 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
               }
             }}
           />
-        </OtherInner>
-        <StyledTypingIndicatorContainer>
-          {currentTypers.length > 0 && (
-            <div>
-              <TypingDots />
-              <strong>
-                {currentTypers
-                  .map(
-                    (x) =>
-                      mikoto.spaces.get(channel.spaceId)?.members?.get(x.userId)
-                        ?.user.name ?? 'Unknown',
-                  )
-                  .join(', ')}
-              </strong>{' '}
-              is typing...
-            </div>
-          )}
-        </StyledTypingIndicatorContainer>
-      </MessagingContainerInner>
+        </Flex>
+        <TypingIndicator typers={currentTypers} channel={channel} />
+      </Grid>
     </ViewContainer>
   );
 });

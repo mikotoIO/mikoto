@@ -10,24 +10,7 @@ import { MessageAvatar } from '@/components/atoms/MessageAvatar';
 import { Markdown } from '@/components/molecules/markdown';
 import { TypingDots } from '@/ui';
 
-const dateFormat = new Intl.DateTimeFormat('en', {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-});
-
-function isToday(someDate: Date): boolean {
-  const today = new Date();
-  return (
-    someDate.getDate() === today.getDate() &&
-    someDate.getMonth() === today.getMonth() &&
-    someDate.getFullYear() === today.getFullYear()
-  );
-}
-
-function padTime(n: number): string {
-  return String(n).padStart(2, '0');
-}
+import { Timestamp } from './Timestamp';
 
 const MessageContainer = styled.div<{ isSimple?: boolean }>`
   margin: 0;
@@ -91,20 +74,6 @@ const Name = styled.div<{ color?: string | null }>`
   }
 `;
 
-function Timestamp({ time }: { time: Date }) {
-  return (
-    <Box color="gray.400" fontSize="xs">
-      {isToday(time) ? 'Today at ' : dateFormat.format(time)}{' '}
-      {padTime(time.getHours())}:{padTime(time.getMinutes())}
-    </Box>
-  );
-}
-
-const AvatarFiller = styled.div`
-  margin: 0;
-  width: 40px;
-`;
-
 interface MessageProps {
   message: ClientMessage;
   isSimple?: boolean;
@@ -122,12 +91,6 @@ export class MessageEditState {
     makeAutoObservable(this);
   }
 }
-
-const EditedNote = styled.span`
-  font-size: 12px;
-  color: var(--chakra-colors-gray-400);
-  margin-left: 4px;
-`;
 
 export const MessageItem = observer(
   ({ message, editState, isSimple }: MessageProps) => {
@@ -165,7 +128,7 @@ export const MessageItem = observer(
     return (
       <MessageContainer isSimple={isSimple} onContextMenu={menu}>
         {isSimple ? (
-          <AvatarFiller />
+          <Box m={0} w={10} />
         ) : (
           <MessageAvatar
             member={message.member ?? undefined}
@@ -198,7 +161,11 @@ export const MessageItem = observer(
           )}
           <div>
             <Markdown content={message.content} />
-            {message.editedTimestamp && <EditedNote>(edited)</EditedNote>}
+            {message.editedTimestamp && (
+              <Box as="span" ml={1} color="gray.400" fontSize="xs">
+                (edited)
+              </Box>
+            )}
           </div>
         </MessageInner>
       </MessageContainer>

@@ -9,14 +9,14 @@ import { ChannelSettingsSurface } from './ChannelSettings';
 import { DiscoverySurface } from './DiscoverySurface';
 import { DMExplorerSurface, ExplorerSurface } from './Explorer';
 import { FriendsSurface } from './FriendsSurface';
+import { MessageSurface } from './Messages';
 import { SearchSurface } from './SearchSurface';
 import { SpaceSettingsSurface } from './SpaceSettings';
 import { WelcomeSurface } from './WelcomeSurface';
-import { MessageSurface } from './Messages';
 
 export const surfaceMap = {
   textChannel: MessageSurface,
-  voiceChannel: lazy(() => import('./VoiceSurface')),
+  voiceChannel: lazy(() => import('./Voice')),
   documentChannel: lazy(() => import('./Documents')),
   search: SearchSurface,
   spaceSettings: SpaceSettingsSurface,
@@ -38,3 +38,6 @@ type SurfaceMap = {
 };
 
 export type TabBaseType = SurfaceMap[keyof SurfaceMap];
+
+export * from './LoadingSurface';
+export * from './ErrorSurface';

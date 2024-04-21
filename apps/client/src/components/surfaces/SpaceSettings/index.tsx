@@ -15,7 +15,7 @@ import { useSetRecoilState } from 'recoil';
 
 import { modalState } from '@/components/ContextMenu';
 import { AvatarEditor } from '@/components/molecules/AvatarEditor';
-import { BaseSettingsSurface } from '@/components/surfaces/BaseSettingSurface';
+import { BaseSettingsSurface } from '@/components/surfaces/BaseSettings';
 import { uploadFile } from '@/functions/fileUpload';
 import { useMikoto } from '@/hooks';
 import { Form } from '@/ui';

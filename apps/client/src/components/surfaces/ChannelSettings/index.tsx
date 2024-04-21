@@ -12,7 +12,7 @@ import { ClientChannel } from 'mikotojs';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-import { BaseSettingsSurface } from '@/components/surfaces/BaseSettingSurface';
+import { BaseSettingsSurface } from '@/components/surfaces/BaseSettings';
 import { useMikoto } from '@/hooks';
 import { Form, Triselector } from '@/ui';
 import { SettingsView } from '@/views';

@@ -17,7 +17,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { modalState } from '@/components/ContextMenu';
 import { userState } from '@/components/UserArea';
 import { AvatarEditor } from '@/components/molecules/AvatarEditor';
-import { BaseSettingsSurface } from '@/components/surfaces/BaseSettingSurface';
+import { BaseSettingsSurface } from '@/components/surfaces/BaseSettings';
 import { uploadFile } from '@/functions/fileUpload';
 import { useAuthClient, useMikoto } from '@/hooks';
 import { useErrorElement } from '@/hooks/useErrorElement';

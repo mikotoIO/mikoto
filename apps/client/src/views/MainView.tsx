@@ -16,9 +16,11 @@ import { Sidebar } from '@/components/sidebars/Base';
 import { FriendSidebar } from '@/components/sidebars/FriendSidebar';
 import { MemberListSidebar } from '@/components/sidebars/MemberListSidebar';
 import { SpaceSidebar } from '@/components/sidebars/SpaceSidebar';
-import { surfaceMap } from '@/components/surfaces';
-import { ErrorSurface } from '@/components/surfaces/ErrorSurface';
-import { LoadingSurface } from '@/components/surfaces/LoadingSurface';
+import {
+  ErrorSurface,
+  LoadingSurface,
+  surfaceMap,
+} from '@/components/surfaces';
 import { TabBarButton, TabbedView } from '@/components/tabs';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState, workspaceState } from '@/store';

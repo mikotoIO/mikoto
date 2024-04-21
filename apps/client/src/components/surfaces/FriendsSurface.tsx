@@ -8,8 +8,8 @@ import {
 import { faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import { useForm } from 'react-hook-form';
 
-import { TabName } from '@/components/TabList';
 import { ViewContainer } from '@/components/ViewContainer';
+import { TabName } from '@/components/tabs';
 import { useMikoto } from '@/hooks';
 import { Form } from '@/ui';
 

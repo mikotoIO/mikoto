@@ -7,14 +7,15 @@ import { Observer, observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
-import { TabName } from '@/components/TabList';
 import { ViewContainer } from '@/components/ViewContainer';
 import { Spinner } from '@/components/atoms/Spinner';
-import { MessageEditState, MessageItem } from '@/components/molecules/Message';
-import { MessageEditor } from '@/components/molecules/MessageEditor';
+import { MessageEditor } from '@/components/surfaces/MessageSurface/MessageEditor';
+import { TabName } from '@/components/tabs';
 import { useFetchMember, useInterval, useMikoto } from '@/hooks';
 import { CurrentSpaceContext } from '@/store';
 import { TypingDots } from '@/ui';
+
+import { MessageEditState, MessageItem } from './Message';
 
 const StyledMessagesLoading = styled.div`
   padding: 40px;

@@ -160,6 +160,9 @@ interface MessageAvatarProps extends AvatarProps {
   member?: ClientMember;
 }
 
+/**
+ * An avatar that when clicked, shows a user profile menu.
+ */
 export function MessageAvatar({ src, member, size }: MessageAvatarProps) {
   const setContextMenu = useSetRecoilState(contextMenuState);
   const avatarRef = useRef<HTMLDivElement>(null);

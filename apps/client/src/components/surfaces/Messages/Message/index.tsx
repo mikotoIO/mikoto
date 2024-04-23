@@ -182,10 +182,10 @@ export function GhostMessage() {
           <Name>Cactus</Name>
         </Flex>
 
-        <div style={{ opacity: '50%' }}>
+        <Box opacity={0.5}>
           <Markdown content="testing ghost message" />
           <TypingDots />
-        </div>
+        </Box>
       </MessageInner>
     </MessageContainer>
   );

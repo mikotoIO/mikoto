@@ -107,7 +107,7 @@ const SurfaceGroup = observer(
               }
             >
               <Box py="8px" h="100%">
-                <ErrorBoundary fallback={<ErrorSurface />}>
+                <ErrorBoundary FallbackComponent={ErrorSurface}>
                   <Suspense fallback={<LoadingSurface />}>
                     <TabViewSwitch tab={tab} />
                   </Suspense>

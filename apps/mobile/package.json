@@ -22,7 +22,7 @@
     "expo": "~50.0.2",
     "expo-splash-screen": "~0.20.5",
     "expo-status-bar": "~1.6.0",
-    "react": "*",
+    "react": "18.3.0",
     "react-native": "0.72.6",
     "react-native-gesture-handler": "~2.12.0",
     "react-native-get-random-values": "^1.9.0",
@@ -37,7 +37,7 @@
     "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@babel/plugin-transform-nullish-coalescing-operator": "^7.23.4",
     "@expo/ngrok": "^4.1.0",
-    "@types/react": "^18.2.64",
+    "@types/react": "^18.3.0",
     "eas-cli": "^5.9.1",
     "typescript": "^5.4.2"
   },

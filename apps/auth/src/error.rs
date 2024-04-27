@@ -8,6 +8,7 @@ use serde_json::json;
 #[derive(Serialize, Debug)]
 #[serde(tag = "code")]
 pub enum Error {
+    InitializationFailed(String),
     InternalServerError,
 }
 

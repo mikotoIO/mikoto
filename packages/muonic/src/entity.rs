@@ -6,6 +6,11 @@ pub trait Entity {
         &'a self,
         query: Query<'q, Postgres, PgArguments>,
     ) -> Query<'q, Postgres, PgArguments>;
+    fn _bind_fields_partial<'a, 'q, 's>(
+        &'a self,
+        query: Query<'q, Postgres, PgArguments>,
+        fields: Vec<&'s str>,
+    ) -> Query<'q, Postgres, PgArguments>;
 }
 
 pub struct Meta {

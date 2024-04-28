@@ -1,10 +1,7 @@
 use axum::Json;
+use muonic::muon::muon;
 
-use crate::{
-    db::{db, muon},
-    entities::User,
-    error::Error,
-};
+use crate::{db::db, entities::User, error::Error};
 
 #[derive(Deserialize)]
 pub struct RegisterPayload {
@@ -14,11 +11,15 @@ pub struct RegisterPayload {
 }
 
 pub async fn route(body: Json<RegisterPayload>) -> Result<(), Error> {
-    let user = muon()
-        .insert(&User {
-            id: uuid::Uuid::new_v4(),
-            name: body.name.clone(),
-        })
+    let mut tx = db().begin().await?;
+    muon::<User>()
+        .insert(
+            &mut *tx,
+            &User {
+                id: uuid::Uuid::new_v4(),
+                name: body.name.clone(),
+            },
+        )
         .await?;
 
     todo!()

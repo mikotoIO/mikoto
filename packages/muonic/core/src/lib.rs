@@ -22,6 +22,7 @@ pub fn muonic_entity_derive(input: TokenStream) -> TokenStream {
     };
     let fields = fields.iter().map(|field| &field.ident);
     let fields2 = fields.clone();
+    let fields3 = fields.clone();
 
     // Construct the output, possibly using quasi-quotation
     let expanded = quote! {
@@ -42,6 +43,22 @@ pub fn muonic_entity_derive(input: TokenStream) -> TokenStream {
                 query: sqlx::query::Query<'q, ::sqlx::Postgres, ::sqlx::postgres::PgArguments>,
             ) -> sqlx::query::Query<'q, ::sqlx::Postgres, ::sqlx::postgres::PgArguments> {
                 #( let query = query.bind(self.#fields2.clone()); )*
+                query
+            }
+
+            fn _bind_fields_partial<'a, 'q, 's>(
+                &'a self,
+                query: sqlx::query::Query<'q, ::sqlx::Postgres, ::sqlx::postgres::PgArguments>,
+                fields: Vec<&'s str>,
+            ) -> sqlx::query::Query<'q, ::sqlx::Postgres, ::sqlx::postgres::PgArguments> {
+                // use a loop!
+                let mut query = query;
+                for field in fields {
+                    match field {
+                        #( stringify!(#fields3) => query = query.bind(self.#fields3.clone()), )*
+                        _ => {}
+                    }
+                }
                 query
             }
         }

@@ -1,12 +1,15 @@
+use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
+#[derive(FromRow)]
 pub struct User {
     pub id: Uuid,
     pub name: String,
 }
 
+#[derive(FromRow)]
 pub struct EmailAuth {
-    pub user_id: Uuid,
+    pub id: Uuid, // is also the account_id
 
     pub email: String,
     pub passhash: Option<String>, // None, if using a "magic link"
@@ -19,6 +22,7 @@ pub struct MultiFactor {
     pub verified: bool,
 }
 
+#[derive(FromRow)]
 pub struct SocialAuth {
     pub id: Uuid,
     pub user_id: Uuid,

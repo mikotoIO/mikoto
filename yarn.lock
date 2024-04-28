@@ -8134,7 +8134,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/nodemailer@npm:^6.4.6":
+"@types/nodemailer@npm:^6.4.14":
   version: 6.4.14
   resolution: "@types/nodemailer@npm:6.4.14"
   dependencies:
@@ -20343,7 +20343,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemailer@npm:^6.9.9":
+"nodemailer@npm:^6.9.13":
   version: 6.9.13
   resolution: "nodemailer@npm:6.9.13"
   checksum: 10/efbc6fc415ec1e1dc1b91530920b0bcfc648183003c3d79718cd54fc2efef4b7dd1917ddd3853ab127e4b5ebd7353903b5859f0ac3ccea487374b076d41ac8b8
@@ -23779,7 +23779,7 @@ __metadata:
     "@types/jsonwebtoken": "npm:^9.0.5"
     "@types/minio": "npm:^7.0.18"
     "@types/multer": "npm:^1.4.11"
-    "@types/nodemailer": "npm:^6.4.6"
+    "@types/nodemailer": "npm:^6.4.14"
     "@types/uuid": "npm:^8.3.4"
     bcrypt: "npm:^5.1.1"
     body-parser: "npm:^1.20.2"
@@ -23798,7 +23798,7 @@ __metadata:
     multer: "npm:^1.4.5-lts.1"
     nanoid: "npm:^3.0.0"
     node-notifier: "npm:^10.0.1"
-    nodemailer: "npm:^6.9.9"
+    nodemailer: "npm:^6.9.13"
     prettier: "npm:^3.2.4"
     prisma: "npm:^4.16.2"
     reflect-metadata: "npm:^0.2.1"

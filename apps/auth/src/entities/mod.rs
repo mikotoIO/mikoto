@@ -1,7 +1,8 @@
+use muonic_macros::Entity;
 use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
-#[derive(FromRow)]
+#[derive(FromRow, Entity)]
 pub struct User {
     pub id: Uuid,
     pub name: String,

@@ -1,6 +1,7 @@
-use std::time::Duration;
+use std::{sync::OnceLock, time::Duration};
 
 use log::warn;
+use muonic::Muonic;
 use sqlx::{migrate::MigrateDatabase, PgPool, Postgres};
 use tokio::{sync::OnceCell, time::timeout};
 
@@ -29,4 +30,9 @@ pub async fn init() -> Result<&'static PgPool, Error> {
 
 pub fn db() -> &'static PgPool {
     DB.get().expect("Database not initialized")
+}
+
+pub fn muon() -> &'static muonic::Muonic<'static> {
+    static MUON: OnceLock<Muonic> = OnceLock::new();
+    MUON.get_or_init(|| Muonic::new(db()))
 }

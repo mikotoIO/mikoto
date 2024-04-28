@@ -1,4 +1,5 @@
 use axum::Json;
+use muonic::muon::muon;
 
 use crate::{db::db, entities::User, error::Error};
 
@@ -10,8 +11,15 @@ pub struct RegisterPayload {
 }
 
 pub async fn route(body: Json<RegisterPayload>) -> Result<(), Error> {
-    let user: User = sqlx::query_as(r#"SELECT * FROM "user""#)
-        .fetch_one(db())
+    let mut tx = db().begin().await?;
+    muon::<User>()
+        .insert(
+            &mut *tx,
+            &User {
+                id: uuid::Uuid::new_v4(),
+                name: body.name.clone(),
+            },
+        )
         .await?;
 
     todo!()

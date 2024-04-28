@@ -14,10 +14,6 @@ pub struct RegisterPayload {
 }
 
 pub async fn route(body: Json<RegisterPayload>) -> Result<(), Error> {
-    // let _user: User = sqlx::query_as(r#"INSERT INTO "User" WHERE "account""#)
-    //     .bind(&body.email)
-    //     .fetch_one(db())
-    //     .await?;
     let user = muon()
         .insert(&User {
             id: uuid::Uuid::new_v4(),

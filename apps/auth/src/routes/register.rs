@@ -1,6 +1,6 @@
 use axum::Json;
 
-use crate::error::Error;
+use crate::{db::db, entities::User, error::Error};
 
 #[derive(Deserialize)]
 pub struct RegisterPayload {
@@ -10,5 +10,9 @@ pub struct RegisterPayload {
 }
 
 pub async fn route(body: Json<RegisterPayload>) -> Result<(), Error> {
+    let user: User = sqlx::query_as(r#"SELECT * FROM "user""#)
+        .fetch_one(db())
+        .await?;
+
     todo!()
 }

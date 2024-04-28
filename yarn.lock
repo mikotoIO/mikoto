@@ -8134,7 +8134,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/nodemailer@npm:^6.4.6":
+"@types/nodemailer@npm:^6.4.14":
   version: 6.4.14
   resolution: "@types/nodemailer@npm:6.4.14"
   dependencies:
@@ -8216,6 +8216,16 @@ __metadata:
     "@types/scheduler": "npm:*"
     csstype: "npm:^3.0.2"
   checksum: 10/5cc185f00ad5a4c2261e127ad25241448492f391e2206738b0477cbdba6aa75692e18ece5e75854ed513342d95c9ee83315744cb6b1470d488772cef1f8b40c8
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:^18.3.0":
+  version: 18.3.0
+  resolution: "@types/react@npm:18.3.0"
+  dependencies:
+    "@types/prop-types": "npm:*"
+    csstype: "npm:^3.0.2"
+  checksum: 10/2444294740016d61721df9adeb8635658c660c13b0782df9f067260ac6b0a4b71e68245089814ab53264843eb75f81d90f770253b94a13955cc1ddccf3593301
   languageName: node
   linkType: hard
 
@@ -10777,7 +10787,7 @@ __metadata:
     "@types/jsonwebtoken": "npm:^9.0.5"
     "@types/markdown-draft-js": "npm:^2.2.4"
     "@types/node": "npm:^16.11.26"
-    "@types/react": "npm:^18.2.64"
+    "@types/react": "npm:^18.3.0"
     "@types/react-dom": "npm:^18.2.21"
     "@types/react-syntax-highlighter": "npm:^15.5.1"
     "@types/react-twemoji": "npm:^0.4.0"
@@ -10818,7 +10828,7 @@ __metadata:
     mobx: "npm:^6.10.0"
     mobx-react-lite: "npm:^4.0.3"
     re-resizable: "npm:^6.9.9"
-    react: "npm:*"
+    react: "npm:18.3.0"
     react-aspect-ratio: "npm:^1.1.2"
     react-async-hook: "npm:^4.0.0"
     react-autosize-textarea: "npm:^7.1.0"
@@ -19882,12 +19892,12 @@ __metadata:
     "@fortawesome/react-native-fontawesome": "npm:^0.3.0"
     "@react-navigation/drawer": "npm:^6.6.4"
     "@react-navigation/native": "npm:^6.1.8"
-    "@types/react": "npm:^18.2.64"
+    "@types/react": "npm:^18.3.0"
     eas-cli: "npm:^5.9.1"
     expo: "npm:~50.0.2"
     expo-splash-screen: "npm:~0.20.5"
     expo-status-bar: "npm:~1.6.0"
-    react: "npm:*"
+    react: "npm:18.3.0"
     react-native: "npm:0.72.6"
     react-native-gesture-handler: "npm:~2.12.0"
     react-native-get-random-values: "npm:^1.9.0"
@@ -20333,7 +20343,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemailer@npm:^6.9.9":
+"nodemailer@npm:^6.9.13":
   version: 6.9.13
   resolution: "nodemailer@npm:6.9.13"
   checksum: 10/efbc6fc415ec1e1dc1b91530920b0bcfc648183003c3d79718cd54fc2efef4b7dd1917ddd3853ab127e4b5ebd7353903b5859f0ac3ccea487374b076d41ac8b8
@@ -22558,6 +22568,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react@npm:18.3.0":
+  version: 18.3.0
+  resolution: "react@npm:18.3.0"
+  dependencies:
+    loose-envify: "npm:^1.1.0"
+  checksum: 10/17112377dad4e5c868b608be57c8e970a3f6ee6eb6269a5c4c23b11b8b4f393c42a8a046be0c9ddbc5f182b909330ddbecab905bcdea5051b05ec3914491fd79
+  languageName: node
+  linkType: hard
+
 "reactjs-popup@npm:^2.0.5":
   version: 2.0.6
   resolution: "reactjs-popup@npm:2.0.6"
@@ -23760,7 +23779,7 @@ __metadata:
     "@types/jsonwebtoken": "npm:^9.0.5"
     "@types/minio": "npm:^7.0.18"
     "@types/multer": "npm:^1.4.11"
-    "@types/nodemailer": "npm:^6.4.6"
+    "@types/nodemailer": "npm:^6.4.14"
     "@types/uuid": "npm:^8.3.4"
     bcrypt: "npm:^5.1.1"
     body-parser: "npm:^1.20.2"
@@ -23779,7 +23798,7 @@ __metadata:
     multer: "npm:^1.4.5-lts.1"
     nanoid: "npm:^3.0.0"
     node-notifier: "npm:^10.0.1"
-    nodemailer: "npm:^6.9.9"
+    nodemailer: "npm:^6.9.13"
     prettier: "npm:^3.2.4"
     prisma: "npm:^4.16.2"
     reflect-metadata: "npm:^0.2.1"

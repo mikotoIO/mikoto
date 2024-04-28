@@ -8,7 +8,15 @@ use serde_json::json;
 #[derive(Serialize, Debug)]
 #[serde(tag = "code")]
 pub enum Error {
+    InitializationFailed(String),
+    DatabaseError(String),
     InternalServerError,
+}
+
+impl From<sqlx::Error> for Error {
+    fn from(err: sqlx::Error) -> Self {
+        Self::InitializationFailed(err.to_string())
+    }
 }
 
 impl IntoResponse for Error {

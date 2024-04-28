@@ -193,6 +193,7 @@ export function RegisterView() {
 export function ResetPasswordView() {
   const { register, handleSubmit } = useForm();
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   return (
     <AuthView>

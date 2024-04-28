@@ -2,6 +2,7 @@ use std::sync::OnceLock;
 
 #[derive(Deserialize, Debug)]
 pub struct Env {
+    pub database_url_superego: String,
     pub superego_port: u16,
 }
 

@@ -38,19 +38,19 @@ pub fn muonic_entity_derive(input: TokenStream) -> TokenStream {
                 &META
             }
 
-            fn _bind_fields<'a, 'q>(
+            fn _bind_fields<'a, 'q, O>(
                 &'a self,
-                query: sqlx::query::Query<'q, ::sqlx::Postgres, ::sqlx::postgres::PgArguments>,
-            ) -> sqlx::query::Query<'q, ::sqlx::Postgres, ::sqlx::postgres::PgArguments> {
+                query: sqlx::query::QueryAs<'q, ::sqlx::Postgres, O, ::sqlx::postgres::PgArguments>,
+            ) -> sqlx::query::QueryAs<'q, ::sqlx::Postgres, O, ::sqlx::postgres::PgArguments> {
                 #( let query = query.bind(self.#fields2.clone()); )*
                 query
             }
 
-            fn _bind_fields_partial<'a, 'q, 's>(
+            fn _bind_fields_partial<'a, 'q, 's, O>(
                 &'a self,
-                query: sqlx::query::Query<'q, ::sqlx::Postgres, ::sqlx::postgres::PgArguments>,
+                query: sqlx::query::QueryAs<'q, ::sqlx::Postgres, O, ::sqlx::postgres::PgArguments>,
                 fields: Vec<&'s str>,
-            ) -> sqlx::query::Query<'q, ::sqlx::Postgres, ::sqlx::postgres::PgArguments> {
+            ) -> sqlx::query::QueryAs<'q, ::sqlx::Postgres, O, ::sqlx::postgres::PgArguments> {
                 // use a loop!
                 let mut query = query;
                 for field in fields {

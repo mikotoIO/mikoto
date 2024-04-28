@@ -1,16 +1,16 @@
-use sqlx::{postgres::PgArguments, query::Query, Postgres};
+use sqlx::{postgres::PgArguments, query::QueryAs, Postgres};
 
 pub trait Entity {
     fn _entity_metadata() -> &'static Meta;
-    fn _bind_fields<'a, 'q>(
+    fn _bind_fields<'a, 'q, O>(
         &'a self,
-        query: Query<'q, Postgres, PgArguments>,
-    ) -> Query<'q, Postgres, PgArguments>;
-    fn _bind_fields_partial<'a, 'q, 's>(
+        query: QueryAs<'q, Postgres, O, PgArguments>,
+    ) -> QueryAs<'q, Postgres, O, PgArguments>;
+    fn _bind_fields_partial<'a, 'q, 's, O>(
         &'a self,
-        query: Query<'q, Postgres, PgArguments>,
+        query: QueryAs<'q, Postgres, O, PgArguments>,
         fields: Vec<&'s str>,
-    ) -> Query<'q, Postgres, PgArguments>;
+    ) -> QueryAs<'q, Postgres, O, PgArguments>;
 }
 
 pub struct Meta {

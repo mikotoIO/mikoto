@@ -4,11 +4,11 @@ use sqlx::{self, postgres::PgRow, FromRow, PgExecutor};
 
 use crate::entity::Entity;
 
-pub struct Muon<E: Entity> {
+pub struct Muon<E> {
     x: PhantomData<E>,
 }
 
-pub fn muon<E: Entity>() -> Muon<E> {
+pub fn muon<E>() -> Muon<E> {
     Muon { x: PhantomData }
 }
 
@@ -37,8 +37,10 @@ impl<'r, E: Entity + FromRow<'r, PgRow>> Muon<E> {
                 .collect::<Vec<_>>()
                 .join(", ")
         );
-
-        entity._bind_fields(sqlx::query(&query)).execute(db).await?;
+        let _: Vec<()> = entity
+            ._bind_fields(sqlx::query_as(&query))
+            .fetch_all(db)
+            .await?;
         Ok(())
     }
 
@@ -60,9 +62,9 @@ impl<'r, E: Entity + FromRow<'r, PgRow>> Muon<E> {
                 .join(", ")
         );
 
-        entity
-            ._bind_fields_partial(sqlx::query(&query), fields)
-            .execute(db)
+        let _: Vec<()> = entity
+            ._bind_fields_partial(sqlx::query_as(&query), fields)
+            .fetch_all(db)
             .await?;
         Ok(())
     }

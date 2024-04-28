@@ -30,6 +30,24 @@ impl<E: Entity + for<'r> FromRow<'r, PgRow> + Send + Unpin> Muon<E> {
         Ok(entity)
     }
 
+    pub async fn dataload<'c, X: PgExecutor<'c>, K>(
+        &self,
+        db: X,
+        column_name: &str,
+        keys: &K,
+    ) -> Result<Vec<E>, sqlx::Error>
+    where
+        for<'q> &'q K: Encode<'q, Postgres> + Type<Postgres> + Send + Sync,
+    {
+        let meta = E::_entity_metadata();
+        let query = format!(
+            r#"SELECT * FROM "{}" WHERE "{}" = ANY($1)"#,
+            meta.table_name, column_name,
+        );
+        let entity = sqlx::query_as(&query).bind(keys).fetch_all(db).await?;
+        Ok(entity)
+    }
+
     // mutations
     pub async fn insert<'c, X: PgExecutor<'c>>(
         &self,

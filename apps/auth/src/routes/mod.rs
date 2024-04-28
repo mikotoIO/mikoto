@@ -7,6 +7,7 @@ use axum::{
 use serde::Serialize;
 use tower_http::cors::CorsLayer;
 
+pub mod login;
 pub mod register;
 
 #[derive(Debug, Serialize)]

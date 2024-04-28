@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use sqlx::{self, postgres::PgRow, types::Uuid, Encode, FromRow, PgExecutor, Postgres, Type};
+use sqlx::{self, postgres::PgRow, Encode, FromRow, PgExecutor, Postgres, Type};
 
 use crate::entity::Entity;
 

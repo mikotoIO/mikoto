@@ -3,6 +3,7 @@ use axum::{
     response::{IntoResponse, Response},
     Json,
 };
+use bcrypt::BcryptError;
 use serde_json::json;
 
 #[derive(Serialize, Debug)]
@@ -16,6 +17,12 @@ pub enum Error {
 impl From<sqlx::Error> for Error {
     fn from(err: sqlx::Error) -> Self {
         Self::InitializationFailed(err.to_string())
+    }
+}
+
+impl From<BcryptError> for Error {
+    fn from(err: BcryptError) -> Self {
+        Self::InternalServerError
     }
 }
 

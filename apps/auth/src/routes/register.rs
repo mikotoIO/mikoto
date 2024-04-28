@@ -2,7 +2,11 @@ use axum::Json;
 use muonic::muon::muon;
 use uuid::Uuid;
 
-use crate::{db::db, entities::User, error::Error};
+use crate::{
+    db::db,
+    entities::{EmailAuth, User},
+    error::Error,
+};
 
 #[derive(Deserialize)]
 pub struct RegisterPayload {
@@ -11,17 +15,21 @@ pub struct RegisterPayload {
     pub password: String,
 }
 
-pub async fn route(body: Json<RegisterPayload>) -> Result<(), Error> {
+pub async fn route(body: Json<RegisterPayload>) -> Result<Json<User>, Error> {
     let mut tx = db().begin().await?;
-    muon::<User>()
-        .insert(
-            &mut *tx,
-            &User {
-                id: uuid::Uuid::new_v4(),
-                name: body.name.clone(),
-            },
-        )
-        .await?;
+    let user = User {
+        id: Uuid::new_v4(),
+        name: body.name.clone(),
+    };
+    muon::<User>().insert(&mut *tx, &user).await?;
 
-    todo!()
+    let email_auth = EmailAuth {
+        id: user.id,
+        email: body.email.clone(),
+        passhash: Some(bcrypt::hash(body.password.clone(), bcrypt::DEFAULT_COST)?),
+    };
+    muon::<EmailAuth>().insert(&mut *tx, &email_auth).await?;
+
+    tx.commit().await?;
+    Ok(Json(user))
 }

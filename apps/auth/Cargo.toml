@@ -22,6 +22,7 @@ itertools = "0.12.1"
 
 muonic = { version = "0.1.0", path = "../../packages/muonic" }
 muonic-macros = { version = "0.1.0", path = "../../packages/muonic/macros" }
+bcrypt = "0.15.1"
 
 # database
 [dependencies.sqlx]

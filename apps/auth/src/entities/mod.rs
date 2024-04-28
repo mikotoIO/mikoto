@@ -2,13 +2,13 @@ use muonic_macros::Entity;
 use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
-#[derive(FromRow, Entity)]
+#[derive(FromRow, Entity, Serialize)]
 pub struct User {
     pub id: Uuid,
     pub name: String,
 }
 
-#[derive(FromRow)]
+#[derive(FromRow, Entity)]
 pub struct EmailAuth {
     pub id: Uuid, // is also the account_id
 

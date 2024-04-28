@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use sqlx::{self, postgres::PgRow, FromRow, PgExecutor};
+use sqlx::{self, postgres::PgRow, types::Uuid, FromRow, PgExecutor};
 
 use crate::entity::Entity;
 
@@ -12,8 +12,21 @@ pub fn muon<E>() -> Muon<E> {
     Muon { x: PhantomData }
 }
 
-impl<'r, E: Entity + FromRow<'r, PgRow>> Muon<E> {
+impl<E: Entity + for<'r> FromRow<'r, PgRow> + Send + Unpin> Muon<E> {
     // queries
+    pub async fn find_one<'c, X: PgExecutor<'c>>(
+        &self,
+        db: X,
+        id: &Uuid,
+    ) -> Result<Option<E>, sqlx::Error> {
+        let meta = E::_entity_metadata();
+        let query = format!(
+            r#"SELECT * FROM "{}" WHERE "{}" = $1"#,
+            meta.table_name, meta.primary_key
+        );
+        let entity = sqlx::query_as(&query).bind(id).fetch_optional(db).await?;
+        Ok(entity)
+    }
 
     // mutations
     pub async fn insert<'c, X: PgExecutor<'c>>(

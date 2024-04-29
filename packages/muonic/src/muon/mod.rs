@@ -4,6 +4,8 @@ use sqlx::{self, postgres::PgRow, Encode, FromRow, PgExecutor, Postgres, Type};
 
 use crate::entity::Entity;
 
+pub mod select;
+
 pub struct Muon<E> {
     x: PhantomData<E>,
 }
@@ -13,13 +15,14 @@ pub fn muon<E>() -> Muon<E> {
 }
 
 impl<E: Entity + for<'r> FromRow<'r, PgRow> + Send + Unpin> Muon<E> {
-    pub async fn find_one<'c, X: PgExecutor<'c>, I>(
+    // queries
+    pub async fn fetch_one<'c, X: PgExecutor<'c>, I>(
         &self,
         db: X,
         id: &I,
     ) -> Result<Option<E>, sqlx::Error>
     where
-        for<'q> &'q I: Encode<'q, Postgres> + Type<Postgres> + Send + Sync,
+        for<'q> &'q I: Encode<'q, Postgres> + Type<Postgres> + Send,
     {
         let meta = E::_entity_metadata();
         let query = format!(
@@ -27,6 +30,7 @@ impl<E: Entity + for<'r> FromRow<'r, PgRow> + Send + Unpin> Muon<E> {
             meta.table_name, meta.primary_key
         );
         let entity = sqlx::query_as(&query).bind(id).fetch_optional(db).await?;
+
         Ok(entity)
     }
 
@@ -47,6 +51,14 @@ impl<E: Entity + for<'r> FromRow<'r, PgRow> + Send + Unpin> Muon<E> {
         let entity = sqlx::query_as(&query).bind(keys).fetch_all(db).await?;
         Ok(entity)
     }
+
+    // pub fn select(&self, rest: &'static str) -> sqlx::query::QueryAs<'_, Postgres, E, PgArguments> {
+    //     sqlx::query_as(&format!(
+    //         r#"SELECT * FROM "{}" {}"#,
+    //         E::_entity_metadata().table_name,
+    //         rest
+    //     ))
+    // }
 
     // mutations
     pub async fn insert<'c, X: PgExecutor<'c>>(

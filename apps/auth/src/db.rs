@@ -9,7 +9,7 @@ use crate::{env::env, error::Error};
 static DB: OnceCell<PgPool> = OnceCell::const_new();
 
 pub async fn init() -> Result<&'static PgPool, Error> {
-    let db_url = &env().database_url_superego;
+    let db_url = &env().database_url;
     DB.get_or_try_init(|| async {
         if !Postgres::database_exists(&db_url).await.unwrap() {
             warn!("Database does not exist, creating...");

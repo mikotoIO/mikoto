@@ -9,7 +9,17 @@ CREATE TABLE "EmailAuth" (
     "email" VARCHAR(255) UNIQUE NOT NULL,
     "passhash" VARCHAR(255),
 
-    FOREIGN KEY (id) REFERENCES "User"(id)
+    FOREIGN KEY (id) REFERENCES "User"(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE "RefreshToken" (
+    "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "token" VARCHAR(255) UNIQUE NOT NULL,
+    "user_id" UUID NOT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT now(),
+    "expires_at" TIMESTAMP NOT NULL,
+
+    FOREIGN KEY ("user_id") REFERENCES "User"(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE "SocialAuth" (
@@ -20,7 +30,7 @@ CREATE TABLE "SocialAuth" (
 
     "provider_id" VARCHAR(255) UNIQUE NOT NULL,
 
-    FOREIGN KEY ("user_id") REFERENCES "User"(id)
+    FOREIGN KEY ("user_id") REFERENCES "User"(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE UNIQUE INDEX "SocialAuth_provider_user_id"

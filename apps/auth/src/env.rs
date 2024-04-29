@@ -2,9 +2,9 @@ use std::sync::OnceLock;
 
 #[derive(Deserialize, Debug)]
 pub struct Env {
-    pub database_url_superego: String,
-    pub superego_secret: String,
-    pub superego_port: u16,
+    pub database_url: String,
+    pub secret: String,
+    pub port: u16,
 }
 
 static ENV: OnceLock<Env> = OnceLock::new();

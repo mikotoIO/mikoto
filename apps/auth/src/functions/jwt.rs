@@ -18,7 +18,7 @@ fn header() -> &'static Header {
 fn encoding_key() -> &'static EncodingKey {
     static HEADER: OnceLock<EncodingKey> = OnceLock::new();
 
-    HEADER.get_or_init(|| EncodingKey::from_secret(env().superego_secret.as_ref()))
+    HEADER.get_or_init(|| EncodingKey::from_secret(env().secret.as_ref()))
     // TODO: support key rotation
 }
 

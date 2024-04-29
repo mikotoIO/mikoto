@@ -40,6 +40,9 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# TODO: separate the envfiles
+/apps/auth/.env
+
 # turbo
 .turbo
 

@@ -18,7 +18,7 @@ async fn main() {
     db::init().await.unwrap();
     let app = routes::router();
 
-    let addr = format!("0.0.0.0:{}", env.superego_port);
+    let addr = format!("0.0.0.0:{}", env.port);
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     info!("Server started on http://{}", &addr);
     axum::serve(listener, app).await.unwrap();

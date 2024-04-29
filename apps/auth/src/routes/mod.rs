@@ -11,6 +11,7 @@ pub mod login;
 pub mod register;
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct IndexResponse {
     name: String,
     version: String,

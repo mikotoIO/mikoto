@@ -4,6 +4,8 @@ use sqlx::{self, postgres::PgRow, Encode, FromRow, PgExecutor, Postgres, Type};
 
 use crate::entity::Entity;
 
+pub mod select;
+
 pub struct Muon<E> {
     x: PhantomData<E>,
 }
@@ -13,13 +15,14 @@ pub fn muon<E>() -> Muon<E> {
 }
 
 impl<E: Entity + for<'r> FromRow<'r, PgRow> + Send + Unpin> Muon<E> {
-    pub async fn find_one<'c, X: PgExecutor<'c>, I>(
+    // queries
+    pub async fn fetch_one<'c, X: PgExecutor<'c>, I>(
         &self,
         db: X,
         id: &I,
     ) -> Result<Option<E>, sqlx::Error>
     where
-        for<'q> &'q I: Encode<'q, Postgres> + Type<Postgres> + Send + Sync,
+        for<'q> &'q I: Encode<'q, Postgres> + Type<Postgres> + Send,
     {
         let meta = E::_entity_metadata();
         let query = format!(
@@ -27,6 +30,7 @@ impl<E: Entity + for<'r> FromRow<'r, PgRow> + Send + Unpin> Muon<E> {
             meta.table_name, meta.primary_key
         );
         let entity = sqlx::query_as(&query).bind(id).fetch_optional(db).await?;
+
         Ok(entity)
     }
 
@@ -48,6 +52,14 @@ impl<E: Entity + for<'r> FromRow<'r, PgRow> + Send + Unpin> Muon<E> {
         Ok(entity)
     }
 
+    // pub fn select(&self, rest: &'static str) -> sqlx::query::QueryAs<'_, Postgres, E, PgArguments> {
+    //     sqlx::query_as(&format!(
+    //         r#"SELECT * FROM "{}" {}"#,
+    //         E::_entity_metadata().table_name,
+    //         rest
+    //     ))
+    // }
+
     // mutations
     pub async fn insert<'c, X: PgExecutor<'c>>(
         &self,
@@ -58,15 +70,35 @@ impl<E: Entity + for<'r> FromRow<'r, PgRow> + Send + Unpin> Muon<E> {
         let query = format!(
             r#"INSERT INTO "{}" ({}) VALUES ({})"#,
             meta.table_name,
+            meta.gen_name_tuple(),
+            meta.gen_insert_tuple()
+        );
+        let _: Vec<()> = entity
+            ._bind_fields(sqlx::query_as(&query))
+            .fetch_all(db)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn upsert<'c, X: PgExecutor<'c>>(
+        &self,
+        db: X,
+        entity: &E,
+    ) -> Result<(), sqlx::Error> {
+        let meta = E::_entity_metadata();
+        let query = format!(
+            r#"INSERT INTO "{}" ({}) VALUES ({}) ON CONFLICT "{}" DO UPDATE SET {}"#,
+            meta.table_name,
+            meta.gen_name_tuple(),
+            meta.gen_insert_tuple(),
+            meta.primary_key,
             meta.fields
                 .iter()
-                .map(|f| f.name)
-                .collect::<Vec<_>>()
-                .join(", "),
-            meta.fields
-                .iter()
-                .enumerate()
-                .map(|(i, _)| format!("${}", i + 1))
+                .map(|f| if f.name == meta.primary_key {
+                    "".to_string()
+                } else {
+                    format!(r#""{}" = EXCLUDED."{}""#, f.name, f.name)
+                })
                 .collect::<Vec<_>>()
                 .join(", ")
         );

@@ -70,15 +70,35 @@ impl<E: Entity + for<'r> FromRow<'r, PgRow> + Send + Unpin> Muon<E> {
         let query = format!(
             r#"INSERT INTO "{}" ({}) VALUES ({})"#,
             meta.table_name,
+            meta.gen_name_tuple(),
+            meta.gen_insert_tuple()
+        );
+        let _: Vec<()> = entity
+            ._bind_fields(sqlx::query_as(&query))
+            .fetch_all(db)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn upsert<'c, X: PgExecutor<'c>>(
+        &self,
+        db: X,
+        entity: &E,
+    ) -> Result<(), sqlx::Error> {
+        let meta = E::_entity_metadata();
+        let query = format!(
+            r#"INSERT INTO "{}" ({}) VALUES ({}) ON CONFLICT "{}" DO UPDATE SET {}"#,
+            meta.table_name,
+            meta.gen_name_tuple(),
+            meta.gen_insert_tuple(),
+            meta.primary_key,
             meta.fields
                 .iter()
-                .map(|f| f.name)
-                .collect::<Vec<_>>()
-                .join(", "),
-            meta.fields
-                .iter()
-                .enumerate()
-                .map(|(i, _)| format!("${}", i + 1))
+                .map(|f| if f.name == meta.primary_key {
+                    "".to_string()
+                } else {
+                    format!(r#""{}" = EXCLUDED."{}""#, f.name, f.name)
+                })
                 .collect::<Vec<_>>()
                 .join(", ")
         );

@@ -8,6 +8,7 @@ pub struct User {
     pub name: String,
 }
 
+
 #[derive(FromRow, Entity)]
 pub struct EmailAuth {
     pub id: Uuid, // is also the account_id

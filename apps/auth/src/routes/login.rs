@@ -4,6 +4,7 @@ use crate::{
     db::db,
     entities::{EmailAuth, User},
     error::Error,
+    functions::jwt::UserClaims,
 };
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -19,7 +20,7 @@ pub struct LoginResponse {
     pub refresh_token: String,
 }
 
-pub async fn route(body: Json<LoginPayload>) -> Result<(), Error> {
+pub async fn route(body: Json<LoginPayload>) -> Result<Json<LoginResponse>, Error> {
     let cred: EmailAuth = sqlx::query_as(r#"SELECT * FROM "EmailAuth" WHERE email = $1"#)
         .bind(&body.email)
         .fetch_optional(db())
@@ -38,5 +39,8 @@ pub async fn route(body: Json<LoginPayload>) -> Result<(), Error> {
         .await?
         .ok_or(Error::NotFound)?;
 
-    todo!()
+    Ok(Json(LoginResponse {
+        access_token: UserClaims::from(user).encode()?,
+        refresh_token: "".to_string(),
+    }))
 }

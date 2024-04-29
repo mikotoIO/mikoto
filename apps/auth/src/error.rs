@@ -12,6 +12,7 @@ pub enum Error {
     NotFound,
     WrongPassword,
     WrongAuthenticationType,
+    JwtValidationError { message: String },
     InitializationFailed { message: String },
     DatabaseError { message: String },
     InternalServerError,
@@ -28,6 +29,14 @@ impl From<sqlx::Error> for Error {
 impl From<BcryptError> for Error {
     fn from(_: BcryptError) -> Self {
         Self::InternalServerError
+    }
+}
+
+impl From<jsonwebtoken::errors::Error> for Error {
+    fn from(err: jsonwebtoken::errors::Error) -> Self {
+        Self::JwtValidationError {
+            message: err.to_string(),
+        }
     }
 }
 

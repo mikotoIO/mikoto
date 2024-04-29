@@ -2,6 +2,8 @@ use std::collections::HashMap;
 use std::hash::Hash;
 use std::iter::IntoIterator;
 
+pub mod jwt;
+
 pub fn group_by<T, K, I, F>(iter: I, key_fn: F) -> HashMap<K, Vec<T>>
 where
     K: Eq + Hash,

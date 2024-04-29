@@ -25,6 +25,9 @@ muonic-macros = { version = "0.1.0", path = "../../packages/muonic/macros" }
 bcrypt = "0.15.1"
 jsonwebtoken = "9.3.0"
 didkit = "0.6.0"
+sha3 = "0.10.8"
+hex = "0.4.3"
+nanoid = "0.4.0"
 
 # database
 [dependencies.sqlx]

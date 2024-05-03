@@ -4,6 +4,7 @@ use std::sync::OnceLock;
 pub struct Env {
     pub database_url: String,
     pub secret: String,
+    pub issuer: String,
     pub port: u16,
 }
 

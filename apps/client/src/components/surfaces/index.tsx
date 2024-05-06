@@ -3,16 +3,16 @@ import type { ComponentProps } from 'react';
 
 import { DesignStory } from '@/views/Palette';
 
-import { AccountSettingsSurface } from './AccountSettings';
 import { BotSettingSurface } from './BotSettingSurface';
-import { ChannelSettingsSurface } from './ChannelSettings';
 import { DiscoverySurface } from './DiscoverySurface';
 import { DMExplorerSurface, ExplorerSurface } from './Explorer';
 import { FriendsSurface } from './FriendsSurface';
 import { MessageSurface } from './Messages';
 import { SearchSurface } from './SearchSurface';
-import { SpaceSettingsSurface } from './SpaceSettings';
 import { WelcomeSurface } from './WelcomeSurface';
+import { AccountSettingsSurface } from './settings/account';
+import { ChannelSettingsSurface } from './settings/channel';
+import { SpaceSettingsSurface } from './settings/space';
 
 export const surfaceMap = {
   textChannel: MessageSurface,

@@ -1,8 +1,9 @@
 use axum::Json;
+use muonic::muon::muon;
 
 use crate::{
     db::db,
-    entities::{EmailAuth, User},
+    entities::{EmailAuth, RefreshToken, User},
     error::Error,
     functions::jwt::UserClaims,
 };
@@ -39,8 +40,10 @@ pub async fn route(body: Json<LoginPayload>) -> Result<Json<LoginResponse>, Erro
         .await?
         .ok_or(Error::NotFound)?;
 
+    let (refresh, token) = RefreshToken::new(user.id);
+    muon::<RefreshToken>().insert(db(), &refresh).await?;
     Ok(Json(LoginResponse {
         access_token: UserClaims::from(user).encode()?,
-        refresh_token: "".to_string(),
+        refresh_token: token,
     }))
 }

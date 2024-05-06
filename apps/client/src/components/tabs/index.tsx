@@ -2,10 +2,7 @@ import { Box, Button, Flex, Grid } from '@chakra-ui/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import {
-  IconDefinition,
-  faAtom,
   faBarsStaggered,
-  faChevronCircleRight,
   faQuestion,
   faX,
 } from '@fortawesome/free-solid-svg-icons';
@@ -19,7 +16,6 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { ContextMenu, useContextMenu } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';
-import { faMikoto } from '@/components/icons';
 import { channelToTab } from '@/components/surfaces/Explorer/channelToTab';
 import type { ExplorerNode } from '@/components/surfaces/Explorer/explorerNode';
 import { useMikoto } from '@/hooks';
@@ -36,6 +32,7 @@ import {
 } from '@/store/surface';
 
 import { IconBox } from './IconBox';
+import { WelcomeToMikoto } from './Welcome';
 
 const StyledCloseButton = styled.div<{ active?: boolean }>`
   display: flex;
@@ -92,10 +89,10 @@ interface TabDnd {
   dragIndex: number;
 }
 
+// TODO: This is a very leaky abstraction. It handles sorting tabs,
+// as well as dispatching actions to the store.
 function useReorderable(destinationSurface: SurfaceLeaf) {
   return (dragIndex: number, dropIndex: number, originSurface: SurfaceLeaf) => {
-    // if (dragIndex === dropIndex) return;
-
     runInAction(() => {
       const nt = originSurface.tabs.splice(dragIndex, 1)[0];
 
@@ -132,6 +129,7 @@ export function TabName({ name, icon }: TabNameProps) {
 }
 
 function Tab({ tab, index, surfaceNode }: TabProps) {
+  // used for when this component is the `drop` of a DnD
   const reorderFn = useReorderable(surfaceNode);
   const tabName = useRecoilValue(tabNameFamily(`${tab.kind}/${tab.key}`));
 
@@ -232,78 +230,6 @@ const StyledRest = styled.div`
   -webkit-app-region: drag;
 `;
 
-const StyledWelcome = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-`;
-
-interface WelcomeButtonProps {
-  emoji: IconDefinition;
-  text: string;
-  linkTo: string;
-}
-
-function WelcomeButton(props: WelcomeButtonProps) {
-  return (
-    <Flex
-      as="a"
-      target="_blank" // TODO: allow opening join links as a surface
-      textDecoration="none"
-      href={props.linkTo}
-      align="center"
-      justify="space-between"
-      w="300px"
-      _hover={{ bg: 'gray.700' }}
-      px={4}
-      py={2}
-      rounded="md"
-      color="gray.600"
-    >
-      <Flex
-        align="center"
-        justify="center"
-        bg="gray.800"
-        rounded="md"
-        fontSize="lg"
-        w={10}
-        h={10}
-      >
-        <FontAwesomeIcon icon={props.emoji} />
-      </Flex>
-      <Box fontSize="sm" color="gray.450" fontWeight="600">
-        {props.text}
-      </Box>
-      <Box>
-        <FontAwesomeIcon icon={faChevronCircleRight} />
-      </Box>
-    </Flex>
-  );
-}
-
-function WelcomeToMikoto() {
-  return (
-    <StyledWelcome>
-      <Box color="gray.650">
-        <FontAwesomeIcon icon={faMikoto} fontSize="160px" />
-      </Box>
-      <Flex mt={8} direction="column">
-        <WelcomeButton
-          emoji={faAtom}
-          text="Official Mikoto Space"
-          linkTo="https://alpha.mikoto.io/invite/WtvbKS7mrLSd"
-        />
-        {/* <WelcomeButton
-          emoji={faBoltLightning}
-          text="Upgrade to Pro"
-          linkTo="#"
-        /> */}
-      </Flex>
-    </StyledWelcome>
-  );
-}
-
 export const TabBarButton = styled.button`
   border: none;
   margin: 4px 8px 0;
@@ -332,9 +258,13 @@ const TabsFlex = styled.div`
   }
 `;
 
+/**
+ * A collection of surfaces, with a tab bar at the top.
+ */
 export const TabbedView = observer(
   ({ children, tabs, surfaceNode }: TabbedViewProps) => {
     const mikoto = useMikoto();
+    // used for dragging to the end of the tab bar
     const reorderFn = useReorderable(surfaceNode);
     const setWorkspace = useSetRecoilState(workspaceState);
 

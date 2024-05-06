@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "dependencies": {
+    "@atlaskit/pragmatic-drag-and-drop": "^1.1.7",
     "@chakra-ui/react": "^2.8.2",
     "@emoji-mart/data": "^1.1.2",
     "@emoji-mart/react": "^1.1.1",

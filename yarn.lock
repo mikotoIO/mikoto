@@ -48,6 +48,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@atlaskit/pragmatic-drag-and-drop@npm:^1.1.7":
+  version: 1.1.7
+  resolution: "@atlaskit/pragmatic-drag-and-drop@npm:1.1.7"
+  dependencies:
+    "@babel/runtime": "npm:^7.0.0"
+    bind-event-listener: "npm:^3.0.0"
+    raf-schd: "npm:^4.0.3"
+  checksum: 10/6afd244ec35758600992eedcd2756f8cb2bcb8725f13c8f102696d62c213d7b3f181bbd7732e93b0627c2e295b054950c95f0c7d40dcf2e6b057ebe405c70841
+  languageName: node
+  linkType: hard
+
 "@axiomhq/js@npm:1.0.0-rc.3":
   version: 1.0.0-rc.3
   resolution: "@axiomhq/js@npm:1.0.0-rc.3"
@@ -9839,6 +9850,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bind-event-listener@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "bind-event-listener@npm:3.0.0"
+  checksum: 10/3d442307ee906b79f041433b065e7b259bd1e5231a74519271cc5beb485f7c469609da9c7f20fdd0b3ab340e4691fee826b76d003c71cf5ad955186aba5c256e
+  languageName: node
+  linkType: hard
+
 "bindings@npm:^1.5.0":
   version: 1.5.0
   resolution: "bindings@npm:1.5.0"
@@ -10741,6 +10759,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "client@workspace:apps/client"
   dependencies:
+    "@atlaskit/pragmatic-drag-and-drop": "npm:^1.1.7"
     "@babel/core": "npm:^7.22.9"
     "@chakra-ui/react": "npm:^2.8.2"
     "@emoji-mart/data": "npm:^1.1.2"

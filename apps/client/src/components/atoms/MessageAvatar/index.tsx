@@ -15,7 +15,7 @@ import { UserContextMenu } from '@/components/modals/ContextMenus';
 import { ProfileModal } from '@/components/modals/Profile';
 import { useMikoto } from '@/hooks';
 
-import { Avatar } from './Avatar';
+import { Avatar } from '../Avatar';
 import { BaseRoleBadge, RoleBadge } from './RoleBadge';
 
 interface AvatarProps {

@@ -63,12 +63,15 @@ export const TabContext = createContext<{ key: string }>({
 });
 
 export const pruneNode = action((node: SurfaceNode): SurfaceNode => {
+  // if leaf, return self
   if ('tabs' in node) {
     return node;
   }
+  // nodes with only one child can be reduced to a its child
   if (node.children.length === 1) {
     return pruneNode(node.children[0]);
   }
+  // remove empty children
   node.children = node.children.filter((x) => 'children' in x || x.tabs.length);
   return node;
 });

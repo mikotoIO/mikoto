@@ -9,7 +9,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 import { ViewContainer } from '@/components/ViewContainer';
-import { Spinner } from '@/components/atoms/Spinner';
+import { Spinner } from '@/ui/Spinner';
 import { TabName } from '@/components/tabs';
 import { useFetchMember, useMikoto } from '@/hooks';
 import { CurrentSpaceContext } from '@/store';

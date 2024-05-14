@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import { StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
-import { Spinner } from '@/components/atoms/Spinner';
+import { Spinner } from '@/ui/Spinner';
 import { useMikoto } from '@/hooks';
 
 const InvitationBox = styled.div`

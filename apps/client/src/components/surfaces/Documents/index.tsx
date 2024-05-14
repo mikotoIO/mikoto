@@ -13,7 +13,7 @@ import { toast } from 'react-toastify';
 
 import { ContextMenu, useContextMenuX } from '@/components/ContextMenu';
 import { ViewContainer } from '@/components/ViewContainer';
-import { Spinner as MikotoSpinner } from '@/components/atoms/Spinner';
+import { Spinner as MikotoSpinner } from '@/ui/Spinner';
 import { TabName } from '@/components/tabs';
 import { useInterval, useMikoto } from '@/hooks';
 

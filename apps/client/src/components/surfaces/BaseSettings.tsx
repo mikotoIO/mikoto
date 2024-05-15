@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TabName } from '@/components/tabs';
-import { SettingsView } from '@/views';
+import { SettingSurface } from '@/views';
 
 interface BaseSettingsSurfaceProps {
   categories: { code: string; tkey: string }[];
@@ -20,10 +20,10 @@ export function BaseSettingsSurface({
   const { t } = useTranslation();
 
   return (
-    <SettingsView.Container>
-      <SettingsView.Sidebar>
+    <SettingSurface.Container>
+      <SettingSurface.Sidebar>
         {categories.map((c) => (
-          <SettingsView.Nav
+          <SettingSurface.Nav
             active={nav === c.code}
             onClick={() => {
               setNav(c.code);
@@ -31,14 +31,14 @@ export function BaseSettingsSurface({
             key={c.code}
           >
             {t(c.tkey)}
-          </SettingsView.Nav>
+          </SettingSurface.Nav>
         ))}
-      </SettingsView.Sidebar>
+      </SettingSurface.Sidebar>
       <TabName
         name={t(categories.find((x) => x.code === nav)?.tkey!)}
         icon={faCog}
       />
       {switcher(nav)}
-    </SettingsView.Container>
+    </SettingSurface.Container>
   );
 }

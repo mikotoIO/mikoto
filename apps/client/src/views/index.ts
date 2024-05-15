@@ -1,1 +1,1 @@
-export { SettingsView } from './SettingsViewTemplate';
+export { SettingSurface } from './SettingsViewTemplate';

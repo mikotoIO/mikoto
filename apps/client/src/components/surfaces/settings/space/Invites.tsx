@@ -3,7 +3,7 @@ import { Invite, Space } from 'mikotojs';
 import { useEffect, useState } from 'react';
 
 import { useMikoto } from '@/hooks';
-import { SettingsView } from '@/views';
+import { SettingSurface } from '@/views';
 
 export function Invites({ space }: { space: Space }) {
   const mikoto = useMikoto();
@@ -16,7 +16,7 @@ export function Invites({ space }: { space: Space }) {
   }, [space.id]);
 
   return (
-    <SettingsView>
+    <SettingSurface>
       <h1>Invites</h1>
       {invites &&
         invites.map((invite) => (
@@ -39,6 +39,6 @@ export function Invites({ space }: { space: Space }) {
             </Button>
           </Box>
         ))}
-    </SettingsView>
+    </SettingSurface>
   );
 }

@@ -37,7 +37,7 @@ const Nav = styled.a<{ active?: boolean }>`
   user-select: none;
 `;
 
-export const SettingsView = Object.assign(SettingsViewBase, {
+export const SettingSurface = Object.assign(SettingsViewBase, {
   Container,
   Sidebar,
   Nav,

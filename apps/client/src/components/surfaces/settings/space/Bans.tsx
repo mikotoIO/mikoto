@@ -1,5 +1,5 @@
-import { SettingsView } from '@/views';
+import { SettingSurface } from '@/views';
 
 export function BansSubsurface() {
-  return <SettingsView>ban surface goes here</SettingsView>;
+  return <SettingSurface>ban surface goes here</SettingSurface>;
 }

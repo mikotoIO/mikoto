@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { DEFAULT_THEME_SETTINGS, themeDB } from '@/store';
 import { useLocalDB } from '@/store/LocalDB';
 import { Form } from '@/ui';
-import { SettingsView } from '@/views';
+import { SettingSurface } from '@/views';
 
 export function ThemesSubsurface() {
   const { t } = useTranslation();
@@ -24,7 +24,7 @@ export function ThemesSubsurface() {
   });
 
   return (
-    <SettingsView>
+    <SettingSurface>
       <h1>{t('accountSettings.themes.title')}</h1>
       <Form
         onSubmit={form.handleSubmit((data) => {
@@ -64,6 +64,6 @@ export function ThemesSubsurface() {
           </Button>
         </ButtonGroup>
       </Form>
-    </SettingsView>
+    </SettingSurface>
   );
 }

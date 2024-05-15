@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next';
 
-import { SettingsView } from '@/views';
+import { SettingSurface } from '@/views';
 
 export function SafetySurface() {
   const { t } = useTranslation();
 
   return (
-    <SettingsView>
+    <SettingSurface>
       <h1>{t('accountSettings.safety.title')}</h1>
-    </SettingsView>
+    </SettingSurface>
   );
 }

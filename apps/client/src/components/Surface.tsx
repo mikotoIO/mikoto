@@ -11,7 +11,7 @@ export const viewContainerCss = css`
   flex-direction: column;
 `;
 
-export const ViewContainer = styled.div<{ padded?: boolean; scroll?: boolean }>`
+export const Surface = styled.div<{ padded?: boolean; scroll?: boolean }>`
   ${viewContainerCss}
 
   padding: ${(p) => (p.padded ? '32px' : '0')};

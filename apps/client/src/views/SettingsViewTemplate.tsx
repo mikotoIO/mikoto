@@ -1,7 +1,7 @@
 import { chakra } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 
-import { viewContainerCss } from '@/components/ViewContainer';
+import { viewContainerCss } from '@/components/Surface';
 
 const SettingsViewBase = chakra('div', {
   baseStyle: {

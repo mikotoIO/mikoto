@@ -1,11 +1,11 @@
 import { Box, Flex, Heading } from '@chakra-ui/react';
 
-import { ViewContainer } from '@/components/ViewContainer';
+import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
 
 export function WelcomeSurface() {
   return (
-    <ViewContainer padded>
+    <Surface padded>
       <Box p={8}>
         <Flex direction="column" gap={4} align="center" justify="center">
           <TabName name="Welcome to Mikoto" />
@@ -17,6 +17,6 @@ export function WelcomeSurface() {
           </Heading>
         </Flex>
       </Box>
-    </ViewContainer>
+    </Surface>
   );
 }

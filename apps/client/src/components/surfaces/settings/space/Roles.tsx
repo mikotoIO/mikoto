@@ -25,7 +25,7 @@ import { useForm } from 'react-hook-form';
 import { useContextMenu } from '@/components/ContextMenu';
 import { useMikoto } from '@/hooks';
 import { Form } from '@/ui';
-import { SettingsView } from '@/views';
+import { SettingSurface } from '@/views';
 
 const SidebarButton = styled.a<{ selected?: boolean }>`
   display: block;
@@ -227,7 +227,7 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
   const role = space.roles.find((x) => x.id === selectedRoleId);
   // const role = rolesDelta.data.find((x) => x.id === selectedRoleId);
   return (
-    <SettingsView style={{ paddingRight: 0 }}>
+    <SettingSurface style={{ paddingRight: 0 }}>
       <Grid w="100%" h="100%" templateColumns="200px auto">
         <Box pr={4}>
           <Button
@@ -261,6 +261,6 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
         </Box>
         {role && <RoleEditor role={role} space={space} key={role.id} />}
       </Grid>
-    </SettingsView>
+    </SettingSurface>
   );
 });

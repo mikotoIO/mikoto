@@ -15,7 +15,7 @@ import { toast } from 'react-toastify';
 import { BaseSettingsSurface } from '@/components/surfaces/BaseSettings';
 import { useMikoto } from '@/hooks';
 import { Form, Triselector } from '@/ui';
-import { SettingsView } from '@/views';
+import { SettingSurface } from '@/views';
 
 const ACCOUNT_SETTING_CATEGORIES = [
   { code: 'general', tkey: 'channelSettings.general.title' },
@@ -30,7 +30,7 @@ function General({ channel }: { channel: ClientChannel }) {
     },
   });
   return (
-    <SettingsView>
+    <SettingSurface>
       <Heading>Overview</Heading>
       <Form
         onSubmit={form.handleSubmit(async (data) => {
@@ -51,13 +51,13 @@ function General({ channel }: { channel: ClientChannel }) {
           Save
         </Button>
       </Form>
-    </SettingsView>
+    </SettingSurface>
   );
 }
 
 function Permissions({ channel }: { channel: ClientChannel }) {
   return (
-    <SettingsView>
+    <SettingSurface>
       <Heading>Permissions</Heading>
       <Box py={4}>
         <Flex justify="space-between">
@@ -68,7 +68,7 @@ function Permissions({ channel }: { channel: ClientChannel }) {
         </Flex>
         <Box color="gray.200">Description of the perm goes here.</Box>
       </Box>
-    </SettingsView>
+    </SettingSurface>
   );
 }
 

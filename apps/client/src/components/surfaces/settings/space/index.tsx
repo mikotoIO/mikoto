@@ -19,7 +19,7 @@ import { BaseSettingsSurface } from '@/components/surfaces/BaseSettings';
 import { uploadFile } from '@/functions/fileUpload';
 import { useMikoto } from '@/hooks';
 import { Form } from '@/ui';
-import { SettingsView } from '@/views';
+import { SettingSurface } from '@/views';
 
 import { BansSubsurface } from './Bans';
 import { EmojiSubsurface } from './Emojis';
@@ -59,7 +59,7 @@ const Overview = observer(({ space }: { space: ClientSpace }) => {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <SettingsView>
+    <SettingSurface>
       <Form>
         <h1>{t('spaceSettings.spaceOverview')}</h1>
         <AvatarEditor
@@ -109,7 +109,7 @@ const Overview = observer(({ space }: { space: ClientSpace }) => {
           <Button variant="danger">Delete Space</Button>
         </ButtonGroup>
       </Form>
-    </SettingsView>
+    </SettingSurface>
   );
 });
 

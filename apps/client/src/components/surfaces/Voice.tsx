@@ -13,7 +13,7 @@ import { RoomEvent, Track } from 'livekit-client';
 import { VoiceToken } from 'mikotojs';
 import { useEffect, useState } from 'react';
 
-import { ViewContainer } from '@/components/ViewContainer';
+import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
 import { useMikoto } from '@/hooks';
 
@@ -61,7 +61,7 @@ export default function VoiceSurface({ channelId }: { channelId: string }) {
   }, []);
 
   return (
-    <ViewContainer data-lk-theme="default">
+    <Surface data-lk-theme="default">
       <TabName name={channel.name} icon={faMicrophone} />
       {voiceConfig && (
         <LiveKitRoom
@@ -77,6 +77,6 @@ export default function VoiceSurface({ channelId }: { channelId: string }) {
           {/* <VideoConference /> */}
         </LiveKitRoom>
       )}
-    </ViewContainer>
+    </Surface>
   );
 }

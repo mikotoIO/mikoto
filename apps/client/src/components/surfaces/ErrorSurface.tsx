@@ -12,13 +12,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { FallbackProps } from 'react-error-boundary';
 
-import { ViewContainer } from '@/components/ViewContainer';
+import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
 
 export function ErrorSurface({ error, resetErrorBoundary }: FallbackProps) {
   const [showDetails, setShowDetails] = useState(false);
   return (
-    <ViewContainer padded>
+    <Surface padded>
       <TabName name="Error" />
       <Flex direction="column" alignItems="center" gap={4}>
         <Heading m={0}>Error!</Heading>
@@ -39,6 +39,6 @@ export function ErrorSurface({ error, resetErrorBoundary }: FallbackProps) {
         </ButtonGroup>
         {showDetails && <Code variant="solid">{error.message}</Code>}
       </Flex>
-    </ViewContainer>
+    </Surface>
   );
 }

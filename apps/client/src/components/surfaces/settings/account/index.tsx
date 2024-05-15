@@ -22,7 +22,7 @@ import { uploadFile } from '@/functions/fileUpload';
 import { useAuthClient, useMikoto } from '@/hooks';
 import { useErrorElement } from '@/hooks/useErrorElement';
 import { Form } from '@/ui';
-import { SettingsView } from '@/views';
+import { SettingSurface } from '@/views';
 
 import { BotsSurface } from './bots';
 import { LanguageSurface } from './language';
@@ -130,7 +130,7 @@ const Overview = observer(() => {
   const user = mikoto.me;
 
   return (
-    <SettingsView>
+    <SettingSurface>
       <h1>{t('accountSettings.general.title')}</h1>
       <Form>
         <Box rounded={8} bg="gray.800" w="100%" maxW="600px">
@@ -205,7 +205,7 @@ const Overview = observer(() => {
       <h2>Debug</h2>
       <Button size="md">Open Design Palette</Button>
       <Box mb="80px" />
-    </SettingsView>
+    </SettingSurface>
   );
 });
 

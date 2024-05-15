@@ -8,7 +8,7 @@ import {
 import { faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import { useForm } from 'react-hook-form';
 
-import { ViewContainer } from '@/components/ViewContainer';
+import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
 import { useMikoto } from '@/hooks';
 import { Form } from '@/ui';
@@ -22,7 +22,7 @@ export function FriendsSurface() {
   const mikoto = useMikoto();
 
   return (
-    <ViewContainer padded scroll>
+    <Surface padded scroll>
       <TabName name="Friends" icon={faUserGroup} />
       <Heading>Friends</Heading>
       <Form
@@ -46,6 +46,6 @@ export function FriendsSurface() {
           Outgoing Requests
         </Heading>
       </Form>
-    </ViewContainer>
+    </Surface>
   );
 }

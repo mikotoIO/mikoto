@@ -2,7 +2,7 @@ import { Box } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { SettingsView } from '@/views';
+import { SettingSurface } from '@/views';
 
 const languages = [
   { name: 'English', code: 'en' },
@@ -17,7 +17,7 @@ export function LanguageSurface() {
   );
 
   return (
-    <SettingsView>
+    <SettingSurface>
       <h1>{t('accountSettings.language.title')}</h1>
       <div>
         {languages.map((lang) => (
@@ -39,6 +39,6 @@ export function LanguageSurface() {
           </Box>
         ))}
       </div>
-    </SettingsView>
+    </SettingSurface>
   );
 }

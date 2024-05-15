@@ -12,10 +12,10 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { ContextMenu, useContextMenuX } from '@/components/ContextMenu';
-import { ViewContainer } from '@/components/ViewContainer';
-import { Spinner as MikotoSpinner } from '@/ui/Spinner';
+import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
 import { useInterval, useMikoto } from '@/hooks';
+import { Spinner as MikotoSpinner } from '@/ui/Spinner';
 
 import { NoteBubbleMenu } from './BubbleMenu';
 import { useNoteEditor, useNoteReader } from './useNoteEditor';
@@ -217,7 +217,7 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
   }, [channelId]);
 
   return (
-    <ViewContainer scroll>
+    <Surface scroll>
       <TabName name={channel.name} icon={faFileLines} />
       <Box p={8}>
         <Heading fontSize="28px" color="gray.100">
@@ -233,6 +233,6 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
           )}
         </EditorContentWrapper>
       </Box>
-    </ViewContainer>
+    </Surface>
   );
 }

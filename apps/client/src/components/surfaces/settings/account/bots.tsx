@@ -21,7 +21,7 @@ import { Avatar } from '@/components/atoms/Avatar';
 import { useAuthClient } from '@/hooks';
 import { useTabkit } from '@/store/surface';
 import { Form } from '@/ui';
-import { SettingsView } from '@/views';
+import { SettingSurface } from '@/views';
 
 const BotCardContainer = styled.div`
   background-color: var(--chakra-colors-gray-800);
@@ -124,7 +124,7 @@ export function BotsSurface() {
   const { result: bots } = useAsync(() => authClient.listBots(), []);
 
   return (
-    <SettingsView>
+    <SettingSurface>
       <h1>{t('accountSettings.bots.title')}</h1>
       <Button
         variant="primary"
@@ -137,6 +137,6 @@ export function BotsSurface() {
         {t('accountSettings.bots.createBot')}{' '}
       </Button>
       {bots && bots.map((bot) => <BotCard key={bot.id} {...bot} />)}
-    </SettingsView>
+    </SettingSurface>
   );
 }

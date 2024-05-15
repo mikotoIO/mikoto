@@ -1,7 +1,7 @@
 import { chakra } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 
-import { viewContainerCss } from '@/components/ViewContainer';
+import { viewContainerCss } from '@/components/Surface';
 
 const SettingsViewBase = chakra('div', {
   baseStyle: {
@@ -37,7 +37,7 @@ const Nav = styled.a<{ active?: boolean }>`
   user-select: none;
 `;
 
-export const SettingsView = Object.assign(SettingsViewBase, {
+export const SettingSurface = Object.assign(SettingsViewBase, {
   Container,
   Sidebar,
   Nav,

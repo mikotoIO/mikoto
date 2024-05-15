@@ -8,11 +8,11 @@ import { Observer, observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
-import { ViewContainer } from '@/components/ViewContainer';
-import { Spinner } from '@/ui/Spinner';
+import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
 import { useFetchMember, useMikoto } from '@/hooks';
 import { CurrentSpaceContext } from '@/store';
+import { Spinner } from '@/ui/Spinner';
 
 import { DateSeparator, showDateSeparator } from './DateSeparator';
 import { MessageEditState, MessageItem } from './Message';
@@ -179,7 +179,7 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
   }, [channel.id]);
 
   return (
-    <ViewContainer key={channel.id}>
+    <Surface key={channel.id}>
       <TabName name={channel.name} icon={channel.space?.icon ?? faHashtag} />
       <Grid templateRows="auto 24px" h="100%">
         <Flex direction="column">
@@ -272,7 +272,7 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
         </Flex>
         <TypingIndicator typers={currentTypers} channel={channel} />
       </Grid>
-    </ViewContainer>
+    </Surface>
   );
 });
 

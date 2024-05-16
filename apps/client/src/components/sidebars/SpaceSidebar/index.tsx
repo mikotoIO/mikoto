@@ -2,29 +2,24 @@ import { Divider } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Tippy from '@tippyjs/react';
 import { produce } from 'immer';
 import { ClientSpace, SpaceStore } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
-import { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 
-import {
-  ContextMenu,
-  modalState,
-  useContextMenu,
-} from '@/components/ContextMenu';
+import { modalState, useContextMenu } from '@/components/ContextMenu';
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import { StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
 import { faMikoto } from '@/components/icons';
-import { InviteModal } from '@/components/modals/Invite';
 import { SpaceJoinModal } from '@/components/modals/SpaceJoin';
+import { reorder } from '@/functions/reorder';
 import { treebarSpaceState, workspaceState } from '@/store';
-import { useTabkit } from '@/store/surface';
-import { Tooltip } from '@/ui';
 
 import { Pill } from './Pill';
+import { SpaceBackContextMenu, SpaceContextMenu } from './SpaceContextMenu';
+import { SpaceIconTooltip } from './Tooltip';
 
 const StyledSpaceSidebar = styled.div`
   align-items: center;
@@ -37,51 +32,6 @@ const StyledSpaceSidebar = styled.div`
     display: none; /* Safari and Chrome */
   }
 `;
-
-function ServerIconContextMenu({ space }: { space: ClientSpace }) {
-  const tabkit = useTabkit();
-  const setModal = useSetRecoilState(modalState);
-
-  return (
-    <ContextMenu>
-      <ContextMenu.Link
-        onClick={async () =>
-          tabkit.openTab(
-            {
-              kind: 'spaceSettings',
-              key: space.id,
-              spaceId: space.id,
-            },
-            true,
-          )
-        }
-      >
-        Space Settings
-      </ContextMenu.Link>
-      <ContextMenu.Link
-        onClick={async () => await navigator.clipboard.writeText(space.id)}
-      >
-        Copy ID
-      </ContextMenu.Link>
-      <ContextMenu.Link
-        onClick={() => {
-          setModal({
-            elem: <InviteModal space={space} />,
-          });
-        }}
-      >
-        Generate Invite
-      </ContextMenu.Link>
-      <ContextMenu.Link
-        onClick={async () => {
-          await space.leave();
-        }}
-      >
-        Leave Space
-      </ContextMenu.Link>
-    </ContextMenu>
-  );
-}
 
 const StyledIconWrapper = styled.div`
   display: flex;
@@ -99,32 +49,35 @@ interface SidebarSpaceIconProps {
   onReorder?: (from: number, to: number) => void;
 }
 
-interface SpaceIconDragItem {
-  spaceId: string;
-  index: number;
+interface UseCombinedDnDProps<T> {
+  type: string;
+  item: T;
+  onDrop: (item: T) => void;
 }
 
-function SpaceIconTooltip({
-  children,
-  tooltip,
-}: {
-  children: React.ReactElement;
-  tooltip: string;
-}) {
-  return (
-    <Tippy
-      animation={false}
-      content={<Tooltip>{tooltip}</Tooltip>}
-      placement="right"
-      offset={[0, 0]}
-    >
-      {children}
-    </Tippy>
+function useCombinedDnD<T>(
+  { type, item, onDrop }: UseCombinedDnDProps<T>,
+  deps?: unknown[],
+) {
+  const [, drag] = useDrag(
+    () => ({
+      type,
+      item,
+    }),
+    deps,
   );
+  const [, drop] = useDrop(
+    {
+      accept: type,
+      drop: onDrop,
+    },
+    deps,
+  );
+  return { drag, drop };
 }
 
 function SidebarSpaceIcon({ space, index, onReorder }: SidebarSpaceIconProps) {
-  // TF is this name?
+  // TODO: TF is this name?
   const [leftSidebar, setLeftSidebar] = useRecoilState(treebarSpaceState);
   const isActive =
     leftSidebar &&
@@ -132,25 +85,20 @@ function SidebarSpaceIcon({ space, index, onReorder }: SidebarSpaceIconProps) {
     leftSidebar.spaceId === space.id;
   const setWorkspace = useSetRecoilState(workspaceState);
 
-  const [, drag] = useDrag(
-    () => ({
+  const ref = useRef<HTMLDivElement>(null);
+  const { drag, drop } = useCombinedDnD(
+    {
       type: 'SPACE',
       item: { spaceId: space.id, index },
-    }),
+      onDrop: (item) => {
+        onReorder?.(item.index, index);
+      },
+    },
     [space.id, index],
   );
-  const [, drop] = useDrop({
-    accept: 'SPACE',
-    drop: (item: SpaceIconDragItem) => {
-      onReorder?.(item.index, index);
-    },
-  });
-
-  const ref = useRef<HTMLDivElement>(null);
   drag(drop(ref));
-  const contextMenu = useContextMenu(() => (
-    <ServerIconContextMenu space={space} />
-  ));
+  
+  const contextMenu = useContextMenu(() => <SpaceContextMenu space={space} />);
 
   return (
     <SpaceIconTooltip tooltip={space.name}>
@@ -178,26 +126,8 @@ function SidebarSpaceIcon({ space, index, onReorder }: SidebarSpaceIconProps) {
   );
 }
 
-function ServerSidebarContextMenu() {
-  const setModal = useSetRecoilState(modalState);
-
-  return (
-    <ContextMenu>
-      <ContextMenu.Link
-        onClick={() => {
-          setModal({
-            elem: <SpaceJoinModal />,
-          });
-        }}
-      >
-        Create / Join Space
-      </ContextMenu.Link>
-    </ContextMenu>
-  );
-}
-
 // order spaces in the same order as the array of IDs
-// if an ID is not in the array, put it at the end
+// if an ID is not in the array, it is pushed to the end
 function orderSpaces(spaces: SpaceStore, order: string[]) {
   const ordered: ClientSpace[] = [];
   const unordered: ClientSpace[] = [];
@@ -220,18 +150,32 @@ function orderSpaces(spaces: SpaceStore, order: string[]) {
   return [res, unordered.length === 0] as const;
 }
 
-function reorder<T>(arr: T[], from: number, to: number) {
-  return produce(arr, (draft) => {
-    const [removed] = draft.splice(from, 1);
-    draft.splice(to, 0, removed);
-  });
+function JoinSpaceButon() {
+  const setModal = useSetRecoilState(modalState);
+
+  return (
+    <SpaceIconTooltip tooltip="Add / Join Space">
+      <StyledIconWrapper>
+        <StyledSpaceIcon
+          color="blue.500"
+          fontSize="18px"
+          onClick={() => {
+            setModal({
+              elem: <SpaceJoinModal />,
+            });
+          }}
+        >
+          <FontAwesomeIcon icon={faCirclePlus} />
+        </StyledSpaceIcon>
+      </StyledIconWrapper>
+    </SpaceIconTooltip>
+  );
 }
 
 export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
-  const setModal = useSetRecoilState(modalState);
   const [spaceId, setSpaceId] = useRecoilState(treebarSpaceState);
 
-  const contextMenu = useContextMenu(() => <ServerSidebarContextMenu />);
+  const contextMenu = useContextMenu(() => <SpaceBackContextMenu />);
 
   const [order, setOrder] = useState<string[]>(() =>
     // TODO: persist to server
@@ -279,21 +223,7 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
             }}
           />
         ))}
-      <SpaceIconTooltip tooltip="Add / Join Space">
-        <StyledIconWrapper>
-          <StyledSpaceIcon
-            color="blue.500"
-            fontSize="18px"
-            onClick={() => {
-              setModal({
-                elem: <SpaceJoinModal />,
-              });
-            }}
-          >
-            <FontAwesomeIcon icon={faCirclePlus} />
-          </StyledSpaceIcon>
-        </StyledIconWrapper>
-      </SpaceIconTooltip>
+      <JoinSpaceButon />
     </StyledSpaceSidebar>
   );
 });

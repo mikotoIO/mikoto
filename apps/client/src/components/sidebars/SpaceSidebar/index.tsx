@@ -45,8 +45,6 @@ const StyledIconWrapper = styled.div`
 
 interface SidebarSpaceIconProps {
   space: ClientSpace;
-  index: number;
-  onReorder?: (from: number, to: number) => void;
 }
 
 interface UseCombinedDnDProps<T> {
@@ -94,7 +92,7 @@ function CombinedDnD<T>({
   return <div ref={ref}>{children}</div>;
 }
 
-function SidebarSpaceIcon({ space, index, onReorder }: SidebarSpaceIconProps) {
+function SidebarSpaceIcon({ space }: SidebarSpaceIconProps) {
   // TODO: TF is this name?
   const [leftSidebar, setLeftSidebar] = useRecoilState(treebarSpaceState);
   const isActive =
@@ -216,6 +214,7 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
         .filter((x) => x.type === 'NONE') // TODO: filter this on the server
         .map((space, index) => (
           <CombinedDnD
+            key={space.id}
             type="SPACE"
             item={{ spaceId: space.id, index }}
             onDrop={(from, to) => {
@@ -225,8 +224,9 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
                 return reordered;
               });
             }}
+            deps={[index]}
           >
-            <SidebarSpaceIcon space={space} index={index} key={space.id} />
+            <SidebarSpaceIcon space={space} />
           </CombinedDnD>
         ))}
       <JoinSpaceButon />

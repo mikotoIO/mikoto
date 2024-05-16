@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Tippy from '@tippyjs/react';
+import { produce } from 'immer';
 import { ClientSpace, SpaceStore } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
@@ -220,12 +221,10 @@ function orderSpaces(spaces: SpaceStore, order: string[]) {
 }
 
 function reorder<T>(arr: T[], from: number, to: number) {
-  if (from === to) return arr;
-
-  const newArr = [...arr];
-  const [removed] = newArr.splice(from, 1);
-  newArr.splice(to, 0, removed);
-  return newArr;
+  return produce(arr, (draft) => {
+    const [removed] = draft.splice(from, 1);
+    draft.splice(to, 0, removed);
+  });
 }
 
 export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {

@@ -52,28 +52,46 @@ interface SidebarSpaceIconProps {
 interface UseCombinedDnDProps<T> {
   type: string;
   item: T;
-  onDrop: (item: T) => void;
+  onDrop: (from: T, to: T) => void;
 }
 
 function useCombinedDnD<T>(
   { type, item, onDrop }: UseCombinedDnDProps<T>,
   deps?: unknown[],
 ) {
-  const [, drag] = useDrag(
+  const [, drag] = useDrag<T>(
     () => ({
       type,
       item,
     }),
     deps,
   );
-  const [, drop] = useDrop(
+  const [, drop] = useDrop<T>(
     {
       accept: type,
-      drop: onDrop,
+      drop: (from) => {
+        onDrop(from, item);
+      },
     },
     deps,
   );
   return { drag, drop };
+}
+
+function CombinedDnD<T>({
+  type,
+  item,
+  onDrop,
+  children,
+  deps,
+}: UseCombinedDnDProps<T> & {
+  children: React.ReactNode;
+  deps?: unknown[];
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { drag, drop } = useCombinedDnD({ type, item, onDrop }, deps);
+  drag(drop(ref));
+  return <div ref={ref}>{children}</div>;
 }
 
 function SidebarSpaceIcon({ space, index, onReorder }: SidebarSpaceIconProps) {
@@ -85,24 +103,11 @@ function SidebarSpaceIcon({ space, index, onReorder }: SidebarSpaceIconProps) {
     leftSidebar.spaceId === space.id;
   const setWorkspace = useSetRecoilState(workspaceState);
 
-  const ref = useRef<HTMLDivElement>(null);
-  const { drag, drop } = useCombinedDnD(
-    {
-      type: 'SPACE',
-      item: { spaceId: space.id, index },
-      onDrop: (item) => {
-        onReorder?.(item.index, index);
-      },
-    },
-    [space.id, index],
-  );
-  drag(drop(ref));
-  
   const contextMenu = useContextMenu(() => <SpaceContextMenu space={space} />);
 
   return (
     <SpaceIconTooltip tooltip={space.name}>
-      <StyledIconWrapper ref={ref}>
+      <StyledIconWrapper>
         <Pill h={isActive ? 32 : 0} />
         <StyledSpaceIcon
           onContextMenu={contextMenu}
@@ -210,18 +215,19 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
       {spaceArray
         .filter((x) => x.type === 'NONE') // TODO: filter this on the server
         .map((space, index) => (
-          <SidebarSpaceIcon
-            space={space}
-            index={index}
-            key={space.id}
-            onReorder={(from, to) => {
-              setOrder((x) => {
-                const reordered = reorder(x, from, to);
+          <CombinedDnD
+            type="SPACE"
+            item={{ spaceId: space.id, index }}
+            onDrop={(from, to) => {
+              setOrder((spaceOrders) => {
+                const reordered = reorder(spaceOrders, from.index, to.index);
                 localStorage.setItem('spaceOrder', JSON.stringify(reordered));
                 return reordered;
               });
             }}
-          />
+          >
+            <SidebarSpaceIcon space={space} index={index} key={space.id} />
+          </CombinedDnD>
         ))}
       <JoinSpaceButon />
     </StyledSpaceSidebar>

@@ -45,7 +45,7 @@ function UserAreaMenuItems() {
       </ContextMenu.Link>
       <ContextMenu.Link
         onClick={() => {
-          tabkit.openTab({ kind: 'accountSettings', key: 'main' }, false);
+          tabkit.openTab({ kind: 'accountSettings', key: 'main' });
         }}
       >
         User Settings
@@ -56,6 +56,17 @@ function UserAreaMenuItems() {
         }}
       >
         Copy My User ID
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          tabkit.openTab({
+            kind: 'spaceInvite',
+            key: 'spaceInvite/derp',
+            inviteCode: 'derp',
+          });
+        }}
+      >
+        Test Button :3
       </ContextMenu.Link>
       <ContextMenu.Link
         onClick={() => {

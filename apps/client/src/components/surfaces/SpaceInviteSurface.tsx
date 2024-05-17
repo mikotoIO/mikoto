@@ -1,11 +1,46 @@
-import { Heading } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Flex,
+  Grid,
+  Heading,
+} from '@chakra-ui/react';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import { SponsoredFeature } from '../Sponsor';
 import { Surface } from '../Surface';
 
-export function SpaceInviteSurface() {
+export function SpaceInviteSurface({ inviteCode }: { inviteCode: string }) {
   return (
     <Surface>
-      <Heading>Space Invite</Heading>
+      <Box>
+        <Flex
+          h="200px"
+          bg="url('/images/artworks/1.jpg') no-repeat center center"
+          bgSize="cover"
+        />
+        <Flex p={8} direction="column" gap={8}>
+          <Heading fontSize="lg" m={0} color="gray.400">
+            You got a new space invite!
+          </Heading>
+          <Heading m={0}>Space Name</Heading>
+          <Box color="gray.400" fontSize="sm">
+            <Box as="span" mr={2}>
+              <FontAwesomeIcon icon={faUser} />
+            </Box>
+            12345 Members
+          </Box>
+          <Flex direction="column" gap={2} maxW="400px">
+            <Button variant="primary">Join Space Name</Button>
+            <Button size="sm" colorScheme="primary" variant="ghost">
+              No, Thanks
+            </Button>
+          </Flex>
+          <SponsoredFeature />
+        </Flex>
+      </Box>
     </Surface>
   );
 }

@@ -51,16 +51,6 @@ services:
     volumes:
       - meilisearch:/meili_data
     restart: on-failure:0
-  caddy:
-    image: caddy
-    restart: always
-    network_mode: host
-    environment:
-      CADDY_HOST: http://localhost:2000
-    ports:
-      - '2000:2000'
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
 
 volumes:
   postgresql:

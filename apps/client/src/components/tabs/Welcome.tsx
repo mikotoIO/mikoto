@@ -4,6 +4,7 @@ import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import {
   faAtom,
   faChevronCircleRight,
+  faDonate,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -71,11 +72,11 @@ export function WelcomeToMikoto() {
           text="Official Mikoto Space"
           linkTo="https://alpha.mikoto.io/invite/WtvbKS7mrLSd"
         />
-        {/* <WelcomeButton
-          emoji={faBoltLightning}
-          text="Upgrade to Pro"
-          linkTo="#"
-        /> */}
+        <WelcomeButton
+          emoji={faDonate}
+          text="Sponsor a feature"
+          linkTo="https://buy.stripe.com/3cseWUcvd5uZcAEaEG"
+        />
       </Flex>
     </StyledWelcome>
   );

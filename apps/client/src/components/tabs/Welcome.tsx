@@ -75,7 +75,7 @@ export function WelcomeToMikoto() {
         <WelcomeButton
           emoji={faDonate}
           text="Sponsor a feature"
-          linkTo="https://buy.stripe.com/3cseWUcvd5uZcAEaEG"
+          linkTo="https://buy.stripe.com/fZe02066P4qV448fZ1"
         />
       </Flex>
     </StyledWelcome>

@@ -114,7 +114,7 @@ export const MessageItem = observer(
         >
           Copy Markdown
         </ContextMenu.Link>
-        <ContextMenu.Link>Pin Message</ContextMenu.Link>
+        <ContextMenu.Link>Reply to Message</ContextMenu.Link>
         <ContextMenu.Link
           onClick={async () => {
             await message.delete();

@@ -13,7 +13,7 @@ import {
   useContainer,
   useExpressServer,
 } from 'routing-controllers';
-import socketio from 'socket.io';
+import * as socketio from 'socket.io';
 import { Container } from 'typedi';
 
 import { AccountController } from './controllers/AccountController';
@@ -70,6 +70,8 @@ async function main() {
   server.listen(env.AUTH_PORT, () => {
     logger.info(`Mikoto auth started on http://0.0.0.0:${env.AUTH_PORT}`);
   });
+
+  console.log(Object.keys(root));
 
   // set up a HyperRPC server as well
   const hss = new hs.HyperschemaServer({

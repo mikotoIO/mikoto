@@ -5829,6 +5829,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lexical/headless@npm:^0.14.4":
+  version: 0.14.5
+  resolution: "@lexical/headless@npm:0.14.5"
+  dependencies:
+    lexical: "npm:0.14.5"
+  checksum: 10/d7bbbeaed2789c724ad2978a71704d6b449d7965728d9ea9eb1da84b6a8a357f17cd7842bfbde96ef9c0acd9c1b49f16422c1249d70d5734b9ec8862ed9cc78d
+  languageName: node
+  linkType: hard
+
 "@lexical/history@npm:0.14.5":
   version: 0.14.5
   resolution: "@lexical/history@npm:0.14.5"
@@ -6008,7 +6017,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lexical/yjs@npm:0.14.5":
+"@lexical/yjs@npm:0.14.5, @lexical/yjs@npm:^0.14.4":
   version: 0.14.5
   resolution: "@lexical/yjs@npm:0.14.5"
   dependencies:
@@ -6133,6 +6142,22 @@ __metadata:
   checksum: 10/b4fc3b78ca7d922a48870610d4d788bb1f629b3fc728f918b3069eeea8791f5ba5fa6e6f2976b1a612da96051192b043607f0c015b76c263183c49112d492000
   languageName: node
   linkType: hard
+
+"@mikoto-io/lexical-markdown@npm:*, @mikoto-io/lexical-markdown@workspace:packages/lexical-markdown":
+  version: 0.0.0-use.local
+  resolution: "@mikoto-io/lexical-markdown@workspace:packages/lexical-markdown"
+  dependencies:
+    "@lexical/code": "npm:^0.14.4"
+    "@lexical/link": "npm:^0.14.4"
+    "@lexical/list": "npm:^0.14.4"
+    "@lexical/markdown": "npm:^0.14.4"
+    "@lexical/react": "npm:^0.14.4"
+    "@lexical/rich-text": "npm:^0.14.4"
+    "@lexical/table": "npm:^0.14.4"
+    lexical: "npm:^0.14.4"
+    typescript: "npm:^5.4.2"
+  languageName: unknown
+  linkType: soft
 
 "@mikoto-io/permcheck@npm:0.0.1, @mikoto-io/permcheck@workspace:packages/permcheck":
   version: 0.0.0-use.local
@@ -24053,6 +24078,10 @@ __metadata:
     "@hocuspocus/cli": "npm:^2.9.0"
     "@hocuspocus/server": "npm:^2.9.0"
     "@hyperschema/core": "npm:^0.0.14"
+    "@lexical/headless": "npm:^0.14.4"
+    "@lexical/markdown": "npm:^0.14.4"
+    "@lexical/yjs": "npm:^0.14.4"
+    "@mikoto-io/lexical-markdown": "npm:*"
     "@mikoto-io/permcheck": "npm:0.0.1"
     "@prisma/client": "npm:^4.16.2"
     "@types/bcrypt": "npm:^5.0.0"
@@ -24078,6 +24107,7 @@ __metadata:
     ioredis: "npm:^5.3.2"
     jest: "npm:^29.5.0"
     jsonwebtoken: "npm:^9.0.2"
+    lexical: "npm:^0.14.4"
     livekit-server-sdk: "npm:^1.2.7"
     meilisearch: "npm:^0.37.0"
     multer: "npm:^1.4.5-lts.1"
@@ -24099,7 +24129,7 @@ __metadata:
     winston: "npm:^3.11.0"
     winston-transport: "npm:^4.6.0"
     y-protocols: "npm:^1.0.6"
-    yjs: "npm:^13.6.10"
+    yjs: "npm:^13.6.15"
     zod: "npm:^3.22.4"
   languageName: unknown
   linkType: soft
@@ -27550,6 +27580,15 @@ __metadata:
   dependencies:
     lib0: "npm:^0.2.86"
   checksum: 10/aa277393aea2524bf80d014b570a2949a6fe930fb9809dbdb38c04fe6086385f3abba8daf4cce2ddfa421c2f8c450c7beede9972106dece405071e0dc5664a11
+  languageName: node
+  linkType: hard
+
+"yjs@npm:^13.6.15":
+  version: 13.6.15
+  resolution: "yjs@npm:13.6.15"
+  dependencies:
+    lib0: "npm:^0.2.86"
+  checksum: 10/56fe847bfb8a29e04bd388afef6788fa42513e6b4dece511373ac3a5cf407172d7e208d9414d41b239b550d4d4ffff6dd40883e7928cfcf669879f21fcbba9e8
   languageName: node
   linkType: hard
 

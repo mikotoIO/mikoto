@@ -40,6 +40,10 @@
     "@hocuspocus/cli": "^2.9.0",
     "@hocuspocus/server": "^2.9.0",
     "@hyperschema/core": "^0.0.14",
+    "@lexical/headless": "^0.14.4",
+    "@lexical/markdown": "^0.14.4",
+    "@lexical/yjs": "^0.14.4",
+    "@mikoto-io/lexical-markdown": "*",
     "@mikoto-io/permcheck": "0.0.1",
     "@prisma/client": "^4.16.2",
     "bcrypt": "^5.1.1",
@@ -53,6 +57,7 @@
     "express": "^4.18.2",
     "ioredis": "^5.3.2",
     "jsonwebtoken": "^9.0.2",
+    "lexical": "^0.14.4",
     "livekit-server-sdk": "^1.2.7",
     "meilisearch": "^0.37.0",
     "multer": "^1.4.5-lts.1",
@@ -66,7 +71,7 @@
     "winston": "^3.11.0",
     "winston-transport": "^4.6.0",
     "y-protocols": "^1.0.6",
-    "yjs": "^13.6.10",
+    "yjs": "^13.6.15",
     "zod": "^3.22.4"
   },
   "bundledDependencies": [

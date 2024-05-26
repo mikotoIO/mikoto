@@ -1,5 +1,6 @@
+use ::muonic::{muonic::col, sea_query::Expr};
 use axum::Json;
-use muonic::muon::muon;
+use muonic::muonic;
 
 use crate::{
     db::db,
@@ -22,11 +23,12 @@ pub struct LoginResponse {
 }
 
 pub async fn route(body: Json<LoginPayload>) -> Result<Json<LoginResponse>, Error> {
-    let cred: EmailAuth = sqlx::query_as(r#"SELECT * FROM "EmailAuth" WHERE email = $1"#)
-        .bind(&body.email)
-        .fetch_optional(db())
+    let cred: EmailAuth = muonic::select()
+        .where_(col("email").eq(&body.email))
+        .one(db())
         .await?
         .ok_or(Error::NotFound)?;
+
     if !bcrypt::verify(
         &body.password,
         &cred.passhash.ok_or(Error::WrongAuthenticationType)?,
@@ -34,14 +36,14 @@ pub async fn route(body: Json<LoginPayload>) -> Result<Json<LoginResponse>, Erro
         return Err(Error::WrongPassword);
     }
 
-    let user: User = sqlx::query_as(r#"SELECT * FROM "User" WHERE id = $1"#)
-        .bind(&cred.id)
-        .fetch_optional(db())
+    let user: User = muonic::select()
+        .where_(col("id").eq(cred.id))
+        .one(db())
         .await?
         .ok_or(Error::NotFound)?;
 
     let (refresh, token) = RefreshToken::new(user.id);
-    muon::<RefreshToken>().insert(db(), &refresh).await?;
+    muonic::insert(db(), &refresh).await?;
     Ok(Json(LoginResponse {
         access_token: UserClaims::from(user).encode()?,
         refresh_token: token,

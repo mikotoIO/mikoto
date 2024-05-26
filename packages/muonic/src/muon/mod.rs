@@ -4,8 +4,6 @@ use sqlx::{self, postgres::PgRow, Encode, FromRow, PgExecutor, Postgres, Type};
 
 use crate::entity::Entity;
 
-pub mod select;
-
 pub struct Muon<E> {
     x: PhantomData<E>,
 }

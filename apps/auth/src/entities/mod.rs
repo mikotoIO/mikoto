@@ -6,37 +6,30 @@ use uuid::Uuid;
 use crate::functions::sha3::sha3;
 
 #[derive(FromRow, Entity, Serialize)]
-pub struct User {
+#[sqlx(rename_all = "camelCase")]
+pub struct Account {
     pub id: Uuid,
-    pub name: String,
-}
-
-#[derive(FromRow, Entity)]
-pub struct EmailAuth {
-    pub id: Uuid, // is also the account_id
-
     pub email: String,
-    pub passhash: Option<String>, // None, if using a "magic link"
+    pub passhash: String,
 }
 
 #[derive(FromRow, Entity)]
+#[sqlx(rename_all = "camelCase")]
 pub struct RefreshToken {
     pub id: Uuid,
     pub token: String,
-    pub user_id: Uuid,
-    pub created_at: time::OffsetDateTime,
     pub expires_at: time::OffsetDateTime,
+    pub account_id: Uuid,
 }
 
 impl RefreshToken {
-    pub fn new(user_id: Uuid) -> (Self, String) {
+    pub fn new(account_id: Uuid) -> (Self, String) {
         let refresh_token = nanoid!(32);
         (
             Self {
                 id: Uuid::new_v4(),
                 token: sha3(&refresh_token),
-                user_id,
-                created_at: time::OffsetDateTime::now_utc(),
+                account_id,
                 expires_at: time::OffsetDateTime::now_utc() + time::Duration::days(30),
             },
             refresh_token,

@@ -1,10 +1,10 @@
-use ::muonic::{muonic::col, sea_query::Expr};
+use ::muonic::muon::col;
 use axum::Json;
-use muonic::muonic;
+use muonic::muon;
 
 use crate::{
     db::db,
-    entities::{EmailAuth, RefreshToken, User},
+    entities::{Account, RefreshToken},
     error::Error,
     functions::jwt::UserClaims,
 };
@@ -23,29 +23,20 @@ pub struct LoginResponse {
 }
 
 pub async fn route(body: Json<LoginPayload>) -> Result<Json<LoginResponse>, Error> {
-    let cred: EmailAuth = muonic::select()
+    let acc: Account = muon::select()
         .where_(col("email").eq(&body.email))
         .one(db())
         .await?
         .ok_or(Error::NotFound)?;
 
-    if !bcrypt::verify(
-        &body.password,
-        &cred.passhash.ok_or(Error::WrongAuthenticationType)?,
-    )? {
+    if !bcrypt::verify(&body.password, &acc.passhash)? {
         return Err(Error::WrongPassword);
     }
 
-    let user: User = muonic::select()
-        .where_(col("id").eq(cred.id))
-        .one(db())
-        .await?
-        .ok_or(Error::NotFound)?;
-
-    let (refresh, token) = RefreshToken::new(user.id);
-    muonic::insert(db(), &refresh).await?;
+    let (refresh, token) = RefreshToken::new(acc.id);
+    muon::insert(db(), &refresh).await?;
     Ok(Json(LoginResponse {
-        access_token: UserClaims::from(user).encode()?,
+        access_token: UserClaims::from(acc).encode()?,
         refresh_token: token,
     }))
 }

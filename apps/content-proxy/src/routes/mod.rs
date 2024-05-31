@@ -33,5 +33,5 @@ pub fn router() -> Router {
         .route("/:store/*path", get(serve::route))
         .route("/:store", post(upload::route))
         .layer(DefaultBodyLimit::max(500 * 1024 * 1024))
-        .layer(CorsLayer::permissive())
+        .layer(CorsLayer::very_permissive())
 }

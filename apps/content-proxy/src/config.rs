@@ -42,7 +42,7 @@ impl Store {
 pub fn config() -> &'static Config {
     static CONFIG: OnceLock<Config> = OnceLock::new();
     CONFIG.get_or_init(|| {
-        let config = std::fs::read_to_string("config.toml").unwrap();
+        let config = include_str!("../config.toml");
         toml::from_str(&config).unwrap()
     })
 }

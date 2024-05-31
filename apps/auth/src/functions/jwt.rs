@@ -2,12 +2,12 @@ use std::sync::OnceLock;
 
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
 
-use crate::{entities::User, env::env, error::Error};
+use crate::{entities::Account, env::env, error::Error};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UserClaims {
-    pub exp: usize,        // expiry
-    pub sub: String,       // user ID
+    pub exp: usize,  // expiry
+    pub sub: String, // user ID
     pub iss: String, // issuer
 }
 
@@ -42,8 +42,8 @@ impl UserClaims {
     }
 }
 
-impl From<User> for UserClaims {
-    fn from(user: User) -> Self {
+impl From<Account> for UserClaims {
+    fn from(user: Account) -> Self {
         Self {
             exp: time::OffsetDateTime::now_utc().unix_timestamp() as usize,
             sub: user.id.to_string(),

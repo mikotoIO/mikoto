@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 use sea_query::{
     Asterisk, Expr, Iden, Order, PostgresQueryBuilder, Query, SelectStatement, SimpleExpr,
 };
-use sea_query_binder::SqlxBinder;
+use sea_query_binder::{SqlxBinder, SqlxValues};
 use sqlx::{postgres::PgRow, FromRow, PgExecutor};
 
 use crate::entity::Entity;
@@ -52,18 +52,17 @@ where
         self
     }
 
-    pub fn where_eq(&mut self, column: &str, val: impl Into<Expr>) -> &mut Self {
-        self.query.and_where(col(column).eq(val.into()));
+    pub fn order_by(&mut self, col: &str, ex: Order) -> &mut Self {
+        self.query.order_by(Name(col.to_string()), ex);
         self
     }
 
-    pub fn order_by(&mut self, col: Name, ex: Order) -> &mut Self {
-        self.query.order_by(col, ex);
-        self
+    pub fn build_query(&self) -> (String, SqlxValues) {
+        self.query.build_sqlx(PostgresQueryBuilder)
     }
 
     pub async fn one<'c, X: PgExecutor<'c>>(&self, db: X) -> Result<Option<E>, sqlx::Error> {
-        let (query, values) = self.query.build_sqlx(PostgresQueryBuilder);
+        let (query, values) = self.build_query();
         let entity = sqlx::query_as_with(&query, values)
             .fetch_optional(db)
             .await?;
@@ -71,7 +70,7 @@ where
     }
 
     pub async fn many<'c, X: PgExecutor<'c>>(&self, db: X) -> Result<Vec<E>, sqlx::Error> {
-        let (query, values) = self.query.build_sqlx(PostgresQueryBuilder);
+        let (query, values) = self.build_query();
         let entity = sqlx::query_as_with(&query, values).fetch_all(db).await?;
         Ok(entity)
     }

@@ -3,7 +3,7 @@ use proc_macro::TokenStream;
 use proc_macro_error::proc_macro_error;
 
 #[proc_macro_error]
-#[proc_macro_derive(Entity, attributes(entity))]
+#[proc_macro_derive(Entity, attributes(muon))]
 pub fn entity_derive(tokens: TokenStream) -> TokenStream {
     muonic_entity_derive(tokens.into()).into()
 }

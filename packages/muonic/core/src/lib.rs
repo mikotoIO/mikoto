@@ -1,12 +1,40 @@
+use darling::{FromDeriveInput, FromMeta};
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{parse2, Data, DeriveInput, Fields};
+use rename::RenameRule;
+use syn::{parse2, Data, DeriveInput, Fields, Meta};
+
+pub mod rename;
+
+#[derive(Debug, FromMeta)]
+pub struct SqlxAttribute {
+    #[darling(default)]
+    pub rename_all: Option<String>,
+}
+
+#[derive(Debug, FromDeriveInput)]
+#[darling(attributes(muon), forward_attrs(sqlx))]
+pub struct MuonicAttributes {
+    #[darling(default)]
+    pub rename_all: Option<String>,
+    pub attrs: Vec<syn::Attribute>,
+}
 
 pub fn muonic_entity_derive(input: TokenStream) -> TokenStream {
     let input = match parse2::<DeriveInput>(input) {
         Ok(tree) => tree,
         Err(error) => return error.to_compile_error(),
     };
+
+    let mut sqlx = None;
+
+    for attr in &input.attrs {
+        if attr.path().is_ident("sqlx") {
+            sqlx = Some(SqlxAttribute::from_meta(&attr.meta).unwrap())
+        }
+    }
+
+    let rename_rule = RenameRule::new(sqlx.map(|x| x.rename_all).flatten());
 
     // Used in the quasi-quotation below as `#name`
     let name = &input.ident;
@@ -21,8 +49,11 @@ pub fn muonic_entity_derive(input: TokenStream) -> TokenStream {
         _ => return syn::Error::new_spanned(&input.ident, "Expected a struct").to_compile_error(),
     };
     let fields = fields.iter().map(|field| &field.ident);
-    let fields2 = fields.clone();
-    let fields3 = fields.clone();
+    let fields_binds = fields.clone();
+    let fields_renamed = fields
+        .clone()
+        .into_iter()
+        .map(|field| rename_rule.apply_to_ident(field.as_ref().unwrap()));
 
     // Construct the output, possibly using quasi-quotation
     let expanded = quote! {
@@ -32,7 +63,7 @@ pub fn muonic_entity_derive(input: TokenStream) -> TokenStream {
                     table_name: stringify!(#name),
                     primary_key: "id",
                     fields: &[
-                        #( ::muonic::entity::MetaField { name: stringify!(#fields) } ),*
+                        #( ::muonic::entity::MetaField { name: stringify!(#fields_renamed) } ),*
                     ],
                 };
                 &META
@@ -42,23 +73,7 @@ pub fn muonic_entity_derive(input: TokenStream) -> TokenStream {
                 &'a self,
                 query: sqlx::query::QueryAs<'q, ::sqlx::Postgres, O, ::sqlx::postgres::PgArguments>,
             ) -> sqlx::query::QueryAs<'q, ::sqlx::Postgres, O, ::sqlx::postgres::PgArguments> {
-                #( let query = query.bind(self.#fields2.clone()); )*
-                query
-            }
-
-            fn _bind_fields_partial<'a, 'q, 's, O>(
-                &'a self,
-                query: sqlx::query::QueryAs<'q, ::sqlx::Postgres, O, ::sqlx::postgres::PgArguments>,
-                fields: Vec<&'s str>,
-            ) -> sqlx::query::QueryAs<'q, ::sqlx::Postgres, O, ::sqlx::postgres::PgArguments> {
-                // use a loop!
-                let mut query = query;
-                for field in fields {
-                    match field {
-                        #( stringify!(#fields3) => query = query.bind(self.#fields3.clone()), )*
-                        _ => {}
-                    }
-                }
+                #( let query = query.bind(self.#fields_binds.clone()); )*
                 query
             }
         }

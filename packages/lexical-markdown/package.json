@@ -1,6 +1,12 @@
 {
   "name": "@mikoto-io/lexical-markdown",
   "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
   "dependencies": {
     "@lexical/code": "^0.14.4",
     "@lexical/link": "^0.14.4",
@@ -15,6 +21,7 @@
     ".": "./src/index.ts"
   },
   "devDependencies": {
+    "tsconfig": "0.0.0",
     "typescript": "^5.4.2"
   }
 }

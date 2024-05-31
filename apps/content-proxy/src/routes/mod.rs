@@ -5,7 +5,7 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
-use tower_http::cors::CorsLayer;
+use tower_http::cors::{Any, CorsLayer};
 
 pub mod proxy;
 pub mod serve;
@@ -33,5 +33,5 @@ pub fn router() -> Router {
         .route("/:store/*path", get(serve::route))
         .route("/:store", post(upload::route))
         .layer(DefaultBodyLimit::max(500 * 1024 * 1024))
-        .layer(CorsLayer::very_permissive())
+        .layer(CorsLayer::new().allow_origin(Any).allow_methods(Any))
 }

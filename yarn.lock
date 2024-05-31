@@ -6155,6 +6155,7 @@ __metadata:
     "@lexical/rich-text": "npm:^0.14.4"
     "@lexical/table": "npm:^0.14.4"
     lexical: "npm:^0.14.4"
+    tsconfig: "npm:0.0.0"
     typescript: "npm:^5.4.2"
   languageName: unknown
   linkType: soft

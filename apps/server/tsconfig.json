@@ -2,6 +2,7 @@
   "extends": "tsconfig/server.tsconfig.json",
   "references": [
     { "path": "../../packages/permcheck" },
+    { "path": "../../packages/lexical-markdown" },
     { "path": "../../hyperschema/typescript-core" }
   ],
   "compilerOptions": {

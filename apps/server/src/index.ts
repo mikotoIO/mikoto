@@ -71,8 +71,6 @@ async function main() {
     logger.info(`Mikoto auth started on http://0.0.0.0:${env.AUTH_PORT}`);
   });
 
-  console.log(Object.keys(root));
-
   // set up a HyperRPC server as well
   const hss = new hs.HyperschemaServer({
     system: root,

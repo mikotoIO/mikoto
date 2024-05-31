@@ -6,4 +6,5 @@ members = [
     "packages/muonic",
     "packages/muonic/macros",
     "packages/muonic/core",
+    "packages/hyperschema-rs",
 ]

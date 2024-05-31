@@ -6163,6 +6163,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@mikoto-io/permcheck@workspace:packages/permcheck"
   dependencies:
+    tsconfig: "npm:0.0.0"
     typescript: "npm:^5.4.2"
   languageName: unknown
   linkType: soft

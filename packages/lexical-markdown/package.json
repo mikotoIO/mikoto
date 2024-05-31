@@ -17,9 +17,6 @@
     "@lexical/table": "^0.14.4",
     "lexical": "^0.14.4"
   },
-  "exports": {
-    ".": "./src/index.ts"
-  },
   "devDependencies": {
     "tsconfig": "0.0.0",
     "typescript": "^5.4.2"

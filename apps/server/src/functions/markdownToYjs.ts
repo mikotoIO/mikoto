@@ -11,9 +11,8 @@ import {
   syncLexicalUpdateToYjs,
   syncYjsChangesToLexical,
 } from '@lexical/yjs';
+import { MARKDOWN_NODES } from '@mikoto-io/lexical-markdown';
 import {
-  $createParagraphNode,
-  $createTextNode,
   $getRoot,
   Klass,
   LexicalEditor,
@@ -35,7 +34,7 @@ function withHeadlessCollaborationEditor<T>(
     nodes,
   });
 
-  const id = 'main';
+  const id = 'Editor';
   const doc = new Doc();
   const docMap = new Map([[id, doc]]);
   const provider = createNoOpProvider();
@@ -111,12 +110,17 @@ function createNoOpProvider(): Provider {
   };
 }
 
-export function markdownToYjs(markdown: string) {
-  const editor = createHeadlessEditor({
-    nodes: [],
-  });
+export function markdownToYjs(markdown: string): Doc {
+  return withHeadlessCollaborationEditor(MARKDOWN_NODES, (editor, binding) => {
+    editor.update(
+      () => $getRoot().clear(), // to prevent any conflicts
+      { discrete: true },
+    );
 
-  editor.update(() => {
-    $convertFromMarkdownString(markdown, TRANSFORMERS);
+    editor.update(() => $convertFromMarkdownString(markdown, TRANSFORMERS), {
+      discrete: true,
+    });
+
+    return binding.doc;
   });
 }

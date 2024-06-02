@@ -1,51 +1,42 @@
-import { Box, Heading } from '@chakra-ui/react';
-import { faFileLines } from '@fortawesome/free-solid-svg-icons';
+import { Box, Flex, Heading, Spinner } from '@chakra-ui/react';
+import {
+  faEllipsis,
+  faFileLines,
+  faSquareCheck,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { HocuspocusProvider } from '@hocuspocus/provider';
-import { CodeHighlightNode, CodeNode } from '@lexical/code';
-import { AutoLinkNode, LinkNode } from '@lexical/link';
-import { ListItemNode, ListNode } from '@lexical/list';
-import { $convertFromMarkdownString, TRANSFORMERS } from '@lexical/markdown';
+import {
+  $convertFromMarkdownString,
+  $convertToMarkdownString,
+  TRANSFORMERS,
+} from '@lexical/markdown';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { CollaborationPlugin } from '@lexical/react/LexicalCollaborationPlugin';
 import {
   InitialConfigType,
   LexicalComposer,
 } from '@lexical/react/LexicalComposer';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
-import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
-import { HeadingNode, QuoteNode } from '@lexical/rich-text';
-import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
-import { $getRoot, Klass, LexicalNode } from 'lexical';
 import { ClientChannel } from 'mikotojs';
 import { useCallback, useEffect, useState } from 'react';
-import { WebsocketProvider } from 'y-websocket';
+import { toast } from 'react-toastify';
 import * as Y from 'yjs';
 
+import { ContextMenu, useContextMenuX } from '@/components/ContextMenu';
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
 import { env } from '@/env';
-import { useMikoto } from '@/hooks';
+import { useInterval, useMikoto } from '@/hooks';
 
+import { EDITOR_NODES } from './editorNodes';
 import { SaveLoadPlugin } from './plugins/SaveLoadPlugin';
 import { lexicalTheme } from './theme';
-
-const EDITOR_NODES: Klass<LexicalNode>[] = [
-  HeadingNode,
-  QuoteNode,
-  HorizontalRuleNode,
-  AutoLinkNode,
-  LinkNode,
-  ListNode,
-  ListItemNode,
-  TableCellNode,
-  TableRowNode,
-  TableNode,
-  CodeNode,
-  CodeHighlightNode,
-];
 
 function getDocFromMap(id: string, yjsDocMap: Map<string, Y.Doc>): Y.Doc {
   let doc = yjsDocMap.get(id);
@@ -56,8 +47,53 @@ function getDocFromMap(id: string, yjsDocMap: Map<string, Y.Doc>): Y.Doc {
   } else {
     doc.load();
   }
-
   return doc;
+}
+
+interface UseProviderFactoryProps {
+  channel: ClientChannel;
+  content: string;
+  onSync?: () => void;
+}
+
+function useProviderFactory({
+  channel,
+  content,
+  onSync,
+}: UseProviderFactoryProps) {
+  const [synced, setSynced] = useState(false);
+  const [editor] = useLexicalComposerContext();
+
+  const providerFactory = useCallback(
+    (id: string, yjsDocMap: Map<string, Y.Doc>) => {
+      const doc = new Y.Doc();
+      yjsDocMap.set(id, doc);
+
+      const hocuspocus = new HocuspocusProvider({
+        url: env.PUBLIC_COLLABORATION_URL,
+        name: channel.id,
+        document: doc,
+      });
+
+      hocuspocus.on('synced', () => {
+        if (doc.store.clients.size === 0) {
+          editor.update(
+            () => {
+              $convertFromMarkdownString(content, TRANSFORMERS);
+            },
+            { discrete: true },
+          );
+        }
+        onSync?.();
+        setSynced(true);
+      });
+
+      return hocuspocus as any;
+    },
+    [],
+  );
+
+  return { providerFactory, synced };
 }
 
 function DocumentEditor({
@@ -69,58 +105,114 @@ function DocumentEditor({
 }) {
   const mikoto = useMikoto();
 
-  const initialConfig: InitialConfigType = {
-    namespace: 'Editor',
-    nodes: EDITOR_NODES,
-    theme: lexicalTheme,
-    editorState: null,
-    onError(error: Error) {
-      throw error;
+  const [editorContent, setEditorContent] = useState(content);
+
+  const [editor] = useLexicalComposerContext();
+  const { providerFactory } = useProviderFactory({
+    channel,
+    content,
+    onSync() {
+      editor.setEditable(true);
     },
+  });
+
+  const save = () => {
+    const contentString = editor
+      .getEditorState()
+      .read(() => $convertToMarkdownString(TRANSFORMERS));
+
+    if (contentString === editorContent) {
+      setChanged(false);
+      return;
+    }
+    setEditorContent(contentString);
+
+    mikoto.client.documents
+      .update({ channelId: channel.id, content: contentString })
+      .then(() => setChanged(false))
+      .catch((e) => {
+        console.error(e);
+        setChanged(true);
+      });
   };
 
-  const providerFactory = useCallback(
-    (id: string, yjsDocMap: Map<string, Y.Doc>) => {
-      const ydoc = getDocFromMap(id, yjsDocMap);
+  const [changed, setChanged] = useState(false);
+  useInterval(() => {
+    if (changed) {
+      save();
+    }
+  }, 5000);
 
-      const hocuspocus = new HocuspocusProvider({
-        url: env.PUBLIC_COLLABORATION_URL,
-        name: channel.id,
-        document: ydoc,
-      }) as any;
-
-      return hocuspocus as any;
-    },
-    [],
-  );
+  const contextMenu = useContextMenuX();
 
   return (
     <Box>
-      <LexicalComposer initialConfig={initialConfig}>
-        <RichTextPlugin
-          contentEditable={
-            <ContentEditable
-              className="editor-input"
-              style={{
-                outline: 'none',
-              }}
-            />
-          }
-          placeholder={<div></div>}
-          ErrorBoundary={LexicalErrorBoundary}
-        />
-        <MarkdownShortcutPlugin />
+      <div>
+        <Flex
+          w="100%"
+          h={8}
+          bg="gray.800"
+          rounded="md"
+          px={4}
+          mb={4}
+          align="center"
+          justify="space-between"
+        >
+          <FontAwesomeIcon
+            icon={faEllipsis}
+            onClick={contextMenu(() => (
+              <ContextMenu>
+                <ContextMenu.Link
+                  onClick={() => {
+                    if (!editor) return;
+                    const text = editor
+                      .getEditorState()
+                      .read(() => $convertToMarkdownString(TRANSFORMERS));
+                    navigator.clipboard.writeText(text);
+                    toast('Copied Markdown to clipboard');
+                  }}
+                >
+                  Copy Markdown
+                </ContextMenu.Link>
+              </ContextMenu>
+            ))}
+          />
+          <Flex gap={2}>
+            {changed ? (
+              <Spinner size="xs" speed="0.5s" />
+            ) : (
+              <FontAwesomeIcon icon={faSquareCheck} />
+            )}
+          </Flex>
+        </Flex>
+      </div>
+      <RichTextPlugin
+        contentEditable={
+          <ContentEditable
+            className="editor-input"
+            style={{
+              outline: 'none',
+            }}
+          />
+        }
+        placeholder={<div></div>}
+        ErrorBoundary={LexicalErrorBoundary}
+      />
+      <CollaborationPlugin
+        id={channel.id}
+        shouldBootstrap={false}
+        providerFactory={providerFactory}
+        username={mikoto.me.name}
+      />
+      <OnChangePlugin
+        onChange={() => {
+          setChanged(true);
+        }}
+      />
+      <MarkdownShortcutPlugin />
 
-        <CollaborationPlugin
-          id={channel.id}
-          shouldBootstrap={true}
-          providerFactory={providerFactory}
-          username={mikoto.me.name}
-        />
-
-        <AutoFocusPlugin />
-        <SaveLoadPlugin channel={channel} />
-      </LexicalComposer>
+      <AutoFocusPlugin />
+      <SaveLoadPlugin channel={channel} />
     </Box>
   );
 }
@@ -133,6 +225,18 @@ export default function DocumentSurfaceNext({
   const mikoto = useMikoto();
   const channel = mikoto.channels.get(channelId)!;
   const [content, setContent] = useState<string | null>(null);
+
+  // lexical context
+  const initialConfig: InitialConfigType = {
+    namespace: 'Editor',
+    editable: false,
+    nodes: EDITOR_NODES,
+    theme: lexicalTheme,
+    editorState: null,
+    onError(error: Error) {
+      throw error;
+    },
+  };
 
   useEffect(() => {
     mikoto.client.documents.get({ channelId }).then((x) => {
@@ -152,7 +256,9 @@ export default function DocumentSurfaceNext({
         </Heading>
 
         {content !== null && (
-          <DocumentEditor channel={channel} content={content} />
+          <LexicalComposer initialConfig={initialConfig}>
+            <DocumentEditor channel={channel} content={content} />
+          </LexicalComposer>
         )}
       </Box>
     </Surface>

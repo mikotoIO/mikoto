@@ -104,7 +104,6 @@ function DocumentEditor({
   content: string;
 }) {
   const mikoto = useMikoto();
-
   const [editorContent, setEditorContent] = useState(content);
 
   const [editor] = useLexicalComposerContext();
@@ -200,7 +199,7 @@ function DocumentEditor({
       />
       <CollaborationPlugin
         id={channel.id}
-        shouldBootstrap={false}
+        shouldBootstrap={true}
         providerFactory={providerFactory}
         username={mikoto.me.name}
       />

@@ -1,16 +1,5 @@
-import { Box, Flex, Heading, Spinner } from '@chakra-ui/react';
-import {
-  faEllipsis,
-  faFileLines,
-  faSquareCheck,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { HocuspocusProvider } from '@hocuspocus/provider';
-import {
-  $convertFromMarkdownString,
-  $convertToMarkdownString,
-  TRANSFORMERS,
-} from '@lexical/markdown';
+import { Box, Heading } from '@chakra-ui/react';
+import { faFileLines } from '@fortawesome/free-solid-svg-icons';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { CollaborationPlugin } from '@lexical/react/LexicalCollaborationPlugin';
 import {
@@ -24,77 +13,17 @@ import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPl
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ClientChannel } from 'mikotojs';
-import { useCallback, useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-import * as Y from 'yjs';
+import { useEffect, useState } from 'react';
 
-import { ContextMenu, useContextMenuX } from '@/components/ContextMenu';
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
-import { env } from '@/env';
 import { useInterval, useMikoto } from '@/hooks';
 
+import { EditorContextBar } from './EditorContextBar';
 import { EDITOR_NODES } from './editorNodes';
 import { SaveLoadPlugin } from './plugins/SaveLoadPlugin';
+import { useProviderFactory } from './providerFactory';
 import { lexicalTheme } from './theme';
-
-function getDocFromMap(id: string, yjsDocMap: Map<string, Y.Doc>): Y.Doc {
-  let doc = yjsDocMap.get(id);
-
-  if (doc === undefined) {
-    doc = new Y.Doc();
-    yjsDocMap.set(id, doc);
-  } else {
-    doc.load();
-  }
-  return doc;
-}
-
-interface UseProviderFactoryProps {
-  channel: ClientChannel;
-  content: string;
-  onSync?: () => void;
-}
-
-function useProviderFactory({
-  channel,
-  content,
-  onSync,
-}: UseProviderFactoryProps) {
-  const [synced, setSynced] = useState(false);
-  const [editor] = useLexicalComposerContext();
-
-  const providerFactory = useCallback(
-    (id: string, yjsDocMap: Map<string, Y.Doc>) => {
-      const doc = new Y.Doc();
-      yjsDocMap.set(id, doc);
-
-      const hocuspocus = new HocuspocusProvider({
-        url: env.PUBLIC_COLLABORATION_URL,
-        name: channel.id,
-        document: doc,
-      });
-
-      hocuspocus.on('synced', () => {
-        if (doc.store.clients.size === 0) {
-          editor.update(
-            () => {
-              $convertFromMarkdownString(content, TRANSFORMERS);
-            },
-            { discrete: true },
-          );
-        }
-        onSync?.();
-        setSynced(true);
-      });
-
-      return hocuspocus as any;
-    },
-    [],
-  );
-
-  return { providerFactory, synced };
-}
 
 function DocumentEditor({
   channel,
@@ -104,10 +33,9 @@ function DocumentEditor({
   content: string;
 }) {
   const mikoto = useMikoto();
-  const [editorContent, setEditorContent] = useState(content);
 
   const [editor] = useLexicalComposerContext();
-  const { providerFactory } = useProviderFactory({
+  const { providerFactory, save, synced, setSynced } = useProviderFactory({
     channel,
     content,
     onSync() {
@@ -115,76 +43,15 @@ function DocumentEditor({
     },
   });
 
-  const save = () => {
-    const contentString = editor
-      .getEditorState()
-      .read(() => $convertToMarkdownString(TRANSFORMERS));
-
-    if (contentString === editorContent) {
-      setChanged(false);
-      return;
-    }
-    setEditorContent(contentString);
-
-    mikoto.client.documents
-      .update({ channelId: channel.id, content: contentString })
-      .then(() => setChanged(false))
-      .catch((e) => {
-        console.error(e);
-        setChanged(true);
-      });
-  };
-
-  const [changed, setChanged] = useState(false);
   useInterval(() => {
-    if (changed) {
+    if (synced === 'syncing') {
       save();
     }
   }, 5000);
 
-  const contextMenu = useContextMenuX();
-
   return (
     <Box>
-      <div>
-        <Flex
-          w="100%"
-          h={8}
-          bg="gray.800"
-          rounded="md"
-          px={4}
-          mb={4}
-          align="center"
-          justify="space-between"
-        >
-          <FontAwesomeIcon
-            icon={faEllipsis}
-            onClick={contextMenu(() => (
-              <ContextMenu>
-                <ContextMenu.Link
-                  onClick={() => {
-                    if (!editor) return;
-                    const text = editor
-                      .getEditorState()
-                      .read(() => $convertToMarkdownString(TRANSFORMERS));
-                    navigator.clipboard.writeText(text);
-                    toast('Copied Markdown to clipboard');
-                  }}
-                >
-                  Copy Markdown
-                </ContextMenu.Link>
-              </ContextMenu>
-            ))}
-          />
-          <Flex gap={2}>
-            {changed ? (
-              <Spinner size="xs" speed="0.5s" />
-            ) : (
-              <FontAwesomeIcon icon={faSquareCheck} />
-            )}
-          </Flex>
-        </Flex>
-      </div>
+      <EditorContextBar syncState={synced} />
       <RichTextPlugin
         contentEditable={
           <ContentEditable
@@ -204,8 +71,9 @@ function DocumentEditor({
         username={mikoto.me.name}
       />
       <OnChangePlugin
+        ignoreSelectionChange
         onChange={() => {
-          setChanged(true);
+          setSynced('syncing');
         }}
       />
       <MarkdownShortcutPlugin />

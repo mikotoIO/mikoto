@@ -1,6 +1,8 @@
 import { Box, Heading } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import { faFileLines } from '@fortawesome/free-solid-svg-icons';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
+import { AutoLinkPlugin } from '@lexical/react/LexicalAutoLinkPlugin';
 import { CollaborationPlugin } from '@lexical/react/LexicalCollaborationPlugin';
 import {
   InitialConfigType,
@@ -24,6 +26,15 @@ import { EDITOR_NODES } from './editorNodes';
 import { SaveLoadPlugin } from './plugins/SaveLoadPlugin';
 import { useProviderFactory } from './providerFactory';
 import { lexicalTheme } from './theme';
+
+const EditorWrapper = styled.div`
+  blockquote {
+    border-left: 2px solid var(--chakra-colors-gray-600);
+    color: var(--chakra-colors-gray-400);
+    margin: 0;
+    padding-left: 1em;
+  }
+`;
 
 function DocumentEditor({
   channel,
@@ -52,18 +63,20 @@ function DocumentEditor({
   return (
     <Box>
       <EditorContextBar syncState={synced} />
-      <RichTextPlugin
-        contentEditable={
-          <ContentEditable
-            className="editor-input"
-            style={{
-              outline: 'none',
-            }}
-          />
-        }
-        placeholder={<div></div>}
-        ErrorBoundary={LexicalErrorBoundary}
-      />
+      <EditorWrapper>
+        <RichTextPlugin
+          contentEditable={
+            <ContentEditable
+              className="editor-input"
+              style={{
+                outline: 'none',
+              }}
+            />
+          }
+          placeholder={<div></div>}
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+      </EditorWrapper>
       <CollaborationPlugin
         id={channel.id}
         shouldBootstrap={true}
@@ -77,6 +90,7 @@ function DocumentEditor({
         }}
       />
       <MarkdownShortcutPlugin />
+      {/* <AutoLinkPlugin /> */}
 
       <AutoFocusPlugin />
       <SaveLoadPlugin channel={channel} />

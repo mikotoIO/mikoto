@@ -84,7 +84,11 @@ function DocumentEditor({
               }}
             />
           }
-          placeholder={<div></div>}
+          placeholder={
+            <Box color="gray.500" pos="absolute" top={0} pointerEvents="none">
+              Write something here...
+            </Box>
+          }
           ErrorBoundary={LexicalErrorBoundary}
         />
       </EditorWrapper>

@@ -18,6 +18,13 @@ import { env } from '../env';
 import Mailer from '../functions/Mailer';
 import { logger } from '../functions/logger';
 
+function normalizeEmail(email: string) {
+  if (!email.includes('@')) {
+    throw new UnauthorizedError('Invalid Email');
+  }
+  return email.toLowerCase().trim();
+}
+
 function bcryptHash(password: string) {
   // if (globalThis.Bun) {
   //   return globalThis.Bun.password.hash(password, 'bcrypt');
@@ -112,14 +119,14 @@ export class AccountController {
           name: body.name,
           Account: {
             create: {
-              email: body.email,
+              email: normalizeEmail(body.email),
               passhash: await bcryptHash(body.password),
             },
           },
         },
       });
       const account = await this.prisma.account.findUnique({
-        where: { email: body.email },
+        where: { email: normalizeEmail(body.email) },
       });
       return await this.createTokenPair(account!);
     } catch (e) {
@@ -141,7 +148,7 @@ export class AccountController {
   @Post('/account/login')
   async login(@Body() body: LoginPayload) {
     const account = await this.prisma.account.findUnique({
-      where: { email: body.email },
+      where: { email: normalizeEmail(body.email) },
     });
     if (account === null) {
       throw new UnauthorizedError('No user found with the given email');
@@ -189,7 +196,7 @@ export class AccountController {
   @Post('/account/reset_password')
   async resetPassword(@Body() body: { email: string }) {
     const account = await this.prisma.account.findUnique({
-      where: { email: body.email },
+      where: { email: normalizeEmail(body.email) },
       include: { user: true },
     });
     if (account === null) {
@@ -208,7 +215,7 @@ export class AccountController {
     const resetLink = `${env.WEB_CLIENT}/forgotpassword/${verification.token}`;
 
     await this.mailer.sendMail(
-      body.email,
+      normalizeEmail(body.email),
       'Reset Password',
       'reset-password.ejs',
       {
@@ -217,7 +224,7 @@ export class AccountController {
         expiry: verification.expiresAt.toISOString(),
       },
     );
-    logger.info(`Sent password reset to ${body.email}`);
+    logger.info(`Sent password reset to ${normalizeEmail(body.email)}`);
     return {};
   }
 

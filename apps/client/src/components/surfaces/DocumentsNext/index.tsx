@@ -2,7 +2,6 @@ import { Box, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faFileLines } from '@fortawesome/free-solid-svg-icons';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
-import { AutoLinkPlugin } from '@lexical/react/LexicalAutoLinkPlugin';
 import { CollaborationPlugin } from '@lexical/react/LexicalCollaborationPlugin';
 import {
   InitialConfigType,
@@ -23,11 +22,15 @@ import { useInterval, useMikoto } from '@/hooks';
 
 import { EditorContextBar } from './EditorContextBar';
 import { EDITOR_NODES } from './editorNodes';
+import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
 import { SaveLoadPlugin } from './plugins/SaveLoadPlugin';
 import { useProviderFactory } from './providerFactory';
 import { lexicalTheme } from './theme';
 
 const EditorWrapper = styled.div`
+  line-height: 1.1;
+  position: relative;
+
   blockquote {
     border-left: 2px solid var(--chakra-colors-gray-600);
     color: var(--chakra-colors-gray-400);
@@ -60,10 +63,18 @@ function DocumentEditor({
     }
   }, 5000);
 
+  const [floatingAnchorElem, setFloatingAnchorElem] =
+    useState<HTMLDivElement | null>(null);
+  const onRef = (_floatingAnchorElem: HTMLDivElement) => {
+    if (_floatingAnchorElem !== null) {
+      setFloatingAnchorElem(_floatingAnchorElem);
+    }
+  };
+
   return (
     <Box>
       <EditorContextBar syncState={synced} />
-      <EditorWrapper>
+      <EditorWrapper ref={onRef}>
         <RichTextPlugin
           contentEditable={
             <ContentEditable
@@ -90,6 +101,9 @@ function DocumentEditor({
         }}
       />
       <MarkdownShortcutPlugin />
+      {floatingAnchorElem && (
+        <>{/* <DraggableBlockPlugin anchorElem={floatingAnchorElem} /> */}</>
+      )}
       {/* <AutoLinkPlugin /> */}
 
       <AutoFocusPlugin />

@@ -92,7 +92,7 @@ yarn build
 | Package              | Description               | Stack                                      |
 | -------------------- | ------------------------- | ------------------------------------------ |
 | `apps/server`        | Core server for Mikoto    | NodeJS + TypeScript + HyperSchema + Prisma |
-| `apps/media-server`  | S3 Proxy                  | NodeJS + TypeScript                        |
+| `apps/content-proxy`  | S3 Proxy                  | NodeJS + TypeScript                        |
 | `apps/client`        | The web client for Mikoto | React + MobX                               |
 | `apps/mobile`        | Mobile client for Mikoto  | React Native + MobX                        |
 | `apps/desktop`       | Desktop client for Mikoto | Electron                                   |

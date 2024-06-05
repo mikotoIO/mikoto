@@ -6005,7 +6005,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lexical/utils@npm:0.14.5":
+"@lexical/utils@npm:0.14.5, @lexical/utils@npm:^0.14.4":
   version: 0.14.5
   resolution: "@lexical/utils@npm:0.14.5"
   dependencies:
@@ -11061,6 +11061,7 @@ __metadata:
     "@lexical/react": "npm:^0.14.4"
     "@lexical/rich-text": "npm:^0.14.4"
     "@lexical/table": "npm:^0.14.4"
+    "@lexical/utils": "npm:^0.14.4"
     "@livekit/components-react": "npm:^1.1.8"
     "@livekit/components-styles": "npm:^1.0.6"
     "@marsidev/react-turnstile": "npm:^0.2.2"

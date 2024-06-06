@@ -22,7 +22,6 @@ import { useInterval, useMikoto } from '@/hooks';
 
 import { EditorContextBar } from './EditorContextBar';
 import { EDITOR_NODES } from './editorNodes';
-import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
 import { SaveLoadPlugin } from './plugins/SaveLoadPlugin';
 import { useProviderFactory } from './providerFactory';
 import { lexicalTheme } from './theme';
@@ -108,7 +107,6 @@ function DocumentEditor({
       {floatingAnchorElem && (
         <>{/* <DraggableBlockPlugin anchorElem={floatingAnchorElem} /> */}</>
       )}
-      {/* <AutoLinkPlugin /> */}
 
       <AutoFocusPlugin />
       <SaveLoadPlugin channel={channel} />

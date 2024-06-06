@@ -31,4 +31,5 @@ jobs:
           branch: 'main'
           remote-organization-name: mikotoIO
           remote-repository-name: cla
+          allowList: TheCactusBlue,dependabot[bot],bot*
 

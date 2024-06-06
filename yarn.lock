@@ -8121,7 +8121,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express@npm:*, @types/express@npm:^4.17.13":
+"@types/express@npm:*, @types/express@npm:^4.17.21":
   version: 4.17.21
   resolution: "@types/express@npm:4.17.21"
   dependencies:
@@ -11174,7 +11174,7 @@ __metadata:
     typed-emitter: "npm:^2.1.0"
     typescript: "npm:^5.4.2"
     usehooks-ts: "npm:^2.6.0"
-    vite: "npm:^5.1.6"
+    vite: "npm:^5.2.12"
     vite-tsconfig-paths: "npm:^4.3.2"
     vitest: "npm:^0.18.0"
     web-vitals: "npm:^3.0.0"
@@ -12553,7 +12553,7 @@ __metadata:
     react: "npm:*"
     react-dom: "npm:*"
     typescript: "npm:^5.4.2"
-    vite: "npm:^5.1.6"
+    vite: "npm:^5.2.12"
   languageName: unknown
   linkType: soft
 
@@ -14351,6 +14351,45 @@ __metadata:
     utils-merge: "npm:1.0.1"
     vary: "npm:~1.1.2"
   checksum: 10/7b817f21afe96e478cd7fe77cd5f52cf7d2d6b70c3e98f0e1399ce48356cef3c5f5d34bf93bdbc7bc326403005c45e2f8522f51b4cc319da52220066c9094745
+  languageName: node
+  linkType: hard
+
+"express@npm:^4.19.2":
+  version: 4.19.2
+  resolution: "express@npm:4.19.2"
+  dependencies:
+    accepts: "npm:~1.3.8"
+    array-flatten: "npm:1.1.1"
+    body-parser: "npm:1.20.2"
+    content-disposition: "npm:0.5.4"
+    content-type: "npm:~1.0.4"
+    cookie: "npm:0.6.0"
+    cookie-signature: "npm:1.0.6"
+    debug: "npm:2.6.9"
+    depd: "npm:2.0.0"
+    encodeurl: "npm:~1.0.2"
+    escape-html: "npm:~1.0.3"
+    etag: "npm:~1.8.1"
+    finalhandler: "npm:1.2.0"
+    fresh: "npm:0.5.2"
+    http-errors: "npm:2.0.0"
+    merge-descriptors: "npm:1.0.1"
+    methods: "npm:~1.1.2"
+    on-finished: "npm:2.4.1"
+    parseurl: "npm:~1.3.3"
+    path-to-regexp: "npm:0.1.7"
+    proxy-addr: "npm:~2.0.7"
+    qs: "npm:6.11.0"
+    range-parser: "npm:~1.2.1"
+    safe-buffer: "npm:5.2.1"
+    send: "npm:0.18.0"
+    serve-static: "npm:1.15.0"
+    setprototypeof: "npm:1.2.0"
+    statuses: "npm:2.0.1"
+    type-is: "npm:~1.6.18"
+    utils-merge: "npm:1.0.1"
+    vary: "npm:~1.1.2"
+  checksum: 10/3fcd792536f802c059789ef48db3851b87e78fba103423e524144d79af37da7952a2b8d4e1a007f423329c7377d686d9476ac42e7d9ea413b80345d495e30a3a
   languageName: node
   linkType: hard
 
@@ -21588,7 +21627,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.4.18, postcss@npm:^8.4.36, postcss@npm:~8.4.32":
+"postcss@npm:^8.4.18, postcss@npm:^8.4.38, postcss@npm:~8.4.32":
   version: 8.4.38
   resolution: "postcss@npm:8.4.38"
   dependencies:
@@ -24092,7 +24131,7 @@ __metadata:
     "@types/body-parser": "npm:^1.19.2"
     "@types/cors": "npm:^2.8.12"
     "@types/ejs": "npm:^3.1.1"
-    "@types/express": "npm:^4.17.13"
+    "@types/express": "npm:^4.17.21"
     "@types/jest": "npm:^28.1.7"
     "@types/jsonwebtoken": "npm:^9.0.5"
     "@types/minio": "npm:^7.0.18"
@@ -24107,7 +24146,7 @@ __metadata:
     did-resolver: "npm:^4.1.0"
     dotenv: "npm:^16.3.2"
     ejs: "npm:^3.1.9"
-    express: "npm:^4.18.2"
+    express: "npm:^4.19.2"
     ioredis: "npm:^5.3.2"
     jest: "npm:^29.5.0"
     jsonwebtoken: "npm:^9.0.2"
@@ -26830,13 +26869,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^5.1.6":
-  version: 5.2.3
-  resolution: "vite@npm:5.2.3"
+"vite@npm:^5.2.12":
+  version: 5.2.12
+  resolution: "vite@npm:5.2.12"
   dependencies:
     esbuild: "npm:^0.20.1"
     fsevents: "npm:~2.3.3"
-    postcss: "npm:^8.4.36"
+    postcss: "npm:^8.4.38"
     rollup: "npm:^4.13.0"
   peerDependencies:
     "@types/node": ^18.0.0 || >=20.0.0
@@ -26866,7 +26905,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: 10/5033a989462bc3127cb937ae5138024af68ec1b67accad07e07e116254b84fc6888a18d7a0358e3d3ce19fe160d72b6622259edc93e7fba47b84d042dcbe1e4e
+  checksum: 10/c27d3efff93016e8171b6a362f605ad5f78e24086292987097ad4a7382ae78d9e0659065976a13bf7b51ba0f593d675579010692097ef36d8a5cc965f3efec4c
   languageName: node
   linkType: hard
 

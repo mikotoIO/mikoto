@@ -65,3 +65,4 @@ Cargo.lock
 
 # Prisma Rust
 **/prisma.rs
+.vscode/

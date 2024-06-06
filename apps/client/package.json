@@ -25,6 +25,7 @@
     "@lexical/markdown": "^0.14.4",
     "@lexical/react": "^0.14.4",
     "@lexical/rich-text": "^0.14.4",
+    "@lexical/selection": "^0.14.4",
     "@lexical/table": "^0.14.4",
     "@lexical/utils": "^0.14.4",
     "@livekit/components-react": "^1.1.8",

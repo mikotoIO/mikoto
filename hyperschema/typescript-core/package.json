@@ -20,7 +20,7 @@
     "json-stringify-pretty-compact": "3.0.0",
     "prettier": "^3.0.3",
     "socket.io": "^4.7.2",
-    "ws": "^8.16.0"
+    "ws": "^8.17.1"
   },
   "peerDependencies": {
     "zod": "*"

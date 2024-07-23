@@ -30,7 +30,7 @@ import { NotificationSurface } from './notification';
 import { SafetySurface } from './safety';
 import { ThemesSubsurface } from './themes';
 
-const bgUrl = '/images/artworks/1.jpg';
+const bgUrl = '/images/artworks/2.jpg';
 
 export function PasswordChangeModal() {
   const authClient = useAuthClient();

@@ -1,7 +1,6 @@
 use std::sync::OnceLock;
 
 use axum::{
-    extract::DefaultBodyLimit,
     routing::{get, post},
     Json, Router,
 };

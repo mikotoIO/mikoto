@@ -8,6 +8,7 @@ use crate::{env::env, error::Error};
 
 static DB: OnceCell<PgPool> = OnceCell::const_new();
 
+
 pub async fn init() -> Result<&'static PgPool, Error> {
     let db_url = &env().database_url;
     DB.get_or_try_init(|| async {

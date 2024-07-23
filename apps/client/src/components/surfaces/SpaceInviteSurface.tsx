@@ -18,7 +18,7 @@ export function SpaceInviteSurface({ inviteCode }: { inviteCode: string }) {
       <Box>
         <Flex
           h="200px"
-          bg="url('/images/artworks/1.jpg') no-repeat center center"
+          bg="url('/images/artworks/2.jpg') no-repeat center center"
           bgSize="cover"
         />
         <Flex p={8} direction="column" gap={8}>

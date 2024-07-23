@@ -56,7 +56,7 @@ const Art = styled.div`
   @media screen and (min-width: 1000px) {
     display: block;
   }
-  background: url('/images/artworks/1.jpg') no-repeat center center;
+  background: url('/images/artworks/2.jpg') no-repeat center center;
   background-size: cover;
 `;
 

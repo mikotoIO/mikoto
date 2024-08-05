@@ -20,6 +20,6 @@ async fn main() {
 
     let addr = format!("0.0.0.0:{}", env.port);
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
-    info!("Server started on http://{}", &addr);
+    info!("Auth server started on http://{}", &addr);
     axum::serve(listener, app).await.unwrap();
 }

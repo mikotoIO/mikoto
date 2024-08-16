@@ -8,6 +8,7 @@ use crate::{
     error::Error,
     functions::jwt::UserClaims,
 };
+
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LoginPayload {
@@ -23,11 +24,10 @@ pub struct LoginResponse {
 }
 
 pub async fn route(body: Json<LoginPayload>) -> Result<Json<LoginResponse>, Error> {
-    let acc: Account = muon::select()
-        .where_(col("email").eq(&body.email))
-        .one(db())
-        .await?
-        .ok_or(Error::NotFound)?;
+    let acc: Account = sqlx::query_as(r##"SELECT * FROM "Accounts" WHERE "email" = $1"##)
+        .bind(&body.email)
+        .fetch_one(db())
+        .await?;
 
     if !bcrypt::verify(&body.password, &acc.passhash)? {
         return Err(Error::WrongPassword);

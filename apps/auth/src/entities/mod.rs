@@ -1,8 +1,8 @@
 use nanoid::nanoid;
-use sqlx::prelude::FromRow;
+use sqlx::{postgres::PgQueryResult, prelude::FromRow};
 use uuid::Uuid;
 
-use crate::functions::sha3::sha3;
+use crate::{error::Error, functions::sha3::sha3};
 
 #[derive(FromRow, Serialize)]
 #[sqlx(rename_all = "camelCase")]
@@ -10,6 +10,31 @@ pub struct Account {
     pub id: Uuid,
     pub email: String,
     pub passhash: String,
+}
+
+impl Account {
+    pub async fn create(&self, db: &sqlx::PgPool) -> Result<(), Error> {
+        sqlx::query(
+            r##"
+            INSERT INTO "Account" ("id", "email", "passhash")
+            VALUES ($1, $2, $3)
+            "##,
+        )
+        .bind(&Uuid::new_v4())
+        .bind(&self.email)
+        .bind(&self.passhash)
+        .execute(db)
+        .await?;
+        Ok(())
+    }
+
+    pub async fn find_by_email(email: &str, db: &sqlx::PgPool) -> Result<Self, Error> {
+        sqlx::query_as(r##"SELECT * FROM "Account" WHERE "email" = $1"##)
+            .bind(email)
+            .fetch_optional(db)
+            .await?
+            .ok_or(Error::NotFound)
+    }
 }
 
 #[derive(FromRow)]
@@ -33,6 +58,21 @@ impl RefreshToken {
             },
             refresh_token,
         )
+    }
+
+    pub async fn create(&self, db: &sqlx::PgPool) -> Result<PgQueryResult, sqlx::Error> {
+        sqlx::query(
+            r##"
+            INSERT INTO "RefreshToken" ("id", "token", "expires_at", "account_id")
+            VALUES ($1, $2, $3, $4)
+            "##,
+        )
+        .bind(&self.id)
+        .bind(&self.token)
+        .bind(&self.expires_at)
+        .bind(&self.account_id)
+        .execute(db)
+        .await
     }
 }
 

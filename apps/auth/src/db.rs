@@ -1,7 +1,6 @@
 use std::time::Duration;
 
-use log::warn;
-use sqlx::{migrate::MigrateDatabase, PgPool, Postgres};
+use sqlx::PgPool;
 use tokio::{sync::OnceCell, time::timeout};
 
 use crate::{env::env, error::Error};

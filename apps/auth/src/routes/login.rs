@@ -22,28 +22,15 @@ pub struct LoginResponse {
 }
 
 pub async fn route(body: Json<LoginPayload>) -> Result<Json<LoginResponse>, Error> {
-    let acc: Account = sqlx::query_as(r##"SELECT * FROM "Accounts" WHERE "email" = $1"##)
-        .bind(&body.email)
-        .fetch_one(db())
-        .await?;
+    let acc = Account::find_by_email(&body.email, db()).await?;
 
     if !bcrypt::verify(&body.password, &acc.passhash)? {
         return Err(Error::WrongPassword);
     }
 
     let (refresh, token) = RefreshToken::new(acc.id);
-    sqlx::query(
-        r##"
-        INSERT INTO "RefreshTokens" ("id", "token", "expires_at", "account_id")
-        VALUES ($1, $2, $3, $4)
-        "##,
-    )
-    .bind(&refresh.id)
-    .bind(&refresh.token)
-    .bind(&refresh.expires_at)
-    .bind(&refresh.account_id)
-    .execute(db())
-    .await?;
+    refresh.create(db()).await?;
+
     Ok(Json(LoginResponse {
         access_token: UserClaims::from(acc).encode()?,
         refresh_token: token,

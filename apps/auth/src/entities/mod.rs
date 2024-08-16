@@ -1,11 +1,10 @@
-use muonic_macros::Entity;
 use nanoid::nanoid;
 use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
 use crate::functions::sha3::sha3;
 
-#[derive(FromRow, Entity, Serialize)]
+#[derive(FromRow, Serialize)]
 #[sqlx(rename_all = "camelCase")]
 pub struct Account {
     pub id: Uuid,
@@ -13,7 +12,7 @@ pub struct Account {
     pub passhash: String,
 }
 
-#[derive(FromRow, Entity)]
+#[derive(FromRow)]
 #[sqlx(rename_all = "camelCase")]
 pub struct RefreshToken {
     pub id: Uuid,

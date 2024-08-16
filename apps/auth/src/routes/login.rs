@@ -1,6 +1,4 @@
-use ::muonic::muon::col;
 use axum::Json;
-use muonic::muon;
 
 use crate::{
     db::db,
@@ -34,7 +32,18 @@ pub async fn route(body: Json<LoginPayload>) -> Result<Json<LoginResponse>, Erro
     }
 
     let (refresh, token) = RefreshToken::new(acc.id);
-    muon::insert(db(), &refresh).await?;
+    sqlx::query(
+        r##"
+        INSERT INTO "RefreshTokens" ("id", "token", "expires_at", "account_id")
+        VALUES ($1, $2, $3, $4)
+        "##,
+    )
+    .bind(&refresh.id)
+    .bind(&refresh.token)
+    .bind(&refresh.expires_at)
+    .bind(&refresh.account_id)
+    .execute(db())
+    .await?;
     Ok(Json(LoginResponse {
         access_token: UserClaims::from(acc).encode()?,
         refresh_token: token,

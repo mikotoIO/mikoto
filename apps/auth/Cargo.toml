@@ -20,8 +20,6 @@ time = { version = "0.3.36", features = ["serde"] }
 uuid = { version = "1.8.0", features = ["serde", "v4"] }
 itertools = "0.12.1"
 
-muonic = { version = "0.1.0", path = "../../packages/muonic" }
-muonic-macros = { version = "0.1.0", path = "../../packages/muonic/macros" }
 bcrypt = "0.15.1"
 jsonwebtoken = "9.3.0"
 didkit = "0.6.0"

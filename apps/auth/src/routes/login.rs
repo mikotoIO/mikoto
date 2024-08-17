@@ -1,4 +1,5 @@
 use axum::Json;
+use schemars::JsonSchema;
 
 use crate::{
     db::db,
@@ -7,14 +8,14 @@ use crate::{
     functions::jwt::UserClaims,
 };
 
-#[derive(Deserialize)]
+#[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct LoginPayload {
     pub email: String,
     pub password: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct LoginResponse {
     pub access_token: String,

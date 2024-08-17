@@ -1,10 +1,11 @@
 use nanoid::nanoid;
+use schemars::JsonSchema;
 use sqlx::{postgres::PgQueryResult, prelude::FromRow};
 use uuid::Uuid;
 
 use crate::{error::Error, functions::sha3::sha3};
 
-#[derive(FromRow, Serialize)]
+#[derive(FromRow, Serialize, JsonSchema)]
 #[sqlx(rename_all = "camelCase")]
 pub struct Account {
     pub id: Uuid,

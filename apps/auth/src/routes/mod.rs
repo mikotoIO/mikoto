@@ -1,20 +1,30 @@
 use std::sync::OnceLock;
 
-use axum::{
-    routing::{get, post},
-    Json, Router,
+use aide::{
+    axum::{
+        routing::{get, post},
+        ApiRouter, IntoApiResponse,
+    },
+    openapi::{Info, OpenApi},
+    scalar::Scalar,
 };
+use axum::{Extension, Json, Router};
+use schemars::JsonSchema;
 use serde::Serialize;
 use tower_http::cors::CorsLayer;
 
 pub mod login;
 pub mod register;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct IndexResponse {
     name: String,
     version: String,
+}
+
+pub async fn serve_api(Extension(api): Extension<OpenApi>) -> impl IntoApiResponse {
+    Json(api)
 }
 
 pub async fn index() -> Json<&'static IndexResponse> {
@@ -26,8 +36,21 @@ pub async fn index() -> Json<&'static IndexResponse> {
 }
 
 pub fn router() -> Router {
-    Router::new()
-        .route("/", get(index))
-        .route("/register", post(register::route))
-        .layer(CorsLayer::permissive())
+    let mut api = OpenApi {
+        info: Info {
+            title: "Mikoto Auth Server".to_string(),
+            ..Info::default()
+        },
+        ..OpenApi::default()
+    };
+
+    let router = ApiRouter::<()>::new()
+        .api_route("/", get(index))
+        .api_route("/register", post(register::route))
+        .api_route("/login", post(login::route))
+        .route("/api.json", axum::routing::get(serve_api))
+        .route("/scalar", Scalar::new("/api.json").axum_route())
+        .layer(CorsLayer::permissive());
+
+    router.finish_api(&mut api).layer(Extension(api))
 }

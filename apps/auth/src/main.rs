@@ -21,5 +21,7 @@ async fn main() {
     let addr = format!("0.0.0.0:{}", env.port);
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     info!("Auth server started on http://{}", &addr);
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app.into_make_service())
+        .await
+        .unwrap();
 }

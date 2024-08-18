@@ -15,6 +15,7 @@ pretty_env_logger = "0.5.0"
 
 # web server
 axum = { version = "0.7.5", features = ["multipart"] }
+axum-extra = "0.9.3"
 tower-http = { version = "0.5.2", features = ["cors"] }
 time = { version = "0.3.36", features = ["serde"] }
 uuid = { version = "1.8.0", features = ["serde", "v4"] }
@@ -26,8 +27,13 @@ didkit = "0.6.0"
 sha3 = "0.10.8"
 hex = "0.4.3"
 nanoid = "0.4.0"
-utoipa = { version = "4.2.3", features = ["axum_extras"] }
-utoipa-scalar = { version = "0.1.0", features = ["axum"] }
+schemars = { version = "0.8.21", features = ["uuid1"] }
+aide = { version = "0.13.4", features = [
+    "scalar",
+    "axum",
+    "axum-extra",
+    "macros",
+] }
 
 # database
 [dependencies.sqlx]

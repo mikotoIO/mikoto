@@ -1,9 +1,10 @@
 use axum::Json;
+use schemars::JsonSchema;
 use uuid::Uuid;
 
 use crate::{db::db, entities::Account, error::Error};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct RegisterPayload {
     pub email: String,

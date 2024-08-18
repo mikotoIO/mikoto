@@ -1,3 +1,4 @@
+use aide::OperationIo;
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
@@ -6,7 +7,7 @@ use axum::{
 use bcrypt::BcryptError;
 use serde_json::json;
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, OperationIo)]
 #[serde(rename_all = "camelCase", tag = "code")]
 pub enum Error {
     NotFound,

@@ -28,7 +28,6 @@ model User {
   Message       Message[]
   Space         Space[]
   ChannelUnread ChannelUnread[]
-  Verification  Verification[]
   Account       Account?
   Bot           Bot?
   Bots          Bot[]           @relation("Bots")
@@ -59,11 +58,21 @@ model Settings {
 
 // factor out email and password
 model Account {
-  id           String         @id @default(uuid()) @db.Uuid
-  email        String         @unique
-  passhash     String         @db.VarChar(256)
-  user         User           @relation(fields: [id], references: [id], onDelete: Cascade)
+  id           String                @id @default(uuid()) @db.Uuid
+  email        String                @unique
+  passhash     String                @db.VarChar(256)
+  user         User                  @relation(fields: [id], references: [id], onDelete: Cascade)
   RefreshToken RefreshToken[]
+  Verification AccountVerification[]
+}
+
+model AccountVerification {
+  id        String   @id @default(uuid()) @db.Uuid
+  category  String
+  token     String   @unique
+  accountId String?  @db.Uuid
+  expiresAt DateTime
+  account   Account? @relation(fields: [accountId], references: [id])
 }
 
 model Bot {
@@ -189,15 +198,6 @@ model Message {
   channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
 
   @@index([channelId, timestamp])
-}
-
-model Verification {
-  id        String   @id @default(uuid()) @db.Uuid
-  category  String
-  token     String   @unique
-  userId    String?  @db.Uuid
-  expiresAt DateTime
-  user      User?    @relation(fields: [userId], references: [id])
 }
 
 model Invite {

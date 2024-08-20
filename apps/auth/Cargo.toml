@@ -34,11 +34,22 @@ aide = { version = "0.13.4", features = [
     "axum-extra",
     "macros",
 ] }
+
+# Mailing and Captcha
+lettre = { version = "0.11.7", default-features = false, features = [
+    "tokio1-rustls-tls",
+    "builder",
+    "hostname",
+    "pool",
+    "smtp-transport",
+] }
+handlebars = "6.0.0"
 hcaptcha = { version = "2.4.7", default-features = false, features = [
     "rustls-backend",
     "ext",
     "hex",
 ] }
+async-trait = "0.1.81"
 
 # database
 [dependencies.sqlx]

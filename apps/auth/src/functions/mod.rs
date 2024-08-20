@@ -4,6 +4,7 @@ use std::iter::IntoIterator;
 
 pub mod captcha;
 pub mod jwt;
+pub mod mail;
 pub mod sha3;
 
 pub fn group_by<T, K, I, F>(iter: I, key_fn: F) -> HashMap<K, Vec<T>>

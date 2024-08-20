@@ -3,7 +3,7 @@ use uuid::Uuid;
 
 #[derive(FromRow, Serialize)]
 #[sqlx(rename_all = "camelCase")]
-pub struct Verification {
+pub struct AccountVerification {
     pub id: Uuid,
     pub category: String,
     pub token: String,

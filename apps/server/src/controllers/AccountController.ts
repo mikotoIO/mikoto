@@ -197,15 +197,14 @@ export class AccountController {
   async resetPassword(@Body() body: { email: string }) {
     const account = await this.prisma.account.findUnique({
       where: { email: normalizeEmail(body.email) },
-      include: { user: true },
     });
     if (account === null) {
       throw new UnauthorizedError('Invalid Email');
     }
 
-    const verification = await this.prisma.verification.create({
+    const verification = await this.prisma.accountVerification.create({
       data: {
-        userId: account.id,
+        accountId: account.id,
         token: await generateRandomToken(),
         category: 'PASSWORD_RESET', // FIXME make this an enum
         expiresAt: new Date(Date.now() + 1000 * 60 * 60),
@@ -219,7 +218,7 @@ export class AccountController {
       'Reset Password',
       'reset-password.ejs',
       {
-        name: account.user.name,
+        name: account.email,
         link: resetLink,
         expiry: verification.expiresAt.toISOString(),
       },
@@ -232,7 +231,7 @@ export class AccountController {
   async resetPasswordVerify(
     @Body() body: { token: string; newPassword: string },
   ) {
-    const verification = await this.prisma.verification.findUnique({
+    const verification = await this.prisma.accountVerification.findUnique({
       where: { token: body.token },
     });
     if (verification === null) {
@@ -247,7 +246,7 @@ export class AccountController {
     }
 
     const account = await this.prisma.user.findUnique({
-      where: { id: verification.userId! },
+      where: { id: verification.accountId! },
     });
 
     if (account === null) {

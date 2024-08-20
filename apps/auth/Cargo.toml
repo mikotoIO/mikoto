@@ -34,6 +34,11 @@ aide = { version = "0.13.4", features = [
     "axum-extra",
     "macros",
 ] }
+hcaptcha = { version = "2.4.7", default-features = false, features = [
+    "rustls-backend",
+    "ext",
+    "hex",
+] }
 
 # database
 [dependencies.sqlx]

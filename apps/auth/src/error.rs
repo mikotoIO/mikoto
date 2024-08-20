@@ -12,6 +12,9 @@ use serde_json::json;
 pub enum Error {
     NotFound,
     WrongPassword,
+    NetworkError,
+    CaptchaFailed,
+    TokenExpired,
     WrongAuthenticationType,
     JwtValidationError { message: String },
     InitializationFailed { message: String },
@@ -38,6 +41,12 @@ impl From<jsonwebtoken::errors::Error> for Error {
         Self::JwtValidationError {
             message: err.to_string(),
         }
+    }
+}
+
+impl From<hcaptcha::HcaptchaError> for Error {
+    fn from(_: hcaptcha::HcaptchaError) -> Self {
+        Self::CaptchaFailed
     }
 }
 

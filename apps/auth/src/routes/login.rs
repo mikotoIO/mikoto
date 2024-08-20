@@ -1,28 +1,30 @@
 use axum::Json;
 use schemars::JsonSchema;
+use serde_json::json;
 
 use crate::{
     db::db,
-    entities::{Account, RefreshToken},
+    entities::{Account, RefreshToken, TokenPair},
     error::Error,
     functions::jwt::UserClaims,
 };
 
+fn login_payload_example() -> serde_json::Value {
+    json!({
+        "email": "misaka.mikoto@tokiwadai.ac.jp",
+        "password": "correcthorsebatterystaple",
+    })
+}
+
 #[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
+#[schemars(example = "login_payload_example")]
 pub struct LoginPayload {
     pub email: String,
     pub password: String,
 }
 
-#[derive(Serialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct LoginResponse {
-    pub access_token: String,
-    pub refresh_token: String,
-}
-
-pub async fn route(body: Json<LoginPayload>) -> Result<Json<LoginResponse>, Error> {
+pub async fn route(body: Json<LoginPayload>) -> Result<Json<TokenPair>, Error> {
     let acc = Account::find_by_email(&body.email, db()).await?;
 
     if !bcrypt::verify(&body.password, &acc.passhash)? {
@@ -32,7 +34,7 @@ pub async fn route(body: Json<LoginPayload>) -> Result<Json<LoginResponse>, Erro
     let (refresh, token) = RefreshToken::new(acc.id);
     refresh.create(db()).await?;
 
-    Ok(Json(LoginResponse {
+    Ok(Json(TokenPair {
         access_token: UserClaims::from(acc).encode()?,
         refresh_token: token,
     }))

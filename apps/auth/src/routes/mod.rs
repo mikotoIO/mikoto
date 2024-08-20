@@ -13,8 +13,11 @@ use schemars::JsonSchema;
 use serde::Serialize;
 use tower_http::cors::CorsLayer;
 
+pub mod change_password;
 pub mod login;
+pub mod refresh;
 pub mod register;
+pub mod reset_password;
 
 #[derive(Debug, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
@@ -48,6 +51,8 @@ pub fn router() -> Router {
         .api_route("/", get(index))
         .api_route("/register", post(register::route))
         .api_route("/login", post(login::route))
+        .api_route("/refresh", post(refresh::route))
+        .api_route("/change_password", post(change_password::route))
         .route("/api.json", axum::routing::get(serve_api))
         .route("/scalar", Scalar::new("/api.json").axum_route())
         .layer(CorsLayer::permissive());

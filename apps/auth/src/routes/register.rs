@@ -3,7 +3,12 @@ use schemars::JsonSchema;
 use serde_json::json;
 use uuid::Uuid;
 
-use crate::{db::db, entities::Account, error::Error, functions::captcha::captcha};
+use crate::{
+    db::db,
+    entities::{user_create, Account},
+    error::Error,
+    functions::captcha::captcha,
+};
 
 fn register_payload_example() -> serde_json::Value {
     json!({
@@ -32,6 +37,9 @@ pub async fn route(body: Json<RegisterPayload>) -> Result<Json<Account>, Error> 
         passhash: bcrypt::hash(body.password.clone(), bcrypt::DEFAULT_COST)?,
     };
 
-    account.create(db()).await?;
+    let mut tx = db().begin().await?;
+    account.create(&mut *tx).await?;
+    user_create(&account.id, &body.name, &mut *tx).await?;
+    tx.commit().await?;
     Ok(Json(account))
 }

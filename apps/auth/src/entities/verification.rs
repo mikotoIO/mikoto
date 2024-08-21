@@ -15,10 +15,10 @@ pub struct AccountVerification {
 }
 
 impl AccountVerification {
-    pub async fn find_by_token(
+    pub async fn find_by_token<'c, X: sqlx::PgExecutor<'c>>(
         token: &str,
         category: &str,
-        db: &sqlx::PgPool,
+        db: X,
     ) -> Result<Self, Error> {
         let verification: AccountVerification = sqlx::query_as(
             r#"
@@ -43,7 +43,10 @@ impl AccountVerification {
         Ok(verification)
     }
 
-    pub async fn create_password_reset(account_id: Uuid, db: &sqlx::PgPool) -> Result<Self, Error> {
+    pub async fn create_password_reset<'c, X: sqlx::PgExecutor<'c>>(
+        account_id: Uuid,
+        db: X,
+    ) -> Result<Self, Error> {
         let verification = Self {
             id: Uuid::new_v4(),
             category: "PASSWORD_RESET".to_string(),
@@ -67,7 +70,7 @@ impl AccountVerification {
         Ok(verification)
     }
 
-    pub async fn delete(&self, db: &sqlx::PgPool) -> Result<(), Error> {
+    pub async fn delete<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
         sqlx::query(
             r#"
             DELETE FROM account_verifications

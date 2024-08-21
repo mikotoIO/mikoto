@@ -24,7 +24,7 @@ fn account_example() -> serde_json::Value {
 }
 
 impl Account {
-    pub async fn create(&self, db: &sqlx::PgPool) -> Result<(), Error> {
+    pub async fn create<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
         sqlx::query(
             r##"
             INSERT INTO "Account" ("id", "email", "passhash")
@@ -39,7 +39,7 @@ impl Account {
         Ok(())
     }
 
-    pub async fn find_by_id(id: &Uuid, db: &sqlx::PgPool) -> Result<Self, Error> {
+    pub async fn find_by_id<'c, X: sqlx::PgExecutor<'c>>(id: &Uuid, db: X) -> Result<Self, Error> {
         sqlx::query_as(r##"SELECT * FROM "Account" WHERE "id" = $1"##)
             .bind(id)
             .fetch_optional(db)
@@ -47,7 +47,10 @@ impl Account {
             .ok_or(Error::NotFound)
     }
 
-    pub async fn find_by_email(email: &str, db: &sqlx::PgPool) -> Result<Self, Error> {
+    pub async fn find_by_email<'c, X: sqlx::PgExecutor<'c>>(
+        email: &str,
+        db: X,
+    ) -> Result<Self, Error> {
         sqlx::query_as(r##"SELECT * FROM "Account" WHERE "email" = $1"##)
             .bind(email.trim().to_lowercase())
             .fetch_optional(db)
@@ -55,7 +58,11 @@ impl Account {
             .ok_or(Error::NotFound)
     }
 
-    pub async fn update_password(&self, password: &str, db: &sqlx::PgPool) -> Result<(), Error> {
+    pub async fn update_password<'c, X: sqlx::PgExecutor<'c>>(
+        &self,
+        password: &str,
+        db: X,
+    ) -> Result<(), Error> {
         let passhash = bcrypt::hash(password, bcrypt::DEFAULT_COST)?;
         sqlx::query(
             r##"

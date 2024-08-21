@@ -8,6 +8,8 @@ pub struct Env {
     pub secret: String,
     pub captcha: String,
     pub captcha_secret: Option<String>,
+
+    pub smtp_url: Option<String>,
 }
 
 static ENV: OnceLock<Env> = OnceLock::new();

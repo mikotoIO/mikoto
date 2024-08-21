@@ -3,10 +3,12 @@ use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
 mod account;
+mod bot;
 mod refresh_token;
 mod verification;
 
 pub use account::*;
+pub use bot::*;
 pub use refresh_token::*;
 pub use verification::*;
 

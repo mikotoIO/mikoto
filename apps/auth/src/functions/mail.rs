@@ -1,3 +1,5 @@
+use std::sync::OnceLock;
+
 use handlebars::Handlebars;
 use lettre::{AsyncSmtpTransport, AsyncTransport, Tokio1Executor};
 use serde::Serialize;
@@ -5,8 +7,8 @@ use serde::Serialize;
 use crate::{env::env, error::Error};
 
 pub struct MailTemplate {
-    pub subject: String,
-    pub body: String,
+    pub subject: &'static str,
+    pub body: &'static str,
 }
 
 pub struct MailSender {
@@ -30,8 +32,8 @@ impl MailSender {
                 let mail = lettre::Message::builder()
                     .from(self.from.parse()?)
                     .to(to.parse()?)
-                    .subject(handlebars.render_template(&template.subject, &data)?)
-                    .body(handlebars.render_template(&template.body, &data)?)
+                    .subject(handlebars.render_template(template.subject, &data)?)
+                    .body(handlebars.render_template(template.body, &data)?)
                     .unwrap();
 
                 let mail = mail.into();
@@ -54,4 +56,9 @@ impl MailSender {
             },
         }
     }
+}
+
+static MAILER: OnceLock<MailSender> = OnceLock::new();
+pub fn mailer() -> &'static MailSender {
+    MAILER.get_or_init(MailSender::from_env)
 }

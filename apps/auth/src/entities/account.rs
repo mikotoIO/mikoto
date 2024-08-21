@@ -54,4 +54,18 @@ impl Account {
             .await?
             .ok_or(Error::NotFound)
     }
+
+    pub async fn update_password(&self, password: &str, db: &sqlx::PgPool) -> Result<(), Error> {
+        let passhash = bcrypt::hash(password, bcrypt::DEFAULT_COST)?;
+        sqlx::query(
+            r##"
+            UPDATE "Account" SET "passhash" = $1 WHERE "id" = $2
+            "##,
+        )
+        .bind(&passhash)
+        .bind(&self.id)
+        .execute(db)
+        .await?;
+        Ok(())
+    }
 }

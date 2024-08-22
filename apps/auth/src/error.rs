@@ -11,13 +11,13 @@ use serde_json::json;
 #[serde(rename_all = "camelCase", tag = "code")]
 pub enum Error {
     NotFound,
+    Unauthorized { message: String },
     WrongPassword,
     NetworkError,
     CaptchaFailed,
     TokenExpired,
     WrongAuthenticationType,
     JwtValidationError { message: String },
-    InitializationFailed { message: String },
     DatabaseError { message: String },
     InternalServerError,
     TemplatingError,
@@ -26,7 +26,7 @@ pub enum Error {
 
 impl From<sqlx::Error> for Error {
     fn from(err: sqlx::Error) -> Self {
-        Self::InitializationFailed {
+        Self::DatabaseError {
             message: err.to_string(),
         }
     }

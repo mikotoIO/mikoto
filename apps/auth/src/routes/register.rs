@@ -38,8 +38,8 @@ pub async fn route(body: Json<RegisterPayload>) -> Result<Json<Account>, Error> 
     };
 
     let mut tx = db().begin().await?;
-    account.create(&mut *tx).await?;
     user_create(&account.id, &body.name, &mut *tx).await?;
+    account.create(&mut *tx).await?;
     tx.commit().await?;
     Ok(Json(account))
 }

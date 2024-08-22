@@ -22,9 +22,9 @@ impl AccountVerification {
     ) -> Result<Self, Error> {
         let verification: AccountVerification = sqlx::query_as(
             r#"
-            SELECT * FROM account_verifications
-            WHERE token = $1
-            AND expires_at > NOW()
+            SELECT * FROM "AccountVerification"
+            WHERE "token" = $1
+            AND "expiresAt" > NOW()
             "#,
         )
         .bind(token)
@@ -56,7 +56,7 @@ impl AccountVerification {
         };
         sqlx::query(
             r#"
-            INSERT INTO account_verifications (id, category, token, account_id, expires_at)
+            INSERT INTO "AccountVerification" ("id", "category", "token", "accountId", "expiresAt")
             VALUES ($1, $2, $3, $4, $5)
             "#,
         )
@@ -73,8 +73,8 @@ impl AccountVerification {
     pub async fn delete<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
         sqlx::query(
             r#"
-            DELETE FROM account_verifications
-            WHERE id = $1
+            DELETE FROM "AccountVerification"
+            WHERE "id" = $1
             "#,
         )
         .bind(&self.id)

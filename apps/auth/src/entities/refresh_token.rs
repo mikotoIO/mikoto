@@ -59,7 +59,7 @@ impl RefreshToken {
     ) -> Result<(), Error> {
         sqlx::query(
             r##"
-            DELETE FROM "RefreshToken" WHERE "account_id" = $1
+            DELETE FROM "RefreshToken" WHERE "accountId" = $1
             "##,
         )
         .bind(&account_id)

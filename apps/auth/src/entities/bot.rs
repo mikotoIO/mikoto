@@ -9,6 +9,8 @@ pub struct Bot {
     pub id: Uuid,
     pub name: String,
     pub owner_id: Uuid,
+
+    pub secret: String,
 }
 
 impl Bot {
@@ -26,13 +28,14 @@ impl Bot {
     pub async fn create<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
         sqlx::query(
             r##"
-            INSERT INTO "Bots" ("id", "name", "ownerId")
-            VALUES ($1, $2, $3)
+            INSERT INTO "Bots" ("id", "name", "ownerId", "secret")
+            VALUES ($1, $2, $3, $4)
             "##,
         )
         .bind(&self.id)
         .bind(&self.name)
         .bind(&self.owner_id)
+        .bind(&self.secret)
         .execute(db)
         .await?;
         Ok(())

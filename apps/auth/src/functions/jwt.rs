@@ -107,7 +107,6 @@ mod tests {
 
     #[test]
     fn test_encode_decode() {
-        println!("testing!!!");
         let key = JwtKey::from_secret("testsecretpleaseignore");
         let acc = Account {
             id: uuid::Uuid::new_v4(),

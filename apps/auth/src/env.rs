@@ -6,7 +6,7 @@ pub struct Env {
     pub issuer: String,
     pub port: u16,
     pub secret: String,
-    pub captcha: String,
+    pub captcha: String, // either "disabled" or "hcaptcha"
     pub captcha_secret: Option<String>,
 
     pub web_url: String,

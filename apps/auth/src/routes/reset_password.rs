@@ -49,14 +49,14 @@ pub async fn route(body: Json<ResetPasswordPayload>) -> Result<Json<()>, Error> 
     Ok(Json(()))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct ResetPasswordConfirmData {
     pub token: String,
     pub password: String,
 }
 
-pub async fn confirm_route(data: Json<ResetPasswordConfirmData>) -> Result<Json<()>, Error> {
+pub async fn confirm(data: Json<ResetPasswordConfirmData>) -> Result<Json<()>, Error> {
     let verification =
         AccountVerification::find_by_token(&data.token, "PASSWORD_RESET", db()).await?;
     let account = Account::find_by_id(&verification.account_id, db()).await?;

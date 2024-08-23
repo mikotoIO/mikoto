@@ -23,3 +23,22 @@ pub async fn user_create<'c, X: sqlx::PgExecutor<'c>>(
     .await?;
     Ok(())
 }
+
+pub async fn bot_create<'c, X: sqlx::PgExecutor<'c>>(
+    id: &Uuid,
+    name: &str,
+    db: X,
+) -> Result<(), Error> {
+    sqlx::query(
+        r##"
+        INSERT INTO "User" ("id", "name", "category")
+        VALUES ($1, $2, $3)
+        "##,
+    )
+    .bind(&id)
+    .bind(&name)
+    .bind("BOT")
+    .execute(db)
+    .await?;
+    Ok(())
+}

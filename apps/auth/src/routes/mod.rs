@@ -2,7 +2,7 @@ use std::sync::OnceLock;
 
 use aide::{
     axum::{
-        routing::{get, post, post_with},
+        routing::{get, get_with, post_with},
         ApiRouter, IntoApiResponse,
     },
     openapi::{Info, OpenApi},
@@ -79,6 +79,10 @@ pub fn router() -> Router {
         .api_route(
             "/bot",
             post_with(bots::create_bot, |o| o.summary("Create Bot")),
+        )
+        .api_route(
+            "/bot",
+            get_with(bots::list_bots, |o| o.summary("List Bots")),
         )
         .route("/api.json", axum::routing::get(serve_api))
         .route("/scalar", Scalar::new("/api.json").axum_route())

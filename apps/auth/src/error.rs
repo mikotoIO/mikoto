@@ -12,6 +12,7 @@ use serde_json::json;
 pub enum Error {
     NotFound,
     Unauthorized { message: String },
+    ValidationFailed { message: String },
     WrongPassword,
     NetworkError,
     CaptchaFailed,
@@ -27,6 +28,14 @@ pub enum Error {
 impl From<sqlx::Error> for Error {
     fn from(err: sqlx::Error) -> Self {
         Self::DatabaseError {
+            message: err.to_string(),
+        }
+    }
+}
+
+impl From<uuid::Error> for Error {
+    fn from(err: uuid::Error) -> Self {
+        Self::ValidationFailed {
             message: err.to_string(),
         }
     }

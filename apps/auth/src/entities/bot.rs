@@ -1,9 +1,10 @@
+use schemars::JsonSchema;
 use sqlx::FromRow;
 use uuid::Uuid;
 
 use crate::error::Error;
 
-#[derive(FromRow)]
+#[derive(FromRow, Serialize, JsonSchema)]
 #[sqlx(rename_all = "camelCase")]
 pub struct Bot {
     pub id: Uuid,

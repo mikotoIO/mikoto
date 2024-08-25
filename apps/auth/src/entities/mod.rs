@@ -3,11 +3,15 @@ use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
 mod account;
+mod bot;
 mod refresh_token;
+mod user;
 mod verification;
 
 pub use account::*;
+pub use bot::*;
 pub use refresh_token::*;
+pub use user::*;
 pub use verification::*;
 
 pub struct MultiFactor {

@@ -245,7 +245,7 @@ export class AccountController {
       throw new UnauthorizedError('Invalid Token');
     }
 
-    const account = await this.prisma.user.findUnique({
+    const account = await this.prisma.account.findUnique({
       where: { id: verification.accountId! },
     });
 

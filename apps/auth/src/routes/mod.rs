@@ -2,7 +2,7 @@ use std::sync::OnceLock;
 
 use aide::{
     axum::{
-        routing::{get, post},
+        routing::{get, post, post_with},
         ApiRouter, IntoApiResponse,
     },
     openapi::{Info, OpenApi},
@@ -13,6 +13,7 @@ use schemars::JsonSchema;
 use serde::Serialize;
 use tower_http::cors::CorsLayer;
 
+pub mod bots;
 pub mod change_password;
 pub mod login;
 pub mod refresh;
@@ -49,10 +50,36 @@ pub fn router() -> Router {
 
     let router = ApiRouter::<()>::new()
         .api_route("/", get(index))
-        .api_route("/register", post(register::route))
-        .api_route("/login", post(login::route))
-        .api_route("/refresh", post(refresh::route))
-        .api_route("/change_password", post(change_password::route))
+        .api_route(
+            "/account/register",
+            post_with(register::route, |o| o.summary("User Registration")),
+        )
+        .api_route(
+            "/account/login",
+            post_with(login::route, |o| o.summary("User Login")),
+        )
+        .api_route(
+            "/account/refresh",
+            post_with(refresh::route, |o| o.summary("Refresh Access Token")),
+        )
+        .api_route(
+            "/account/change_password",
+            post_with(change_password::route, |o| o.summary("Change Password")),
+        )
+        .api_route(
+            "/account/reset_password",
+            post_with(reset_password::route, |o| o.summary("Reset Password")),
+        )
+        .api_route(
+            "/account/reset_password/submit",
+            post_with(reset_password::confirm, |o| {
+                o.summary("Confirm Password Reset")
+            }),
+        )
+        .api_route(
+            "/bot",
+            post_with(bots::create_bot, |o| o.summary("Create Bot")),
+        )
         .route("/api.json", axum::routing::get(serve_api))
         .route("/scalar", Scalar::new("/api.json").axum_route())
         .layer(CorsLayer::permissive());

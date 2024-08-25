@@ -8,6 +8,7 @@ pub mod entities;
 pub mod env;
 pub mod error;
 pub mod functions;
+pub mod middlewares;
 pub mod routes;
 
 #[tokio::main]

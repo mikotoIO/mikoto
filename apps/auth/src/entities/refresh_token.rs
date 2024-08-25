@@ -26,7 +26,7 @@ impl RefreshToken {
         )
     }
 
-    pub async fn create(&self, db: &sqlx::PgPool) -> Result<(), Error> {
+    pub async fn create<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
         sqlx::query(
             r##"
             INSERT INTO "RefreshToken" ("id", "token", "expires_at", "account_id")
@@ -42,7 +42,10 @@ impl RefreshToken {
         Ok(())
     }
 
-    pub async fn find_token(token: &str, db: &sqlx::PgPool) -> Result<Self, Error> {
+    pub async fn find_token<'c, X: sqlx::PgExecutor<'c>>(
+        token: &str,
+        db: X,
+    ) -> Result<Self, Error> {
         sqlx::query_as(r##"SELECT * FROM "RefreshToken" WHERE "token" = $1"##)
             .bind(token)
             .fetch_optional(db)
@@ -50,10 +53,13 @@ impl RefreshToken {
             .ok_or(Error::NotFound)
     }
 
-    pub async fn clear_all(account_id: Uuid, db: &sqlx::PgPool) -> Result<(), Error> {
+    pub async fn clear_all<'c, X: sqlx::PgExecutor<'c>>(
+        account_id: Uuid,
+        db: X,
+    ) -> Result<(), Error> {
         sqlx::query(
             r##"
-            DELETE FROM "RefreshToken" WHERE "account_id" = $1
+            DELETE FROM "RefreshToken" WHERE "accountId" = $1
             "##,
         )
         .bind(&account_id)

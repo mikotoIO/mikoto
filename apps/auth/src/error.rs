@@ -11,20 +11,22 @@ use serde_json::json;
 #[serde(rename_all = "camelCase", tag = "code")]
 pub enum Error {
     NotFound,
+    Unauthorized { message: String },
     WrongPassword,
     NetworkError,
     CaptchaFailed,
     TokenExpired,
     WrongAuthenticationType,
     JwtValidationError { message: String },
-    InitializationFailed { message: String },
     DatabaseError { message: String },
     InternalServerError,
+    TemplatingError,
+    MailError,
 }
 
 impl From<sqlx::Error> for Error {
     fn from(err: sqlx::Error) -> Self {
-        Self::InitializationFailed {
+        Self::DatabaseError {
             message: err.to_string(),
         }
     }
@@ -47,6 +49,18 @@ impl From<jsonwebtoken::errors::Error> for Error {
 impl From<hcaptcha::HcaptchaError> for Error {
     fn from(_: hcaptcha::HcaptchaError) -> Self {
         Self::CaptchaFailed
+    }
+}
+
+impl From<handlebars::RenderError> for Error {
+    fn from(_: handlebars::RenderError) -> Self {
+        Self::TemplatingError
+    }
+}
+
+impl From<lettre::address::AddressError> for Error {
+    fn from(_: lettre::address::AddressError) -> Self {
+        Self::MailError
     }
 }
 

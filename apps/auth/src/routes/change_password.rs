@@ -6,7 +6,7 @@ use crate::{
     db::db,
     entities::{Account, RefreshToken, TokenPair},
     error::Error,
-    functions::jwt::UserClaims,
+    functions::jwt::{jwt_key, Claims},
 };
 
 #[derive(Deserialize, JsonSchema)]
@@ -41,7 +41,7 @@ pub async fn route(body: Json<ChangePasswordPayload>) -> Result<Json<TokenPair>,
     refresh.create(db()).await?;
 
     Ok(Json(TokenPair {
-        access_token: UserClaims::from(acc).encode()?,
+        access_token: Claims::from(&acc).encode(jwt_key())?,
         refresh_token: token,
     }))
 }

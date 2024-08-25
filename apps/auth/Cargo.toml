@@ -8,6 +8,13 @@ edition = "2021"
 tokio = { version = "1.35.1", features = ["full"] }
 serde = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0.108"
+async-trait = "0.1.81"
+time = { version = "0.3.36", features = ["serde"] }
+uuid = { version = "1.8.0", features = ["serde", "v4"] }
+nanoid = "0.4.0"
+hex = "0.4.3"
+
+# env
 dotenv = "0.15.0"
 envy = "0.4.2"
 log = "0.4.21"
@@ -17,16 +24,6 @@ pretty_env_logger = "0.5.0"
 axum = { version = "0.7.5", features = ["multipart"] }
 axum-extra = "0.9.3"
 tower-http = { version = "0.5.2", features = ["cors"] }
-time = { version = "0.3.36", features = ["serde"] }
-uuid = { version = "1.8.0", features = ["serde", "v4"] }
-itertools = "0.12.1"
-
-bcrypt = "0.15.1"
-jsonwebtoken = "9.3.0"
-didkit = "0.6.0"
-sha3 = "0.10.8"
-hex = "0.4.3"
-nanoid = "0.4.0"
 schemars = { version = "0.8.21", features = ["uuid1"] }
 aide = { version = "0.13.4", features = [
     "scalar",
@@ -34,6 +31,23 @@ aide = { version = "0.13.4", features = [
     "axum-extra",
     "macros",
 ] }
+
+itertools = "0.12.1"
+bcrypt = "0.15.1"
+jsonwebtoken = "9.3.0"
+didkit = "0.6.0"
+sha3 = "0.10.8"
+
+
+# Mailing and Captcha
+lettre = { version = "0.11.7", default-features = false, features = [
+    "tokio1-rustls-tls",
+    "builder",
+    "hostname",
+    "pool",
+    "smtp-transport",
+] }
+handlebars = "6.0.0"
 hcaptcha = { version = "2.4.7", default-features = false, features = [
     "rustls-backend",
     "ext",

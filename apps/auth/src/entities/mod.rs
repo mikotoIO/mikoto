@@ -25,7 +25,8 @@ pub struct MultiFactor {
 #[serde(rename_all = "camelCase")]
 pub struct TokenPair {
     pub access_token: String,
-    pub refresh_token: String,
+    /// If the refresh token is not provided, you can continue using the same refresh token.
+    pub refresh_token: Option<String>,
 }
 
 #[derive(FromRow)]

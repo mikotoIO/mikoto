@@ -1,13 +1,17 @@
 use axum::Json;
+use log::info;
 use schemars::JsonSchema;
 use serde_json::json;
 use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{user_create, Account},
+    entities::{user_create, Account, RefreshToken, TokenPair},
     error::Error,
-    functions::captcha::captcha,
+    functions::{
+        captcha::captcha,
+        jwt::{jwt_key, Claims},
+    },
 };
 
 fn register_payload_example() -> serde_json::Value {
@@ -28,7 +32,7 @@ pub struct RegisterPayload {
     pub captcha: Option<String>,
 }
 
-pub async fn route(body: Json<RegisterPayload>) -> Result<Json<Account>, Error> {
+pub async fn route(body: Json<RegisterPayload>) -> Result<Json<TokenPair>, Error> {
     captcha().validate(body.captcha.as_deref()).await?;
 
     let account = Account {
@@ -37,9 +41,13 @@ pub async fn route(body: Json<RegisterPayload>) -> Result<Json<Account>, Error> 
         passhash: bcrypt::hash(body.password.clone(), bcrypt::DEFAULT_COST)?,
     };
 
-    let mut tx = db().begin().await?;
-    user_create(&account.id, &body.name, &mut *tx).await?;
-    account.create(&mut *tx).await?;
-    tx.commit().await?;
-    Ok(Json(account))
+    account.create_with_user(&body.name, db()).await?;
+
+    let (refresh, token) = RefreshToken::new(account.id);
+    refresh.create(db()).await?;
+
+    Ok(Json(TokenPair {
+        access_token: Claims::from(&account).encode(jwt_key())?,
+        refresh_token: Some(token),
+    }))
 }

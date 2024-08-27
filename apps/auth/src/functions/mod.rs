@@ -2,10 +2,17 @@ use std::collections::HashMap;
 use std::hash::Hash;
 use std::iter::IntoIterator;
 
+use time::PrimitiveDateTime;
+
 pub mod captcha;
 pub mod jwt;
 pub mod mail;
 pub mod sha3;
+
+pub fn primitive_now() -> time::PrimitiveDateTime {
+    let t = time::OffsetDateTime::now_utc();
+    PrimitiveDateTime::new(t.date(), t.time())
+}
 
 pub fn group_by<T, K, I, F>(iter: I, key_fn: F) -> HashMap<K, Vec<T>>
 where

@@ -1,4 +1,7 @@
-use crate::{error::Error, functions::sha3::sha3};
+use crate::{
+    error::Error,
+    functions::{primitive_now, sha3::sha3},
+};
 use nanoid::nanoid;
 use sqlx::FromRow;
 use uuid::Uuid;
@@ -8,7 +11,7 @@ use uuid::Uuid;
 pub struct RefreshToken {
     pub id: Uuid,
     pub token: String,
-    pub expires_at: time::OffsetDateTime,
+    pub expires_at: time::PrimitiveDateTime,
     pub account_id: Uuid,
 }
 
@@ -20,7 +23,7 @@ impl RefreshToken {
                 id: Uuid::new_v4(),
                 token: sha3(&refresh_token),
                 account_id,
-                expires_at: time::OffsetDateTime::now_utc() + time::Duration::days(30),
+                expires_at: primitive_now() + time::Duration::days(30),
             },
             refresh_token,
         )
@@ -29,7 +32,7 @@ impl RefreshToken {
     pub async fn create<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
         sqlx::query(
             r##"
-            INSERT INTO "RefreshToken" ("id", "token", "expires_at", "account_id")
+            INSERT INTO "RefreshToken" ("id", "token", "expiresAt", "accountId")
             VALUES ($1, $2, $3, $4)
             "##,
         )
@@ -47,7 +50,7 @@ impl RefreshToken {
         db: X,
     ) -> Result<Self, Error> {
         sqlx::query_as(r##"SELECT * FROM "RefreshToken" WHERE "token" = $1"##)
-            .bind(token)
+            .bind(sha3(token))
             .fetch_optional(db)
             .await?
             .ok_or(Error::NotFound)

@@ -36,6 +36,6 @@ pub async fn route(body: Json<LoginPayload>) -> Result<Json<TokenPair>, Error> {
 
     Ok(Json(TokenPair {
         access_token: Claims::from(&acc).encode(jwt_key())?,
-        refresh_token: token,
+        refresh_token: Some(token),
     }))
 }

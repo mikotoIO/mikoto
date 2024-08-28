@@ -2,7 +2,7 @@ use nanoid::nanoid;
 use sqlx::FromRow;
 use uuid::Uuid;
 
-use crate::error::Error;
+use crate::{error::Error, functions::primitive_now};
 
 #[derive(FromRow, Serialize)]
 #[sqlx(rename_all = "camelCase")]
@@ -11,7 +11,7 @@ pub struct AccountVerification {
     pub category: String,
     pub token: String,
     pub account_id: Uuid,
-    pub expires_at: time::OffsetDateTime,
+    pub expires_at: time::PrimitiveDateTime,
 }
 
 impl AccountVerification {
@@ -36,7 +36,7 @@ impl AccountVerification {
             return Err(Error::NotFound);
         }
 
-        if (verification.expires_at - time::OffsetDateTime::now_utc()).whole_seconds() < 0 {
+        if (verification.expires_at - primitive_now()).whole_seconds() < 0 {
             return Err(Error::NotFound);
         }
 
@@ -52,7 +52,7 @@ impl AccountVerification {
             category: "PASSWORD_RESET".to_string(),
             token: nanoid!(48),
             account_id,
-            expires_at: time::OffsetDateTime::now_utc() + time::Duration::hours(1),
+            expires_at: primitive_now() + time::Duration::hours(1),
         };
         sqlx::query(
             r#"

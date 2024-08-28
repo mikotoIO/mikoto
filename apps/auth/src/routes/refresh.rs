@@ -5,7 +5,10 @@ use crate::{
     db::db,
     entities::{Account, RefreshToken, TokenPair},
     error::Error,
-    functions::jwt::{jwt_key, Claims},
+    functions::{
+        jwt::{jwt_key, Claims},
+        primitive_now,
+    },
 };
 
 #[derive(Deserialize, JsonSchema)]
@@ -17,7 +20,7 @@ pub struct RefreshPayload {
 pub async fn route(body: Json<RefreshPayload>) -> Result<Json<TokenPair>, Error> {
     let refresh = RefreshToken::find_token(&body.refresh_token, db()).await?;
 
-    if refresh.expires_at < time::OffsetDateTime::now_utc() {
+    if refresh.expires_at < primitive_now() {
         return Err(Error::TokenExpired);
     }
 
@@ -25,6 +28,6 @@ pub async fn route(body: Json<RefreshPayload>) -> Result<Json<TokenPair>, Error>
 
     Ok(Json(TokenPair {
         access_token: Claims::from(&acc).encode(jwt_key())?,
-        refresh_token: body.refresh_token.clone(),
+        refresh_token: None,
     }))
 }

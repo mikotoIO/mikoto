@@ -42,6 +42,6 @@ pub async fn route(body: Json<ChangePasswordPayload>) -> Result<Json<TokenPair>,
 
     Ok(Json(TokenPair {
         access_token: Claims::from(&acc).encode(jwt_key())?,
-        refresh_token: token,
+        refresh_token: Some(token),
     }))
 }

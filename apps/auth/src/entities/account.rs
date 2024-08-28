@@ -39,6 +39,31 @@ impl Account {
         Ok(())
     }
 
+    pub async fn create_with_user<'c, X: sqlx::PgExecutor<'c>>(
+        &self,
+        name: &str,
+        db: X,
+    ) -> Result<(), Error> {
+        sqlx::query(
+            r##"
+            WITH u AS (
+                INSERT INTO "User" ("id", "name")
+                VALUES ($1, $2)
+                RETURNING "id"
+            )
+            INSERT INTO "Account" ("id", "email", "passhash")
+            VALUES ((SELECT "id" FROM u), $3, $4)
+            "##,
+        )
+        .bind(&self.id)
+        .bind(name)
+        .bind(&self.email.trim().to_lowercase())
+        .bind(&self.passhash)
+        .execute(db)
+        .await?;
+        Ok(())
+    }
+
     pub async fn find_by_id<'c, X: sqlx::PgExecutor<'c>>(id: &Uuid, db: X) -> Result<Self, Error> {
         sqlx::query_as(r##"SELECT * FROM "Account" WHERE "id" = $1"##)
             .bind(id)

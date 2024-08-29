@@ -1,12 +1,11 @@
 use axum::Json;
-use log::info;
 use schemars::JsonSchema;
 use serde_json::json;
 use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{user_create, Account, RefreshToken, TokenPair},
+    entities::{Account, RefreshToken, TokenPair},
     error::Error,
     functions::{
         captcha::captcha,

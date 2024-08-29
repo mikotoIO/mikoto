@@ -10,6 +10,7 @@ pub struct Env {
     pub captcha_secret: Option<String>,
 
     pub web_url: String,
+    pub smtp_sender: Option<String>,
     pub smtp_url: Option<String>,
 }
 

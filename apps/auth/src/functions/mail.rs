@@ -45,7 +45,11 @@ impl MailSender {
 
     pub fn from_env() -> Self {
         MailSender {
-            from: "placeholder".to_string(),
+            from: env()
+                .smtp_sender
+                .as_ref()
+                .expect("SMTP_SENDER not set")
+                .to_string(),
             transport: match &env().smtp_url {
                 None => MailTransport::Dummy,
                 Some(url) => MailTransport::Smtp(

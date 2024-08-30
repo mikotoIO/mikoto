@@ -11,12 +11,13 @@ import {
 } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import HCaptcha from '@hcaptcha/react-hcaptcha';
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Turnstile } from '@marsidev/react-turnstile';
+import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { faMikoto } from '@/components/icons';
+import { env } from '@/env';
 import { useErrorElement } from '@/hooks/useErrorElement';
 import { authClient } from '@/store/authClient';
 
@@ -38,16 +39,22 @@ function Logo() {
 }
 
 // not always a real captcha
-function Captcha() {
-  return <div />;
-  // return (
-  //   <HCaptcha
-  //     sitekey={env.PUBLIC_CAPTCHA_KEY}
-  //     onVerify={(t) => {
-  //       console.log(t);
-  //     }}
-  //   />
-  // );
+function Captcha({ name }: { name: string }) {
+  return (
+    <Controller
+      name={name}
+      render={({ field }) => {
+        return (
+          <Turnstile
+            siteKey={env.PUBLIC_CAPTCHA_KEY}
+            onSuccess={(token) => {
+              field.onChange(token);
+            }}
+          />
+        );
+      }}
+    />
+  );
 }
 
 const Art = styled.div`
@@ -117,6 +124,7 @@ export function LoginView() {
           <Input type="password" {...register('password')} />
         </FormControl>
 
+        <Captcha name="captcha" />
         <Button
           variant="primary"
           type="submit"
@@ -130,7 +138,6 @@ export function LoginView() {
         <Anchor to="/forgotpassword" as={Link}>
           Forgot Password?
         </Anchor>
-        <Captcha />
       </AuthForm>
     </AuthView>
   );
@@ -173,6 +180,7 @@ export function RegisterView() {
           <FormLabel>Password</FormLabel>
           <Input type="password" {...register('password')} />
         </FormControl>
+        <Captcha name="captcha" />
 
         <Button
           variant="primary"
@@ -184,7 +192,6 @@ export function RegisterView() {
         <Anchor to="/login" as={Link}>
           Log In
         </Anchor>
-        <Captcha />
       </AuthForm>
     </AuthView>
   );
@@ -218,7 +225,7 @@ export function ResetPasswordView() {
             <Button variant="primary" type="submit">
               Send Password Reset Email
             </Button>
-            <Captcha />
+            <Captcha name="captcha" />
           </>
         )}
       </AuthForm>

@@ -5,11 +5,17 @@ pub struct Env {
     pub database_url: String,
     pub issuer: String,
     pub port: u16,
+
+    // JWT
     pub secret: String,
+
+    // Captchas
     pub captcha: String, // either "disabled" or "hcaptcha"
+    pub captcha_url: Option<String>,
     pub captcha_secret: Option<String>,
 
     pub web_url: String,
+    pub smtp_sender: Option<String>,
     pub smtp_url: Option<String>,
 }
 

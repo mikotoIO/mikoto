@@ -20,7 +20,7 @@ pub enum Error {
     WrongAuthenticationType,
     JwtValidationError { message: String },
     DatabaseError { message: String },
-    InternalServerError,
+    InternalServerError { message: String },
     TemplatingError,
     MailError,
 }
@@ -43,7 +43,9 @@ impl From<uuid::Error> for Error {
 
 impl From<BcryptError> for Error {
     fn from(_: BcryptError) -> Self {
-        Self::InternalServerError
+        Self::InternalServerError {
+            message: "Failed to hash password".to_string(),
+        }
     }
 }
 

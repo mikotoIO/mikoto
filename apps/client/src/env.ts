@@ -10,5 +10,5 @@ export const env = {
   PUBLIC_COLLABORATION_URL:
     import.meta.env.PUBLIC_COLLABORATION_URL ?? 'ws://localhost:1234',
   PUBLIC_CAPTCHA_KEY:
-    import.meta.env.PUBLIC_CAPTCHA_KEY ?? '3x00000000000000000000FF',
+    import.meta.env.PUBLIC_CAPTCHA_KEY ?? '1x00000000000000000000AA',
 };

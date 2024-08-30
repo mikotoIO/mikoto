@@ -13,7 +13,7 @@ import styled from '@emotion/styled';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Turnstile } from '@marsidev/react-turnstile';
 import { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Control, useController, useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { faMikoto } from '@/components/icons';
@@ -39,19 +39,14 @@ function Logo() {
 }
 
 // not always a real captcha
-function Captcha({ name }: { name: string }) {
+function Captcha({ name, control }: { name: string; control: Control }) {
+  const { field } = useController({ name, control });
+
   return (
-    <Controller
-      name={name}
-      render={({ field }) => {
-        return (
-          <Turnstile
-            siteKey={env.PUBLIC_CAPTCHA_KEY}
-            onSuccess={(token) => {
-              field.onChange(token);
-            }}
-          />
-        );
+    <Turnstile
+      siteKey={env.PUBLIC_CAPTCHA_KEY}
+      onSuccess={(token) => {
+        field.onChange(token);
       }}
     />
   );
@@ -93,7 +88,7 @@ const AuthForm = chakra('form', {
 });
 
 export function LoginView() {
-  const { register, handleSubmit, formState } = useForm();
+  const { register, handleSubmit, formState, control } = useForm();
   const error = useErrorElement();
 
   return (
@@ -124,7 +119,7 @@ export function LoginView() {
           <Input type="password" {...register('password')} />
         </FormControl>
 
-        <Captcha name="captcha" />
+        <Captcha name="captcha" control={control} />
         <Button
           variant="primary"
           type="submit"
@@ -144,7 +139,7 @@ export function LoginView() {
 }
 
 export function RegisterView() {
-  const { register, handleSubmit, formState } = useForm();
+  const { register, handleSubmit, formState, control } = useForm();
   const error = useErrorElement();
 
   return (
@@ -180,7 +175,7 @@ export function RegisterView() {
           <FormLabel>Password</FormLabel>
           <Input type="password" {...register('password')} />
         </FormControl>
-        <Captcha name="captcha" />
+        <Captcha name="captcha" control={control} />
 
         <Button
           variant="primary"
@@ -198,7 +193,7 @@ export function RegisterView() {
 }
 
 export function ResetPasswordView() {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, control } = useForm();
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -225,7 +220,7 @@ export function ResetPasswordView() {
             <Button variant="primary" type="submit">
               Send Password Reset Email
             </Button>
-            <Captcha name="captcha" />
+            <Captcha name="captcha" control={control} />
           </>
         )}
       </AuthForm>

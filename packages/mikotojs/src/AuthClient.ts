@@ -16,29 +16,42 @@ export class AuthClient {
     });
   }
 
-  async register(name: string, email: string, password: string) {
+  async register(
+    name: string,
+    email: string,
+    password: string,
+    captcha: string | null = null,
+  ) {
     const x = await this.axios.post<TokenPair>('/account/register', {
       name,
       email,
       password,
+      captcha,
     });
     return x.data;
   }
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string, captcha: string | null = null) {
     const x = await this.axios.post<TokenPair>('/account/login', {
       email,
       password,
+      captcha,
     });
     return x.data;
   }
 
-  async changePassword(id: string, oldPassword: string, newPassword: string) {
+  async changePassword(
+    id: string,
+    oldPassword: string,
+    newPassword: string,
+    captcha: string | null = null,
+  ) {
     return this.axios
       .post<TokenPair>('/account/change_password', {
         id,
         oldPassword,
         newPassword,
+        captcha,
       })
       .then((x) => x.data);
   }

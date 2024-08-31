@@ -40,7 +40,7 @@ function Logo() {
 
 // not always a real captcha
 function Captcha({ name, control }: { name: string; control: Control }) {
-  const { field } = useController({ name, control });
+  const { field } = useController({ name, control, defaultValue: null });
 
   return (
     <Turnstile
@@ -94,11 +94,12 @@ export function LoginView() {
   return (
     <AuthView>
       <AuthForm
-        onSubmit={handleSubmit(async (formData) => {
+        onSubmit={handleSubmit(async (form) => {
           try {
             const tk = await authClient.login(
-              formData.email,
-              formData.password,
+              form.email,
+              form.password,
+              form.captcha,
             );
             localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
             // Screw SPAs, why not just force an actual reload at this point?
@@ -145,12 +146,13 @@ export function RegisterView() {
   return (
     <AuthView>
       <AuthForm
-        onSubmit={handleSubmit(async (data) => {
+        onSubmit={handleSubmit(async (form) => {
           try {
             const tk = await authClient.register(
-              data.name,
-              data.email,
-              data.password,
+              form.name,
+              form.email,
+              form.password,
+              form.captcha
             );
             localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
             window.location.href = '/';
@@ -195,7 +197,6 @@ export function RegisterView() {
 export function ResetPasswordView() {
   const { register, handleSubmit, control } = useForm();
   const [sent, setSent] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   return (
     <AuthView>

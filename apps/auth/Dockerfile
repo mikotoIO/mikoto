@@ -11,7 +11,7 @@ RUN cargo chef prepare --recipe-path recipe.json
 
 FROM base AS builder
 WORKDIR /mikoto
-COPY --from=planner /app/recipe.json recipe.json
+COPY --from=planner /mikoto/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY . .
 

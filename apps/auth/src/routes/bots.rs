@@ -3,12 +3,7 @@ use nanoid::nanoid;
 use schemars::JsonSchema;
 use uuid::Uuid;
 
-use crate::{
-    db::db,
-    entities::{bot_create, Bot},
-    error::Error,
-    functions::jwt::Claims,
-};
+use crate::{db::db, entities::Bot, error::Error, functions::jwt::Claims};
 
 #[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
@@ -27,9 +22,7 @@ pub async fn create_bot(account: Claims, body: Json<CreateBotPayload>) -> Result
         secret: random_token,
     };
 
-    let mut tx = db().begin().await?;
-    bot_create(&bot.id, &body.name, &mut *tx).await?;
-    bot.create(db()).await?;
+    bot.create_with_user(&body.name, db()).await?;
     Ok(Json(bot))
 }
 

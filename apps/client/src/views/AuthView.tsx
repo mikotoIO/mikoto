@@ -101,7 +101,9 @@ export function LoginView() {
               form.password,
               form.captcha,
             );
-            localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
+            if (tk.refreshToken) {
+              localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
+            }
             // Screw SPAs, why not just force an actual reload at this point?
             window.location.href = '/';
           } catch (e) {
@@ -152,9 +154,11 @@ export function RegisterView() {
               form.name,
               form.email,
               form.password,
-              form.captcha
+              form.captcha,
             );
-            localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
+            if (tk.refreshToken) {
+              localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
+            }
             window.location.href = '/';
           } catch (e) {
             error.setError((e as any)?.response?.data);

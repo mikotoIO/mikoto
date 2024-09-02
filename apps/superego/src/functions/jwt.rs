@@ -2,6 +2,7 @@ use std::sync::OnceLock;
 
 use aide::OperationIo;
 use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
+use chrono::{TimeDelta, Utc};
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
 
 use crate::{entities::Account, env::env, error::Error};
@@ -53,9 +54,9 @@ impl Claims {
 
 impl From<&Account> for Claims {
     fn from(user: &Account) -> Self {
-        let expiry = time::OffsetDateTime::now_utc() + time::Duration::hours(1);
+        let expiry = Utc::now() + TimeDelta::hours(1);
         Self {
-            exp: expiry.unix_timestamp() as usize,
+            exp: expiry.timestamp_millis() as usize,
             sub: user.id.to_string(),
             // iss: env().issuer.clone(),
         }

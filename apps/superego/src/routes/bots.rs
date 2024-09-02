@@ -1,9 +1,25 @@
+use aide::axum::{
+    routing::{get_with, post_with},
+    ApiRouter,
+};
 use axum::Json;
 use nanoid::nanoid;
 use schemars::JsonSchema;
 use uuid::Uuid;
 
 use crate::{db::db, entities::Bot, error::Error, functions::jwt::Claims};
+
+pub fn router() -> ApiRouter {
+    ApiRouter::<()>::new()
+        .api_route(
+            "/",
+            get_with(list_bots, |o| o.tag("Bots").summary("List Bots")),
+        )
+        .api_route(
+            "/",
+            post_with(create_bot, |o| o.tag("Bots").summary("Create a Bot")),
+        )
+}
 
 #[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
@@ -12,7 +28,7 @@ pub struct CreateBotPayload {
 }
 
 // FIXME: the API keys should be hashed as well
-pub async fn create_bot(account: Claims, body: Json<CreateBotPayload>) -> Result<Json<Bot>, Error> {
+async fn create_bot(account: Claims, body: Json<CreateBotPayload>) -> Result<Json<Bot>, Error> {
     let random_token = nanoid!(32);
 
     let bot = Bot {
@@ -26,7 +42,7 @@ pub async fn create_bot(account: Claims, body: Json<CreateBotPayload>) -> Result
     Ok(Json(bot))
 }
 
-pub async fn list_bots(account: Claims) -> Result<Json<Vec<Bot>>, Error> {
+async fn list_bots(account: Claims) -> Result<Json<Vec<Bot>>, Error> {
     let bots = Bot::list(Uuid::parse_str(&account.sub)?, db()).await?;
     Ok(Json(bots))
 }

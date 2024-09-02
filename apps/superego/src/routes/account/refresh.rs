@@ -1,14 +1,12 @@
 use axum::Json;
+use chrono::Utc;
 use schemars::JsonSchema;
 
 use crate::{
     db::db,
     entities::{Account, RefreshToken, TokenPair},
     error::Error,
-    functions::{
-        jwt::{jwt_key, Claims},
-        primitive_now,
-    },
+    functions::jwt::{jwt_key, Claims},
 };
 
 #[derive(Deserialize, JsonSchema)]
@@ -20,7 +18,7 @@ pub struct RefreshPayload {
 pub async fn route(body: Json<RefreshPayload>) -> Result<Json<TokenPair>, Error> {
     let refresh = RefreshToken::find_token(&body.refresh_token, db()).await?;
 
-    if refresh.expires_at < primitive_now() {
+    if refresh.expires_at < Utc::now().naive_utc() {
         return Err(Error::TokenExpired);
     }
 

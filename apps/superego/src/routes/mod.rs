@@ -1,10 +1,7 @@
 use std::sync::OnceLock;
 
 use aide::{
-    axum::{
-        routing::{get, get_with, post_with},
-        ApiRouter, IntoApiResponse,
-    },
+    axum::{routing::get, ApiRouter, IntoApiResponse},
     openapi::{Info, OpenApi},
     scalar::Scalar,
 };
@@ -15,6 +12,7 @@ use tower_http::cors::CorsLayer;
 
 pub mod account;
 pub mod bots;
+pub mod spaces;
 
 #[derive(Debug, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
@@ -47,14 +45,7 @@ pub fn router() -> Router {
     let router = ApiRouter::<()>::new()
         .api_route("/", get(index))
         .nest("/account", account::router())
-        .api_route(
-            "/bot",
-            post_with(bots::create_bot, |o| o.summary("Create Bot")),
-        )
-        .api_route(
-            "/bot",
-            get_with(bots::list_bots, |o| o.summary("List Bots")),
-        )
+        .nest("/bots", bots::router())
         .route("/api.json", axum::routing::get(serve_api))
         .route("/scalar", Scalar::new("/api.json").axum_route())
         .layer(CorsLayer::permissive());

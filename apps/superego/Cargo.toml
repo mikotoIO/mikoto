@@ -9,7 +9,7 @@ tokio = { version = "1.35.1", features = ["full"] }
 serde = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0.108"
 async-trait = "0.1.81"
-time = { version = "0.3.36", features = ["serde"] }
+chrono = "0.4.38"
 uuid = { version = "1.8.0", features = ["serde", "v4"] }
 nanoid = "0.4.0"
 hex = "0.4.3"
@@ -24,7 +24,7 @@ pretty_env_logger = "0.5.0"
 axum = { version = "0.7.5", features = ["multipart"] }
 axum-extra = "0.9.3"
 tower-http = { version = "0.5.2", features = ["cors"] }
-schemars = { version = "0.8.21", features = ["uuid1"] }
+schemars = { version = "0.8.21", features = ["uuid1", "chrono"] }
 aide = { version = "0.13.4", features = [
     "scalar",
     "axum",
@@ -62,7 +62,7 @@ features = [
     "tls-rustls",
     "postgres",
     "uuid",
-    "time",
+    "chrono",
     "json",
     "migrate",
 ]

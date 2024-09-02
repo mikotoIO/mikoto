@@ -5,6 +5,12 @@ use uuid::Uuid;
 
 use crate::error::Error;
 
+pub mod refresh_token;
+pub mod verification;
+
+pub use refresh_token::*;
+pub use verification::*;
+
 #[derive(FromRow, Serialize, JsonSchema)]
 #[sqlx(rename_all = "camelCase")]
 #[schemars(example = "account_example")]

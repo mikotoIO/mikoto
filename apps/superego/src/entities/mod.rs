@@ -4,15 +4,15 @@ use uuid::Uuid;
 
 mod account;
 mod bot;
-mod refresh_token;
+mod channel;
+mod space;
 mod user;
-mod verification;
 
 pub use account::*;
 pub use bot::*;
-pub use refresh_token::*;
+pub use channel::*;
+pub use space::*;
 pub use user::*;
-pub use verification::*;
 
 pub struct MultiFactor {
     pub user_id: Uuid,

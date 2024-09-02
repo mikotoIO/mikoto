@@ -15,7 +15,7 @@ COPY --from=planner /mikoto/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY . .
 
-WORKDIR /mikoto/apps/auth
+WORKDIR /mikoto/apps/superego
 RUN cargo build --release
 
 FROM alpine:latest

@@ -1,22 +1,18 @@
 import type * as Preset from '@docusaurus/preset-classic';
 import type { Config } from '@docusaurus/types';
+import { ScalarOptions } from '@scalar/docusaurus';
 import { themes as prismThemes } from 'prism-react-renderer';
 
 const config: Config = {
-  title: 'My Site',
-  tagline: 'Dinosaurs are cool',
+  title: 'Mikoto',
+  tagline: 'The most overkill messaging app in the world',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://your-docusaurus-site.example.com',
+  url: 'https://docs.mikoto.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
-
-  // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -68,23 +64,29 @@ const config: Config = {
       {
         label: 'Superego (Auth)',
         route: '/superego',
+        showNavLink: true,
         configuration: {
+          theme: 'purple',
+          layout: 'modern',
           spec: {
             // Put the URL to your OpenAPI document here:
             url: 'http://localhost:9503/api.json',
           },
         },
-      },
+      } satisfies ScalarOptions,
     ],
   ],
 
   themeConfig: {
+    colorMode: {
+      defaultMode: 'dark',
+    },
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
     navbar: {
-      title: 'My Site',
+      title: 'Mikoto Docs',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'Mikoto Logo',
         src: 'img/logo.svg',
       },
       items: [
@@ -96,7 +98,7 @@ const config: Config = {
         },
         { to: '/blog', label: 'Blog', position: 'left' },
         {
-          href: 'https://github.com/facebook/docusaurus',
+          href: 'https://github.com/mikotoIO/mikoto',
           label: 'GitHub',
           position: 'right',
         },
@@ -118,16 +120,8 @@ const config: Config = {
           title: 'Community',
           items: [
             {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-            },
-            {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
-            },
-            {
               label: 'Twitter',
-              href: 'https://twitter.com/docusaurus',
+              href: 'https://x.com/mikotoIO',
             },
           ],
         },
@@ -140,7 +134,7 @@ const config: Config = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/mikotoIO/mikoto',
             },
           ],
         },
@@ -148,8 +142,8 @@ const config: Config = {
       copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
     },
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: prismThemes.oneDark,
+      darkTheme: prismThemes.oneDark,
     },
   } satisfies Preset.ThemeConfig,
 };

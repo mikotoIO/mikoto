@@ -21,7 +21,7 @@ pub struct ResetPasswordPayload {
 
 static RESET_PASSWORD_TEMPLATE: MailTemplate = MailTemplate {
     subject: "Reset your password",
-    body: include_str!("../email/reset.hbs"),
+    body: include_str!("../../email/reset.hbs"),
 };
 
 #[derive(Serialize)]

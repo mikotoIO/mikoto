@@ -13,12 +13,8 @@ use schemars::JsonSchema;
 use serde::Serialize;
 use tower_http::cors::CorsLayer;
 
+pub mod account;
 pub mod bots;
-pub mod change_password;
-pub mod login;
-pub mod refresh;
-pub mod register;
-pub mod reset_password;
 
 #[derive(Debug, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
@@ -50,32 +46,7 @@ pub fn router() -> Router {
 
     let router = ApiRouter::<()>::new()
         .api_route("/", get(index))
-        .api_route(
-            "/account/register",
-            post_with(register::route, |o| o.summary("User Registration")),
-        )
-        .api_route(
-            "/account/login",
-            post_with(login::route, |o| o.summary("User Login")),
-        )
-        .api_route(
-            "/account/refresh",
-            post_with(refresh::route, |o| o.summary("Refresh Access Token")),
-        )
-        .api_route(
-            "/account/change_password",
-            post_with(change_password::route, |o| o.summary("Change Password")),
-        )
-        .api_route(
-            "/account/reset_password",
-            post_with(reset_password::route, |o| o.summary("Reset Password")),
-        )
-        .api_route(
-            "/account/reset_password/submit",
-            post_with(reset_password::confirm, |o| {
-                o.summary("Confirm Password Reset")
-            }),
-        )
+        .nest("/account", account::router())
         .api_route(
             "/bot",
             post_with(bots::create_bot, |o| o.summary("Create Bot")),

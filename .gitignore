@@ -41,7 +41,7 @@ yarn-error.log*
 .env.production.local
 
 # TODO: separate the envfiles
-/apps/auth/.env
+/apps/superego/.env
 
 # turbo
 .turbo

@@ -5,7 +5,7 @@
   "workspaces": [
     "apps/*",
     "packages/*",
-    "docs/*",
+    "docs",
     "hyperschema/*"
   ],
   "scripts": {

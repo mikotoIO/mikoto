@@ -1,14 +1,14 @@
-name: Build Docker for Superego (Auth)
+name: Build Docker for Superego
 on:
   push:
     paths:
-      - apps/auth/**
+      - apps/superego/**
     branches: ['main']
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: mikotoIO/superego
-  DOCKERFILE: ./apps/auth/Dockerfile
+  DOCKERFILE: ./apps/superego/Dockerfile
 
 jobs:
   build:

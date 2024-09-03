@@ -2,7 +2,7 @@
 resolver = "2"
 members = [
     "apps/content-proxy",
-    "apps/auth",
+    "apps/superego",
     "packages/muonic",
     "packages/muonic/macros",
     "packages/muonic/core",

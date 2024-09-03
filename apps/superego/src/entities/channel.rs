@@ -4,6 +4,7 @@ use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
 #[derive(sqlx::Type, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[sqlx(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ChannelType {
     Text,
@@ -15,6 +16,7 @@ pub enum ChannelType {
 }
 
 #[derive(FromRow, Serialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
 #[sqlx(rename_all = "camelCase")]
 pub struct Channel {
     pub id: Uuid,

@@ -12,7 +12,9 @@ use tower_http::cors::CorsLayer;
 
 pub mod account;
 pub mod bots;
+pub mod channels;
 pub mod spaces;
+pub mod ws;
 
 #[derive(Debug, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
@@ -46,6 +48,8 @@ pub fn router() -> Router {
         .api_route("/", get(index))
         .nest("/account", account::router())
         .nest("/bots", bots::router())
+        .nest("/spaces", spaces::router())
+        .route("/ws", axum::routing::get(ws::handler))
         .route("/api.json", axum::routing::get(serve_api))
         .route("/scalar", Scalar::new("/api.json").axum_route())
         .layer(CorsLayer::permissive());

@@ -3,6 +3,7 @@ use std::sync::OnceLock;
 #[derive(Deserialize, Debug)]
 pub struct Env {
     pub database_url: String,
+    pub redis_url: String,
     pub issuer: String,
     pub port: u16,
 

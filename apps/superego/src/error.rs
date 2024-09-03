@@ -20,14 +20,24 @@ pub enum Error {
     WrongAuthenticationType,
     JwtValidationError { message: String },
     DatabaseError { message: String },
+    RedisError { message: String },
     InternalServerError { message: String },
     TemplatingError,
     MailError,
+    Todo,
 }
 
 impl From<sqlx::Error> for Error {
     fn from(err: sqlx::Error) -> Self {
         Self::DatabaseError {
+            message: err.to_string(),
+        }
+    }
+}
+
+impl From<fred::error::RedisError> for Error {
+    fn from(err: fred::error::RedisError) -> Self {
+        Self::RedisError {
             message: err.to_string(),
         }
     }

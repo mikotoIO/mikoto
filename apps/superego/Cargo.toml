@@ -21,7 +21,7 @@ log = "0.4.21"
 pretty_env_logger = "0.5.0"
 
 # web server
-axum = { version = "0.7.5", features = ["multipart"] }
+axum = { version = "0.7.5", features = ["ws", "macros", "multipart"] }
 axum-extra = "0.9.3"
 tower-http = { version = "0.5.2", features = ["cors"] }
 schemars = { version = "0.8.21", features = ["uuid1", "chrono"] }
@@ -53,6 +53,8 @@ hcaptcha = { version = "2.4.7", default-features = false, features = [
     "ext",
     "hex",
 ] }
+futures-util = "0.3.30"
+fred = "9.1.2"
 
 # database
 [dependencies.sqlx]

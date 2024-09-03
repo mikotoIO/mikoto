@@ -1,5 +1,9 @@
 use std::time::Duration;
 
+use fred::{
+    prelude::{ClientLike, RedisClient},
+    types::{Builder, RedisConfig},
+};
 use sqlx::PgPool;
 use tokio::{sync::OnceCell, time::timeout};
 
@@ -29,4 +33,24 @@ pub async fn init() -> Result<&'static PgPool, Error> {
 
 pub fn db() -> &'static PgPool {
     DB.get().expect("Database not initialized")
+}
+
+static REDIS: OnceCell<RedisClient> = OnceCell::const_new();
+
+pub async fn init_redis() -> Result<&'static RedisClient, Error> {
+    REDIS
+        .get_or_try_init(|| async {
+            let redis = Builder::from_config(
+                RedisConfig::from_url(&env().redis_url).expect("Invalid Redis URL"),
+            )
+            .build()
+            .unwrap();
+            redis.init().await.expect("Failed to connect to Redis");
+            Ok(redis)
+        })
+        .await
+}
+
+pub fn redis() -> &'static RedisClient {
+    REDIS.get().expect("Redis not initialized")
 }

@@ -2,7 +2,7 @@ use axum::{
     extract::{ws, WebSocketUpgrade},
     response::Response,
 };
-use fred::prelude::{ClientLike, EventInterface};
+use fred::prelude::{ClientLike, EventInterface, PubsubInterface};
 use futures_util::{stream::StreamExt, SinkExt};
 use state::WebsocketState;
 
@@ -20,12 +20,13 @@ async fn handle_socket_infallible(socket: ws::WebSocket) {
 }
 
 async fn handle_socket(socket: ws::WebSocket) -> Result<(), Error> {
-    let _state = WebsocketState::new();
+    let state = WebsocketState::new();
 
     let (mut writer, mut reader) = socket.split();
 
     let redis = redis().clone_new();
     redis.init().await?;
+    redis.subscribe(vec![state.conn_id.to_string()]).await?;
 
     let mut server_to_client = tokio::spawn(async move {
         while let Ok(msg) = redis.message_rx().recv().await {

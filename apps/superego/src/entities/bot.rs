@@ -1,18 +1,16 @@
-use schemars::JsonSchema;
-use sqlx::FromRow;
 use uuid::Uuid;
 
-use crate::error::Error;
+use crate::{entity, error::Error};
 
-#[derive(FromRow, Serialize, JsonSchema)]
-#[sqlx(rename_all = "camelCase")]
-pub struct Bot {
-    pub id: Uuid,
-    pub name: String,
-    pub owner_id: Uuid,
+entity!(
+    pub struct Bot {
+        pub id: Uuid,
+        pub name: String,
+        pub owner_id: Uuid,
 
-    pub secret: String,
-}
+        pub secret: String,
+    }
+);
 
 impl Bot {
     pub async fn list<'c, X: sqlx::PgExecutor<'c>>(

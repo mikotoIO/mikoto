@@ -8,6 +8,7 @@ use state::WebsocketState;
 
 use crate::{db::redis, error::Error};
 
+pub mod schema;
 pub mod state;
 
 #[derive(Serialize, Deserialize)]

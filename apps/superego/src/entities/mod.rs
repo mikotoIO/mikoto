@@ -5,6 +5,7 @@ use uuid::Uuid;
 mod account;
 mod bot;
 mod channel;
+mod macros;
 mod space;
 mod user;
 

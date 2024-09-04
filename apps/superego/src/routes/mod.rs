@@ -9,11 +9,13 @@ use axum::{Extension, Json, Router};
 use schemars::JsonSchema;
 use serde::Serialize;
 use tower_http::cors::CorsLayer;
+use ws::schema::websocket_openapi_extension;
 
 pub mod account;
 pub mod bots;
 pub mod channels;
 pub mod spaces;
+pub mod users;
 pub mod ws;
 
 #[derive(Debug, Serialize, JsonSchema)]
@@ -43,12 +45,24 @@ pub fn router() -> Router {
         },
         ..OpenApi::default()
     };
+    api.extensions
+        .insert("websocket".to_string(), websocket_openapi_extension());
 
     let router = ApiRouter::<()>::new()
         .api_route("/", get(index))
         .nest("/account", account::router())
         .nest("/bots", bots::router())
+        .nest("/channels", channels::router())
+        .nest(
+            "/channel/:channel_id/documents",
+            channels::documents::router(),
+        )
+        .nest(
+            "/channel/:channel_id/messages",
+            channels::messages::router(),
+        )
         .nest("/spaces", spaces::router())
+        .nest("/spaces/:space_id/roles", spaces::roles::router())
         .route("/ws", axum::routing::get(ws::handler))
         .route("/api.json", axum::routing::get(serve_api))
         .route("/scalar", Scalar::new("/api.json").axum_route())

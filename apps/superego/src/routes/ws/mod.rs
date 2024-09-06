@@ -4,6 +4,7 @@ use axum::{
 };
 use fred::prelude::{ClientLike, EventInterface, PubsubInterface};
 use futures_util::{stream::StreamExt, SinkExt};
+use schema::WebSocketRouter;
 use state::WebsocketState;
 
 use crate::{db::redis, error::Error};
@@ -12,15 +13,12 @@ pub mod schema;
 pub mod state;
 
 #[derive(Serialize, Deserialize)]
-pub struct SimpleOperation {
+pub struct Operation {
     pub op: String,
+    pub data: serde_json::Value,
 }
 
-async fn handle_socket_infallible(socket: ws::WebSocket) {
-    let _ = handle_socket(socket).await;
-}
-
-async fn handle_socket(socket: ws::WebSocket) -> Result<(), Error> {
+async fn handle_socket(socket: ws::WebSocket, router: &WebSocketRouter<()>) -> Result<(), Error> {
     let state = WebsocketState::new();
 
     let (mut writer, mut reader) = socket.split();
@@ -47,9 +45,9 @@ async fn handle_socket(socket: ws::WebSocket) -> Result<(), Error> {
             let msg = if let Ok(ws::Message::Text(msg)) = msg {
                 msg
             } else {
-                // client disconnected
-                return;
+                return; // client disconnected
             };
+
             dbg!(msg.clone());
         }
     });
@@ -62,5 +60,8 @@ async fn handle_socket(socket: ws::WebSocket) -> Result<(), Error> {
 }
 
 pub async fn handler(upgrade: WebSocketUpgrade) -> Response {
-    upgrade.on_upgrade(handle_socket_infallible)
+    let router = WebSocketRouter::<()>::new();
+    upgrade.on_upgrade(|socket| async move {
+        let _ = handle_socket(socket, &router).await;
+    })
 }

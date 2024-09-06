@@ -9,7 +9,7 @@ use axum::{Extension, Json, Router};
 use schemars::JsonSchema;
 use serde::Serialize;
 use tower_http::cors::CorsLayer;
-use ws::schema::websocket_openapi_extension;
+use ws::schema::WebSocketRouter;
 
 pub mod account;
 pub mod bots;
@@ -37,6 +37,11 @@ pub async fn index() -> Json<&'static IndexResponse> {
     }))
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct Foo {
+    bar: String,
+}
+
 pub fn router() -> Router {
     let mut api = OpenApi {
         info: Info {
@@ -45,8 +50,10 @@ pub fn router() -> Router {
         },
         ..OpenApi::default()
     };
+
+    let ws = WebSocketRouter::<()>::new().event("foo_events", |_: Foo, _| true);
     api.extensions
-        .insert("websocket".to_string(), websocket_openapi_extension());
+        .insert("websocket".to_string(), ws.build_schema_ext());
 
     let router = ApiRouter::<()>::new()
         .api_route("/", get(index))

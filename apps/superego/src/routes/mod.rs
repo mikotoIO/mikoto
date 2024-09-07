@@ -9,7 +9,7 @@ use axum::{Extension, Json, Router};
 use schemars::JsonSchema;
 use serde::Serialize;
 use tower_http::cors::CorsLayer;
-use ws::schema::WebSocketRouter;
+use ws::{schema::WebSocketRouter, MikotoWebsocketRouter};
 
 pub mod account;
 pub mod bots;
@@ -51,7 +51,7 @@ pub fn router() -> Router {
         ..OpenApi::default()
     };
 
-    let ws = WebSocketRouter::<()>::new().event("foo_events", |foo: Foo, _| Some(foo));
+    let ws = MikotoWebsocketRouter::new().event("foo_events", |foo: Foo, _| Some(foo));
     api.extensions
         .insert("websocket".to_string(), ws.build_schema_ext());
 

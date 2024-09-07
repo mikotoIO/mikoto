@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{
     extract::{ws, WebSocketUpgrade},
     routing::{get, MethodRouter},
@@ -6,7 +8,7 @@ use fred::prelude::{ClientLike, EventInterface, PubsubInterface};
 use futures_util::{stream::StreamExt, SinkExt};
 use schema::WebSocketRouter;
 use state::WebsocketState;
-use tokio::task::JoinHandle;
+use tokio::{sync::RwLock, task::JoinHandle};
 
 use crate::{db::redis, error::Error};
 
@@ -19,17 +21,24 @@ pub struct Operation {
     pub data: serde_json::Value,
 }
 
+pub type MikotoWebsocketRouter = WebSocketRouter<Arc<RwLock<WebsocketState>>>;
+
 async fn handle_socket(
     socket: ws::WebSocket,
-    router: &'static WebSocketRouter<()>,
+    router: &'static MikotoWebsocketRouter,
 ) -> Result<(), Error> {
-    let state = WebsocketState::new();
+    let state = Arc::new(RwLock::new(WebsocketState::new()));
 
     let (mut writer, mut reader) = socket.split();
 
-    let redis = redis().clone_new();
-    redis.init().await?;
-    redis.subscribe(vec![state.conn_id.to_string()]).await?;
+    let redis = {
+        let redis = redis().clone_new();
+        redis.init().await?;
+        redis
+            .subscribe(vec![state.read().await.conn_id.to_string()])
+            .await?;
+        redis
+    };
 
     let mut server_to_client: JoinHandle<Result<(), Error>> = tokio::spawn(async move {
         while let Ok(msg) = redis.message_rx().recv().await {
@@ -40,7 +49,7 @@ async fn handle_socket(
             };
             let msg: Operation = serde_json::from_str(&msg)?;
             let filter = router.event_filters.get(&msg.op).unwrap();
-            if let Some(data) = filter(msg.data, ())? {
+            if let Some(data) = filter(msg.data, state.clone())? {
                 writer
                     .send(serde_json::to_string(&Operation { op: msg.op, data })?.into())
                     .await
@@ -69,8 +78,8 @@ async fn handle_socket(
     Ok(())
 }
 
-pub fn handler(router: WebSocketRouter<()>) -> MethodRouter<()> {
-    let router: &'static WebSocketRouter<()> = Box::leak(Box::new(router));
+pub fn handler(router: MikotoWebsocketRouter) -> MethodRouter<()> {
+    let router: &'static MikotoWebsocketRouter = Box::leak(Box::new(router));
 
     get(move |upgrade: WebSocketUpgrade| async move {
         upgrade.on_upgrade(move |socket| async move {

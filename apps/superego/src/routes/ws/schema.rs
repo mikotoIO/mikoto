@@ -9,8 +9,10 @@ pub struct WebSocketRouter<S> {
     pub events: BTreeMap<String, Schema>,
 
     pub _state: std::marker::PhantomData<S>,
-    pub event_filters:
-        BTreeMap<String, Box<dyn Fn(serde_json::Value, S) -> Result<bool, Error> + Send + Sync>>,
+    pub event_filters: BTreeMap<
+        String,
+        Box<dyn Fn(serde_json::Value, S) -> Result<Option<serde_json::Value>, Error> + Send + Sync>,
+    >,
 }
 
 #[derive(Serialize, Clone)]
@@ -38,16 +40,25 @@ impl<S> WebSocketRouter<S> {
         self
     }
 
-    pub fn event<T, F>(mut self, name: &str, filter: F) -> Self
+    pub fn event<T, R, F>(mut self, name: &str, filter: F) -> Self
     where
-        T: JsonSchema + Serialize + DeserializeOwned,
-        F: Fn(T, S) -> bool + 'static + Send + Sync,
+        T: Serialize + DeserializeOwned,
+        R: JsonSchema + Serialize,
+        F: Fn(T, S) -> Option<R> + 'static + Send + Sync,
     {
-        let schema = aide::gen::in_context(|ctx| ctx.schema.subschema_for::<T>());
+        let schema = aide::gen::in_context(|ctx| ctx.schema.subschema_for::<R>());
         self.events.insert(name.to_string(), schema);
         self.event_filters.insert(
             name.to_string(),
-            Box::new(move |value, state| Ok(filter(serde_json::from_value(value)?, state))),
+            Box::new(move |value, state| {
+                let parsed = serde_json::from_value(value)?;
+                let result = filter(parsed, state);
+                if let Some(result) = result {
+                    Ok(Some(serde_json::to_value(result)?))
+                } else {
+                    Ok(None)
+                }
+            }),
         );
         self
     }

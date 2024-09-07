@@ -15,6 +15,7 @@ pub enum Error {
     ValidationFailed { message: String },
     WrongPassword,
     NetworkError,
+    WebSocketTerminated,
     CaptchaFailed,
     TokenExpired,
     WrongAuthenticationType,
@@ -23,8 +24,15 @@ pub enum Error {
     RedisError { message: String },
     InternalServerError { message: String },
     TemplatingError,
+    SerdeError,
     MailError,
     Todo,
+}
+
+impl From<serde_json::Error> for Error {
+    fn from(value: serde_json::Error) -> Self {
+        Self::SerdeError
+    }
 }
 
 impl From<sqlx::Error> for Error {

@@ -51,7 +51,7 @@ pub fn router() -> Router {
         ..OpenApi::default()
     };
 
-    let ws = WebSocketRouter::<()>::new().event("foo_events", |_: Foo, _| true);
+    let ws = WebSocketRouter::<()>::new().event("foo_events", |foo: Foo, _| Some(foo));
     api.extensions
         .insert("websocket".to_string(), ws.build_schema_ext());
 
@@ -70,7 +70,7 @@ pub fn router() -> Router {
         )
         .nest("/spaces", spaces::router())
         .nest("/spaces/:space_id/roles", spaces::roles::router())
-        .route("/ws", axum::routing::get(ws::handler))
+        .route("/ws", ws::handler(ws))
         .route("/api.json", axum::routing::get(serve_api))
         .route("/scalar", Scalar::new("/api.json").axum_route())
         .layer(CorsLayer::permissive());

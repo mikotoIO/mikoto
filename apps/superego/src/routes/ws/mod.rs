@@ -1,11 +1,12 @@
 use axum::{
     extract::{ws, WebSocketUpgrade},
-    response::Response,
+    routing::{get, MethodRouter},
 };
 use fred::prelude::{ClientLike, EventInterface, PubsubInterface};
 use futures_util::{stream::StreamExt, SinkExt};
 use schema::WebSocketRouter;
 use state::WebsocketState;
+use tokio::task::JoinHandle;
 
 use crate::{db::redis, error::Error};
 
@@ -18,7 +19,10 @@ pub struct Operation {
     pub data: serde_json::Value,
 }
 
-async fn handle_socket(socket: ws::WebSocket, router: &WebSocketRouter<()>) -> Result<(), Error> {
+async fn handle_socket(
+    socket: ws::WebSocket,
+    router: &'static WebSocketRouter<()>,
+) -> Result<(), Error> {
     let state = WebsocketState::new();
 
     let (mut writer, mut reader) = socket.split();
@@ -27,17 +31,23 @@ async fn handle_socket(socket: ws::WebSocket, router: &WebSocketRouter<()>) -> R
     redis.init().await?;
     redis.subscribe(vec![state.conn_id.to_string()]).await?;
 
-    let mut server_to_client = tokio::spawn(async move {
+    let mut server_to_client: JoinHandle<Result<(), Error>> = tokio::spawn(async move {
         while let Ok(msg) = redis.message_rx().recv().await {
-            dbg!(msg);
-            if writer
-                .send(ws::Message::Text("lol".to_string()))
-                .await
-                .is_err()
-            {
-                return;
+            let msg = if let Some(x) = msg.value.as_string() {
+                x
+            } else {
+                continue; // not a string message
+            };
+            let msg: Operation = serde_json::from_str(&msg)?;
+            let filter = router.event_filters.get(&msg.op).unwrap();
+            if let Some(data) = filter(msg.data, ())? {
+                writer
+                    .send(serde_json::to_string(&Operation { op: msg.op, data })?.into())
+                    .await
+                    .map_err(|_| Error::WebSocketTerminated)?;
             }
         }
+        Err(Error::WebSocketTerminated)
     });
 
     let mut client_to_server = tokio::spawn(async move {
@@ -59,9 +69,12 @@ async fn handle_socket(socket: ws::WebSocket, router: &WebSocketRouter<()>) -> R
     Ok(())
 }
 
-pub async fn handler(upgrade: WebSocketUpgrade) -> Response {
-    let router = WebSocketRouter::<()>::new();
-    upgrade.on_upgrade(|socket| async move {
-        let _ = handle_socket(socket, &router).await;
+pub fn handler(router: WebSocketRouter<()>) -> MethodRouter<()> {
+    let router: &'static WebSocketRouter<()> = Box::leak(Box::new(router));
+
+    get(move |upgrade: WebSocketUpgrade| async move {
+        upgrade.on_upgrade(move |socket| async move {
+            let _ = handle_socket(socket, router).await;
+        })
     })
 }

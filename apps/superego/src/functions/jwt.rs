@@ -1,7 +1,7 @@
 use std::sync::OnceLock;
 
 use aide::OperationIo;
-use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
+use axum::{extract::FromRequestParts, http::request::Parts};
 use chrono::{TimeDelta, Utc};
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
 

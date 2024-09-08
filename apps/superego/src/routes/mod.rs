@@ -1,19 +1,21 @@
 use std::sync::OnceLock;
 
 use aide::{
-    axum::{routing::get, ApiRouter, IntoApiResponse},
+    axum::{routing::get, IntoApiResponse},
     openapi::{Info, OpenApi},
     scalar::Scalar,
 };
 use axum::{Extension, Json, Router};
+use router::AppRouter;
 use schemars::JsonSchema;
 use serde::Serialize;
 use tower_http::cors::CorsLayer;
-use ws::schema::websocket_openapi_extension;
+use ws::{schema::WebSocketRouter, state};
 
 pub mod account;
 pub mod bots;
 pub mod channels;
+pub mod router;
 pub mod spaces;
 pub mod users;
 pub mod ws;
@@ -37,36 +39,48 @@ pub async fn index() -> Json<&'static IndexResponse> {
     }))
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct Foo {
+    bar: String,
+}
+
 pub fn router() -> Router {
     let mut api = OpenApi {
         info: Info {
-            title: "Mikoto Auth Server".to_string(),
+            title: "Mikoto Superego".to_string(),
             ..Info::default()
         },
         ..OpenApi::default()
     };
+
+    let ws = WebSocketRouter::<state::State>::new().event("foo_events", |foo: Foo, _| Some(foo));
     api.extensions
-        .insert("websocket".to_string(), websocket_openapi_extension());
+        .insert("websocket".to_string(), ws.build_schema_ext());
 
-    let router = ApiRouter::<()>::new()
-        .api_route("/", get(index))
-        .nest("/account", account::router())
-        .nest("/bots", bots::router())
-        .nest("/channels", channels::router())
-        .nest(
-            "/channel/:channel_id/documents",
-            channels::documents::router(),
-        )
-        .nest(
-            "/channel/:channel_id/messages",
-            channels::messages::router(),
-        )
-        .nest("/spaces", spaces::router())
-        .nest("/spaces/:space_id/roles", spaces::roles::router())
-        .route("/ws", axum::routing::get(ws::handler))
-        .route("/api.json", axum::routing::get(serve_api))
-        .route("/scalar", Scalar::new("/api.json").axum_route())
-        .layer(CorsLayer::permissive());
+    let router = AppRouter::<(), state::State>::new().on_http(|router| {
+        router
+            .api_route("/", get(index))
+            .nest("/account", account::router())
+            .nest("/bots", bots::router())
+            .nest("/channels", channels::router())
+            .nest(
+                "/channel/:channel_id/documents",
+                channels::documents::router(),
+            )
+            .nest(
+                "/channel/:channel_id/messages",
+                channels::messages::router(),
+            )
+            .nest("/spaces", spaces::router())
+            .nest("/spaces/:space_id/roles", spaces::roles::router())
+            .route("/ws", ws::handler(ws))
+            .route("/api.json", axum::routing::get(serve_api))
+            .route("/scalar", Scalar::new("/api.json").axum_route())
+    });
 
-    router.finish_api(&mut api).layer(Extension(api))
+    router
+        .http
+        .finish_api(&mut api)
+        .layer(Extension(api))
+        .layer(CorsLayer::permissive())
 }

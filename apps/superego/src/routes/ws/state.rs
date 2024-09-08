@@ -1,15 +1,29 @@
 use serde::{de::DeserializeOwned, Serialize};
 use uuid::Uuid;
 
-pub struct WebsocketState {
+use super::WebSocketState;
+
+pub struct State {
     pub conn_id: Uuid,
 }
 
-impl WebsocketState {
-    pub fn new() -> Self {
+#[derive(Deserialize)]
+pub struct WebsocketParams {
+    pub token: Option<String>,
+}
+
+#[async_trait]
+impl WebSocketState for State {
+    type Initial = WebsocketParams;
+
+    fn new() -> Self {
         Self {
             conn_id: Uuid::new_v4(),
         }
+    }
+
+    async fn initialize(&mut self, _init: Self::Initial) -> Option<Vec<String>> {
+        Some(vec![self.conn_id.to_string()])
     }
 }
 
@@ -18,5 +32,5 @@ where
     Self: Sized + Serialize + DeserializeOwned,
 {
     fn name() -> &'static str;
-    fn into_message(self, state: WebsocketState) -> Option<Self>;
+    fn into_message(self, state: State) -> Option<Self>;
 }

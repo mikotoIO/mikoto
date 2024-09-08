@@ -4,6 +4,9 @@ use log::info;
 #[macro_use]
 extern crate serde;
 
+#[macro_use]
+extern crate async_trait;
+
 pub mod db;
 pub mod entities;
 pub mod env;

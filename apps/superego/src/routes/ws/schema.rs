@@ -1,17 +1,21 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, sync::Arc};
 
 use jsonwebtoken::errors::Error;
 use schemars::{schema::Schema, JsonSchema};
 use serde::{de::DeserializeOwned, Serialize};
+use tokio::sync::RwLock;
 
 pub struct WebSocketRouter<S> {
     pub commands: BTreeMap<String, Schema>,
     pub events: BTreeMap<String, Schema>,
 
-    pub _state: std::marker::PhantomData<S>,
     pub event_filters: BTreeMap<
         String,
-        Box<dyn Fn(serde_json::Value, S) -> Result<Option<serde_json::Value>, Error> + Send + Sync>,
+        Box<
+            dyn Fn(serde_json::Value, Arc<RwLock<S>>) -> Result<Option<serde_json::Value>, Error>
+                + Send
+                + Sync,
+        >,
     >,
 }
 
@@ -26,7 +30,6 @@ impl<S> WebSocketRouter<S> {
         Self {
             commands: BTreeMap::new(),
             events: BTreeMap::new(),
-            _state: std::marker::PhantomData,
             event_filters: BTreeMap::new(),
         }
     }
@@ -44,7 +47,7 @@ impl<S> WebSocketRouter<S> {
     where
         T: Serialize + DeserializeOwned,
         R: JsonSchema + Serialize,
-        F: Fn(T, S) -> Option<R> + 'static + Send + Sync,
+        F: Fn(T, Arc<RwLock<S>>) -> Option<R> + 'static + Send + Sync,
     {
         let schema = aide::gen::in_context(|ctx| ctx.schema.subschema_for::<R>());
         self.events.insert(name.to_string(), schema);
@@ -70,6 +73,16 @@ impl<S> WebSocketRouter<S> {
         self
     }
 
+    pub fn nest(mut self, prefix: &str, other: Self) -> Self {
+        let prefix = prefix.trim_end_matches('/');
+        self.commands.extend(prefix_map(prefix, other.commands));
+        self.events.extend(prefix_map(prefix, other.events));
+        self.event_filters
+            .extend(prefix_map(prefix, other.event_filters));
+
+        self
+    }
+
     pub fn build_schema_ext(&self) -> serde_json::Value {
         serde_json::to_value(WebSocketRouterSchema {
             commands: self.commands.clone(),
@@ -77,4 +90,10 @@ impl<S> WebSocketRouter<S> {
         })
         .unwrap()
     }
+}
+
+fn prefix_map<T>(prefix: &str, map: BTreeMap<String, T>) -> BTreeMap<String, T> {
+    map.into_iter()
+        .map(|(k, v)| (format!("{}/{}", prefix, k), v))
+        .collect()
 }

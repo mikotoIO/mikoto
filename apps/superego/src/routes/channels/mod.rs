@@ -1,12 +1,11 @@
-use aide::axum::{
-    routing::{delete_with, get_with, patch_with, post_with},
-    ApiRouter,
-};
+use aide::axum::routing::{delete_with, get_with, patch_with, post_with};
 use axum::{extract::Path, Json};
 use schemars::JsonSchema;
 use uuid::Uuid;
 
 use crate::{entities::Channel, error::Error};
+
+use super::{router::AppRouter, ws::state::State};
 
 pub mod documents;
 pub mod messages;
@@ -48,20 +47,22 @@ async fn delete(_id: Path<Uuid>) -> Result<Json<()>, Error> {
 
 static TAG: &str = "Channels";
 
-pub fn router() -> ApiRouter {
-    ApiRouter::<()>::new()
-        .api_route("/", get_with(list, |o| o.tag(TAG).summary("List Channels")))
-        .api_route("/:id", get_with(get, |o| o.tag(TAG).summary("Get Channel")))
-        .api_route(
-            "/",
-            post_with(create, |o| o.tag(TAG).summary("Create Channel")),
-        )
-        .api_route(
-            "/:id",
-            patch_with(update, |o| o.tag(TAG).summary("Update Channel")),
-        )
-        .api_route(
-            "/:id",
-            delete_with(delete, |o| o.tag(TAG).summary("Delete Channel")),
-        )
+pub fn router() -> AppRouter<State> {
+    AppRouter::new().on_http(|router| {
+        router
+            .api_route("/", get_with(list, |o| o.tag(TAG).summary("List Channels")))
+            .api_route("/:id", get_with(get, |o| o.tag(TAG).summary("Get Channel")))
+            .api_route(
+                "/",
+                post_with(create, |o| o.tag(TAG).summary("Create Channel")),
+            )
+            .api_route(
+                "/:id",
+                patch_with(update, |o| o.tag(TAG).summary("Update Channel")),
+            )
+            .api_route(
+                "/:id",
+                delete_with(delete, |o| o.tag(TAG).summary("Delete Channel")),
+            )
+    })
 }

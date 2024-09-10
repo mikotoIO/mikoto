@@ -1,12 +1,13 @@
-use aide::axum::{
-    routing::{delete_with, patch_with, post_with},
-    ApiRouter,
-};
+use aide::axum::routing::{delete_with, patch_with, post_with};
 use axum::{extract::Path, Json};
 use schemars::JsonSchema;
 use uuid::Uuid;
 
-use crate::{entities::Role, error::Error};
+use crate::{
+    entities::Role,
+    error::Error,
+    routes::{router::AppRouter, ws::state::State},
+};
 
 #[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
@@ -40,18 +41,20 @@ async fn delete(_id: Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
 
 static TAG: &str = "Roles";
 
-pub fn router() -> ApiRouter {
-    ApiRouter::<()>::new()
-        .api_route(
-            "/",
-            post_with(create, |o| o.tag(TAG).summary("Create Role")),
-        )
-        .api_route(
-            "/:role_id",
-            patch_with(update, |o| o.tag(TAG).summary("Update Role")),
-        )
-        .api_route(
-            "/:role_id",
-            delete_with(delete, |o| o.tag(TAG).summary("Delete Role")),
-        )
+pub fn router() -> AppRouter<State> {
+    AppRouter::new().on_http(|router| {
+        router
+            .api_route(
+                "/",
+                post_with(create, |o| o.tag(TAG).summary("Create Role")),
+            )
+            .api_route(
+                "/:role_id",
+                patch_with(update, |o| o.tag(TAG).summary("Update Role")),
+            )
+            .api_route(
+                "/:role_id",
+                delete_with(delete, |o| o.tag(TAG).summary("Delete Role")),
+            )
+    })
 }

@@ -9,7 +9,7 @@ use router::AppRouter;
 use schemars::JsonSchema;
 use serde::Serialize;
 use tower_http::cors::CorsLayer;
-use ws::state;
+use ws::state::State;
 
 pub mod account;
 pub mod bots;
@@ -44,23 +44,26 @@ pub struct Foo {
 }
 
 pub fn router() -> Router {
-    let router = AppRouter::<state::State>::new()
+    let router = AppRouter::<State>::new()
+        .nest("channels", "/channels", channels::router())
+        .nest(
+            "documents",
+            "/channel/:channel_id/documents",
+            channels::documents::router(),
+        )
+        .nest(
+            "messages",
+            "/channel/:channel_id/messages",
+            channels::messages::router(),
+        )
+        .nest("spaces", "/spaces", spaces::router())
+        .nest("roles", "/spaces/:space_id/roles", spaces::roles::router())
         .on_http(|router| {
             router
                 .api_route("/", get(index))
                 .nest("/account", account::router())
                 .nest("/bots", bots::router())
-                .nest("/channels", channels::router())
-                .nest(
-                    "/channel/:channel_id/documents",
-                    channels::documents::router(),
-                )
-                .nest(
-                    "/channel/:channel_id/messages",
-                    channels::messages::router(),
-                )
-                .nest("/spaces", spaces::router())
-                .nest("/spaces/:space_id/roles", spaces::roles::router())
+                
         })
         .on_ws(|router| {
             // websocket stuff

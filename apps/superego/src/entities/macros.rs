@@ -9,6 +9,15 @@ macro_rules! db_enum {
 }
 
 #[macro_export]
+macro_rules! model {
+    ($item:item) => {
+        #[derive(Clone, Serialize, Deserialize, schemars::JsonSchema)]
+        #[serde(rename_all = "camelCase")]
+        $item
+    };
+}
+
+#[macro_export]
 macro_rules! entity {
     ($item:item) => {
         #[derive(sqlx::FromRow, Clone, Serialize, Deserialize, schemars::JsonSchema)]

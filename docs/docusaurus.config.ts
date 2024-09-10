@@ -62,7 +62,7 @@ const config: Config = {
     [
       '@scalar/docusaurus',
       {
-        label: 'Superego (Auth)',
+        label: 'Superego REST',
         route: '/superego',
         showNavLink: true,
         configuration: {

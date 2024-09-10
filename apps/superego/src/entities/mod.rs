@@ -6,12 +6,14 @@ mod account;
 mod bot;
 mod channel;
 mod macros;
+mod models;
 mod space;
 mod user;
 
 pub use account::*;
 pub use bot::*;
 pub use channel::*;
+pub use models::*;
 pub use space::*;
 pub use user::*;
 

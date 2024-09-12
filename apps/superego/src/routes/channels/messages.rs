@@ -1,12 +1,13 @@
-use aide::axum::{
-    routing::{delete_with, get_with, patch_with, post_with},
-    ApiRouter,
-};
+use aide::axum::routing::{delete_with, get_with, patch_with, post_with};
 use axum::{extract::Path, Json};
 use schemars::JsonSchema;
 use uuid::Uuid;
 
-use crate::{entities::MessageExt, error::Error};
+use crate::{
+    entities::MessageExt,
+    error::Error,
+    routes::{router::AppRouter, ws::state::State},
+};
 
 #[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
@@ -48,20 +49,29 @@ async fn delete(_id: Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
 
 static TAG: &str = "Messages";
 
-pub fn router() -> ApiRouter {
-    ApiRouter::<()>::new()
-        .api_route("/", get_with(list, |o| o.tag(TAG).summary("List Messages")))
-        .api_route("/:id", get_with(get, |o| o.tag(TAG).summary("Get Message")))
-        .api_route(
-            "/",
-            post_with(send, |o| o.tag(TAG).summary("Create Message")),
-        )
-        .api_route(
-            "/:id",
-            patch_with(edit, |o| o.tag(TAG).summary("Update Message")),
-        )
-        .api_route(
-            "/:id",
-            delete_with(delete, |o| o.tag(TAG).summary("Delete Message")),
-        )
+pub fn router() -> AppRouter<State> {
+    AppRouter::new()
+        .on_http(|router| {
+            router
+                .api_route("/", get_with(list, |o| o.tag(TAG).summary("List Messages")))
+                .api_route("/:id", get_with(get, |o| o.tag(TAG).summary("Get Message")))
+                .api_route(
+                    "/",
+                    post_with(send, |o| o.tag(TAG).summary("Create Message")),
+                )
+                .api_route(
+                    "/:id",
+                    patch_with(edit, |o| o.tag(TAG).summary("Update Message")),
+                )
+                .api_route(
+                    "/:id",
+                    delete_with(delete, |o| o.tag(TAG).summary("Delete Message")),
+                )
+        })
+        .on_ws(|router| {
+            router
+                .event("create", |space: MessageExt, _| Some(space))
+                .event("update", |space: MessageExt, _| Some(space))
+                .event("delete", |space: MessageExt, _| Some(space))
+        })
 }

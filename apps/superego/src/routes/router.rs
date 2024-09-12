@@ -1,20 +1,29 @@
-use aide::axum::ApiRouter;
+use aide::{
+    axum::{ApiRouter, IntoApiResponse},
+    openapi::OpenApi,
+    scalar::Scalar,
+};
+use axum::{Extension, Json, Router};
 
-use super::ws::{schema::WebSocketRouter, WebSocketState};
+use super::ws::{self, schema::WebSocketRouter, WebSocketState};
 
-pub struct AppRouter<S, W: WebSocketState> {
-    pub http: ApiRouter<S>,
+pub struct AppRouter<W: WebSocketState> {
+    pub http: ApiRouter,
     pub ws: WebSocketRouter<W>,
 }
 
-impl<S: Clone + Send + Sync + 'static, W: WebSocketState> AppRouter<S, W> {
+async fn serve_api(Extension(api): Extension<OpenApi>) -> impl IntoApiResponse {
+    Json(api)
+}
+
+impl<W: WebSocketState> AppRouter<W> {
     pub fn new() -> Self {
         let http = ApiRouter::new();
         let ws = WebSocketRouter::new();
         Self { http, ws }
     }
 
-    pub fn nest(mut self, key: &str, path: &str, other: AppRouter<S, W>) -> Self {
+    pub fn nest(mut self, key: &str, path: &str, other: AppRouter<W>) -> Self {
         self.http = self.http.nest(path, other.http);
         self.ws = self.ws.nest(key, other.ws);
         self
@@ -22,7 +31,7 @@ impl<S: Clone + Send + Sync + 'static, W: WebSocketState> AppRouter<S, W> {
 
     pub fn on_http<F>(mut self, f: F) -> Self
     where
-        F: FnOnce(ApiRouter<S>) -> ApiRouter<S>,
+        F: FnOnce(ApiRouter<()>) -> ApiRouter<()>,
     {
         self.http = f(self.http);
         self
@@ -34,5 +43,19 @@ impl<S: Clone + Send + Sync + 'static, W: WebSocketState> AppRouter<S, W> {
     {
         self.ws = f(self.ws);
         self
+    }
+
+    pub fn build(self, mut api: OpenApi) -> Router {
+        let Self { http, ws } = self;
+
+        api.extensions
+            .insert("websocket".to_string(), ws.build_schema_ext());
+
+        let http = http
+            .route("/ws", ws::handler(ws))
+            .route("/api.json", axum::routing::get(serve_api))
+            .route("/scalar", Scalar::new("/api.json").axum_route());
+
+        http.finish_api(&mut api).layer(Extension(api))
     }
 }

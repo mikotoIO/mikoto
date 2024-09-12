@@ -50,7 +50,7 @@ entity!(
     }
 );
 
-#[derive(Serialize, JsonSchema)]
+#[derive(Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct MessageExt {
     pub base: Message,

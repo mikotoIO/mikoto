@@ -47,7 +47,6 @@ async fn handle_socket<S: WebSocketState>(
         let redis = redis().clone_new();
         redis.init().await?;
         redis
-            // TODO: return initial subscriptions
             .subscribe(initial_subscriptions)
             .await?;
         redis

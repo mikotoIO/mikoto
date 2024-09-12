@@ -17609,7 +17609,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ejs@npm:^3.1.5, ejs@npm:^3.1.6, ejs@npm:^3.1.7, ejs@npm:^3.1.8, ejs@npm:^3.1.9":
+"ejs@npm:^3.1.10":
+  version: 3.1.10
+  resolution: "ejs@npm:3.1.10"
+  dependencies:
+    jake: "npm:^10.8.5"
+  bin:
+    ejs: bin/cli.js
+  checksum: 10/a9cb7d7cd13b7b1cd0be5c4788e44dd10d92f7285d2f65b942f33e127230c054f99a42db4d99f766d8dbc6c57e94799593ee66a14efd7c8dd70c4812bf6aa384
+  languageName: node
+  linkType: hard
+
+"ejs@npm:^3.1.5, ejs@npm:^3.1.6, ejs@npm:^3.1.7, ejs@npm:^3.1.8":
   version: 3.1.9
   resolution: "ejs@npm:3.1.9"
   dependencies:
@@ -32401,7 +32412,7 @@ __metadata:
     cors: "npm:^2.8.5"
     did-resolver: "npm:^4.1.0"
     dotenv: "npm:^16.3.2"
-    ejs: "npm:^3.1.9"
+    ejs: "npm:^3.1.10"
     express: "npm:^4.19.2"
     ioredis: "npm:^5.3.2"
     jest: "npm:^29.5.0"

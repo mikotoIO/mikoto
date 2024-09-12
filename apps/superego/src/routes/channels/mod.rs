@@ -48,21 +48,28 @@ async fn delete(_id: Path<Uuid>) -> Result<Json<()>, Error> {
 static TAG: &str = "Channels";
 
 pub fn router() -> AppRouter<State> {
-    AppRouter::new().on_http(|router| {
-        router
-            .api_route("/", get_with(list, |o| o.tag(TAG).summary("List Channels")))
-            .api_route("/:id", get_with(get, |o| o.tag(TAG).summary("Get Channel")))
-            .api_route(
-                "/",
-                post_with(create, |o| o.tag(TAG).summary("Create Channel")),
-            )
-            .api_route(
-                "/:id",
-                patch_with(update, |o| o.tag(TAG).summary("Update Channel")),
-            )
-            .api_route(
-                "/:id",
-                delete_with(delete, |o| o.tag(TAG).summary("Delete Channel")),
-            )
-    })
+    AppRouter::new()
+        .on_http(|router| {
+            router
+                .api_route("/", get_with(list, |o| o.tag(TAG).summary("List Channels")))
+                .api_route("/:id", get_with(get, |o| o.tag(TAG).summary("Get Channel")))
+                .api_route(
+                    "/",
+                    post_with(create, |o| o.tag(TAG).summary("Create Channel")),
+                )
+                .api_route(
+                    "/:id",
+                    patch_with(update, |o| o.tag(TAG).summary("Update Channel")),
+                )
+                .api_route(
+                    "/:id",
+                    delete_with(delete, |o| o.tag(TAG).summary("Delete Channel")),
+                )
+        })
+        .on_ws(|router| {
+            router
+                .event("create", |space: Channel, _| Some(space))
+                .event("update", |space: Channel, _| Some(space))
+                .event("delete", |space: Channel, _| Some(space))
+        })
 }

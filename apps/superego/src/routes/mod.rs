@@ -1,7 +1,7 @@
 use std::sync::OnceLock;
 
 use aide::{
-    axum::{routing::get, IntoApiResponse},
+    axum::{routing::get_with, IntoApiResponse},
     openapi::{Info, OpenApi},
 };
 use axum::{Extension, Json, Router};
@@ -38,13 +38,14 @@ pub async fn index() -> Json<&'static IndexResponse> {
     }))
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
-pub struct Foo {
-    bar: String,
-}
-
 pub fn router() -> Router {
     let router = AppRouter::<State>::new()
+        .on_http(|router| {
+            router
+                .api_route("/", get_with(index, |o| o.summary("Index")))
+                .nest("/account", account::router())
+                .nest("/bots", bots::router())
+        })
         .nest("channels", "/channels", channels::router())
         .nest(
             "documents",
@@ -57,18 +58,7 @@ pub fn router() -> Router {
             channels::messages::router(),
         )
         .nest("spaces", "/spaces", spaces::router())
-        .nest("roles", "/spaces/:space_id/roles", spaces::roles::router())
-        .on_http(|router| {
-            router
-                .api_route("/", get(index))
-                .nest("/account", account::router())
-                .nest("/bots", bots::router())
-                
-        })
-        .on_ws(|router| {
-            // websocket stuff
-            router.event("foo_events", |foo: Foo, _| Some(foo))
-        });
+        .nest("roles", "/spaces/:space_id/roles", spaces::roles::router());
 
     router
         .build(OpenApi {

@@ -4,12 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-# the basic dependencies
 tokio = { version = "1.35.1", features = ["full"] }
+# the basic dependencies
 serde = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0.108"
 async-trait = "0.1.81"
-chrono = "0.4.38"
+chrono = { version = "0.4.38", features = ["serde"] }
 uuid = { version = "1.8.0", features = ["serde", "v4"] }
 nanoid = "0.4.0"
 hex = "0.4.3"
@@ -35,7 +35,7 @@ aide = { version = "0.13.4", features = [
 itertools = "0.12.1"
 bcrypt = "0.15.1"
 jsonwebtoken = "9.3.0"
-didkit = "0.6.0"
+# didkit = "0.6.0"
 sha3 = "0.10.8"
 
 

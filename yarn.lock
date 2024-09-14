@@ -13878,7 +13878,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.3.6, axios@npm:^1.6.2, axios@npm:^1.6.7":
+"axios@npm:^1.3.6, axios@npm:^1.6.2":
   version: 1.6.8
   resolution: "axios@npm:1.6.8"
   dependencies:
@@ -13889,7 +13889,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.6.0":
+"axios@npm:^1.6.0, axios@npm:^1.7.4":
   version: 1.7.7
   resolution: "axios@npm:1.7.7"
   dependencies:
@@ -15461,7 +15461,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:^7.1.1"
     "@use-it/event-listener": "npm:^0.1.7"
     "@vitejs/plugin-react": "npm:^4.2.1"
-    axios: "npm:^1.6.7"
+    axios: "npm:^1.7.4"
     babel-loader: "npm:^8.3.0"
     cmdk: "npm:^1.0.0"
     dotenv: "npm:^16.3.2"
@@ -26928,7 +26928,7 @@ __metadata:
     "@mikoto-io/permcheck": "npm:0.0.1"
     "@types/events": "npm:^3.0.0"
     "@zodios/core": "npm:^10.9.6"
-    axios: "npm:^1.6.7"
+    axios: "npm:^1.7.4"
     events: "npm:^3.3.0"
     mobx: "npm:^6.10.0"
     openapi-fetch: "npm:^0.12.0"

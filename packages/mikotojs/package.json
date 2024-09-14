@@ -20,7 +20,7 @@
     "@hyperschema/client": "^0.0.4",
     "@mikoto-io/permcheck": "0.0.1",
     "@zodios/core": "^10.9.6",
-    "axios": "^1.6.7",
+    "axios": "^1.7.4",
     "events": "^3.3.0",
     "mobx": "^6.10.0",
     "openapi-fetch": "^0.12.0",

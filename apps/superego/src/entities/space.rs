@@ -25,6 +25,15 @@ entity!(
 );
 
 entity!(
+    pub struct SpaceUser {
+        pub id: Uuid,
+        pub name: String,
+        pub space_id: Uuid,
+        pub user_id: Uuid,
+    }
+);
+
+entity!(
     pub struct Role {
         pub id: Uuid,
         pub space_id: Uuid,
@@ -44,4 +53,12 @@ pub struct SpaceExt {
     pub base: Space,
     pub roles: Vec<Role>,
     pub channels: Vec<Channel>,
+}
+
+#[derive(Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct Member {
+    #[serde(flatten)]
+    pub base: SpaceUser,
+    pub role_ids: Vec<Uuid>,
 }

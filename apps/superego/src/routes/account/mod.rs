@@ -11,35 +11,47 @@ pub fn router() -> ApiRouter {
         .api_route(
             "/register",
             post_with(register::route, |o| {
-                o.tag("Account").summary("User Registration")
+                o.tag("Account")
+                    .id("account.register")
+                    .summary("User Registration")
             }),
         )
         .api_route(
             "/login",
-            post_with(login::route, |o| o.tag("Account").summary("User Login")),
+            post_with(login::route, |o| {
+                o.tag("Account").id("account.login").summary("User Login")
+            }),
         )
         .api_route(
             "/refresh",
             post_with(refresh::route, |o| {
-                o.tag("Account").summary("Refresh Access Token")
+                o.tag("Account")
+                    .id("account.refresh")
+                    .summary("Refresh Access Token")
             }),
         )
         .api_route(
             "/change_password",
             post_with(change_password::route, |o| {
-                o.tag("Account").summary("Change Password")
+                o.tag("Account")
+                    .id("account.change_password")
+                    .summary("Change Password")
             }),
         )
         .api_route(
             "/reset_password",
             post_with(reset_password::route, |o| {
-                o.tag("Account").summary("Reset Password")
+                o.tag("Account")
+                    .id("account.reset_password")
+                    .summary("Reset Password")
             }),
         )
         .api_route(
             "/reset_password/submit",
             post_with(reset_password::confirm, |o| {
-                o.tag("Account").summary("Confirm Password Reset")
+                o.tag("Account")
+                    .id("account.reset_password.confirm")
+                    .summary("Confirm Password Reset")
             }),
         )
 }

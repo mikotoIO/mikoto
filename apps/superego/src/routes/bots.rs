@@ -13,11 +13,15 @@ pub fn router() -> ApiRouter {
     ApiRouter::<()>::new()
         .api_route(
             "/",
-            get_with(list_bots, |o| o.tag("Bots").summary("List Bots")),
+            get_with(list_bots, |o| {
+                o.tag("Bots").id("bots.list").summary("List Bots")
+            }),
         )
         .api_route(
             "/",
-            post_with(create_bot, |o| o.tag("Bots").summary("Create a Bot")),
+            post_with(create_bot, |o| {
+                o.tag("Bots").id("bots.create").summary("Create a Bot")
+            }),
         )
 }
 

@@ -10,6 +10,7 @@ use crate::{
 
 use super::{router::AppRouter, ws::state::State};
 
+pub mod members;
 pub mod roles;
 
 #[derive(Deserialize, JsonSchema)]
@@ -50,25 +51,39 @@ pub fn router() -> AppRouter<State> {
     AppRouter::new()
         .on_http(|router| {
             router
-                .api_route("/", get_with(list, |o| o.tag(TAG).summary("List Spaces")))
-                .api_route("/:id", get_with(get, |o| o.tag(TAG).summary("Get Space")))
                 .api_route(
                     "/",
-                    post_with(create, |o| o.tag(TAG).summary("Create Space")),
+                    get_with(list, |o| {
+                        o.tag(TAG).id("spaces.list").summary("List Spaces")
+                    }),
                 )
                 .api_route(
                     "/:id",
-                    patch_with(update, |o| o.tag(TAG).summary("Update Space")),
+                    get_with(get, |o| o.tag(TAG).id("spaces.get").summary("Get Space")),
+                )
+                .api_route(
+                    "/",
+                    post_with(create, |o| {
+                        o.tag(TAG).id("spaces.create").summary("Create Space")
+                    }),
                 )
                 .api_route(
                     "/:id",
-                    delete_with(delete, |o| o.tag(TAG).summary("Delete Space")),
+                    patch_with(update, |o| {
+                        o.tag(TAG).id("spaces.update").summary("Update Space")
+                    }),
+                )
+                .api_route(
+                    "/:id",
+                    delete_with(delete, |o| {
+                        o.tag(TAG).id("spaces.delete").summary("Delete Space")
+                    }),
                 )
         })
         .on_ws(|router| {
             router
-                .event("create", |space: SpaceExt, _| Some(space))
-                .event("update", |space: SpaceExt, _| Some(space))
-                .event("delete", |space: ObjectWithId, _| Some(space))
+                .event("onCreate", |space: SpaceExt, _| Some(space))
+                .event("onUpdate", |space: SpaceExt, _| Some(space))
+                .event("onDelete", |space: ObjectWithId, _| Some(space))
         })
 }

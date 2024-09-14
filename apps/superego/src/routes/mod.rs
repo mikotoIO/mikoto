@@ -42,10 +42,11 @@ pub fn router() -> Router {
     let router = AppRouter::<State>::new()
         .on_http(|router| {
             router
-                .api_route("/", get_with(index, |o| o.summary("Index")))
+                .api_route("/", get_with(index, |o| o.id("index").summary("Index")))
                 .nest("/account", account::router())
                 .nest("/bots", bots::router())
         })
+        .nest("users", "/users", users::router())
         .nest("channels", "/channels", channels::router())
         .nest(
             "documents",
@@ -58,6 +59,11 @@ pub fn router() -> Router {
             channels::messages::router(),
         )
         .nest("spaces", "/spaces", spaces::router())
+        .nest(
+            "members",
+            "/spaces/:space_id/members",
+            spaces::members::router(),
+        )
         .nest("roles", "/spaces/:space_id/roles", spaces::roles::router());
 
     router

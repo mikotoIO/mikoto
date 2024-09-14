@@ -53,25 +53,41 @@ pub fn router() -> AppRouter<State> {
     AppRouter::new()
         .on_http(|router| {
             router
-                .api_route("/", get_with(list, |o| o.tag(TAG).summary("List Messages")))
-                .api_route("/:id", get_with(get, |o| o.tag(TAG).summary("Get Message")))
                 .api_route(
                     "/",
-                    post_with(send, |o| o.tag(TAG).summary("Create Message")),
+                    get_with(list, |o| {
+                        o.tag(TAG).id("messages.list").summary("List Messages")
+                    }),
                 )
                 .api_route(
                     "/:id",
-                    patch_with(edit, |o| o.tag(TAG).summary("Update Message")),
+                    get_with(get, |o| {
+                        o.tag(TAG).id("messages.get").summary("Get Message")
+                    }),
+                )
+                .api_route(
+                    "/",
+                    post_with(send, |o| {
+                        o.tag(TAG).id("messages.create").summary("Create Message")
+                    }),
                 )
                 .api_route(
                     "/:id",
-                    delete_with(delete, |o| o.tag(TAG).summary("Delete Message")),
+                    patch_with(edit, |o| {
+                        o.tag(TAG).id("messages.update").summary("Update Message")
+                    }),
+                )
+                .api_route(
+                    "/:id",
+                    delete_with(delete, |o| {
+                        o.tag(TAG).id("messages.delete").summary("Delete Message")
+                    }),
                 )
         })
         .on_ws(|router| {
             router
-                .event("create", |space: MessageExt, _| Some(space))
-                .event("update", |space: MessageExt, _| Some(space))
-                .event("delete", |space: MessageExt, _| Some(space))
+                .event("onCreate", |space: MessageExt, _| Some(space))
+                .event("onUpdate", |space: MessageExt, _| Some(space))
+                .event("onDelete", |space: MessageExt, _| Some(space))
         })
 }

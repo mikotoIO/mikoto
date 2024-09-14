@@ -46,15 +46,21 @@ pub fn router() -> AppRouter<State> {
         router
             .api_route(
                 "/",
-                post_with(create, |o| o.tag(TAG).summary("Create Role")),
+                post_with(create, |o| {
+                    o.tag(TAG).id("roles.create").summary("Create Role")
+                }),
             )
             .api_route(
                 "/:role_id",
-                patch_with(update, |o| o.tag(TAG).summary("Update Role")),
+                patch_with(update, |o| {
+                    o.tag(TAG).id("roles.update").summary("Update Role")
+                }),
             )
             .api_route(
                 "/:role_id",
-                delete_with(delete, |o| o.tag(TAG).summary("Delete Role")),
+                delete_with(delete, |o| {
+                    o.tag(TAG).id("roles.delete").summary("Delete Role")
+                }),
             )
     })
 }

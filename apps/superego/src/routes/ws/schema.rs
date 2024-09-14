@@ -94,6 +94,6 @@ impl<S> WebSocketRouter<S> {
 
 fn prefix_map<T>(prefix: &str, map: BTreeMap<String, T>) -> BTreeMap<String, T> {
     map.into_iter()
-        .map(|(k, v)| (format!("{}/{}", prefix, k), v))
+        .map(|(k, v)| (format!("{}.{}", prefix, k), v))
         .collect()
 }

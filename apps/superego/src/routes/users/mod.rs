@@ -10,6 +10,8 @@ use crate::{
 
 use super::{router::AppRouter, ws::state::State};
 
+pub mod relations;
+
 #[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UserUpdatePayload {
@@ -28,25 +30,22 @@ static TAG: &str = "Users";
 
 pub fn router() -> AppRouter<State> {
     AppRouter::new()
-        .on_http(|router| {
-            router
-                .api_route(
-                    "/:id",
-                    get_with(me, |o| {
-                        o.tag(TAG).id("user.get").summary("Get Current User")
-                    }),
-                )
-                .api_route(
-                    "/:id",
-                    patch_with(update, |o| {
-                        o.tag(TAG).id("user.update").summary("Update User")
-                    }),
-                )
-        })
+        .route(
+            "/:id",
+            get_with(me, |o| {
+                o.tag(TAG).id("user.get").summary("Get Current User")
+            }),
+        )
+        .route(
+            "/:id",
+            patch_with(update, |o| {
+                o.tag(TAG).id("user.update").summary("Update User")
+            }),
+        )
         .on_ws(|router| {
             router
-                .event("onCreate", |space: User, _| Some(space))
-                .event("onUpdate", |space: User, _| Some(space))
-                .event("onDelete", |space: ObjectWithId, _| Some(space))
+                .event("onCreate", |user: User, _| Some(user))
+                .event("onUpdate", |user: User, _| Some(user))
+                .event("onDelete", |user: ObjectWithId, _| Some(user))
         })
 }

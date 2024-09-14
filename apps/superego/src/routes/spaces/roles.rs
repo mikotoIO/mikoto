@@ -42,25 +42,29 @@ async fn delete(_id: Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
 static TAG: &str = "Roles";
 
 pub fn router() -> AppRouter<State> {
-    AppRouter::new().on_http(|router| {
-        router
-            .api_route(
-                "/",
-                post_with(create, |o| {
-                    o.tag(TAG).id("roles.create").summary("Create Role")
-                }),
-            )
-            .api_route(
-                "/:role_id",
-                patch_with(update, |o| {
-                    o.tag(TAG).id("roles.update").summary("Update Role")
-                }),
-            )
-            .api_route(
-                "/:role_id",
-                delete_with(delete, |o| {
-                    o.tag(TAG).id("roles.delete").summary("Delete Role")
-                }),
-            )
-    })
+    AppRouter::new()
+        .route(
+            "/",
+            post_with(create, |o| {
+                o.tag(TAG).id("roles.create").summary("Create Role")
+            }),
+        )
+        .route(
+            "/:role_id",
+            patch_with(update, |o| {
+                o.tag(TAG).id("roles.update").summary("Update Role")
+            }),
+        )
+        .route(
+            "/:role_id",
+            delete_with(delete, |o| {
+                o.tag(TAG).id("roles.delete").summary("Delete Role")
+            }),
+        )
+        .on_ws(|router| {
+            router
+                .event("onCreate", |role: Role, _| Some(role))
+                .event("onUpdate", |role: Role, _| Some(role))
+                .event("onDelete", |role: Role, _| Some(role))
+        })
 }

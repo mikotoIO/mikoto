@@ -3,23 +3,31 @@ use axum::{extract::Path, Json};
 use schemars::JsonSchema;
 use uuid::Uuid;
 
-use crate::{entities::Channel, error::Error};
+use crate::{
+    entities::{Channel, ChannelType},
+    error::Error,
+};
 
 use super::{router::AppRouter, ws::state::State};
 
 pub mod documents;
 pub mod messages;
+pub mod voice;
 
 #[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct ChannelCreatePayload {
     pub name: String,
+    pub parent_id: Option<Uuid>,
+
+    #[serde(rename = "type")]
+    pub kind: Option<ChannelType>,
 }
 
 #[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct ChannelUpdatePayload {
-    pub name: String,
+    pub name: Option<String>,
 }
 
 async fn get(_id: Path<Uuid>) -> Result<Json<Channel>, Error> {
@@ -49,43 +57,40 @@ static TAG: &str = "Channels";
 
 pub fn router() -> AppRouter<State> {
     AppRouter::new()
-        .on_http(|router| {
-            router
-                .api_route(
-                    "/",
-                    get_with(list, |o| {
-                        o.tag(TAG).id("channels.list").summary("List Channels")
-                    }),
-                )
-                .api_route(
-                    "/:id",
-                    get_with(get, |o| {
-                        o.tag(TAG).id("channels.get").summary("Get Channel")
-                    }),
-                )
-                .api_route(
-                    "/",
-                    post_with(create, |o| {
-                        o.tag(TAG).id("channels.create").summary("Create Channel")
-                    }),
-                )
-                .api_route(
-                    "/:id",
-                    patch_with(update, |o| {
-                        o.tag(TAG).id("channels.update").summary("Update Channel")
-                    }),
-                )
-                .api_route(
-                    "/:id",
-                    delete_with(delete, |o| {
-                        o.id("channels.delete").tag(TAG).summary("Delete Channel")
-                    }),
-                )
-        })
+        .route(
+            "/",
+            get_with(list, |o| {
+                o.tag(TAG).id("channels.list").summary("List Channels")
+            }),
+        )
+        .route(
+            "/:id",
+            get_with(get, |o| {
+                o.tag(TAG).id("channels.get").summary("Get Channel")
+            }),
+        )
+        .route(
+            "/",
+            post_with(create, |o| {
+                o.tag(TAG).id("channels.create").summary("Create Channel")
+            }),
+        )
+        .route(
+            "/:id",
+            patch_with(update, |o| {
+                o.tag(TAG).id("channels.update").summary("Update Channel")
+            }),
+        )
+        .route(
+            "/:id",
+            delete_with(delete, |o| {
+                o.id("channels.delete").tag(TAG).summary("Delete Channel")
+            }),
+        )
         .on_ws(|router| {
             router
-                .event("onCreate", |space: Channel, _| Some(space))
-                .event("onUpdate", |space: Channel, _| Some(space))
-                .event("onDelete", |space: Channel, _| Some(space))
+                .event("onCreate", |channel: Channel, _| Some(channel))
+                .event("onUpdate", |channel: Channel, _| Some(channel))
+                .event("onDelete", |channel: Channel, _| Some(channel))
         })
 }

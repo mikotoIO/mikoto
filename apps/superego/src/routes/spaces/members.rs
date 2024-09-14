@@ -45,43 +45,40 @@ static TAG: &str = "Members";
 
 pub fn router() -> AppRouter<State> {
     AppRouter::new()
-        .on_http(|router| {
-            router
-                .api_route(
-                    "/",
-                    get_with(list, |o| {
-                        o.tag(TAG)
-                            .id("members.list")
-                            .summary("List Members in Space")
-                    }),
-                )
-                .api_route(
-                    "/:id",
-                    get_with(get, |o| {
-                        o.tag(TAG)
-                            .id("members.get")
-                            .summary("Get Member from Space")
-                    }),
-                )
-                .api_route(
-                    "/",
-                    post_with(create, |o| {
-                        o.tag(TAG).id("members.create").summary("Add Bot Member")
-                    }),
-                )
-                .api_route(
-                    "/:id",
-                    patch_with(update, |o| {
-                        o.tag(TAG).id("members.update").summary("Update Member")
-                    }),
-                )
-                .api_route(
-                    "/:id",
-                    delete_with(delete, |o| {
-                        o.tag(TAG).id("members.delete").summary("Ban Member")
-                    }),
-                )
-        })
+        .route(
+            "/",
+            get_with(list, |o| {
+                o.tag(TAG)
+                    .id("members.list")
+                    .summary("List Members in Space")
+            }),
+        )
+        .route(
+            "/:id",
+            get_with(get, |o| {
+                o.tag(TAG)
+                    .id("members.get")
+                    .summary("Get Member from Space")
+            }),
+        )
+        .route(
+            "/",
+            post_with(create, |o| {
+                o.tag(TAG).id("members.create").summary("Add Bot Member")
+            }),
+        )
+        .route(
+            "/:id",
+            patch_with(update, |o| {
+                o.tag(TAG).id("members.update").summary("Update Member")
+            }),
+        )
+        .route(
+            "/:id",
+            delete_with(delete, |o| {
+                o.tag(TAG).id("members.delete").summary("Ban Member")
+            }),
+        )
         .on_ws(|router| {
             router
                 .event("onCreate", |member: Member, _| Some(member))

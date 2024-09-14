@@ -51,43 +51,40 @@ static TAG: &str = "Messages";
 
 pub fn router() -> AppRouter<State> {
     AppRouter::new()
-        .on_http(|router| {
-            router
-                .api_route(
-                    "/",
-                    get_with(list, |o| {
-                        o.tag(TAG).id("messages.list").summary("List Messages")
-                    }),
-                )
-                .api_route(
-                    "/:id",
-                    get_with(get, |o| {
-                        o.tag(TAG).id("messages.get").summary("Get Message")
-                    }),
-                )
-                .api_route(
-                    "/",
-                    post_with(send, |o| {
-                        o.tag(TAG).id("messages.create").summary("Create Message")
-                    }),
-                )
-                .api_route(
-                    "/:id",
-                    patch_with(edit, |o| {
-                        o.tag(TAG).id("messages.update").summary("Update Message")
-                    }),
-                )
-                .api_route(
-                    "/:id",
-                    delete_with(delete, |o| {
-                        o.tag(TAG).id("messages.delete").summary("Delete Message")
-                    }),
-                )
-        })
+        .route(
+            "/",
+            get_with(list, |o| {
+                o.tag(TAG).id("messages.list").summary("List Messages")
+            }),
+        )
+        .route(
+            "/:id",
+            get_with(get, |o| {
+                o.tag(TAG).id("messages.get").summary("Get Message")
+            }),
+        )
+        .route(
+            "/",
+            post_with(send, |o| {
+                o.tag(TAG).id("messages.create").summary("Create Message")
+            }),
+        )
+        .route(
+            "/:id",
+            patch_with(edit, |o| {
+                o.tag(TAG).id("messages.update").summary("Update Message")
+            }),
+        )
+        .route(
+            "/:id",
+            delete_with(delete, |o| {
+                o.tag(TAG).id("messages.delete").summary("Delete Message")
+            }),
+        )
         .on_ws(|router| {
             router
-                .event("onCreate", |space: MessageExt, _| Some(space))
-                .event("onUpdate", |space: MessageExt, _| Some(space))
-                .event("onDelete", |space: MessageExt, _| Some(space))
+                .event("onCreate", |message: MessageExt, _| Some(message))
+                .event("onUpdate", |message: MessageExt, _| Some(message))
+                .event("onDelete", |message: MessageExt, _| Some(message))
         })
 }

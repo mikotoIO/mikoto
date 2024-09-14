@@ -5,6 +5,7 @@ use aide::{
     openapi::{Info, OpenApi},
 };
 use axum::{Extension, Json, Router};
+use channels::voice;
 use router::AppRouter;
 use schemars::JsonSchema;
 use serde::Serialize;
@@ -47,12 +48,14 @@ pub fn router() -> Router {
                 .nest("/bots", bots::router())
         })
         .nest("users", "/users", users::router())
+        .nest("relations", "/relations", users::relations::router())
         .nest("channels", "/channels", channels::router())
         .nest(
             "documents",
             "/channel/:channel_id/documents",
             channels::documents::router(),
         )
+        .nest("voice", "/channels/:channel_id/voice", voice::router())
         .nest(
             "messages",
             "/channel/:channel_id/messages",

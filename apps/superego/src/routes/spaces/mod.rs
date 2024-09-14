@@ -49,37 +49,34 @@ static TAG: &str = "Spaces";
 
 pub fn router() -> AppRouter<State> {
     AppRouter::new()
-        .on_http(|router| {
-            router
-                .api_route(
-                    "/",
-                    get_with(list, |o| {
-                        o.tag(TAG).id("spaces.list").summary("List Spaces")
-                    }),
-                )
-                .api_route(
-                    "/:id",
-                    get_with(get, |o| o.tag(TAG).id("spaces.get").summary("Get Space")),
-                )
-                .api_route(
-                    "/",
-                    post_with(create, |o| {
-                        o.tag(TAG).id("spaces.create").summary("Create Space")
-                    }),
-                )
-                .api_route(
-                    "/:id",
-                    patch_with(update, |o| {
-                        o.tag(TAG).id("spaces.update").summary("Update Space")
-                    }),
-                )
-                .api_route(
-                    "/:id",
-                    delete_with(delete, |o| {
-                        o.tag(TAG).id("spaces.delete").summary("Delete Space")
-                    }),
-                )
-        })
+        .route(
+            "/",
+            get_with(list, |o| {
+                o.tag(TAG).id("spaces.list").summary("List Spaces")
+            }),
+        )
+        .route(
+            "/:id",
+            get_with(get, |o| o.tag(TAG).id("spaces.get").summary("Get Space")),
+        )
+        .route(
+            "/",
+            post_with(create, |o| {
+                o.tag(TAG).id("spaces.create").summary("Create Space")
+            }),
+        )
+        .route(
+            "/:id",
+            patch_with(update, |o| {
+                o.tag(TAG).id("spaces.update").summary("Update Space")
+            }),
+        )
+        .route(
+            "/:id",
+            delete_with(delete, |o| {
+                o.tag(TAG).id("spaces.delete").summary("Delete Space")
+            }),
+        )
         .on_ws(|router| {
             router
                 .event("onCreate", |space: SpaceExt, _| Some(space))

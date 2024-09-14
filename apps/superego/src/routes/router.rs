@@ -1,5 +1,5 @@
 use aide::{
-    axum::{ApiRouter, IntoApiResponse},
+    axum::{routing::ApiMethodRouter, ApiRouter, IntoApiResponse},
     openapi::OpenApi,
     scalar::Scalar,
 };
@@ -42,6 +42,11 @@ impl<W: WebSocketState> AppRouter<W> {
         F: FnOnce(WebSocketRouter<W>) -> WebSocketRouter<W>,
     {
         self.ws = f(self.ws);
+        self
+    }
+
+    pub fn route(mut self, path: &str, method_router: ApiMethodRouter<()>) -> Self {
+        self.http = self.http.api_route(path, method_router);
         self
     }
 

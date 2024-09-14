@@ -29,19 +29,17 @@ async fn update(
 static TAG: &str = "Documents";
 
 pub fn router() -> AppRouter<State> {
-    AppRouter::new().on_http(|router| {
-        router
-            .api_route(
-                "/",
-                get_with(get, |o| {
-                    o.tag(TAG).id("document.get").summary("Get Document")
-                }),
-            )
-            .api_route(
-                "/",
-                patch_with(update, |o| {
-                    o.tag(TAG).id("document.update").summary("Update Document")
-                }),
-            )
-    })
+    AppRouter::new()
+        .route(
+            "/",
+            get_with(get, |o| {
+                o.tag(TAG).id("document.get").summary("Get Document")
+            }),
+        )
+        .route(
+            "/",
+            patch_with(update, |o| {
+                o.tag(TAG).id("document.update").summary("Update Document")
+            }),
+        )
 }

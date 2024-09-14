@@ -53,7 +53,7 @@
     "cors": "^2.8.5",
     "did-resolver": "^4.1.0",
     "dotenv": "^16.3.2",
-    "ejs": "^3.1.9",
+    "ejs": "^3.1.10",
     "express": "^4.19.2",
     "ioredis": "^5.3.2",
     "jsonwebtoken": "^9.0.2",

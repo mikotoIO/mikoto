@@ -30,10 +30,18 @@ impl MailSender {
             MailTransport::Smtp(transport) => {
                 let handlebars = Handlebars::new();
                 let mail = lettre::Message::builder()
-                    .from(self.from.parse()?)
-                    .to(to.parse()?)
-                    .subject(handlebars.render_template(template.subject, &data)?)
-                    .body(handlebars.render_template(template.body, &data)?)
+                    .from(self.from.parse().map_err(|_| Error::MailError)?)
+                    .to(to.parse().map_err(|_| Error::MailError)?)
+                    .subject(
+                        handlebars
+                            .render_template(template.subject, &data)
+                            .map_err(|_| Error::TemplatingError)?,
+                    )
+                    .body(
+                        handlebars
+                            .render_template(template.body, &data)
+                            .map_err(|_| Error::TemplatingError)?,
+                    )
                     .unwrap();
 
                 let mail = mail.into();

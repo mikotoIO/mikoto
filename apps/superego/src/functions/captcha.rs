@@ -33,12 +33,15 @@ impl Captcha for Hcaptcha {
         } else {
             HcaptchaClient::new()
         };
+        let captcha = captcha.ok_or(Error::CaptchaFailed)?;
+        let req = HcaptchaCaptcha::new(captcha)
+            .and_then(|captcha| HcaptchaRequest::new(&self.secret, captcha))
+            .map_err(|_| Error::CaptchaFailed)?;
+
         let resp = client
-            .verify_client_response(HcaptchaRequest::new(
-                &self.secret,
-                HcaptchaCaptcha::new(captcha.ok_or(Error::CaptchaFailed)?)?,
-            )?)
-            .await?;
+            .verify_client_response(req)
+            .await
+            .map_err(|_| Error::CaptchaFailed)?;
 
         if !resp.success() {
             return Err(Error::CaptchaFailed);

@@ -9,8 +9,9 @@ use futures_util::{stream::StreamExt, SinkExt};
 use schema::WebSocketRouter;
 use serde::de::DeserializeOwned;
 use tokio::{sync::RwLock, task::JoinHandle};
+use uuid::Uuid;
 
-use crate::{db::redis, error::Error};
+use crate::{db::redis, entities::ObjectWithId, error::Error, functions::pubsub::emit_event};
 
 pub mod schema;
 pub mod state;
@@ -46,9 +47,7 @@ async fn handle_socket<S: WebSocketState>(
     let redis = {
         let redis = redis().clone_new();
         redis.init().await?;
-        redis
-            .subscribe(initial_subscriptions)
-            .await?;
+        redis.subscribe(initial_subscriptions).await?;
         redis
     };
 
@@ -62,7 +61,11 @@ async fn handle_socket<S: WebSocketState>(
                 continue; // not a string message
             };
             let msg: Operation = serde_json::from_str(&msg)?;
-            let filter = router.event_filters.get(&msg.op).unwrap();
+            let filter = if let Some(filter) = router.event_filters.get(&msg.op) {
+                filter
+            } else {
+                continue; // no filter for this event
+            };
             if let Some(data) = filter(msg.data, state.clone())? {
                 writer
                     .send(serde_json::to_string(&Operation { op: msg.op, data })?.into())
@@ -80,7 +83,13 @@ async fn handle_socket<S: WebSocketState>(
             } else {
                 return; // client disconnected
             };
-
+            emit_event(
+                "spaces.onDelete",
+                ObjectWithId { id: Uuid::new_v4() },
+                "all",
+            )
+            .await
+            .unwrap();
             dbg!(msg.clone());
         }
     });

@@ -23,7 +23,7 @@ impl WebSocketState for State {
     }
 
     async fn initialize(&mut self, _init: Self::Initial) -> Option<Vec<String>> {
-        Some(vec![self.conn_id.to_string()])
+        Some(vec!["all".to_string(), self.conn_id.to_string()])
     }
 }
 

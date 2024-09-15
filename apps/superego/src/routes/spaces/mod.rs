@@ -4,8 +4,10 @@ use schemars::JsonSchema;
 use uuid::Uuid;
 
 use crate::{
-    entities::{ObjectWithId, SpaceExt},
+    db::db,
+    entities::{ObjectWithId, Space, SpaceExt},
     error::Error,
+    functions::jwt::Claims,
 };
 
 use super::{router::AppRouter, ws::state::State};
@@ -25,12 +27,17 @@ pub struct SpaceUpdatePayload {
     pub name: String,
 }
 
-async fn get(_id: Path<Uuid>) -> Result<Json<SpaceExt>, Error> {
-    Err(Error::Todo)
+async fn get(space_id: Path<Uuid>) -> Result<Json<SpaceExt>, Error> {
+    // TODO: Check if the member is in space
+    let space = Space::get(&space_id, db()).await?;
+    let space = SpaceExt::dataload_one(space, db()).await?;
+    Ok(Json(space))
 }
 
-async fn list() -> Result<Json<Vec<SpaceExt>>, Error> {
-    Err(Error::Todo)
+async fn list(claims: Claims) -> Result<Json<Vec<SpaceExt>>, Error> {
+    let spaces = Space::list_from_user_id(claims.sub.parse()?, db()).await?;
+    let spaces = SpaceExt::dataload(spaces, db()).await?;
+    Ok(Json(spaces))
 }
 
 async fn create(_body: Json<SpaceCreatePayload>) -> Result<Json<SpaceExt>, Error> {

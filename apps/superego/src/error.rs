@@ -7,58 +7,89 @@ use axum::{
 use bcrypt::BcryptError;
 use serde_json::json;
 
-#[derive(Serialize, Debug, OperationIo)]
-#[serde(rename_all = "camelCase", tag = "code")]
+#[derive(Debug, OperationIo, strum::AsRefStr, thiserror::Error)]
 pub enum Error {
+    #[error("Not found")]
     NotFound,
+    #[error("{message}")]
     Unauthorized { message: String },
-    ValidationFailed { message: String },
-    WrongPassword,
-    NetworkError,
-    WebSocketTerminated,
-    CaptchaFailed,
-    TokenExpired,
-    WrongAuthenticationType,
-    JwtValidationError { message: String },
-    DatabaseError { message: String },
-    RedisError { message: String },
+    #[error("Validation failed")]
+    ValidationFailed,
+
+    // errors relating to services
+    #[error("{0}")]
+    DatabaseError(#[from] sqlx::Error),
+    #[error("{0}")]
+    RedisError(#[from] fred::error::RedisError),
+    #[error("{0}")]
+    SerdeError(#[from] serde_json::Error),
+
+    #[error("Unknown internal server error")]
     InternalServerError { message: String },
-    SerdeError { message: String },
 
+    #[error("Wrong password")]
+    WrongPassword,
+    #[error("Network error")]
+    NetworkError,
+    #[error("WebSocket terminated")]
+    WebSocketTerminated,
+    #[error("Captcha failed")]
+    CaptchaFailed,
+    #[error("Token expired")]
+    TokenExpired,
+    #[error("Wrong authentication type provided")]
+    WrongAuthenticationType,
+    #[error("JWT is invalid")]
+    JwtValidationError { message: String },
+
+    #[error("Templating error")]
     TemplatingError,
+    #[error("Mail error")]
     MailError,
+    #[error("Unimplemented so far")]
     Todo,
+
+    #[error("{message}")]
+    Miscallaneous {
+        code: String,
+        status: StatusCode,
+        message: String,
+    },
 }
 
-impl From<serde_json::Error> for Error {
-    fn from(value: serde_json::Error) -> Self {
-        Self::SerdeError {
-            message: value.to_string(),
+impl Error {
+    pub fn new(code: &str, status: StatusCode, message: &str) -> Self {
+        Self::Miscallaneous {
+            code: code.to_string(),
+            status,
+            message: message.to_string(),
         }
     }
 }
 
-impl From<sqlx::Error> for Error {
-    fn from(err: sqlx::Error) -> Self {
-        Self::DatabaseError {
-            message: err.to_string(),
-        }
-    }
-}
+impl IntoResponse for Error {
+    fn into_response(self) -> Response {
+        let status = match self {
+            Error::Miscallaneous { status, .. } => status,
+            Error::NotFound => StatusCode::NOT_FOUND,
+            Error::WrongPassword => StatusCode::UNAUTHORIZED,
+            _ => StatusCode::INTERNAL_SERVER_ERROR,
+        };
 
-impl From<fred::error::RedisError> for Error {
-    fn from(err: fred::error::RedisError) -> Self {
-        Self::RedisError {
-            message: err.to_string(),
-        }
+        (
+            status,
+            Json(json!({
+                "code": self.as_ref(),
+                "message": self.to_string(),
+            })),
+        )
+            .into_response()
     }
 }
 
 impl From<uuid::Error> for Error {
-    fn from(err: uuid::Error) -> Self {
-        Self::ValidationFailed {
-            message: err.to_string(),
-        }
+    fn from(_: uuid::Error) -> Self {
+        Self::ValidationFailed
     }
 }
 
@@ -78,32 +109,4 @@ impl From<jsonwebtoken::errors::Error> for Error {
     }
 }
 
-impl From<hcaptcha::HcaptchaError> for Error {
-    fn from(_: hcaptcha::HcaptchaError) -> Self {
-        Self::CaptchaFailed
-    }
-}
-
-impl From<handlebars::RenderError> for Error {
-    fn from(_: handlebars::RenderError) -> Self {
-        Self::TemplatingError
-    }
-}
-
-impl From<lettre::address::AddressError> for Error {
-    fn from(_: lettre::address::AddressError) -> Self {
-        Self::MailError
-    }
-}
-
-impl IntoResponse for Error {
-    fn into_response(self) -> Response {
-        let status = match self {
-            Error::NotFound => StatusCode::NOT_FOUND,
-            Error::WrongPassword => StatusCode::UNAUTHORIZED,
-            _ => StatusCode::INTERNAL_SERVER_ERROR,
-        };
-
-        (status, Json(json!(self).to_string())).into_response()
-    }
-}
+pub type Result<T, E = Error> = std::result::Result<T, E>;

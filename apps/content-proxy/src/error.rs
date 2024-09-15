@@ -29,7 +29,7 @@ impl IntoResponse for Error {
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         };
 
-        (status, Json(json!(self).to_string())).into_response()
+        (status, Json(json!(self))).into_response()
     }
 }
 

@@ -13,6 +13,8 @@ chrono = { version = "0.4.38", features = ["serde"] }
 uuid = { version = "1.8.0", features = ["serde", "v4"] }
 nanoid = "0.4.0"
 hex = "0.4.3"
+thiserror = "1.0.63"
+strum = { version = "0.26", features = ["derive"] }
 
 # env
 dotenv = "0.15.0"

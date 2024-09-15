@@ -12,6 +12,7 @@ use crate::{
 
 use super::{router::AppRouter, ws::state::State};
 
+pub mod invites;
 pub mod members;
 pub mod roles;
 

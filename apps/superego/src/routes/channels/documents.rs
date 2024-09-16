@@ -1,29 +1,26 @@
 use aide::axum::routing::{get_with, patch_with};
 use axum::{extract::Path, Json};
-use schemars::JsonSchema;
 use uuid::Uuid;
 
 use crate::{
-    entities::{Channel, Document},
+    db::db,
+    entities::{Document, DocumentPatch},
     error::Error,
     routes::{router::AppRouter, ws::state::State},
 };
 
-#[derive(Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct DocumentUpdatePayload {
-    pub content: String,
-}
-
-async fn get(_id: Path<Uuid>) -> Result<Json<Document>, Error> {
-    Err(Error::Todo)
+async fn get(Path((_, channel_id)): Path<(Uuid, Uuid)>) -> Result<Json<Document>, Error> {
+    let document = Document::get_by_channel_id(channel_id, db()).await?;
+    Ok(document.into())
 }
 
 async fn update(
-    _id: Path<Uuid>,
-    _body: Json<DocumentUpdatePayload>,
-) -> Result<Json<Channel>, Error> {
-    Err(Error::Todo)
+    Path((_, channel_id)): Path<(Uuid, Uuid)>,
+    Json(patch): Json<DocumentPatch>,
+) -> Result<Json<Document>, Error> {
+    let document = Document::get_by_channel_id(channel_id, db()).await?;
+    let document = document.update(patch, db()).await?;
+    Ok(document.into())
 }
 
 static TAG: &str = "Documents";

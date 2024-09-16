@@ -1,9 +1,16 @@
+use std::{future::Future, sync::Arc};
+
 use aide::{
     axum::{routing::ApiMethodRouter, ApiRouter, IntoApiResponse},
     openapi::OpenApi,
     scalar::Scalar,
 };
 use axum::{Extension, Json, Router};
+use schemars::JsonSchema;
+use serde::{de::DeserializeOwned, Serialize};
+use tokio::sync::RwLock;
+
+use crate::error::Error;
 
 use super::ws::{self, schema::WebSocketRouter, WebSocketState};
 
@@ -52,12 +59,22 @@ impl<W: WebSocketState> AppRouter<W> {
 
     pub fn ws_event<T, R, F, Fut>(mut self, name: &str, filter: F) -> Self
     where
-        T: serde::Serialize + serde::de::DeserializeOwned,
-        R: schemars::JsonSchema + serde::Serialize,
-        Fut: std::future::Future<Output = Option<R>> + Send + Sync,
-        F: Fn(T, std::sync::Arc<tokio::sync::RwLock<W>>) -> Fut + 'static + Send + Sync + Copy,
+        T: Serialize + DeserializeOwned,
+        R: JsonSchema + Serialize,
+        F: Fn(T, Arc<RwLock<W>>) -> Fut + 'static + Send + Sync + Copy,
+        Fut: Future<Output = Option<R>> + Send + Sync,
     {
         self.ws = self.ws.event(name, filter);
+        self
+    }
+
+    pub fn ws_command<T, F, Fut>(mut self, name: &str, func: F) -> Self
+    where
+        T: JsonSchema + DeserializeOwned,
+        F: Fn(T, Arc<RwLock<W>>) -> Fut + 'static + Send + Sync + Copy,
+        Fut: Future<Output = Result<(), Error>> + Send,
+    {
+        self.ws = self.ws.command(name, func);
         self
     }
 

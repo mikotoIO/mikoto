@@ -1,10 +1,11 @@
 use serde::{de::DeserializeOwned, Serialize};
 use uuid::Uuid;
 
-use super::WebSocketState;
+use super::{SocketAction, WebSocketState};
 
 pub struct State {
     pub conn_id: Uuid,
+    pub actions: Vec<SocketAction>,
 }
 
 #[derive(Deserialize)]
@@ -19,7 +20,12 @@ impl WebSocketState for State {
     fn new() -> Self {
         Self {
             conn_id: Uuid::new_v4(),
+            actions: vec![],
         }
+    }
+
+    fn clear_actions(&mut self) -> Vec<SocketAction> {
+        std::mem::take(&mut self.actions)
     }
 
     async fn initialize(&mut self, _init: Self::Initial) -> Option<Vec<String>> {

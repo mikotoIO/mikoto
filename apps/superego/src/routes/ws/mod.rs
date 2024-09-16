@@ -22,12 +22,19 @@ pub trait WebSocketState: Send + Sync + 'static {
 
     fn new() -> Self;
     async fn initialize(&mut self, q: Self::Initial) -> Option<Vec<String>>;
+    fn clear_actions(&mut self) -> Vec<SocketAction>;
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Operation {
     pub op: String,
     pub data: serde_json::Value,
+}
+
+#[derive(Clone)]
+pub enum SocketAction {
+    Subscribe(Vec<String>),
+    Unsubscribe(Vec<String>),
 }
 
 async fn handle_socket<S: WebSocketState>(
@@ -66,7 +73,19 @@ async fn handle_socket<S: WebSocketState>(
             } else {
                 continue; // no filter for this event
             };
-            if let Some(data) = filter(msg.data, state.clone())? {
+
+            if let Some(data) = filter(msg.data, state.clone()).await? {
+                let actions = { state.write().await.clear_actions() };
+                for action in actions {
+                    match action {
+                        SocketAction::Subscribe(channel) => {
+                            redis.subscribe(channel).await?;
+                        }
+                        SocketAction::Unsubscribe(channel) => {
+                            redis.unsubscribe(channel).await?;
+                        }
+                    }
+                }
                 writer
                     .send(serde_json::to_string(&Operation { op: msg.op, data })?.into())
                     .await

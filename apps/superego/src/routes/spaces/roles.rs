@@ -61,10 +61,7 @@ pub fn router() -> AppRouter<State> {
                 o.tag(TAG).id("roles.delete").summary("Delete Role")
             }),
         )
-        .on_ws(|router| {
-            router
-                .event("onCreate", |role: Role, _| Some(role))
-                .event("onUpdate", |role: Role, _| Some(role))
-                .event("onDelete", |role: Role, _| Some(role))
-        })
+        .ws_event("onCreate", |role: Role, _| async move { Some(role) })
+        .ws_event("onUpdate", |role: Role, _| async move { Some(role) })
+        .ws_event("onDelete", |role: Role, _| async move { Some(role) })
 }

@@ -5,7 +5,11 @@ use axum::{extract::FromRequestParts, http::request::Parts};
 use chrono::{TimeDelta, Utc};
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
 
-use crate::{entities::Account, env::env, error::Error};
+use crate::{
+    entities::{Account, User},
+    env::env,
+    error::Error,
+};
 
 // Represents a user claim.
 // This can be used as an Axum extractor as well.

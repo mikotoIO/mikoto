@@ -1,11 +1,16 @@
 use aide::axum::routing::{delete_with, get_with, patch_with, post_with};
-use axum::{extract::Path, Json};
+use axum::{
+    extract::{Path, Query},
+    Json,
+};
 use schemars::JsonSchema;
 use uuid::Uuid;
 
 use crate::{
-    entities::MessageExt,
+    db::db,
+    entities::{Channel, Message, MessageExt, MessageKey, MessagePatch},
     error::Error,
+    functions::{jwt::Claims, pubsub::emit_event},
     routes::{router::AppRouter, ws::state::State},
 };
 
@@ -21,30 +26,91 @@ pub struct MessageEditPayload {
     pub content: String,
 }
 
-async fn get(_id: Path<(Uuid, Uuid)>) -> Result<Json<MessageExt>, Error> {
-    Err(Error::Todo)
+async fn get(
+    Path((_, _, message_id)): Path<(Uuid, Uuid, Uuid)>,
+) -> Result<Json<MessageExt>, Error> {
+    let message = Message::find_by_id(message_id, db()).await?;
+    let message = MessageExt::dataload_one(message, db()).await?;
+    Ok(message.into())
 }
 
-async fn list(_channel_id: Path<Uuid>) -> Result<Json<Vec<MessageExt>>, Error> {
-    Err(Error::Todo)
+#[derive(Deserialize, JsonSchema)]
+struct ListQuery {
+    limit: Option<i32>,
+    cursor: Option<Uuid>,
+}
+
+async fn list(
+    Path((_, channel_id)): Path<(Uuid, Uuid)>,
+    Query(query): Query<ListQuery>,
+) -> Result<Json<Vec<MessageExt>>, Error> {
+    let messages = Message::paginate(
+        channel_id,
+        query.cursor,
+        query.limit.unwrap_or(50).clamp(1, 100),
+        db(),
+    )
+    .await?;
+    let messages = MessageExt::dataload(messages, db()).await?;
+    Ok(messages.into())
 }
 
 async fn send(
-    _channel_id: Path<Uuid>,
-    _body: Json<MessageSendPayload>,
+    Path((_, channel_id)): Path<(Uuid, Uuid)>,
+    claim: Claims,
+    Json(body): Json<MessageSendPayload>,
 ) -> Result<Json<MessageExt>, Error> {
-    Err(Error::Todo)
+    let channel = Channel::find_by_id(channel_id, db()).await?;
+    let message = Message::new(&channel, claim.sub.parse()?, body.content);
+    message.create(db()).await?;
+    let message = MessageExt::dataload_one(message, db()).await?;
+
+    emit_event(
+        "messages.onCreate",
+        &message,
+        &format!("space:{}", channel.space_id),
+    )
+    .await?;
+    Ok(message.into())
 }
 
 async fn edit(
-    _id: Path<(Uuid, Uuid)>,
-    _body: Json<MessageEditPayload>,
+    Path((_, channel_id, message_id)): Path<(Uuid, Uuid, Uuid)>,
+    Json(body): Json<MessageEditPayload>,
 ) -> Result<Json<MessageExt>, Error> {
-    Err(Error::Todo)
+    let _channel = Channel::find_by_id(channel_id, db()).await?;
+    let message = Message::find_by_id(message_id, db()).await?;
+    let message = message
+        .update(MessagePatch::edit(body.content), db())
+        .await?;
+    let message = MessageExt::dataload_one(message, db()).await?;
+
+    emit_event(
+        "messages.onUpdate",
+        &message,
+        &format!("space:{}", channel_id),
+    )
+    .await?;
+    Ok(message.into())
 }
 
-async fn delete(_id: Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
-    Err(Error::Todo)
+async fn delete(
+    Path((_, channel_id, message_id)): Path<(Uuid, Uuid, Uuid)>,
+) -> Result<Json<()>, Error> {
+    let _channel = Channel::find_by_id(channel_id, db()).await?;
+    let message = Message::find_by_id(message_id, db()).await?;
+    message.delete(db()).await?;
+
+    emit_event(
+        "messages.onDelete",
+        MessageKey {
+            message_id: message.id,
+            channel_id: message.channel_id,
+        },
+        &format!("space:{}", channel_id),
+    )
+    .await?;
+    Ok(().into())
 }
 
 static TAG: &str = "Messages";
@@ -81,10 +147,16 @@ pub fn router() -> AppRouter<State> {
                 o.tag(TAG).id("messages.delete").summary("Delete Message")
             }),
         )
-        .on_ws(|router| {
-            router
-                .event("onCreate", |message: MessageExt, _| Some(message))
-                .event("onUpdate", |message: MessageExt, _| Some(message))
-                .event("onDelete", |message: MessageExt, _| Some(message))
-        })
+        .ws_event(
+            "onCreate",
+            |message: MessageExt, _| async move { Some(message) },
+        )
+        .ws_event(
+            "onUpdate",
+            |message: MessageExt, _| async move { Some(message) },
+        )
+        .ws_event(
+            "onDelete",
+            |message: MessageKey, _| async move { Some(message) },
+        )
 }

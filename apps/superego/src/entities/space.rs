@@ -1,12 +1,9 @@
-use std::collections::HashMap;
-
-use chrono::NaiveDateTime;
 use schemars::JsonSchema;
 use uuid::Uuid;
 
-use crate::{db_enum, entity, error::Error};
+use crate::{db_entity_delete, db_enum, db_find_by_id, entities::Role, entity, error::Error};
 
-use super::{group_by_key, Channel};
+use super::Channel;
 
 db_enum!(
     pub enum SpaceType {
@@ -23,36 +20,10 @@ entity!(
         pub name: String,
         pub icon: Option<String>,
         pub owner_id: Option<Uuid>,
+
+        #[serde(rename = "type")]
+        #[sqlx(rename = "type")]
         pub space_type: SpaceType,
-    }
-);
-
-entity!(
-    pub struct SpaceUser {
-        pub id: Uuid,
-        pub name: String,
-        pub space_id: Uuid,
-        pub user_id: Uuid,
-    }
-);
-
-entity!(
-    pub struct Role {
-        pub id: Uuid,
-        pub space_id: Uuid,
-        pub name: String,
-        pub color: Option<String>,
-        pub permissions: String,
-        pub position: i32,
-    }
-);
-
-entity!(
-    pub struct Invite {
-        pub id: String, // Not UUID, but a NanoID
-        pub space_id: Uuid,
-        pub created_at: NaiveDateTime,
-        pub creator_id: Uuid,
     }
 );
 
@@ -67,27 +38,25 @@ pub struct SpaceExt {
     pub channels: Vec<Channel>,
 }
 
-#[derive(Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct Member {
-    #[serde(flatten)]
-    pub base: SpaceUser,
-    pub role_ids: Vec<Uuid>,
+#[derive(Default)]
+pub struct SpacePatch {
+    pub name: Option<String>,
+    pub icon: Option<String>,
+    pub owner_id: Option<Uuid>,
 }
 
 impl Space {
-    pub async fn get<'c, X: sqlx::PgExecutor<'c>>(id: &Uuid, db: X) -> Result<Space, Error> {
-        let res = sqlx::query_as(
-            r##"
-            SELECT * FROM "Space" WHERE "id" = $1
-            "##,
-        )
-        .bind(id)
-        .fetch_optional(db)
-        .await?
-        .ok_or(Error::NotFound)?;
-        Ok(res)
+    pub fn new(name: String, owner_id: Uuid) -> Self {
+        Self {
+            id: Uuid::new_v4(),
+            name,
+            icon: None,
+            owner_id: Some(owner_id),
+            space_type: SpaceType::None,
+        }
     }
+
+    db_find_by_id!("Space");
 
     pub async fn list_from_user_id<'c, X: sqlx::PgExecutor<'c>>(
         user_id: Uuid,
@@ -105,38 +74,60 @@ impl Space {
         .await?;
         Ok(res)
     }
-}
 
-impl Role {
-    pub async fn list<'c, X: sqlx::PgExecutor<'c>>(
-        space_id: Uuid,
-        db: X,
-    ) -> Result<Vec<Role>, Error> {
-        let res = sqlx::query_as(
+    pub async fn create<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
+        sqlx::query(
             r##"
-            SELECT * FROM "Role" WHERE "spaceId" = $1
+            WITH "c" AS (
+                INSERT INTO "Channel" ("id", "spaceId", "name", "order")
+                VALUES (gen_random_uuid(), $1, 'general', 0)
+                RETURNING "id"
+            )
+            WITH "r" AS (
+                INSERT INTO "Role" ("id", "spaceId", "name", "position", "permissions")
+                VALUES (gen_random_uuid(), $1, '@everyone', -1, '0')
+                RETURNING "id"
+            )
+            INSERT INTO "Space" ("id", "name", "icon", "ownerId", "type")
+            VALUES ($1, $2, $3, $4, $5)
             "##,
         )
-        .bind(space_id)
-        .fetch_all(db)
+        .bind(&self.id)
+        .bind(&self.name)
+        .bind(&self.icon)
+        .bind(&self.owner_id)
+        .bind(&self.space_type)
+        .execute(db)
         .await?;
+        Ok(())
+    }
+
+    pub async fn update<'c, X: sqlx::PgExecutor<'c>>(
+        &self,
+        patch: SpacePatch,
+        db: X,
+    ) -> Result<Space, Error> {
+        let res = sqlx::query_as(
+            r##"
+            UPDATE "Space" SET
+            "name" = COALESCE($2, "name"),
+            "icon" = COALESCE($3, "icon"),
+            "ownerId" = COALESCE($4, "ownerId")
+            WHERE "id" = $1
+            RETURNING *
+            "##,
+        )
+        .bind(&self.id)
+        .bind(&patch.name)
+        .bind(&patch.icon)
+        .bind(&patch.owner_id)
+        .fetch_optional(db)
+        .await?
+        .ok_or(Error::NotFound)?;
         Ok(res)
     }
 
-    pub async fn dataload_space<'c, X: sqlx::PgExecutor<'c>>(
-        space_ids: Vec<Uuid>,
-        db: X,
-    ) -> Result<HashMap<Uuid, Vec<Self>>, Error> {
-        let xs: Vec<Self> = sqlx::query_as(
-            r##"
-            SELECT * FROM "Role" WHERE "spaceId" = ANY($1)
-            "##,
-        )
-        .bind(&space_ids)
-        .fetch_all(db)
-        .await?;
-        Ok(group_by_key(xs, |x| x.space_id))
-    }
+    db_entity_delete!("Space");
 }
 
 impl SpaceExt {
@@ -145,7 +136,7 @@ impl SpaceExt {
         db: X,
     ) -> Result<Self, Error> {
         let (channels, roles) =
-            tokio::try_join!(Channel::list(space.id, db), Role::list(space.id, db),)?;
+            tokio::try_join!(Channel::list(space.id, db), Role::list(space.id, db))?;
 
         Ok(SpaceExt {
             base: space,

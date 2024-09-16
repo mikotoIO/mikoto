@@ -9,3 +9,9 @@ model!(
         pub id: Uuid,
     }
 );
+
+impl ObjectWithId {
+    pub fn from_id(id: Uuid) -> Self {
+        Self { id }
+    }
+}

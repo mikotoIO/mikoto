@@ -4,7 +4,7 @@ use chrono::NaiveDateTime;
 use schemars::JsonSchema;
 use uuid::Uuid;
 
-use crate::{db_enum, entity, error::Error};
+use crate::{db_entity_delete, db_enum, db_find_by_id, db_list_where, entity, error::Error};
 
 use super::group_by_key;
 
@@ -31,20 +31,10 @@ entity!(
         #[serde(rename = "type")]
         #[sqlx(rename = "type")]
         pub category: ChannelType,
-        pub last_updated: NaiveDateTime,
+        pub last_updated: Option<NaiveDateTime>,
     }
 );
 
-entity!(
-    pub struct Message {
-        pub id: Uuid,
-        pub channel_id: Uuid,
-        pub author_id: Uuid,
-        pub timestamp: NaiveDateTime,
-        pub edited_timestamp: Option<NaiveDateTime>,
-        pub content: String,
-    }
-);
 
 entity!(
     pub struct Document {
@@ -54,23 +44,17 @@ entity!(
     }
 );
 
-#[derive(Serialize, Deserialize, JsonSchema)]
+
+
+#[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct MessageExt {
-    pub base: Message,
+pub struct ChannelPatch {
+    pub name: Option<String>,
 }
 
 impl Channel {
-    pub async fn list<'c, X: sqlx::PgExecutor<'c>>(
-        space_id: Uuid,
-        db: X,
-    ) -> Result<Vec<Self>, crate::error::Error> {
-        let channels = sqlx::query_as(r#"SELECT * FROM "Channels" WHERE "spaceId" = $1"#)
-            .bind(space_id)
-            .fetch_all(db)
-            .await?;
-        Ok(channels)
-    }
+    db_find_by_id!("Channel");
+    db_list_where!("Channel", list, "spaceId", space_id, Uuid);
 
     pub async fn dataload_space<'c, X: sqlx::PgExecutor<'c>>(
         space_ids: Vec<Uuid>,
@@ -78,7 +62,7 @@ impl Channel {
     ) -> Result<HashMap<Uuid, Vec<Self>>, Error> {
         let channels: Vec<Self> = sqlx::query_as(
             r##"
-            SELECT * FROM "Channels"
+            SELECT * FROM "Channel"
             WHERE "spaceId" = ANY($1)
             "##,
         )
@@ -91,7 +75,7 @@ impl Channel {
     pub async fn create<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
         sqlx::query(
             r##"
-            INSERT INTO "Channels" ("id", "spaceId", "parentId", "order", "name", "type", "lastUpdated")
+            INSERT INTO "Channel" ("id", "spaceId", "parentId", "order", "name", "type", "lastUpdated")
             VALUES ($1, $2, $3, $4, $5, $6, $7)
             "##,
         )
@@ -106,4 +90,27 @@ impl Channel {
         .await?;
         Ok(())
     }
+
+    pub async fn update<'c, X: sqlx::PgExecutor<'c>>(
+        &self,
+        patch: ChannelPatch,
+        db: X,
+    ) -> Result<Channel, Error> {
+        let res = sqlx::query_as(
+            r##"
+            UPDATE "Channel" SET
+            "name" = COALESCE($2, "name"),
+            WHERE "id" = $1
+            RETURNING *
+            "##,
+        )
+        .bind(&self.id)
+        .bind(&patch.name)
+        .fetch_optional(db)
+        .await?
+        .ok_or(Error::NotFound)?;
+        Ok(res)
+    }
+
+    db_entity_delete!("Channel");
 }

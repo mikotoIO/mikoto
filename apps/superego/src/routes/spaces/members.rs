@@ -4,7 +4,7 @@ use schemars::JsonSchema;
 use uuid::Uuid;
 
 use crate::{
-    entities::{Member, ObjectWithId},
+    entities::{MemberExt, MemberKey, ObjectWithId},
     error::Error,
     routes::{router::AppRouter, ws::state::State},
 };
@@ -21,19 +21,22 @@ pub struct MemberUpdatePayload {
     pub role_ids: Vec<Uuid>,
 }
 
-async fn get(_id: Path<Uuid>) -> Result<Json<Member>, Error> {
+async fn get(_id: Path<Uuid>) -> Result<Json<MemberExt>, Error> {
     Err(Error::Todo)
 }
 
-async fn list() -> Result<Json<Vec<Member>>, Error> {
+async fn list() -> Result<Json<Vec<MemberExt>>, Error> {
     Err(Error::Todo)
 }
 
-async fn create(_body: Json<MemberCreatePayload>) -> Result<Json<Member>, Error> {
+async fn create(_body: Json<MemberCreatePayload>) -> Result<Json<MemberExt>, Error> {
     Err(Error::Todo)
 }
 
-async fn update(_id: Path<Uuid>, _body: Json<MemberUpdatePayload>) -> Result<Json<Member>, Error> {
+async fn update(
+    _id: Path<Uuid>,
+    _body: Json<MemberUpdatePayload>,
+) -> Result<Json<MemberExt>, Error> {
     Err(Error::Todo)
 }
 
@@ -81,8 +84,8 @@ pub fn router() -> AppRouter<State> {
         )
         .on_ws(|router| {
             router
-                .event("onCreate", |member: Member, _| Some(member))
-                .event("onUpdate", |member: Member, _| Some(member))
-                .event("onDelete", |member: ObjectWithId, _| Some(member))
+                .event("onCreate", |member: MemberExt, _| Some(member))
+                .event("onUpdate", |member: MemberExt, _| Some(member))
+                .event("onDelete", |member: MemberKey, _| Some(member))
         })
 }

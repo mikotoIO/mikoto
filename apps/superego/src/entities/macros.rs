@@ -26,3 +26,24 @@ macro_rules! entity {
         $item
     };
 }
+
+#[macro_export]
+macro_rules! db_find_by_id {
+    ($table: expr) => {
+        pub async fn find_by_id<'c, X: sqlx::PgExecutor<'c>>(
+            id: uuid::Uuid,
+            db: X,
+        ) -> Result<Self, crate::error::Error> {
+            sqlx::query_as(&format!(
+                r##"
+                SELECT * FROM "{}" WHERE "id" = $1
+                "##,
+                stringify!($table)
+            ))
+            .bind(&id)
+            .fetch_optional(db)
+            .await?
+            .ok_or(crate::error::Error::NotFound)
+        }
+    };
+}

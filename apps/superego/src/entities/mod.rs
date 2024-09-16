@@ -8,15 +8,21 @@ use uuid::Uuid;
 mod account;
 mod bot;
 mod channel;
+mod invite;
 mod macros;
+mod member;
 mod models;
+mod role;
 mod space;
 mod user;
 
 pub use account::*;
 pub use bot::*;
 pub use channel::*;
+pub use invite::*;
+pub use member::*;
 pub use models::*;
+pub use role::*;
 pub use space::*;
 pub use user::*;
 
@@ -44,17 +50,28 @@ pub struct SocialAuth {
     pub provider_id: String,
 }
 
-fn group_by_key<T, K, F>(items: Vec<T>, key_fn: F) -> HashMap<K, Vec<T>>
+pub fn hashmap_by_key<T, K, F>(items: Vec<T>, key_fn: F) -> HashMap<K, T>
+where
+    F: Fn(&T) -> K,
+    K: Eq + Hash,
+{
+    let mut map: HashMap<K, T> = HashMap::new();
+    for item in items {
+        let key = key_fn(&item);
+        map.insert(key, item);
+    }
+    map
+}
+
+pub fn group_by_key<T, K, F>(items: Vec<T>, key_fn: F) -> HashMap<K, Vec<T>>
 where
     F: Fn(&T) -> K,
     K: Eq + Hash,
 {
     let mut grouped: HashMap<K, Vec<T>> = HashMap::new();
-
     for item in items {
         let key = key_fn(&item);
         grouped.entry(key).or_insert_with(Vec::new).push(item);
     }
-
     grouped
 }

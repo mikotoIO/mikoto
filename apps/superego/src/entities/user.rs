@@ -53,6 +53,16 @@ pub struct UserPatch {
 }
 
 impl User {
+    pub fn ghost() -> Self {
+        Self {
+            id: Uuid::nil(),
+            name: "Ghost".to_string(),
+            avatar: None,
+            description: None,
+            category: None,
+        }
+    }
+
     db_find_by_id!("User");
 
     pub async fn dataload<'c, X: sqlx::PgExecutor<'c>>(

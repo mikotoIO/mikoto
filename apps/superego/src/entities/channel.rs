@@ -35,17 +35,6 @@ entity!(
     }
 );
 
-
-entity!(
-    pub struct Document {
-        pub id: Uuid,
-        pub channel_id: Uuid,
-        pub content: String,
-    }
-);
-
-
-
 #[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct ChannelPatch {

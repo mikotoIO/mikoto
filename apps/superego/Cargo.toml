@@ -25,7 +25,7 @@ pretty_env_logger = "0.5.0"
 # web server
 axum = { version = "0.7.5", features = ["ws", "macros", "multipart"] }
 axum-extra = "0.9.3"
-tower-http = { version = "0.5.2", features = ["cors"] }
+tower-http = { version = "0.5.2", features = ["cors", "normalize-path"] }
 schemars = { version = "0.8.21", features = ["uuid1", "chrono"] }
 aide = { version = "0.13.4", features = [
     "scalar",
@@ -57,6 +57,7 @@ hcaptcha = { version = "2.4.7", default-features = false, features = [
 ] }
 futures-util = "0.3.30"
 fred = "9.1.2"
+tower-layer = "0.3.3"
 
 # database
 [dependencies.sqlx]

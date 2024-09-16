@@ -17,11 +17,10 @@ pub mod schema;
 pub mod state;
 
 #[async_trait]
-pub trait WebSocketState: Send + Sync + 'static {
+pub trait WebSocketState: Sized + Send + Sync + 'static {
     type Initial: DeserializeOwned + Send + Sync + 'static;
 
-    fn new() -> Self;
-    async fn initialize(&mut self, q: Self::Initial) -> Option<Vec<String>>;
+    async fn initialize(q: Self::Initial) -> Result<(Self, Vec<String>), Error>;
     fn clear_actions(&mut self) -> Vec<SocketAction>;
 }
 
@@ -42,14 +41,9 @@ async fn handle_socket<S: WebSocketState>(
     query: S::Initial,
     router: &'static WebSocketRouter<S>,
 ) -> Result<(), Error> {
-    let mut state = S::new();
-
     let (mut writer, mut reader) = socket.split();
 
-    let initial_subscriptions = state
-        .initialize(query)
-        .await
-        .ok_or(Error::WebSocketTerminated)?;
+    let (state, initial_subscriptions) = S::initialize(query).await?;
 
     let redis = {
         let redis = redis().clone_new();

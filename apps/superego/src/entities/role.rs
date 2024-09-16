@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use uuid::Uuid;
 
-use crate::{entity, error::Error};
+use crate::{db_list_where, entity, error::Error};
 
 use super::group_by_key;
 
@@ -18,20 +18,7 @@ entity!(
 );
 
 impl Role {
-    pub async fn list<'c, X: sqlx::PgExecutor<'c>>(
-        space_id: Uuid,
-        db: X,
-    ) -> Result<Vec<Role>, Error> {
-        let res = sqlx::query_as(
-            r##"
-            SELECT * FROM "Role" WHERE "spaceId" = $1
-            "##,
-        )
-        .bind(space_id)
-        .fetch_all(db)
-        .await?;
-        Ok(res)
-    }
+    db_list_where!("Role", list, "spaceId", space_id, Uuid);
 
     pub async fn dataload_space<'c, X: sqlx::PgExecutor<'c>>(
         space_ids: Vec<Uuid>,

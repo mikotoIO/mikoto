@@ -1,7 +1,7 @@
 use schemars::JsonSchema;
 use uuid::Uuid;
 
-use crate::{db_enum, db_find_by_id, entities::Role, entity, error::Error};
+use crate::{db_entity_delete, db_enum, db_find_by_id, entities::Role, entity, error::Error};
 
 use super::Channel;
 
@@ -127,17 +127,7 @@ impl Space {
         Ok(res)
     }
 
-    pub async fn delete<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
-        sqlx::query(
-            r##"
-            DELETE FROM "Space" WHERE "id" = $1
-            "##,
-        )
-        .bind(&self.id)
-        .execute(db)
-        .await?;
-        Ok(())
-    }
+    db_entity_delete!("Space");
 }
 
 impl SpaceExt {

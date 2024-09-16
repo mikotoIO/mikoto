@@ -50,6 +50,17 @@ impl<W: WebSocketState> AppRouter<W> {
         self
     }
 
+    pub fn ws_event<T, R, F, Fut>(mut self, name: &str, filter: F) -> Self
+    where
+        T: serde::Serialize + serde::de::DeserializeOwned,
+        R: schemars::JsonSchema + serde::Serialize,
+        Fut: std::future::Future<Output = Option<R>> + Send + Sync,
+        F: Fn(T, std::sync::Arc<tokio::sync::RwLock<W>>) -> Fut + 'static + Send + Sync + Copy,
+    {
+        self.ws = self.ws.event(name, filter);
+        self
+    }
+
     pub fn build(self, mut api: OpenApi) -> Router {
         let Self { http, ws } = self;
 

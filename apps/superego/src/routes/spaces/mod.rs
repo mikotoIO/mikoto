@@ -1,6 +1,9 @@
+use std::sync::Arc;
+
 use aide::axum::routing::{delete_with, get_with, patch_with, post_with};
 use axum::{extract::Path, Json};
 use schemars::JsonSchema;
+use tokio::sync::RwLock;
 use uuid::Uuid;
 
 use crate::{
@@ -12,7 +15,10 @@ use crate::{
     functions::{jwt::Claims, pubsub::emit_event},
 };
 
-use super::{router::AppRouter, ws::state::State};
+use super::{
+    router::AppRouter,
+    ws::{state::State, SocketAction},
+};
 
 pub mod invites;
 pub mod members;
@@ -189,13 +195,27 @@ pub fn router() -> AppRouter<State> {
                 o.tag(TAG).id("spaces.leave").summary("Leave Space")
             }),
         )
-        .on_ws(|router| {
-            router
-                .event("onCreate", |space: SpaceExt, _| async move { Some(space) })
-                .event("onUpdate", |space: SpaceExt, _| async move { Some(space) })
-                .event("onDelete", |space: ObjectWithId, state| async move {
-                    // let _ = state.blocking_write();
-                    Some(space)
-                })
-        })
+        .ws_event(
+            "onCreate",
+            |space: SpaceExt, state: Arc<RwLock<State>>| async move {
+                let mut writer = state.write().await;
+                writer.actions.push(SocketAction::Subscribe(vec![format!(
+                    "space:{}",
+                    space.base.id
+                )]));
+                Some(space)
+            },
+        )
+        .ws_event("onUpdate", |space: SpaceExt, _| async move { Some(space) })
+        .ws_event(
+            "onDelete",
+            |space: ObjectWithId, state: Arc<RwLock<State>>| async move {
+                let mut writer = state.write().await;
+                writer.actions.push(SocketAction::Unsubscribe(vec![format!(
+                    "space:{}",
+                    space.id
+                )]));
+                Some(space)
+            },
+        )
 }

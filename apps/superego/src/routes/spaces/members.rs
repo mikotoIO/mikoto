@@ -82,19 +82,16 @@ pub fn router() -> AppRouter<State> {
                 o.tag(TAG).id("members.delete").summary("Ban Member")
             }),
         )
-        .on_ws(|router| {
-            router
-                .event(
-                    "onCreate",
-                    |member: MemberExt, _| async move { Some(member) },
-                )
-                .event(
-                    "onUpdate",
-                    |member: MemberExt, _| async move { Some(member) },
-                )
-                .event(
-                    "onDelete",
-                    |member: MemberKey, _| async move { Some(member) },
-                )
-        })
+        .ws_event(
+            "onCreate",
+            |member: MemberExt, _| async move { Some(member) },
+        )
+        .ws_event(
+            "onUpdate",
+            |member: MemberExt, _| async move { Some(member) },
+        )
+        .ws_event(
+            "onDelete",
+            |member: MemberKey, _| async move { Some(member) },
+        )
 }

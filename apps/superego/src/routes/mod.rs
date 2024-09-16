@@ -49,19 +49,27 @@ pub fn router() -> Router {
         })
         .nest("users", "/users", users::router())
         .nest("relations", "/relations", users::relations::router())
-        .nest("channels", "/channels", channels::router())
+        .nest("spaces", "/spaces", spaces::router())
         .nest(
-            "documents",
-            "/channel/:channel_id/documents",
-            channels::documents::router(),
+            "channels",
+            "/spaces/:space_id/channels",
+            channels::router(),
         )
-        .nest("voice", "/channels/:channel_id/voice", voice::router())
         .nest(
             "messages",
-            "/channel/:channel_id/messages",
+            "/spaces/:space_id/channel/:channel_id/messages",
             channels::messages::router(),
         )
-        .nest("spaces", "/spaces", spaces::router())
+        .nest(
+            "voice",
+            "/spaces/:space_id/channels/:channel_id/voice",
+            voice::router(),
+        )
+        .nest(
+            "documents",
+            "/spaces/:space_id/channel/:channel_id/documents",
+            channels::documents::router(),
+        )
         .nest(
             "members",
             "/spaces/:space_id/members",

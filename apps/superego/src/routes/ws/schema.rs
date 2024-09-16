@@ -1,13 +1,26 @@
 use std::{collections::BTreeMap, future::Future, pin::Pin, sync::Arc};
 
-use jsonwebtoken::errors::Error;
 use schemars::{schema::Schema, JsonSchema};
 use serde::{de::DeserializeOwned, Serialize};
 use tokio::sync::RwLock;
 
+use crate::error::Error;
+
 pub struct WebSocketRouter<S> {
     pub commands: BTreeMap<String, Schema>,
     pub events: BTreeMap<String, Schema>,
+
+    pub command_filters: BTreeMap<
+        String,
+        Box<
+            dyn Fn(
+                    serde_json::Value,
+                    Arc<RwLock<S>>,
+                ) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>
+                + Send
+                + Sync,
+        >,
+    >,
 
     pub event_filters: BTreeMap<
         String,
@@ -36,16 +49,29 @@ impl<S: 'static + Send + Sync> WebSocketRouter<S> {
         Self {
             commands: BTreeMap::new(),
             events: BTreeMap::new(),
+
+            command_filters: BTreeMap::new(),
             event_filters: BTreeMap::new(),
         }
     }
 
-    pub fn command<T>(mut self, name: &str) -> Self
+    pub fn command<T, F, Fut>(mut self, name: &str, func: F) -> Self
     where
-        T: JsonSchema,
+        T: JsonSchema + DeserializeOwned,
+        F: Fn(T, Arc<RwLock<S>>) -> Fut + 'static + Send + Sync + Copy,
+        Fut: Future<Output = Result<(), Error>> + Send,
     {
         let schema = aide::gen::in_context(|ctx| ctx.schema.subschema_for::<T>());
         self.commands.insert(name.to_string(), schema);
+        self.command_filters.insert(
+            name.to_string(),
+            Box::new(move |value, state| {
+                Box::pin(async move {
+                    let parsed = serde_json::from_value(value)?;
+                    func(parsed, state).await
+                })
+            }),
+        );
         self
     }
 
@@ -53,8 +79,8 @@ impl<S: 'static + Send + Sync> WebSocketRouter<S> {
     where
         T: Serialize + DeserializeOwned,
         R: JsonSchema + Serialize,
-        Fut: Future<Output = Option<R>> + Send + Sync,
         F: Fn(T, Arc<RwLock<S>>) -> Fut + 'static + Send + Sync + Copy,
+        Fut: Future<Output = Option<R>> + Send + Sync,
     {
         let schema = aide::gen::in_context(|ctx| ctx.schema.subschema_for::<R>());
         self.events.insert(name.to_string(), schema);
@@ -78,6 +104,7 @@ impl<S: 'static + Send + Sync> WebSocketRouter<S> {
     pub fn merge(mut self, other: Self) -> Self {
         self.commands.extend(other.commands);
         self.events.extend(other.events);
+        self.command_filters.extend(other.command_filters);
         self.event_filters.extend(other.event_filters);
         self
     }
@@ -86,6 +113,8 @@ impl<S: 'static + Send + Sync> WebSocketRouter<S> {
         let prefix = prefix.trim_end_matches('/');
         self.commands.extend(prefix_map(prefix, other.commands));
         self.events.extend(prefix_map(prefix, other.events));
+        self.command_filters
+            .extend(prefix_map(prefix, other.command_filters));
         self.event_filters
             .extend(prefix_map(prefix, other.event_filters));
 

@@ -53,8 +53,11 @@ async fn handle_socket<S: WebSocketState>(
     };
 
     let state = Arc::new(RwLock::new(state));
+    let s2c_state = state.clone();
+    let c2s_state = state.clone();
 
     let mut server_to_client: JoinHandle<Result<(), Error>> = tokio::spawn(async move {
+        let state = s2c_state;
         while let Ok(msg) = redis.message_rx().recv().await {
             let msg = if let Some(x) = msg.value.as_string() {
                 x
@@ -89,22 +92,26 @@ async fn handle_socket<S: WebSocketState>(
         Err(Error::WebSocketTerminated)
     });
 
-    let mut client_to_server = tokio::spawn(async move {
+    let mut client_to_server: JoinHandle<Result<(), Error>> = tokio::spawn(async move {
+        let state = c2s_state;
+
         while let Some(msg) = reader.next().await {
             let msg = if let Ok(ws::Message::Text(msg)) = msg {
                 msg
             } else {
-                return; // client disconnected
+                return Err(Error::WebSocketTerminated); // client disconnected
             };
-            emit_event(
-                "spaces.onDelete",
-                ObjectWithId { id: Uuid::new_v4() },
-                "all",
-            )
-            .await
-            .unwrap();
-            dbg!(msg.clone());
+            let msg: Operation = serde_json::from_str(&msg)?;
+            let filter = if let Some(filter) = router.command_filters.get(&msg.op) {
+                filter
+            } else {
+                continue; // no filter for this event
+            };
+
+            filter(msg.data, state.clone()).await?;
         }
+
+        Err(Error::WebSocketTerminated)
     });
 
     tokio::select! {

@@ -1,4 +1,4 @@
-use std::sync::OnceLock;
+use std::sync::{Arc, OnceLock};
 
 use aide::{
     axum::{routing::get_with, IntoApiResponse},
@@ -9,8 +9,11 @@ use channels::voice;
 use router::AppRouter;
 use schemars::JsonSchema;
 use serde::Serialize;
+use tokio::sync::RwLock;
 use tower_http::cors::CorsLayer;
 use ws::state::State;
+
+use crate::functions::pubsub::emit_event;
 
 pub mod account;
 pub mod bots;
@@ -37,6 +40,11 @@ pub async fn index() -> Json<&'static IndexResponse> {
         name: "superego".to_string(),
         version: "*".to_string(),
     }))
+}
+
+#[derive(Serialize, Deserialize, JsonSchema)]
+pub struct Ping {
+    pub message: String,
 }
 
 pub fn router() -> Router {
@@ -71,7 +79,13 @@ pub fn router() -> Router {
             "/spaces/:space_id/members",
             spaces::members::router(),
         )
-        .nest("roles", "/spaces/:space_id/roles", spaces::roles::router());
+        .nest("roles", "/spaces/:space_id/roles", spaces::roles::router())
+        .ws_command("ping", |ping: Ping, state: Arc<RwLock<State>>| async move {
+            let reader = state.read().await;
+            emit_event("pong", ping, &format!("conn:{}", reader.conn_id)).await?;
+            Ok(())
+        })
+        .ws_event("pong", |ping: Ping, _| async move { Some(ping) });
 
     router
         .build(OpenApi {

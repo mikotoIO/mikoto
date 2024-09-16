@@ -1,4 +1,4 @@
-use std::{collections::BTreeMap, sync::Arc};
+use std::{collections::BTreeMap, future::Future, pin::Pin, sync::Arc};
 
 use jsonwebtoken::errors::Error;
 use schemars::{schema::Schema, JsonSchema};
@@ -12,8 +12,14 @@ pub struct WebSocketRouter<S> {
     pub event_filters: BTreeMap<
         String,
         Box<
-            dyn Fn(serde_json::Value, Arc<RwLock<S>>) -> Result<Option<serde_json::Value>, Error>
-                + Send
+            dyn Fn(
+                    serde_json::Value,
+                    Arc<RwLock<S>>,
+                ) -> Pin<
+                    Box<
+                        dyn Future<Output = Result<Option<serde_json::Value>, Error>> + Send + Sync,
+                    >,
+                > + Send
                 + Sync,
         >,
     >,
@@ -25,7 +31,7 @@ pub struct WebSocketRouterSchema {
     pub events: BTreeMap<String, Schema>,
 }
 
-impl<S> WebSocketRouter<S> {
+impl<S: 'static + Send + Sync> WebSocketRouter<S> {
     pub fn new() -> Self {
         Self {
             commands: BTreeMap::new(),
@@ -43,24 +49,27 @@ impl<S> WebSocketRouter<S> {
         self
     }
 
-    pub fn event<T, R, F>(mut self, name: &str, filter: F) -> Self
+    pub fn event<T, R, F, Fut>(mut self, name: &str, filter: F) -> Self
     where
         T: Serialize + DeserializeOwned,
         R: JsonSchema + Serialize,
-        F: Fn(T, Arc<RwLock<S>>) -> Option<R> + 'static + Send + Sync,
+        Fut: Future<Output = Option<R>> + Send + Sync,
+        F: Fn(T, Arc<RwLock<S>>) -> Fut + 'static + Send + Sync + Copy,
     {
         let schema = aide::gen::in_context(|ctx| ctx.schema.subschema_for::<R>());
         self.events.insert(name.to_string(), schema);
         self.event_filters.insert(
             name.to_string(),
             Box::new(move |value, state| {
-                let parsed = serde_json::from_value(value)?;
-                let result = filter(parsed, state);
-                if let Some(result) = result {
-                    Ok(Some(serde_json::to_value(result)?))
-                } else {
-                    Ok(None)
-                }
+                Box::pin(async move {
+                    let parsed = serde_json::from_value(value)?;
+                    let result = filter(parsed, state).await;
+                    if let Some(result) = result {
+                        Ok(Some(serde_json::to_value(result)?))
+                    } else {
+                        Ok(None)
+                    }
+                })
             }),
         );
         self

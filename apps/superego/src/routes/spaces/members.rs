@@ -4,7 +4,7 @@ use schemars::JsonSchema;
 use uuid::Uuid;
 
 use crate::{
-    entities::{MemberExt, MemberKey, ObjectWithId},
+    entities::{MemberExt, MemberKey},
     error::Error,
     routes::{router::AppRouter, ws::state::State},
 };
@@ -84,8 +84,17 @@ pub fn router() -> AppRouter<State> {
         )
         .on_ws(|router| {
             router
-                .event("onCreate", |member: MemberExt, _| Some(member))
-                .event("onUpdate", |member: MemberExt, _| Some(member))
-                .event("onDelete", |member: MemberKey, _| Some(member))
+                .event(
+                    "onCreate",
+                    |member: MemberExt, _| async move { Some(member) },
+                )
+                .event(
+                    "onUpdate",
+                    |member: MemberExt, _| async move { Some(member) },
+                )
+                .event(
+                    "onDelete",
+                    |member: MemberKey, _| async move { Some(member) },
+                )
         })
 }

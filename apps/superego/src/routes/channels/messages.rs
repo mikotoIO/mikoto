@@ -83,8 +83,17 @@ pub fn router() -> AppRouter<State> {
         )
         .on_ws(|router| {
             router
-                .event("onCreate", |message: MessageExt, _| Some(message))
-                .event("onUpdate", |message: MessageExt, _| Some(message))
-                .event("onDelete", |message: MessageExt, _| Some(message))
+                .event(
+                    "onCreate",
+                    |message: MessageExt, _| async move { Some(message) },
+                )
+                .event(
+                    "onUpdate",
+                    |message: MessageExt, _| async move { Some(message) },
+                )
+                .event(
+                    "onDelete",
+                    |message: MessageExt, _| async move { Some(message) },
+                )
         })
 }

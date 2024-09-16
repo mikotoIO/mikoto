@@ -1,7 +1,7 @@
 use chrono::NaiveDateTime;
 use uuid::Uuid;
 
-use crate::{db_find_by_id, entity, error::Error};
+use crate::{entity, error::Error};
 
 entity!(
     pub struct Invite {

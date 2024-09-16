@@ -89,8 +89,17 @@ pub fn router() -> AppRouter<State> {
         )
         .on_ws(|router| {
             router
-                .event("onCreate", |channel: Channel, _| Some(channel))
-                .event("onUpdate", |channel: Channel, _| Some(channel))
-                .event("onDelete", |channel: Channel, _| Some(channel))
+                .event(
+                    "onCreate",
+                    |channel: Channel, _| async move { Some(channel) },
+                )
+                .event(
+                    "onUpdate",
+                    |channel: Channel, _| async move { Some(channel) },
+                )
+                .event(
+                    "onDelete",
+                    |channel: Channel, _| async move { Some(channel) },
+                )
         })
 }

@@ -191,8 +191,11 @@ pub fn router() -> AppRouter<State> {
         )
         .on_ws(|router| {
             router
-                .event("onCreate", |space: SpaceExt, _| Some(space))
-                .event("onUpdate", |space: SpaceExt, _| Some(space))
-                .event("onDelete", |space: ObjectWithId, _| Some(space))
+                .event("onCreate", |space: SpaceExt, _| async move { Some(space) })
+                .event("onUpdate", |space: SpaceExt, _| async move { Some(space) })
+                .event("onDelete", |space: ObjectWithId, state| async move {
+                    // let _ = state.blocking_write();
+                    Some(space)
+                })
         })
 }

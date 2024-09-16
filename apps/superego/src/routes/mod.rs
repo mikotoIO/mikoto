@@ -50,11 +50,7 @@ pub fn router() -> Router {
         .nest("users", "/users", users::router())
         .nest("relations", "/relations", users::relations::router())
         .nest("spaces", "/spaces", spaces::router())
-        .nest(
-            "channels",
-            "/spaces/:space_id/channels",
-            channels::router(),
-        )
+        .nest("channels", "/spaces/:space_id/channels", channels::router())
         .nest(
             "messages",
             "/spaces/:space_id/channel/:channel_id/messages",

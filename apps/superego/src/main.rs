@@ -1,5 +1,8 @@
+use axum::{extract::Request, ServiceExt};
 use futures_util::join;
 use log::info;
+use tower_http::normalize_path::NormalizePathLayer;
+use tower_layer::Layer;
 
 #[macro_use]
 extern crate serde;
@@ -24,11 +27,20 @@ async fn main() {
     db.unwrap();
     redis.unwrap();
     let app = routes::router();
+    let app = NormalizePathLayer::trim_trailing_slash().layer(app);
 
     let addr = format!("0.0.0.0:{}", env.port);
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
-    info!("Auth server started on http://{}", &addr);
-    axum::serve(listener, app.into_make_service())
+    println!("{}", include_str!("./ascii2.txt"));
+    info!(
+        "👉⚡🪙  Mikoto API server is running on on http://{}",
+        &addr
+    );
+    info!(
+        "You can see the API documentation on http://{}/scalar",
+        &addr
+    );
+    axum::serve(listener, ServiceExt::<Request>::into_make_service(app))
         .await
         .unwrap();
 }

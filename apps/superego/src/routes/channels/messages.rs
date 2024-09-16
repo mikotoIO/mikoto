@@ -36,7 +36,9 @@ async fn get(
 
 #[derive(Deserialize, JsonSchema)]
 struct ListQuery {
+    #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     cursor: Option<Uuid>,
 }
 

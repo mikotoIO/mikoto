@@ -65,8 +65,15 @@ export function useProviderFactory({
       .getEditorState()
       .read(() => $convertToMarkdownString(TRANSFORMERS));
 
-    mikoto.client.documents
-      .update({ channelId: channel.id, content: contentString })
+    mikoto.api['documents.update'](
+      { content: contentString },
+      {
+        params: {
+          spaceId: channel.spaceId,
+          channelId: channel.id,
+        },
+      },
+    )
       .then(() => setSynced('synced'))
       .catch((e) => {
         console.error(e);

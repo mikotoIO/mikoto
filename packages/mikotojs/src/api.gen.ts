@@ -159,6 +159,13 @@ const ChannelPatch = z
   .partial();
 export type ChannelPatch = z.infer<typeof ChannelPatch>;
 
+const ChannelUnread = z.object({
+  channelId: z.string().uuid(),
+  timestamp: z.string(),
+  userId: z.string().uuid(),
+});
+export type ChannelUnread = z.infer<typeof ChannelUnread>;
+
 const cursor = z.union([z.string(), z.null()]).optional();
 export type cursor = z.infer<typeof cursor>;
 
@@ -181,6 +188,13 @@ export type MessageSendPayload = z.infer<typeof MessageSendPayload>;
 
 const MessageEditPayload = z.object({ content: z.string() });
 export type MessageEditPayload = z.infer<typeof MessageEditPayload>;
+
+const VoiceToken = z.object({
+  channelId: z.string().uuid(),
+  token: z.string(),
+  url: z.string(),
+});
+export type VoiceToken = z.infer<typeof VoiceToken>;
 
 const Document = z.object({
   channelId: z.string().uuid(),
@@ -278,11 +292,13 @@ export const schemas = {
   SpaceUpdatePayload,
   ChannelCreatePayload,
   ChannelPatch,
+  ChannelUnread,
   cursor,
   limit,
   MessageExt,
   MessageSendPayload,
   MessageEditPayload,
+  VoiceToken,
   Document,
   DocumentPatch,
   MemberExt,
@@ -532,16 +548,23 @@ const endpoints = makeApi([
     response: Channel,
   },
   {
+    method: "post",
+    path: "/spaces/:spaceId/channels/:channelId/ack",
+    alias: "channels.acknowledge",
+    requestFormat: "json",
+    response: z.null(),
+  },
+  {
     method: "get",
     path: "/spaces/:spaceId/channels/:channelId/documents/",
-    alias: "document.get",
+    alias: "documents.get",
     requestFormat: "json",
     response: Document,
   },
   {
     method: "patch",
     path: "/spaces/:spaceId/channels/:channelId/documents/",
-    alias: "document.update",
+    alias: "documents.update",
     requestFormat: "json",
     parameters: [
       {
@@ -618,7 +641,14 @@ const endpoints = makeApi([
     path: "/spaces/:spaceId/channels/:channelId/voice/",
     alias: "voice.join",
     requestFormat: "json",
-    response: Document,
+    response: VoiceToken,
+  },
+  {
+    method: "get",
+    path: "/spaces/:spaceId/channels/unreads",
+    alias: "channels.unreads",
+    requestFormat: "json",
+    response: z.array(ChannelUnread),
   },
   {
     method: "get",
@@ -738,6 +768,13 @@ const endpoints = makeApi([
       },
     ],
     response: Role,
+  },
+  {
+    method: "get",
+    path: "/spaces/join/:invite",
+    alias: "spaces.preview",
+    requestFormat: "json",
+    response: SpaceExt,
   },
   {
     method: "post",

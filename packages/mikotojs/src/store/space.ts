@@ -3,6 +3,7 @@ import { ObservableMap, makeAutoObservable, runInAction } from 'mobx';
 import type { MikotoClient } from '../MikotoClient';
 import {
   ChannelType,
+  ChannelUnread,
   SpaceExt,
   SpaceType,
   SpaceUpdatePayload,
@@ -43,6 +44,12 @@ export class ClientSpace implements SpaceExt {
 
   get member() {
     return this.members?.get(this.client.me.id);
+  }
+
+  async listUnread(): Promise<ChannelUnread[]> {
+    return await this.client.api['channels.unreads']({
+      params: { spaceId: this.id },
+    });
   }
 
   sortRoles() {

@@ -35,6 +35,14 @@ entity!(
     }
 );
 
+entity!(
+    pub struct ChannelUnread {
+        pub channel_id: Uuid,
+        pub user_id: Uuid,
+        pub timestamp: NaiveDateTime,
+    }
+);
+
 #[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct ChannelPatch {

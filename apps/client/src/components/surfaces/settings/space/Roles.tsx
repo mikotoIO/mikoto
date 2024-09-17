@@ -16,7 +16,7 @@ import styled from '@emotion/styled';
 import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { checkPermission, permissions } from '@mikoto-io/permcheck';
-import { ClientSpace, Role, Space } from 'mikotojs';
+import { ClientSpace, Role, SpaceExt } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
@@ -147,78 +147,73 @@ const StyledRoleEditor = styled(Form)`
   overflow-y: scroll;
 `;
 
-const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
-  const mikoto = useMikoto();
-  const form = useForm({
-    defaultValues: {
-      name: role.name,
-      position: role.position,
-    },
-  });
-  const [perms, setPerms] = useState(role.permissions);
-  const [color, setColor] = useState<string | null>(role.color);
+const RoleEditor = observer(
+  ({ role, space }: { space: SpaceExt; role: Role }) => {
+    const mikoto = useMikoto();
+    const form = useForm({
+      defaultValues: {
+        name: role.name,
+        position: role.position,
+      },
+    });
+    const [perms, setPerms] = useState(role.permissions);
+    const [color, setColor] = useState<string | null | undefined>(role.color);
 
-  return (
-    <StyledRoleEditor
-      p={16}
-      h="100%"
-      onSubmit={form.handleSubmit((d) => {
-        const data = { ...d, permissions: perms, color };
-        mikoto.client.roles
-          .edit({
-            spaceId: space.id,
-            roleId: role.id,
-            options: data,
-          })
-          .then(() => {});
-      })}
-    >
-      <h2>Edit {role.name}</h2>
+    return (
+      <StyledRoleEditor
+        p={16}
+        h="100%"
+        onSubmit={form.handleSubmit((d) => {
+          const data = { ...d, permissions: perms, color };
+          mikoto.api['roles.update'](data, {
+            params: { spaceId: space.id, roleId: role.id },
+          }).then(() => {});
+        })}
+      >
+        <h2>Edit {role.name}</h2>
 
-      {role.name !== '@everyone' && (
-        <>
-          <FormControl>
-            <FormLabel>Role Name</FormLabel>
-            <Input {...form.register('name')} />
-          </FormControl>
-          <FormControl>
-            <FormLabel>Role Priority</FormLabel>
-            <Input
-              type="number"
-              min={0}
-              max={99}
-              {...form.register('position', { valueAsNumber: true })}
-            />
-          </FormControl>
-          <RoleColorPicker value={color} onChange={setColor} />
-        </>
-      )}
-
-      <RolePermissionEditor perms={perms} onChange={setPerms} />
-      <ButtonGroup>
-        <Button variant="primary" type="submit">
-          Save Changes
-        </Button>
         {role.name !== '@everyone' && (
-          <Button
-            type="button"
-            variant="danger"
-            onClick={() => {
-              mikoto.client.roles
-                .delete({
-                  spaceId: space.id,
-                  roleId: role.id,
-                })
-                .then(() => {});
-            }}
-          >
-            Delete Role
-          </Button>
+          <>
+            <FormControl>
+              <FormLabel>Role Name</FormLabel>
+              <Input {...form.register('name')} />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Role Priority</FormLabel>
+              <Input
+                type="number"
+                min={0}
+                max={99}
+                {...form.register('position', { valueAsNumber: true })}
+              />
+            </FormControl>
+            <RoleColorPicker value={color} onChange={setColor} />
+          </>
         )}
-      </ButtonGroup>
-    </StyledRoleEditor>
-  );
-});
+
+        <RolePermissionEditor perms={perms} onChange={setPerms} />
+        <ButtonGroup>
+          <Button variant="primary" type="submit">
+            Save Changes
+          </Button>
+          {role.name !== '@everyone' && (
+            <Button
+              type="button"
+              variant="danger"
+              onClick={() => {
+                mikoto.api['roles.delete'](undefined, {
+                  params: { spaceId: space.id, roleId: role.id },
+                }).then(() => {});
+              }}
+            >
+              Delete Role
+            </Button>
+          )}
+        </ButtonGroup>
+      </StyledRoleEditor>
+    );
+  },
+);
 
 export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
   const mikoto = useMikoto();
@@ -235,10 +230,12 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
             leftIcon={<FontAwesomeIcon icon={faCirclePlus} />}
             variant="primary"
             onClick={async () => {
-              await mikoto.client.roles.create({
-                spaceId: space.id,
-                name: 'New Role',
-              });
+              await mikoto.api['roles.create'](
+                { name: 'New Role' },
+                {
+                  params: { spaceId: space.id },
+                },
+              );
             }}
           >
             New Role

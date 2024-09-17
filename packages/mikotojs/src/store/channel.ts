@@ -82,6 +82,18 @@ export class ClientChannel implements Channel {
       },
     );
   }
+
+  async ack() {
+    await this.client.api['channels.acknowledge'](
+      undefined,
+      {
+        params: {
+          spaceId: this.spaceId,
+          channelId: this.id,
+        },
+      },
+    );
+  }
 }
 
 export class ChannelStore extends Store<Channel, ClientChannel> {

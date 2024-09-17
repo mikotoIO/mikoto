@@ -34,10 +34,16 @@ function AddBotModal({ space }: { space: ClientSpace }) {
     <ModalContent rounded="md" p={4} maxW="480px">
       <Form
         onSubmit={form.handleSubmit(async (data) => {
-          await mikoto.client.members.create({
-            spaceId: space.id,
-            userId: data.botId,
-          });
+          await mikoto.api['members.create'](
+            {
+              userId: data.botId,
+            },
+            {
+              params: {
+                spaceId: space.id,
+              },
+            },
+          );
           setModal(null);
         })}
       >

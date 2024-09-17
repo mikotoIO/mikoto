@@ -2,7 +2,7 @@ import { Box, Flex, Grid, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faHashtag } from '@fortawesome/free-solid-svg-icons';
 import throttle from 'lodash/throttle';
-import { Channel, ClientChannel, ClientMessage, Message } from 'mikotojs';
+import { Channel, ClientChannel, ClientMessage, MessageExt } from 'mikotojs';
 import { runInAction } from 'mobx';
 import { Observer, observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -36,7 +36,7 @@ function MessagesLoading() {
   );
 }
 
-function isMessageSimple(message: Message, prevMessage?: Message) {
+function isMessageSimple(message: MessageExt, prevMessage?: MessageExt) {
   return (
     prevMessage &&
     prevMessage.author?.id === message.author?.id &&
@@ -79,40 +79,41 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
 
   // TODO: When I wrote this code, only God and I understood what I was doing
   // At this point, I don't think God understands it either
-  useEffect(
-    () =>
-      mikoto.client.messages.onTypingStart((ev) => {
-        if (ev.channelId !== channel.id) return;
-        if (ev.userId === mikoto.me.id) return;
+  // useEffect(
+  //   () =>
+  //     mikoto.client.messages.onTypingStart((ev) => {
+  //       if (ev.channelId !== channel.id) return;
+  //       if (ev.userId === mikoto.me.id) return;
 
-        setCurrentTypers((cts) => {
-          const ct = [...cts];
-          let exists = false;
-          ct.forEach((x) => {
-            if (x.userId === ev.userId) {
-              exists = true;
-              x.timestamp = Date.now() + 5000;
-            }
-          });
-          if (!exists) {
-            ct.push({
-              timestamp: Date.now() + 5000,
-              userId: ev.userId,
-            });
-          }
-          return ct;
-        });
-      }),
-    [channel.id],
-  );
+  //       setCurrentTypers((cts) => {
+  //         const ct = [...cts];
+  //         let exists = false;
+  //         ct.forEach((x) => {
+  //           if (x.userId === ev.userId) {
+  //             exists = true;
+  //             x.timestamp = Date.now() + 5000;
+  //           }
+  //         });
+  //         if (!exists) {
+  //           ct.push({
+  //             timestamp: Date.now() + 5000,
+  //             userId: ev.userId,
+  //           });
+  //         }
+  //         return ct;
+  //       });
+  //     }),
+  //   [channel.id],
+  // );
 
   const typing = useCallback(
     throttle(() => {
-      mikoto.client.messages
-        .startTyping({
-          channelId: channel.id,
-        })
-        .then();
+      // TODO: reimplement typing
+      // mikoto.client.messages
+      //   .startTyping({
+      //     channelId: channel.id,
+      //   })
+      //   .then();
     }, 3000),
     [],
   );
@@ -137,22 +138,28 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
     }
   });
 
-  const createFn = (x: Message) => {
+  const createFn = (x: MessageExt) => {
     setMsgs((xs) => {
       if (xs === null) return null;
       setCurrentTypers((ts) => ts.filter((y) => y.userId !== x.author?.id));
-      mikoto.client.messages
-        .ack({
+      // mikoto.client.messages
+      //   .ack({
+      //     channelId: channel.id,
+      //     timestamp: x.timestamp,
+      //   })
+      //   .then(() => {});
+      mikoto.api['channels.acknowledge'](undefined, {
+        params: {
+          spaceId: channel.spaceId,
           channelId: channel.id,
-          timestamp: x.timestamp,
-        })
-        .then(() => {});
+        },
+      }).then(() => {});
       setScrollToBottom(true);
       return [...xs, new ClientMessage(mikoto, x)];
     });
   };
 
-  const updateFn = (x: Message) => {
+  const updateFn = (x: MessageExt) => {
     setMsgs((xs) => {
       if (xs === null) return null;
       return xs?.map((m) => (m.id === x.id ? new ClientMessage(mikoto, x) : m));

@@ -1,6 +1,6 @@
 import axios, { Axios } from 'axios';
 
-import { TokenPair } from './models';
+import { TokenPair } from './api.gen';
 
 interface Bot {
   id: string;

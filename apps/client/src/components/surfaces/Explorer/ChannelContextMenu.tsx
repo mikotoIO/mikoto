@@ -18,6 +18,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { permissions } from '@mikoto-io/permcheck';
 import {
   Channel,
+  ChannelType,
   ClientChannel,
   ClientSpace,
   checkMemberPermission,
@@ -71,7 +72,7 @@ export function CreateChannelModal({
   const setModal = useSetRecoilState(modalState);
   const { register, handleSubmit } = useForm();
 
-  const [channelType, setChannelType] = useState('TEXT');
+  const [channelType, setChannelType] = useState<ChannelType>('TEXT');
   const error = useErrorElement();
 
   return (
@@ -108,7 +109,7 @@ export function CreateChannelModal({
                 key={type.id}
                 type="button"
                 active={channelType === type.id}
-                onClick={() => setChannelType(type.id)}
+                onClick={() => setChannelType(type.id as ChannelType)}
               >
                 <FontAwesomeIcon className="icon" icon={type.icon} />
                 <br />

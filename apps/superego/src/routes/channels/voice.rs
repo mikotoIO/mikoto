@@ -3,12 +3,20 @@ use axum::{extract::Path, Json};
 use uuid::Uuid;
 
 use crate::{
-    entities::Document,
     error::Error,
+    model,
     routes::{router::AppRouter, ws::state::State},
 };
 
-async fn join(_channel_id: Path<Uuid>) -> Result<Json<Document>, Error> {
+model!(
+    pub struct VoiceToken {
+        pub url: String,
+        pub token: String,
+        pub channel_id: Uuid,
+    }
+);
+
+async fn join(_channel_id: Path<Uuid>) -> Result<Json<VoiceToken>, Error> {
     Err(Error::Todo)
 }
 

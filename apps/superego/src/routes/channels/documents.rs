@@ -30,13 +30,13 @@ pub fn router() -> AppRouter<State> {
         .route(
             "/",
             get_with(get, |o| {
-                o.tag(TAG).id("document.get").summary("Get Document")
+                o.tag(TAG).id("documents.get").summary("Get Document")
             }),
         )
         .route(
             "/",
             patch_with(update, |o| {
-                o.tag(TAG).id("document.update").summary("Update Document")
+                o.tag(TAG).id("documents.update").summary("Update Document")
             }),
         )
 }

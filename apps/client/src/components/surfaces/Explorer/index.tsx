@@ -67,7 +67,7 @@ function useAcks(space: ClientSpace) {
   const [acks, setAcks] = useState<Record<string, Date>>({});
 
   useEffect(() => {
-    mikoto.client.messages.listUnread({ spaceId: space.id }).then((ur) => {
+    space.listUnread().then((ur) => {
       setAcks(
         Object.fromEntries(ur.map((u) => [u.channelId, new Date(u.timestamp)])),
       );
@@ -75,30 +75,25 @@ function useAcks(space: ClientSpace) {
   }, [space.id]);
 
   useEffect(() => {
-    const destroy = mikoto.client.messages.onCreate((msg) => {
-      const ch = mikoto.channels.get(msg.channelId);
-      if (ch?.spaceId !== space.id) return;
-      if (msg.author?.id === mikoto.me.id) return;
-
-      ch.lastUpdated = msg.timestamp;
-    });
-    return () => {
-      destroy();
-    };
+    // FIXME: what the hell is this
+    // const destroy = mikoto.client.messages.onCreate((msg) => {
+    //   const ch = mikoto.channels.get(msg.channelId);
+    //   if (ch?.spaceId !== space.id) return;
+    //   if (msg.author?.id === mikoto.me.id) return;
+    //   ch.lastUpdated = msg.timestamp;
+    // });
+    // return () => {
+    //   destroy();
+    // };
   }, [space.id]);
 
   return {
     acks,
     ackChannel(channel: ClientChannel) {
       const now = new Date();
-      mikoto.client.messages
-        .ack({
-          channelId: channel.id,
-          timestamp: now.toISOString(),
-        })
-        .then(() => {
-          setAcks((xs) => ({ ...xs, [channel.id]: now }));
-        });
+      channel.ack().then(() => {
+        setAcks((xs) => ({ ...xs, [channel.id]: now }));
+      });
     },
   };
 }

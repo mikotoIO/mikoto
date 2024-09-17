@@ -23,7 +23,7 @@ async fn create(
 }
 
 async fn list(_space_id: Path<Uuid>) -> Result<Json<Vec<Invite>>, Error> {
-    Err(Error::Todo)
+    Ok(Json(vec![]))
 }
 
 async fn delete(_id: Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {

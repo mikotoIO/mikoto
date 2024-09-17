@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Channel, ChannelPatch, ChannelType, ObjectWithId},
+    entities::{Channel, ChannelPatch, ChannelType, ChannelUnread, ObjectWithId},
     error::Error,
     functions::pubsub::emit_event,
 };
@@ -87,6 +87,17 @@ async fn delete(Path((_, channel_id)): Path<(Uuid, Uuid)>) -> Result<Json<()>, E
     Ok(().into())
 }
 
+async fn list_unread(Path(_space_id): Path<Uuid>) -> Result<Json<Vec<ChannelUnread>>, Error> {
+    // no-op for now
+    Ok(vec![].into())
+}
+
+async fn acknowledge(Path((_, _channel_id)): Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
+    // no-op for now
+    // TODO: Implement
+    Ok(().into())
+}
+
 static TAG: &str = "Channels";
 
 pub fn router() -> AppRouter<State> {
@@ -119,6 +130,20 @@ pub fn router() -> AppRouter<State> {
             "/:channelId",
             delete_with(delete, |o| {
                 o.id("channels.delete").tag(TAG).summary("Delete Channel")
+            }),
+        )
+        .route(
+            "/unreads",
+            get_with(list_unread, |o| {
+                o.id("channels.unreads").tag(TAG).summary("List Unreads")
+            }),
+        )
+        .route(
+            "/:channelId/ack",
+            post_with(acknowledge, |o| {
+                o.id("channels.acknowledge")
+                    .tag(TAG)
+                    .summary("Acknowledge Channel")
             }),
         )
         .ws_event(

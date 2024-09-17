@@ -137,6 +137,14 @@ async fn delete(Path(space_id): Path<Uuid>, claims: Claims) -> Result<Json<()>, 
     Ok(().into())
 }
 
+async fn invite_preview(Path(invite): Path<String>) -> Result<Json<SpaceExt>, Error> {
+    let invite = Invite::find_by_id(&invite, db()).await?;
+
+    let space = Space::find_by_id(invite.space_id, db()).await?;
+    let space = SpaceExt::dataload_one(space, db()).await?;
+    Ok(space.into())
+}
+
 async fn join(Path(invite): Path<String>, claims: Claims) -> Result<Json<SpaceExt>, Error> {
     let invite = Invite::find_by_id(&invite, db()).await?;
 
@@ -166,6 +174,14 @@ pub fn router() -> AppRouter<State> {
         .route(
             "/:spaceId",
             get_with(get, |o| o.tag(TAG).id("spaces.get").summary("Get Space")),
+        )
+        .route(
+            "/join/:invite",
+            get_with(invite_preview, |o| {
+                o.tag(TAG)
+                    .id("spaces.preview")
+                    .summary("Preview Space Invite")
+            }),
         )
         .route(
             "/join/:invite",

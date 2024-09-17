@@ -10,9 +10,9 @@ import { AuthContext, MikotoContext, useInterval } from '@/hooks';
 import { authClient } from '@/store/authClient';
 
 function registerNotifications(mikoto: MikotoClient) {
-  mikoto.client.messages.onCreate((msg) => {
-    notifyFromMessage(mikoto, msg);
-  });
+  // mikoto.client.messages.onCreate((msg) => {
+  //   notifyFromMessage(mikoto, msg);
+  // });
 }
 
 interface ApiLoaderProps {

@@ -74,9 +74,10 @@ export function ProfileModal({ user }: { user: User }) {
                   <Button
                     variant="success"
                     onClick={async () => {
-                      await mikoto.client.relations.openDm({
-                        relationId: '2a36685a-6236-4fbe-92bf-b3025fd92cfb',
-                      });
+                      // FIXME: the fuck is this
+                      // await mikoto.client.relations.openDm({
+                      //   relationId: '2a36685a-6236-4fbe-92bf-b3025fd92cfb',
+                      // });
 
                       setModal(null);
                     }}
@@ -86,18 +87,22 @@ export function ProfileModal({ user }: { user: User }) {
                   <Button
                     variant="secondary"
                     onClick={async () => {
-                      const dm = await mikoto.client.relations.openDm({
-                        relationId: user.id,
+                      // const dm = await mikoto.client.relations.openDm({
+                      //   relationId: user.id,
+                      // });
+                      const dm = await mikoto.api['relations.openDm'](undefined, {
+                        params: { relationId: user.id },
                       });
-                      const spaceId = dm.space?.id;
-                      if (spaceId) {
-                        setSpace({
-                          kind: 'explorer',
-                          key: `explorer/${spaceId}`,
-                          spaceId,
-                        });
-                      }
-                      setModal(null);
+                      // TODO: Rework DMs
+                      // const spaceId = dm.space?.id;
+                      // if (spaceId) {
+                      //   setSpace({
+                      //     kind: 'explorer',
+                      //     key: `explorer/${spaceId}`,
+                      //     spaceId,
+                      //   });
+                      // }
+                      // setModal(null);
                     }}
                   >
                     <FontAwesomeIcon icon={faEnvelope} />

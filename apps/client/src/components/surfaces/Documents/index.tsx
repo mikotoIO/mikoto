@@ -127,8 +127,15 @@ function DocumentEditor({ channel, content, onChange }: DocumentEditorProps) {
 
   const save = (edt: Editor) => {
     const contentString: string = edt.storage.markdown.getMarkdown();
-    mikoto.client.documents
-      .update({ channelId: channel.id, content: contentString })
+    mikoto.api['documents.update'](
+      { content: contentString },
+      {
+        params: {
+          spaceId: channel.spaceId,
+          channelId: channel.id,
+        },
+      },
+    )
       .then(() => setChanged(false))
       .catch(() => setChanged(true));
   };
@@ -211,9 +218,12 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
   const [content, setContent] = useState<string | null>(null);
 
   useEffect(() => {
-    mikoto.client.documents.get({ channelId }).then((x) => {
-      setContent(x.content);
-    });
+    mikoto.api['documents.get']({
+      params: {
+        spaceId: channel.spaceId,
+        channelId,
+      },
+    }).then((x) => {});
   }, [channelId]);
 
   return (

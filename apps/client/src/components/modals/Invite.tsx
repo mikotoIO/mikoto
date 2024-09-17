@@ -1,6 +1,6 @@
 import { Button, ModalContent } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { Invite, Space } from 'mikotojs';
+import { Invite, SpaceExt } from 'mikotojs';
 import { useState } from 'react';
 
 import { env } from '@/env';
@@ -23,11 +23,11 @@ const InviteLink = styled.button`
   }
 `;
 
-export function InviteModal({ space }: { space: Space }) {
+export function InviteModal({ space }: { space: SpaceExt }) {
   const [invite, setInvite] = useState<Invite | null>(null);
   const mikoto = useMikoto();
   const link = invite
-    ? `${env.PUBLIC_FRONTEND_URL}/invite/${invite.code}`
+    ? `${env.PUBLIC_FRONTEND_URL}/invite/${invite.id}`
     : undefined;
 
   return (
@@ -38,13 +38,14 @@ export function InviteModal({ space }: { space: Space }) {
             variant="primary"
             type="button"
             onClick={() => {
-              mikoto.client.spaces
-                .createInvite({
-                  spaceId: space.id,
-                })
-                .then((x) => {
-                  setInvite(x);
-                });
+              mikoto.api['invites.create'](
+                {},
+                {
+                  params: { spaceId: space.id },
+                },
+              ).then((x) => {
+                setInvite(x);
+              });
             }}
           >
             Generate

@@ -10,7 +10,9 @@ export function Invites({ space }: { space: SpaceExt }) {
   const [invites, setInvites] = useState<Invite[] | null>(null);
 
   useEffect(() => {
-    mikoto.client.spaces.listInvites({ spaceId: space.id }).then((x) => {
+    mikoto.api['invites.list']({
+      params: { spaceId: space.id },
+    }).then((x) => {
       setInvites(x);
     });
   }, [space.id]);
@@ -20,19 +22,18 @@ export function Invites({ space }: { space: SpaceExt }) {
       <h1>Invites</h1>
       {invites &&
         invites.map((invite) => (
-          <Box key={invite.code} bg="gray.800" m={1} p={4} rounded="md">
+          <Box key={invite.id} bg="gray.800" m={1} p={4} rounded="md">
             <Box bg="gray.900" p={2} rounded="md">
-              {invite.code}
+              {invite.id}
             </Box>
             <Button
               variant="danger"
               onClick={async () => {
-                await mikoto.client.spaces.deleteInvite({
-                  spaceId: space.id,
-                  inviteCode: invite.code,
+                await mikoto.api['invites.delete'](undefined, {
+                  params: { spaceId: space.id, inviteId: invite.id },
                 });
 
-                setInvites(invites.filter((x) => x.code !== invite.code));
+                setInvites(invites.filter((x) => x.id !== invite.id));
               }}
             >
               Delete

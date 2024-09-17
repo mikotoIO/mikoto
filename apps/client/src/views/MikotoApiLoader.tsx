@@ -45,12 +45,9 @@ export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
   const buildMikotoClient = async () => {
     try {
       const token = await refreshAuth(authClient);
-      const mi = await constructMikoto({
-        token,
-        url: env.PUBLIC_SERVER_URL,
-        onConnect() {},
-        onDisconnect() {},
-      });
+      const mi = new MikotoClient(env.PUBLIC_SERVER_URL, token, {});
+      await Promise.all([mi.spaces.list(true), mi.getMe()]);
+
       registerNotifications(mi);
       setMikoto(mi);
     } catch (e) {
@@ -68,21 +65,22 @@ export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
     buildMikotoClient().then();
   }, []);
 
-  useInterval(() => {
-    if (!(mikoto instanceof MikotoClient)) {
-      console.log(`current client state: ${mikoto}: reconnecting`);
-      buildMikotoClient().then();
-      return;
-    }
+  // FIXME: Rework the heartbeat system
+  // useInterval(() => {
+  //   if (!(mikoto instanceof MikotoClient)) {
+  //     console.log(`current client state: ${mikoto}: reconnecting`);
+  //     buildMikotoClient().then();
+  //     return;
+  //   }
 
-    Promise.race([wait(PING_TIMEOUT), mikoto.client.ping({})]).catch(() => {
-      console.warn('Ping failed, websocket timeout');
-      // clean up the old client to avoid memory leaks, before reconnecting
-      mikoto.disconnect();
-      setMikoto('reconnecting');
-      buildMikotoClient().then();
-    });
-  }, PING_INTERVAL);
+  //   Promise.race([wait(PING_TIMEOUT), mikoto.client.ping({})]).catch(() => {
+  //     console.warn('Ping failed, websocket timeout');
+  //     // clean up the old client to avoid memory leaks, before reconnecting
+  //     mikoto.disconnect();
+  //     setMikoto('reconnecting');
+  //     buildMikotoClient().then();
+  //   });
+  // }, PING_INTERVAL);
 
   if (err !== null) {
     console.log('this should only redirect auth-related errors');

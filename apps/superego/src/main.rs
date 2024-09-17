@@ -1,8 +1,10 @@
 use axum::{extract::Request, ServiceExt};
 use futures_util::join;
-use log::info;
 use tower_http::normalize_path::NormalizePathLayer;
 use tower_layer::Layer;
+
+#[macro_use]
+extern crate log;
 
 #[macro_use]
 extern crate serde;

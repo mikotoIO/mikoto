@@ -67,10 +67,12 @@ const User = z.object({
 });
 export type User = z.infer<typeof User>;
 
-const UserPatch = z.object({
-  avatar: z.union([z.string(), z.null()]).optional(),
-  name: z.string(),
-});
+const UserPatch = z
+  .object({
+    avatar: z.union([z.string(), z.null()]),
+    name: z.union([z.string(), z.null()]),
+  })
+  .partial();
 export type UserPatch = z.infer<typeof UserPatch>;
 
 const RelationState = z.enum([

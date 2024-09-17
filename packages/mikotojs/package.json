@@ -24,6 +24,7 @@
     "@hyperschema/client": "^0.0.4",
     "@mikoto-io/permcheck": "0.0.1",
     "@zodios/core": "^10.9.6",
+    "@zodios/plugins": "^10.6.0",
     "axios": "^1.6.7",
     "events": "^3.3.0",
     "isomorphic-ws": "^5.0.0",

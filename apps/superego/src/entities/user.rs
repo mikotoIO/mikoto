@@ -48,7 +48,7 @@ entity!(
 #[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UserPatch {
-    pub name: String,
+    pub name: Option<String>,
     pub avatar: Option<String>,
 }
 

@@ -13057,6 +13057,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@zodios/plugins@npm:^10.6.0":
+  version: 10.6.0
+  resolution: "@zodios/plugins@npm:10.6.0"
+  dependencies:
+    qs: "npm:^6.11.0"
+  peerDependencies:
+    "@zodios/core": ^10.x
+    axios: ^0.x || ^1.0.0
+  checksum: 10/4cc4881637632d6be1fdde85a5f74d41e7ccd7c2048d4ae5430cd7b0202b524412ad878c923c6b096ec65db6e534f6f06e1c225360849b94da7aac1bb3a04aec
+  languageName: node
+  linkType: hard
+
 "abbrev@npm:1, abbrev@npm:^1.0.0":
   version: 1.1.1
   resolution: "abbrev@npm:1.1.1"
@@ -27199,6 +27211,7 @@ __metadata:
     "@types/events": "npm:^3.0.0"
     "@types/ws": "npm:^8"
     "@zodios/core": "npm:^10.9.6"
+    "@zodios/plugins": "npm:^10.6.0"
     axios: "npm:^1.6.7"
     events: "npm:^3.3.0"
     isomorphic-ws: "npm:^5.0.0"
@@ -30420,6 +30433,15 @@ __metadata:
   dependencies:
     side-channel: "npm:^1.0.4"
   checksum: 10/5a3bfea3e2f359ede1bfa5d2f0dbe54001aa55e40e27dc3e60fab814362d83a9b30758db057c2011b6f53a2d4e4e5150194b5bac45372652aecb3e3c0d4b256e
+  languageName: node
+  linkType: hard
+
+"qs@npm:^6.11.0":
+  version: 6.13.0
+  resolution: "qs@npm:6.13.0"
+  dependencies:
+    side-channel: "npm:^1.0.6"
+  checksum: 10/f548b376e685553d12e461409f0d6e5c59ec7c7d76f308e2a888fd9db3e0c5e89902bedd0754db3a9038eda5f27da2331a6f019c8517dc5e0a16b3c9a6e9cef8
   languageName: node
   linkType: hard
 

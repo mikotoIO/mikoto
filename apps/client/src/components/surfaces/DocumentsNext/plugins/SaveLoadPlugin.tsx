@@ -16,14 +16,17 @@ export function SaveLoadPlugin({ channel }: { channel: ClientChannel }) {
         // check if key is ctrl + s
         if (event && event.ctrlKey && event.key === 's') {
           const content = $convertToMarkdownString(TRANSFORMERS);
-          mikoto.client.documents
-            .update({
-              channelId: channel.id,
+          mikoto.api['documents.update'](
+            {
               content,
-            })
-            .then(() => {
-              console.log('updated!');
-            });
+            },
+            {
+              params: {
+                spaceId: channel.spaceId,
+                channelId: channel.id,
+              },
+            },
+          );
 
           event.preventDefault();
         }

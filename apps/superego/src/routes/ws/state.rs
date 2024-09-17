@@ -1,11 +1,13 @@
+use chrono::format;
 use serde::{de::DeserializeOwned, Serialize};
 use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::User,
+    entities::{Space, User},
     error::Error,
     functions::jwt::{jwt_key, Claims},
+    routes::spaces,
 };
 
 use super::{SocketAction, WebSocketState};
@@ -37,21 +39,27 @@ impl WebSocketState for State {
             })?,
             jwt_key(),
         )?;
-        let user = User::find_by_id(claims.sub.parse()?, db()).await?;
+        let (user, spaces) = tokio::try_join!(
+            User::find_by_id(claims.sub.parse()?, db()),
+            Space::list_from_user_id(claims.sub.parse()?, db())
+        )?;
+
         let user_id = user.id;
         let state = Self {
             conn_id,
             user,
             actions: vec![],
         };
-        Ok((
-            state,
-            vec![
-                "all".to_string(),
-                format!("conn:{}", conn_id),
-                format!("user:{}", user_id),
-            ],
-        ))
+
+        let mut initial_subs = vec![
+            "all".to_string(),
+            format!("conn:{}", conn_id),
+            format!("user:{}", user_id),
+        ];
+
+        initial_subs.extend(spaces.into_iter().map(|x| format!("space:{}", x.id)));
+
+        Ok((state, initial_subs))
     }
 }
 

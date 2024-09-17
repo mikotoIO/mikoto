@@ -77,7 +77,8 @@ impl Message {
         .bind(&limit)
         .fetch_all(db)
         .await?;
-        Ok(res)
+        // reverse the order
+        Ok(res.into_iter().rev().collect())
     }
 
     pub async fn create<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {

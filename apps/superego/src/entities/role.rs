@@ -17,14 +17,13 @@ entity!(
     }
 );
 
-entity!(
-    pub struct RoleToSpaceUser {
-        #[sqlx(rename = "A")]
-        pub role_id: Uuid,
-        #[sqlx(rename = "B")]
-        pub member_id: Uuid,
-    }
-);
+#[derive(sqlx::FromRow, Clone, Debug, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct RoleToSpaceUser {
+    #[sqlx(rename = "A")]
+    pub role_id: Uuid,
+    #[sqlx(rename = "B")]
+    pub member_id: Uuid,
+}
 
 impl Role {
     db_list_where!("Role", list, "spaceId", space_id, Uuid);

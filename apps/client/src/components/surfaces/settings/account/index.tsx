@@ -101,12 +101,7 @@ function NameChangeModal() {
     <ModalContent rounded="md" p={4} maxW="480px">
       <Form
         onSubmit={handleSubmit(async (form) => {
-          await mikoto.client.users.update({
-            options: {
-              name: form.name,
-              avatar: null,
-            },
-          });
+          await mikoto.api['user.update']({ name: form.name }, {});
           setModal(null);
         })}
       >
@@ -145,12 +140,7 @@ const Overview = observer(() => {
               avatar={user?.avatar ?? undefined}
               onDrop={async (file) => {
                 const { data } = await uploadFile('/avatar', file);
-                await mikoto.client.users.update({
-                  options: {
-                    avatar: data.url,
-                    name: null,
-                  },
-                });
+                await mikoto.api['user.update']({ avatar: data.url }, {});
               }}
             />
             <Heading as="h2" ml="16px" fontSize="2xl">

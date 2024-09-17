@@ -1,3 +1,5 @@
+import { pluginToken } from '@zodios/plugins';
+
 import { api, createApiClient } from './api.gen';
 import { ChannelEmitter, MessageEmitter, SpaceEmitter } from './emitters';
 import {
@@ -44,6 +46,11 @@ export class MikotoClient {
     { onReady, onConnect, onDisconnect }: MikotoClientOptions,
   ) {
     this.api = createApiClient('http://localhost:9503', {});
+    this.api.use(
+      pluginToken({
+        getToken: async () => accessToken,
+      }),
+    );
 
     // this.transport = new SocketIOClientTransport({
     //   url: hyperRPCUrl,

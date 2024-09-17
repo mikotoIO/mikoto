@@ -28,9 +28,14 @@ export function SpaceInviteViewInner() {
   const inviteCode = useParams<{ inviteCode: string }>().inviteCode ?? '';
 
   useEffect(() => {
-    mikoto.client.spaces.getSpaceFromInvite({ inviteCode }).then((x) => {
-      setSpace(x);
-    });
+    // mikoto.client.spaces.getSpaceFromInvite({ inviteCode }).then((x) => {
+    //   setSpace(x);
+    // });
+    mikoto.api['spaces.preview']({ params: { invite: inviteCode } }).then(
+      (x) => {
+        setSpace(x);
+      },
+    );
   }, [inviteCode]);
 
   return (

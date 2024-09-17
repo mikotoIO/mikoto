@@ -12,9 +12,9 @@ import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
 
 import { modalState } from '@/components/ContextMenu';
-import { Form } from '@/ui';
 import { useMikoto } from '@/hooks';
 import { useErrorElement } from '@/hooks/useErrorElement';
+import { Form } from '@/ui';
 
 const SpaceJoinModalWrapper = styled.div`
   min-width: 400px;
@@ -30,7 +30,7 @@ function SpaceCreateForm({ closeModal }: { closeModal: () => void }) {
   return (
     <Form
       onSubmit={form.handleSubmit(async (data) => {
-        await mikoto.client.spaces.create({ name: data.spaceName });
+        await mikoto.api['spaces.create']({ name: data.spaceName });
         closeModal();
         form.reset();
       })}
@@ -55,8 +55,8 @@ function SpaceJoinForm({ closeModal }: { closeModal: () => void }) {
     <Form
       onSubmit={handleSubmit(async (data) => {
         try {
-          await mikoto.client.spaces.join({
-            inviteCode: data.inviteCode,
+          await mikoto.api['spaces.join'](undefined, {
+            params: { invite: data.inviteCode },
           });
           closeModal();
           reset();

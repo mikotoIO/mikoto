@@ -136,7 +136,12 @@ export default function DocumentSurfaceNext({
   };
 
   useEffect(() => {
-    mikoto.client.documents.get({ channelId }).then((x) => {
+    mikoto.api['documents.get']({
+      params: {
+        spaceId: channel.spaceId,
+        channelId,
+      },
+    }).then((x) => {
       setContent(x.content);
     });
   }, [channelId]);

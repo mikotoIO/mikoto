@@ -1,14 +1,14 @@
 import { makeAutoObservable } from 'mobx';
 
 import type { MikotoClient } from '../MikotoClient';
-import { User } from '../hs-client';
+import { User, UserCategory } from '../api.gen';
 import { normalizedAssign } from './base';
 
 export class ClientUser implements User {
   id!: string;
   name!: string;
-  avatar!: string | null;
-  category!: string | null;
+  avatar!: string | null | undefined;
+  category!: UserCategory | null | undefined;
 
   constructor(
     public client: MikotoClient,

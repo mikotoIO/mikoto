@@ -17,6 +17,8 @@ import { {{{@key}}} } from "./{{{this}}}"
 
 {{#each schemas}}
 const {{@key}}{{#if (lookup ../emittedType @key)}}: z.ZodType<{{@key}}>{{/if}} = {{{this}}};
+export type {{@key}} = z.infer<typeof {{@key}}>;
+
 {{/each}}
 
 {{#ifNotEmptyObj schemas}}
@@ -86,8 +88,6 @@ export const {{options.apiClientName}} = new Zodios({{#if options.baseUrl}}"{{op
 export function createApiClient(baseUrl: string, options?: ZodiosOptions) {
     return new Zodios(baseUrl, endpoints, options);
 }
-
-// {{options.api.info.title}}
 
 export const websocketCommands = {
 {{#each options.websocket.commands}}

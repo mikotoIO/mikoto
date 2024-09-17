@@ -70,7 +70,7 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:id",
+            "/:userId",
             get_with(get, |o| {
                 o.tag(TAG)
                     .id("members.get")
@@ -84,13 +84,13 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:id",
+            "/:userId",
             patch_with(update, |o| {
                 o.tag(TAG).id("members.update").summary("Update Member")
             }),
         )
         .route(
-            "/:id",
+            "/:userId",
             delete_with(delete, |o| {
                 o.tag(TAG).id("members.delete").summary("Ban Member")
             }),

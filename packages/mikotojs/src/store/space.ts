@@ -1,18 +1,23 @@
 import { ObservableMap, makeAutoObservable, runInAction } from 'mobx';
 
 import type { MikotoClient } from '../MikotoClient';
-import { Space, SpaceUpdateOptions } from '../hs-client';
+import {
+  ChannelType,
+  SpaceExt,
+  SpaceType,
+  SpaceUpdatePayload,
+} from '../api.gen';
 import { Store, normalizedAssign } from './base';
 import { ClientChannel } from './channel';
 import { ClientMember } from './member';
 import { ClientRole } from './role';
 
-export class ClientSpace implements Space {
+export class ClientSpace implements SpaceExt {
   id!: string;
   name!: string;
-  type!: string;
-  icon!: string | null;
-  ownerId!: string | null;
+  type!: SpaceType;
+  icon!: string | null | undefined;
+  ownerId: string | null | undefined;
 
   channelIds!: string[];
   roleIds!: string[];
@@ -22,7 +27,7 @@ export class ClientSpace implements Space {
 
   constructor(
     public client: MikotoClient,
-    data: Space,
+    data: SpaceExt,
   ) {
     normalizedAssign(this, data, { channels: 'channelIds', roles: 'roleIds' });
     makeAutoObservable(this, { id: false, client: false });
@@ -50,8 +55,8 @@ export class ClientSpace implements Space {
 
   async fetchMembers(forceSync?: boolean) {
     if (this.members && !forceSync) return;
-    const members = await this.client.client.members.list({
-      spaceId: this.id,
+    const members = await this.client.api['members.list']({
+      params: { spaceId: this.id },
     });
 
     runInAction(() => {
@@ -64,47 +69,52 @@ export class ClientSpace implements Space {
   async createChannel(data: {
     name: string;
     parentId: string | null;
-    type: string;
+    type: ChannelType;
   }) {
-    return await this.client.client.channels.create({
-      name: data.name,
-      spaceId: this.id,
-      parentId: data.parentId,
-      type: data.type,
-    });
+    return await this.client.api['channels.create'](
+      {
+        name: data.name,
+        parentId: data.parentId,
+        type: data.type,
+      },
+      {
+        params: { spaceId: this.id },
+      },
+    );
   }
 
-  update(options: SpaceUpdateOptions) {
-    return this.client.client.spaces.update({
-      spaceId: this.id,
-      options,
+  update(options: SpaceUpdatePayload) {
+    return this.client.api['spaces.update'](options, {
+      params: { spaceId: this.id },
     });
   }
 
   leave() {
-    return this.client.client.spaces.leave({ spaceId: this.id });
+    return this.client.api['spaces.leave'](undefined, {
+      params: { spaceId: this.id },
+    });
   }
 }
 
-export class SpaceStore extends Store<Space, ClientSpace> {
-  async fetch(id: string, data?: Space) {
+export class SpaceStore extends Store<SpaceExt, ClientSpace> {
+  async fetch(id: string, data?: SpaceExt) {
     if (this.has(id)) return this.getAndUpdate(id, data);
     const cData =
       data ??
-      (await this.client.client.spaces.get({
-        spaceId: id,
+      (await this.client.api['spaces.get']({
+        params: { spaceId: id },
       }));
     return this.produce(cData);
   }
 
-  expand(data: Space) {
+  expand(data: SpaceExt) {
     data.channels.forEach((x) => this.client.channels.produce(x));
     data.roles.forEach((x) => this.client.roles.produce(x));
   }
 
   async list(reload?: boolean) {
     if (reload) {
-      const a = await this.client.client.spaces.list({});
+      const a = await this.client.api['spaces.list']();
       const list = a.map((x) => this.fetch(x.id, x));
       await Promise.all(list);
     }

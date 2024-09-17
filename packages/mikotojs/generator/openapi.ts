@@ -53,13 +53,13 @@ const main = async () => {
     distPath: './src/api.gen.ts',
     templatePath: './generator/template.hbs',
     options: {
+      withAlias: true,
       shouldExportAllSchemas: true,
+      additionalPropertiesDefaultValue: false,
       api: openApiDoc,
-      websocket: generateWebsocket(openApiDoc)
+      websocket: generateWebsocket(openApiDoc),
     },
   });
-  console.log(result);
-  // console.log(JSON.stringify(generateWebsocket(openApiDoc), null, 2));
 };
 
 main();

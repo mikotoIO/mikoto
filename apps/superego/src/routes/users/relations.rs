@@ -14,7 +14,7 @@ async fn get(_id: Path<Uuid>) -> Result<Json<Relationship>, Error> {
 }
 
 async fn list() -> Result<Json<Vec<Relationship>>, Error> {
-    Err(Error::Todo)
+    Ok(vec![].into()) // TODO
 }
 
 async fn open_dm(_id: Path<Uuid>) -> Result<Json<User>, Error> {
@@ -34,13 +34,13 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:id",
+            "/:relationId",
             get_with(get, |o| {
                 o.tag(TAG).id("relations.get").summary("Get Relationship")
             }),
         )
         .route(
-            "/:id/dm",
+            "/:relationId/dm",
             post_with(open_dm, |o| {
                 o.tag(TAG)
                     .id("relations.openDm")

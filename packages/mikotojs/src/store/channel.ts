@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 
 import type { MikotoClient } from '../MikotoClient';
-import { Channel, ChannelUpdateOptions } from '../hs-client';
+import { Channel, ChannelPatch, ChannelType } from '../api.gen';
 import { Store } from './base';
 import { ClientMessage } from './message';
 
@@ -9,10 +9,10 @@ export class ClientChannel implements Channel {
   id!: string;
   name!: string;
   spaceId!: string;
-  parentId!: string | null;
-  type!: string;
+  parentId!: string | null | undefined;
+  type!: ChannelType;
   order!: number;
-  lastUpdated!: string | null;
+  lastUpdated!: string | null | undefined;
 
   get space() {
     return this.client.spaces.get(this.spaceId);
@@ -23,10 +23,17 @@ export class ClientChannel implements Channel {
   }
 
   async listMessages(limit: number, cursor: string | null) {
-    const msgs = await this.client.client.messages.list({
-      channelId: this.id,
-      limit,
-      cursor,
+    // const msgs = await this.client.client.messages.list({
+    //   channelId: this.id,
+    //   limit,
+    //   cursor,
+    // });
+    const msgs = await this.client.api['messages.list']({
+      params: {
+        spaceId: this.spaceId,
+        channelId: this.id,
+      },
+      queries: { limit, cursor },
     });
     // return msgs;
     return msgs.map((x) => new ClientMessage(this.client, x));
@@ -40,22 +47,40 @@ export class ClientChannel implements Channel {
     makeAutoObservable(this, { id: false, client: false });
   }
 
-  async update(options: ChannelUpdateOptions) {
-    await this.client.client.channels.update({
-      channelId: this.id,
-      options,
+  async update(options: ChannelPatch) {
+    await this.client.api['channels.update'](options, {
+      params: {
+        spaceId: this.spaceId,
+        channelId: this.id,
+      },
     });
   }
 
   async delete() {
-    await this.client.client.channels.delete({ channelId: this.id });
+    await this.client.api['channels.delete'](undefined, {
+      params: {
+        spaceId: this.spaceId,
+        channelId: this.id,
+      },
+    });
   }
 
   async sendMessage(content: string) {
-    await this.client.client.messages.send({
-      channelId: this.id,
-      content,
-    });
+    // await this.client.client.messages.send({
+    //   channelId: this.id,
+    //   content,
+    // });
+    await this.client.api['messages.create'](
+      {
+        content,
+      },
+      {
+        params: {
+          spaceId: this.spaceId,
+          channelId: this.id,
+        },
+      },
+    );
   }
 }
 
@@ -63,7 +88,10 @@ export class ChannelStore extends Store<Channel, ClientChannel> {
   async fetch(id: string, data?: Channel) {
     if (this.has(id)) return this.getAndUpdate(id, data);
     const cData =
-      data ?? (await this.client.client.channels.get({ channelId: id }));
+      data ??
+      (await this.client.api['channels.get']({
+        params: { channelId: id, spaceId: '' }, // FIXME: space_id is required
+      }));
     return this.produce(cData);
   }
 

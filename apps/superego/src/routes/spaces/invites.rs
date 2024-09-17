@@ -45,7 +45,7 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:invite_id",
+            "/:inviteId",
             delete_with(delete, |o| {
                 o.tag(TAG).id("invites.delete").summary("Delete Invite")
             }),

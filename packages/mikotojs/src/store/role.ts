@@ -1,13 +1,13 @@
 import { makeAutoObservable } from 'mobx';
 
 import type { MikotoClient } from '../MikotoClient';
-import { Role } from '../hs-client';
 import { Store, normalizedAssign } from './base';
+import { Role } from '../api.gen';
 
 export class ClientRole implements Role {
   id!: string;
   name!: string;
-  color!: string | null;
+  color!: string | null | undefined;
   position!: number;
   permissions!: string;
   spaceId!: string;

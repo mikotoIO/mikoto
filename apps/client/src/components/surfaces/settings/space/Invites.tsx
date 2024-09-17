@@ -1,11 +1,11 @@
 import { Box, Button } from '@chakra-ui/react';
-import { Invite, Space } from 'mikotojs';
+import { Invite, SpaceExt } from 'mikotojs';
 import { useEffect, useState } from 'react';
 
 import { useMikoto } from '@/hooks';
 import { SettingSurface } from '@/views';
 
-export function Invites({ space }: { space: Space }) {
+export function Invites({ space }: { space: SpaceExt }) {
   const mikoto = useMikoto();
   const [invites, setInvites] = useState<Invite[] | null>(null);
 

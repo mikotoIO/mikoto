@@ -1,13 +1,13 @@
 import { makeAutoObservable } from 'mobx';
 
 import type { MikotoClient } from '../MikotoClient';
-import { Message, User } from '../hs-client';
+import { MessageExt, User } from '../api.gen';
 
-export class ClientMessage implements Message {
+export class ClientMessage implements MessageExt {
   id!: string;
   channelId!: string;
-  authorId!: string | null;
-  author!: User | null;
+  authorId!: string | null | undefined;
+  author!: User | null | undefined;
   content!: string;
   timestamp!: string;
   editedTimestamp!: string | null;
@@ -17,31 +17,39 @@ export class ClientMessage implements Message {
   }
 
   get member() {
-    if (this.authorId === null) return null;
+    if (!this.authorId) return null;
     return this.channel.space!.members?.get(this.authorId);
   }
 
   constructor(
     public client: MikotoClient,
-    data: Message,
+    data: MessageExt,
   ) {
     Object.assign(this, data);
     makeAutoObservable(this, { id: false, client: false });
   }
 
   delete() {
-    return this.client.client.messages.delete({
-      channelId: this.channelId,
-      messageId: this.id,
+    return this.client.api['messages.delete'](undefined, {
+      params: {
+        spaceId: this.channel.spaceId,
+        channelId: this.channelId,
+        messageId: this.id,
+      },
     });
   }
 
   async edit(content: string) {
-    const msg = await this.client.client.messages.edit({
-      channelId: this.channelId,
-      messageId: this.id,
-      content,
-    });
+    const msg = await this.client.api['messages.update'](
+      { content },
+      {
+        params: {
+          spaceId: this.channel.spaceId,
+          channelId: this.channelId,
+          messageId: this.id,
+        },
+      },
+    );
     Object.assign(this, msg);
   }
 }

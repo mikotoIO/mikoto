@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
 
-import { Channel, Message, Space } from '../hs-client';
+import { Channel, MessageExt, SpaceExt } from '../api.gen';
 
 export type EmitterEvents<T> = {
   [key: `create/${string}`]: (message: T) => void;
@@ -10,7 +10,7 @@ export type EmitterEvents<T> = {
 };
 
 export class MessageEmitter extends (EventEmitter as unknown as new () => TypedEmitter<
-  EmitterEvents<Message>
+  EmitterEvents<MessageExt>
 >) {
   // ...
 }
@@ -23,7 +23,7 @@ export class ChannelEmitter extends (EventEmitter as unknown as new () => TypedE
 
 // the scope is always "@"
 export class SpaceEmitter extends (EventEmitter as unknown as new () => TypedEmitter<
-  EmitterEvents<Space>
+  EmitterEvents<SpaceExt>
 >) {
   // ...
 }

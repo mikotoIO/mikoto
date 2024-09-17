@@ -109,11 +109,14 @@ export function normalizedAssign<B extends EntityBase, T extends B>(
 ) {
   // eslint-disable-next-line no-restricted-syntax
   for (const key of Object.keys(data) as (keyof B)[]) {
+    // data[key] is the field of the POJO
     if (!toNormalize[key]) {
       entity[key] = data[key] as any;
     } else {
+      
       const idKey = toNormalize[key];
       if (idKey?.slice(-1) === 's') {
+        // if the key ends with 's', it's an array of entities
         (entity as any)[idKey] = (data[key] as EntityBase[]).map((x) => x.id);
       } else {
         (entity as any)[idKey] = (data[key] as EntityBase).id;

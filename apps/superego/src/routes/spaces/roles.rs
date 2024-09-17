@@ -50,13 +50,13 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:role_id",
+            "/:roleId",
             patch_with(update, |o| {
                 o.tag(TAG).id("roles.update").summary("Update Role")
             }),
         )
         .route(
-            "/:role_id",
+            "/:roleId",
             delete_with(delete, |o| {
                 o.tag(TAG).id("roles.delete").summary("Delete Role")
             }),

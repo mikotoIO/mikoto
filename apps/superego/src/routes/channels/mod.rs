@@ -98,7 +98,7 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:id",
+            "/:channelId",
             get_with(get, |o| {
                 o.tag(TAG).id("channels.get").summary("Get Channel")
             }),
@@ -110,13 +110,13 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:id",
+            "/:channelId",
             patch_with(update, |o| {
                 o.tag(TAG).id("channels.update").summary("Update Channel")
             }),
         )
         .route(
-            "/:id",
+            "/:channelId",
             delete_with(delete, |o| {
                 o.id("channels.delete").tag(TAG).summary("Delete Channel")
             }),

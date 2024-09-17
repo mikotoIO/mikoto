@@ -104,7 +104,9 @@ export function UserAreaAvatar() {
     left: 80,
   });
   useEffect(() => {
-    mikoto.client.users.me({}).then(setUser);
+    mikoto.api['user.get']().then((x) => {
+      setUser(x);
+    });
   }, []);
 
   return (

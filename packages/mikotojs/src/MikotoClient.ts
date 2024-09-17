@@ -1,8 +1,5 @@
-import { SocketIOClientTransport } from '@hyperschema/client';
-import { runInAction } from 'mobx';
-
+import { api, createApiClient } from './api.gen';
 import { ChannelEmitter, MessageEmitter, SpaceEmitter } from './emitters';
-import { MainService } from './hs-client';
 import {
   ChannelStore,
   ClientChannel,
@@ -25,8 +22,9 @@ interface MikotoClientOptions {
 
 export class MikotoClient {
   // spaces: SpaceEngine = new SpaceEngine(this);
-  client!: MainService;
-  transport!: SocketIOClientTransport;
+  // client!: MainService;
+  // transport!: SocketIOClientTransport;
+  api: typeof api;
 
   // screw all of the above, we're rewriting the entire thing
   messageEmitter = new MessageEmitter();
@@ -45,80 +43,72 @@ export class MikotoClient {
     accessToken: string,
     { onReady, onConnect, onDisconnect }: MikotoClientOptions,
   ) {
-    this.transport = new SocketIOClientTransport({
-      url: hyperRPCUrl,
-      authToken: accessToken,
-    });
+    this.api = createApiClient('http://localhost:9503', {});
 
-    this.client = new MainService(this.transport);
-    this.setupClient();
+    // this.transport = new SocketIOClientTransport({
+    //   url: hyperRPCUrl,
+    //   authToken: accessToken,
+    // });
 
-    this.client.onReady(() => {
-      onReady?.(this);
-    });
+    // this.client = new MainService(this.transport);
+    // this.setupClient();
 
-    this.client.onConnect(() => {
-      onConnect?.();
-    });
+    // this.client.onReady(() => {
+    //   onReady?.(this);
+    // });
 
-    this.client.onDisconnect(() => {
-      onDisconnect?.();
-    });
+    // this.client.onConnect(() => {
+    //   onConnect?.();
+    // });
+
+    // this.client.onDisconnect(() => {
+    //   onDisconnect?.();
+    // });
   }
 
   setupClient() {
-    this.spaces.subscribe(this.client.spaces);
-    this.channels.subscribe(this.client.channels);
-    this.members.subscribe(this.client.members);
-    this.roles.subscribe(this.client.roles);
-
-    this.client.messages.onCreate((message) => {
-      this.messageEmitter.emit(`create/${message.channelId}`, message);
-    });
-
-    this.client.messages.onUpdate((message) => {
-      this.messageEmitter.emit(`update/${message.channelId}`, message);
-    });
-
-    this.client.messages.onDelete(({ id, channelId }) => {
-      this.messageEmitter.emit(`delete/${channelId}`, id);
-    });
-
-    this.client.channels.onCreate((channel) => {
-      this.channelEmitter.emit(`create/${channel.spaceId}`, channel);
-    });
-
-    this.client.channels.onUpdate((channel) => {
-      this.channelEmitter.emit(`update/${channel.spaceId}`, channel);
-    });
-
-    this.client.channels.onDelete((channel) => {
-      this.channelEmitter.emit(`delete/${channel.spaceId}`, channel.id);
-    });
-
-    this.client.spaces.onCreate((space) => {
-      this.spaceEmitter.emit('create/@', space);
-    });
-
-    this.client.spaces.onUpdate((space) => {
-      this.spaceEmitter.emit('update/@', space);
-    });
-
-    this.client.spaces.onDelete((space) => {
-      this.spaceEmitter.emit('delete/@', space.id);
-    });
-
-    this.client.users.onUpdate((user) => {
-      if (this.me && user.id === this.me.id) {
-        runInAction(() => {
-          Object.assign(this.me, user);
-        });
-      }
-    });
+    // this.spaces.subscribe(this.client.spaces);
+    // this.channels.subscribe(this.client.channels);
+    // this.members.subscribe(this.client.members);
+    // this.roles.subscribe(this.client.roles);
+    // this.client.messages.onCreate((message) => {
+    //   this.messageEmitter.emit(`create/${message.channelId}`, message);
+    // });
+    // this.client.messages.onUpdate((message) => {
+    //   this.messageEmitter.emit(`update/${message.channelId}`, message);
+    // });
+    // this.client.messages.onDelete(({ id, channelId }) => {
+    //   this.messageEmitter.emit(`delete/${channelId}`, id);
+    // });
+    // this.client.channels.onCreate((channel) => {
+    //   this.channelEmitter.emit(`create/${channel.spaceId}`, channel);
+    // });
+    // this.client.channels.onUpdate((channel) => {
+    //   this.channelEmitter.emit(`update/${channel.spaceId}`, channel);
+    // });
+    // this.client.channels.onDelete((channel) => {
+    //   this.channelEmitter.emit(`delete/${channel.spaceId}`, channel.id);
+    // });
+    // this.client.spaces.onCreate((space) => {
+    //   this.spaceEmitter.emit('create/@', space);
+    // });
+    // this.client.spaces.onUpdate((space) => {
+    //   this.spaceEmitter.emit('update/@', space);
+    // });
+    // this.client.spaces.onDelete((space) => {
+    //   this.spaceEmitter.emit('delete/@', space.id);
+    // });
+    // this.client.users.onUpdate((user) => {
+    //   if (this.me && user.id === this.me.id) {
+    //     runInAction(() => {
+    //       Object.assign(this.me, user);
+    //     });
+    //   }
+    // });
   }
 
   disconnect() {
-    this.transport.disconnect();
+    // this.transport.disconnect();
     this.spaceEmitter.removeAllListeners();
     this.channelEmitter.removeAllListeners();
     this.messageEmitter.removeAllListeners();
@@ -126,7 +116,9 @@ export class MikotoClient {
 
   async getMe() {
     if (this.me) return this.me;
-    this.me = new ClientUser(this, await this.client.users.me({}));
+
+    let op = await this.api['user.get']();
+    this.me = new ClientUser(this, await this.api['user.get']());
     return this.me;
   }
 }

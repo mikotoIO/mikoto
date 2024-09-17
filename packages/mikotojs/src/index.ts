@@ -44,3 +44,5 @@ export * from './emitters';
 export * from './AuthClient';
 export * from './MikotoClient';
 export * from './store';
+
+export * from './api.gen';

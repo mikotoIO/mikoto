@@ -10,7 +10,7 @@ entity!(
     pub struct Message {
         pub id: Uuid,
         pub channel_id: Uuid,
-        pub author_id: Uuid,
+        pub author_id: Option<Uuid>,
         pub timestamp: NaiveDateTime,
         pub edited_timestamp: Option<NaiveDateTime>,
         pub content: String,
@@ -25,8 +25,9 @@ pub struct MessagePatch {
 #[derive(Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct MessageExt {
+    #[serde(flatten)]
     pub base: Message,
-    pub author: User,
+    pub author: Option<User>,
 }
 
 model!(
@@ -41,7 +42,7 @@ impl Message {
         Self {
             id: Uuid::new_v4(),
             channel_id: channel.id,
-            author_id,
+            author_id: Some(author_id),
             timestamp: Utc::now().naive_utc(),
             edited_timestamp: None,
             content,
@@ -137,7 +138,11 @@ impl MessageExt {
         message: Message,
         db: X,
     ) -> Result<Self, Error> {
-        let author = User::find_by_id(message.author_id, db).await?;
+        let author = if let Some(author_id) = message.author_id {
+            Some(User::find_by_id(author_id, db).await?)
+        } else {
+            None
+        };
         Ok(MessageExt {
             base: message,
             author,
@@ -148,13 +153,17 @@ impl MessageExt {
         messages: Vec<Message>,
         db: X,
     ) -> Result<Vec<Self>, Error> {
-        let author_ids: Vec<Uuid> = messages.iter().map(|m| m.author_id).collect();
+        let author_ids: Vec<Uuid> = messages.iter().map(|m| m.author_id).flatten().collect();
         let authors = User::dataload(author_ids, db).await?;
 
         let res = messages
             .into_iter()
             .map(|message| {
-                let author = authors.get(&message.author_id).unwrap().clone();
+                let author = if let Some(author_id) = message.author_id {
+                    authors.get(&author_id).cloned()
+                } else {
+                    None
+                };
                 MessageExt {
                     base: message,
                     author,

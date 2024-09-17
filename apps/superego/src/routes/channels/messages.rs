@@ -126,7 +126,7 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:id",
+            "/:messageId",
             get_with(get, |o| {
                 o.tag(TAG).id("messages.get").summary("Get Message")
             }),
@@ -138,13 +138,13 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:id",
+            "/:messageId",
             patch_with(edit, |o| {
                 o.tag(TAG).id("messages.update").summary("Update Message")
             }),
         )
         .route(
-            "/:id",
+            "/:messageId",
             delete_with(delete, |o| {
                 o.tag(TAG).id("messages.delete").summary("Delete Message")
             }),

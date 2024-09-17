@@ -164,11 +164,11 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:id",
+            "/:spaceId",
             get_with(get, |o| o.tag(TAG).id("spaces.get").summary("Get Space")),
         )
         .route(
-            "/join",
+            "/join/:invite",
             post_with(join, |o| o.tag(TAG).id("spaces.join").summary("Join Space")),
         )
         .route(
@@ -178,19 +178,19 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:id",
+            "/:spaceId",
             patch_with(update, |o| {
                 o.tag(TAG).id("spaces.update").summary("Update Space")
             }),
         )
         .route(
-            "/:id",
+            "/:spaceId",
             delete_with(delete, |o| {
                 o.tag(TAG).id("spaces.delete").summary("Delete Space")
             }),
         )
         .route(
-            "/:id/leave",
+            "/:spaceId/leave",
             delete_with(leave, |o| {
                 o.tag(TAG).id("spaces.leave").summary("Leave Space")
             }),

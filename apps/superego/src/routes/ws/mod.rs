@@ -9,9 +9,8 @@ use futures_util::{stream::StreamExt, SinkExt};
 use schema::WebSocketRouter;
 use serde::de::DeserializeOwned;
 use tokio::{sync::RwLock, task::JoinHandle};
-use uuid::Uuid;
 
-use crate::{db::redis, entities::ObjectWithId, error::Error, functions::pubsub::emit_event};
+use crate::{db::redis, error::Error};
 
 pub mod schema;
 pub mod state;

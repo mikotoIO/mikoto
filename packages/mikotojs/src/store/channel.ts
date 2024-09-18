@@ -23,11 +23,6 @@ export class ClientChannel implements Channel {
   }
 
   async listMessages(limit: number, cursor: string | null) {
-    // const msgs = await this.client.client.messages.list({
-    //   channelId: this.id,
-    //   limit,
-    //   cursor,
-    // });
     const msgs = await this.client.api['messages.list']({
       params: {
         spaceId: this.spaceId,
@@ -35,7 +30,6 @@ export class ClientChannel implements Channel {
       },
       queries: { limit, cursor },
     });
-    // return msgs;
     return msgs.map((x) => new ClientMessage(this.client, x));
   }
 
@@ -66,10 +60,6 @@ export class ClientChannel implements Channel {
   }
 
   async sendMessage(content: string) {
-    // await this.client.client.messages.send({
-    //   channelId: this.id,
-    //   content,
-    // });
     await this.client.api['messages.create'](
       {
         content,
@@ -84,25 +74,22 @@ export class ClientChannel implements Channel {
   }
 
   async ack() {
-    await this.client.api['channels.acknowledge'](
-      undefined,
-      {
-        params: {
-          spaceId: this.spaceId,
-          channelId: this.id,
-        },
+    await this.client.api['channels.acknowledge'](undefined, {
+      params: {
+        spaceId: this.spaceId,
+        channelId: this.id,
       },
-    );
+    });
   }
 }
 
 export class ChannelStore extends Store<Channel, ClientChannel> {
-  async fetch(id: string, data?: Channel) {
-    if (this.has(id)) return this.getAndUpdate(id, data);
+  async fetch(spaceId: string, channelId: string, data?: Channel) {
+    if (this.has(channelId)) return this.getAndUpdate(channelId, data);
     const cData =
       data ??
       (await this.client.api['channels.get']({
-        params: { channelId: id, spaceId: '' }, // FIXME: space_id is required
+        params: { spaceId, channelId },
       }));
     return this.produce(cData);
   }

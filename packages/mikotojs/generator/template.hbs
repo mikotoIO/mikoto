@@ -16,7 +16,7 @@ import { {{{@key}}} } from "./{{{this}}}"
 {{/if}}
 
 {{#each schemas}}
-const {{@key}}{{#if (lookup ../emittedType @key)}}: z.ZodType<{{@key}}>{{/if}} = {{{this}}};
+export const {{@key}}{{#if (lookup ../emittedType @key)}}: z.ZodType<{{@key}}>{{/if}} = {{{this}}};
 export type {{@key}} = z.infer<typeof {{@key}}>;
 
 {{/each}}

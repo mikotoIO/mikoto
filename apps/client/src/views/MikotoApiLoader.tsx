@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import { MikotoClient, constructMikoto } from 'mikotojs';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { env } from '@/env';
@@ -42,10 +42,8 @@ export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
   const [mikoto, setMikoto] = useState<MikotoConnectionState>('connecting');
   const [err, setErr] = useState<AxiosError | null>(null);
 
-  const buildMikotoClient = async () => {
+  const setupMikotoClient = async (mi: MikotoClient) => {
     try {
-      const token = await refreshAuth(authClient);
-      const mi = new MikotoClient(env.PUBLIC_SERVER_URL, token, {});
       await Promise.all([mi.spaces.list(true), mi.getMe()]);
 
       registerNotifications(mi);
@@ -58,11 +56,23 @@ export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
     }
   };
 
-  useEffect(() => {
-    if (clientLock) return;
-    clientLock = true;
+  const initialized = useRef(false);
 
-    buildMikotoClient().then();
+  useEffect(() => {
+    if (!initialized.current) {
+      initialized.current = true;
+
+      const mi = new MikotoClient(env.PUBLIC_SERVER_URL, {});
+      mi.connect();
+      setupMikotoClient(mi);
+
+      return () => {
+        mi.disconnect();
+        setMikoto('disconnected');
+      };
+    }
+
+    return () => {};
   }, []);
 
   // FIXME: Rework the heartbeat system

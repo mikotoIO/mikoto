@@ -99,7 +99,7 @@ async fn edit(
 async fn delete(
     Path((_, channel_id, message_id)): Path<(Uuid, Uuid, Uuid)>,
 ) -> Result<Json<()>, Error> {
-    let _channel = Channel::find_by_id(channel_id, db()).await?;
+    let channel = Channel::find_by_id(channel_id, db()).await?;
     let message = Message::find_by_id(message_id, db()).await?;
     message.delete(db()).await?;
 
@@ -109,7 +109,7 @@ async fn delete(
             message_id: message.id,
             channel_id: message.channel_id,
         },
-        &format!("space:{}", channel_id),
+        &format!("space:{}", channel.space_id),
     )
     .await?;
     Ok(().into())

@@ -1,13 +1,19 @@
 use std::sync::Arc;
 
 use axum::{
-    extract::{ws, Query, WebSocketUpgrade},
+    extract::{
+        ws::{self, Message, WebSocket},
+        Query, WebSocketUpgrade,
+    },
     routing::{get, MethodRouter},
 };
 use fred::prelude::{ClientLike, EventInterface, PubsubInterface};
-use futures_util::{stream::StreamExt, SinkExt};
+use futures_util::{
+    stream::{SplitSink, StreamExt},
+    SinkExt,
+};
 use schema::WebSocketRouter;
-use serde::de::DeserializeOwned;
+use serde::{de::DeserializeOwned, Serialize};
 use tokio::{sync::RwLock, task::JoinHandle};
 
 use crate::{db::redis, error::Error};
@@ -35,6 +41,24 @@ pub enum SocketAction {
     Unsubscribe(Vec<String>),
 }
 
+async fn ws_send<T: Serialize>(
+    writer: &mut SplitSink<WebSocket, Message>,
+    op: &str,
+    data: T,
+) -> Result<(), Error> {
+    writer
+        .send(
+            serde_json::to_string(&Operation {
+                op: op.to_string(),
+                data: serde_json::to_value(data)?,
+            })?
+            .into(),
+        )
+        .await
+        .map_err(|_| Error::WebSocketTerminated)?;
+    Ok(())
+}
+
 async fn handle_socket<S: WebSocketState>(
     socket: ws::WebSocket,
     query: S::Initial,
@@ -54,6 +78,8 @@ async fn handle_socket<S: WebSocketState>(
     let state = Arc::new(RwLock::new(state));
     let s2c_state = state.clone();
     let c2s_state = state.clone();
+
+    ws_send(&mut writer, "ready", ()).await?;
 
     let mut server_to_client: JoinHandle<Result<(), Error>> = tokio::spawn(async move {
         let state = s2c_state;
@@ -82,10 +108,7 @@ async fn handle_socket<S: WebSocketState>(
                         }
                     }
                 }
-                writer
-                    .send(serde_json::to_string(&Operation { op: msg.op, data })?.into())
-                    .await
-                    .map_err(|_| Error::WebSocketTerminated)?;
+                ws_send(&mut writer, &msg.op, data).await?;
             }
         }
         Err(Error::WebSocketTerminated)

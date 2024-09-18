@@ -2,10 +2,13 @@
 import { makeApi, Zodios, type ZodiosOptions } from "@zodios/core";
 import { z } from "zod";
 
-const IndexResponse = z.object({ name: z.string(), version: z.string() });
+export const IndexResponse = z.object({
+  name: z.string(),
+  version: z.string(),
+});
 export type IndexResponse = z.infer<typeof IndexResponse>;
 
-const RegisterPayload = z.object({
+export const RegisterPayload = z.object({
   captcha: z.union([z.string(), z.null()]).optional(),
   email: z.string(),
   name: z.string(),
@@ -13,38 +16,41 @@ const RegisterPayload = z.object({
 });
 export type RegisterPayload = z.infer<typeof RegisterPayload>;
 
-const TokenPair = z.object({
+export const TokenPair = z.object({
   accessToken: z.string(),
   refreshToken: z.union([z.string(), z.null()]).optional(),
 });
 export type TokenPair = z.infer<typeof TokenPair>;
 
-const LoginPayload = z.object({ email: z.string(), password: z.string() });
+export const LoginPayload = z.object({
+  email: z.string(),
+  password: z.string(),
+});
 export type LoginPayload = z.infer<typeof LoginPayload>;
 
-const RefreshPayload = z.object({ refreshToken: z.string() });
+export const RefreshPayload = z.object({ refreshToken: z.string() });
 export type RefreshPayload = z.infer<typeof RefreshPayload>;
 
-const ChangePasswordPayload = z.object({
+export const ChangePasswordPayload = z.object({
   id: z.string().uuid(),
   newPassword: z.string(),
   oldPassword: z.string(),
 });
 export type ChangePasswordPayload = z.infer<typeof ChangePasswordPayload>;
 
-const ResetPasswordPayload = z.object({
+export const ResetPasswordPayload = z.object({
   captcha: z.union([z.string(), z.null()]).optional(),
   email: z.string(),
 });
 export type ResetPasswordPayload = z.infer<typeof ResetPasswordPayload>;
 
-const ResetPasswordConfirmData = z.object({
+export const ResetPasswordConfirmData = z.object({
   password: z.string(),
   token: z.string(),
 });
 export type ResetPasswordConfirmData = z.infer<typeof ResetPasswordConfirmData>;
 
-const Bot = z.object({
+export const Bot = z.object({
   id: z.string().uuid(),
   name: z.string(),
   ownerId: z.string().uuid(),
@@ -52,13 +58,13 @@ const Bot = z.object({
 });
 export type Bot = z.infer<typeof Bot>;
 
-const CreateBotPayload = z.object({ name: z.string() });
+export const CreateBotPayload = z.object({ name: z.string() });
 export type CreateBotPayload = z.infer<typeof CreateBotPayload>;
 
-const UserCategory = z.enum(["BOT", "UNVERIFIED"]);
+export const UserCategory = z.enum(["BOT", "UNVERIFIED"]);
 export type UserCategory = z.infer<typeof UserCategory>;
 
-const User = z.object({
+export const User = z.object({
   avatar: z.union([z.string(), z.null()]).optional(),
   category: z.union([UserCategory, z.null()]).optional(),
   description: z.union([z.string(), z.null()]).optional(),
@@ -67,7 +73,7 @@ const User = z.object({
 });
 export type User = z.infer<typeof User>;
 
-const UserPatch = z
+export const UserPatch = z
   .object({
     avatar: z.union([z.string(), z.null()]),
     name: z.union([z.string(), z.null()]),
@@ -75,7 +81,7 @@ const UserPatch = z
   .partial();
 export type UserPatch = z.infer<typeof UserPatch>;
 
-const RelationState = z.enum([
+export const RelationState = z.enum([
   "NONE",
   "FRIEND",
   "BLOCKED",
@@ -84,7 +90,7 @@ const RelationState = z.enum([
 ]);
 export type RelationState = z.infer<typeof RelationState>;
 
-const Relationship = z.object({
+export const Relationship = z.object({
   id: z.string().uuid(),
   relationId: z.string().uuid(),
   spaceId: z.union([z.string(), z.null()]).optional(),
@@ -93,7 +99,7 @@ const Relationship = z.object({
 });
 export type Relationship = z.infer<typeof Relationship>;
 
-const ChannelType = z.enum([
+export const ChannelType = z.enum([
   "TEXT",
   "VOICE",
   "DOCUMENT",
@@ -103,7 +109,7 @@ const ChannelType = z.enum([
 ]);
 export type ChannelType = z.infer<typeof ChannelType>;
 
-const Channel = z.object({
+export const Channel = z.object({
   id: z.string().uuid(),
   lastUpdated: z.union([z.string(), z.null()]).optional(),
   name: z.string(),
@@ -114,7 +120,7 @@ const Channel = z.object({
 });
 export type Channel = z.infer<typeof Channel>;
 
-const Role = z.object({
+export const Role = z.object({
   color: z.union([z.string(), z.null()]).optional(),
   id: z.string().uuid(),
   name: z.string(),
@@ -124,10 +130,10 @@ const Role = z.object({
 });
 export type Role = z.infer<typeof Role>;
 
-const SpaceType = z.enum(["NONE", "DM", "GROUP"]);
+export const SpaceType = z.enum(["NONE", "DM", "GROUP"]);
 export type SpaceType = z.infer<typeof SpaceType>;
 
-const SpaceExt = z.object({
+export const SpaceExt = z.object({
   channels: z.array(Channel),
   icon: z.union([z.string(), z.null()]).optional(),
   id: z.string().uuid(),
@@ -138,10 +144,10 @@ const SpaceExt = z.object({
 });
 export type SpaceExt = z.infer<typeof SpaceExt>;
 
-const SpaceCreatePayload = z.object({ name: z.string() });
+export const SpaceCreatePayload = z.object({ name: z.string() });
 export type SpaceCreatePayload = z.infer<typeof SpaceCreatePayload>;
 
-const SpaceUpdatePayload = z
+export const SpaceUpdatePayload = z
   .object({
     icon: z.union([z.string(), z.null()]),
     name: z.union([z.string(), z.null()]),
@@ -149,32 +155,32 @@ const SpaceUpdatePayload = z
   .partial();
 export type SpaceUpdatePayload = z.infer<typeof SpaceUpdatePayload>;
 
-const ChannelCreatePayload = z.object({
+export const ChannelCreatePayload = z.object({
   name: z.string(),
   parentId: z.union([z.string(), z.null()]).optional(),
   type: z.union([ChannelType, z.null()]).optional(),
 });
 export type ChannelCreatePayload = z.infer<typeof ChannelCreatePayload>;
 
-const ChannelPatch = z
+export const ChannelPatch = z
   .object({ name: z.union([z.string(), z.null()]) })
   .partial();
 export type ChannelPatch = z.infer<typeof ChannelPatch>;
 
-const ChannelUnread = z.object({
+export const ChannelUnread = z.object({
   channelId: z.string().uuid(),
   timestamp: z.string(),
   userId: z.string().uuid(),
 });
 export type ChannelUnread = z.infer<typeof ChannelUnread>;
 
-const cursor = z.union([z.string(), z.null()]).optional();
+export const cursor = z.union([z.string(), z.null()]).optional();
 export type cursor = z.infer<typeof cursor>;
 
-const limit = z.union([z.number(), z.null()]).optional();
+export const limit = z.union([z.number(), z.null()]).optional();
 export type limit = z.infer<typeof limit>;
 
-const MessageExt = z.object({
+export const MessageExt = z.object({
   author: z.union([User, z.null()]).optional(),
   authorId: z.union([z.string(), z.null()]).optional(),
   channelId: z.string().uuid(),
@@ -185,32 +191,32 @@ const MessageExt = z.object({
 });
 export type MessageExt = z.infer<typeof MessageExt>;
 
-const MessageSendPayload = z.object({ content: z.string() });
+export const MessageSendPayload = z.object({ content: z.string() });
 export type MessageSendPayload = z.infer<typeof MessageSendPayload>;
 
-const MessageEditPayload = z.object({ content: z.string() });
+export const MessageEditPayload = z.object({ content: z.string() });
 export type MessageEditPayload = z.infer<typeof MessageEditPayload>;
 
-const VoiceToken = z.object({
+export const VoiceToken = z.object({
   channelId: z.string().uuid(),
   token: z.string(),
   url: z.string(),
 });
 export type VoiceToken = z.infer<typeof VoiceToken>;
 
-const Document = z.object({
+export const Document = z.object({
   channelId: z.string().uuid(),
   content: z.string(),
   id: z.string().uuid(),
 });
 export type Document = z.infer<typeof Document>;
 
-const DocumentPatch = z
+export const DocumentPatch = z
   .object({ content: z.union([z.string(), z.null()]) })
   .partial();
 export type DocumentPatch = z.infer<typeof DocumentPatch>;
 
-const MemberExt = z.object({
+export const MemberExt = z.object({
   id: z.string().uuid(),
   name: z.union([z.string(), z.null()]).optional(),
   roleIds: z.array(z.string().uuid()),
@@ -220,19 +226,21 @@ const MemberExt = z.object({
 });
 export type MemberExt = z.infer<typeof MemberExt>;
 
-const MemberCreatePayload = z.object({ userId: z.string().uuid() });
+export const MemberCreatePayload = z.object({ userId: z.string().uuid() });
 export type MemberCreatePayload = z.infer<typeof MemberCreatePayload>;
 
-const MemberUpdatePayload = z.object({ roleIds: z.array(z.string().uuid()) });
+export const MemberUpdatePayload = z.object({
+  roleIds: z.array(z.string().uuid()),
+});
 export type MemberUpdatePayload = z.infer<typeof MemberUpdatePayload>;
 
-const RoleCreatePayload = z.object({ name: z.string() });
+export const RoleCreatePayload = z.object({ name: z.string() });
 export type RoleCreatePayload = z.infer<typeof RoleCreatePayload>;
 
-const RoleUpdatePayload = z.object({ name: z.string() });
+export const RoleUpdatePayload = z.object({ name: z.string() });
 export type RoleUpdatePayload = z.infer<typeof RoleUpdatePayload>;
 
-const Invite = z.object({
+export const Invite = z.object({
   createdAt: z.string(),
   creatorId: z.string().uuid(),
   id: z.string(),
@@ -240,10 +248,10 @@ const Invite = z.object({
 });
 export type Invite = z.infer<typeof Invite>;
 
-const InviteCreatePayload = z.object({}).partial();
+export const InviteCreatePayload = z.object({}).partial();
 export type InviteCreatePayload = z.infer<typeof InviteCreatePayload>;
 
-const ListQuery = z
+export const ListQuery = z
   .object({
     cursor: z.union([z.string(), z.null()]),
     limit: z.union([z.number(), z.null()]),
@@ -251,22 +259,22 @@ const ListQuery = z
   .partial();
 export type ListQuery = z.infer<typeof ListQuery>;
 
-const MemberKey = z.object({
+export const MemberKey = z.object({
   spaceId: z.string().uuid(),
   userId: z.string().uuid(),
 });
 export type MemberKey = z.infer<typeof MemberKey>;
 
-const MessageKey = z.object({
+export const MessageKey = z.object({
   channelId: z.string().uuid(),
   messageId: z.string().uuid(),
 });
 export type MessageKey = z.infer<typeof MessageKey>;
 
-const ObjectWithId = z.object({ id: z.string().uuid() });
+export const ObjectWithId = z.object({ id: z.string().uuid() });
 export type ObjectWithId = z.infer<typeof ObjectWithId>;
 
-const Ping = z.object({ message: z.string() });
+export const Ping = z.object({ message: z.string() });
 export type Ping = z.infer<typeof Ping>;
 
 export const schemas = {

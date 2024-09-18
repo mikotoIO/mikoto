@@ -1,5 +1,7 @@
 import { pluginToken } from '@zodios/plugins';
+import WebSocket from 'isomorphic-ws';
 
+import { AuthClient } from './AuthClient';
 import { api, createApiClient } from './api.gen';
 import { ChannelEmitter, MessageEmitter, SpaceEmitter } from './emitters';
 import {
@@ -22,11 +24,23 @@ interface MikotoClientOptions {
   onDisconnect?: () => void;
 }
 
+// FIXME: this should not be in library-level code
+export async function refreshAuth(client: AuthClient) {
+  const { refreshToken, accessToken } = await client.refresh(
+    localStorage.getItem('REFRESH_TOKEN')!,
+  );
+  if (refreshToken) {
+    localStorage.setItem('REFRESH_TOKEN', refreshToken);
+  }
+  return accessToken;
+}
+
 export class MikotoClient {
-  // spaces: SpaceEngine = new SpaceEngine(this);
-  // client!: MainService;
-  // transport!: SocketIOClientTransport;
+  auth: AuthClient;
   api: typeof api;
+  ws?: WebSocket;
+  private token?: string;
+  private timeOfLastRefresh = new Date(0);
 
   // screw all of the above, we're rewriting the entire thing
   messageEmitter = new MessageEmitter();
@@ -42,13 +56,24 @@ export class MikotoClient {
 
   constructor(
     hyperRPCUrl: string,
-    accessToken: string,
     { onReady, onConnect, onDisconnect }: MikotoClientOptions,
   ) {
+    this.auth = new AuthClient('http://localhost:9503');
     this.api = createApiClient('http://localhost:9503', {});
     this.api.use(
       pluginToken({
-        getToken: async () => accessToken,
+        getToken: async () => {
+          // check if it has been more than 15 minutes since the last refresh
+          const now = new Date();
+          if (
+            now.getTime() - this.timeOfLastRefresh.getTime() >
+            15 * 60 * 1000
+          ) {
+            this.token = await refreshAuth(this.auth);
+            this.timeOfLastRefresh = now;
+          }
+          return this.token;
+        },
       }),
     );
 
@@ -71,6 +96,19 @@ export class MikotoClient {
     // this.client.onDisconnect(() => {
     //   onDisconnect?.();
     // });
+  }
+
+  async connect() {
+    const token = await refreshAuth(this.auth);
+    this.ws = new WebSocket(`ws://localhost:9503/ws?token=${token}`);
+    this.ws.onopen = () => {};
+    this.ws.onmessage = (event) => {
+      const data = JSON.parse((event as any).data);
+      console.log(data);
+    };
+    this.ws.onclose = () => {
+      this.ws = undefined;
+    };
   }
 
   setupClient() {
@@ -115,6 +153,10 @@ export class MikotoClient {
   }
 
   disconnect() {
+    if (this.ws) {
+      this.ws.onmessage = null;
+      this.ws.close();
+    }
     // this.transport.disconnect();
     this.spaceEmitter.removeAllListeners();
     this.channelEmitter.removeAllListeners();

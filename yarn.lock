@@ -27224,6 +27224,7 @@ __metadata:
     tsx: "npm:^4.19.1"
     typed-emitter: "npm:^2.1.0"
     typescript: "npm:^5.4.2"
+    valtio: "npm:^2.0.0"
     ws: "npm:^8.18.0"
     zod: "npm:^3.22.4"
   languageName: unknown
@@ -30345,6 +30346,13 @@ __metadata:
     forwarded: "npm:0.2.0"
     ipaddr.js: "npm:1.9.1"
   checksum: 10/f24a0c80af0e75d31e3451398670d73406ec642914da11a2965b80b1898ca6f66a0e3e091a11a4327079b2b268795f6fa06691923fef91887215c3d0e8ea3f68
+  languageName: node
+  linkType: hard
+
+"proxy-compare@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "proxy-compare@npm:3.0.0"
+  checksum: 10/072b654e303ac6c7a9ac94648614b84388bd8b25828bd4971123dfe5a843e0848e5bf17d0ce546e9878395f356e695109b234c97183614469ff757e68ed39904
   languageName: node
   linkType: hard
 
@@ -36251,6 +36259,23 @@ __metadata:
   version: 13.11.0
   resolution: "validator@npm:13.11.0"
   checksum: 10/4bf094641eb71729c06a42d669840e7189597ba655a8264adabac9bf03f95cd6fde5fbc894b0a13ee861bd4a852f56d2afdc9391aeaeb3fc0f9633a974140e12
+  languageName: node
+  linkType: hard
+
+"valtio@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "valtio@npm:2.0.0"
+  dependencies:
+    proxy-compare: "npm:^3.0.0"
+  peerDependencies:
+    "@types/react": ">=18.0.0"
+    react: ">=18.0.0"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    react:
+      optional: true
+  checksum: 10/8730918b7ac4e36e99500c90c7d945a35f519281d4b24ed21324dcd89a7ec9da86fb7a92270bdc11bddd7126172abec3a0d2887f32beef5c1fab9fd5eda4eae3
   languageName: node
   linkType: hard
 

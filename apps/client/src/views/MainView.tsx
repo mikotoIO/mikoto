@@ -31,7 +31,7 @@ import {
   surfaceStore,
 } from '@/store/surface';
 
-import { MikotoApiLoader } from './MikotoApiLoader';
+import { MikotoClientProvider } from './MikotoClientProvider';
 import { WindowBar } from './WindowBar';
 
 const AppContainer = styled.div`
@@ -216,11 +216,11 @@ function Fallback() {
 
 export default function MainView() {
   return (
-    <MikotoApiLoader fallback={<Fallback />}>
+    <MikotoClientProvider fallback={<Fallback />}>
       <AppView />
       <CommandMenuKit />
       <ContextMenuKit />
       <ModalKit />
-    </MikotoApiLoader>
+    </MikotoClientProvider>
   );
 }

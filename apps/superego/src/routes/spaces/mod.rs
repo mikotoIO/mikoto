@@ -69,12 +69,7 @@ async fn leave_space(space: &SpaceExt, user_id: Uuid) -> Result<(), Error> {
     };
     SpaceUser::delete_by_key(&key, db()).await?;
     emit_event("members.onDelete", key, &format!("space:{}", space.base.id)).await?;
-    emit_event(
-        "spaces.onDelete",
-        ObjectWithId::from_id(space.base.id),
-        &format!("user:{}", user_id),
-    )
-    .await?;
+    emit_event("spaces.onDelete", &space, &format!("user:{}", user_id)).await?;
     Ok(())
 }
 
@@ -121,14 +116,10 @@ async fn update(
 
 async fn delete(Path(space_id): Path<Uuid>, claims: Claims) -> Result<Json<()>, Error> {
     let space = Space::find_by_id(space_id, db()).await?;
-    if space.owner_id == Some(claims.sub.parse()?) {
-        space.delete(db()).await?;
-        emit_event(
-            "spaces.onDelete",
-            ObjectWithId::from_id(space_id),
-            &format!("user:{}", claims.sub),
-        )
-        .await?;
+    let space = SpaceExt::dataload_one(space, db()).await?;
+    if space.base.owner_id == Some(claims.sub.parse()?) {
+        space.base.delete(db()).await?;
+        emit_event("spaces.onDelete", &space, &format!("user:{}", claims.sub)).await?;
     } else {
         return Err(Error::Unauthorized {
             message: "Only the owner may delete the space".to_string(),
@@ -225,11 +216,11 @@ pub fn router() -> AppRouter<State> {
         .ws_event("onUpdate", |space: SpaceExt, _| async move { Some(space) })
         .ws_event(
             "onDelete",
-            |space: ObjectWithId, state: Arc<RwLock<State>>| async move {
+            |space: SpaceExt, state: Arc<RwLock<State>>| async move {
                 let mut writer = state.write().await;
                 writer.actions.push(SocketAction::Unsubscribe(vec![format!(
                     "space:{}",
-                    space.id
+                    space.base.id
                 )]));
                 Some(space)
             },

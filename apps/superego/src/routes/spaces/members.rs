@@ -51,9 +51,10 @@ async fn update(
 async fn delete(Path((space_id, user_id)): Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
     let key = MemberKey::new(space_id, user_id);
     let member = SpaceUser::get_by_key(&key, db()).await?;
-    member.delete(db()).await?;
+    let member = MemberExt::dataload_one(member, db()).await?;
+    member.base.delete(db()).await?;
 
-    emit_event("members.onDelete", key, &format!("space:{}", space_id)).await?;
+    emit_event("members.onDelete", &member, &format!("space:{}", space_id)).await?;
     Ok(().into())
 }
 
@@ -105,6 +106,6 @@ pub fn router() -> AppRouter<State> {
         )
         .ws_event(
             "onDelete",
-            |member: MemberKey, _| async move { Some(member) },
+            |member: MemberExt, _| async move { Some(member) },
         )
 }

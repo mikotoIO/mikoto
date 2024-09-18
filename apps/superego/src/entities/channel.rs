@@ -4,7 +4,7 @@ use chrono::NaiveDateTime;
 use schemars::JsonSchema;
 use uuid::Uuid;
 
-use crate::{db_entity_delete, db_enum, db_find_by_id, db_list_where, entity, error::Error};
+use crate::{db_entity_delete, db_enum, db_find_by_id, db_list_where, entity, error::Error, model};
 
 use super::group_by_key;
 
@@ -16,6 +16,13 @@ db_enum!(
         Application,
         Thread,
         Category,
+    }
+);
+
+model!(
+    pub struct ChannelKey {
+        pub space_id: Uuid,
+        pub channel_id: Uuid,
     }
 );
 

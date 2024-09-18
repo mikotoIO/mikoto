@@ -1,4 +1,3 @@
-use chrono::format;
 use serde::{de::DeserializeOwned, Serialize};
 use uuid::Uuid;
 
@@ -7,7 +6,6 @@ use crate::{
     entities::{Space, User},
     error::Error,
     functions::jwt::{jwt_key, Claims},
-    routes::spaces,
 };
 
 use super::{SocketAction, WebSocketState};

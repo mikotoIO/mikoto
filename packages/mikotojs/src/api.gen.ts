@@ -259,12 +259,6 @@ export const ListQuery = z
   .partial();
 export type ListQuery = z.infer<typeof ListQuery>;
 
-export const MemberKey = z.object({
-  spaceId: z.string().uuid(),
-  userId: z.string().uuid(),
-});
-export type MemberKey = z.infer<typeof MemberKey>;
-
 export const MessageKey = z.object({
   channelId: z.string().uuid(),
   messageId: z.string().uuid(),
@@ -319,7 +313,6 @@ export const schemas = {
   Invite,
   InviteCreatePayload,
   ListQuery,
-  MemberKey,
   MessageKey,
   ObjectWithId,
   Ping,
@@ -828,10 +821,10 @@ export const websocketCommands = {
 
 export const websocketEvents = {
   "channels.onCreate": Channel,
-  "channels.onDelete": ObjectWithId,
+  "channels.onDelete": Channel,
   "channels.onUpdate": Channel,
   "members.onCreate": MemberExt,
-  "members.onDelete": MemberKey,
+  "members.onDelete": MemberExt,
   "members.onUpdate": MemberExt,
   "messages.onCreate": MessageExt,
   "messages.onDelete": MessageKey,
@@ -841,7 +834,7 @@ export const websocketEvents = {
   "roles.onDelete": Role,
   "roles.onUpdate": Role,
   "spaces.onCreate": SpaceExt,
-  "spaces.onDelete": ObjectWithId,
+  "spaces.onDelete": SpaceExt,
   "spaces.onUpdate": SpaceExt,
   "users.onCreate": User,
   "users.onDelete": ObjectWithId,

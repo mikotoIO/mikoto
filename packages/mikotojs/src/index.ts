@@ -12,7 +12,7 @@ function constructMikotoSimple(options: MikotoConstructOptions) {
     try {
       let connected = false;
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const mikoto = new MikotoClient(options.url, options.token, {
+      const mikoto = new MikotoClient(options.url, {
         onReady: (m) => {
           connected = true;
           resolve(m);
@@ -34,7 +34,7 @@ function constructMikotoSimple(options: MikotoConstructOptions) {
 }
 
 export async function constructMikoto(options: MikotoConstructOptions) {
-  const mikoto = new MikotoClient(options.url, options.token, {});
+  const mikoto = new MikotoClient(options.url, {});
   await Promise.all([mikoto.spaces.list(true), mikoto.getMe()]);
   return mikoto;
 }

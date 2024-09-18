@@ -15,7 +15,7 @@ function registerNotifications(mikoto: MikotoClient) {
   // });
 }
 
-interface ApiLoaderProps {
+interface MikotoClientProviderProps {
   fallback?: React.ReactNode;
   children: React.ReactNode;
 }
@@ -38,7 +38,10 @@ type MikotoConnectionState =
   | 'reconnecting'
   | 'disconnected';
 
-export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
+export function MikotoClientProvider({
+  children,
+  fallback,
+}: MikotoClientProviderProps) {
   const [mikoto, setMikoto] = useState<MikotoConnectionState>('connecting');
   const [err, setErr] = useState<AxiosError | null>(null);
 
@@ -60,7 +63,7 @@ export function MikotoApiLoader({ children, fallback }: ApiLoaderProps) {
 
   useEffect(() => {
     if (!initialized.current) {
-      initialized.current = true;
+      // initialized.current = true;
 
       const mi = new MikotoClient(env.PUBLIC_SERVER_URL, {});
       mi.connect();

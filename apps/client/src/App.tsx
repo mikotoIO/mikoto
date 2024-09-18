@@ -8,7 +8,7 @@ import {
   ResetPasswordView,
 } from '@/views/AuthView';
 import MainView from '@/views/MainView';
-import { MikotoApiLoader } from '@/views/MikotoApiLoader';
+import { MikotoApiLoader } from '@/views/MikotoClientProvider';
 import { NotFound } from '@/views/NotFoundPage';
 import { SpaceInviteView } from '@/views/SpaceInviteView';
 

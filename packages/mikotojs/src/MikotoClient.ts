@@ -1,5 +1,7 @@
 import { pluginToken } from '@zodios/plugins';
+import { EventEmitter } from 'events';
 import WebSocket from 'isomorphic-ws';
+import TypedEventEmitter from 'typed-emitter';
 
 import { AuthClient } from './AuthClient';
 import { api, createApiClient } from './api.gen';
@@ -17,6 +19,7 @@ import {
   RoleStore,
   SpaceStore,
 } from './store';
+import { WsEvents } from './websocket';
 
 interface MikotoClientOptions {
   onReady?: (client: MikotoClient) => void;
@@ -43,6 +46,7 @@ export class MikotoClient {
   private timeOfLastRefresh = new Date(0);
 
   // screw all of the above, we're rewriting the entire thing
+  emitter = new EventEmitter() as TypedEventEmitter<WsEvents>;
   messageEmitter = new MessageEmitter();
   channelEmitter = new ChannelEmitter();
   spaceEmitter = new SpaceEmitter();
@@ -76,35 +80,16 @@ export class MikotoClient {
         },
       }),
     );
-
-    // this.transport = new SocketIOClientTransport({
-    //   url: hyperRPCUrl,
-    //   authToken: accessToken,
-    // });
-
-    // this.client = new MainService(this.transport);
-    // this.setupClient();
-
-    // this.client.onReady(() => {
-    //   onReady?.(this);
-    // });
-
-    // this.client.onConnect(() => {
-    //   onConnect?.();
-    // });
-
-    // this.client.onDisconnect(() => {
-    //   onDisconnect?.();
-    // });
   }
 
   async connect() {
     const token = await refreshAuth(this.auth);
+    this.setupClient();
     this.ws = new WebSocket(`ws://localhost:9503/ws?token=${token}`);
     this.ws.onopen = () => {};
     this.ws.onmessage = (event) => {
-      const data = JSON.parse((event as any).data);
-      console.log(data);
+      const msg = JSON.parse((event as any).data);
+      this.emitter.emit(msg.op, msg.data);
     };
     this.ws.onclose = () => {
       this.ws = undefined;
@@ -112,44 +97,86 @@ export class MikotoClient {
   }
 
   setupClient() {
-    // this.spaces.subscribe(this.client.spaces);
-    // this.channels.subscribe(this.client.channels);
-    // this.members.subscribe(this.client.members);
-    // this.roles.subscribe(this.client.roles);
-    // this.client.messages.onCreate((message) => {
-    //   this.messageEmitter.emit(`create/${message.channelId}`, message);
-    // });
-    // this.client.messages.onUpdate((message) => {
-    //   this.messageEmitter.emit(`update/${message.channelId}`, message);
-    // });
-    // this.client.messages.onDelete(({ id, channelId }) => {
-    //   this.messageEmitter.emit(`delete/${channelId}`, id);
-    // });
-    // this.client.channels.onCreate((channel) => {
-    //   this.channelEmitter.emit(`create/${channel.spaceId}`, channel);
-    // });
-    // this.client.channels.onUpdate((channel) => {
-    //   this.channelEmitter.emit(`update/${channel.spaceId}`, channel);
-    // });
-    // this.client.channels.onDelete((channel) => {
-    //   this.channelEmitter.emit(`delete/${channel.spaceId}`, channel.id);
-    // });
-    // this.client.spaces.onCreate((space) => {
-    //   this.spaceEmitter.emit('create/@', space);
-    // });
-    // this.client.spaces.onUpdate((space) => {
-    //   this.spaceEmitter.emit('update/@', space);
-    // });
-    // this.client.spaces.onDelete((space) => {
-    //   this.spaceEmitter.emit('delete/@', space.id);
-    // });
-    // this.client.users.onUpdate((user) => {
-    //   if (this.me && user.id === this.me.id) {
-    //     runInAction(() => {
-    //       Object.assign(this.me, user);
-    //     });
-    //   }
-    // });
+    this.spaces.subscribe({
+      onCreate: (fn) => {
+        this.emitter.on('spaces.onCreate', fn);
+      },
+      onUpdate: (fn) => {
+        this.emitter.on('spaces.onUpdate', fn);
+      },
+      onDelete: (fn) => {
+        this.emitter.on('spaces.onDelete', fn);
+      },
+    });
+
+    this.channels.subscribe({
+      onCreate: (fn) => {
+        this.emitter.on('channels.onCreate', fn);
+      },
+      onUpdate: (fn) => {
+        this.emitter.on('channels.onUpdate', fn);
+      },
+      onDelete: (fn) => {
+        this.emitter.on('channels.onDelete', fn);
+      },
+    });
+
+    this.members.subscribe({
+      onCreate: (fn) => {
+        this.emitter.on('members.onCreate', fn);
+      },
+      onUpdate: (fn) => {
+        this.emitter.on('members.onUpdate', fn);
+      },
+      onDelete: (fn) => {
+        this.emitter.on('members.onDelete', fn);
+      },
+    });
+
+    this.roles.subscribe({
+      onCreate: (fn) => {
+        this.emitter.on('roles.onCreate', fn);
+      },
+      onUpdate: (fn) => {
+        this.emitter.on('roles.onUpdate', fn);
+      },
+      onDelete: (fn) => {
+        this.emitter.on('roles.onDelete', fn);
+      },
+    });
+
+    this.emitter.on('messages.onCreate', (message) => {
+      this.messageEmitter.emit(`create/${message.channelId}`, message);
+    });
+    this.emitter.on('messages.onUpdate', (message) => {
+      this.messageEmitter.emit(`update/${message.channelId}`, message);
+    });
+    this.emitter.on('messages.onDelete', ({ messageId, channelId }) => {
+      this.messageEmitter.emit(`delete/${channelId}`, messageId);
+    });
+    this.emitter.on('channels.onCreate', (channel) => {
+      this.channelEmitter.emit(`create/${channel.spaceId}`, channel);
+    });
+    this.emitter.on('channels.onUpdate', (channel) => {
+      this.channelEmitter.emit(`update/${channel.spaceId}`, channel);
+    });
+    this.emitter.on('channels.onDelete', (channel) => {
+      this.channelEmitter.emit(`delete/${channel.spaceId}`, channel.id);
+    });
+    this.emitter.on('spaces.onCreate', (space) => {
+      this.spaceEmitter.emit('create/@', space);
+    });
+    this.emitter.on('spaces.onUpdate', (space) => {
+      this.spaceEmitter.emit('update/@', space);
+    });
+    this.emitter.on('spaces.onDelete', (space) => {
+      this.spaceEmitter.emit('delete/@', space.id);
+    });
+    this.emitter.on('users.onUpdate', (user) => {
+      if (this.me && user.id === this.me.id) {
+        Object.assign(this.me, user);
+      }
+    });
   }
 
   disconnect() {
@@ -161,6 +188,8 @@ export class MikotoClient {
     this.spaceEmitter.removeAllListeners();
     this.channelEmitter.removeAllListeners();
     this.messageEmitter.removeAllListeners();
+
+    this.emitter.removeAllListeners();
   }
 
   async getMe() {

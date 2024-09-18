@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Channel, ChannelPatch, ChannelType, ChannelUnread, ObjectWithId},
+    entities::{Channel, ChannelKey, ChannelPatch, ChannelType, ChannelUnread, ObjectWithId},
     error::Error,
     functions::pubsub::emit_event,
 };
@@ -80,7 +80,7 @@ async fn delete(Path((_, channel_id)): Path<(Uuid, Uuid)>) -> Result<Json<()>, E
     channel.delete(db()).await?;
     emit_event(
         "channels.onDelete",
-        &ObjectWithId::from_id(channel_id),
+        &channel,
         &format!("spaces:{}", channel.space_id),
     )
     .await?;
@@ -154,7 +154,8 @@ pub fn router() -> AppRouter<State> {
             "onUpdate",
             |channel: Channel, _| async move { Some(channel) },
         )
-        .ws_event("onDelete", |channel: ObjectWithId, _| async move {
-            Some(channel)
-        })
+        .ws_event(
+            "onDelete",
+            |channel: Channel, _| async move { Some(channel) },
+        )
 }

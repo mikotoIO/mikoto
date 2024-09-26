@@ -8,10 +8,22 @@ interface SidebarProps {
   onResize?: (size: NumberSize) => void;
 }
 
+export const RESIZABLE_DISABLES = {
+  top: false,
+  right: false,
+  bottom: false,
+  left: false,
+  topRight: false,
+  bottomRight: false,
+  bottomLeft: false,
+  topLeft: false,
+};
+
 export function Sidebar({ children, position, size, onResize }: SidebarProps) {
   return (
     <Resizable
       enable={{
+        ...RESIZABLE_DISABLES,
         right: position === 'left',
         left: position === 'right',
       }}

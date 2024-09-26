@@ -12,7 +12,7 @@ import { CommandMenuKit } from '@/components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
 import { UserAreaAvatar } from '@/components/UserArea';
 import { faMikoto } from '@/components/icons';
-import { Sidebar } from '@/components/sidebars/Base';
+import { RESIZABLE_DISABLES, Sidebar } from '@/components/sidebars/Base';
 import { FriendSidebar } from '@/components/sidebars/FriendSidebar';
 import { MemberListSidebar } from '@/components/sidebars/MemberListSidebar';
 import { SpaceSidebar } from '@/components/sidebars/SpaceSidebar';
@@ -87,7 +87,7 @@ const SurfaceGroup = observer(
           <SurfaceGroup surfaceNode={head} />
           {tails.map((child, idx) => (
             // eslint-disable-next-line react/no-array-index-key
-            <Resizable key={idx} enable={{ left: true }}>
+            <Resizable key={idx} enable={{ ...RESIZABLE_DISABLES, left: true }}>
               <SurfaceGroup surfaceNode={child} />
             </Resizable>
           ))}

@@ -21,8 +21,8 @@
     "typescript": "^5.4.2"
   },
   "dependencies": {
-    "@hyperschema/client": "^0.0.4",
-    "@mikoto-io/permcheck": "0.0.1",
+    "@hyperschema/client": "workspace:*",
+    "@mikoto-io/permcheck": "workspace:*",
     "@zodios/core": "^10.9.6",
     "@zodios/plugins": "^10.6.0",
     "axios": "^1.6.7",

@@ -26,11 +26,7 @@ function wait(ms: number) {
   });
 }
 
-const PING_INTERVAL = 15 * 1000;
-const PING_TIMEOUT = 10 * 1000;
-
 // exists to "cheat" React Strict Mode
-let clientLock = false;
 
 type MikotoConnectionState =
   | MikotoClient

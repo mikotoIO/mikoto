@@ -1,0 +1,41 @@
+{
+  "name": "@mikoto-io/mikoto.js",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "module": "dist/module/index.js",
+  "typings": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "require": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "run-p build:*",
+    "build:main": "tsc -p tsconfig.json",
+    "build:module": "tsc -p tsconfig.module.json",
+    "generate": "tsx ./generator/openapi.ts",
+    "test": "vitest run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@zodios/core": "^10.9.6",
+    "@zodios/plugins": "^10.6.0",
+    "axios": "^1.7.7",
+    "events": "^3.3.0",
+    "isomorphic-ws": "^5.0.0",
+    "typed-emitter": "^2.1.0",
+    "valtio": "^2.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@apidevtools/swagger-parser": "^10.1.0",
+    "@types/events": "^3.0.3",
+    "@types/ws": "^8.5.12",
+    "openapi-zod-client": "^1.18.2",
+    "openapi3-ts": "^4.4.0"
+  }
+}

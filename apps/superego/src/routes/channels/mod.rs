@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Channel, ChannelKey, ChannelPatch, ChannelType, ChannelUnread, ObjectWithId},
+    entities::{Channel, ChannelPatch, ChannelType, ChannelUnread},
     error::Error,
     functions::pubsub::emit_event,
 };
@@ -53,7 +53,7 @@ async fn create(
     emit_event(
         "channels.onCreate",
         &channel,
-        &format!("spaces:{}", space_id),
+        &format!("space:{}", space_id),
     )
     .await?;
 
@@ -69,7 +69,7 @@ async fn update(
     emit_event(
         "channels.onUpdate",
         &channel,
-        &format!("spaces:{}", channel.space_id),
+        &format!("space:{}", channel.space_id),
     )
     .await?;
     Ok(channel.into())
@@ -81,7 +81,7 @@ async fn delete(Path((_, channel_id)): Path<(Uuid, Uuid)>) -> Result<Json<()>, E
     emit_event(
         "channels.onDelete",
         &channel,
-        &format!("spaces:{}", channel.space_id),
+        &format!("space:{}", channel.space_id),
     )
     .await?;
     Ok(().into())

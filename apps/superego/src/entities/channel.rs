@@ -103,7 +103,7 @@ impl Channel {
         let res = sqlx::query_as(
             r##"
             UPDATE "Channel" SET
-            "name" = COALESCE($2, "name"),
+            "name" = COALESCE($2, "name")
             WHERE "id" = $1
             RETURNING *
             "##,
@@ -116,5 +116,5 @@ impl Channel {
         Ok(res)
     }
 
-    db_entity_delete!("Channel");
+db_entity_delete!("Channel");
 }

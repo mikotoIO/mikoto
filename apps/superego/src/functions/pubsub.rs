@@ -11,6 +11,6 @@ pub async fn emit_event<T: Serialize>(op: &str, data: T, channel: &str) -> Resul
     })
     .to_string();
 
-    redis().publish(channel, o).await?;
+    let _: () = redis().publish(channel, o).await?;
     Ok(())
 }

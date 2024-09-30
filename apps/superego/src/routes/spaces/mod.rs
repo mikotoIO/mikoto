@@ -8,9 +8,7 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{
-        Invite, MemberExt, MemberKey, ObjectWithId, Space, SpaceExt, SpacePatch, SpaceUser,
-    },
+    entities::{Invite, MemberExt, MemberKey, Space, SpaceExt, SpacePatch, SpaceUser},
     error::Error,
     functions::{jwt::Claims, pubsub::emit_event},
 };

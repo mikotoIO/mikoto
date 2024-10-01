@@ -1,7 +1,9 @@
 #[macro_export]
 macro_rules! db_enum {
     ($item:item) => {
-        #[derive(sqlx::Type, Clone, Debug, Serialize, Deserialize, schemars::JsonSchema)]
+        #[derive(
+            sqlx::Type, Clone, Eq, PartialEq, Debug, Serialize, Deserialize, schemars::JsonSchema,
+        )]
         #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
         #[sqlx(rename_all = "SCREAMING_SNAKE_CASE")]
         $item

@@ -116,5 +116,5 @@ impl Channel {
         Ok(res)
     }
 
-db_entity_delete!("Channel");
+    db_entity_delete!("Channel");
 }

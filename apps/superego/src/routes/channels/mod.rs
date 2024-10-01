@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Channel, ChannelPatch, ChannelType, ChannelUnread},
+    entities::{Channel, ChannelPatch, ChannelType, ChannelUnread, Document},
     error::Error,
     functions::pubsub::emit_event,
 };
@@ -50,6 +50,16 @@ async fn create(
         last_updated: Some(chrono::Utc::now().naive_utc()),
     };
     channel.create(db()).await?;
+
+    if channel.category == ChannelType::Document {
+        Document {
+            id: Uuid::new_v4(),
+            channel_id: channel.id,
+            content: "".to_string(),
+        }
+        .create(db())
+        .await?;
+    }
     emit_event(
         "channels.onCreate",
         &channel,

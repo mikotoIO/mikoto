@@ -45,7 +45,6 @@ export class MikotoChannel extends ZSchema(Channel) {
         channelId: this.id,
       },
     });
-    this._patch(channel);
     return this;
   }
 
@@ -102,8 +101,10 @@ export class ChannelManager extends CachedManager<MikotoChannel> {
 
   static _subscribe(client: MikotoClient) {
     client.ws.on('channels.onCreate', (data) => {
-      if (!client.spaces.cache.get(data.spaceId)) return;
+      const space = client.spaces.cache.get(data.spaceId);
+      if (!space) return;
       client.channels._insert(new MikotoChannel(data, client));
+      space.channelIds.push(data.id);
     });
 
     client.ws.on('channels.onUpdate', (data) => {
@@ -113,7 +114,9 @@ export class ChannelManager extends CachedManager<MikotoChannel> {
     });
 
     client.ws.on('channels.onDelete', (data) => {
-      client.channels._delete(data.id);
+      const space = client.spaces.cache.get(data.spaceId);
+      if (!space) return;
+      space.channelIds = space.channelIds.filter((x) => x !== data.id);
     });
   }
 }

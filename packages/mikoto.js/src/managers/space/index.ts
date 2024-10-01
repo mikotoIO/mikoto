@@ -51,9 +51,11 @@ export class MikotoSpace extends ZSchema(SimpleSpaceExt) {
   }
 
   get channels() {
-    return this.channelIds
-      .map((id) => this.client.channels._get(id))
-      .filter((x) => !!x);
+    return proxy(
+      this.channelIds
+        .map((id) => this.client.channels._get(id))
+        .filter((x) => !!x),
+    );
   }
 
   async edit(data: SpaceUpdatePayload) {

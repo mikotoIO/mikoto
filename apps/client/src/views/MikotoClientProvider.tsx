@@ -37,6 +37,7 @@ export function MikotoClientProvider({
   const setupMikotoClient = async (mi: MikotoClient) => {
     try {
       await Promise.all([mi.spaces.list(), mi.user.load()]);
+      (globalThis as any).mikoto = mi;
 
       registerNotifications(mi);
       setMikoto(mi);

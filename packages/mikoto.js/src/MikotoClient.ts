@@ -5,7 +5,7 @@ import { WebsocketApi } from './WebsocketApi';
 import { type Api, createApiClient } from './api.gen';
 import { RelationshipManager, UserManager } from './managers';
 import { ChannelManager } from './managers/channel';
-import { SpaceManager } from './managers/space';
+import { MemberManager, RoleManager, SpaceManager } from './managers/space';
 
 export interface MikotoClientOptions {
   auth: AuthClient;
@@ -57,6 +57,11 @@ export class MikotoClient {
     this.ws = new WebsocketApi({
       url: `${websocketUrl.origin}/ws?token=${this.token}`,
     });
+
+    SpaceManager._subscribe(this);
+    ChannelManager._subscribe(this);
+    MemberManager._subscribe(this);
+    RoleManager._subscribe(this);
   }
 
   disconnect() {

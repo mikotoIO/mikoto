@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tokio = { version = "1.35.1", features = ["full"] }
+tokio = { version = "1.40.0", features = ["full"] }
 # the basic dependencies
 serde = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0.108"
@@ -59,6 +59,9 @@ futures-util = "0.3.30"
 fred = "9.1.2"
 tower-layer = "0.3.3"
 
+yrs = "0.18.2"
+
+
 # database
 [dependencies.sqlx]
 version = "0.7"
@@ -71,3 +74,8 @@ features = [
     "json",
     "migrate",
 ]
+
+
+[dependencies.yrs-axum]
+git = "https://github.com/mikotoIO/yrs-axum"
+branch = "master"

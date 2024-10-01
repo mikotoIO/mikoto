@@ -1,21 +1,15 @@
 import { Box, Flex, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import {
-  MikotoChannel,
-  MikotoRelationship,
-  MikotoSpace,
-  Relationship,
-} from '@mikoto-io/mikoto.js';
-import { observer } from 'mobx-react-lite';
+import { MikotoChannel, MikotoSpace, Relationship } from '@mikoto-io/mikoto.js';
 import { useEffect, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
+import { useSnapshot } from 'valtio/react';
 
 import {
   ContextMenu,
   modalState,
   useContextMenuX,
 } from '@/components/ContextMenu';
-import { Avatar } from '@/components/atoms/Avatar';
 import { useFetchMember, useMikoto } from '@/hooks';
 import { useTabkit } from '@/store/surface';
 
@@ -109,6 +103,9 @@ const ExplorerInner = ({ space }: { space: MikotoSpace }) => {
   const { acks, ackChannel } = useAcks(space);
   const nodeContextMenu = useContextMenuX();
 
+  useSnapshot(space);
+  useSnapshot(space.channels); // TODO: fine-grained subscription
+
   const channelTree = channelToStructuredTree(space.channels, (channel) => ({
     icon: getIconFromChannelType(channel.type),
     id: channel.id,
@@ -126,7 +123,7 @@ const ExplorerInner = ({ space }: { space: MikotoSpace }) => {
   return <ChannelTree nodes={channelTree.descendant ?? []} />;
 };
 
-export const Explorer = ({ space }: { space: MikotoSpace }) => {
+export function Explorer({ space }: { space: MikotoSpace }) {
   const nodeContextMenu = useContextMenuX();
 
   // TODO: return loading indicator
@@ -143,7 +140,7 @@ export const Explorer = ({ space }: { space: MikotoSpace }) => {
       <ExplorerInner space={space} />
     </StyledTree>
   );
-};
+}
 
 export const DMExplorer = ({
   space,

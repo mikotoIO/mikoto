@@ -3,14 +3,15 @@ import styled from '@emotion/styled';
 import { MikotoMessage } from '@mikoto-io/mikoto.js';
 import { makeAutoObservable, runInAction } from 'mobx';
 import { atom } from 'recoil';
+import { useSnapshot } from 'valtio/react';
 
 import { ContextMenu, useContextMenu } from '@/components/ContextMenu';
 import { MessageAvatar } from '@/components/atoms/MessageAvatar';
 import { Markdown } from '@/components/molecules/markdown';
+import { useMikoto } from '@/hooks';
 import { TypingDots } from '@/ui';
 
 import { Timestamp } from './Timestamp';
-import { useMikoto } from '@/hooks';
 
 const MessageContainer = styled.div<{ isSimple?: boolean }>`
   margin: 0;
@@ -93,6 +94,7 @@ export class MessageEditState {
 }
 
 export const MessageItem = ({ message, editState, isSimple }: MessageProps) => {
+  const messageSnap = useSnapshot(message);
   const mikoto = useMikoto();
   const menu = useContextMenu(() => (
     <ContextMenu>
@@ -132,18 +134,18 @@ export const MessageItem = ({ message, editState, isSimple }: MessageProps) => {
       ) : (
         <MessageAvatar
           member={message.member ?? undefined}
-          src={message.author?.avatar ?? undefined}
-          user={message.author ?? undefined}
+          src={messageSnap.author?.avatar ?? undefined}
+          user={messageSnap.author ?? undefined}
         />
       )}
       <MessageInner>
         {!isSimple && (
           <Flex align="center" gap="8px" mb="6px">
-            <Name color={message.member?.roleColor}>
-              {message.author?.name ?? 'Ghost'}
+            <Name color={messageSnap.member?.roleColor}>
+              {messageSnap.author?.name ?? 'Ghost'}
             </Name>
 
-            {message.author?.category === 'BOT' && (
+            {messageSnap.author?.category === 'BOT' && (
               <Tag
                 size="sm"
                 fontSize="2xs"
@@ -156,11 +158,11 @@ export const MessageItem = ({ message, editState, isSimple }: MessageProps) => {
                 BOT
               </Tag>
             )}
-            <Timestamp time={new Date(message.timestamp)} />
+            <Timestamp time={new Date(messageSnap.timestamp)} />
           </Flex>
         )}
         <div>
-          <Markdown content={message.content} />
+          <Markdown content={messageSnap.content} />
           {message.editedTimestamp && (
             <Box as="span" ml={1} color="gray.400" fontSize="xs">
               (edited)

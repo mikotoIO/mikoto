@@ -13,7 +13,7 @@ import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
-import { ClientChannel } from 'mikotojs';
+import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useEffect, useState } from 'react';
 
 import { Surface } from '@/components/Surface';
@@ -42,7 +42,7 @@ function DocumentEditor({
   channel,
   content,
 }: {
-  channel: ClientChannel;
+  channel: MikotoChannel;
   content: string;
 }) {
   const mikoto = useMikoto();
@@ -95,7 +95,7 @@ function DocumentEditor({
         id={channel.id}
         shouldBootstrap={true}
         providerFactory={providerFactory}
-        username={mikoto.me.name}
+        username={mikoto.user.me!.name}
       />
       <OnChangePlugin
         ignoreSelectionChange
@@ -120,7 +120,7 @@ export default function DocumentSurfaceNext({
   channelId: string;
 }) {
   const mikoto = useMikoto();
-  const channel = mikoto.channels.get(channelId)!;
+  const channel = mikoto.channels._get(channelId)!;
   const [content, setContent] = useState<string | null>(null);
 
   // lexical context
@@ -136,7 +136,7 @@ export default function DocumentSurfaceNext({
   };
 
   useEffect(() => {
-    mikoto.api['documents.get']({
+    mikoto.rest['documents.get']({
       params: {
         spaceId: channel.spaceId,
         channelId,

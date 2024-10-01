@@ -1,11 +1,10 @@
+import { MikotoClient } from '@mikoto-io/mikoto.js';
 import { AxiosError } from 'axios';
-import { MikotoClient, constructMikoto } from 'mikotojs';
 import React, { useEffect, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { env } from '@/env';
 import { notifyFromMessage } from '@/functions/notify';
-import { refreshAuth } from '@/functions/refreshAuth';
 import { AuthContext, MikotoContext, useInterval } from '@/hooks';
 import { authClient } from '@/store/authClient';
 
@@ -18,12 +17,6 @@ function registerNotifications(mikoto: MikotoClient) {
 interface MikotoClientProviderProps {
   fallback?: React.ReactNode;
   children: React.ReactNode;
-}
-
-function wait(ms: number) {
-  return new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('timeout succeeded')), ms);
-  });
 }
 
 // exists to "cheat" React Strict Mode
@@ -43,7 +36,7 @@ export function MikotoClientProvider({
 
   const setupMikotoClient = async (mi: MikotoClient) => {
     try {
-      await Promise.all([mi.spaces.list(true), mi.getMe()]);
+      await Promise.all([mi.spaces.list(), mi.user.load()]);
 
       registerNotifications(mi);
       setMikoto(mi);
@@ -61,8 +54,10 @@ export function MikotoClientProvider({
     if (!initialized.current) {
       // initialized.current = true;
 
-      const mi = new MikotoClient(env.PUBLIC_SERVER_URL, {});
-      mi.connect();
+      const mi = new MikotoClient({
+        url: env.PUBLIC_AUTH_URL,
+        auth: authClient,
+      });
       setupMikotoClient(mi);
 
       return () => {

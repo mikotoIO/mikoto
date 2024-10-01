@@ -1,4 +1,4 @@
-import { AuthClient, ClientSpace, MikotoClient } from 'mikotojs';
+import { AuthClient, MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
 import React, { useContext, useEffect } from 'react';
 
 import { useInterval } from './useInterval';
@@ -7,7 +7,7 @@ export { useInterval };
 
 export const MikotoContext = React.createContext<MikotoClient>(undefined!);
 
-export function useMikoto() {
+export function useMikoto(): MikotoClient {
   return useContext(MikotoContext);
 }
 
@@ -19,8 +19,8 @@ export function useAuthClient() {
 
 export function useEvent() {}
 
-export const useFetchMember = (space: ClientSpace) => {
+export const useFetchMember = (space: MikotoSpace) => {
   useEffect(() => {
-    space.fetchMembers();
+    space.members.list();
   }, [space.id]);
 };

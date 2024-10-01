@@ -1,8 +1,14 @@
 import { Box, Flex, Grid, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faHashtag } from '@fortawesome/free-solid-svg-icons';
+import {
+  Channel,
+  MessageExt,
+  MessageKey,
+  MikotoChannel,
+  MikotoMessage,
+} from '@mikoto-io/mikoto.js';
 import throttle from 'lodash/throttle';
-import { Channel, ClientChannel, ClientMessage, MessageExt } from 'mikotojs';
 import { runInAction } from 'mobx';
 import { Observer, observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -64,7 +70,7 @@ function ChannelHead({ channel }: { channel: Channel }) {
 // as Virtuoso does not allow negative values
 const FUNNY_NUMBER = 69_420_000;
 
-const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
+const RealMessageView = observer(({ channel }: { channel: MikotoChannel }) => {
   useFetchMember(channel.space!);
 
   const virtuosoRef = useRef<VirtuosoHandle>(null);
@@ -118,7 +124,7 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
     [],
   );
 
-  const [msgs, setMsgs] = useState<ClientMessage[] | null>(null);
+  const [msgs, setMsgs] = useState<MikotoMessage[] | null>(null);
   useEffect(() => {
     channel.listMessages(50, null).then((m) => {
       setMsgs(m);
@@ -139,6 +145,8 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
   });
 
   const createFn = (x: MessageExt) => {
+    if (x.channelId !== channel.id) return;
+
     setMsgs((xs) => {
       if (xs === null) return null;
       setCurrentTypers((ts) => ts.filter((y) => y.userId !== x.author?.id));
@@ -148,40 +156,43 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
       //     timestamp: x.timestamp,
       //   })
       //   .then(() => {});
-      mikoto.api['channels.acknowledge'](undefined, {
+      mikoto.rest['channels.acknowledge'](undefined, {
         params: {
           spaceId: channel.spaceId,
           channelId: channel.id,
         },
       }).then(() => {});
       setScrollToBottom(true);
-      return [...xs, new ClientMessage(mikoto, x)];
+      return [...xs, new MikotoMessage(x, mikoto)];
     });
   };
 
   const updateFn = (x: MessageExt) => {
+    if (x.channelId !== channel.id) return;
     setMsgs((xs) => {
       if (xs === null) return null;
-      return xs?.map((m) => (m.id === x.id ? new ClientMessage(mikoto, x) : m));
+      return xs?.map((m) => (m.id === x.id ? new MikotoMessage(x, mikoto) : m));
     });
   };
 
-  const deleteFn = (id: string) => {
+  const deleteFn = (x: MessageKey) => {
+    if (x.channelId !== channel.id) return;
+
     setMsgs((xs) => {
       if (xs === null) return null;
       setScrollToBottom(true);
-      return xs.filter((y) => y.id !== id);
+      return xs.filter((y) => y.id !== x.messageId);
     });
   };
 
   useEffect(() => {
-    mikoto.messageEmitter.on(`create/${channel.id}`, createFn);
-    mikoto.messageEmitter.on(`update/${channel.id}`, updateFn);
-    mikoto.messageEmitter.on(`delete/${channel.id}`, deleteFn);
+    mikoto.ws.on('messages.onCreate', createFn);
+    mikoto.ws.on('messages.onUpdate', updateFn);
+    mikoto.ws.on('messages.onDelete', deleteFn);
     return () => {
-      mikoto.messageEmitter.off(`create/${channel.id}`, createFn);
-      mikoto.messageEmitter.off(`update/${channel.id}`, updateFn);
-      mikoto.messageEmitter.off(`delete/${channel.id}`, deleteFn);
+      mikoto.ws.off('messages.onCreate', createFn);
+      mikoto.ws.off('messages.onUpdate', updateFn);
+      mikoto.ws.off('messages.onDelete', deleteFn);
     };
   }, [channel.id]);
 
@@ -285,7 +296,7 @@ const RealMessageView = observer(({ channel }: { channel: ClientChannel }) => {
 
 export function MessageSurface({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
-  const channel = mikoto.channels.get(channelId)!;
+  const channel = mikoto.channels._get(channelId)!;
 
   return (
     <CurrentSpaceContext.Provider value={channel.space!}>

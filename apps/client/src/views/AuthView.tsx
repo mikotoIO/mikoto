@@ -96,11 +96,11 @@ export function LoginView() {
       <AuthForm
         onSubmit={handleSubmit(async (form) => {
           try {
-            const tk = await authClient.login(
-              form.email,
-              form.password,
-              form.captcha,
-            );
+            const tk = await authClient.login({
+              email: form.email,
+              password: form.password,
+              // captcha: form.captcha,
+            });
             if (tk.refreshToken) {
               localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
             }
@@ -150,12 +150,12 @@ export function RegisterView() {
       <AuthForm
         onSubmit={handleSubmit(async (form) => {
           try {
-            const tk = await authClient.register(
-              form.name,
-              form.email,
-              form.password,
-              form.captcha,
-            );
+            const tk = await authClient.register({
+              name: form.name,
+              email: form.email,
+              password: form.password,
+              captcha: form.captcha,
+            });
             if (tk.refreshToken) {
               localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
             }
@@ -206,7 +206,10 @@ export function ResetPasswordView() {
     <AuthView>
       <AuthForm
         onSubmit={handleSubmit(async (data) => {
-          await authClient.resetPassword(data.email);
+          await authClient.resetPassword({
+            email: data.email,
+            captcha: data.captcha,
+          });
           setSent(true);
         })}
       >
@@ -262,7 +265,10 @@ export function ResetChangePasswordView() {
             timeout = setTimeout(() => {
               navigate('/login');
             }, 1400);
-            authClient.resetPasswordSubmit(data.password, params.token!); // TODO error handling
+            authClient.resetPasswordSubmit({
+              token: params.token!,
+              password: data.password,
+            }); // TODO error handling
           } catch (e) {
             if (timeout) clearTimeout(timeout);
             error.setError((e as any)?.response?.data);

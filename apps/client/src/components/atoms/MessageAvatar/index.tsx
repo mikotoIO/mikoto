@@ -1,8 +1,7 @@
 import { Box, Checkbox, Flex } from '@chakra-ui/react';
 import styled from '@emotion/styled';
+import { MikotoMember, Role, User } from '@mikoto-io/mikoto.js';
 import { permissions } from '@mikoto-io/permcheck';
-import { ClientMember, Role, User, checkMemberPermission } from 'mikotojs';
-import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 
@@ -50,7 +49,7 @@ function RoleSetter({
   member,
 }: {
   roles: Role[];
-  member: ClientMember;
+  member: MikotoMember;
 }) {
   const mikoto = useMikoto();
 
@@ -97,67 +96,68 @@ function RoleSetter({
   );
 }
 
-export const MemberContextMenu = observer(
-  ({ user, member }: { user: User; member?: ClientMember }) => {
-    const setModal = useSetRecoilState(modalState);
+export function MemberContextMenu({
+  user,
+  member,
+}: {
+  user: User;
+  member?: MikotoMember;
+}) {
+  const setModal = useSetRecoilState(modalState);
 
-    const [roleEditorOpen, setRoleEditorOpen] = useState(false);
-    const setContextMenu = useSetRecoilState(contextMenuState);
+  const [roleEditorOpen, setRoleEditorOpen] = useState(false);
+  const setContextMenu = useSetRecoilState(contextMenuState);
 
-    return (
-      <div style={{ display: 'grid', gridGap: '8px' }}>
-        <AvatarContextWrapper>
-          {member === null ? (
-            'loading'
-          ) : (
-            <div>
-              <Avatar
-                src={user.avatar ?? undefined}
-                size={80}
-                onClick={() => {
-                  setModal({
-                    elem: <ProfileModal user={user} />,
-                  });
-                  setContextMenu(null);
-                }}
-              />
-              <h1>{user.name}</h1>
-              <hr />
-              {member && (
-                <>
-                  <h2>Roles</h2>
-                  <Box gap={2}>
-                    {member.roles.map(
-                      (r) => r && <RoleBadge key={r.id} role={r} />,
-                    )}
-                    {checkMemberPermission(
-                      member.space.member!,
-                      permissions.manageRoles,
-                    ) && (
-                      <BaseRoleBadge
-                        cursor="pointer"
-                        onClick={() => setRoleEditorOpen((x) => !x)}
-                      >
-                        +
-                      </BaseRoleBadge>
-                    )}
-                  </Box>
-                </>
-              )}
-            </div>
-          )}
-        </AvatarContextWrapper>
-        {member && roleEditorOpen && (
-          <RoleSetter roles={member.space?.roles!} member={member!} />
+  return (
+    <div style={{ display: 'grid', gridGap: '8px' }}>
+      <AvatarContextWrapper>
+        {member === null ? (
+          'loading'
+        ) : (
+          <div>
+            <Avatar
+              src={user.avatar ?? undefined}
+              size={80}
+              onClick={() => {
+                setModal({
+                  elem: <ProfileModal user={user} />,
+                });
+                setContextMenu(null);
+              }}
+            />
+            <h1>{user.name}</h1>
+            <hr />
+            {member && (
+              <>
+                <h2>Roles</h2>
+                <Box gap={2}>
+                  {member.roles.map(
+                    (r) => r && <RoleBadge key={r.id} role={r} />,
+                  )}
+                  {member.checkPermission(permissions.manageRoles) && (
+                    <BaseRoleBadge
+                      cursor="pointer"
+                      onClick={() => setRoleEditorOpen((x) => !x)}
+                    >
+                      +
+                    </BaseRoleBadge>
+                  )}
+                </Box>
+              </>
+            )}
+          </div>
         )}
-      </div>
-    );
-  },
-);
+      </AvatarContextWrapper>
+      {member && roleEditorOpen && (
+        <RoleSetter roles={member.space?.roles!.values()!} member={member!} />
+      )}
+    </div>
+  );
+}
 
 interface MessageAvatarProps extends AvatarProps {
   user?: User;
-  member?: ClientMember;
+  member?: MikotoMember;
 }
 
 /**

@@ -1,9 +1,9 @@
 import { Box } from '@chakra-ui/react';
-import { ClientChannel } from 'mikotojs';
 import { useState } from 'react';
 
 import { useInterval, useMikoto } from '@/hooks';
 import { TypingDots } from '@/ui';
+import { MikotoChannel } from '@mikoto-io/mikoto.js';
 
 export interface Typer {
   timestamp: number;
@@ -22,7 +22,7 @@ export function useTyping() {
 
 export interface TypingIndicatorProps {
   typers: Typer[];
-  channel: ClientChannel;
+  channel: MikotoChannel;
 }
 
 export function TypingIndicator({ typers, channel }: TypingIndicatorProps) {
@@ -37,7 +37,7 @@ export function TypingIndicator({ typers, channel }: TypingIndicatorProps) {
             {typers
               .map(
                 (x) =>
-                  mikoto.spaces.get(channel.spaceId)?.members?.get(x.userId)
+                  mikoto.spaces._get(channel.spaceId)?.members?._get(x.userId)
                     ?.user.name ?? 'Unknown',
               )
               .join(', ')}

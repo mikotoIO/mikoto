@@ -15,8 +15,8 @@ import {
 import styled from '@emotion/styled';
 import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { MikotoSpace, Role } from '@mikoto-io/mikoto.js';
 import { checkPermission, permissions } from '@mikoto-io/permcheck';
-import { ClientSpace, Role, SpaceExt } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
@@ -148,7 +148,7 @@ const StyledRoleEditor = styled(Form)`
 `;
 
 const RoleEditor = observer(
-  ({ role, space }: { space: SpaceExt; role: Role }) => {
+  ({ role, space }: { space: MikotoSpace; role: Role }) => {
     const mikoto = useMikoto();
     const form = useForm({
       defaultValues: {
@@ -165,7 +165,7 @@ const RoleEditor = observer(
         h="100%"
         onSubmit={form.handleSubmit((d) => {
           const data = { ...d, permissions: perms, color };
-          mikoto.api['roles.update'](data, {
+          mikoto.rest['roles.update'](data, {
             params: { spaceId: space.id, roleId: role.id },
           }).then(() => {});
         })}
@@ -201,7 +201,7 @@ const RoleEditor = observer(
               type="button"
               variant="danger"
               onClick={() => {
-                mikoto.api['roles.delete'](undefined, {
+                mikoto.rest['roles.delete'](undefined, {
                   params: { spaceId: space.id, roleId: role.id },
                 }).then(() => {});
               }}
@@ -215,11 +215,11 @@ const RoleEditor = observer(
   },
 );
 
-export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
+export const RolesSubsurface = observer(({ space }: { space: MikotoSpace }) => {
   const mikoto = useMikoto();
 
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
-  const role = space.roles.find((x) => x.id === selectedRoleId);
+  const role = space.roles.values().find((x) => x.id === selectedRoleId);
   // const role = rolesDelta.data.find((x) => x.id === selectedRoleId);
   return (
     <SettingSurface style={{ paddingRight: 0 }}>
@@ -230,7 +230,7 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
             leftIcon={<FontAwesomeIcon icon={faCirclePlus} />}
             variant="primary"
             onClick={async () => {
-              await mikoto.api['roles.create'](
+              await mikoto.rest['roles.create'](
                 { name: 'New Role' },
                 {
                   params: { spaceId: space.id },
@@ -240,7 +240,7 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
           >
             New Role
           </Button>
-          {space.roles.map((r) => (
+          {space.roles.values().map((r) => (
             <SidebarButton
               key={r.id}
               selected={selectedRoleId === r.id}

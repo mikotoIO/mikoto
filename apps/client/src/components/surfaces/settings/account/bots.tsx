@@ -99,7 +99,7 @@ function BotCreateModal() {
     <ModalContent rounded="md" p={4} maxW="480px">
       <Form
         onSubmit={handleSubmit(async (form) => {
-          await authClient.createBot(form.name);
+          await authClient.createBot({ name: form.name });
           setModal(null);
         })}
       >

@@ -76,7 +76,6 @@
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
     "markdown-draft-js": "^2.4.0",
-    "mikotojs": "workspace:*",
     "mobx": "^6.10.0",
     "mobx-react-lite": "^4.0.3",
     "re-resizable": "^6.9.9",

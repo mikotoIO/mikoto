@@ -1,20 +1,31 @@
-import { proxy, ref } from "valtio/vanilla";
-import type { MikotoClient } from "../MikotoClient";
-import { type SpaceExt, User } from "../api.gen";
-import { ZSchema } from "../helpers/ZSchema";
+import { proxy, ref } from 'valtio/vanilla';
+
+import type { MikotoClient } from '../MikotoClient';
+import { User } from '../api.gen';
+import { ZSchema } from '../helpers/ZSchema';
+import { Manager } from './base';
 
 export class MikotoUser extends ZSchema(User) {
-	client!: MikotoClient;
+  client!: MikotoClient;
 
-	constructor(base: SpaceExt, client: MikotoClient) {
-		const cached = client.spaces.cache.get(base.id);
-		if (cached) {
-			cached._patch(base);
-			return cached;
-		}
+  constructor(base: User, client: MikotoClient) {
+    super(base);
+    this.client = ref(client);
+    return proxy(this);
+  }
+}
 
-		super(base);
-		this.client = ref(client);
-		return proxy(this);
-	}
+export class UserManager extends Manager {
+  constructor(public client: MikotoClient) {
+    super(client);
+    proxy(this);
+  }
+
+  me?: MikotoUser;
+
+  async load() {
+    const res = await this.client.rest['user.get']();
+    this.me = new MikotoUser(res, this.client);
+    return this.me;
+  }
 }

@@ -1,15 +1,16 @@
-import { proxy, ref } from "valtio/vanilla";
-import type { MikotoClient } from "../../MikotoClient";
+import { proxy, ref } from 'valtio/vanilla';
+
+import type { MikotoClient } from '../../MikotoClient';
 import {
   type ChannelCreatePayload,
   SpaceExt,
   type SpaceUpdatePayload,
-} from "../../api.gen";
-import { ZSchema } from "../../helpers/ZSchema";
-import { CachedManager } from "../base";
-import { MikotoChannel } from "../channel";
-import { MemberManager } from "./member";
-import { RoleManager } from "./role";
+} from '../../api.gen';
+import { ZSchema } from '../../helpers/ZSchema';
+import { CachedManager } from '../base';
+import { MikotoChannel } from '../channel';
+import { MemberManager } from './member';
+import { RoleManager } from './role';
 
 const SimpleSpaceExt = SpaceExt.omit({
   channels: true,
@@ -36,7 +37,7 @@ export class MikotoSpace extends ZSchema(SimpleSpaceExt) {
 
     this.client = ref(client);
     this.channelIds = base.channels.map(
-      (channel) => new MikotoChannel(channel, client).id
+      (channel) => new MikotoChannel(channel, client).id,
     );
     this.roles = new RoleManager(this, base.roles);
     this.members = new MemberManager(this);
@@ -56,29 +57,43 @@ export class MikotoSpace extends ZSchema(SimpleSpaceExt) {
   }
 
   async edit(data: SpaceUpdatePayload) {
-    await this.client.rest["spaces.update"](data, {
+    await this.client.rest['spaces.update'](data, {
       params: { spaceId: this.id },
     });
     return this;
   }
 
   async delete() {
-    await this.client.rest["spaces.delete"](undefined, {
+    await this.client.rest['spaces.delete'](undefined, {
       params: { spaceId: this.id },
     });
   }
 
   async leave() {
-    await this.client.rest["spaces.leave"](undefined, {
+    await this.client.rest['spaces.leave'](undefined, {
       params: { spaceId: this.id },
     });
   }
 
+  async listUnread() {
+    const unread = await this.client.rest['channels.unreads']({
+      params: { spaceId: this.id },
+    });
+    return unread;
+  }
+
   async createChannel(data: ChannelCreatePayload) {
-    const channel = await this.client.rest["channels.create"](data, {
+    const channel = await this.client.rest['channels.create'](data, {
       params: { spaceId: this.id },
     });
     return channel;
+  }
+
+  /**
+   * Get member of the current user
+   */
+  get member() {
+    return this.members._get(this.client.user.me!.id);
   }
 }
 
@@ -89,33 +104,33 @@ export class SpaceManager extends CachedManager<MikotoSpace> {
   }
 
   async list() {
-    const spaces = await this.client.rest["spaces.list"]();
+    const spaces = await this.client.rest['spaces.list']();
     return spaces.map((space) => new MikotoSpace(space, this.client));
   }
 
   async join(invite: string) {
-    const space = await this.client.rest["spaces.join"](undefined, {
+    const space = await this.client.rest['spaces.join'](undefined, {
       params: { invite },
     });
     return new MikotoSpace(space, this.client);
   }
 
   static _subscribe(client: MikotoClient) {
-    client.ws.on("spaces.onCreate", (data) => {
+    client.ws.on('spaces.onCreate', (data) => {
       const space = new MikotoSpace(data, client);
       client.spaces._insert(space);
     });
 
-    client.ws.on("spaces.onUpdate", (data) => {
+    client.ws.on('spaces.onUpdate', (data) => {
       const space = client.spaces._get(data.id);
       if (space) space._patch(data);
     });
 
-    client.ws.on("spaces.onDelete", (data) => {
+    client.ws.on('spaces.onDelete', (data) => {
       client.spaces._delete(data.id);
     });
   }
 }
 
-export * from "./member";
-export * from "./role";
+export * from './member';
+export * from './role';

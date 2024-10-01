@@ -9,8 +9,8 @@ import {
   useTracks,
 } from '@livekit/components-react';
 import '@livekit/components-styles';
+import { VoiceToken } from '@mikoto-io/mikoto.js';
 import { RoomEvent, Track } from 'livekit-client';
-import { VoiceToken } from 'mikotojs';
 import { useEffect, useState } from 'react';
 
 import { Surface } from '@/components/Surface';
@@ -47,11 +47,11 @@ const VoiceViewWrapper = styled.div`
 
 export default function VoiceSurface({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
-  const channel = mikoto.channels.get(channelId)!;
+  const channel = mikoto.channels._get(channelId)!;
 
   const [voiceConfig, setVoiceConfig] = useState<VoiceToken | null>(null);
   useEffect(() => {
-    mikoto.api['voice.join'](undefined, {
+    mikoto.rest['voice.join'](undefined, {
       params: {
         spaceId: channel.spaceId,
         channelId: channel.id,

@@ -11,6 +11,10 @@ export class CachedManager<T extends { id: string }> {
 		this.cache = proxyMap();
 	}
 
+	values() {
+		return [...this.cache.values()];
+	}
+
 	_get(id: string) {
 		return this.cache.get(id);
 	}

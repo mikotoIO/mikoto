@@ -136,7 +136,7 @@ const AppView = observer(() => {
       ? leftSidebar.spaceId
       : undefined;
 
-  const space = spaceId ? mikoto.spaces.get(spaceId) : undefined;
+  const space = spaceId ? mikoto.spaces._get(spaceId) : undefined;
 
   return (
     <AppContainer>
@@ -156,7 +156,7 @@ const AppView = observer(() => {
           <SidebarRest />
         </div>
         <div className="bars">
-          <SpaceSidebar spaces={mikoto.spaces} />
+          <SpaceSidebar />
           {workspace.leftOpen && (
             <Sidebar
               position="left"

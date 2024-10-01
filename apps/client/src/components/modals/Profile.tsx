@@ -9,7 +9,7 @@ import {
 import styled from '@emotion/styled';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { User } from 'mikotojs';
+import { User } from '@mikoto-io/mikoto.js';
 import { useSetRecoilState } from 'recoil';
 
 import { modalState } from '@/components/ContextMenu';
@@ -69,7 +69,7 @@ export function ProfileModal({ user }: { user: User }) {
               <MikotoId>@cactus.mikoto.io</MikotoId>
             </div>
             <div>
-              {mikoto.me.id !== user.id && (
+              {mikoto.user.me?.id !== user.id && (
                 <ButtonGroup>
                   <Button
                     variant="success"
@@ -90,9 +90,12 @@ export function ProfileModal({ user }: { user: User }) {
                       // const dm = await mikoto.client.relations.openDm({
                       //   relationId: user.id,
                       // });
-                      const dm = await mikoto.api['relations.openDm'](undefined, {
-                        params: { relationId: user.id },
-                      });
+                      const dm = await mikoto.rest['relations.openDm'](
+                        undefined,
+                        {
+                          params: { relationId: user.id },
+                        },
+                      );
                       // TODO: Rework DMs
                       // const spaceId = dm.space?.id;
                       // if (spaceId) {

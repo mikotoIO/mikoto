@@ -30,7 +30,7 @@ function SpaceCreateForm({ closeModal }: { closeModal: () => void }) {
   return (
     <Form
       onSubmit={form.handleSubmit(async (data) => {
-        await mikoto.api['spaces.create']({ name: data.spaceName });
+        await mikoto.rest['spaces.create']({ name: data.spaceName });
         closeModal();
         form.reset();
       })}
@@ -55,7 +55,7 @@ function SpaceJoinForm({ closeModal }: { closeModal: () => void }) {
     <Form
       onSubmit={handleSubmit(async (data) => {
         try {
-          await mikoto.api['spaces.join'](undefined, {
+          await mikoto.rest['spaces.join'](undefined, {
             params: { invite: data.inviteCode },
           });
           closeModal();

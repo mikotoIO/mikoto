@@ -27,6 +27,7 @@
     "axios": "^1.7.7",
     "events": "^3.3.0",
     "isomorphic-ws": "^5.0.0",
+    "lodash-es": "^4.17.21",
     "typed-emitter": "^2.1.0",
     "valtio": "^2.0.0",
     "zod": "^3.23.8"
@@ -34,6 +35,8 @@
   "devDependencies": {
     "@apidevtools/swagger-parser": "^10.1.0",
     "@types/events": "^3.0.3",
+    "@types/lodash": "^4.17.9",
+    "@types/lodash-es": "^4.17.12",
     "@types/ws": "^8.5.12",
     "openapi-zod-client": "^1.18.2",
     "openapi3-ts": "^4.4.0"

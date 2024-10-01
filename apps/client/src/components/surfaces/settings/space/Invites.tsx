@@ -1,16 +1,16 @@
 import { Box, Button } from '@chakra-ui/react';
-import { Invite, SpaceExt } from 'mikotojs';
+import { Invite, MikotoSpace, SpaceExt } from '@mikoto-io/mikoto.js';
 import { useEffect, useState } from 'react';
 
 import { useMikoto } from '@/hooks';
 import { SettingSurface } from '@/views';
 
-export function Invites({ space }: { space: SpaceExt }) {
+export function Invites({ space }: { space: MikotoSpace }) {
   const mikoto = useMikoto();
   const [invites, setInvites] = useState<Invite[] | null>(null);
 
   useEffect(() => {
-    mikoto.api['invites.list']({
+    mikoto.rest['invites.list']({
       params: { spaceId: space.id },
     }).then((x) => {
       setInvites(x);
@@ -29,7 +29,7 @@ export function Invites({ space }: { space: SpaceExt }) {
             <Button
               variant="danger"
               onClick={async () => {
-                await mikoto.api['invites.delete'](undefined, {
+                await mikoto.rest['invites.delete'](undefined, {
                   params: { spaceId: space.id, inviteId: invite.id },
                 });
 

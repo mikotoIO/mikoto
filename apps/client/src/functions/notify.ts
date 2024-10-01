@@ -1,4 +1,4 @@
-import { MessageExt, MikotoClient } from 'mikotojs';
+import { MessageExt, MikotoClient } from '@mikoto-io/mikoto.js';
 
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 
@@ -7,10 +7,10 @@ audio.volume = 0.3;
 audio.load();
 
 export function notifyFromMessage(mikoto: MikotoClient, message: MessageExt) {
-  if (message.authorId === mikoto.me.id) return;
-  const channel = mikoto.channels.get(message.channelId);
+  if (message.authorId === mikoto.user.me!.id) return;
+  const channel = mikoto.channels._get(message.channelId);
   if (!channel) return;
-  const space = mikoto.spaces.get(channel.spaceId);
+  const space = mikoto.spaces._get(channel.spaceId);
   if (!space) return;
 
   const notification = new Notification(

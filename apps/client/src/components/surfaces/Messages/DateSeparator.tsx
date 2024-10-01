@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { MessageExt } from 'mikotojs';
+import { MessageExt } from '@mikoto-io/mikoto.js';
 
 const DAYS_OF_WEEK = [
   'Sunday',

@@ -1,6 +1,6 @@
 import { Button, Flex, Grid } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { SpaceExt } from 'mikotojs';
+import { SpaceExt } from '@mikoto-io/mikoto.js';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -31,7 +31,7 @@ export function SpaceInviteViewInner() {
     // mikoto.client.spaces.getSpaceFromInvite({ inviteCode }).then((x) => {
     //   setSpace(x);
     // });
-    mikoto.api['spaces.preview']({ params: { invite: inviteCode } }).then(
+    mikoto.rest['spaces.preview']({ params: { invite: inviteCode } }).then(
       (x) => {
         setSpace(x);
       },
@@ -56,7 +56,7 @@ export function SpaceInviteViewInner() {
                 // TODO: BEFORE THAT, improve Hyperschema error handling
                 // apparently I did not do a good enough job at it
                 try {
-                  await mikoto.api['spaces.join'](undefined, {
+                  await mikoto.rest['spaces.join'](undefined, {
                     params: { invite: inviteCode },
                   });
                   window.location.href = `/`;

@@ -36,10 +36,11 @@ export const FriendSidebar = observer(() => {
   const [, setLeftSidebar] = useRecoilState(treebarSpaceState);
 
   useEffect(() => {
-    mikoto.relations.list(true);
+    // mikoto.relations.list(true);
   }, []);
 
-  const friends = Array.from(mikoto.relations.values());
+  // FIXME: rework relations
+  const friends: any[] = []; // Array.from(mikoto.relations.values());
 
   return (
     <Box p={2}>

@@ -2,7 +2,7 @@ import { Box, Tag } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faCrown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ClientMember, ClientSpace } from 'mikotojs';
+import { MikotoMember, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
@@ -24,7 +24,7 @@ const StyledMember = styled.div`
   ${hoverableButtonLike}
 `;
 
-const MemberElement = observer(({ member }: { member: ClientMember }) => {
+const MemberElement = observer(({ member }: { member: MikotoMember }) => {
   const setContextMenu = useSetRecoilState(contextMenuState);
   const elemRef = useRef<HTMLDivElement>(null);
 
@@ -53,7 +53,7 @@ const MemberElement = observer(({ member }: { member: ClientMember }) => {
       <Box className="name" color={member.roleColor}>
         {member.user.name}
       </Box>
-      {member.isSpaceOwner && (
+      {member.isOwner && (
         <Box display="inline-block" color="yellow.500">
           <FontAwesomeIcon className="crown" icon={faCrown} />
         </Box>
@@ -82,33 +82,31 @@ const StyledMemberListSidebar = styled.div`
   box-sizing: border-box;
 `;
 
-export const MemberListSidebar = observer(
-  ({ space }: { space: ClientSpace }) => {
-    useFetchMember(space);
+export const MemberListSidebar = ({ space }: { space: MikotoSpace }) => {
+  useFetchMember(space);
 
-    const spaceMembers = Array.from(space.members?.values() ?? []).toSorted(
-      (a, b) => a.user.name.localeCompare(b.user.name),
-    );
+  const spaceMembers = Array.from(space.members?.cache.values() ?? []).toSorted(
+    (a, b) => a.user.name.localeCompare(b.user.name),
+  );
 
-    return (
-      <StyledMemberListSidebar>
-        {spaceMembers && (
-          <Virtuoso
-            components={{
-              Header() {
-                return (
-                  <Box color="gray.200" p={4} fontWeight="bold">
-                    Members
-                  </Box>
-                );
-              },
-            }}
-            style={{ height: '100%', overflowX: 'hidden' }}
-            data={spaceMembers}
-            itemContent={(idx, member) => <MemberElement member={member} />}
-          />
-        )}
-      </StyledMemberListSidebar>
-    );
-  },
-);
+  return (
+    <StyledMemberListSidebar>
+      {spaceMembers && (
+        <Virtuoso
+          components={{
+            Header() {
+              return (
+                <Box color="gray.200" p={4} fontWeight="bold">
+                  Members
+                </Box>
+              );
+            },
+          }}
+          style={{ height: '100%', overflowX: 'hidden' }}
+          data={spaceMembers}
+          itemContent={(idx, member) => <MemberElement member={member} />}
+        />
+      )}
+    </StyledMemberListSidebar>
+  );
+};

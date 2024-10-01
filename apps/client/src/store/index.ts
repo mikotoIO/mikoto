@@ -1,4 +1,4 @@
-import { SpaceExt } from 'mikotojs';
+import { MikotoSpace } from '@mikoto-io/mikoto.js';
 import React from 'react';
 import { atom, useSetRecoilState } from 'recoil';
 import { recoilPersist } from 'recoil-persist';
@@ -32,7 +32,7 @@ export function useModalKit() {
 }
 
 // some local contexts
-export const CurrentSpaceContext = React.createContext<SpaceExt | undefined>(
+export const CurrentSpaceContext = React.createContext<MikotoSpace | undefined>(
   undefined,
 );
 

@@ -274,7 +274,7 @@ export const TabbedView = observer(
         if ('tab' in item) {
           reorderFn(item.dragIndex, -1, item.surfaceLeaf);
         } else {
-          surfaceNode.tabs.push(channelToTab(mikoto.channels.get(item.id)!));
+          surfaceNode.tabs.push(channelToTab(mikoto.channels._get(item.id)!));
           surfaceNode.index = surfaceNode.tabs.length - 1;
         }
       },

@@ -32,13 +32,15 @@ export class MikotoSpace extends ZSchema(SimpleSpaceExt) {
     }
 
     super(base);
+
+    this.channelIds = base.channels.map(
+      (channel) => new MikotoChannel(channel, client).id,
+    );
+
     const instance = proxy(this);
     client.spaces._insert(instance);
 
     this.client = ref(client);
-    this.channelIds = base.channels.map(
-      (channel) => new MikotoChannel(channel, client).id,
-    );
     this.roles = new RoleManager(this, base.roles);
     this.members = new MemberManager(this);
 

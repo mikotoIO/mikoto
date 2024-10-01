@@ -104,6 +104,7 @@ const ExplorerInner = ({ space }: { space: MikotoSpace }) => {
   const nodeContextMenu = useContextMenuX();
 
   useSnapshot(space);
+  // console.log(cid.channelIds);
   useSnapshot(space.channels); // TODO: fine-grained subscription
 
   const channelTree = channelToStructuredTree(space.channels, (channel) => ({

@@ -119,7 +119,7 @@ export class MemberManager extends CachedManager<MikotoMember> {
     client.ws.on('members.onDelete', (data) => {
       const space = client.spaces.cache.get(data.spaceId);
       if (!space) return;
-      space.members._delete(data.id);
+      space.members._delete(data.userId);
     });
   }
 }

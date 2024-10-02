@@ -100,7 +100,7 @@ CREATE TABLE public."Channel" (
     id uuid NOT NULL,
     TYPE public."ChannelType" DEFAULT 'TEXT' :: public."ChannelType" NOT NULL,
     parentId uuid,
-    "order" int DEFAULT 0 NOT NULL,
+    order int DEFAULT 0 NOT NULL,
     name varchar(64) NOT NULL,
     spaceId uuid NOT NULL,
     lastUpdated timestamp(3)

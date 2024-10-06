@@ -4,7 +4,8 @@ use schemars::JsonSchema;
 use uuid::Uuid;
 
 use crate::{
-    entities::Role,
+    db::db,
+    entities::{Role, RolePatch},
     error::Error,
     routes::{router::AppRouter, ws::state::State},
 };
@@ -15,28 +16,32 @@ pub struct RoleCreatePayload {
     pub name: String,
 }
 
-#[derive(Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct RoleUpdatePayload {
-    pub name: String,
-}
-
-async fn create(
-    _space_id: Path<Uuid>,
-    _body: Json<RoleCreatePayload>,
-) -> Result<Json<Role>, Error> {
-    Err(Error::Todo)
+async fn create(space_id: Path<Uuid>, body: Json<RoleCreatePayload>) -> Result<Json<Role>, Error> {
+    let role = Role {
+        id: Uuid::new_v4(),
+        space_id: *space_id,
+        name: body.name.clone(),
+        color: None,
+        permissions: "0".to_string(),
+        position: 0,
+    };
+    role.create(db()).await?;
+    Ok(role.into())
 }
 
 async fn update(
-    _id: Path<(Uuid, Uuid)>,
-    _body: Json<RoleUpdatePayload>,
+    Path((_space_id, role_id)): Path<(Uuid, Uuid)>,
+    patch: Json<RolePatch>,
 ) -> Result<Json<Role>, Error> {
-    Err(Error::Todo)
+    let role = Role::find_by_id(role_id, db()).await?;
+    let role = role.update(&patch, db()).await?;
+    Ok(role.into())
 }
 
-async fn delete(_id: Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
-    Err(Error::Todo)
+async fn delete(Path((_space_id, role_id)): Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
+    let role = Role::find_by_id(role_id, db()).await?;
+    role.delete(db()).await?;
+    Ok(Json(()))
 }
 
 static TAG: &str = "Roles";

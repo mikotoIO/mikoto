@@ -29,7 +29,7 @@ entity!(
 
 /// # Space
 /// Represents a Mikoto Space.
-#[derive(Serialize, Deserialize, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct SpaceExt {
     #[serde(flatten)]

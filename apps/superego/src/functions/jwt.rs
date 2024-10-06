@@ -96,6 +96,7 @@ where
                 message: "Invalid authorization header".to_string(),
             })?;
         let claims = Claims::decode(&parse_bearer_token(auth_header)?, jwt_key())?;
+        parts.extensions.insert(claims.clone());
         Ok(claims)
     }
 }

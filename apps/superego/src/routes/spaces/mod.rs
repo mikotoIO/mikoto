@@ -11,6 +11,7 @@ use crate::{
     entities::{Invite, MemberExt, MemberKey, Space, SpaceExt, SpacePatch, SpaceUser},
     error::Error,
     functions::{jwt::Claims, pubsub::emit_event},
+    middlewares::load::Load,
 };
 
 use super::{
@@ -71,10 +72,7 @@ async fn leave_space(space: &SpaceExt, user_id: Uuid) -> Result<(), Error> {
     Ok(())
 }
 
-async fn get(Path(space_id): Path<Uuid>) -> Result<Json<SpaceExt>, Error> {
-    // TODO: Check if the member is in space
-    let space = Space::find_by_id(space_id, db()).await?;
-    let space = SpaceExt::dataload_one(space, db()).await?;
+async fn get(Load(space): Load<SpaceExt>) -> Result<Json<SpaceExt>, Error> {
     Ok(space.into())
 }
 
@@ -112,9 +110,7 @@ async fn update(
     Ok(space.into())
 }
 
-async fn delete(Path(space_id): Path<Uuid>, claims: Claims) -> Result<Json<()>, Error> {
-    let space = Space::find_by_id(space_id, db()).await?;
-    let space = SpaceExt::dataload_one(space, db()).await?;
+async fn delete(Load(space): Load<SpaceExt>, claims: Claims) -> Result<Json<()>, Error> {
     if space.base.owner_id == Some(claims.sub.parse()?) {
         space.base.delete(db()).await?;
         emit_event("spaces.onDelete", &space, &format!("user:{}", claims.sub)).await?;

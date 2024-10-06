@@ -5,6 +5,7 @@ use std::iter::IntoIterator;
 pub mod captcha;
 pub mod jwt;
 pub mod mail;
+pub mod permissions;
 pub mod pubsub;
 pub mod sha3;
 

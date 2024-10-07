@@ -18,6 +18,10 @@ pub struct Env {
     pub web_url: String,
     pub smtp_sender: Option<String>,
     pub smtp_url: Option<String>,
+
+    pub livekit_server: Option<String>,
+    pub livekit_key: Option<String>,
+    pub livekit_secret: Option<String>,
 }
 
 static ENV: OnceLock<Env> = OnceLock::new();

@@ -60,6 +60,11 @@ fred = "9.1.2"
 tower-layer = "0.3.3"
 
 yrs = "0.18.2"
+num = "0.4.3"
+livekit-api = { version = "0.4.0", features = [
+    "rustls-tls-native-roots",
+    "signal-client-tokio",
+] }
 
 
 # database

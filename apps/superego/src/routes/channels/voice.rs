@@ -40,7 +40,7 @@ async fn join(
     let user = User::find_by_id(Uuid::parse_str(&claim.sub)?, db()).await?;
 
     let token = AccessToken::with_api_key(&key, &secret)
-        .with_identity(&claim.sub)
+        .with_identity(&user.id.to_string())
         .with_name(&user.name)
         .with_grants(VideoGrants {
             room_join: true,

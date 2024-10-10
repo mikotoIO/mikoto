@@ -1,6 +1,12 @@
-import { Box, Heading } from '@chakra-ui/react';
+import { Box, Flex, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { faFileLines } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBookAtlas,
+  faFileLines,
+  faPencilSquare,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { $convertFromMarkdownString, TRANSFORMERS } from '@lexical/markdown';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { CollaborationPlugin } from '@lexical/react/LexicalCollaborationPlugin';
 import {
@@ -14,11 +20,14 @@ import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPl
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import Tippy from '@tippyjs/react';
 import { useEffect, useState } from 'react';
 
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
 import { useInterval, useMikoto } from '@/hooks';
+import { Tooltip, createTooltip } from '@/ui';
 
 import { EditorContextBar } from './EditorContextBar';
 import { EDITOR_NODES } from './editorNodes';
@@ -114,11 +123,38 @@ function DocumentEditor({
   );
 }
 
-export default function DocumentSurfaceNext({
-  channelId,
+function DocumentViewer({
+  channel,
+  content,
 }: {
-  channelId: string;
+  channel: MikotoChannel;
+  content: string;
 }) {
+  return (
+    <Box>
+      <EditorWrapper>
+        <RichTextPlugin
+          contentEditable={
+            <ContentEditable
+              className="editor-input"
+              style={{
+                outline: 'none',
+              }}
+            />
+          }
+          placeholder={
+            <Box color="gray.500" pos="absolute" top={0} pointerEvents="none">
+              Write something here...
+            </Box>
+          }
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+      </EditorWrapper>
+    </Box>
+  );
+}
+
+export function DocumentSurfaceNext({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
   const channel = mikoto.channels._get(channelId)!;
   const [content, setContent] = useState<string | null>(null);
@@ -163,6 +199,76 @@ export default function DocumentSurfaceNext({
           </LexicalComposer>
         )}
       </Box>
+    </Surface>
+  );
+}
+
+const ActionTooltip = createTooltip({
+  animation: false,
+  placement: 'bottom',
+  offset: [0, 4],
+});
+
+function DocumentActions({ channel }: { channel: MikotoChannel }) {
+  return (
+    <Flex
+      bg="gray.750"
+      px={4}
+      py={2}
+      mb={4}
+      rounded="md"
+      align="center"
+      justify="space-between"
+    >
+      <Box className="left">#{channel.name}</Box>
+      <Flex className="right" fontSize="xl" gap={3}>
+        <ActionTooltip tooltip="Edit">
+          <FontAwesomeIcon icon={faPencilSquare} />
+        </ActionTooltip>
+        <ActionTooltip tooltip="Publish">
+          <FontAwesomeIcon icon={faBookAtlas} />
+        </ActionTooltip>
+      </Flex>
+    </Flex>
+  );
+}
+
+export default function DocumentSurface({ channelId }: { channelId: string }) {
+  const mikoto = useMikoto();
+  const channel = mikoto.channels._get(channelId)!;
+
+  const { data: document } = useSuspenseQuery({
+    queryKey: ['documents.get', channel.spaceId, channel.id],
+    queryFn: async () => {
+      return await mikoto.rest['documents.get']({
+        params: {
+          spaceId: channel.spaceId,
+          channelId,
+        },
+      });
+    },
+  });
+
+  return (
+    <Surface scroll padded>
+      <TabName name={channel.name} icon={faFileLines} />
+      <DocumentActions channel={channel} />
+      <LexicalComposer
+        initialConfig={{
+          namespace: 'Editor',
+          editable: false,
+          nodes: EDITOR_NODES,
+          theme: lexicalTheme,
+          editorState: () =>
+            $convertFromMarkdownString(document.content, TRANSFORMERS),
+          // editorState: markdownToEditorS
+          onError(error: Error) {
+            throw error;
+          },
+        }}
+      >
+        <ContentEditable className="editor-input" style={{ outline: 'none' }} />
+      </LexicalComposer>
     </Surface>
   );
 }

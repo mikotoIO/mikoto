@@ -65,6 +65,7 @@ livekit-api = { version = "0.4.0", features = [
     "rustls-tls-native-roots",
     "signal-client-tokio",
 ] }
+bitflags = "2.6.0"
 
 
 # database

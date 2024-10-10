@@ -63,7 +63,7 @@
     "electron": "^27.0.3",
     "emoji-mart": "^5.5.2",
     "events": "^3.3.0",
-    "framer-motion": "^11.0.8",
+    "framer-motion": "^11.11.7",
     "fuse.js": "^6.6.2",
     "gemoji": "^8.1.0",
     "i18next": "^23.3.0",

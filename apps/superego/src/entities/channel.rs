@@ -9,6 +9,7 @@ use crate::{db_entity_delete, db_enum, db_find_by_id, db_list_where, entity, err
 use super::group_by_key;
 
 db_enum!(
+    #[sqlx(type_name = "ChannelType")]
     pub enum ChannelType {
         Text,
         Voice,

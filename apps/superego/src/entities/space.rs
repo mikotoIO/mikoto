@@ -6,6 +6,7 @@ use crate::{db_entity_delete, db_enum, db_find_by_id, entities::Role, entity, er
 use super::Channel;
 
 db_enum!(
+    #[sqlx(type_name = "SpaceType")]
     pub enum SpaceType {
         None,
         Dm,
@@ -82,8 +83,8 @@ impl Space {
                 INSERT INTO "Channel" ("id", "spaceId", "name", "order")
                 VALUES (gen_random_uuid(), $1, 'general', 0)
                 RETURNING "id"
-            )
-            WITH "r" AS (
+            ),
+            "r" AS (
                 INSERT INTO "Role" ("id", "spaceId", "name", "position", "permissions")
                 VALUES (gen_random_uuid(), $1, '@everyone', -1, '0')
                 RETURNING "id"

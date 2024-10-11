@@ -6,6 +6,7 @@ import { MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
 import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useSnapshot } from 'valtio/react';
 
 import { modalState, useContextMenu } from '@/components/ContextMenu';
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
@@ -175,15 +176,16 @@ function JoinSpaceButon() {
   );
 }
 
-export const SpaceSidebar = () => {
+export function SpaceSidebar() {
   const mikoto = useMikoto();
   const [spaceId, setSpaceId] = useRecoilState(treebarSpaceState);
 
+  useSnapshot(mikoto.spaces);
   const contextMenu = useContextMenu(() => <SpaceBackContextMenu />);
 
   const [order, setOrder] = useState<string[]>(() =>
     // TODO: persist to server
-    JSON.parse(localStorage.getItem('spaceOrder') ?? '[]'),
+    JSON.parse(localStorage.getItem('spaceOrder') ?? '[]')
   );
   const [spaceArray, isOrdered] = orderSpaces(mikoto, order);
   if (!isOrdered) {
@@ -197,14 +199,13 @@ export const SpaceSidebar = () => {
         <Pill h={spaceId === null ? 32 : 0} />
         <StyledSpaceIcon
           style={{
-            background:
-              spaceId === null
-                ? 'linear-gradient(133deg, #2298ff 0%, rgba(59,108,255,1) 100%)'
-                : undefined,
+            background: spaceId === null
+              ? 'linear-gradient(133deg, #2298ff 0%, rgba(59,108,255,1) 100%)'
+              : undefined,
           }}
           onClick={() => {
             setSpaceId(null);
-          }}
+          } }
         >
           <FontAwesomeIcon icon={faMikoto} fontSize="28px" />
         </StyledSpaceIcon>
@@ -224,7 +225,7 @@ export const SpaceSidebar = () => {
                 localStorage.setItem('spaceOrder', JSON.stringify(reordered));
                 return reordered;
               });
-            }}
+            } }
             deps={[index]}
           >
             <SidebarSpaceIcon space={space} />
@@ -233,4 +234,4 @@ export const SpaceSidebar = () => {
       <JoinSpaceButon />
     </StyledSpaceSidebar>
   );
-};
+}

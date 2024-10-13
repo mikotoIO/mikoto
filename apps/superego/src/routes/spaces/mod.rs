@@ -115,9 +115,7 @@ async fn delete(Load(space): Load<SpaceExt>, claims: Claims) -> Result<Json<()>,
         space.base.delete(db()).await?;
         emit_event("spaces.onDelete", &space, &format!("user:{}", claims.sub)).await?;
     } else {
-        return Err(Error::Unauthorized {
-            message: "Only the owner may delete the space".to_string(),
-        });
+        return Err(Error::unauthorized("Only the owner may delete the space"));
     }
     Ok(().into())
 }

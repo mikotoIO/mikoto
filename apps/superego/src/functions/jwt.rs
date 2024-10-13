@@ -66,14 +66,10 @@ impl From<&Account> for Claims {
 fn parse_bearer_token(token: &str) -> Result<String, Error> {
     let parts: Vec<&str> = token.split_whitespace().collect();
     if parts.len() != 2 {
-        return Err(Error::Unauthorized {
-            message: "Invalid authorization header".to_string(),
-        });
+        return Err(Error::unauthorized("Invalid authorization header"));
     }
     if parts[0] != "Bearer" {
-        return Err(Error::Unauthorized {
-            message: "Invalid authorization header".to_string(),
-        });
+        return Err(Error::unauthorized("Invalid authorization header"));
     }
     Ok(parts[1].to_string())
 }
@@ -88,13 +84,9 @@ where
         let auth_header = parts
             .headers
             .get("authorization")
-            .ok_or(Error::Unauthorized {
-                message: "No authorization header".to_string(),
-            })?
+            .ok_or(Error::unauthorized("Invalid authorization header"))?
             .to_str()
-            .map_err(|_| Error::Unauthorized {
-                message: "Invalid authorization header".to_string(),
-            })?;
+            .map_err(|_| Error::unauthorized("Invalid authorization header"))?;
         let claims = Claims::decode(&parse_bearer_token(auth_header)?, jwt_key())?;
         parts.extensions.insert(claims.clone());
         Ok(claims)

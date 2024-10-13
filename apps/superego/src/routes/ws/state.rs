@@ -32,9 +32,9 @@ impl WebSocketState for State {
     async fn initialize(params: Self::Initial) -> Result<(Self, Vec<String>), Error> {
         let conn_id = Uuid::new_v4();
         let claims = Claims::decode(
-            &params.token.ok_or(Error::Unauthorized {
-                message: "Token not provided".to_string(),
-            })?,
+            &params
+                .token
+                .ok_or(Error::unauthorized("Token not provided"))?,
             jwt_key(),
         )?;
         let (user, spaces) = tokio::try_join!(

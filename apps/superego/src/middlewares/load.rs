@@ -75,9 +75,10 @@ where
             }
         })?;
 
-        let claim: &Claims = parts.extensions.get().ok_or(Error::Unauthorized {
-            message: "No authorization header".to_string(),
-        })?;
+        let claim: &Claims = parts
+            .extensions
+            .get()
+            .ok_or(Error::unauthorized("No authorization header"))?;
 
         let member = SpaceUser::get_by_key(
             &MemberKey::new(path.space_id, Uuid::parse_str(&claim.sub)?),
@@ -85,9 +86,7 @@ where
         )
         .await
         .map_err(|err| match err {
-            Error::NotFound => Error::Unauthorized {
-                message: "You are not a member of this space".to_string(),
-            },
+            Error::NotFound => Error::unauthorized("You are not a member of this space"),
             _ => err,
         })?;
         let member = MemberExt::dataload_one(member, db()).await?;

@@ -93,6 +93,10 @@ impl IntoResponse for Error {
             Error::Miscallaneous { status, .. } => status,
             Error::NotFound => StatusCode::NOT_FOUND,
             Error::WrongPassword => StatusCode::UNAUTHORIZED,
+
+            Error::Unauthorized { .. } => StatusCode::UNAUTHORIZED,
+            Error::Forbidden { .. } => StatusCode::FORBIDDEN,
+            Error::ValidationFailed => StatusCode::BAD_REQUEST,
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         };
 

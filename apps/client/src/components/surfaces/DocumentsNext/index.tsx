@@ -21,13 +21,12 @@ import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import Tippy from '@tippyjs/react';
 import { useEffect, useState } from 'react';
 
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
 import { useInterval, useMikoto } from '@/hooks';
-import { Tooltip, createTooltip } from '@/ui';
+import { createTooltip } from '@/ui';
 
 import { EditorContextBar } from './EditorContextBar';
 import { EDITOR_NODES } from './editorNodes';
@@ -123,37 +122,6 @@ function DocumentEditor({
   );
 }
 
-function DocumentViewer({
-  channel,
-  content,
-}: {
-  channel: MikotoChannel;
-  content: string;
-}) {
-  return (
-    <Box>
-      <EditorWrapper>
-        <RichTextPlugin
-          contentEditable={
-            <ContentEditable
-              className="editor-input"
-              style={{
-                outline: 'none',
-              }}
-            />
-          }
-          placeholder={
-            <Box color="gray.500" pos="absolute" top={0} pointerEvents="none">
-              Write something here...
-            </Box>
-          }
-          ErrorBoundary={LexicalErrorBoundary}
-        />
-      </EditorWrapper>
-    </Box>
-  );
-}
-
 export function DocumentSurfaceNext({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
   const channel = mikoto.channels._get(channelId)!;
@@ -233,6 +201,60 @@ function DocumentActions({ channel }: { channel: MikotoChannel }) {
   );
 }
 
+interface DocumentReaderProps {
+  content: string;
+}
+
+function DocumentReader({ content }: DocumentReaderProps) {
+  return (
+    <LexicalComposer
+      initialConfig={{
+        namespace: 'Editor',
+        editable: false,
+        nodes: EDITOR_NODES,
+        theme: lexicalTheme,
+        editorState: () => $convertFromMarkdownString(content, TRANSFORMERS),
+        // editorState: markdownToEditorS
+        onError(error: Error) {
+          throw error;
+        },
+      }}
+    >
+      <RichTextPlugin
+        contentEditable={
+          <ContentEditable
+            className="editor-input"
+            style={{
+              outline: 'none',
+            }}
+          />
+        }
+        placeholder={
+          <Flex
+            color="gray.500"
+            top={0}
+            justify="center"
+            pointerEvents="none"
+            align="center"
+            direction="column"
+          >
+            <Box mb={8}>
+              <FontAwesomeIcon
+                icon={faFileLines}
+                fontSize="100px"
+                opacity={0.2}
+              />
+            </Box>
+            <Box>It's a blank page for now.</Box>
+            <Box>but also an empty canvas to write something beautiful.</Box>
+          </Flex>
+        }
+        ErrorBoundary={LexicalErrorBoundary}
+      />
+    </LexicalComposer>
+  );
+}
+
 export default function DocumentSurface({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
   const channel = mikoto.channels._get(channelId)!;
@@ -253,22 +275,7 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
     <Surface scroll padded>
       <TabName name={channel.name} icon={faFileLines} />
       <DocumentActions channel={channel} />
-      <LexicalComposer
-        initialConfig={{
-          namespace: 'Editor',
-          editable: false,
-          nodes: EDITOR_NODES,
-          theme: lexicalTheme,
-          editorState: () =>
-            $convertFromMarkdownString(document.content, TRANSFORMERS),
-          // editorState: markdownToEditorS
-          onError(error: Error) {
-            throw error;
-          },
-        }}
-      >
-        <ContentEditable className="editor-input" style={{ outline: 'none' }} />
-      </LexicalComposer>
+      <DocumentReader content={document.content} />
     </Surface>
   );
 }

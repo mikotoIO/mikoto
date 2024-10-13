@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{MemberExt, MemberKey, SpaceUser},
+    entities::{MemberExt, MemberKey, Role, RoleToSpaceUser, SpaceUser},
     error::Error,
     functions::pubsub::emit_event,
     routes::{router::AppRouter, ws::state::State},
@@ -48,12 +48,43 @@ async fn update(
     Err(Error::Todo)
 }
 
+async fn add_role(
+    Path((space_id, user_id, role_id)): Path<(Uuid, Uuid, Uuid)>,
+) -> Result<Json<MemberExt>, Error> {
+    let key = MemberKey::new(space_id, user_id);
+    let member = SpaceUser::get_by_key(&key, db()).await?;
+    let role = Role::find_by_id(role_id, db()).await?;
+    if role.space_id != space_id {
+        return Err(Error::forbidden("Role does not belong to Space"));
+    }
+
+    RoleToSpaceUser::create(role.id, member.id, db()).await?;
+    let member = MemberExt::dataload_one(member, db()).await?;
+    emit_event("members.onUpdate", &member, &format!("space:{}", space_id)).await?;
+    Ok(member.into())
+}
+
+async fn remove_role(
+    Path((space_id, user_id, role_id)): Path<(Uuid, Uuid, Uuid)>,
+) -> Result<Json<MemberExt>, Error> {
+    let key = MemberKey::new(space_id, user_id);
+    let member = SpaceUser::get_by_key(&key, db()).await?;
+    let role = Role::find_by_id(role_id, db()).await?;
+    if role.space_id != space_id {
+        return Err(Error::forbidden("Role does not belong to Space"));
+    }
+
+    RoleToSpaceUser::delete(role.id, member.id, db()).await?;
+    let member = MemberExt::dataload_one(member, db()).await?;
+    emit_event("members.onUpdate", &member, &format!("space:{}", space_id)).await?;
+    Ok(member.into())
+}
+
 async fn delete(Path((space_id, user_id)): Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
     let key = MemberKey::new(space_id, user_id);
     let member = SpaceUser::get_by_key(&key, db()).await?;
     let member = MemberExt::dataload_one(member, db()).await?;
     member.base.delete(db()).await?;
-
     emit_event("members.onDelete", &member, &format!("space:{}", space_id)).await?;
     Ok(().into())
 }
@@ -94,6 +125,22 @@ pub fn router() -> AppRouter<State> {
             "/:userId",
             delete_with(delete, |o| {
                 o.tag(TAG).id("members.delete").summary("Ban Member")
+            }),
+        )
+        .route(
+            "/:userId/roles/:roleId",
+            post_with(add_role, |o| {
+                o.tag(TAG)
+                    .id("members.addRole")
+                    .summary("Add Role to Member")
+            }),
+        )
+        .route(
+            "/:userId/roles/:roleId",
+            delete_with(remove_role, |o| {
+                o.tag(TAG)
+                    .id("members.removeRole")
+                    .summary("Remove Role from Member")
             }),
         )
         .ws_event(

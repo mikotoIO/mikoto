@@ -13,6 +13,8 @@ pub enum Error {
     NotFound,
     #[error("{message}")]
     Unauthorized { message: String },
+    #[error("{message}")]
+    Forbidden { message: String },
     #[error("Validation failed")]
     ValidationFailed,
 
@@ -62,6 +64,24 @@ impl Error {
         Self::Miscallaneous {
             code: code.to_string(),
             status,
+            message: message.to_string(),
+        }
+    }
+
+    pub fn internal(message: &str) -> Self {
+        Self::InternalServerError {
+            message: message.to_string(),
+        }
+    }
+
+    pub fn unauthorized(message: &str) -> Self {
+        Self::Unauthorized {
+            message: message.to_string(),
+        }
+    }
+
+    pub fn forbidden(message: &str) -> Self {
+        Self::Forbidden {
             message: message.to_string(),
         }
     }

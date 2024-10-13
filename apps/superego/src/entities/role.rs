@@ -136,4 +136,40 @@ impl RoleToSpaceUser {
             .map(|(k, v)| (k, v.into_iter().map(|x| x.role_id).collect()))
             .collect())
     }
+
+    pub async fn create<'c, X: sqlx::PgExecutor<'c>>(
+        role_id: Uuid,
+        member_id: Uuid,
+        db: X,
+    ) -> Result<(), Error> {
+        sqlx::query(
+            r##"
+            INSERT INTO "_RoleToSpaceUser" ("A", "B")
+            VALUES ($1, $2)
+            "##,
+        )
+        .bind(&role_id)
+        .bind(&member_id)
+        .execute(db)
+        .await?;
+        Ok(())
+    }
+
+    pub async fn delete<'c, X: sqlx::PgExecutor<'c>>(
+        role_id: Uuid,
+        member_id: Uuid,
+        db: X,
+    ) -> Result<(), Error> {
+        sqlx::query(
+            r##"
+            DELETE FROM "_RoleToSpaceUser"
+            WHERE "A" = $1 AND "B" = $2
+            "##,
+        )
+        .bind(&role_id)
+        .bind(&member_id)
+        .execute(db)
+        .await?;
+        Ok(())
+    }
 }

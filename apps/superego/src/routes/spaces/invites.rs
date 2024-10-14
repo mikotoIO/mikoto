@@ -8,6 +8,7 @@ use crate::{
     db::db,
     entities::Invite,
     error::Error,
+    functions::jwt::Claims,
     routes::{router::AppRouter, ws::state::State},
 };
 
@@ -18,14 +19,15 @@ static TAG: &str = "Spaces";
 pub struct InviteCreatePayload {}
 
 async fn create(
-    _space_id: Path<Uuid>,
+    Path(space_id): Path<Uuid>,
+    claim: Claims,
     _body: Json<InviteCreatePayload>,
 ) -> Result<Json<Invite>, Error> {
     let invite = Invite {
         id: nanoid!(12),
-        space_id: Uuid::new_v4(),
+        space_id,
         created_at: chrono::Utc::now().naive_utc(),
-        creator_id: Uuid::new_v4(),
+        creator_id: claim.sub.parse()?,
     };
     invite.create(db()).await?;
     Ok(invite.into())

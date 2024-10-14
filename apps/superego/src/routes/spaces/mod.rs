@@ -61,14 +61,21 @@ async fn join_space(space: &SpaceExt, user_id: Uuid) -> Result<(), Error> {
     Ok(())
 }
 
-async fn leave_space(space: &SpaceExt, user_id: Uuid) -> Result<(), Error> {
-    let key = MemberKey {
-        space_id: space.base.id,
-        user_id,
-    };
+async fn leave_space(space: &SpaceExt, member: &MemberExt) -> Result<(), Error> {
+    let key = member.key();
     SpaceUser::delete_by_key(&key, db()).await?;
-    emit_event("members.onDelete", key, &format!("space:{}", space.base.id)).await?;
-    emit_event("spaces.onDelete", &space, &format!("user:{}", user_id)).await?;
+    emit_event(
+        "members.onDelete",
+        &member,
+        &format!("space:{}", space.base.id),
+    )
+    .await?;
+    emit_event(
+        "spaces.onDelete",
+        &space,
+        &format!("user:{}", member.base.user_id),
+    )
+    .await?;
     Ok(())
 }
 
@@ -140,7 +147,12 @@ async fn join(Path(invite): Path<String>, claims: Claims) -> Result<Json<SpaceEx
 async fn leave(Path(space_id): Path<Uuid>, claims: Claims) -> Result<Json<()>, Error> {
     let space = Space::find_by_id(space_id, db()).await?;
     let space = SpaceExt::dataload_one(space, db()).await?;
-    leave_space(&space, claims.sub.parse()?).await?;
+
+    let member =
+        SpaceUser::get_by_key(&MemberKey::new(space_id, claims.sub.parse()?), db()).await?;
+    let member = MemberExt::dataload_one(member, db()).await?;
+
+    leave_space(&space, &member).await?;
     Ok(().into())
 }
 

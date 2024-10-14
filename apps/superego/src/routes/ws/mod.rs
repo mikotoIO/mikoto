@@ -29,7 +29,7 @@ pub trait WebSocketState: Sized + Send + Sync + 'static {
     fn clear_actions(&mut self) -> Vec<SocketAction>;
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Operation {
     pub op: String,
     pub data: serde_json::Value,
@@ -96,7 +96,12 @@ async fn handle_socket<S: WebSocketState>(
                 continue; // no filter for this event
             };
 
-            if let Some(data) = filter(msg.data, state.clone()).await? {
+            let res = filter(msg.data, state.clone()).await.map_err(|e| {
+                warn!("Error handling event \"{}\": {}", msg.op, e);
+                e
+            })?;
+
+            if let Some(data) = res {
                 let actions = { state.write().await.clear_actions() };
                 for action in actions {
                     match action {
@@ -129,7 +134,6 @@ async fn handle_socket<S: WebSocketState>(
             } else {
                 continue; // no filter for this event
             };
-
             filter(msg.data, state.clone()).await?;
         }
 

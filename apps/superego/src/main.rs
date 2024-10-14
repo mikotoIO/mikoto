@@ -25,6 +25,9 @@ async fn main() {
     let env = env::env();
     pretty_env_logger::init();
 
+    println!("{}", include_str!("./ascii2.txt"));
+    env.print_env_info();
+
     let (db, redis) = join!(db::init(), db::init_redis());
     db.unwrap();
     redis.unwrap();
@@ -33,7 +36,6 @@ async fn main() {
 
     let addr = format!("0.0.0.0:{}", env.port);
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
-    println!("{}", include_str!("./ascii2.txt"));
     info!(
         "👉⚡🪙  Mikoto API server is running on on http://{}",
         &addr

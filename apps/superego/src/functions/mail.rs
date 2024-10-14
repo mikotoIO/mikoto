@@ -52,20 +52,20 @@ impl MailSender {
     }
 
     pub fn from_env() -> Self {
-        MailSender {
-            from: env()
-                .smtp_sender
-                .as_ref()
-                .expect("SMTP_SENDER not set")
-                .to_string(),
-            transport: match &env().smtp_url {
-                None => MailTransport::Dummy,
-                Some(url) => MailTransport::Smtp(
-                    AsyncSmtpTransport::<Tokio1Executor>::from_url(&url)
+        if let Some(smtp) = &env().smtp {
+            MailSender {
+                from: smtp.sender.clone(),
+                transport: MailTransport::Smtp(
+                    AsyncSmtpTransport::<Tokio1Executor>::from_url(&smtp.url)
                         .unwrap()
                         .build(),
                 ),
-            },
+            }
+        } else {
+            MailSender {
+                from: "dummy@mikoto.example".to_string(),
+                transport: MailTransport::Dummy,
+            }
         }
     }
 }

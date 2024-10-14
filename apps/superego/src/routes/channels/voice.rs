@@ -25,12 +25,8 @@ async fn join(
     Path((_space_id, channel_id)): Path<(Uuid, Uuid)>,
     claim: Claims,
 ) -> Result<Json<VoiceToken>, Error> {
-    let (url, key, secret) = if let (Some(url), Some(key), Some(secret)) = (
-        env().livekit_server.as_ref(),
-        env().livekit_key.as_ref(),
-        env().livekit_secret.as_ref(),
-    ) {
-        (url, key, secret)
+    let livekit = if let Some(livekit) = env().livekit.as_ref() {
+        livekit
     } else {
         return Err(Error::InternalServerError {
             message: "LiveKit server not configured".to_string(),
@@ -39,7 +35,7 @@ async fn join(
 
     let user = User::find_by_id(Uuid::parse_str(&claim.sub)?, db()).await?;
 
-    let token = AccessToken::with_api_key(&key, &secret)
+    let token = AccessToken::with_api_key(&livekit.key, &livekit.secret)
         .with_identity(&user.id.to_string())
         .with_name(&user.name)
         .with_grants(VideoGrants {
@@ -53,7 +49,7 @@ async fn join(
         })?;
 
     Ok(VoiceToken {
-        url,
+        url: &livekit.server,
         token,
         channel_id,
     }

@@ -17,8 +17,8 @@ thiserror = "1.0.63"
 strum = { version = "0.26", features = ["derive"] }
 
 # env
-dotenv = "0.15.0"
-envy = "0.4.2"
+dotenvy = "0.15.7"
+serde-env = "0.2.0"
 log = "0.4.21"
 pretty_env_logger = "0.5.0"
 

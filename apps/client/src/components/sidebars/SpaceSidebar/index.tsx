@@ -9,6 +9,7 @@ import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useSnapshot } from 'valtio/react';
 
 import { modalState, useContextMenu } from '@/components/ContextMenu';
+import { UserAreaAvatar } from '@/components/UserArea';
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import { StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
 import { faMikoto } from '@/components/icons';
@@ -38,9 +39,9 @@ const StyledIconWrapper = styled.div`
   position: relative;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 8px;
-  padding-left: 8px;
-  padding-right: 8px;
+  margin-bottom: 4px;
+  padding-left: 6px;
+  padding-right: 4px;
 `;
 
 interface SidebarSpaceIconProps {
@@ -108,6 +109,7 @@ function SidebarSpaceIcon({ space }: SidebarSpaceIconProps) {
       <StyledIconWrapper>
         <Pill h={isActive ? 32 : 0} />
         <StyledSpaceIcon
+          size={ICON_SIZE}
           onContextMenu={contextMenu}
           icon={space.icon ? normalizeMediaUrl(space.icon) : undefined}
           onDoubleClick={() => {
@@ -161,6 +163,7 @@ function JoinSpaceButon() {
     <SpaceIconTooltip tooltip="Add / Join Space">
       <StyledIconWrapper>
         <StyledSpaceIcon
+          size={ICON_SIZE}
           color="blue.500"
           fontSize="18px"
           onClick={() => {
@@ -176,6 +179,8 @@ function JoinSpaceButon() {
   );
 }
 
+const ICON_SIZE = '40px';
+
 export function SpaceSidebar() {
   const mikoto = useMikoto();
   const [spaceId, setSpaceId] = useRecoilState(treebarSpaceState);
@@ -185,7 +190,7 @@ export function SpaceSidebar() {
 
   const [order, setOrder] = useState<string[]>(() =>
     // TODO: persist to server
-    JSON.parse(localStorage.getItem('spaceOrder') ?? '[]')
+    JSON.parse(localStorage.getItem('spaceOrder') ?? '[]'),
   );
   const [spaceArray, isOrdered] = orderSpaces(mikoto, order);
   if (!isOrdered) {
@@ -195,19 +200,24 @@ export function SpaceSidebar() {
 
   return (
     <StyledSpaceSidebar onContextMenu={contextMenu}>
-      <StyledIconWrapper style={{ marginTop: '8px' }}>
+      <StyledIconWrapper>
+        <UserAreaAvatar />
+      </StyledIconWrapper>
+      <StyledIconWrapper>
         <Pill h={spaceId === null ? 32 : 0} />
         <StyledSpaceIcon
+          size={ICON_SIZE}
           style={{
-            background: spaceId === null
-              ? 'linear-gradient(133deg, #2298ff 0%, rgba(59,108,255,1) 100%)'
-              : undefined,
+            background:
+              spaceId === null
+                ? 'linear-gradient(133deg, #2298ff 0%, rgba(59,108,255,1) 100%)'
+                : undefined,
           }}
           onClick={() => {
             setSpaceId(null);
-          } }
+          }}
         >
-          <FontAwesomeIcon icon={faMikoto} fontSize="28px" />
+          <FontAwesomeIcon icon={faMikoto} fontSize="24px" />
         </StyledSpaceIcon>
       </StyledIconWrapper>
       <Divider w={8} />
@@ -225,7 +235,7 @@ export function SpaceSidebar() {
                 localStorage.setItem('spaceOrder', JSON.stringify(reordered));
                 return reordered;
               });
-            } }
+            }}
             deps={[index]}
           >
             <SidebarSpaceIcon space={space} />

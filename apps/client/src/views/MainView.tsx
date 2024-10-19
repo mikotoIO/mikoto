@@ -10,7 +10,6 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 
 import { CommandMenuKit } from '@/components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
-import { UserAreaAvatar } from '@/components/UserArea';
 import { faMikoto } from '@/components/icons';
 import { RESIZABLE_DISABLES, Sidebar } from '@/components/sidebars/Base';
 import { FriendSidebar } from '@/components/sidebars/FriendSidebar';
@@ -126,7 +125,7 @@ const SidebarRest = styled.div`
   -webkit-app-region: drag;
 `;
 
-const AppView = observer(() => {
+function AppView() {
   const leftSidebar = useRecoilValue(treebarSpaceState);
   const mikoto = useMikoto();
   const [workspace, setWorkspace] = useRecoilState(workspaceState);
@@ -152,7 +151,6 @@ const AppView = observer(() => {
           >
             <FontAwesomeIcon icon={faBarsStaggered} />
           </TabBarButton>
-          {workspace.leftOpen && <UserAreaAvatar />}
           <SidebarRest />
         </div>
         <div className="bars">
@@ -201,7 +199,7 @@ const AppView = observer(() => {
       )}
     </AppContainer>
   );
-});
+}
 
 function Fallback() {
   return (

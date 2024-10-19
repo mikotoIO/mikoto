@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSetRecoilState } from 'recoil';
+import { useSnapshot } from 'valtio';
 
 import { modalState } from '@/components/ContextMenu';
 import { AvatarEditor } from '@/components/molecules/AvatarEditor';
@@ -59,17 +60,18 @@ function AddBotModal({ space }: { space: MikotoSpace }) {
   );
 }
 
-const Overview = observer(({ space }: { space: MikotoSpace }) => {
+function Overview({ space }: { space: MikotoSpace }) {
   const { t } = useTranslation();
   const [spaceName, setSpaceName] = useState(space.name);
   const setModal = useSetRecoilState(modalState);
+  const spaceSnap = useSnapshot(space);
 
   return (
     <SettingSurface>
       <Form>
         <h1>{t('spaceSettings.spaceOverview')}</h1>
         <AvatarEditor
-          avatar={space.icon ?? undefined}
+          avatar={spaceSnap.icon ?? undefined}
           onDrop={async (file) => {
             const { data } = await uploadFile('/spaceicon', file);
 
@@ -117,7 +119,7 @@ const Overview = observer(({ space }: { space: MikotoSpace }) => {
       </Form>
     </SettingSurface>
   );
-});
+}
 
 function Switch({ nav, space }: { nav: string; space: MikotoSpace }) {
   switch (nav) {

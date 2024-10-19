@@ -87,6 +87,9 @@ importers:
       '@lexical/code':
         specifier: ^0.14.4
         version: 0.14.5
+      '@lexical/history':
+        specifier: ^0.14.4
+        version: 0.14.5
       '@lexical/link':
         specifier: ^0.14.4
         version: 0.14.5
@@ -297,6 +300,9 @@ importers:
       react-hook-form:
         specifier: ^7.34.2
         version: 7.53.0(react@18.3.1)
+      react-hotkeys-hook:
+        specifier: ^4.5.1
+        version: 4.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-i18next:
         specifier: ^13.0.2
         version: 13.5.0(i18next@23.15.1)(react-dom@18.3.1(react@18.3.1))(react-native@0.72.6(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(encoding@0.1.13)(react@18.3.1))(react@18.3.1)
@@ -10304,6 +10310,12 @@ packages:
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18 || ^19
+
+  react-hotkeys-hook@4.5.1:
+    resolution: {integrity: sha512-scAEJOh3Irm0g95NIn6+tQVf/OICCjsQsC9NBHfQws/Vxw4sfq1tDQut5fhTEvPraXhu/sHxRd9lOtxzyYuNAg==}
+    peerDependencies:
+      react: '>=16.8.1'
+      react-dom: '>=16.8.1'
 
   react-i18next@13.5.0:
     resolution: {integrity: sha512-CFJ5NDGJ2MUyBohEHxljOq/39NQ972rh1ajnadG9BjTk+UXbHLq4z5DKEbEQBDoIhUmmbuS/fIMJKo6VOax1HA==}
@@ -25185,6 +25197,11 @@ snapshots:
   react-hook-form@7.53.0(react@18.3.1):
     dependencies:
       react: 18.3.1
+
+  react-hotkeys-hook@4.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   react-i18next@13.5.0(i18next@23.15.1)(react-dom@18.3.1(react@18.3.1))(react-native@0.72.6(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(encoding@0.1.13)(react@18.3.1))(react@18.3.1):
     dependencies:

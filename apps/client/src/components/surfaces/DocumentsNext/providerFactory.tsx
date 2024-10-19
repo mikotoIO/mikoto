@@ -61,19 +61,12 @@ export function useProviderFactory({
   );
 
   const save = () => {
-    const contentString = editor
+    const content = editor
       .getEditorState()
       .read(() => $convertToMarkdownString(TRANSFORMERS));
 
-    mikoto.rest['documents.update'](
-      { content: contentString },
-      {
-        params: {
-          spaceId: channel.spaceId,
-          channelId: channel.id,
-        },
-      },
-    )
+    channel
+      .updateDocument({ content })
       .then(() => setSynced('synced'))
       .catch((e) => {
         console.error(e);

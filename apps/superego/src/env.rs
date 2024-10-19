@@ -39,6 +39,9 @@ pub struct CaptchaEnv {
 
 impl Env {
     pub fn print_env_info(&self) {
+        if self.smtp.is_none() {
+            warn!("SMTP server not configured. Please enable it for production use.");
+        }
         info!("Captcha provider: {}", self.captcha.provider);
         if self.livekit.is_none() {
             warn!("LiveKit server not configured. Please enable it for production use.");

@@ -1,7 +1,12 @@
 import { proxy, ref } from 'valtio/vanilla';
 
 import type { MikotoClient } from '../../MikotoClient';
-import { Channel, type ChannelPatch } from '../../api.gen';
+import {
+  Channel,
+  type ChannelPatch,
+  type Document,
+  type DocumentPatch,
+} from '../../api.gen';
 import { ZSchema } from '../../helpers/ZSchema';
 import { CachedManager } from '../base';
 import { MikotoMessage } from '../message';
@@ -90,6 +95,24 @@ export class MikotoChannel extends ZSchema(Channel) {
         },
       },
     );
+  }
+
+  async getDocument(): Promise<Document> {
+    return await this.client.rest['documents.get']({
+      params: {
+        spaceId: this.spaceId,
+        channelId: this.id,
+      },
+    });
+  }
+
+  async updateDocument(patch: DocumentPatch): Promise<Document> {
+    return await this.client.rest['documents.update'](patch, {
+      params: {
+        spaceId: this.spaceId,
+        channelId: this.id,
+      },
+    });
   }
 }
 

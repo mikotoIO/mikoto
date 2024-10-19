@@ -1,6 +1,4 @@
 // models without backing database tables
-
-
 use uuid::Uuid;
 
 use crate::model;
@@ -16,4 +14,3 @@ impl ObjectWithId {
         Self { id }
     }
 }
-

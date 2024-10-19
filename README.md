@@ -48,14 +48,14 @@ and upcoming features:
 
 ```sh
 # install dependencies
-yarn install
+pnpm install
 
 # start services (PostgreSQL, Redis, MinIO, etc.)
 docker-compose up
 
 # set up database
 cd apps/server
-npx prisma migrate dev
+pnpx prisma migrate dev
 ```
 
 ### Development
@@ -67,7 +67,7 @@ Use Docker Compose to run the necessary services.
 To develop all apps and packages, run the following command:
 
 ```sh
-yarn start
+pnpm start
 ```
 
 To browse/edit the Database run the following command:
@@ -89,15 +89,15 @@ yarn build
 
 ## Project Structure
 
-| Package              | Description               | Stack                                      |
-| -------------------- | ------------------------- | ------------------------------------------ |
-| `apps/server`        | Core server for Mikoto    | NodeJS + TypeScript + HyperSchema + Prisma |
-| `apps/content-proxy`  | S3 Proxy                  | NodeJS + TypeScript                        |
-| `apps/client`        | The web client for Mikoto | React + MobX                               |
-| `apps/mobile`        | Mobile client for Mikoto  | React Native + MobX                        |
-| `apps/desktop`       | Desktop client for Mikoto | Electron                                   |
-| `packages/mikotojs`  | Mikoto API for JS         | TypeScript                                 |
-| `packages/permcheck` | Permisson Calculator      | TypeScript                                 |
+| Package              | Description               | Stack               |
+| -------------------- | ------------------------- | ------------------- |
+| `apps/superego`      | Core server for Mikoto    | Rust + Axum + SQLX  |
+| `apps/content-proxy` | S3 Proxy                  | Rust                |
+| `apps/client`        | The web client for Mikoto | React               |
+| `apps/mobile`        | Mobile client for Mikoto  | React Native        |
+| `apps/desktop`       | Desktop client for Mikoto | Electron            |
+| `packages/mikoto.js` | Mikoto API for JS         | TypeScript + Valtio |
+| `packages/permcheck` | Permisson Calculator      | TypeScript          |
 
 ## License
 

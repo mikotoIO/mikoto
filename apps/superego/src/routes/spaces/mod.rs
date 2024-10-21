@@ -10,7 +10,11 @@ use crate::{
     db::db,
     entities::{Invite, MemberExt, MemberKey, Space, SpaceExt, SpacePatch, SpaceUser},
     error::Error,
-    functions::{jwt::Claims, pubsub::emit_event},
+    functions::{
+        jwt::Claims,
+        permissions::{permissions_or_admin, Permission},
+        pubsub::emit_event,
+    },
     middlewares::load::Load,
 };
 
@@ -102,9 +106,13 @@ async fn create(
 
 async fn update(
     Path(space_id): Path<Uuid>,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
     Json(body): Json<SpaceUpdatePayload>,
 ) -> Result<Json<SpaceExt>, Error> {
     // TODO: Check update rights
+    permissions_or_admin(&space, &member, Permission::MANAGE_SPACE)?;
+
     let space = Space::find_by_id(space_id, db()).await?;
     let space = space.update(body.into(), db()).await?;
     let space = SpaceExt::dataload_one(space, db()).await?;

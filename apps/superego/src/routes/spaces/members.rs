@@ -5,9 +5,13 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{MemberExt, MemberKey, Role, RoleToSpaceUser, SpaceUser},
+    entities::{MemberExt, MemberKey, Role, RoleToSpaceUser, SpaceExt, SpaceUser},
     error::Error,
-    functions::pubsub::emit_event,
+    functions::{
+        permissions::{permissions_or_admin, Permission},
+        pubsub::emit_event,
+    },
+    middlewares::load::Load,
     routes::{router::AppRouter, ws::state::State},
 };
 
@@ -50,7 +54,11 @@ async fn update(
 
 async fn add_role(
     Path((space_id, user_id, role_id)): Path<(Uuid, Uuid, Uuid)>,
+    Load(space): Load<SpaceExt>,
+    Load(acting_member): Load<MemberExt>,
 ) -> Result<Json<MemberExt>, Error> {
+    permissions_or_admin(&space, &acting_member, Permission::ASSIGN_ROLES)?;
+
     let key = MemberKey::new(space_id, user_id);
     let member = SpaceUser::get_by_key(&key, db()).await?;
     let role = Role::find_by_id(role_id, db()).await?;
@@ -66,7 +74,11 @@ async fn add_role(
 
 async fn remove_role(
     Path((space_id, user_id, role_id)): Path<(Uuid, Uuid, Uuid)>,
+    Load(space): Load<SpaceExt>,
+    Load(acting_member): Load<MemberExt>,
 ) -> Result<Json<MemberExt>, Error> {
+    permissions_or_admin(&space, &acting_member, Permission::ASSIGN_ROLES)?;
+
     let key = MemberKey::new(space_id, user_id);
     let member = SpaceUser::get_by_key(&key, db()).await?;
     let role = Role::find_by_id(role_id, db()).await?;
@@ -80,7 +92,14 @@ async fn remove_role(
     Ok(member.into())
 }
 
-async fn delete(Path((space_id, user_id)): Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
+async fn delete(
+    Load(space): Load<SpaceExt>,
+    Load(acting_member): Load<MemberExt>,
+    Path((space_id, user_id)): Path<(Uuid, Uuid)>,
+) -> Result<Json<()>, Error> {
+    permissions_or_admin(&space, &acting_member, Permission::BAN)?;
+
+    // ban user
     let key = MemberKey::new(space_id, user_id);
     let member = SpaceUser::get_by_key(&key, db()).await?;
     let member = MemberExt::dataload_one(member, db()).await?;

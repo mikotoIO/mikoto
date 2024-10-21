@@ -1,11 +1,13 @@
 import EventEmitter from 'events';
 import WebSocket from 'isomorphic-ws';
 
-import type { WebsocketEventEmitter } from './api.gen';
+import type { WebsocketEventEmitter, websocketCommands } from './api.gen';
 
 export interface WebsocketApiOptions {
   url: string;
 }
+
+type WebsocketCommands = typeof websocketCommands;
 
 export class WebsocketApi extends (EventEmitter as new () => WebsocketEventEmitter) {
   ws: WebSocket;
@@ -20,5 +22,18 @@ export class WebsocketApi extends (EventEmitter as new () => WebsocketEventEmitt
     this.ws.onclose = (ev) => {
       console.log('Websocket closed', ev);
     };
+  }
+
+  send<K extends keyof WebsocketCommands>(op: K, data: WebsocketCommands[K]) {
+    this.ws.send(
+      JSON.stringify({
+        op,
+        data,
+      }),
+    );
+  }
+
+  close() {
+    this.ws.close();
   }
 }

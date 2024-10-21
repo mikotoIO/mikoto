@@ -5,8 +5,10 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Role, RolePatch},
+    entities::{MemberExt, Role, RolePatch, SpaceExt},
     error::Error,
+    functions::permissions::{permissions_or_admin, Permission},
+    middlewares::load::Load,
     routes::{router::AppRouter, ws::state::State},
 };
 
@@ -16,7 +18,14 @@ pub struct RoleCreatePayload {
     pub name: String,
 }
 
-async fn create(space_id: Path<Uuid>, body: Json<RoleCreatePayload>) -> Result<Json<Role>, Error> {
+async fn create(
+    space_id: Path<Uuid>,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
+    body: Json<RoleCreatePayload>,
+) -> Result<Json<Role>, Error> {
+    permissions_or_admin(&space, &member, Permission::MANAGE_ROLES)?;
+
     let role = Role {
         id: Uuid::new_v4(),
         space_id: *space_id,
@@ -31,14 +40,24 @@ async fn create(space_id: Path<Uuid>, body: Json<RoleCreatePayload>) -> Result<J
 
 async fn update(
     Path((_space_id, role_id)): Path<(Uuid, Uuid)>,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
     patch: Json<RolePatch>,
 ) -> Result<Json<Role>, Error> {
+    permissions_or_admin(&space, &member, Permission::MANAGE_ROLES)?;
+
     let role = Role::find_by_id(role_id, db()).await?;
     let role = role.update(&patch, db()).await?;
     Ok(role.into())
 }
 
-async fn delete(Path((_space_id, role_id)): Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
+async fn delete(
+    Path((_space_id, role_id)): Path<(Uuid, Uuid)>,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
+) -> Result<Json<()>, Error> {
+    permissions_or_admin(&space, &member, Permission::MANAGE_ROLES)?;
+
     let role = Role::find_by_id(role_id, db()).await?;
     role.delete(db()).await?;
     Ok(Json(()))

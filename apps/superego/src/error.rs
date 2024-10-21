@@ -14,6 +14,8 @@ pub enum Error {
     #[error("{message}")]
     Unauthorized { message: String },
     #[error("{message}")]
+    InsufficientPermissions { message: String },
+    #[error("{message}")]
     Forbidden { message: String },
     #[error("Validation failed")]
     ValidationFailed,
@@ -93,6 +95,7 @@ impl IntoResponse for Error {
             Error::Miscallaneous { status, .. } => status,
             Error::NotFound => StatusCode::NOT_FOUND,
             Error::WrongPassword => StatusCode::UNAUTHORIZED,
+            Error::InsufficientPermissions { .. } => StatusCode::FORBIDDEN,
 
             Error::Unauthorized { .. } => StatusCode::UNAUTHORIZED,
             Error::Forbidden { .. } => StatusCode::FORBIDDEN,

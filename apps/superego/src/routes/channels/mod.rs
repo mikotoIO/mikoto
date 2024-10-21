@@ -5,9 +5,13 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Channel, ChannelPatch, ChannelType, ChannelUnread, Document},
+    entities::{Channel, ChannelPatch, ChannelType, ChannelUnread, Document, MemberExt, SpaceExt},
     error::Error,
-    functions::pubsub::emit_event,
+    functions::{
+        permissions::{permissions_or_admin, Permission},
+        pubsub::emit_event,
+    },
+    middlewares::load::Load,
 };
 
 use super::{router::AppRouter, ws::state::State};
@@ -38,8 +42,12 @@ async fn list(Path(space_id): Path<Uuid>) -> Result<Json<Vec<Channel>>, Error> {
 
 async fn create(
     Path(space_id): Path<Uuid>,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
     Json(body): Json<ChannelCreatePayload>,
 ) -> Result<Json<Channel>, Error> {
+    permissions_or_admin(&space, &member, Permission::MANAGE_CHANNELS)?;
+
     let channel = Channel {
         id: Uuid::new_v4(),
         space_id,
@@ -72,8 +80,12 @@ async fn create(
 
 async fn update(
     Path((_, channel_id)): Path<(Uuid, Uuid)>,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
     Json(patch): Json<ChannelPatch>,
 ) -> Result<Json<Channel>, Error> {
+    permissions_or_admin(&space, &member, Permission::MANAGE_CHANNELS)?;
+
     let channel = Channel::find_by_id(channel_id, db()).await?;
     let channel = channel.update(patch, db()).await?;
     emit_event(
@@ -85,7 +97,13 @@ async fn update(
     Ok(channel.into())
 }
 
-async fn delete(Path((_, channel_id)): Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
+async fn delete(
+    Path((_, channel_id)): Path<(Uuid, Uuid)>,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
+) -> Result<Json<()>, Error> {
+    permissions_or_admin(&space, &member, Permission::MANAGE_CHANNELS)?;
+
     let channel = Channel::find_by_id(channel_id, db()).await?;
     channel.delete(db()).await?;
     emit_event(

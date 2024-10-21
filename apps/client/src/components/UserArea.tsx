@@ -105,8 +105,8 @@ export function UserAreaAvatar() {
   const mikoto = useMikoto();
   const [user, setUser] = useRecoilState(userState);
   const contextMenu = useContextMenu(() => <UserAreaMenu />, {
-    top: 48,
-    left: 80,
+    top: 32,
+    left: 64,
   });
   useEffect(() => {
     mikoto.rest['user.get']().then((x) => {

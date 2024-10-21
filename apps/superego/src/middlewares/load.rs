@@ -9,7 +9,7 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{MemberExt, MemberKey, Space, SpaceExt, SpaceUser},
+    entities::{Channel, MemberExt, MemberKey, Space, SpaceExt, SpaceUser},
     error::Error,
     functions::jwt::Claims,
 };
@@ -92,5 +92,31 @@ where
         let member = MemberExt::dataload_one(member, db()).await?;
 
         Ok(member.into())
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChannelPath {
+    pub space_id: Option<Uuid>,
+    pub channel_id: Uuid,
+}
+
+#[async_trait]
+impl<S> FromRequestParts<S> for Load<Channel>
+where
+    S: Send + Sync,
+{
+    type Rejection = Error;
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        let path: Path<ChannelPath> =
+            Path::from_request_parts(parts, state).await.map_err(|_| {
+                Error::InternalServerError {
+                    message: "spaceId was not found".to_string(),
+                }
+            })?;
+        let channel = Channel::find_by_id(path.channel_id, db()).await?;
+
+        Ok(channel.into())
     }
 }

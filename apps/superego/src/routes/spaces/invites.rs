@@ -6,9 +6,13 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::Invite,
+    entities::{Invite, MemberExt, SpaceExt},
     error::Error,
-    functions::jwt::Claims,
+    functions::{
+        jwt::Claims,
+        permissions::{permissions_or_moderator, Permission},
+    },
+    middlewares::load::Load,
     routes::{router::AppRouter, ws::state::State},
 };
 
@@ -21,8 +25,11 @@ pub struct InviteCreatePayload {}
 async fn create(
     Path(space_id): Path<Uuid>,
     claim: Claims,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
     _body: Json<InviteCreatePayload>,
 ) -> Result<Json<Invite>, Error> {
+    permissions_or_moderator(&space, &member, Permission::MANAGE_INVITES)?;
     let invite = Invite {
         id: nanoid!(12),
         space_id,
@@ -33,11 +40,24 @@ async fn create(
     Ok(invite.into())
 }
 
-async fn list(_space_id: Path<Uuid>) -> Result<Json<Vec<Invite>>, Error> {
-    Ok(Json(vec![]))
+async fn list(
+    Path(space_id): Path<Uuid>,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
+) -> Result<Json<Vec<Invite>>, Error> {
+    permissions_or_moderator(&space, &member, Permission::MANAGE_INVITES)?;
+
+    let res = Invite::list_by_space_id(space_id, db()).await?;
+    Ok(Json(res))
 }
 
-async fn delete(Path((_space_id, invite_id)): Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
+async fn delete(
+    Path((_space_id, invite_id)): Path<(Uuid, Uuid)>,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
+) -> Result<Json<()>, Error> {
+    permissions_or_moderator(&space, &member, Permission::MANAGE_INVITES)?;
+
     Invite::delete(&invite_id.to_string(), db()).await?;
     Ok(Json(()))
 }

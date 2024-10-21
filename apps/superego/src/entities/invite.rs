@@ -27,6 +27,21 @@ impl Invite {
         Ok(res)
     }
 
+    pub async fn list_by_space_id<'c, X: sqlx::PgExecutor<'c>>(
+        id: Uuid,
+        db: X,
+    ) -> Result<Vec<Self>, Error> {
+        let res = sqlx::query_as(
+            r#"
+            SELECT * FROM "Invite" WHERE "space_id" = $1
+            "#,
+        )
+        .bind(id)
+        .fetch_all(db)
+        .await?;
+        Ok(res)
+    }
+
     pub async fn create<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
         sqlx::query(
             r#"

@@ -81,3 +81,16 @@ pub fn permissions_or_admin(
 ) -> Result<(), Error> {
     permissions_with_bypass(space, member, rule, Permission::ADMIN)
 }
+
+pub fn permissions_or_moderator(
+    space: &SpaceExt,
+    member: &MemberExt,
+    rule: Permission,
+) -> Result<(), Error> {
+    permissions_with_bypass(
+        space,
+        member,
+        rule,
+        Permission::ADMIN | Permission::MODERATOR,
+    )
+}

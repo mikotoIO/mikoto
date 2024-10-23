@@ -75,10 +75,14 @@ where
             }
         })?;
 
-        let claim: &Claims = parts
-            .extensions
-            .get()
-            .ok_or(Error::unauthorized("No authorization header"))?;
+        // let claim = Claims::from_request_parts(parts, state).await;
+
+        let claim: Option<&Claims> = parts.extensions.get();
+        let claim = if let Some(claim) = claim {
+            claim
+        } else {
+            &Claims::from_request_parts(parts, state).await?
+        };
 
         let member = SpaceUser::get_by_key(
             &MemberKey::new(path.space_id, Uuid::parse_str(&claim.sub)?),
@@ -112,7 +116,7 @@ where
         let path: Path<ChannelPath> =
             Path::from_request_parts(parts, state).await.map_err(|_| {
                 Error::InternalServerError {
-                    message: "spaceId was not found".to_string(),
+                    message: "channelId was not found".to_string(),
                 }
             })?;
         let channel = Channel::find_by_id(path.channel_id, db()).await?;

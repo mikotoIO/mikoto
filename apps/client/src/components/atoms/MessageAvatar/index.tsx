@@ -67,27 +67,42 @@ function RoleSetter({
   return (
     <AvatarContextWrapper>
       <Flex direction="column" gap={8}>
-        {roles.map((x) => {
-          if (x.name === '@everyone') return null;
+        {roles.map((role) => {
+          if (role.name === '@everyone') return null;
           return (
             <Checkbox
-              key={x.id}
-              checked={selectedRoles[x.id]}
+              key={role.id}
+              checked={selectedRoles[role.id]}
               onChange={async (e) => {
-                const newSelectedRoles = {
-                  ...selectedRoles,
-                  [x.id]: e.currentTarget.checked,
-                };
-                setSelectedRoles(newSelectedRoles);
+                console.log(role);
+                console.log(e.currentTarget.checked);
 
-                await member.update({
-                  roleIds: Object.keys(newSelectedRoles).filter(
-                    (id) => newSelectedRoles[id],
-                  ),
-                });
+                if (e.currentTarget.checked) {
+                  await member.client.rest['members.addRole'](undefined, {
+                    params: {
+                      spaceId: member.spaceId,
+                      userId: member.user.id,
+                      roleId: role.id,
+                    },
+                  });
+                } else {
+                  await member.client.rest['members.removeRole'](undefined, {
+                    params: {
+                      spaceId: member.spaceId,
+                      userId: member.user.id,
+                      roleId: role.id,
+                    },
+                  });
+                }
+
+                // await member.update({
+                //   roleIds: Object.keys(newSelectedRoles).filter(
+                //     (id) => newSelectedRoles[id],
+                //   ),
+                // });
               }}
             >
-              {x.name}
+              {role.name}
             </Checkbox>
           );
         })}

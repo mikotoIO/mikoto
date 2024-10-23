@@ -238,8 +238,13 @@ export type MemberUpdatePayload = z.infer<typeof MemberUpdatePayload>;
 export const RoleCreatePayload = z.object({ name: z.string() });
 export type RoleCreatePayload = z.infer<typeof RoleCreatePayload>;
 
-export const RoleUpdatePayload = z.object({ name: z.string() });
-export type RoleUpdatePayload = z.infer<typeof RoleUpdatePayload>;
+export const RolePatch = z.object({
+  color: z.union([z.string(), z.null()]).optional(),
+  name: z.string(),
+  permissions: z.string(),
+  position: z.number().int(),
+});
+export type RolePatch = z.infer<typeof RolePatch>;
 
 export const Invite = z.object({
   createdAt: z.string(),
@@ -310,7 +315,7 @@ export const schemas = {
   MemberCreatePayload,
   MemberUpdatePayload,
   RoleCreatePayload,
-  RoleUpdatePayload,
+  RolePatch,
   Invite,
   InviteCreatePayload,
   ListQuery,
@@ -740,6 +745,20 @@ const endpoints = makeApi([
   },
   {
     method: "post",
+    path: "/spaces/:spaceId/members/:userId/roles/:roleId",
+    alias: "members.addRole",
+    requestFormat: "json",
+    response: MemberExt,
+  },
+  {
+    method: "delete",
+    path: "/spaces/:spaceId/members/:userId/roles/:roleId",
+    alias: "members.removeRole",
+    requestFormat: "json",
+    response: MemberExt,
+  },
+  {
+    method: "post",
     path: "/spaces/:spaceId/roles/",
     alias: "roles.create",
     requestFormat: "json",
@@ -768,7 +787,7 @@ const endpoints = makeApi([
       {
         name: "body",
         type: "Body",
-        schema: z.object({ name: z.string() }),
+        schema: RolePatch,
       },
     ],
     response: Role,

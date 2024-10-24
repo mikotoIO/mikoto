@@ -1,8 +1,8 @@
 import { Modal, ModalOverlay } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import useEventListener from '@use-it/event-listener';
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { atom, useRecoilState, useSetRecoilState } from 'recoil';
-import styled from '@emotion/styled';
 
 interface Positions {
   top?: number;
@@ -63,8 +63,6 @@ export function ContextMenuKit() {
     if (ref.current) {
       const rect = ref.current.getBoundingClientRect();
       setBottomPin(rect.top + rect.height > window.innerHeight);
-      // console.log(rect);
-      // console.log(rect.top + rect.height > window.innerHeight);
     } else {
       setBottomPin(false);
     }

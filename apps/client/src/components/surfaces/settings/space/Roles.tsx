@@ -17,7 +17,6 @@ import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoSpace, Role } from '@mikoto-io/mikoto.js';
 import { checkPermission, permissions } from '@mikoto-io/permcheck';
-import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';

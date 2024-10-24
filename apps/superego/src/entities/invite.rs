@@ -33,7 +33,7 @@ impl Invite {
     ) -> Result<Vec<Self>, Error> {
         let res = sqlx::query_as(
             r#"
-            SELECT * FROM "Invite" WHERE "space_id" = $1
+            SELECT * FROM "Invite" WHERE "spaceId" = $1
             "#,
         )
         .bind(id)

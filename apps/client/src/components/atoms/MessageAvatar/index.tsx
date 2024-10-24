@@ -4,6 +4,7 @@ import { MikotoMember, Role, User } from '@mikoto-io/mikoto.js';
 import { permissions } from '@mikoto-io/permcheck';
 import { useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
+import { proxy, useSnapshot } from 'valtio';
 
 import {
   contextMenuState,
@@ -12,7 +13,7 @@ import {
 } from '@/components/ContextMenu';
 import { UserContextMenu } from '@/components/modals/ContextMenus';
 import { ProfileModal } from '@/components/modals/Profile';
-import { useMikoto } from '@/hooks';
+import { useMaybeSnapshot, useMikoto } from '@/hooks';
 
 import { Avatar } from '../Avatar';
 import { BaseRoleBadge, RoleBadge } from './RoleBadge';
@@ -51,8 +52,6 @@ function RoleSetter({
   roles: Role[];
   member: MikotoMember;
 }) {
-  const mikoto = useMikoto();
-
   const [selectedRoles, setSelectedRoles] = useState<Record<string, boolean>>(
     () => {
       const o: Record<string, boolean> = {};
@@ -72,11 +71,8 @@ function RoleSetter({
           return (
             <Checkbox
               key={role.id}
-              checked={selectedRoles[role.id]}
+              defaultChecked={selectedRoles[role.id]}
               onChange={async (e) => {
-                console.log(role);
-                console.log(e.currentTarget.checked);
-
                 if (e.currentTarget.checked) {
                   await member.client.rest['members.addRole'](undefined, {
                     params: {
@@ -118,6 +114,7 @@ export function MemberContextMenu({
   user: User;
   member?: MikotoMember;
 }) {
+  const memberSnap = useMaybeSnapshot(member);
   const setModal = useSetRecoilState(modalState);
 
   const [roleEditorOpen, setRoleEditorOpen] = useState(false);
@@ -126,7 +123,7 @@ export function MemberContextMenu({
   return (
     <div style={{ display: 'grid', gridGap: '8px' }}>
       <AvatarContextWrapper>
-        {member === null ? (
+        {memberSnap === null ? (
           'loading'
         ) : (
           <div>
@@ -142,14 +139,14 @@ export function MemberContextMenu({
             />
             <h1>{user.name}</h1>
             <hr />
-            {member && (
+            {memberSnap && (
               <>
                 <h2>Roles</h2>
                 <Box gap={2}>
-                  {member.roles.map(
+                  {memberSnap.roles.map(
                     (r) => r && <RoleBadge key={r.id} role={r} />,
                   )}
-                  {member.checkPermission(permissions.manageRoles) && (
+                  {memberSnap.checkPermission(permissions.manageRoles) && (
                     <BaseRoleBadge
                       cursor="pointer"
                       onClick={() => setRoleEditorOpen((x) => !x)}
@@ -181,6 +178,7 @@ interface MessageAvatarProps extends AvatarProps {
 export function MessageAvatar({ src, member, size }: MessageAvatarProps) {
   const setContextMenu = useSetRecoilState(contextMenuState);
   const avatarRef = useRef<HTMLDivElement>(null);
+  useMaybeSnapshot(member);
 
   const user = member?.user;
 

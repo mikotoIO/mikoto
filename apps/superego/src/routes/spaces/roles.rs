@@ -7,7 +7,10 @@ use crate::{
     db::db,
     entities::{MemberExt, Role, RolePatch, SpaceExt},
     error::Error,
-    functions::permissions::{permissions_or_admin, Permission},
+    functions::{
+        permissions::{permissions_or_admin, Permission},
+        pubsub::emit_event,
+    },
     middlewares::load::Load,
     routes::{router::AppRouter, ws::state::State},
 };
@@ -35,6 +38,7 @@ async fn create(
         position: 0,
     };
     role.create(db()).await?;
+    emit_event("roles.onCreate", &role, &format!("space:{}", space.base.id)).await?;
     Ok(role.into())
 }
 
@@ -48,6 +52,7 @@ async fn update(
 
     let role = Role::find_by_id(role_id, db()).await?;
     let role = role.update(&patch, db()).await?;
+    emit_event("roles.onUpdate", &role, &format!("space:{}", space.base.id)).await?;
     Ok(role.into())
 }
 
@@ -60,6 +65,7 @@ async fn delete(
 
     let role = Role::find_by_id(role_id, db()).await?;
     role.delete(db()).await?;
+    emit_event("roles.onDelete", &role, &format!("space:{}", space.base.id)).await?;
     Ok(Json(()))
 }
 

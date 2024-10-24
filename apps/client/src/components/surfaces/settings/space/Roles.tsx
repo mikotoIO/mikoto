@@ -21,6 +21,7 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
+import { useSnapshot } from 'valtio';
 
 import { useContextMenu } from '@/components/ContextMenu';
 import { useMikoto } from '@/hooks';
@@ -147,79 +148,80 @@ const StyledRoleEditor = styled(Form)`
   overflow-y: scroll;
 `;
 
-const RoleEditor = observer(
-  ({ role, space }: { space: MikotoSpace; role: Role }) => {
-    const mikoto = useMikoto();
-    const form = useForm({
-      defaultValues: {
-        name: role.name,
-        position: role.position,
-      },
-    });
-    const [perms, setPerms] = useState(role.permissions);
-    const [color, setColor] = useState<string | null | undefined>(role.color);
-
-    return (
-      <StyledRoleEditor
-        p={16}
-        h="100%"
-        onSubmit={form.handleSubmit((d) => {
-          const data = { ...d, permissions: perms, color };
-          mikoto.rest['roles.update'](data, {
-            params: { spaceId: space.id, roleId: role.id },
-          }).then(() => {});
-        })}
-      >
-        <h2>Edit {role.name}</h2>
-
-        {role.name !== '@everyone' && (
-          <>
-            <FormControl>
-              <FormLabel>Role Name</FormLabel>
-              <Input {...form.register('name')} />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Role Priority</FormLabel>
-              <Input
-                type="number"
-                min={0}
-                max={99}
-                {...form.register('position', { valueAsNumber: true })}
-              />
-            </FormControl>
-            <RoleColorPicker value={color} onChange={setColor} />
-          </>
-        )}
-
-        <RolePermissionEditor perms={perms} onChange={setPerms} />
-        <ButtonGroup>
-          <Button variant="primary" type="submit">
-            Save Changes
-          </Button>
-          {role.name !== '@everyone' && (
-            <Button
-              type="button"
-              variant="danger"
-              onClick={() => {
-                mikoto.rest['roles.delete'](undefined, {
-                  params: { spaceId: space.id, roleId: role.id },
-                }).then(() => {});
-              }}
-            >
-              Delete Role
-            </Button>
-          )}
-        </ButtonGroup>
-      </StyledRoleEditor>
-    );
-  },
-);
-
-export const RolesSubsurface = observer(({ space }: { space: MikotoSpace }) => {
+function RoleEditor({ role, space }: { space: MikotoSpace; role: Role }) {
   const mikoto = useMikoto();
+  const form = useForm({
+    defaultValues: {
+      name: role.name,
+      position: role.position,
+    },
+  });
+  const [perms, setPerms] = useState(role.permissions);
+  const [color, setColor] = useState<string | null | undefined>(role.color);
+
+  useSnapshot(space.roles);
+
+  return (
+    <StyledRoleEditor
+      p={16}
+      h="100%"
+      onSubmit={form.handleSubmit((d) => {
+        const data = { ...d, permissions: perms, color };
+        mikoto.rest['roles.update'](data, {
+          params: { spaceId: space.id, roleId: role.id },
+        }).then(() => {});
+      })}
+    >
+      <h2>Edit {role.name}</h2>
+
+      {role.name !== '@everyone' && (
+        <>
+          <FormControl>
+            <FormLabel>Role Name</FormLabel>
+            <Input {...form.register('name')} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Role Priority</FormLabel>
+            <Input
+              type="number"
+              min={0}
+              max={99}
+              {...form.register('position', { valueAsNumber: true })}
+            />
+          </FormControl>
+          <RoleColorPicker value={color} onChange={setColor} />
+        </>
+      )}
+
+      <RolePermissionEditor perms={perms} onChange={setPerms} />
+      <ButtonGroup>
+        <Button variant="primary" type="submit">
+          Save Changes
+        </Button>
+        {role.name !== '@everyone' && (
+          <Button
+            type="button"
+            variant="danger"
+            onClick={async () => {
+              await mikoto.rest['roles.delete'](undefined, {
+                params: { spaceId: space.id, roleId: role.id },
+              });
+            }}
+          >
+            Delete Role
+          </Button>
+        )}
+      </ButtonGroup>
+    </StyledRoleEditor>
+  );
+}
+
+export function RolesSubsurface({ space }: { space: MikotoSpace }) {
+  const mikoto = useMikoto();
+  const spaceRoles = useSnapshot(space.roles);
 
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
-  const role = space.roles.values().find((x) => x.id === selectedRoleId);
+  const role = spaceRoles.values().find((x) => x.id === selectedRoleId);
   // const role = rolesDelta.data.find((x) => x.id === selectedRoleId);
   return (
     <SettingSurface style={{ paddingRight: 0 }}>
@@ -240,7 +242,7 @@ export const RolesSubsurface = observer(({ space }: { space: MikotoSpace }) => {
           >
             New Role
           </Button>
-          {space.roles.values().map((r) => (
+          {spaceRoles.values().map((r) => (
             <SidebarButton
               key={r.id}
               selected={selectedRoleId === r.id}
@@ -260,4 +262,4 @@ export const RolesSubsurface = observer(({ space }: { space: MikotoSpace }) => {
       </Grid>
     </SettingSurface>
   );
-});
+}

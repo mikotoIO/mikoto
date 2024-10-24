@@ -1,16 +1,15 @@
 import { Box, Flex, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { ClientChannel, ClientRelation, ClientSpace } from 'mikotojs';
-import { observer } from 'mobx-react-lite';
+import { MikotoChannel, MikotoSpace, Relationship } from '@mikoto-io/mikoto.js';
 import { useEffect, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
+import { useSnapshot } from 'valtio/react';
 
 import {
   ContextMenu,
   modalState,
   useContextMenuX,
-} from '@/components//ContextMenu';
-import { Avatar } from '@/components/atoms/Avatar';
+} from '@/components/ContextMenu';
 import { useFetchMember, useMikoto } from '@/hooks';
 import { useTabkit } from '@/store/surface';
 
@@ -26,7 +25,7 @@ const StyledTree = styled.div`
   height: 100%;
 `;
 
-function TreebarContextMenu({ space }: { space: ClientSpace }) {
+function TreebarContextMenu({ space }: { space: MikotoSpace }) {
   const setModal = useSetRecoilState(modalState);
   const tabkit = useTabkit();
   return (
@@ -57,17 +56,17 @@ function TreebarContextMenu({ space }: { space: ClientSpace }) {
   );
 }
 
-function isUnread(lastUpdate: Date | null, ack: Date | null) {
-  if (lastUpdate === null || ack === null) return false;
+function isUnread(lastUpdate: Date | undefined, ack: Date | null) {
+  if (lastUpdate === undefined || ack === null) return false;
   return lastUpdate.getTime() > ack.getTime();
 }
 
-function useAcks(space: ClientSpace) {
+function useAcks(space: MikotoSpace) {
   const mikoto = useMikoto();
   const [acks, setAcks] = useState<Record<string, Date>>({});
 
   useEffect(() => {
-    mikoto.client.messages.listUnread({ spaceId: space.id }).then((ur) => {
+    space.listUnread().then((ur) => {
       setAcks(
         Object.fromEntries(ur.map((u) => [u.channelId, new Date(u.timestamp)])),
       );
@@ -75,39 +74,38 @@ function useAcks(space: ClientSpace) {
   }, [space.id]);
 
   useEffect(() => {
-    const destroy = mikoto.client.messages.onCreate((msg) => {
-      const ch = mikoto.channels.get(msg.channelId);
-      if (ch?.spaceId !== space.id) return;
-      if (msg.author?.id === mikoto.me.id) return;
-
-      ch.lastUpdated = msg.timestamp;
-    });
-    return () => {
-      destroy();
-    };
+    // FIXME: what the hell is this
+    // const destroy = mikoto.client.messages.onCreate((msg) => {
+    //   const ch = mikoto.channels.get(msg.channelId);
+    //   if (ch?.spaceId !== space.id) return;
+    //   if (msg.author?.id === mikoto.me.id) return;
+    //   ch.lastUpdated = msg.timestamp;
+    // });
+    // return () => {
+    //   destroy();
+    // };
   }, [space.id]);
 
   return {
     acks,
-    ackChannel(channel: ClientChannel) {
+    ackChannel(channel: MikotoChannel) {
       const now = new Date();
-      mikoto.client.messages
-        .ack({
-          channelId: channel.id,
-          timestamp: now.toISOString(),
-        })
-        .then(() => {
-          setAcks((xs) => ({ ...xs, [channel.id]: now }));
-        });
+      channel.ack().then(() => {
+        setAcks((xs) => ({ ...xs, [channel.id]: now }));
+      });
     },
   };
 }
 
-const ExplorerInner = observer(({ space }: { space: ClientSpace }) => {
+const ExplorerInner = ({ space }: { space: MikotoSpace }) => {
   useFetchMember(space);
   const tabkit = useTabkit();
   const { acks, ackChannel } = useAcks(space);
   const nodeContextMenu = useContextMenuX();
+
+  useSnapshot(space);
+  // console.log(cid.channelIds);
+  useSnapshot(space.channels); // TODO: fine-grained subscription
 
   const channelTree = channelToStructuredTree(space.channels, (channel) => ({
     icon: getIconFromChannelType(channel.type),
@@ -124,9 +122,9 @@ const ExplorerInner = observer(({ space }: { space: ClientSpace }) => {
   }));
 
   return <ChannelTree nodes={channelTree.descendant ?? []} />;
-});
+};
 
-export const Explorer = observer(({ space }: { space: ClientSpace }) => {
+export function Explorer({ space }: { space: MikotoSpace }) {
   const nodeContextMenu = useContextMenuX();
 
   // TODO: return loading indicator
@@ -143,34 +141,38 @@ export const Explorer = observer(({ space }: { space: ClientSpace }) => {
       <ExplorerInner space={space} />
     </StyledTree>
   );
-});
+}
 
-export const DMExplorer = observer(
-  ({ space, relation }: { space: ClientSpace; relation: ClientRelation }) => {
-    const nodeContextMenu = useContextMenuX();
+export const DMExplorer = ({
+  space,
+  relation,
+}: {
+  space: MikotoSpace;
+  relation: Relationship;
+}) => {
+  const nodeContextMenu = useContextMenuX();
 
-    // TODO: return loading indicator
-    if (space === null) return null;
-
-    return (
-      <StyledTree
-        onContextMenu={nodeContextMenu(<TreebarContextMenu space={space} />)}
-      >
-        <Flex p="16px" align="center">
-          <Avatar src={relation.relation?.avatar ?? undefined} size={32} />
-          <Heading fontSize="16px" ml={2}>
-            {relation.relation?.name ?? 'Unknown User'}
-          </Heading>
-        </Flex>
-        <ExplorerInner space={space} />
-      </StyledTree>
-    );
-  },
-);
+  // TODO: return loading indicator
+  if (space === null) return null;
+  // FIXME: reimplement this
+  return (
+    <StyledTree
+      onContextMenu={nodeContextMenu(<TreebarContextMenu space={space} />)}
+    >
+      <Flex p="16px" align="center">
+        {/* <Avatar src={relation.relation?.avatar ?? undefined} size={32} />
+        <Heading fontSize="16px" ml={2}>
+          {relation.relation?.name ?? 'Unknown User'}
+        </Heading> */}
+      </Flex>
+      <ExplorerInner space={space} />
+    </StyledTree>
+  );
+};
 
 export function ExplorerSurface({ spaceId }: { spaceId: string }) {
   const mikoto = useMikoto();
-  const space = mikoto.spaces.get(spaceId);
+  const space = mikoto.spaces._get(spaceId);
   if (space === undefined) return null;
   return <Explorer space={space} />;
 }
@@ -183,8 +185,8 @@ export function DMExplorerSurface({
   relationId: string;
 }) {
   const mikoto = useMikoto();
-  const space = mikoto.spaces.get(spaceId);
-  const relation = mikoto.relations.get(relationId);
+  const space = mikoto.spaces._get(spaceId);
+  const relation = mikoto.relationships._get(relationId);
 
   if (space === undefined || relation === undefined) return null;
   return <DMExplorer space={space} relation={relation} />;

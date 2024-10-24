@@ -10,21 +10,50 @@ pub struct Env {
     // JWT
     pub secret: String,
 
-    // Captchas
-    pub captcha: String, // either "disabled" or "hcaptcha"
-    pub captcha_url: Option<String>,
-    pub captcha_secret: Option<String>,
-
     pub web_url: String,
-    pub smtp_sender: Option<String>,
-    pub smtp_url: Option<String>,
+
+    pub smtp: Option<SmtpEnv>,
+    pub captcha: CaptchaEnv,
+    pub livekit: Option<LivekitEnv>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct SmtpEnv {
+    pub sender: String,
+    pub url: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct LivekitEnv {
+    pub server: String,
+    pub key: String,
+    pub secret: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct CaptchaEnv {
+    pub provider: String,
+    pub secret: String,
+    pub url: Option<String>,
+}
+
+impl Env {
+    pub fn print_env_info(&self) {
+        if self.smtp.is_none() {
+            warn!("SMTP server not configured. Please enable it for production use.");
+        }
+        info!("Captcha provider: {}", self.captcha.provider);
+        if self.livekit.is_none() {
+            warn!("LiveKit server not configured. Please enable it for production use.");
+        }
+    }
 }
 
 static ENV: OnceLock<Env> = OnceLock::new();
 
 pub fn env() -> &'static Env {
     ENV.get_or_init(|| {
-        dotenv::dotenv().ok();
-        envy::from_env().unwrap_or_else(|err| panic!("{:#?}", err))
+        dotenvy::dotenv().ok();
+        serde_env::from_env().unwrap_or_else(|err| panic!("{:#?}", err))
     })
 }

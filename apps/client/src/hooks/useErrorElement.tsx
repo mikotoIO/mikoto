@@ -1,8 +1,12 @@
 import { Box, Flex } from '@chakra-ui/react';
 import { faClose } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { AppError } from 'mikotojs';
 import { useState } from 'react';
+
+export interface AppError {
+  name: string;
+  message: string;
+}
 
 export function useErrorElement() {
   const [error, setError] = useState<AppError | null>(null);

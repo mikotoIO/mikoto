@@ -15,12 +15,13 @@ import {
 import styled from '@emotion/styled';
 import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { MikotoSpace, Role } from '@mikoto-io/mikoto.js';
 import { checkPermission, permissions } from '@mikoto-io/permcheck';
-import { ClientSpace, Role, Space } from 'mikotojs';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
+import { useSnapshot } from 'valtio';
 
 import { useContextMenu } from '@/components/ContextMenu';
 import { useMikoto } from '@/hooks';
@@ -147,7 +148,7 @@ const StyledRoleEditor = styled(Form)`
   overflow-y: scroll;
 `;
 
-const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
+function RoleEditor({ role, space }: { space: MikotoSpace; role: Role }) {
   const mikoto = useMikoto();
   const form = useForm({
     defaultValues: {
@@ -156,7 +157,9 @@ const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
     },
   });
   const [perms, setPerms] = useState(role.permissions);
-  const [color, setColor] = useState<string | null>(role.color);
+  const [color, setColor] = useState<string | null | undefined>(role.color);
+
+  useSnapshot(space.roles);
 
   return (
     <StyledRoleEditor
@@ -164,13 +167,9 @@ const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
       h="100%"
       onSubmit={form.handleSubmit((d) => {
         const data = { ...d, permissions: perms, color };
-        mikoto.client.roles
-          .edit({
-            spaceId: space.id,
-            roleId: role.id,
-            options: data,
-          })
-          .then(() => {});
+        mikoto.rest['roles.update'](data, {
+          params: { spaceId: space.id, roleId: role.id },
+        }).then(() => {});
       })}
     >
       <h2>Edit {role.name}</h2>
@@ -203,13 +202,10 @@ const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
           <Button
             type="button"
             variant="danger"
-            onClick={() => {
-              mikoto.client.roles
-                .delete({
-                  spaceId: space.id,
-                  roleId: role.id,
-                })
-                .then(() => {});
+            onClick={async () => {
+              await mikoto.rest['roles.delete'](undefined, {
+                params: { spaceId: space.id, roleId: role.id },
+              });
             }}
           >
             Delete Role
@@ -218,13 +214,14 @@ const RoleEditor = observer(({ role, space }: { space: Space; role: Role }) => {
       </ButtonGroup>
     </StyledRoleEditor>
   );
-});
+}
 
-export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
+export function RolesSubsurface({ space }: { space: MikotoSpace }) {
   const mikoto = useMikoto();
+  const spaceRoles = useSnapshot(space.roles);
 
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
-  const role = space.roles.find((x) => x.id === selectedRoleId);
+  const role = spaceRoles.values().find((x) => x.id === selectedRoleId);
   // const role = rolesDelta.data.find((x) => x.id === selectedRoleId);
   return (
     <SettingSurface style={{ paddingRight: 0 }}>
@@ -235,15 +232,17 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
             leftIcon={<FontAwesomeIcon icon={faCirclePlus} />}
             variant="primary"
             onClick={async () => {
-              await mikoto.client.roles.create({
-                spaceId: space.id,
-                name: 'New Role',
-              });
+              await mikoto.rest['roles.create'](
+                { name: 'New Role' },
+                {
+                  params: { spaceId: space.id },
+                },
+              );
             }}
           >
             New Role
           </Button>
-          {space.roles.map((r) => (
+          {spaceRoles.values().map((r) => (
             <SidebarButton
               key={r.id}
               selected={selectedRoleId === r.id}
@@ -263,4 +262,4 @@ export const RolesSubsurface = observer(({ space }: { space: ClientSpace }) => {
       </Grid>
     </SettingSurface>
   );
-});
+}

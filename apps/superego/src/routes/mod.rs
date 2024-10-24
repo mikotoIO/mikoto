@@ -5,7 +5,7 @@ use aide::{
     openapi::{Info, OpenApi},
 };
 use axum::{Extension, Json, Router};
-use channels::voice;
+use channels::{documents::collab_ws, voice};
 use router::AppRouter;
 use schemars::JsonSchema;
 use serde::Serialize;
@@ -58,28 +58,33 @@ pub fn router() -> Router {
         .nest("users", "/users", users::router())
         .nest("relations", "/relations", users::relations::router())
         .nest("spaces", "/spaces", spaces::router())
-        .nest("channels", "/spaces/:space_id/channels", channels::router())
+        .nest("channels", "/spaces/:spaceId/channels", channels::router())
         .nest(
             "messages",
-            "/spaces/:space_id/channel/:channel_id/messages",
+            "/spaces/:spaceId/channels/:channelId/messages",
             channels::messages::router(),
         )
         .nest(
             "voice",
-            "/spaces/:space_id/channels/:channel_id/voice",
+            "/spaces/:spaceId/channels/:channelId/voice",
             voice::router(),
         )
         .nest(
             "documents",
-            "/spaces/:space_id/channel/:channel_id/documents",
+            "/spaces/:spaceId/channels/:channelId/documents",
             channels::documents::router(),
         )
         .nest(
             "members",
-            "/spaces/:space_id/members",
+            "/spaces/:spaceId/members",
             spaces::members::router(),
         )
-        .nest("roles", "/spaces/:space_id/roles", spaces::roles::router())
+        .nest("roles", "/spaces/:spaceId/roles", spaces::roles::router())
+        .nest(
+            "roles",
+            "/spaces/:spaceId/invites",
+            spaces::invites::router(),
+        )
         .ws_command("ping", |ping: Ping, state: Arc<RwLock<State>>| async move {
             let reader = state.read().await;
             emit_event("pong", ping, &format!("conn:{}", reader.conn_id)).await?;
@@ -95,5 +100,6 @@ pub fn router() -> Router {
             },
             ..OpenApi::default()
         })
+        .nest("/collab", collab_ws())
         .layer(CorsLayer::permissive())
 }

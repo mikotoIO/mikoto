@@ -8,6 +8,7 @@ use crate::{db_enum, db_find_by_id, entity, error::Error};
 use super::hashmap_by_key;
 
 db_enum!(
+    #[sqlx(type_name = "UserCategory")]
     pub enum UserCategory {
         Bot,
         Unverified,
@@ -25,6 +26,7 @@ entity!(
 );
 
 db_enum!(
+    #[sqlx(type_name = "RelationState")]
     pub enum RelationState {
         None,
         Friend,
@@ -48,7 +50,7 @@ entity!(
 #[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UserPatch {
-    pub name: String,
+    pub name: Option<String>,
     pub avatar: Option<String>,
 }
 

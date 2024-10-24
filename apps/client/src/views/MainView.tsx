@@ -10,9 +10,8 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 
 import { CommandMenuKit } from '@/components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
-import { UserAreaAvatar } from '@/components/UserArea';
 import { faMikoto } from '@/components/icons';
-import { Sidebar } from '@/components/sidebars/Base';
+import { RESIZABLE_DISABLES, Sidebar } from '@/components/sidebars/Base';
 import { FriendSidebar } from '@/components/sidebars/FriendSidebar';
 import { MemberListSidebar } from '@/components/sidebars/MemberListSidebar';
 import { SpaceSidebar } from '@/components/sidebars/SpaceSidebar';
@@ -31,7 +30,7 @@ import {
   surfaceStore,
 } from '@/store/surface';
 
-import { MikotoApiLoader } from './MikotoApiLoader';
+import { MikotoClientProvider } from './MikotoClientProvider';
 import { WindowBar } from './WindowBar';
 
 const AppContainer = styled.div`
@@ -87,7 +86,7 @@ const SurfaceGroup = observer(
           <SurfaceGroup surfaceNode={head} />
           {tails.map((child, idx) => (
             // eslint-disable-next-line react/no-array-index-key
-            <Resizable key={idx} enable={{ left: true }}>
+            <Resizable key={idx} enable={{ ...RESIZABLE_DISABLES, left: true }}>
               <SurfaceGroup surfaceNode={child} />
             </Resizable>
           ))}
@@ -126,7 +125,7 @@ const SidebarRest = styled.div`
   -webkit-app-region: drag;
 `;
 
-const AppView = observer(() => {
+function AppView() {
   const leftSidebar = useRecoilValue(treebarSpaceState);
   const mikoto = useMikoto();
   const [workspace, setWorkspace] = useRecoilState(workspaceState);
@@ -136,7 +135,7 @@ const AppView = observer(() => {
       ? leftSidebar.spaceId
       : undefined;
 
-  const space = spaceId ? mikoto.spaces.get(spaceId) : undefined;
+  const space = spaceId ? mikoto.spaces._get(spaceId) : undefined;
 
   return (
     <AppContainer>
@@ -152,11 +151,10 @@ const AppView = observer(() => {
           >
             <FontAwesomeIcon icon={faBarsStaggered} />
           </TabBarButton>
-          {workspace.leftOpen && <UserAreaAvatar />}
           <SidebarRest />
         </div>
         <div className="bars">
-          <SpaceSidebar spaces={mikoto.spaces} />
+          <SpaceSidebar />
           {workspace.leftOpen && (
             <Sidebar
               position="left"
@@ -201,7 +199,7 @@ const AppView = observer(() => {
       )}
     </AppContainer>
   );
-});
+}
 
 function Fallback() {
   return (
@@ -216,11 +214,11 @@ function Fallback() {
 
 export default function MainView() {
   return (
-    <MikotoApiLoader fallback={<Fallback />}>
+    <MikotoClientProvider fallback={<Fallback />}>
       <AppView />
       <CommandMenuKit />
       <ContextMenuKit />
       <ModalKit />
-    </MikotoApiLoader>
+    </MikotoClientProvider>
   );
 }

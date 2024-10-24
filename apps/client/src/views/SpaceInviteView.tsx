@@ -1,13 +1,13 @@
 import { Button, Flex, Grid } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { Space } from 'mikotojs';
+import { SpaceExt } from '@mikoto-io/mikoto.js';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import { StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
-import { Spinner } from '@/ui/Spinner';
 import { useMikoto } from '@/hooks';
+import { Spinner } from '@/ui/Spinner';
 
 const InvitationBox = styled.div`
   display: flex;
@@ -24,13 +24,18 @@ const InvitationBox = styled.div`
 
 export function SpaceInviteViewInner() {
   const mikoto = useMikoto();
-  const [space, setSpace] = useState<Space | null>(null);
+  const [space, setSpace] = useState<SpaceExt | null>(null);
   const inviteCode = useParams<{ inviteCode: string }>().inviteCode ?? '';
 
   useEffect(() => {
-    mikoto.client.spaces.getSpaceFromInvite({ inviteCode }).then((x) => {
-      setSpace(x);
-    });
+    // mikoto.client.spaces.getSpaceFromInvite({ inviteCode }).then((x) => {
+    //   setSpace(x);
+    // });
+    mikoto.rest['spaces.preview']({ params: { invite: inviteCode } }).then(
+      (x) => {
+        setSpace(x);
+      },
+    );
   }, [inviteCode]);
 
   return (
@@ -51,7 +56,9 @@ export function SpaceInviteViewInner() {
                 // TODO: BEFORE THAT, improve Hyperschema error handling
                 // apparently I did not do a good enough job at it
                 try {
-                  await mikoto.client.spaces.join({ inviteCode });
+                  await mikoto.rest['spaces.join'](undefined, {
+                    params: { invite: inviteCode },
+                  });
                   window.location.href = `/`;
                 } catch (e) {
                   console.log('error joining space:');

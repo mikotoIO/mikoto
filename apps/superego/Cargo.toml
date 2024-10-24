@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tokio = { version = "1.35.1", features = ["full"] }
+tokio = { version = "1.40.0", features = ["full"] }
 # the basic dependencies
 serde = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0.108"
@@ -17,8 +17,8 @@ thiserror = "1.0.63"
 strum = { version = "0.26", features = ["derive"] }
 
 # env
-dotenv = "0.15.0"
-envy = "0.4.2"
+dotenvy = "0.15.7"
+serde-env = "0.2.0"
 log = "0.4.21"
 pretty_env_logger = "0.5.0"
 
@@ -59,6 +59,15 @@ futures-util = "0.3.30"
 fred = "9.1.2"
 tower-layer = "0.3.3"
 
+yrs = "0.18.2"
+num = "0.4.3"
+livekit-api = { version = "0.4.0", features = [
+    "rustls-tls-native-roots",
+    "signal-client-tokio",
+] }
+bitflags = "2.6.0"
+
+
 # database
 [dependencies.sqlx]
 version = "0.7"
@@ -71,3 +80,8 @@ features = [
     "json",
     "migrate",
 ]
+
+
+[dependencies.yrs-axum]
+git = "https://github.com/mikotoIO/yrs-axum"
+branch = "master"

@@ -1,5 +1,5 @@
 import { Flex, Heading } from '@chakra-ui/react';
-import { User } from 'mikotojs';
+import { User } from '@mikoto-io/mikoto.js';
 import { useEffect } from 'react';
 import { atom, useRecoilState } from 'recoil';
 
@@ -52,7 +52,9 @@ function UserAreaMenuItems() {
       </ContextMenu.Link>
       <ContextMenu.Link
         onClick={() => {
-          navigator.clipboard.writeText(mikoto.me.id);
+          if (mikoto.user.me) {
+            navigator.clipboard.writeText(mikoto.user.me.id);
+          }
         }}
       >
         Copy My User ID
@@ -82,15 +84,18 @@ function UserAreaMenuItems() {
 
 function UserAreaMenu() {
   const mikoto = useMikoto();
+  const user = mikoto.user.me;
 
   return (
     <ContextMenu style={{ width: '280px' }}>
-      <Flex gap={2} bg="gray.800" p="16px" rounded="md" direction="column">
-        <Avatar src={mikoto.me.avatar ?? undefined} size={80} />
-        <Heading fontSize="18px" mb={0}>
-          {mikoto.me.name}
-        </Heading>
-      </Flex>
+      {user && (
+        <Flex gap={2} bg="gray.800" p="16px" rounded="md" direction="column">
+          <Avatar src={user.avatar ?? undefined} size={80} />
+          <Heading fontSize="18px" mb={0}>
+            {user.name}
+          </Heading>
+        </Flex>
+      )}
       <UserAreaMenuItems />
     </ContextMenu>
   );
@@ -100,21 +105,18 @@ export function UserAreaAvatar() {
   const mikoto = useMikoto();
   const [user, setUser] = useRecoilState(userState);
   const contextMenu = useContextMenu(() => <UserAreaMenu />, {
-    top: 48,
-    left: 80,
+    top: 32,
+    left: 64,
   });
   useEffect(() => {
-    mikoto.client.users.me({}).then(setUser);
+    mikoto.rest['user.get']().then((x) => {
+      setUser(x);
+    });
   }, []);
 
   return (
     user && (
-      <Avatar
-        size={28}
-        style={{ marginTop: '6px' }}
-        onClick={contextMenu}
-        src={user.avatar ?? undefined}
-      />
+      <Avatar size={40} onClick={contextMenu} src={user.avatar ?? undefined} />
     )
   );
 }

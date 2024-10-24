@@ -4,11 +4,12 @@ use chrono::NaiveDateTime;
 use schemars::JsonSchema;
 use uuid::Uuid;
 
-use crate::{db_entity_delete, db_enum, db_find_by_id, db_list_where, entity, error::Error};
+use crate::{db_entity_delete, db_enum, db_find_by_id, db_list_where, entity, error::Error, model};
 
 use super::group_by_key;
 
 db_enum!(
+    #[sqlx(type_name = "ChannelType")]
     pub enum ChannelType {
         Text,
         Voice,
@@ -16,6 +17,13 @@ db_enum!(
         Application,
         Thread,
         Category,
+    }
+);
+
+model!(
+    pub struct ChannelKey {
+        pub space_id: Uuid,
+        pub channel_id: Uuid,
     }
 );
 
@@ -32,6 +40,14 @@ entity!(
         #[sqlx(rename = "type")]
         pub category: ChannelType,
         pub last_updated: Option<NaiveDateTime>,
+    }
+);
+
+entity!(
+    pub struct ChannelUnread {
+        pub channel_id: Uuid,
+        pub user_id: Uuid,
+        pub timestamp: NaiveDateTime,
     }
 );
 
@@ -88,7 +104,7 @@ impl Channel {
         let res = sqlx::query_as(
             r##"
             UPDATE "Channel" SET
-            "name" = COALESCE($2, "name"),
+            "name" = COALESCE($2, "name")
             WHERE "id" = $1
             RETURNING *
             "##,

@@ -82,9 +82,9 @@ async function main() {
       }),
     ],
     writers: [
-      new hs.TypeScriptWriter(
-        path.join(__dirname, '../../../packages/mikotojs/src/hs-client.ts'),
-      ),
+      // new hs.TypeScriptWriter(
+      //   path.join(__dirname, '../../../packages/mikotojs/src/hs-client.ts'),
+      // ),
       new hs.JSONWriter(path.join(__dirname, '../hyperschema.json')),
     ],
   });

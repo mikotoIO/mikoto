@@ -27,8 +27,8 @@ export function FriendsSurface() {
       <Heading>Friends</Heading>
       <Form
         onSubmit={form.handleSubmit(async (data) => {
-          await mikoto.client.relations.openDm({
-            relationId: data.friendId,
+          await mikoto.rest['relations.openDm'](undefined, {
+            params: { relationId: data.friendId },
           });
         })}
       >

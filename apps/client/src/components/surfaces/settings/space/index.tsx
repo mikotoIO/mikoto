@@ -6,12 +6,13 @@ import {
   Input,
   ModalContent,
 } from '@chakra-ui/react';
-import { ClientSpace } from 'mikotojs';
+import { MikotoSpace } from '@mikoto-io/mikoto.js';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSetRecoilState } from 'recoil';
+import { useSnapshot } from 'valtio';
 
 import { modalState } from '@/components/ContextMenu';
 import { AvatarEditor } from '@/components/molecules/AvatarEditor';
@@ -26,7 +27,7 @@ import { EmojiSubsurface } from './Emojis';
 import { Invites } from './Invites';
 import { RolesSubsurface } from './Roles';
 
-function AddBotModal({ space }: { space: ClientSpace }) {
+function AddBotModal({ space }: { space: MikotoSpace }) {
   const form = useForm();
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
@@ -34,10 +35,16 @@ function AddBotModal({ space }: { space: ClientSpace }) {
     <ModalContent rounded="md" p={4} maxW="480px">
       <Form
         onSubmit={form.handleSubmit(async (data) => {
-          await mikoto.client.members.create({
-            spaceId: space.id,
-            userId: data.botId,
-          });
+          await mikoto.rest['members.create'](
+            {
+              userId: data.botId,
+            },
+            {
+              params: {
+                spaceId: space.id,
+              },
+            },
+          );
           setModal(null);
         })}
       >
@@ -53,21 +60,22 @@ function AddBotModal({ space }: { space: ClientSpace }) {
   );
 }
 
-const Overview = observer(({ space }: { space: ClientSpace }) => {
+function Overview({ space }: { space: MikotoSpace }) {
   const { t } = useTranslation();
   const [spaceName, setSpaceName] = useState(space.name);
   const setModal = useSetRecoilState(modalState);
+  const spaceSnap = useSnapshot(space);
 
   return (
     <SettingSurface>
       <Form>
         <h1>{t('spaceSettings.spaceOverview')}</h1>
         <AvatarEditor
-          avatar={space.icon ?? undefined}
+          avatar={spaceSnap.icon ?? undefined}
           onDrop={async (file) => {
             const { data } = await uploadFile('/spaceicon', file);
 
-            await space.update({
+            await space.edit({
               icon: data.url,
               name: null,
             });
@@ -111,9 +119,9 @@ const Overview = observer(({ space }: { space: ClientSpace }) => {
       </Form>
     </SettingSurface>
   );
-});
+}
 
-function Switch({ nav, space }: { nav: string; space: ClientSpace }) {
+function Switch({ nav, space }: { nav: string; space: MikotoSpace }) {
   switch (nav) {
     case 'overview':
       return <Overview space={space} />;
@@ -140,7 +148,7 @@ const SPACE_SETTING_CATEGORIES = [
 
 export function SpaceSettingsSurface({ spaceId }: { spaceId: string }) {
   const mikoto = useMikoto();
-  const space = mikoto.spaces.get(spaceId)!;
+  const space = mikoto.spaces._get(spaceId)!;
 
   return (
     <BaseSettingsSurface

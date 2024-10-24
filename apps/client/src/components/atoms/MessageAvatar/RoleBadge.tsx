@@ -1,5 +1,5 @@
 import { Circle, chakra } from '@chakra-ui/react';
-import { Role } from 'mikotojs';
+import { Role } from '@mikoto-io/mikoto.js';
 
 export const BaseRoleBadge = chakra('div', {
   baseStyle: {

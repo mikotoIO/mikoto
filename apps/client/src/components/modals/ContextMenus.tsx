@@ -1,5 +1,5 @@
+import { MikotoMember, User } from '@mikoto-io/mikoto.js';
 import { permissions } from '@mikoto-io/permcheck';
-import { ClientMember, User, checkMemberPermission } from 'mikotojs';
 import { useSetRecoilState } from 'recoil';
 
 import { ContextMenu, modalState } from '@/components/ContextMenu';
@@ -7,7 +7,7 @@ import { ProfileModal } from '@/components/modals/Profile';
 
 interface UserContextMenuProps {
   user: User;
-  member?: ClientMember;
+  member?: MikotoMember;
 }
 
 export function UserContextMenu({ user, member }: UserContextMenuProps) {
@@ -24,16 +24,15 @@ export function UserContextMenu({ user, member }: UserContextMenuProps) {
       >
         Profile
       </ContextMenu.Link>
-      {member &&
-        checkMemberPermission(member.space.member!, permissions.ban) && (
-          <ContextMenu.Link
-            onClick={async () => {
-              await member.kick();
-            }}
-          >
-            Kick {user.name}
-          </ContextMenu.Link>
-        )}
+      {member && member.checkPermission(permissions.ban) && (
+        <ContextMenu.Link
+          onClick={async () => {
+            await member.kick();
+          }}
+        >
+          Kick {user.name}
+        </ContextMenu.Link>
+      )}
     </ContextMenu>
   );
 }

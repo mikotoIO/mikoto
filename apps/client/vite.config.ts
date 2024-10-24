@@ -24,21 +24,8 @@ export default ({ mode }: { mode: string }) =>
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src'),
-        // '@/*': fileURLToPath(new URL('./src', import.meta.url)),
-
         '@mikoto-io/permcheck': fileURLToPath(
           new URL('../../packages/permcheck/src/index.ts', import.meta.url),
-        ),
-
-        '@hyperschema/client': fileURLToPath(
-          new URL(
-            '../../hyperschema/typescript-client/src/index.ts',
-            import.meta.url,
-          ),
-        ),
-
-        mikotojs: fileURLToPath(
-          new URL('../../packages/mikotojs/src/index.ts', import.meta.url),
         ),
       },
     },

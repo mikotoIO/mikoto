@@ -160,4 +160,11 @@ impl MemberExt {
             })
             .collect())
     }
+
+    pub fn key(&self) -> MemberKey {
+        MemberKey {
+            space_id: self.base.space_id,
+            user_id: self.base.user_id,
+        }
+    }
 }

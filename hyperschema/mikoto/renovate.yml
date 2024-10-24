@@ -1,0 +1,9 @@
+url: postgres://postgres:postgres@localhost:5432/mikoto
+remote_url: postgres://postgres:postgres@localhost:5432/mikoto
+output:
+  layout: normal
+  path: .
+  format:
+    indent: 4
+    uppercase: true
+    lines_between_queries: 2

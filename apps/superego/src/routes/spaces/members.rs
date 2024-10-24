@@ -5,9 +5,13 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{MemberExt, MemberKey, SpaceUser},
+    entities::{MemberExt, MemberKey, Role, RoleToSpaceUser, SpaceExt, SpaceUser},
     error::Error,
-    functions::pubsub::emit_event,
+    functions::{
+        permissions::{permissions_or_admin, Permission},
+        pubsub::emit_event,
+    },
+    middlewares::load::Load,
     routes::{router::AppRouter, ws::state::State},
 };
 
@@ -48,12 +52,59 @@ async fn update(
     Err(Error::Todo)
 }
 
-async fn delete(Path((space_id, user_id)): Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
+async fn add_role(
+    Path((space_id, user_id, role_id)): Path<(Uuid, Uuid, Uuid)>,
+    Load(space): Load<SpaceExt>,
+    Load(acting_member): Load<MemberExt>,
+) -> Result<Json<MemberExt>, Error> {
+    permissions_or_admin(&space, &acting_member, Permission::ASSIGN_ROLES)?;
+
     let key = MemberKey::new(space_id, user_id);
     let member = SpaceUser::get_by_key(&key, db()).await?;
-    member.delete(db()).await?;
+    let role = Role::find_by_id(role_id, db()).await?;
+    if role.space_id != space_id {
+        return Err(Error::forbidden("Role does not belong to Space"));
+    }
 
-    emit_event("members.onDelete", key, &format!("space:{}", space_id)).await?;
+    RoleToSpaceUser::create(role.id, member.id, db()).await?;
+    let member = MemberExt::dataload_one(member, db()).await?;
+    emit_event("members.onUpdate", &member, &format!("space:{}", space_id)).await?;
+    Ok(member.into())
+}
+
+async fn remove_role(
+    Path((space_id, user_id, role_id)): Path<(Uuid, Uuid, Uuid)>,
+    Load(space): Load<SpaceExt>,
+    Load(acting_member): Load<MemberExt>,
+) -> Result<Json<MemberExt>, Error> {
+    permissions_or_admin(&space, &acting_member, Permission::ASSIGN_ROLES)?;
+
+    let key = MemberKey::new(space_id, user_id);
+    let member = SpaceUser::get_by_key(&key, db()).await?;
+    let role = Role::find_by_id(role_id, db()).await?;
+    if role.space_id != space_id {
+        return Err(Error::forbidden("Role does not belong to Space"));
+    }
+
+    RoleToSpaceUser::delete(role.id, member.id, db()).await?;
+    let member = MemberExt::dataload_one(member, db()).await?;
+    emit_event("members.onUpdate", &member, &format!("space:{}", space_id)).await?;
+    Ok(member.into())
+}
+
+async fn delete(
+    Load(space): Load<SpaceExt>,
+    Load(acting_member): Load<MemberExt>,
+    Path((space_id, user_id)): Path<(Uuid, Uuid)>,
+) -> Result<Json<()>, Error> {
+    permissions_or_admin(&space, &acting_member, Permission::BAN)?;
+
+    // ban user
+    let key = MemberKey::new(space_id, user_id);
+    let member = SpaceUser::get_by_key(&key, db()).await?;
+    let member = MemberExt::dataload_one(member, db()).await?;
+    member.base.delete(db()).await?;
+    emit_event("members.onDelete", &member, &format!("space:{}", space_id)).await?;
     Ok(().into())
 }
 
@@ -70,7 +121,7 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:id",
+            "/:userId",
             get_with(get, |o| {
                 o.tag(TAG)
                     .id("members.get")
@@ -84,15 +135,31 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:id",
+            "/:userId",
             patch_with(update, |o| {
                 o.tag(TAG).id("members.update").summary("Update Member")
             }),
         )
         .route(
-            "/:id",
+            "/:userId",
             delete_with(delete, |o| {
                 o.tag(TAG).id("members.delete").summary("Ban Member")
+            }),
+        )
+        .route(
+            "/:userId/roles/:roleId",
+            post_with(add_role, |o| {
+                o.tag(TAG)
+                    .id("members.addRole")
+                    .summary("Add Role to Member")
+            }),
+        )
+        .route(
+            "/:userId/roles/:roleId",
+            delete_with(remove_role, |o| {
+                o.tag(TAG)
+                    .id("members.removeRole")
+                    .summary("Remove Role from Member")
             }),
         )
         .ws_event(
@@ -105,6 +172,6 @@ pub fn router() -> AppRouter<State> {
         )
         .ws_event(
             "onDelete",
-            |member: MemberKey, _| async move { Some(member) },
+            |member: MemberExt, _| async move { Some(member) },
         )
 }

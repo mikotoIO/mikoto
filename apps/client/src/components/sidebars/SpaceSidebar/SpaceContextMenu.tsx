@@ -1,12 +1,12 @@
-import { ClientSpace } from 'mikotojs';
+import { MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useSetRecoilState } from 'recoil';
 
 import { ContextMenu, modalState } from '@/components/ContextMenu';
 import { InviteModal } from '@/components/modals/Invite';
-import { useTabkit } from '@/store/surface';
 import { SpaceJoinModal } from '@/components/modals/SpaceJoin';
+import { useTabkit } from '@/store/surface';
 
-export function SpaceContextMenu({ space }: { space: ClientSpace }) {
+export function SpaceContextMenu({ space }: { space: MikotoSpace }) {
   const tabkit = useTabkit();
   const setModal = useSetRecoilState(modalState);
 

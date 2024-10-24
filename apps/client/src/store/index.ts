@@ -1,10 +1,11 @@
-import { Space } from 'mikotojs';
+import { MikotoSpace } from '@mikoto-io/mikoto.js';
 import React from 'react';
 import { atom, useSetRecoilState } from 'recoil';
 import { recoilPersist } from 'recoil-persist';
 import { z } from 'zod';
 
 import { modalState } from '@/components/ContextMenu';
+
 import { LocalDB } from './LocalDB';
 import { Tabable } from './surface';
 
@@ -31,7 +32,7 @@ export function useModalKit() {
 }
 
 // some local contexts
-export const CurrentSpaceContext = React.createContext<Space | undefined>(
+export const CurrentSpaceContext = React.createContext<MikotoSpace | undefined>(
   undefined,
 );
 

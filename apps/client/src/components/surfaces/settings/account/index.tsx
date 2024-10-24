@@ -45,11 +45,11 @@ export function PasswordChangeModal() {
         style={{ minWidth: 400 }}
         onSubmit={handleSubmit(async (form) => {
           try {
-            await authClient.changePassword(
-              user!.id,
-              form.oldPassword,
-              form.newPassword,
-            );
+            await authClient.changePassword({
+              id: user!.id,
+              oldPassword: form.oldPassword,
+              newPassword: form.newPassword,
+            });
             window.location.href = '/login';
           } catch (e) {
             error.setError((e as any)?.response?.data);
@@ -101,12 +101,7 @@ function NameChangeModal() {
     <ModalContent rounded="md" p={4} maxW="480px">
       <Form
         onSubmit={handleSubmit(async (form) => {
-          await mikoto.client.users.update({
-            options: {
-              name: form.name,
-              avatar: null,
-            },
-          });
+          await mikoto.rest['user.update']({ name: form.name }, {});
           setModal(null);
         })}
       >
@@ -127,7 +122,7 @@ const Overview = observer(() => {
   const { t } = useTranslation();
 
   const mikoto = useMikoto();
-  const user = mikoto.me;
+  const user = mikoto.user.me!;
 
   return (
     <SettingSurface>
@@ -145,12 +140,7 @@ const Overview = observer(() => {
               avatar={user?.avatar ?? undefined}
               onDrop={async (file) => {
                 const { data } = await uploadFile('/avatar', file);
-                await mikoto.client.users.update({
-                  options: {
-                    avatar: data.url,
-                    name: null,
-                  },
-                });
+                await mikoto.rest['user.update']({ avatar: data.url }, {});
               }}
             />
             <Heading as="h2" ml="16px" fontSize="2xl">

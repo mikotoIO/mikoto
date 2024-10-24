@@ -8,7 +8,7 @@
     "build": "tsc"
   },
   "devDependencies": {
-    "tsconfig": "0.0.0",
+    "tsconfig": "workspace:*",
     "typescript": "^5.4.2"
   }
 }

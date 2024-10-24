@@ -1,10 +1,10 @@
 import { Box, Checkbox, Flex } from '@chakra-ui/react';
 import styled from '@emotion/styled';
+import { MikotoMember, Role, User } from '@mikoto-io/mikoto.js';
 import { permissions } from '@mikoto-io/permcheck';
-import { ClientMember, Role, User, checkMemberPermission } from 'mikotojs';
-import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
+import { proxy, useSnapshot } from 'valtio';
 
 import {
   contextMenuState,
@@ -13,7 +13,7 @@ import {
 } from '@/components/ContextMenu';
 import { UserContextMenu } from '@/components/modals/ContextMenus';
 import { ProfileModal } from '@/components/modals/Profile';
-import { useMikoto } from '@/hooks';
+import { useMaybeSnapshot, useMikoto } from '@/hooks';
 
 import { Avatar } from '../Avatar';
 import { BaseRoleBadge, RoleBadge } from './RoleBadge';
@@ -50,10 +50,8 @@ function RoleSetter({
   member,
 }: {
   roles: Role[];
-  member: ClientMember;
+  member: MikotoMember;
 }) {
-  const mikoto = useMikoto();
-
   const [selectedRoles, setSelectedRoles] = useState<Record<string, boolean>>(
     () => {
       const o: Record<string, boolean> = {};
@@ -68,27 +66,39 @@ function RoleSetter({
   return (
     <AvatarContextWrapper>
       <Flex direction="column" gap={8}>
-        {roles.map((x) => {
-          if (x.name === '@everyone') return null;
+        {roles.map((role) => {
+          if (role.name === '@everyone') return null;
           return (
             <Checkbox
-              key={x.id}
-              checked={selectedRoles[x.id]}
+              key={role.id}
+              defaultChecked={selectedRoles[role.id]}
               onChange={async (e) => {
-                const newSelectedRoles = {
-                  ...selectedRoles,
-                  [x.id]: e.currentTarget.checked,
-                };
-                setSelectedRoles(newSelectedRoles);
+                if (e.currentTarget.checked) {
+                  await member.client.rest['members.addRole'](undefined, {
+                    params: {
+                      spaceId: member.spaceId,
+                      userId: member.user.id,
+                      roleId: role.id,
+                    },
+                  });
+                } else {
+                  await member.client.rest['members.removeRole'](undefined, {
+                    params: {
+                      spaceId: member.spaceId,
+                      userId: member.user.id,
+                      roleId: role.id,
+                    },
+                  });
+                }
 
-                await member.update({
-                  roleIds: Object.keys(newSelectedRoles).filter(
-                    (id) => newSelectedRoles[id],
-                  ),
-                });
+                // await member.update({
+                //   roleIds: Object.keys(newSelectedRoles).filter(
+                //     (id) => newSelectedRoles[id],
+                //   ),
+                // });
               }}
             >
-              {x.name}
+              {role.name}
             </Checkbox>
           );
         })}
@@ -97,67 +107,69 @@ function RoleSetter({
   );
 }
 
-export const MemberContextMenu = observer(
-  ({ user, member }: { user: User; member?: ClientMember }) => {
-    const setModal = useSetRecoilState(modalState);
+export function MemberContextMenu({
+  user,
+  member,
+}: {
+  user: User;
+  member?: MikotoMember;
+}) {
+  const memberSnap = useMaybeSnapshot(member);
+  const setModal = useSetRecoilState(modalState);
 
-    const [roleEditorOpen, setRoleEditorOpen] = useState(false);
-    const setContextMenu = useSetRecoilState(contextMenuState);
+  const [roleEditorOpen, setRoleEditorOpen] = useState(false);
+  const setContextMenu = useSetRecoilState(contextMenuState);
 
-    return (
-      <div style={{ display: 'grid', gridGap: '8px' }}>
-        <AvatarContextWrapper>
-          {member === null ? (
-            'loading'
-          ) : (
-            <div>
-              <Avatar
-                src={user.avatar ?? undefined}
-                size={80}
-                onClick={() => {
-                  setModal({
-                    elem: <ProfileModal user={user} />,
-                  });
-                  setContextMenu(null);
-                }}
-              />
-              <h1>{user.name}</h1>
-              <hr />
-              {member && (
-                <>
-                  <h2>Roles</h2>
-                  <Box gap={2}>
-                    {member.roles.map(
-                      (r) => r && <RoleBadge key={r.id} role={r} />,
-                    )}
-                    {checkMemberPermission(
-                      member.space.member!,
-                      permissions.manageRoles,
-                    ) && (
-                      <BaseRoleBadge
-                        cursor="pointer"
-                        onClick={() => setRoleEditorOpen((x) => !x)}
-                      >
-                        +
-                      </BaseRoleBadge>
-                    )}
-                  </Box>
-                </>
-              )}
-            </div>
-          )}
-        </AvatarContextWrapper>
-        {member && roleEditorOpen && (
-          <RoleSetter roles={member.space?.roles!} member={member!} />
+  return (
+    <div style={{ display: 'grid', gridGap: '8px' }}>
+      <AvatarContextWrapper>
+        {memberSnap === null ? (
+          'loading'
+        ) : (
+          <div>
+            <Avatar
+              src={user.avatar ?? undefined}
+              size={80}
+              onClick={() => {
+                setModal({
+                  elem: <ProfileModal user={user} />,
+                });
+                setContextMenu(null);
+              }}
+            />
+            <h1>{user.name}</h1>
+            <hr />
+            {memberSnap && (
+              <>
+                <h2>Roles</h2>
+                <Box gap={2}>
+                  {memberSnap.roles.map(
+                    (r) => r && <RoleBadge key={r.id} role={r} />,
+                  )}
+                  {memberSnap.checkPermission(permissions.manageRoles) && (
+                    <BaseRoleBadge
+                      cursor="pointer"
+                      onClick={() => setRoleEditorOpen((x) => !x)}
+                    >
+                      +
+                    </BaseRoleBadge>
+                  )}
+                </Box>
+              </>
+            )}
+          </div>
         )}
-      </div>
-    );
-  },
-);
+      </AvatarContextWrapper>
+      {member && roleEditorOpen && (
+        <RoleSetter roles={member.space?.roles!.values()!} member={member!} />
+      )}
+    </div>
+  );
+}
 
 interface MessageAvatarProps extends AvatarProps {
   user?: User;
-  member?: ClientMember;
+  member?: MikotoMember;
 }
 
 /**
@@ -166,6 +178,7 @@ interface MessageAvatarProps extends AvatarProps {
 export function MessageAvatar({ src, member, size }: MessageAvatarProps) {
   const setContextMenu = useSetRecoilState(contextMenuState);
   const avatarRef = useRef<HTMLDivElement>(null);
+  useMaybeSnapshot(member);
 
   const user = member?.user;
 

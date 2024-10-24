@@ -15,13 +15,13 @@ import {
   faMicrophone,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { permissions } from '@mikoto-io/permcheck';
 import {
   Channel,
-  ClientChannel,
-  ClientSpace,
-  checkMemberPermission,
-} from 'mikotojs';
+  ChannelType,
+  MikotoChannel,
+  MikotoSpace,
+} from '@mikoto-io/mikoto.js';
+import { permissions } from '@mikoto-io/permcheck';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -65,13 +65,13 @@ export function CreateChannelModal({
   space,
   channel,
 }: {
-  space: ClientSpace;
+  space: MikotoSpace;
   channel?: Channel;
 }) {
   const setModal = useSetRecoilState(modalState);
   const { register, handleSubmit } = useForm();
 
-  const [channelType, setChannelType] = useState('TEXT');
+  const [channelType, setChannelType] = useState<ChannelType>('TEXT');
   const error = useErrorElement();
 
   return (
@@ -108,7 +108,7 @@ export function CreateChannelModal({
                 key={type.id}
                 type="button"
                 active={channelType === type.id}
-                onClick={() => setChannelType(type.id)}
+                onClick={() => setChannelType(type.id as ChannelType)}
               >
                 <FontAwesomeIcon className="icon" icon={type.icon} />
                 <br />
@@ -130,7 +130,7 @@ export function CreateChannelModal({
   );
 }
 
-function DeleteChannelModal({ channel }: { channel: ClientChannel }) {
+function DeleteChannelModal({ channel }: { channel: MikotoChannel }) {
   const setModal = useSetRecoilState(modalState);
 
   return (
@@ -162,73 +162,68 @@ function DeleteChannelModal({ channel }: { channel: ClientChannel }) {
   );
 }
 
-export const ChannelContextMenu = observer(
-  ({ channel }: { channel: ClientChannel }) => {
-    const tabkit = useTabkit();
-    const setModal = useSetRecoilState(modalState);
+export const ChannelContextMenu = ({ channel }: { channel: MikotoChannel }) => {
+  const tabkit = useTabkit();
+  const setModal = useSetRecoilState(modalState);
 
-    return (
-      <ContextMenu>
-        <ContextMenu.Link
-          onClick={() => {
-            tabkit.openTab(channelToTab(channel), true);
-          }}
-        >
-          Open in new tab
-        </ContextMenu.Link>
-        <ContextMenu.Link>Mark as Read</ContextMenu.Link>
-        <ContextMenu.Link
-          onClick={() => {
-            tabkit.openTab(
-              {
-                kind: 'channelSettings',
-                key: `channelSettings/${channel.id}`,
-                channelId: channel.id,
-              },
-              false,
-            );
-          }}
-        >
-          Channel Settings
-        </ContextMenu.Link>
-        {checkMemberPermission(
-          channel.space!.member!,
-          permissions.superuser,
-        ) && (
-          <>
-            <ContextMenu.Link
-              onClick={() => {
-                const { space } = channel;
-                if (!space) {
-                  console.error('channel has no space. probably a bug.');
-                  return;
-                }
-                setModal({
-                  elem: <CreateChannelModal space={space} channel={channel} />,
-                });
-              }}
-            >
-              Create Subchannel
-            </ContextMenu.Link>
-            <ContextMenu.Link
-              onClick={() => {
-                navigator.clipboard.writeText(
-                  `${window.location.origin}/?m=${channel.id}`,
-                );
-              }}
-            >
-              Copy Channel Link
-            </ContextMenu.Link>
-            <ContextMenu.Link
-              onClick={() => {
-                setModal({ elem: <DeleteChannelModal channel={channel} /> });
-              }}
-            >
-              Delete Channel
-            </ContextMenu.Link>
-          </>
-        )}
-      </ContextMenu>
-    );
-  },
-);
+  return (
+    <ContextMenu>
+      <ContextMenu.Link
+        onClick={() => {
+          tabkit.openTab(channelToTab(channel), true);
+        }}
+      >
+        Open in new tab
+      </ContextMenu.Link>
+      <ContextMenu.Link>Mark as Read</ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={() => {
+          tabkit.openTab(
+            {
+              kind: 'channelSettings',
+              key: `channelSettings/${channel.id}`,
+              channelId: channel.id,
+            },
+            false,
+          );
+        }}
+      >
+        Channel Settings
+      </ContextMenu.Link>
+      {channel.space!.member!.checkPermission(permissions.superuser) && (
+        <>
+          <ContextMenu.Link
+            onClick={() => {
+              const { space } = channel;
+              if (!space) {
+                console.error('channel has no space. probably a bug.');
+                return;
+              }
+              setModal({
+                elem: <CreateChannelModal space={space} channel={channel} />,
+              });
+            }}
+          >
+            Create Subchannel
+          </ContextMenu.Link>
+          <ContextMenu.Link
+            onClick={() => {
+              navigator.clipboard.writeText(
+                `${window.location.origin}/?m=${channel.id}`,
+              );
+            }}
+          >
+            Copy Channel Link
+          </ContextMenu.Link>
+          <ContextMenu.Link
+            onClick={() => {
+              setModal({ elem: <DeleteChannelModal channel={channel} /> });
+            }}
+          >
+            Delete Channel
+          </ContextMenu.Link>
+        </>
+      )}
+    </ContextMenu>
+  );
+};

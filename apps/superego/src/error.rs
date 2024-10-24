@@ -13,6 +13,10 @@ pub enum Error {
     NotFound,
     #[error("{message}")]
     Unauthorized { message: String },
+    #[error("{message}")]
+    InsufficientPermissions { message: String },
+    #[error("{message}")]
+    Forbidden { message: String },
     #[error("Validation failed")]
     ValidationFailed,
 
@@ -65,6 +69,24 @@ impl Error {
             message: message.to_string(),
         }
     }
+
+    pub fn internal(message: &str) -> Self {
+        Self::InternalServerError {
+            message: message.to_string(),
+        }
+    }
+
+    pub fn unauthorized(message: &str) -> Self {
+        Self::Unauthorized {
+            message: message.to_string(),
+        }
+    }
+
+    pub fn forbidden(message: &str) -> Self {
+        Self::Forbidden {
+            message: message.to_string(),
+        }
+    }
 }
 
 impl IntoResponse for Error {
@@ -73,6 +95,11 @@ impl IntoResponse for Error {
             Error::Miscallaneous { status, .. } => status,
             Error::NotFound => StatusCode::NOT_FOUND,
             Error::WrongPassword => StatusCode::UNAUTHORIZED,
+            Error::InsufficientPermissions { .. } => StatusCode::FORBIDDEN,
+
+            Error::Unauthorized { .. } => StatusCode::UNAUTHORIZED,
+            Error::Forbidden { .. } => StatusCode::FORBIDDEN,
+            Error::ValidationFailed => StatusCode::BAD_REQUEST,
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         };
 

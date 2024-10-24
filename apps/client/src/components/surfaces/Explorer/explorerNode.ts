@@ -1,5 +1,5 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { ClientChannel } from 'mikotojs';
+import { MikotoChannel } from '@mikoto-io/mikoto.js';
 
 export interface ExplorerNode {
   id: string;
@@ -23,8 +23,8 @@ export interface ExplorerNode {
  * @returns The root NodeObject of the structured tree.
  */
 export function channelToStructuredTree(
-  channels: ClientChannel[],
-  nodeObjectFactory: (ch: ClientChannel) => ExplorerNode,
+  channels: MikotoChannel[],
+  nodeObjectFactory: (ch: MikotoChannel) => ExplorerNode,
 ): ExplorerNode {
   const root: ExplorerNode = {
     id: 'root',

@@ -8,7 +8,7 @@ import {
   Input,
   Textarea,
 } from '@chakra-ui/react';
-import { ClientChannel } from 'mikotojs';
+import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
@@ -22,7 +22,7 @@ const ACCOUNT_SETTING_CATEGORIES = [
   { code: 'permissions', tkey: 'channelSettings.permissions.title' },
 ];
 
-function General({ channel }: { channel: ClientChannel }) {
+function General({ channel }: { channel: MikotoChannel }) {
   const form = useForm({
     defaultValues: {
       name: channel.name,
@@ -34,7 +34,7 @@ function General({ channel }: { channel: ClientChannel }) {
       <Heading>Overview</Heading>
       <Form
         onSubmit={form.handleSubmit(async (data) => {
-          await channel.update(data);
+          await channel.edit(data);
           toast.success('Updated channel');
         })}
       >
@@ -55,7 +55,7 @@ function General({ channel }: { channel: ClientChannel }) {
   );
 }
 
-function Permissions({ channel }: { channel: ClientChannel }) {
+function Permissions({ channel }: { channel: MikotoChannel }) {
   return (
     <SettingSurface>
       <Heading>Permissions</Heading>
@@ -72,7 +72,7 @@ function Permissions({ channel }: { channel: ClientChannel }) {
   );
 }
 
-function Switch({ nav, channel }: { nav: string; channel: ClientChannel }) {
+function Switch({ nav, channel }: { nav: string; channel: MikotoChannel }) {
   // TODO
   switch (nav) {
     case 'general':
@@ -86,7 +86,7 @@ function Switch({ nav, channel }: { nav: string; channel: ClientChannel }) {
 
 export function ChannelSettingsSurface({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
-  const channel = mikoto.channels.get(channelId)!;
+  const channel = mikoto.channels._get(channelId)!;
   return (
     <BaseSettingsSurface
       defaultNav="general"

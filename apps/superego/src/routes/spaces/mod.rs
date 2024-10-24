@@ -8,11 +8,14 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{
-        Invite, MemberExt, MemberKey, ObjectWithId, Space, SpaceExt, SpacePatch, SpaceUser,
-    },
+    entities::{Invite, MemberExt, MemberKey, Space, SpaceExt, SpacePatch, SpaceUser},
     error::Error,
-    functions::{jwt::Claims, pubsub::emit_event},
+    functions::{
+        jwt::Claims,
+        permissions::{permissions_or_admin, Permission},
+        pubsub::emit_event,
+    },
+    middlewares::load::Load,
 };
 
 use super::{
@@ -62,26 +65,25 @@ async fn join_space(space: &SpaceExt, user_id: Uuid) -> Result<(), Error> {
     Ok(())
 }
 
-async fn leave_space(space: &SpaceExt, user_id: Uuid) -> Result<(), Error> {
-    let key = MemberKey {
-        space_id: space.base.id,
-        user_id,
-    };
+async fn leave_space(space: &SpaceExt, member: &MemberExt) -> Result<(), Error> {
+    let key = member.key();
     SpaceUser::delete_by_key(&key, db()).await?;
-    emit_event("members.onDelete", key, &format!("space:{}", space.base.id)).await?;
+    emit_event(
+        "members.onDelete",
+        &member,
+        &format!("space:{}", space.base.id),
+    )
+    .await?;
     emit_event(
         "spaces.onDelete",
-        ObjectWithId::from_id(space.base.id),
-        &format!("user:{}", user_id),
+        &space,
+        &format!("user:{}", member.base.user_id),
     )
     .await?;
     Ok(())
 }
 
-async fn get(Path(space_id): Path<Uuid>) -> Result<Json<SpaceExt>, Error> {
-    // TODO: Check if the member is in space
-    let space = Space::find_by_id(space_id, db()).await?;
-    let space = SpaceExt::dataload_one(space, db()).await?;
+async fn get(Load(space): Load<SpaceExt>) -> Result<Json<SpaceExt>, Error> {
     Ok(space.into())
 }
 
@@ -104,9 +106,13 @@ async fn create(
 
 async fn update(
     Path(space_id): Path<Uuid>,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
     Json(body): Json<SpaceUpdatePayload>,
 ) -> Result<Json<SpaceExt>, Error> {
     // TODO: Check update rights
+    permissions_or_admin(&space, &member, Permission::MANAGE_SPACE)?;
+
     let space = Space::find_by_id(space_id, db()).await?;
     let space = space.update(body.into(), db()).await?;
     let space = SpaceExt::dataload_one(space, db()).await?;
@@ -119,22 +125,22 @@ async fn update(
     Ok(space.into())
 }
 
-async fn delete(Path(space_id): Path<Uuid>, claims: Claims) -> Result<Json<()>, Error> {
-    let space = Space::find_by_id(space_id, db()).await?;
-    if space.owner_id == Some(claims.sub.parse()?) {
-        space.delete(db()).await?;
-        emit_event(
-            "spaces.onDelete",
-            ObjectWithId::from_id(space_id),
-            &format!("user:{}", claims.sub),
-        )
-        .await?;
+async fn delete(Load(space): Load<SpaceExt>, claims: Claims) -> Result<Json<()>, Error> {
+    if space.base.owner_id == Some(claims.sub.parse()?) {
+        space.base.delete(db()).await?;
+        emit_event("spaces.onDelete", &space, &format!("user:{}", claims.sub)).await?;
     } else {
-        return Err(Error::Unauthorized {
-            message: "Only the owner may delete the space".to_string(),
-        });
+        return Err(Error::unauthorized("Only the owner may delete the space"));
     }
     Ok(().into())
+}
+
+async fn invite_preview(Path(invite): Path<String>) -> Result<Json<SpaceExt>, Error> {
+    let invite = Invite::find_by_id(&invite, db()).await?;
+
+    let space = Space::find_by_id(invite.space_id, db()).await?;
+    let space = SpaceExt::dataload_one(space, db()).await?;
+    Ok(space.into())
 }
 
 async fn join(Path(invite): Path<String>, claims: Claims) -> Result<Json<SpaceExt>, Error> {
@@ -149,7 +155,12 @@ async fn join(Path(invite): Path<String>, claims: Claims) -> Result<Json<SpaceEx
 async fn leave(Path(space_id): Path<Uuid>, claims: Claims) -> Result<Json<()>, Error> {
     let space = Space::find_by_id(space_id, db()).await?;
     let space = SpaceExt::dataload_one(space, db()).await?;
-    leave_space(&space, claims.sub.parse()?).await?;
+
+    let member =
+        SpaceUser::get_by_key(&MemberKey::new(space_id, claims.sub.parse()?), db()).await?;
+    let member = MemberExt::dataload_one(member, db()).await?;
+
+    leave_space(&space, &member).await?;
     Ok(().into())
 }
 
@@ -164,11 +175,19 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:id",
+            "/:spaceId",
             get_with(get, |o| o.tag(TAG).id("spaces.get").summary("Get Space")),
         )
         .route(
-            "/join",
+            "/join/:invite",
+            get_with(invite_preview, |o| {
+                o.tag(TAG)
+                    .id("spaces.preview")
+                    .summary("Preview Space Invite")
+            }),
+        )
+        .route(
+            "/join/:invite",
             post_with(join, |o| o.tag(TAG).id("spaces.join").summary("Join Space")),
         )
         .route(
@@ -178,19 +197,19 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:id",
+            "/:spaceId",
             patch_with(update, |o| {
                 o.tag(TAG).id("spaces.update").summary("Update Space")
             }),
         )
         .route(
-            "/:id",
+            "/:spaceId",
             delete_with(delete, |o| {
                 o.tag(TAG).id("spaces.delete").summary("Delete Space")
             }),
         )
         .route(
-            "/:id/leave",
+            "/:spaceId/leave",
             delete_with(leave, |o| {
                 o.tag(TAG).id("spaces.leave").summary("Leave Space")
             }),
@@ -209,11 +228,11 @@ pub fn router() -> AppRouter<State> {
         .ws_event("onUpdate", |space: SpaceExt, _| async move { Some(space) })
         .ws_event(
             "onDelete",
-            |space: ObjectWithId, state: Arc<RwLock<State>>| async move {
+            |space: SpaceExt, state: Arc<RwLock<State>>| async move {
                 let mut writer = state.write().await;
                 writer.actions.push(SocketAction::Unsubscribe(vec![format!(
                     "space:{}",
-                    space.id
+                    space.base.id
                 )]));
                 Some(space)
             },

@@ -2,19 +2,20 @@ import { Divider } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { produce } from 'immer';
-import { ClientSpace, SpaceStore } from 'mikotojs';
-import { observer } from 'mobx-react-lite';
+import { MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
 import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useSnapshot } from 'valtio/react';
 
 import { modalState, useContextMenu } from '@/components/ContextMenu';
+import { UserAreaAvatar } from '@/components/UserArea';
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import { StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
 import { faMikoto } from '@/components/icons';
 import { SpaceJoinModal } from '@/components/modals/SpaceJoin';
 import { reorder } from '@/functions/reorder';
+import { useMikoto } from '@/hooks';
 import { treebarSpaceState, workspaceState } from '@/store';
 
 import { Pill } from './Pill';
@@ -38,13 +39,13 @@ const StyledIconWrapper = styled.div`
   position: relative;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 8px;
-  padding-left: 8px;
-  padding-right: 8px;
+  margin-bottom: 4px;
+  padding-left: 6px;
+  padding-right: 4px;
 `;
 
 interface SidebarSpaceIconProps {
-  space: ClientSpace;
+  space: MikotoSpace;
 }
 
 interface UseCombinedDnDProps<T> {
@@ -108,6 +109,7 @@ function SidebarSpaceIcon({ space }: SidebarSpaceIconProps) {
       <StyledIconWrapper>
         <Pill h={isActive ? 32 : 0} />
         <StyledSpaceIcon
+          size={ICON_SIZE}
           onContextMenu={contextMenu}
           icon={space.icon ? normalizeMediaUrl(space.icon) : undefined}
           onDoubleClick={() => {
@@ -119,7 +121,8 @@ function SidebarSpaceIcon({ space }: SidebarSpaceIconProps) {
               key: `explorer/${space.id}`,
               spaceId: space.id,
             });
-            space.fetchMembers().then();
+            // FIXME: correctly fetch members
+            // space.fetchMembers().then();
           }}
         >
           {space.icon === null ? space.name[0] : ''}
@@ -131,12 +134,12 @@ function SidebarSpaceIcon({ space }: SidebarSpaceIconProps) {
 
 // order spaces in the same order as the array of IDs
 // if an ID is not in the array, it is pushed to the end
-function orderSpaces(spaces: SpaceStore, order: string[]) {
-  const ordered: ClientSpace[] = [];
-  const unordered: ClientSpace[] = [];
-  const keys = new Set(spaces.keys());
+function orderSpaces(mikoto: MikotoClient, order: string[]) {
+  const ordered: MikotoSpace[] = [];
+  const unordered: MikotoSpace[] = [];
+  const keys = new Set(mikoto.spaces.cache.keys());
   order.forEach((id) => {
-    const space = spaces.get(id);
+    const space = mikoto.spaces._get(id);
     if (space && space.type === 'NONE') {
       ordered.push(space);
     }
@@ -144,7 +147,7 @@ function orderSpaces(spaces: SpaceStore, order: string[]) {
   });
 
   keys.forEach((id) => {
-    const space = spaces.get(id);
+    const space = mikoto.spaces._get(id);
     if (space && space.type === 'NONE') {
       unordered.push(space);
     }
@@ -160,6 +163,7 @@ function JoinSpaceButon() {
     <SpaceIconTooltip tooltip="Add / Join Space">
       <StyledIconWrapper>
         <StyledSpaceIcon
+          size={ICON_SIZE}
           color="blue.500"
           fontSize="18px"
           onClick={() => {
@@ -175,16 +179,20 @@ function JoinSpaceButon() {
   );
 }
 
-export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
+const ICON_SIZE = '40px';
+
+export function SpaceSidebar() {
+  const mikoto = useMikoto();
   const [spaceId, setSpaceId] = useRecoilState(treebarSpaceState);
 
+  useSnapshot(mikoto.spaces);
   const contextMenu = useContextMenu(() => <SpaceBackContextMenu />);
 
   const [order, setOrder] = useState<string[]>(() =>
     // TODO: persist to server
     JSON.parse(localStorage.getItem('spaceOrder') ?? '[]'),
   );
-  const [spaceArray, isOrdered] = orderSpaces(spaces, order);
+  const [spaceArray, isOrdered] = orderSpaces(mikoto, order);
   if (!isOrdered) {
     setOrder(spaceArray.map((x) => x.id));
     return null;
@@ -192,9 +200,13 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
 
   return (
     <StyledSpaceSidebar onContextMenu={contextMenu}>
-      <StyledIconWrapper style={{ marginTop: '8px' }}>
+      <StyledIconWrapper>
+        <UserAreaAvatar />
+      </StyledIconWrapper>
+      <StyledIconWrapper>
         <Pill h={spaceId === null ? 32 : 0} />
         <StyledSpaceIcon
+          size={ICON_SIZE}
           style={{
             background:
               spaceId === null
@@ -205,7 +217,7 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
             setSpaceId(null);
           }}
         >
-          <FontAwesomeIcon icon={faMikoto} fontSize="28px" />
+          <FontAwesomeIcon icon={faMikoto} fontSize="24px" />
         </StyledSpaceIcon>
       </StyledIconWrapper>
       <Divider w={8} />
@@ -232,4 +244,4 @@ export const SpaceSidebar = observer(({ spaces }: { spaces: SpaceStore }) => {
       <JoinSpaceButon />
     </StyledSpaceSidebar>
   );
-});
+}

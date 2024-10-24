@@ -5,9 +5,13 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Channel, ChannelPatch, ChannelType, ObjectWithId},
+    entities::{Channel, ChannelPatch, ChannelType, ChannelUnread, Document, MemberExt, SpaceExt},
     error::Error,
-    functions::pubsub::emit_event,
+    functions::{
+        permissions::{permissions_or_admin, Permission},
+        pubsub::emit_event,
+    },
+    middlewares::load::Load,
 };
 
 use super::{router::AppRouter, ws::state::State};
@@ -38,8 +42,12 @@ async fn list(Path(space_id): Path<Uuid>) -> Result<Json<Vec<Channel>>, Error> {
 
 async fn create(
     Path(space_id): Path<Uuid>,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
     Json(body): Json<ChannelCreatePayload>,
 ) -> Result<Json<Channel>, Error> {
+    permissions_or_admin(&space, &member, Permission::MANAGE_CHANNELS)?;
+
     let channel = Channel {
         id: Uuid::new_v4(),
         space_id,
@@ -50,10 +58,20 @@ async fn create(
         last_updated: Some(chrono::Utc::now().naive_utc()),
     };
     channel.create(db()).await?;
+
+    if channel.category == ChannelType::Document {
+        Document {
+            id: Uuid::new_v4(),
+            channel_id: channel.id,
+            content: "".to_string(),
+        }
+        .create(db())
+        .await?;
+    }
     emit_event(
         "channels.onCreate",
         &channel,
-        &format!("spaces:{}", space_id),
+        &format!("space:{}", space_id),
     )
     .await?;
 
@@ -62,28 +80,49 @@ async fn create(
 
 async fn update(
     Path((_, channel_id)): Path<(Uuid, Uuid)>,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
     Json(patch): Json<ChannelPatch>,
 ) -> Result<Json<Channel>, Error> {
+    permissions_or_admin(&space, &member, Permission::MANAGE_CHANNELS)?;
+
     let channel = Channel::find_by_id(channel_id, db()).await?;
     let channel = channel.update(patch, db()).await?;
     emit_event(
         "channels.onUpdate",
         &channel,
-        &format!("spaces:{}", channel.space_id),
+        &format!("space:{}", channel.space_id),
     )
     .await?;
     Ok(channel.into())
 }
 
-async fn delete(Path((_, channel_id)): Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
+async fn delete(
+    Path((_, channel_id)): Path<(Uuid, Uuid)>,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
+) -> Result<Json<()>, Error> {
+    permissions_or_admin(&space, &member, Permission::MANAGE_CHANNELS)?;
+
     let channel = Channel::find_by_id(channel_id, db()).await?;
     channel.delete(db()).await?;
     emit_event(
         "channels.onDelete",
-        &ObjectWithId::from_id(channel_id),
-        &format!("spaces:{}", channel.space_id),
+        &channel,
+        &format!("space:{}", channel.space_id),
     )
     .await?;
+    Ok(().into())
+}
+
+async fn list_unread(Path(_space_id): Path<Uuid>) -> Result<Json<Vec<ChannelUnread>>, Error> {
+    // no-op for now
+    Ok(vec![].into())
+}
+
+async fn acknowledge(Path((_, _channel_id)): Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
+    // no-op for now
+    // TODO: Implement
     Ok(().into())
 }
 
@@ -98,7 +137,7 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:id",
+            "/:channelId",
             get_with(get, |o| {
                 o.tag(TAG).id("channels.get").summary("Get Channel")
             }),
@@ -110,15 +149,29 @@ pub fn router() -> AppRouter<State> {
             }),
         )
         .route(
-            "/:id",
+            "/:channelId",
             patch_with(update, |o| {
                 o.tag(TAG).id("channels.update").summary("Update Channel")
             }),
         )
         .route(
-            "/:id",
+            "/:channelId",
             delete_with(delete, |o| {
                 o.id("channels.delete").tag(TAG).summary("Delete Channel")
+            }),
+        )
+        .route(
+            "/unreads",
+            get_with(list_unread, |o| {
+                o.id("channels.unreads").tag(TAG).summary("List Unreads")
+            }),
+        )
+        .route(
+            "/:channelId/ack",
+            post_with(acknowledge, |o| {
+                o.id("channels.acknowledge")
+                    .tag(TAG)
+                    .summary("Acknowledge Channel")
             }),
         )
         .ws_event(
@@ -129,7 +182,8 @@ pub fn router() -> AppRouter<State> {
             "onUpdate",
             |channel: Channel, _| async move { Some(channel) },
         )
-        .ws_event("onDelete", |channel: ObjectWithId, _| async move {
-            Some(channel)
-        })
+        .ws_event(
+            "onDelete",
+            |channel: Channel, _| async move { Some(channel) },
+        )
 }

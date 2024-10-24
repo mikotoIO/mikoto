@@ -9,7 +9,7 @@ import {
 import styled from '@emotion/styled';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { User } from 'mikotojs';
+import { User } from '@mikoto-io/mikoto.js';
 import { useSetRecoilState } from 'recoil';
 
 import { modalState } from '@/components/ContextMenu';
@@ -69,14 +69,15 @@ export function ProfileModal({ user }: { user: User }) {
               <MikotoId>@cactus.mikoto.io</MikotoId>
             </div>
             <div>
-              {mikoto.me.id !== user.id && (
+              {mikoto.user.me?.id !== user.id && (
                 <ButtonGroup>
                   <Button
                     variant="success"
                     onClick={async () => {
-                      await mikoto.client.relations.openDm({
-                        relationId: '2a36685a-6236-4fbe-92bf-b3025fd92cfb',
-                      });
+                      // FIXME: the fuck is this
+                      // await mikoto.client.relations.openDm({
+                      //   relationId: '2a36685a-6236-4fbe-92bf-b3025fd92cfb',
+                      // });
 
                       setModal(null);
                     }}
@@ -86,18 +87,25 @@ export function ProfileModal({ user }: { user: User }) {
                   <Button
                     variant="secondary"
                     onClick={async () => {
-                      const dm = await mikoto.client.relations.openDm({
-                        relationId: user.id,
-                      });
-                      const spaceId = dm.space?.id;
-                      if (spaceId) {
-                        setSpace({
-                          kind: 'explorer',
-                          key: `explorer/${spaceId}`,
-                          spaceId,
-                        });
-                      }
-                      setModal(null);
+                      // const dm = await mikoto.client.relations.openDm({
+                      //   relationId: user.id,
+                      // });
+                      const dm = await mikoto.rest['relations.openDm'](
+                        undefined,
+                        {
+                          params: { relationId: user.id },
+                        },
+                      );
+                      // TODO: Rework DMs
+                      // const spaceId = dm.space?.id;
+                      // if (spaceId) {
+                      //   setSpace({
+                      //     kind: 'explorer',
+                      //     key: `explorer/${spaceId}`,
+                      //     spaceId,
+                      //   });
+                      // }
+                      // setModal(null);
                     }}
                   >
                     <FontAwesomeIcon icon={faEnvelope} />

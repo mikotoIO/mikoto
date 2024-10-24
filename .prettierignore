@@ -1,2 +1,3 @@
 data/
 hs-client.ts
+*.gen.ts

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Message } from 'mikotojs';
+import { MessageExt } from '@mikoto-io/mikoto.js';
 
 const DAYS_OF_WEEK = [
   'Sunday',
@@ -40,7 +40,7 @@ export function DateSeparator({ date }: { date: Date }) {
   );
 }
 
-export function showDateSeparator(message: Message, prevMessage?: Message) {
+export function showDateSeparator(message: MessageExt, prevMessage?: MessageExt) {
   if (!prevMessage) return true;
   const prevDate = new Date(prevMessage.timestamp);
   const currDate = new Date(message.timestamp);

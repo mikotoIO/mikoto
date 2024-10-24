@@ -5,7 +5,7 @@ import {
   TRANSFORMERS,
 } from '@lexical/markdown';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { ClientChannel } from 'mikotojs';
+import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useCallback, useState } from 'react';
 import * as Y from 'yjs';
 
@@ -13,7 +13,7 @@ import { env } from '@/env';
 import { useMikoto } from '@/hooks';
 
 export interface UseProviderFactoryProps {
-  channel: ClientChannel;
+  channel: MikotoChannel;
   content: string;
   onSync?: () => void;
 }
@@ -61,12 +61,12 @@ export function useProviderFactory({
   );
 
   const save = () => {
-    const contentString = editor
+    const content = editor
       .getEditorState()
       .read(() => $convertToMarkdownString(TRANSFORMERS));
 
-    mikoto.client.documents
-      .update({ channelId: channel.id, content: contentString })
+    channel
+      .updateDocument({ content })
       .then(() => setSynced('synced'))
       .catch((e) => {
         console.error(e);

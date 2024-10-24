@@ -1,5 +1,5 @@
 import { faFile, faMicrophone } from '@fortawesome/free-solid-svg-icons';
-import { Channel } from 'mikotojs';
+import { Channel } from '@mikoto-io/mikoto.js';
 
 import { Tabable } from '@/store/surface';
 

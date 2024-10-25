@@ -612,6 +612,12 @@ importers:
       typescript:
         specifier: ^5.4.2
         version: 5.5.4
+      vite:
+        specifier: ^5.2.12
+        version: 5.4.8(@types/node@22.7.2)(terser@5.33.0)
+      vitest:
+        specifier: ^0.18.0
+        version: 0.18.1(terser@5.33.0)
 
   apps/server:
     dependencies:
@@ -954,6 +960,12 @@ importers:
       openapi3-ts:
         specifier: ^4.4.0
         version: 4.4.0
+      typescript:
+        specifier: ^5.4.2
+        version: 5.6.2
+      vitest:
+        specifier: ^0.18.0
+        version: 0.18.1(terser@5.33.0)
 
   packages/permcheck:
     devDependencies:
@@ -2856,7 +2868,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {'0': node >=0.10.0}
+    engines: {node: '>=0.10.0'}
 
   '@expo/cli@0.17.13':
     resolution: {integrity: sha512-n13yxOmI3I0JidzMdFCH68tYKGDtK4XlDFk1vysZX7AIRKeDVRsSbHhma5jCla2bDt25RKmJBHA9KtzielwzAA==}
@@ -19419,7 +19431,7 @@ snapshots:
   config-file-ts@0.2.6:
     dependencies:
       glob: 10.4.5
-      typescript: 5.5.4
+      typescript: 5.6.2
 
   confusing-browser-globals@1.0.11: {}
 

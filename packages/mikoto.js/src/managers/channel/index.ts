@@ -44,7 +44,7 @@ export class MikotoChannel extends ZSchema(Channel) {
   }
 
   async edit(data: ChannelPatch) {
-    const channel = await this.client.rest['channels.update'](data, {
+    await this.client.rest['channels.update'](data, {
       params: {
         spaceId: this.spaceId,
         channelId: this.id,

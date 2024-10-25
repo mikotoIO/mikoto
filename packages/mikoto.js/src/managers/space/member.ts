@@ -74,10 +74,10 @@ export class MikotoMember extends ZSchema(MemberExt) {
       );
     }
 
-    const totalPerms = roles.reduce(
-      (acc, x) => acc | BigInt(x.permissions),
-      0n,
-    );
+    // const totalPerms = roles.reduce(
+    //   (acc, x) => acc | BigInt(x.permissions),
+    //   0n,
+    // );
     return true; // FIXME: correct this
     // return this.client.checkPermission(act, totalPerms);
   }
@@ -90,8 +90,8 @@ export class MemberManager extends CachedManager<MikotoMember> {
   }
 
   override _insert(data: MikotoMember) {
-		this.cache.set(data.userId, data);
-	}
+    this.cache.set(data.userId, data);
+  }
 
   async list() {
     const res = await this.client.rest['members.list']({

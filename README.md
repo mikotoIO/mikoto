@@ -52,10 +52,6 @@ pnpm install
 
 # start services (PostgreSQL, Redis, MinIO, etc.)
 docker-compose up
-
-# set up database
-cd apps/server
-pnpx prisma migrate dev
 ```
 
 ### Development

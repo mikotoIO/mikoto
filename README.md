@@ -60,7 +60,7 @@ Mikoto uses a turborepo-based monorepo.
 
 Use Docker Compose to run the necessary services.
 
-To develop all apps and packages, run the following command:
+To develop apps and packages, run the following command:
 
 ```sh
 pnpm start

@@ -4,7 +4,12 @@ use chrono::NaiveDateTime;
 use schemars::JsonSchema;
 use uuid::Uuid;
 
-use crate::{db_entity_delete, db_enum, db_find_by_id, db_list_where, entity, error::Error, model};
+use crate::{
+    db_entity_delete, db_enum, db_find_by_id, db_list_where, entity,
+    error::Error,
+    functions::time::{rfc3339, rfc3339_opt},
+    model,
+};
 
 use super::group_by_key;
 
@@ -39,6 +44,8 @@ entity!(
         #[serde(rename = "type")]
         #[sqlx(rename = "type")]
         pub category: ChannelType,
+        #[serde(with = "rfc3339_opt")]
+        #[schemars(with = "Option<NaiveDateTime>")]
         pub last_updated: Option<NaiveDateTime>,
     }
 );
@@ -47,6 +54,9 @@ entity!(
     pub struct ChannelUnread {
         pub channel_id: Uuid,
         pub user_id: Uuid,
+
+        #[serde(with = "rfc3339")]
+        #[schemars(with = "NaiveDateTime")]
         pub timestamp: NaiveDateTime,
     }
 );

@@ -2,7 +2,12 @@ use chrono::{NaiveDateTime, Utc};
 use schemars::JsonSchema;
 use uuid::Uuid;
 
-use crate::{db_entity_delete, db_find_by_id, entity, error::Error, model};
+use crate::{
+    db_entity_delete, db_find_by_id, entity,
+    error::Error,
+    functions::time::{rfc3339, rfc3339_opt},
+    model,
+};
 
 use super::{Channel, User};
 
@@ -11,14 +16,20 @@ entity!(
         pub id: Uuid,
         pub channel_id: Uuid,
         pub author_id: Option<Uuid>,
+        #[serde(with = "rfc3339")]
+        #[schemars(with = "NaiveDateTime")]
         pub timestamp: NaiveDateTime,
+        #[serde(with = "rfc3339_opt")]
+        #[schemars(with = "Option<NaiveDateTime>")]
         pub edited_timestamp: Option<NaiveDateTime>,
         pub content: String,
     }
 );
 
+#[derive(Serialize)]
 pub struct MessagePatch {
     pub content: Option<String>,
+    #[serde(with = "rfc3339_opt")]
     pub edited_timestamp: Option<NaiveDateTime>,
 }
 

@@ -1,7 +1,9 @@
-use std::{collections::BTreeMap, future::Future, pin::Pin, sync::Arc};
+use std::{collections::BTreeMap, future::Future, sync::Arc};
 
+use futures_util::{future::BoxFuture, FutureExt};
 use schemars::{schema::Schema, JsonSchema};
 use serde::{de::DeserializeOwned, Serialize};
+use serde_json::Value;
 use tokio::sync::RwLock;
 
 use crate::error::Error;
@@ -12,27 +14,14 @@ pub struct WebSocketRouter<S> {
 
     pub command_filters: BTreeMap<
         String,
-        Box<
-            dyn Fn(
-                    serde_json::Value,
-                    Arc<RwLock<S>>,
-                ) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>
-                + Send
-                + Sync,
-        >,
+        Box<dyn Fn(Value, Arc<RwLock<S>>) -> BoxFuture<'static, Result<(), Error>> + Send + Sync>,
     >,
 
     pub event_filters: BTreeMap<
         String,
         Box<
-            dyn Fn(
-                    serde_json::Value,
-                    Arc<RwLock<S>>,
-                ) -> Pin<
-                    Box<
-                        dyn Future<Output = Result<Option<serde_json::Value>, Error>> + Send + Sync,
-                    >,
-                > + Send
+            dyn Fn(Value, Arc<RwLock<S>>) -> BoxFuture<'static, Result<Option<Value>, Error>>
+                + Send
                 + Sync,
         >,
     >,
@@ -66,10 +55,11 @@ impl<S: 'static + Send + Sync> WebSocketRouter<S> {
         self.command_filters.insert(
             name.to_string(),
             Box::new(move |value, state| {
-                Box::pin(async move {
+                async move {
                     let parsed = serde_json::from_value(value)?;
                     func(parsed, state).await
-                })
+                }
+                .boxed()
             }),
         );
         self
@@ -87,7 +77,7 @@ impl<S: 'static + Send + Sync> WebSocketRouter<S> {
         self.event_filters.insert(
             name.to_string(),
             Box::new(move |value, state| {
-                Box::pin(async move {
+                async move {
                     let parsed = serde_json::from_value(value)?;
                     let result = filter(parsed, state).await;
                     if let Some(result) = result {
@@ -95,7 +85,8 @@ impl<S: 'static + Send + Sync> WebSocketRouter<S> {
                     } else {
                         Ok(None)
                     }
-                })
+                }
+                .boxed()
             }),
         );
         self

@@ -4,6 +4,7 @@ use sqlx::FromRow;
 use uuid::Uuid;
 
 use crate::error::Error;
+use crate::functions::time::rfc3339;
 
 #[derive(FromRow, Serialize)]
 #[sqlx(rename_all = "camelCase")]
@@ -12,6 +13,7 @@ pub struct AccountVerification {
     pub category: String,
     pub token: String,
     pub account_id: Uuid,
+    #[serde(with = "rfc3339")]
     pub expires_at: NaiveDateTime,
 }
 

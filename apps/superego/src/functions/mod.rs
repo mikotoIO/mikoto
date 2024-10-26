@@ -8,6 +8,7 @@ pub mod mail;
 pub mod permissions;
 pub mod pubsub;
 pub mod sha3;
+pub mod time;
 
 pub fn group_by<T, K, I, F>(iter: I, key_fn: F) -> HashMap<K, Vec<T>>
 where

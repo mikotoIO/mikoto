@@ -97,7 +97,7 @@ async fn handle_socket<S: WebSocketState>(
             };
 
             let res = filter(msg.data, state.clone()).await.map_err(|e| {
-                warn!("Error handling event \"{}\": {}", msg.op, e);
+                warn!("Error handling event \"{}\": {:?}", msg.op, e);
                 e
             })?;
 

@@ -1,4 +1,4 @@
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, NaiveDateTime, TimeDelta, Utc};
 use schemars::{schema, JsonSchema};
 use serde::{de::Error, Deserialize, Deserializer, Serialize, Serializer};
 
@@ -10,6 +10,10 @@ pub struct Timestamp(pub NaiveDateTime);
 impl Timestamp {
     pub fn now() -> Self {
         Self(Utc::now().naive_utc())
+    }
+
+    pub fn after(self, d: TimeDelta) -> Self {
+        Self(self.0 + d)
     }
 }
 

@@ -55,7 +55,7 @@ impl AccountVerification {
             category: "PASSWORD_RESET".to_string(),
             token: nanoid!(48),
             account_id,
-            expires_at: (Utc::now().naive_utc() + TimeDelta::hours(1)).into(),
+            expires_at: Timestamp::now().after(TimeDelta::hours(1)),
         };
         sqlx::query(
             r#"

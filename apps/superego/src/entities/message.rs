@@ -1,4 +1,4 @@
-use chrono::Utc;
+use chrono::TimeDelta;
 use schemars::JsonSchema;
 use uuid::Uuid;
 
@@ -63,8 +63,7 @@ impl Message {
         let pagination_time = if let Some(cursor_id) = cursor {
             Self::find_by_id(cursor_id, db).await?.timestamp
         } else {
-            // If no cursor is provided, just use a value in the future
-            (Utc::now() + chrono::Duration::hours(1)).naive_utc().into()
+            Timestamp::now().after(TimeDelta::hours(1))
         };
 
         let res = sqlx::query_as(

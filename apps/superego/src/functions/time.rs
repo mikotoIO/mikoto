@@ -4,30 +4,9 @@ use serde::{de::Error, Deserialize, Deserializer, Serialize, Serializer};
 pub mod rfc3339 {
     use super::*;
 
-    pub fn naive_to_rfc3339(datetime: NaiveDateTime) -> String {
-        let utc_time = DateTime::<Utc>::from_naive_utc_and_offset(datetime, Utc);
-        utc_time.to_rfc3339()
-    }
-
     pub fn serialize<S: Serializer>(datetime: &NaiveDateTime, s: S) -> Result<S::Ok, S::Error> {
-        naive_to_rfc3339(*datetime).serialize(s)
-    }
-
-    pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<NaiveDateTime, D::Error> {
-        let s = String::deserialize(d)?;
-
-        let datetime = DateTime::parse_from_rfc3339(&s)
-            .map_err(D::Error::custom)?
-            .naive_utc();
-        Ok(datetime)
-    }
-}
-
-pub struct RFC3339;
-
-impl RFC3339 {
-    pub fn serialize<S: Serializer>(datetime: &NaiveDateTime, s: S) -> Result<S::Ok, S::Error> {
-        rfc3339::naive_to_rfc3339(*datetime).serialize(s)
+        let utc_time = DateTime::<Utc>::from_naive_utc_and_offset(*datetime, Utc);
+        utc_time.to_rfc3339().serialize(s)
     }
 
     pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<NaiveDateTime, D::Error> {

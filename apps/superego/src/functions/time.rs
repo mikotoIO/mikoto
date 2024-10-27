@@ -1,3 +1,5 @@
+use std::ops::{Add, Sub};
+
 use chrono::{DateTime, NaiveDateTime, TimeDelta, Utc};
 use schemars::{schema, JsonSchema};
 use serde::{de::Error, Deserialize, Deserializer, Serialize, Serializer};
@@ -11,9 +13,21 @@ impl Timestamp {
     pub fn now() -> Self {
         Self(Utc::now().naive_utc())
     }
+}
 
-    pub fn after(self, d: TimeDelta) -> Self {
-        Self(self.0 + d)
+impl Add<TimeDelta> for Timestamp {
+    type Output = Self;
+
+    fn add(self, rhs: TimeDelta) -> Self::Output {
+        Self(self.0 + rhs)
+    }
+}
+
+impl Sub for Timestamp {
+    type Output = TimeDelta;
+
+    fn sub(self, rhs: Timestamp) -> Self::Output {
+        self.0 - rhs.0
     }
 }
 

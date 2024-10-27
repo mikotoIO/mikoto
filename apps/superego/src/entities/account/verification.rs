@@ -1,4 +1,4 @@
-use chrono::{NaiveDateTime, TimeDelta, Utc};
+use chrono::TimeDelta;
 use nanoid::nanoid;
 use sqlx::FromRow;
 use uuid::Uuid;
@@ -38,8 +38,7 @@ impl AccountVerification {
             return Err(Error::NotFound);
         }
 
-        if (NaiveDateTime::from(verification.expires_at) - Utc::now().naive_utc()).num_seconds() < 0
-        {
+        if (verification.expires_at - Timestamp::now()) < TimeDelta::zero() {
             return Err(Error::NotFound);
         }
 
@@ -55,7 +54,7 @@ impl AccountVerification {
             category: "PASSWORD_RESET".to_string(),
             token: nanoid!(48),
             account_id,
-            expires_at: Timestamp::now().after(TimeDelta::hours(1)),
+            expires_at: Timestamp::now() + TimeDelta::hours(1),
         };
         sqlx::query(
             r#"

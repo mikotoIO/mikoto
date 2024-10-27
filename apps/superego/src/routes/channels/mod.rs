@@ -9,7 +9,8 @@ use crate::{
     error::Error,
     functions::{
         permissions::{permissions_or_admin, Permission},
-        pubsub::emit_event, time::Timestamp,
+        pubsub::emit_event,
+        time::Timestamp,
     },
     middlewares::load::Load,
 };

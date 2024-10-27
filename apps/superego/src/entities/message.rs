@@ -63,7 +63,7 @@ impl Message {
         let pagination_time = if let Some(cursor_id) = cursor {
             Self::find_by_id(cursor_id, db).await?.timestamp
         } else {
-            Timestamp::now().after(TimeDelta::hours(1))
+            Timestamp::now() + TimeDelta::hours(1)
         };
 
         let res = sqlx::query_as(

@@ -24,7 +24,7 @@ impl RefreshToken {
                 id: Uuid::new_v4(),
                 token: sha3(&refresh_token),
                 account_id,
-                expires_at: Timestamp::now().after(TimeDelta::days(30)),
+                expires_at: Timestamp::now() + TimeDelta::days(30),
             },
             refresh_token,
         )

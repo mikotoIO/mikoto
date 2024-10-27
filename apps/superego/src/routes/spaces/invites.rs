@@ -11,6 +11,7 @@ use crate::{
     functions::{
         jwt::Claims,
         permissions::{permissions_or_moderator, Permission},
+        time::Timestamp,
     },
     middlewares::load::Load,
     routes::{router::AppRouter, ws::state::State},
@@ -33,7 +34,7 @@ async fn create(
     let invite = Invite {
         id: nanoid!(12),
         space_id,
-        created_at: chrono::Utc::now().naive_utc(),
+        created_at: Timestamp::now(),
         creator_id: claim.sub.parse()?,
     };
     invite.create(db()).await?;

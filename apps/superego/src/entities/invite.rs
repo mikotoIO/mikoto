@@ -1,15 +1,12 @@
-use chrono::NaiveDateTime;
 use uuid::Uuid;
 
-use crate::{entity, error::Error, functions::time::rfc3339};
+use crate::{entity, error::Error, functions::time::Timestamp};
 
 entity!(
     pub struct Invite {
         pub id: String, // Not UUID, but a NanoID
         pub space_id: Uuid,
-        #[serde(with = "rfc3339")]
-        #[schemars(with = "NaiveDateTime")]
-        pub created_at: NaiveDateTime,
+        pub created_at: Timestamp,
         pub creator_id: Uuid,
     }
 );

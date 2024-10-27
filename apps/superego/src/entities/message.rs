@@ -1,12 +1,9 @@
-use chrono::{NaiveDateTime, Utc};
+use chrono::Utc;
 use schemars::JsonSchema;
 use uuid::Uuid;
 
 use crate::{
-    db_entity_delete, db_find_by_id, entity,
-    error::Error,
-    functions::time::{rfc3339, rfc3339_opt},
-    model,
+    db_entity_delete, db_find_by_id, entity, error::Error, functions::time::Timestamp, model,
 };
 
 use super::{Channel, User};
@@ -16,12 +13,8 @@ entity!(
         pub id: Uuid,
         pub channel_id: Uuid,
         pub author_id: Option<Uuid>,
-        #[serde(with = "rfc3339")]
-        #[schemars(with = "NaiveDateTime")]
-        pub timestamp: NaiveDateTime,
-        #[serde(with = "rfc3339_opt")]
-        #[schemars(with = "Option<NaiveDateTime>")]
-        pub edited_timestamp: Option<NaiveDateTime>,
+        pub timestamp: Timestamp,
+        pub edited_timestamp: Option<Timestamp>,
         pub content: String,
     }
 );
@@ -29,8 +22,7 @@ entity!(
 #[derive(Serialize)]
 pub struct MessagePatch {
     pub content: Option<String>,
-    #[serde(with = "rfc3339_opt")]
-    pub edited_timestamp: Option<NaiveDateTime>,
+    pub edited_timestamp: Option<Timestamp>,
 }
 
 #[derive(Serialize, Deserialize, JsonSchema)]
@@ -54,7 +46,7 @@ impl Message {
             id: Uuid::new_v4(),
             channel_id: channel.id,
             author_id: Some(author_id),
-            timestamp: Utc::now().naive_utc(),
+            timestamp: Timestamp::now(),
             edited_timestamp: None,
             content,
         }
@@ -72,7 +64,7 @@ impl Message {
             Self::find_by_id(cursor_id, db).await?.timestamp
         } else {
             // If no cursor is provided, just use a value in the future
-            (Utc::now() + chrono::Duration::hours(1)).naive_utc()
+            (Utc::now() + chrono::Duration::hours(1)).naive_utc().into()
         };
 
         let res = sqlx::query_as(
@@ -140,7 +132,7 @@ impl MessagePatch {
     pub fn edit(content: String) -> Self {
         Self {
             content: Some(content),
-            edited_timestamp: Some(Utc::now().naive_utc()),
+            edited_timestamp: Some(Timestamp::now()),
         }
     }
 }

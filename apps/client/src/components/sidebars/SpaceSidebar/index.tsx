@@ -41,7 +41,7 @@ const StyledIconWrapper = styled.div`
   align-items: center;
   margin-bottom: 4px;
   padding-left: 6px;
-  padding-right: 4px;
+  padding-right: 8px;
 `;
 
 interface SidebarSpaceIconProps {

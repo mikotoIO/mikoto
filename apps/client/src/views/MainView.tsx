@@ -105,7 +105,7 @@ const SurfaceGroup = observer(
                 idx !== surfaceNode.index ? { display: 'none' } : undefined
               }
             >
-              <Box py="8px" h="100%">
+              <Box h="100%">
                 <ErrorBoundary FallbackComponent={ErrorSurface}>
                   <Suspense fallback={<LoadingSurface />}>
                     <TabViewSwitch tab={tab} />

@@ -1,6 +1,9 @@
 import { Divider } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBarsStaggered,
+  faCirclePlus,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
 import React, { useRef, useState } from 'react';
@@ -11,14 +14,14 @@ import { useSnapshot } from 'valtio/react';
 import { modalState, useContextMenu } from '@/components/ContextMenu';
 import { UserAreaAvatar } from '@/components/UserArea';
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
-import { StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
+import { SpaceIconLike, StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
 import { faMikoto } from '@/components/icons';
 import { SpaceJoinModal } from '@/components/modals/SpaceJoin';
+import { TabBarButton } from '@/components/tabs';
 import { reorder } from '@/functions/reorder';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState, workspaceState } from '@/store';
 
-import { Pill } from './Pill';
 import { SpaceBackContextMenu, SpaceContextMenu } from './SpaceContextMenu';
 import { SpaceIconTooltip } from './Tooltip';
 
@@ -39,7 +42,7 @@ const StyledIconWrapper = styled.div`
   position: relative;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   padding-left: 6px;
   padding-right: 8px;
 `;
@@ -107,8 +110,8 @@ function SidebarSpaceIcon({ space }: SidebarSpaceIconProps) {
   return (
     <SpaceIconTooltip tooltip={space.name}>
       <StyledIconWrapper>
-        <Pill h={isActive ? 32 : 0} />
         <StyledSpaceIcon
+          active={isActive}
           size={ICON_SIZE}
           onContextMenu={contextMenu}
           icon={space.icon ? normalizeMediaUrl(space.icon) : undefined}
@@ -187,6 +190,7 @@ export function SpaceSidebar() {
 
   useSnapshot(mikoto.spaces);
   const contextMenu = useContextMenu(() => <SpaceBackContextMenu />);
+  const setWorkspace = useSetRecoilState(workspaceState);
 
   const [order, setOrder] = useState<string[]>(() =>
     // TODO: persist to server
@@ -200,13 +204,21 @@ export function SpaceSidebar() {
 
   return (
     <StyledSpaceSidebar onContextMenu={contextMenu}>
+      <TabBarButton
+        onClick={() => {
+          setWorkspace((ws) => ({
+            ...ws,
+            leftOpen: !ws.leftOpen,
+          }));
+        }}
+      >
+        <FontAwesomeIcon icon={faBarsStaggered} />
+      </TabBarButton>
       <StyledIconWrapper>
         <UserAreaAvatar />
       </StyledIconWrapper>
       <StyledIconWrapper>
-        <Pill h={spaceId === null ? 32 : 0} />
-        <StyledSpaceIcon
-          size={ICON_SIZE}
+        <SpaceIconLike
           style={{
             background:
               spaceId === null
@@ -218,7 +230,7 @@ export function SpaceSidebar() {
           }}
         >
           <FontAwesomeIcon icon={faMikoto} fontSize="24px" />
-        </StyledSpaceIcon>
+        </SpaceIconLike>
       </StyledIconWrapper>
       <Divider w={8} />
 

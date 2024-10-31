@@ -1,4 +1,5 @@
 import { Flex } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import React from 'react';
 
 interface SpaceIconProps {
@@ -6,29 +7,72 @@ interface SpaceIconProps {
   size?: string;
   color?: string;
   fontSize?: string;
+  active?: boolean | null;
 }
+
+// layout equivalent to a space icon
+export const SpaceIconLike = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+`;
+
+const SpaceIcon = styled.div<{
+  icon?: string;
+  size?: string;
+  fontSize?: string;
+  active?: boolean | null;
+}>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: ${(p) => p.size ?? '40px'};
+  height: ${(p) => p.size ?? '40px'};
+  background-color: ${(p) =>
+    p.active
+      ? 'var(--chakra-colors-gray-700)'
+      : 'var(--chakra-colors-surface)'};
+  background-size: cover;
+  background-image: ${(p) => (p.icon ? `url(${p.icon})` : 'none')};
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+`;
+
+const SpaceIconOutline = styled.div<{
+  active?: boolean | null;
+}>`
+  border-radius: 6px;
+  padding: 2px;
+  border: 2px solid transparent;
+  border-color: ${(p) =>
+    p.active ? 'var(--chakra-colors-gray-150)' : 'transparent'};
+`;
 
 export function StyledSpaceIcon({
   icon,
   size,
-  color,
   fontSize,
+  active,
   ...rest
 }: SpaceIconProps & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <Flex
-      w={size ?? '48px'}
-      h={size ?? '48px'}
-      align="center"
-      justify="center"
-      borderRadius={8}
-      bg="surface"
-      bgImage={icon ? `url(${icon})` : 'none'}
-      bgSize="cover"
-      cursor="pointer"
-      color={color}
-      fontSize={fontSize ?? '14px'}
-      {...rest}
-    />
+    <SpaceIconOutline active={active}>
+      <SpaceIcon
+        icon={icon}
+        size={size}
+        fontSize={fontSize}
+        active={active}
+        {...rest}
+      />
+    </SpaceIconOutline>
   );
 }

@@ -1,5 +1,8 @@
-use crate::{error::Error, functions::sha3::sha3};
-use chrono::{NaiveDateTime, TimeDelta, Utc};
+use crate::{
+    error::Error,
+    functions::{sha3::sha3, time::Timestamp},
+};
+use chrono::TimeDelta;
 use nanoid::nanoid;
 use sqlx::FromRow;
 use uuid::Uuid;
@@ -9,7 +12,7 @@ use uuid::Uuid;
 pub struct RefreshToken {
     pub id: Uuid,
     pub token: String,
-    pub expires_at: NaiveDateTime,
+    pub expires_at: Timestamp,
     pub account_id: Uuid,
 }
 
@@ -21,7 +24,7 @@ impl RefreshToken {
                 id: Uuid::new_v4(),
                 token: sha3(&refresh_token),
                 account_id,
-                expires_at: Utc::now().naive_utc() + TimeDelta::days(30),
+                expires_at: Timestamp::now() + TimeDelta::days(30),
             },
             refresh_token,
         )

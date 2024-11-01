@@ -4,7 +4,6 @@ import styled from '@emotion/styled';
 export const viewContainerCss = css`
   box-sizing: border-box;
   flex: 1;
-  border-radius: 8px;
   background-color: var(--chakra-colors-surface);
   height: 100%;
   display: flex;

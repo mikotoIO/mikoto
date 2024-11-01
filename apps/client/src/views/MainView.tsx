@@ -105,7 +105,7 @@ const SurfaceGroup = observer(
                 idx !== surfaceNode.index ? { display: 'none' } : undefined
               }
             >
-              <Box py="8px" h="100%">
+              <Box h="100%">
                 <ErrorBoundary FallbackComponent={ErrorSurface}>
                   <Suspense fallback={<LoadingSurface />}>
                     <TabViewSwitch tab={tab} />
@@ -140,19 +140,6 @@ function AppView() {
   return (
     <AppContainer>
       <LeftBar>
-        <div className="top">
-          <TabBarButton
-            onClick={() => {
-              setWorkspace((ws) => ({
-                ...ws,
-                leftOpen: !workspace.leftOpen,
-              }));
-            }}
-          >
-            <FontAwesomeIcon icon={faBarsStaggered} />
-          </TabBarButton>
-          <SidebarRest />
-        </div>
         <div className="bars">
           <SpaceSidebar />
           {workspace.leftOpen && (
@@ -178,9 +165,6 @@ function AppView() {
       <SurfaceGroup surfaceNode={surfaceStore.node} />
       {workspace.rightOpen && (
         <LeftBar>
-          <div className="top">
-            <WindowBar />
-          </div>
           <div className="bars">
             <Sidebar
               position="right"

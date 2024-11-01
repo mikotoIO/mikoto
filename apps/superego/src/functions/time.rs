@@ -1,108 +1,82 @@
-use chrono::{DateTime, NaiveDateTime, Utc};
+use std::ops::{Add, Sub};
+
+use chrono::{DateTime, NaiveDateTime, TimeDelta, Utc};
+use schemars::{schema, JsonSchema};
 use serde::{de::Error, Deserialize, Deserializer, Serialize, Serializer};
 
-pub mod rfc3339 {
-    use super::*;
+/// A simple UTC time that is stored as a timezoneless type, but serialized as a UTC time.
+#[derive(sqlx::Type, Clone, Copy, Debug)]
+#[sqlx(transparent)]
+pub struct Timestamp(pub NaiveDateTime);
 
-    pub fn naive_to_rfc3339(datetime: NaiveDateTime) -> String {
-        let utc_time = DateTime::<Utc>::from_naive_utc_and_offset(datetime, Utc);
-        utc_time.to_rfc3339()
+impl Timestamp {
+    pub fn now() -> Self {
+        Self(Utc::now().naive_utc())
+    }
+}
+
+impl Add<TimeDelta> for Timestamp {
+    type Output = Self;
+
+    fn add(self, rhs: TimeDelta) -> Self::Output {
+        Self(self.0 + rhs)
+    }
+}
+
+impl Sub for Timestamp {
+    type Output = TimeDelta;
+
+    fn sub(self, rhs: Timestamp) -> Self::Output {
+        self.0 - rhs.0
+    }
+}
+
+impl From<NaiveDateTime> for Timestamp {
+    fn from(value: NaiveDateTime) -> Self {
+        Self(value)
+    }
+}
+
+impl From<Timestamp> for NaiveDateTime {
+    fn from(value: Timestamp) -> Self {
+        value.0
+    }
+}
+
+impl JsonSchema for Timestamp {
+    fn schema_name() -> String {
+        "Timestamp".to_string()
     }
 
-    pub fn serialize<S: Serializer>(datetime: &NaiveDateTime, s: S) -> Result<S::Ok, S::Error> {
-        naive_to_rfc3339(*datetime).serialize(s)
+    fn json_schema(_: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
+        schema::Schema::Object(schema::SchemaObject {
+            instance_type: Some(schema::InstanceType::String.into()),
+            format: Some("date-time".into()),
+            ..schema::SchemaObject::default()
+        })
     }
+}
 
-    pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<NaiveDateTime, D::Error> {
-        let s = String::deserialize(d)?;
+impl Serialize for Timestamp {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let utc_time = DateTime::<Utc>::from_naive_utc_and_offset(self.0, Utc);
+        utc_time.to_rfc3339().serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for Timestamp {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
 
         let datetime = DateTime::parse_from_rfc3339(&s)
             .map_err(D::Error::custom)?
             .naive_utc();
-        Ok(datetime)
-    }
-}
-
-pub struct RFC3339;
-
-impl RFC3339 {
-    pub fn serialize<S: Serializer>(datetime: &NaiveDateTime, s: S) -> Result<S::Ok, S::Error> {
-        rfc3339::naive_to_rfc3339(*datetime).serialize(s)
-    }
-
-    pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<NaiveDateTime, D::Error> {
-        let s = String::deserialize(d)?;
-
-        let datetime = DateTime::parse_from_rfc3339(&s)
-            .map_err(D::Error::custom)?
-            .naive_utc();
-        Ok(datetime)
-    }
-}
-
-pub mod rfc3339_opt {
-    use super::*;
-
-    pub fn serialize<S: Serializer>(
-        datetime: &Option<NaiveDateTime>,
-        s: S,
-    ) -> Result<S::Ok, S::Error> {
-        match datetime {
-            Some(dt) => super::rfc3339::serialize(dt, s),
-            None => s.serialize_none(),
-        }
-    }
-
-    pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<Option<NaiveDateTime>, D::Error> {
-        let s: Option<String> = Option::deserialize(d)?;
-        match s {
-            Some(datetime_str) => {
-                let datetime = DateTime::parse_from_rfc3339(&datetime_str)
-                    .map_err(D::Error::custom)?
-                    .naive_utc();
-                Ok(Some(datetime))
-            }
-            None => Ok(None),
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use chrono::NaiveDate;
-
-    use super::*;
-
-    #[derive(Debug, PartialEq, Serialize, Deserialize)]
-    struct Wrapper {
-        #[serde(with = "rfc3339")]
-        datetime: NaiveDateTime,
-    }
-
-    #[test]
-    pub fn test_serialize_deserialize_consistency() {
-        // Define a sample NaiveDateTime
-        let original_datetime = NaiveDate::from_ymd_opt(2023, 10, 26)
-            .unwrap()
-            .and_hms_opt(12, 34, 56)
-            .unwrap();
-
-        // Wrap it in our Wrapper struct
-        let original = Wrapper {
-            datetime: original_datetime,
-        };
-
-        // Serialize the Wrapper struct to a JSON string
-        let serialized = serde_json::to_string(&original).expect("Serialization failed");
-
-        // Deserialize the JSON string back to a Wrapper struct
-        let deserialized: Wrapper =
-            serde_json::from_str(&serialized).expect("Deserialization failed");
-
-        // Check that the original and deserialized instances are equal
-        assert_eq!(
-            original, deserialized,
-            "Original and deserialized instances should be equal"
-        );
+        Ok(Self(datetime))
     }
 }

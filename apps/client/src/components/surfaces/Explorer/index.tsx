@@ -97,14 +97,13 @@ function useAcks(space: MikotoSpace) {
   };
 }
 
-const ExplorerInner = ({ space }: { space: MikotoSpace }) => {
+function ExplorerInner({ space }: { space: MikotoSpace }) {
   useFetchMember(space);
   const tabkit = useTabkit();
   const { acks, ackChannel } = useAcks(space);
   const nodeContextMenu = useContextMenuX();
 
   useSnapshot(space);
-  // console.log(cid.channelIds);
   useSnapshot(space.channels); // TODO: fine-grained subscription
 
   const channelTree = channelToStructuredTree(space.channels, (channel) => ({
@@ -122,7 +121,7 @@ const ExplorerInner = ({ space }: { space: MikotoSpace }) => {
   }));
 
   return <ChannelTree nodes={channelTree.descendant ?? []} />;
-};
+}
 
 export function Explorer({ space }: { space: MikotoSpace }) {
   const nodeContextMenu = useContextMenuX();

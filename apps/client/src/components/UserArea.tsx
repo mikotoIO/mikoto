@@ -116,7 +116,12 @@ export function UserAreaAvatar() {
 
   return (
     user && (
-      <Avatar size={40} onClick={contextMenu} src={user.avatar ?? undefined} />
+      <Avatar
+        size={40}
+        onClick={contextMenu}
+        src={user.avatar ?? undefined}
+        style={{ marginTop: '8px' }}
+      />
     )
   );
 }

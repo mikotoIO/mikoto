@@ -30,15 +30,18 @@ export function Sidebar({ children, position, size, onResize }: SidebarProps) {
       minWidth={200}
       maxWidth="50vw"
       maxHeight="100%"
-      style={{
-        padding: 8,
-      }}
       size={{ width: size, height: '100%' }}
       onResizeStop={(_, _1, _2, d) => {
         onResize?.(d);
       }}
     >
-      <Box height="100%" overflowY="auto" bg="surface" rounded="8px">
+      <Box
+        className="sidebar"
+        height="100%"
+        overflowY="auto"
+        borderX="1px solid"
+        borderColor="gray.650"
+      >
         {children}
       </Box>
     </Resizable>

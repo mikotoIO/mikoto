@@ -10,6 +10,7 @@ use crate::{
     functions::{
         permissions::{permissions_or_admin, Permission},
         pubsub::emit_event,
+        time::Timestamp,
     },
     middlewares::load::Load,
 };
@@ -55,7 +56,7 @@ async fn create(
         parent_id: body.parent_id,
         category: body.kind.unwrap_or(ChannelType::Text),
         order: 0,
-        last_updated: Some(chrono::Utc::now().naive_utc()),
+        last_updated: Some(Timestamp::now()),
     };
     channel.create(db()).await?;
 

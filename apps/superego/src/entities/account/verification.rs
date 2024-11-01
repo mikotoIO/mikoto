@@ -1,10 +1,10 @@
-use chrono::{NaiveDateTime, TimeDelta, Utc};
+use chrono::TimeDelta;
 use nanoid::nanoid;
 use sqlx::FromRow;
 use uuid::Uuid;
 
 use crate::error::Error;
-use crate::functions::time::rfc3339;
+use crate::functions::time::Timestamp;
 
 #[derive(FromRow, Serialize)]
 #[sqlx(rename_all = "camelCase")]
@@ -13,8 +13,7 @@ pub struct AccountVerification {
     pub category: String,
     pub token: String,
     pub account_id: Uuid,
-    #[serde(with = "rfc3339")]
-    pub expires_at: NaiveDateTime,
+    pub expires_at: Timestamp,
 }
 
 impl AccountVerification {
@@ -39,7 +38,7 @@ impl AccountVerification {
             return Err(Error::NotFound);
         }
 
-        if (verification.expires_at - Utc::now().naive_utc()).num_seconds() < 0 {
+        if (verification.expires_at - Timestamp::now()) < TimeDelta::zero() {
             return Err(Error::NotFound);
         }
 
@@ -55,7 +54,7 @@ impl AccountVerification {
             category: "PASSWORD_RESET".to_string(),
             token: nanoid!(48),
             account_id,
-            expires_at: Utc::now().naive_utc() + TimeDelta::hours(1),
+            expires_at: Timestamp::now() + TimeDelta::hours(1),
         };
         sqlx::query(
             r#"

@@ -10,7 +10,7 @@ import {
 } from '@mikoto-io/mikoto.js';
 import throttle from 'lodash/throttle';
 import { runInAction } from 'mobx';
-import { Observer, observer } from 'mobx-react-lite';
+import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
@@ -206,10 +206,6 @@ const RealMessageView = observer(({ channel }: { channel: MikotoChannel }) => {
           ) : (
             <Virtuoso
               ref={virtuosoRef}
-              increaseViewportBy={{
-                top: 200,
-                bottom: 200,
-              }}
               followOutput="auto"
               defaultItemHeight={28}
               style={{ flexGrow: 1, overflowX: 'hidden' }}
@@ -218,6 +214,7 @@ const RealMessageView = observer(({ channel }: { channel: MikotoChannel }) => {
               atBottomStateChange={(atBottom) => {
                 setBottomState(atBottom);
               }}
+              overscan={1000}
               components={{
                 Header() {
                   if (topLoaded) return <ChannelHead channel={channel} />;
@@ -237,25 +234,20 @@ const RealMessageView = observer(({ channel }: { channel: MikotoChannel }) => {
                 setFirstItemIndex((x) => x - m.length);
               }}
               itemContent={(index, msg) => (
-                <Observer>
-                  {() => (
-                    <>
-                      {showDateSeparator(
-                        msg,
-                        msgs[index - firstItemIndex - 1],
-                      ) && <DateSeparator date={new Date(msg.timestamp)} />}
-                      <MessageItem
-                        editState={messageEditState}
-                        message={msg}
-                        // message={new ClientMessage(mikoto, msg)}
-                        isSimple={isMessageSimple(
-                          msg,
-                          msgs[index - firstItemIndex - 1],
-                        )}
-                      />
-                    </>
+                <>
+                  {showDateSeparator(msg, msgs[index - firstItemIndex - 1]) && (
+                    <DateSeparator date={new Date(msg.timestamp)} />
                   )}
-                </Observer>
+                  <MessageItem
+                    editState={messageEditState}
+                    message={msg}
+                    // message={new ClientMessage(mikoto, msg)}
+                    isSimple={isMessageSimple(
+                      msg,
+                      msgs[index - firstItemIndex - 1],
+                    )}
+                  />
+                </>
               )}
             />
           )}

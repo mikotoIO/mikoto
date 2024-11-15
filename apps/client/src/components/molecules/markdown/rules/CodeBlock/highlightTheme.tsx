@@ -1,10 +1,10 @@
 // modified version of the One Dark Theme
 // TOKENS
-import { chakraTheme } from '@/components/chakraTheme';
+import { chakraSystem, chakraTheme } from '@/components/chakraTheme';
 
-const BACKGROUND = chakraTheme.colors.gray[800];
-const FOREGROUND = chakraTheme.colors.gray[300];
-const COMMENT = chakraTheme.colors.gray[500];
+const BACKGROUND = chakraSystem.token('gray.800');
+const FOREGROUND = chakraSystem.token('gray.300');
+const COMMENT = chakraSystem.token('gray.500');
 
 export const highlightTheme = {
   hljs: {

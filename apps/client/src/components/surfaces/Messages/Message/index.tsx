@@ -1,4 +1,4 @@
-import { Box, Flex, Tag } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { MikotoMessage } from '@mikoto-io/mikoto.js';
 import { makeAutoObservable, runInAction } from 'mobx';
@@ -8,6 +8,7 @@ import { useSnapshot } from 'valtio/react';
 import { ContextMenu, useContextMenu } from '@/components/ContextMenu';
 import { MessageAvatar } from '@/components/atoms/MessageAvatar';
 import { Markdown } from '@/components/molecules/markdown';
+import { Tag } from '@/components/ui';
 import { useMikoto } from '@/hooks';
 import { TypingDots } from '@/ui';
 

@@ -25,38 +25,40 @@ interface WelcomeButtonProps {
 
 function WelcomeButton(props: WelcomeButtonProps) {
   return (
-    <Flex
-      as="a"
+    <a
       target="_blank" // TODO: allow opening join links as a surface
-      textDecoration="none"
       href={props.linkTo}
-      align="center"
-      justify="space-between"
-      w="300px"
-      _hover={{ bg: 'gray.700' }}
-      px={4}
-      py={2}
-      rounded="md"
-      color="gray.600"
     >
       <Flex
+        textDecoration="none"
         align="center"
-        justify="center"
-        bg="gray.800"
+        justify="space-between"
+        w="300px"
+        _hover={{ bg: 'gray.700' }}
+        px={4}
+        py={2}
         rounded="md"
-        fontSize="lg"
-        w={10}
-        h={10}
+        color="gray.600"
       >
-        <FontAwesomeIcon icon={props.emoji} />
+        <Flex
+          align="center"
+          justify="center"
+          bg="gray.800"
+          rounded="md"
+          fontSize="lg"
+          w={10}
+          h={10}
+        >
+          <FontAwesomeIcon icon={props.emoji} />
+        </Flex>
+        <Box fontSize="sm" color="gray.450" fontWeight="600">
+          {props.text}
+        </Box>
+        <Box>
+          <FontAwesomeIcon icon={faChevronCircleRight} />
+        </Box>
       </Flex>
-      <Box fontSize="sm" color="gray.450" fontWeight="600">
-        {props.text}
-      </Box>
-      <Box>
-        <FontAwesomeIcon icon={faChevronCircleRight} />
-      </Box>
-    </Flex>
+    </a>
   );
 }
 

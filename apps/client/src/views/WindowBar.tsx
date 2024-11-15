@@ -16,7 +16,7 @@ const StyledWindowBar = styled.div`
 `;
 
 const StyledWindowButtons = chakra('div', {
-  baseStyle: {
+  base: {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',

@@ -1,13 +1,4 @@
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  FormControl,
-  FormLabel,
-  Heading,
-  Input,
-  ModalContent,
-} from '@chakra-ui/react';
+import { Box, Button, Group, Heading, Input } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import {
   faFileAlt,
@@ -22,12 +13,12 @@ import {
   MikotoSpace,
 } from '@mikoto-io/mikoto.js';
 import { permissions } from '@mikoto-io/permcheck';
-import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
 
 import { ContextMenu, modalState } from '@/components/ContextMenu';
+import { DialogContent, Field } from '@/components/ui';
 import { useErrorElement } from '@/hooks/useErrorElement';
 import { useTabkit } from '@/store/surface';
 import { Form } from '@/ui';
@@ -75,7 +66,7 @@ export function CreateChannelModal({
   const error = useErrorElement();
 
   return (
-    <ModalContent rounded="md" p={4} maxW="480px">
+    <DialogContent rounded="md" p={4} maxW="480px">
       <Box>
         <Heading fontSize="xl" mt={0} mb={1}>
           {channel ? 'Create Subchannel' : 'Create Channel'}
@@ -116,17 +107,16 @@ export function CreateChannelModal({
               </ChannelTypeButton>
             ))}
           </div>
-          <FormControl>
-            <FormLabel>Channel Name</FormLabel>
+          <Field label="Channel Name">
             <Input placeholder="New Channel" {...register('name')} />
-          </FormControl>
+          </Field>
 
-          <Button variant="primary" type="submit">
+          <Button colorPalette="primary" type="submit">
             Create Channel
           </Button>
         </Form>
       </Box>
-    </ModalContent>
+    </DialogContent>
   );
 }
 
@@ -134,14 +124,14 @@ function DeleteChannelModal({ channel }: { channel: MikotoChannel }) {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <ModalContent rounded="md" p={4} maxW="480px">
+    <DialogContent rounded="md" p={4} maxW="480px">
       <Box pb={4}>
         Are you sure you want to delete the channel{' '}
         <strong>#{channel.name}</strong>?
       </Box>
-      <ButtonGroup>
+      <Group>
         <Button
-          variant="danger"
+          colorPalette="danger"
           onClick={async () => {
             await channel.delete();
             setModal(null);
@@ -150,15 +140,15 @@ function DeleteChannelModal({ channel }: { channel: MikotoChannel }) {
           Delete
         </Button>
         <Button
-          variant="secondary"
+          colorPalette="secondary"
           onClick={() => {
             setModal(null);
           }}
         >
           Cancel
         </Button>
-      </ButtonGroup>
-    </ModalContent>
+      </Group>
+    </DialogContent>
   );
 }
 

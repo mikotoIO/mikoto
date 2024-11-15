@@ -1,9 +1,10 @@
-import { Button, ModalContent } from '@chakra-ui/react';
+import { Button, DialogContent } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { MikotoSpace, Invite } from '@mikoto-io/mikoto.js';
+import { Invite, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useState } from 'react';
 
 import { env } from '@/env';
+import { } from '@/components/ui'
 import { useMikoto } from '@/hooks';
 
 const InviteLink = styled.button`
@@ -31,11 +32,11 @@ export function InviteModal({ space }: { space: MikotoSpace }) {
     : undefined;
 
   return (
-    <ModalContent rounded="md" p={4} maxW="400px">
+    <DialogContent rounded="md" p={4} maxW="400px">
       <div>
         {!invite ? (
           <Button
-            variant="primary"
+            colorPalette="primary"
             type="button"
             onClick={() => {
               mikoto.rest['invites.create'](
@@ -65,7 +66,7 @@ export function InviteModal({ space }: { space: MikotoSpace }) {
             </InviteLink>
             <Button
               type="button"
-              variant="primary"
+              colorPalette="primary"
               onClick={() => {
                 navigator.share({
                   title: `Invite to ${space.name} on Mikoto`,
@@ -78,6 +79,6 @@ export function InviteModal({ space }: { space: MikotoSpace }) {
           </>
         )}
       </div>
-    </ModalContent>
+    </DialogContent>
   );
 }

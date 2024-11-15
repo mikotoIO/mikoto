@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import { viewContainerCss } from '@/components/Surface';
 
 const SettingsViewBase = chakra('div', {
-  baseStyle: {
+  base: {
     px: '8px',
     py: '32px',
     overflowY: 'scroll',
@@ -12,7 +12,7 @@ const SettingsViewBase = chakra('div', {
 });
 
 const Sidebar = chakra('div', {
-  baseStyle: {
+  base: {
     p: 4,
   },
 });

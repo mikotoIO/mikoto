@@ -1,9 +1,10 @@
-import { Box, Link, ModalContent } from '@chakra-ui/react';
+import { Box, Link } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import SimpleMarkdown from '@khanacademy/simple-markdown';
 import { useSetRecoilState } from 'recoil';
 
 import { modalState } from '@/components/ContextMenu';
+import { DialogContent } from '@/components/ui';
 
 import { createRule } from '../rules';
 
@@ -31,14 +32,14 @@ export function MessageImage({ src, alt }: MessageImageProps) {
       onClick={() => {
         setModal({
           elem: (
-            <ModalContent p={0} width="480px" bg="transparent">
+            <DialogContent p={0} width="480px" bg="transparent">
               <Box mb={2}>
                 <Link href={src} target="_blank" color="gray.100">
                   Open in Browser
                 </Link>
               </Box>
               <StyledMessageImage src={src} alt={alt} />
-            </ModalContent>
+            </DialogContent>
           ),
         });
       }}

@@ -1,15 +1,9 @@
-import {
-  Button,
-  ButtonGroup,
-  FormControl,
-  FormLabel,
-  Input,
-  Select,
-} from '@chakra-ui/react';
+import { Button, Group, Input } from '@chakra-ui/react';
 import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { Field, SelectRoot } from '@/components/ui';
 import { DEFAULT_THEME_SETTINGS, themeDB } from '@/store';
 import { useLocalDB } from '@/store/LocalDB';
 import { Form } from '@/ui';
@@ -31,26 +25,24 @@ export function ThemesSubsurface() {
           setThemeSettings(data);
         })}
       >
-        <FormControl>
-          <FormLabel>Theme</FormLabel>
+        {/* <Field label="Theme">
           <Select {...form.register('theme')}>
             <option value="dark">Dark</option>
             <option value="light">Light</option>
           </Select>
-        </FormControl>
+        </Field> */}
 
-        <FormControl>
-          <FormLabel>Color</FormLabel>
+        <Field label="Color">
           <Input {...form.register('accent')} />
-        </FormControl>
+        </Field>
         <HexColorPicker
           color={form.getValues('accent')}
           onChange={(color) => {
             form.setValue('accent', color);
           }}
         />
-        <ButtonGroup>
-          <Button variant="primary" type="submit">
+        <Group>
+          <Button colorPalette="primary" type="submit">
             Save
           </Button>
           <Button
@@ -62,7 +54,7 @@ export function ThemesSubsurface() {
           >
             Reset
           </Button>
-        </ButtonGroup>
+        </Group>
       </Form>
     </SettingSurface>
   );

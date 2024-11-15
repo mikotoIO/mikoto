@@ -1,15 +1,10 @@
-import {
-  Button,
-  FormControl,
-  FormLabel,
-  Heading,
-  Input,
-} from '@chakra-ui/react';
+import { Button, Heading, Input } from '@chakra-ui/react';
 import { faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import { useForm } from 'react-hook-form';
 
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
+import { Field } from '@/components/ui';
 import { useMikoto } from '@/hooks';
 import { Form } from '@/ui';
 
@@ -32,11 +27,10 @@ export function FriendsSurface() {
           });
         })}
       >
-        <FormControl>
-          <FormLabel>Friend ID</FormLabel>
+        <Field label="Friend ID">
           <Input placeholder="Friend ID" {...form.register('friendId')} />
-        </FormControl>
-        <Button type="submit" variant="success">
+        </Field>
+        <Button type="submit" colorPalette="success">
           Send Friend Request (Debug)
         </Button>
         <Heading as="h2" fontSize="xl">

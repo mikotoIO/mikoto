@@ -2,11 +2,11 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
 export const viewContainerCss = css`
+  display: flex;
   box-sizing: border-box;
   flex: 1;
   background-color: var(--chakra-colors-surface);
   height: 100%;
-  display: flex;
   flex-direction: column;
 `;
 

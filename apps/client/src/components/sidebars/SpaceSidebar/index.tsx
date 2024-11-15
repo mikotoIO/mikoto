@@ -1,4 +1,4 @@
-import { Divider } from '@chakra-ui/react';
+import { Separator } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import {
   faBarsStaggered,
@@ -232,7 +232,7 @@ export function SpaceSidebar() {
           <FontAwesomeIcon icon={faMikoto} fontSize="24px" />
         </SpaceIconLike>
       </StyledIconWrapper>
-      <Divider w={8} />
+      <Separator w={8} />
 
       {spaceArray
         .filter((x) => x.type === 'NONE') // TODO: filter this on the server

@@ -1,14 +1,4 @@
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  Heading,
-  Input,
-  ModalContent,
-  Textarea,
-} from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Input, Textarea } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +8,7 @@ import { modalState } from '@/components/ContextMenu';
 import { userState } from '@/components/UserArea';
 import { AvatarEditor } from '@/components/molecules/AvatarEditor';
 import { BaseSettingsSurface } from '@/components/surfaces/BaseSettings';
+import { DialogContent, Field } from '@/components/ui';
 import { uploadFile } from '@/functions/fileUpload';
 import { useAuthClient, useMikoto } from '@/hooks';
 import { useErrorElement } from '@/hooks/useErrorElement';
@@ -40,7 +31,7 @@ export function PasswordChangeModal() {
   const error = useErrorElement();
 
   return (
-    <ModalContent rounded="md" p={4} maxW="480px">
+    <DialogContent rounded="md" p={4} maxW="480px">
       <Form
         style={{ minWidth: 400 }}
         onSubmit={handleSubmit(async (form) => {
@@ -59,22 +50,19 @@ export function PasswordChangeModal() {
         <h1>Change Password</h1>
         {error.el}
 
-        <FormControl>
-          <FormLabel>Old Password</FormLabel>
+        <Field label="Old Password">
           <Input
             type="password"
             {...register('oldPassword', { required: true })}
           />
-        </FormControl>
-        <FormControl>
-          <FormLabel>New Password</FormLabel>
+        </Field>
+        <Field label="New Password">
           <Input
             type="password"
             {...register('newPassword', { required: true })}
           />
-        </FormControl>
-        <FormControl>
-          <FormLabel>Confirm New Password</FormLabel>
+        </Field>
+        <Field label="Confirm New Password">
           <Input
             type="password"
             {...register('confirmNewPassword', {
@@ -82,13 +70,13 @@ export function PasswordChangeModal() {
               validate: (value) => value === getValues('newPassword'),
             })}
           />
-        </FormControl>
+        </Field>
 
-        <Button variant="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           Change Password
         </Button>
       </Form>
-    </ModalContent>
+    </DialogContent>
   );
 }
 
@@ -98,22 +86,21 @@ function NameChangeModal() {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <ModalContent rounded="md" p={4} maxW="480px">
+    <DialogContent rounded="md" p={4} maxW="480px">
       <Form
         onSubmit={handleSubmit(async (form) => {
           await mikoto.rest['user.update']({ name: form.name }, {});
           setModal(null);
         })}
       >
-        <FormControl>
-          <FormLabel>New Name</FormLabel>
+        <Field label="New Name">
           <Input {...register('name')} />
-        </FormControl>
-        <Button type="submit" variant="primary">
+        </Field>
+        <Button type="submit" colorPalette="primary">
           Change Name
         </Button>
       </Form>
-    </ModalContent>
+    </DialogContent>
   );
 }
 
@@ -160,11 +147,10 @@ const Overview = observer(() => {
             </Button>
           </Box>
         </Box>
-        <FormControl>
-          <FormLabel>Bio</FormLabel>
+        <Field label="Bio">
           <Textarea h={160} />
-        </FormControl>
-        <Button variant="primary">Save</Button>
+        </Field>
+        <Button colorPalette="primary">Save</Button>
       </Form>
 
       <h2>{t('accountSettings.general.authentication')}</h2>
@@ -179,7 +165,12 @@ const Overview = observer(() => {
         >
           {t('accountSettings.general.changePassword')}
         </Button>
-        <Button variant="warning" type="submit" height="auto" blockSize="auto">
+        <Button
+          colorPalette="warning"
+          type="submit"
+          height="auto"
+          blockSize="auto"
+        >
           {t('accountSettings.general.logOutOfAllDevices')}
         </Button>
       </Flex>
@@ -188,7 +179,7 @@ const Overview = observer(() => {
         Warning: This action is irreversible. You will lose all your data.
       </Box>
       <Flex gap={2}>
-        <Button variant="danger">
+        <Button colorPalette="danger">
           {t('accountSettings.general.deleteAccount')}
         </Button>
       </Flex>

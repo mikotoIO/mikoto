@@ -1,4 +1,3 @@
-import { ChakraProvider } from '@chakra-ui/react';
 import { Global } from '@emotion/react';
 import * as Sentry from '@sentry/react';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -14,6 +13,7 @@ import { RecoilEnv, RecoilRoot } from 'recoil';
 
 import App from '@/App';
 import { chakraTheme, globalCss } from '@/components/chakraTheme';
+import { Provider as ChakraProvider } from '@/components/ui/provider';
 import { env } from '@/env';
 import reportWebVitals from '@/reportWebVitals';
 
@@ -47,7 +47,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <HelmetProvider>
       <RecoilRoot>
-        <ChakraProvider theme={chakraTheme} resetCSS={false}>
+        <ChakraProvider forcedTheme="dark">
           <QueryClientProvider client={queryClient}>
             <DndProvider backend={HTML5Backend}>
               <>

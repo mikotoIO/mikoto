@@ -1,4 +1,4 @@
-import { Box, Checkbox, Flex } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { MikotoMember, Role, User } from '@mikoto-io/mikoto.js';
 import { permissions } from '@mikoto-io/permcheck';
@@ -13,6 +13,7 @@ import {
 } from '@/components/ContextMenu';
 import { UserContextMenu } from '@/components/modals/ContextMenus';
 import { ProfileModal } from '@/components/modals/Profile';
+import { Checkbox } from '@/components/ui';
 import { useMaybeSnapshot, useMikoto } from '@/hooks';
 
 import { Avatar } from '../Avatar';
@@ -72,8 +73,8 @@ function RoleSetter({
             <Checkbox
               key={role.id}
               defaultChecked={selectedRoles[role.id]}
-              onChange={async (e) => {
-                if (e.currentTarget.checked) {
+              onCheckedChange={async (e) => {
+                if (e.checked) {
                   await member.client.rest['members.addRole'](undefined, {
                     params: {
                       spaceId: member.spaceId,

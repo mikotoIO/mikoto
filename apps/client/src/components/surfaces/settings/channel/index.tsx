@@ -1,18 +1,10 @@
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  Heading,
-  Input,
-  Textarea,
-} from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Input, Textarea } from '@chakra-ui/react';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 import { BaseSettingsSurface } from '@/components/surfaces/BaseSettings';
+import { Field } from '@/components/ui';
 import { useMikoto } from '@/hooks';
 import { Form, Triselector } from '@/ui';
 import { SettingSurface } from '@/views';
@@ -38,16 +30,14 @@ function General({ channel }: { channel: MikotoChannel }) {
           toast.success('Updated channel');
         })}
       >
-        <FormControl>
-          <FormLabel>Channel Name</FormLabel>
+        <Field label="Channel Name">
           <Input {...form.register('name')} />
-        </FormControl>
-        <FormControl>
-          <FormLabel>Description</FormLabel>
+        </Field>
+        <Field label="Description">
           <Textarea h={200} {...form.register('description')} />
-        </FormControl>
+        </Field>
 
-        <Button variant="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           Save
         </Button>
       </Form>

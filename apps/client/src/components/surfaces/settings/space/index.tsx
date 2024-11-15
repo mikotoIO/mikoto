@@ -1,13 +1,5 @@
-import {
-  Button,
-  ButtonGroup,
-  FormControl,
-  FormLabel,
-  Input,
-  ModalContent,
-} from '@chakra-ui/react';
+import { Button, Group, Input } from '@chakra-ui/react';
 import { MikotoSpace } from '@mikoto-io/mikoto.js';
-import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +9,7 @@ import { useSnapshot } from 'valtio';
 import { modalState } from '@/components/ContextMenu';
 import { AvatarEditor } from '@/components/molecules/AvatarEditor';
 import { BaseSettingsSurface } from '@/components/surfaces/BaseSettings';
+import { DialogContent, Field } from '@/components/ui';
 import { uploadFile } from '@/functions/fileUpload';
 import { useMikoto } from '@/hooks';
 import { Form } from '@/ui';
@@ -32,7 +25,7 @@ function AddBotModal({ space }: { space: MikotoSpace }) {
   const mikoto = useMikoto();
   const setModal = useSetRecoilState(modalState);
   return (
-    <ModalContent rounded="md" p={4} maxW="480px">
+    <DialogContent rounded="md" p={4} maxW="480px">
       <Form
         onSubmit={form.handleSubmit(async (data) => {
           await mikoto.rest['members.create'](
@@ -48,15 +41,14 @@ function AddBotModal({ space }: { space: MikotoSpace }) {
           setModal(null);
         })}
       >
-        <FormControl>
-          <FormLabel>Bot ID</FormLabel>
+        <Field label="Bot ID">
           <Input {...form.register('botId')} />
-        </FormControl>
-        <Button type="submit" variant="primary">
+        </Field>
+        <Button type="submit" colorPalette="primary">
           Submit
         </Button>
       </Form>
-    </ModalContent>
+    </DialogContent>
   );
 }
 
@@ -82,17 +74,16 @@ function Overview({ space }: { space: MikotoSpace }) {
           }}
         />
 
-        <FormControl>
-          <FormLabel>Space Name</FormLabel>
+        <Field label="Space Name">
           <Input
             value={spaceName}
             onChange={(x) => setSpaceName(x.target.value)}
           />
-        </FormControl>
+        </Field>
 
-        <ButtonGroup>
+        <Group>
           <Button
-            variant="primary"
+            colorPalette="primary"
             type="button"
             onClick={() => {
               // TODO: Implement Space Update
@@ -111,11 +102,11 @@ function Overview({ space }: { space: MikotoSpace }) {
           >
             Add Bot
           </Button>
-        </ButtonGroup>
+        </Group>
         <h2>Dangerous</h2>
-        <ButtonGroup>
-          <Button variant="danger">Delete Space</Button>
-        </ButtonGroup>
+        <Group>
+          <Button colorPalette="danger">Delete Space</Button>
+        </Group>
       </Form>
     </SettingSurface>
   );

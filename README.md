@@ -46,9 +46,26 @@ and upcoming features:
 
 ## Setup
 
+Prerequisites:
+
+- Docker
+- Rust 1.81+
+- Node.js 22+
+- sqlx CLI (`cargo install sqlx-cli --no-default-features --features rustls,postgres`)
+
 ```sh
+# use corepack
+corepack enable
+
 # install dependencies
 pnpm install
+
+# Copy .env.example to .env and set the variables
+cp ./apps/superego/.env.example ./apps/superego/.env
+
+# migrate database (run in superego directory)
+sqlx database create
+sqlx migrate run
 
 # start services (PostgreSQL, Redis, MinIO, etc.)
 docker-compose up

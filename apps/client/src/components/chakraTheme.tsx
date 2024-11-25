@@ -11,6 +11,12 @@ export const chakraTheme = defineConfig({
   //   initialColorMode: 'dark',
   //   useSystemColorMode: false,
   // },
+  preflight: false,
+  globalCss: {
+    '*::selection': {
+      bg: 'blue.700',
+    },
+  },
   theme: {
     tokens: {
       colors: {

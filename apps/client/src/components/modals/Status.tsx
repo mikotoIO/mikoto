@@ -1,15 +1,9 @@
-import {
-  Button,
-  FormControl,
-  FormLabel,
-  Heading,
-  Input,
-  ModalContent,
-} from '@chakra-ui/react';
+import { Button, Heading, Input } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
 
 import { modalState } from '@/components/ContextMenu';
+import { DialogContent, Field } from '@/components/ui';
 import { Form } from '@/ui';
 
 export function SetStatusModal() {
@@ -17,7 +11,7 @@ export function SetStatusModal() {
   const form = useForm();
 
   return (
-    <ModalContent rounded="md" p={4} maxW="400px">
+    <DialogContent rounded="md" p={4} maxW="400px">
       <Heading fontSize="xl">Set Status</Heading>
       <Form
         onSubmit={form.handleSubmit((data) => {
@@ -25,16 +19,15 @@ export function SetStatusModal() {
           setModalState(null);
         })}
       >
-        <FormControl>
-          <FormLabel>Your status</FormLabel>
+        <Field label="Your Status">
           <Input {...form.register('status')} />
-        </FormControl>
+        </Field>
 
-        <Button variant="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           Set status
         </Button>
         <Button type="button">Clear Status</Button>
       </Form>
-    </ModalContent>
+    </DialogContent>
   );
 }

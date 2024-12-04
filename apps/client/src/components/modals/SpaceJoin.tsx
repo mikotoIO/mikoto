@@ -1,10 +1,4 @@
-import {
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  ModalContent,
-} from '@chakra-ui/react';
+import { Button, Input } from '@chakra-ui/react';
 import { Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { AxiosError } from 'axios';
@@ -12,6 +6,8 @@ import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
 
 import { modalState } from '@/components/ContextMenu';
+import { Field } from '@/components/ui';
+import { DialogContent } from '@/components/ui';
 import { useMikoto } from '@/hooks';
 import { useErrorElement } from '@/hooks/useErrorElement';
 import { Form } from '@/ui';
@@ -35,11 +31,10 @@ function SpaceCreateForm({ closeModal }: { closeModal: () => void }) {
         form.reset();
       })}
     >
-      <FormControl>
-        <FormLabel>Space Name</FormLabel>
+      <Field label="Space Name">
         <Input placeholder="Academy City" {...form.register('spaceName')} />
-      </FormControl>
-      <Button variant="primary" type="submit">
+      </Field>
+      <Button colorPalette="primary" type="submit">
         Create Space
       </Button>
     </Form>
@@ -66,10 +61,9 @@ function SpaceJoinForm({ closeModal }: { closeModal: () => void }) {
       })}
     >
       {error.el}
-      <FormControl>
-        <FormLabel>Invite Link/Code</FormLabel>
+      <Field label="Invite Link/Code">
         <Input {...register('inviteCode')} />
-      </FormControl>
+      </Field>
       <Button>Join Space</Button>
     </Form>
   );
@@ -79,7 +73,7 @@ export function SpaceJoinModal() {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <ModalContent rounded="md" p={4} maxW="480px">
+    <DialogContent rounded="md" p={4} maxW="480px">
       <SpaceJoinModalWrapper>
         <Heading fontSize="xl" className="inviteheader" mt={0}>
           Create a Space
@@ -96,6 +90,6 @@ export function SpaceJoinModal() {
           }}
         />
       </SpaceJoinModalWrapper>
-    </ModalContent>
+    </DialogContent>
   );
 }

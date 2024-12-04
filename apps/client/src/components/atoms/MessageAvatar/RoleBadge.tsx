@@ -2,7 +2,7 @@ import { Circle, chakra } from '@chakra-ui/react';
 import { Role } from '@mikoto-io/mikoto.js';
 
 export const BaseRoleBadge = chakra('div', {
-  baseStyle: {
+  base: {
     display: 'inline-block',
     px: 2,
     py: 1,

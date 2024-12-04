@@ -86,7 +86,11 @@ const SurfaceGroup = observer(
           <SurfaceGroup surfaceNode={head} />
           {tails.map((child, idx) => (
             // eslint-disable-next-line react/no-array-index-key
-            <Resizable key={idx} enable={{ ...RESIZABLE_DISABLES, left: true }}>
+            <Resizable
+              className="resizable"
+              key={idx}
+              enable={{ ...RESIZABLE_DISABLES, left: true }}
+            >
               <SurfaceGroup surfaceNode={child} />
             </Resizable>
           ))}
@@ -101,6 +105,7 @@ const SurfaceGroup = observer(
             key={`${tab.kind}/${tab.key}`}
           >
             <div
+              className="singletab"
               style={
                 idx !== surfaceNode.index ? { display: 'none' } : undefined
               }

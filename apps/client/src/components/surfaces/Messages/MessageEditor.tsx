@@ -89,7 +89,7 @@ const EditorButtons = styled.div`
 `;
 
 const EditorButton = chakra('div', {
-  baseStyle: {
+  base: {
     color: 'gray.400',
     cursor: 'pointer',
     _hover: {

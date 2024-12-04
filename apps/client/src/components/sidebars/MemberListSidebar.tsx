@@ -1,4 +1,4 @@
-import { Box, Tag } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faCrown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -13,6 +13,7 @@ import { Avatar } from '@/components/atoms/Avatar';
 import { MemberContextMenu } from '@/components/atoms/MessageAvatar';
 import { hoverableButtonLike } from '@/components/design';
 import { UserContextMenu } from '@/components/modals/ContextMenus';
+import { Tag } from '@/components/ui';
 import { useFetchMember } from '@/hooks';
 
 const StyledMember = styled.div`

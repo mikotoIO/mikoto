@@ -1,11 +1,11 @@
-import { Box, Flex, Heading } from '@chakra-ui/react';
+import { Box, Heading, Link } from '@chakra-ui/react';
 import { faDonate } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export function SponsoredFeature() {
   return (
-    <Flex
-      as="a"
+    <Link
+      display="flex"
       color="white"
       textDecor="none"
       href="#"
@@ -16,7 +16,7 @@ export function SponsoredFeature() {
       }}
       rounded="lg"
       fontSize="sm"
-      align="center"
+      alignItems="center"
       w="fit-content"
       gap={6}
     >
@@ -35,6 +35,6 @@ export function SponsoredFeature() {
           <strong>$10</strong>!
         </Box>
       </Box>
-    </Flex>
+    </Link>
   );
 }

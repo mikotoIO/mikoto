@@ -1,11 +1,13 @@
-import { useContextMenuX, ContextMenu } from "@/components/ContextMenu";
-import { Flex, Spinner } from "@chakra-ui/react";
-import { faEllipsis, faSquareCheck } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { toast } from "react-toastify";
-import { SyncState } from "./providerFactory";
+import { Flex, Spinner } from '@chakra-ui/react';
+import { faEllipsis, faSquareCheck } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { $convertToMarkdownString, TRANSFORMERS } from '@lexical/markdown';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { toast } from 'react-toastify';
+
+import { ContextMenu, useContextMenuX } from '@/components/ContextMenu';
+
+import { SyncState } from './providerFactory';
 
 export interface EditorContextBarProps {
   syncState: SyncState;
@@ -47,7 +49,7 @@ export function EditorContextBar({ syncState }: EditorContextBarProps) {
       />
       <Flex gap={2}>
         {syncState === 'syncing' ? (
-          <Spinner size="xs" speed="0.5s" />
+          <Spinner size="xs" />
         ) : (
           <FontAwesomeIcon icon={faSquareCheck} />
         )}

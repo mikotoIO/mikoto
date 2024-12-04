@@ -1,10 +1,10 @@
 import {
   Box,
   Button,
-  ButtonGroup,
   Center,
   Code,
   Flex,
+  Group,
   Heading,
 } from '@chakra-ui/react';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
@@ -24,19 +24,15 @@ export function ErrorSurface({ error, resetErrorBoundary }: FallbackProps) {
         <Heading m={0}>Error!</Heading>
         <Box>You were probably not supposed to see this.</Box>
         <Box>Please contact the devs, and they'll fix it soon!</Box>
-        <ButtonGroup>
-          <Button
-            size="sm"
-            leftIcon={<FontAwesomeIcon icon={faRefresh} />}
-            onClick={resetErrorBoundary}
-            variant="primary"
-          >
+        <Group>
+          <Button size="sm" onClick={resetErrorBoundary} colorPalette="primary">
+            <FontAwesomeIcon icon={faRefresh} />
             Reload
           </Button>
           <Button size="sm" onClick={() => setShowDetails(!showDetails)}>
             Show Error Details
           </Button>
-        </ButtonGroup>
+        </Group>
         {showDetails && <Code variant="solid">{error.message}</Code>}
       </Flex>
     </Surface>

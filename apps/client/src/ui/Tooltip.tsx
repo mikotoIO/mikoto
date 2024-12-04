@@ -2,7 +2,7 @@ import { chakra } from '@chakra-ui/react';
 import Tippy, { TippyProps } from '@tippyjs/react';
 
 export const Tooltip = chakra('div', {
-  baseStyle: {
+  base: {
     color: 'white',
     backgroundColor: 'gray.900',
     borderRadius: '4px',

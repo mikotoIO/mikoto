@@ -1,12 +1,4 @@
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  FormControl,
-  FormLabel,
-  Input,
-  ModalContent,
-} from '@chakra-ui/react';
+import { Box, Group, Input } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faCog, faCopy, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,6 +10,8 @@ import { useSetRecoilState } from 'recoil';
 
 import { modalState } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';
+import { Button, Field } from '@/components/ui';
+import { DialogContent } from '@/components/ui';
 import { useAuthClient } from '@/hooks';
 import { useTabkit } from '@/store/surface';
 import { Form } from '@/ui';
@@ -49,7 +43,7 @@ function BotCard({ id, name, secret }: BotProps) {
       <Box>
         <h2>{name}</h2>
         {/* <p>Bot ID: {id}</p> */}
-        <ButtonGroup>
+        <Group>
           <Button
             onClick={() => {
               tabkit.openTab(
@@ -61,10 +55,10 @@ function BotCard({ id, name, secret }: BotProps) {
                 true,
               );
             }}
-            variant="primary"
+            colorPalette="primary"
             type="button"
-            leftIcon={<FontAwesomeIcon icon={faCog} />}
           >
+            <FontAwesomeIcon icon={faCog} />
             Manage Bot
           </Button>
           <Button
@@ -73,18 +67,15 @@ function BotCard({ id, name, secret }: BotProps) {
               toast.success('Copied bot token to clipboard!');
             }}
             type="button"
-            leftIcon={<FontAwesomeIcon icon={faCopy} />}
           >
+            <FontAwesomeIcon icon={faCopy} />
             Copy Bot Token
           </Button>
-          <Button
-            type="button"
-            variant="danger"
-            leftIcon={<FontAwesomeIcon icon={faTrash} />}
-          >
+          <Button type="button" colorPalette="danger">
+            <FontAwesomeIcon icon={faTrash} />
             Delete Bot
           </Button>
-        </ButtonGroup>
+        </Group>
       </Box>
     </BotCardContainer>
   );
@@ -96,7 +87,7 @@ function BotCreateModal() {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <ModalContent rounded="md" p={4} maxW="480px">
+    <DialogContent rounded="md" p={4} maxW="480px">
       <Form
         onSubmit={handleSubmit(async (form) => {
           await authClient.createBot({ name: form.name });
@@ -104,15 +95,14 @@ function BotCreateModal() {
         })}
       >
         <h1>Create Bot</h1>
-        <FormControl>
-          <FormLabel>Bot Name</FormLabel>
+        <Field label="Bot Name">
           <Input {...register('name', { required: true })} />
-        </FormControl>
-        <Button variant="primary" type="submit">
+        </Field>
+        <Button colorPalette="primary" type="submit">
           Create Bot
         </Button>
       </Form>
-    </ModalContent>
+    </DialogContent>
   );
 }
 
@@ -127,7 +117,7 @@ export function BotsSurface() {
     <SettingSurface>
       <h1>{t('accountSettings.bots.title')}</h1>
       <Button
-        variant="primary"
+        colorPalette="primary"
         onClick={() => {
           setModal({
             elem: <BotCreateModal />,

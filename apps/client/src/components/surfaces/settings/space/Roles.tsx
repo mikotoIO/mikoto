@@ -2,15 +2,12 @@
 import {
   Box,
   Button,
-  ButtonGroup,
   Circle,
   Flex,
-  FormControl,
-  FormLabel,
   Grid,
+  Group,
   Heading,
   Input,
-  Switch,
 } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
@@ -23,6 +20,7 @@ import { useForm } from 'react-hook-form';
 import { useSnapshot } from 'valtio';
 
 import { useContextMenu } from '@/components/ContextMenu';
+import { Field, Switch } from '@/components/ui';
 import { useMikoto } from '@/hooks';
 import { Form } from '@/ui';
 import { SettingSurface } from '@/views';
@@ -123,12 +121,12 @@ function RolePermissionEditor({
             </Heading>
             <Switch
               size="lg"
-              isChecked={checkPermission(x.permission, perm)}
-              onChange={(t) => {
+              checked={checkPermission(x.permission, perm)}
+              onCheckedChange={(t) => {
                 // if X is true, switch the bitset to 1
                 // if X is false, switch the bitset to 0
 
-                if (t.target.checked) {
+                if (t.checked) {
                   onChange?.((perm | x.permission).toString());
                 } else {
                   onChange?.((perm & ~x.permission).toString());
@@ -175,32 +173,30 @@ function RoleEditor({ role, space }: { space: MikotoSpace; role: Role }) {
 
       {role.name !== '@everyone' && (
         <>
-          <FormControl>
-            <FormLabel>Role Name</FormLabel>
+          <Field label="Role Name">
             <Input {...form.register('name')} />
-          </FormControl>
-          <FormControl>
-            <FormLabel>Role Priority</FormLabel>
+          </Field>
+          <Field label="Role Priority">
             <Input
               type="number"
               min={0}
               max={99}
               {...form.register('position', { valueAsNumber: true })}
             />
-          </FormControl>
+          </Field>
           <RoleColorPicker value={color} onChange={setColor} />
         </>
       )}
 
       <RolePermissionEditor perms={perms} onChange={setPerms} />
-      <ButtonGroup>
-        <Button variant="primary" type="submit">
+      <Group>
+        <Button colorPalette="primary" type="submit">
           Save Changes
         </Button>
         {role.name !== '@everyone' && (
           <Button
             type="button"
-            variant="danger"
+            colorPalette="danger"
             onClick={async () => {
               await mikoto.rest['roles.delete'](undefined, {
                 params: { spaceId: space.id, roleId: role.id },
@@ -210,7 +206,7 @@ function RoleEditor({ role, space }: { space: MikotoSpace; role: Role }) {
             Delete Role
           </Button>
         )}
-      </ButtonGroup>
+      </Group>
     </StyledRoleEditor>
   );
 }
@@ -228,8 +224,7 @@ export function RolesSubsurface({ space }: { space: MikotoSpace }) {
         <Box pr={4}>
           <Button
             my={4}
-            leftIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-            variant="primary"
+            colorPalette="primary"
             onClick={async () => {
               await mikoto.rest['roles.create'](
                 { name: 'New Role' },
@@ -239,6 +234,7 @@ export function RolesSubsurface({ space }: { space: MikotoSpace }) {
               );
             }}
           >
+            <FontAwesomeIcon icon={faCirclePlus} />
             New Role
           </Button>
           {spaceRoles.values().map((r) => (

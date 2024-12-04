@@ -48,7 +48,7 @@ export function SpaceInviteViewInner() {
             </StyledSpaceIcon>
             <h1>{space.name}</h1>
             <Button
-              variant="primary"
+              colorPalette="primary"
               onClick={async () => {
                 // TODO: test for invalid links, links that have already been accepted
                 // links that have expired, etc.

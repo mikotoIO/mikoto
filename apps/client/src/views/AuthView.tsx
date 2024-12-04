@@ -1,10 +1,7 @@
 import {
   Link as Anchor,
   Box,
-  Button,
   Flex,
-  FormControl,
-  FormLabel,
   Heading,
   Input,
   chakra,
@@ -17,6 +14,7 @@ import { Control, useController, useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { faMikoto } from '@/components/icons';
+import { Button, Field } from '@/components/ui';
 import { env } from '@/env';
 import { useErrorElement } from '@/hooks/useErrorElement';
 import { authClient } from '@/store/authClient';
@@ -79,7 +77,7 @@ export function AuthView({ children }: { children: React.ReactNode }) {
 }
 
 const AuthForm = chakra('form', {
-  baseStyle: {
+  base: {
     w: '360px',
     display: 'flex',
     flexDir: 'column',
@@ -113,28 +111,26 @@ export function LoginView() {
       >
         <Heading size="lg">Log In</Heading>
         {error.el}
-        <FormControl>
-          <FormLabel>Email</FormLabel>
+        <Field label="Email">
           <Input {...register('email')} />
-        </FormControl>
-        <FormControl>
-          <FormLabel>Password</FormLabel>
+        </Field>
+        <Field label="Password">
           <Input type="password" {...register('password')} />
-        </FormControl>
+        </Field>
 
         <Captcha name="captcha" control={control} />
         <Button
-          variant="primary"
+          colorPalette="primary"
           type="submit"
-          isLoading={formState.isSubmitting}
+          loading={formState.isSubmitting}
         >
           Log In
         </Button>
-        <Anchor to="/register" as={Link}>
-          Register
+        <Anchor asChild>
+          <Link to="/register">Register</Link>
         </Anchor>
-        <Anchor to="/forgotpassword" as={Link}>
-          Forgot Password?
+        <Anchor asChild>
+          <Link to="/forgotpassword">Forgot Password?</Link>
         </Anchor>
       </AuthForm>
     </AuthView>
@@ -167,31 +163,28 @@ export function RegisterView() {
       >
         <Heading size="lg">Register</Heading>
         {error.el}
-        <FormControl>
-          <FormLabel>Username</FormLabel>
+        <Field label="Username">
           <Input {...register('name')} />
-        </FormControl>
+        </Field>
 
-        <FormControl>
-          <FormLabel>Email</FormLabel>
+        <Field label="Email">
           <Input {...register('email')} />
-        </FormControl>
+        </Field>
 
-        <FormControl>
-          <FormLabel>Password</FormLabel>
+        <Field label="Password">
           <Input type="password" {...register('password')} />
-        </FormControl>
+        </Field>
         <Captcha name="captcha" control={control} />
 
         <Button
-          variant="primary"
+          colorPalette="primary"
           type="submit"
-          isLoading={formState.isSubmitting}
+          loading={formState.isSubmitting}
         >
           Register
         </Button>
-        <Anchor to="/login" as={Link}>
-          Log In
+        <Anchor asChild>
+          <Link to="/login">Log In</Link>
         </Anchor>
       </AuthForm>
     </AuthView>
@@ -221,11 +214,10 @@ export function ResetPasswordView() {
         ) : (
           <>
             <Heading size="lg">Reset Password</Heading>
-            <FormControl>
-              <FormLabel>Email</FormLabel>
+            <Field label="Email">
               <Input {...register('email')} />
-            </FormControl>
-            <Button variant="primary" type="submit">
+            </Field>
+            <Button colorPalette="primary" type="submit">
               Send Password Reset Email
             </Button>
             <Captcha name="captcha" control={control} />
@@ -284,17 +276,15 @@ export function ResetChangePasswordView() {
         ) : (
           <>
             <Heading size="lg">Reset Password</Heading>
-            <FormControl>
-              <FormLabel>New Password</FormLabel>
+            <Field label="New Password">
               <Input type="password" {...register('password')} />
-            </FormControl>
+            </Field>
 
-            <FormControl>
-              <FormLabel>Confirm New Password</FormLabel>
+            <Field label="Confirm New Password">
               <Input type="password" {...register('passwordConfirm')} />
-            </FormControl>
+            </Field>
 
-            <Button variant="primary" type="submit">
+            <Button colorPalette="primary" type="submit">
               Confirm new password
             </Button>
           </>

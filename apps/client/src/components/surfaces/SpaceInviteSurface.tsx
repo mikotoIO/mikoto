@@ -1,11 +1,4 @@
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Flex,
-  Grid,
-  Heading,
-} from '@chakra-ui/react';
+import { Box, Button, Flex, Heading } from '@chakra-ui/react';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -33,8 +26,8 @@ export function SpaceInviteSurface({ inviteCode }: { inviteCode: string }) {
             12345 Members
           </Box>
           <Flex direction="column" gap={2} maxW="400px">
-            <Button variant="primary">Join Space Name</Button>
-            <Button size="sm" colorScheme="primary" variant="ghost">
+            <Button colorPalette="primary">Join Space Name</Button>
+            <Button size="sm" colorPalette="primary" variant="ghost">
               No, Thanks
             </Button>
           </Flex>

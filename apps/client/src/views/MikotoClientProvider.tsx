@@ -56,7 +56,7 @@ export function MikotoClientProvider({
       // initialized.current = true;
 
       const mi = new MikotoClient({
-        url: env.PUBLIC_AUTH_URL,
+        url: env.PUBLIC_SERVER_URL,
         auth: authClient,
       });
       setupMikotoClient(mi);

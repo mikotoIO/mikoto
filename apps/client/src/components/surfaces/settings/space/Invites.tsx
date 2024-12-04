@@ -27,7 +27,7 @@ export function Invites({ space }: { space: MikotoSpace }) {
               {invite.id}
             </Box>
             <Button
-              variant="danger"
+              colorPalette="danger"
               onClick={async () => {
                 await mikoto.rest['invites.delete'](undefined, {
                   params: { spaceId: space.id, inviteId: invite.id },

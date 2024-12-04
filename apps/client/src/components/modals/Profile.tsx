@@ -1,11 +1,4 @@
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Flex,
-  Heading,
-  ModalContent,
-} from '@chakra-ui/react';
+import { Box, Button, Flex, Group, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,6 +7,7 @@ import { useSetRecoilState } from 'recoil';
 
 import { modalState } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';
+import { DialogContent } from '@/components/ui';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState } from '@/store';
 
@@ -51,7 +45,7 @@ export function ProfileModal({ user }: { user: User }) {
   const setModal = useSetRecoilState(modalState);
 
   return (
-    <ModalContent rounded="md" p={0} width="640px">
+    <DialogContent rounded="md" p={0} width="640px">
       <ProfileContainer>
         <div className="banner">
           <Avatar
@@ -70,9 +64,9 @@ export function ProfileModal({ user }: { user: User }) {
             </div>
             <div>
               {mikoto.user.me?.id !== user.id && (
-                <ButtonGroup>
+                <Group>
                   <Button
-                    variant="success"
+                    colorPalette="success"
                     onClick={async () => {
                       // FIXME: the fuck is this
                       // await mikoto.client.relations.openDm({
@@ -85,7 +79,7 @@ export function ProfileModal({ user }: { user: User }) {
                     Send Friend Request
                   </Button>
                   <Button
-                    variant="secondary"
+                    colorPalette="secondary"
                     onClick={async () => {
                       // const dm = await mikoto.client.relations.openDm({
                       //   relationId: user.id,
@@ -110,7 +104,7 @@ export function ProfileModal({ user }: { user: User }) {
                   >
                     <FontAwesomeIcon icon={faEnvelope} />
                   </Button>
-                </ButtonGroup>
+                </Group>
               )}
             </div>
           </Flex>
@@ -120,6 +114,6 @@ export function ProfileModal({ user }: { user: User }) {
           <p>Bio Should go here. Lorem ipsum dolor sit amet consectetur.</p>
         </Box>
       </ProfileContainer>
-    </ModalContent>
+    </DialogContent>
   );
 }

@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Flex, Heading } from '@chakra-ui/react';
+import { Box, Button, Flex, Group } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import {
   faBookAtlas,
@@ -234,10 +234,12 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
       <DocumentActions>
         <Box className="left">#{channel.name}</Box>
         <Flex className="right" fontSize="xl" gap={3}>
-          <ButtonGroup>
+          <Group>
             <ActionTooltip tooltip="Edit">
               <Button
-                variant={documentSnap.type === 'edit' ? 'primary' : undefined}
+                colorPalette={
+                  documentSnap.type === 'edit' ? 'primary' : undefined
+                }
                 p={2}
                 onClick={() => {
                   if (documentSnap.type === 'read') {
@@ -260,7 +262,7 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
                 <FontAwesomeIcon icon={faBookAtlas} />
               </Button>
             </ActionTooltip>
-          </ButtonGroup>
+          </Group>
         </Flex>
       </DocumentActions>
       {documentSnap.type === 'read' && <DocumentReader channel={channel} />}

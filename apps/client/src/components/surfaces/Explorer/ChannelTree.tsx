@@ -23,7 +23,7 @@ export const StyledTreeBody = styled.div`
 `;
 
 const NodeBase = chakra('a', {
-  baseStyle: {
+  base: {
     position: 'relative',
     fontSize: '14px',
     height: '32px',

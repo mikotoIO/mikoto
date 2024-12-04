@@ -1,8 +1,9 @@
-import { Modal, ModalOverlay } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import useEventListener from '@use-it/event-listener';
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { atom, useRecoilState, useSetRecoilState } from 'recoil';
+
+import { DialogBackdrop, DialogRoot } from '@/components/ui';
 
 interface Positions {
   top?: number;
@@ -176,15 +177,16 @@ export function ModalKit() {
 
   // opened={modal !== null}
   return (
-    <Modal
-      size="auto"
-      isOpen={modal !== null}
-      onClose={() => {
-        setModal(null);
+    <DialogRoot
+      open={modal !== null}
+      onOpenChange={({ open }) => {
+        if (!open) {
+          setModal(null);
+        }
       }}
     >
-      {modal && <ModalOverlay />}
+      {modal && <DialogBackdrop />}
       {modal?.elem}
-    </Modal>
+    </DialogRoot>
   );
 }

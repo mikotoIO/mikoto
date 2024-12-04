@@ -100,6 +100,11 @@ export const globalCss = css`
     --font-code: 'JetBrains Mono', monospace;
   }
 
+  input {
+    border-style: solid;
+    background-color:  var(--chakra-colors-subsurface);
+  }
+
   background-color: var(--chakra-colors-subsurface);
   color: var(--chakra-colors-text);
 

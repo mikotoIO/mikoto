@@ -12,6 +12,7 @@ pub struct Env {
 
     pub web_url: String,
 
+    pub s3: S3Env,
     pub smtp: Option<SmtpEnv>,
     pub captcha: CaptchaEnv,
     pub livekit: Option<LivekitEnv>,
@@ -35,6 +36,17 @@ pub struct CaptchaEnv {
     pub provider: String,
     pub secret: String,
     pub url: Option<String>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct S3Env {
+    pub access_key: Option<String>,
+    pub secret_key: Option<String>,
+    pub region: Option<String>,
+    pub endpoint: String,
+    pub bucket: String,
+    pub use_ssl: bool,
+    pub port: Option<u16>,
 }
 
 impl Env {

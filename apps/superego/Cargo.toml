@@ -4,8 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tokio = { version = "1.40.0", features = ["full"] }
+
 # the basic dependencies
+tokio = { version = "1.40.0", features = ["full"] }
 serde = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0.108"
 async-trait = "0.1.81"
@@ -15,6 +16,7 @@ nanoid = "0.4.0"
 hex = "0.4.3"
 thiserror = "1.0.63"
 strum = { version = "0.26", features = ["derive"] }
+url = "2.4.1"
 
 # env
 dotenvy = "0.15.7"
@@ -37,7 +39,6 @@ aide = { version = "0.13.4", features = [
 itertools = "0.12.1"
 bcrypt = "0.15.1"
 jsonwebtoken = "9.3.0"
-# didkit = "0.6.0"
 sha3 = "0.10.8"
 
 
@@ -67,6 +68,10 @@ livekit-api = { version = "0.4.0", features = [
 ] }
 bitflags = "2.6.0"
 
+# media processing
+mime = "0.3.17"
+mime_guess = "2.0.4"
+image = "0.24.7"
 
 # database
 [dependencies.sqlx]
@@ -81,6 +86,16 @@ features = [
     "migrate",
 ]
 
+[dependencies.rust-s3]
+git = "https://github.com/ScuffleTV/rust-s3.git"
+branch = "troy/rustls"
+default-features = false
+features = ["tokio-rustls-tls"]
+
+[dependencies.reqwest]
+version = "0.12.3"
+default-features = false
+features = ["charset", "http2", "rustls-tls"]
 
 [dependencies.yrs-axum]
 git = "https://github.com/mikotoIO/yrs-axum"

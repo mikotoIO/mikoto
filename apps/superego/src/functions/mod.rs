@@ -3,6 +3,7 @@ use std::hash::Hash;
 use std::iter::IntoIterator;
 
 pub mod captcha;
+pub mod filetypes;
 pub mod jwt;
 pub mod mail;
 pub mod permissions;

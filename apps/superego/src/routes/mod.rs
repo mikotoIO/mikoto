@@ -17,6 +17,7 @@ use crate::functions::pubsub::emit_event;
 
 pub mod account;
 pub mod bots;
+pub mod cdn;
 pub mod channels;
 pub mod router;
 pub mod spaces;

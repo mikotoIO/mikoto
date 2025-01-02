@@ -5,6 +5,8 @@ use axum::{
     Json,
 };
 use bcrypt::BcryptError;
+use image::ImageError;
+use s3::error::S3Error;
 use serde_json::json;
 
 #[derive(Debug, OperationIo, strum::AsRefStr, thiserror::Error)]
@@ -131,6 +133,26 @@ impl From<BcryptError> for Error {
 impl From<jsonwebtoken::errors::Error> for Error {
     fn from(err: jsonwebtoken::errors::Error) -> Self {
         Self::JwtValidationError {
+            message: err.to_string(),
+        }
+    }
+}
+
+impl From<S3Error> for Error {
+    fn from(err: S3Error) -> Self {
+        Self::Miscallaneous {
+            code: "S3Error".to_string(),
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            message: err.to_string(),
+        }
+    }
+}
+
+impl From<ImageError> for Error {
+    fn from(err: ImageError) -> Self {
+        Self::Miscallaneous {
+            code: "ImageError".to_string(),
+            status: StatusCode::INTERNAL_SERVER_ERROR,
             message: err.to_string(),
         }
     }

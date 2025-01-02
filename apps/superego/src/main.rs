@@ -19,6 +19,7 @@ pub mod error;
 pub mod functions;
 pub mod middlewares;
 pub mod routes;
+pub mod services;
 
 #[tokio::main]
 async fn main() {

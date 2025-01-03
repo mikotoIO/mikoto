@@ -13,6 +13,8 @@ use serde_json::json;
 pub enum Error {
     #[error("Not found")]
     NotFound,
+    #[error("Bad request")]
+    BadRequest,
     #[error("{message}")]
     Unauthorized { message: String },
     #[error("{message}")]
@@ -21,6 +23,8 @@ pub enum Error {
     Forbidden { message: String },
     #[error("Validation failed")]
     ValidationFailed,
+    #[error("File too large")]
+    FileTooLarge,
 
     // errors relating to services
     #[error("{0}")]

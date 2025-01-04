@@ -6,7 +6,7 @@ use nanoid::nanoid;
 
 use crate::{error::Error, services::bucket};
 
-use super::config::{Store, StoreType};
+use super::config::Store;
 
 fn mime_to_ext(mime: &str) -> &'static str {
     match mime {
@@ -23,34 +23,34 @@ pub struct UploadResponse {
     pub url: String,
 }
 
-// not a route: this is a handler
-pub async fn upload(
-    store: &Store,
-    name: &str,
+/// Reads a multipart form field into a buffer.
+/// Returns the buffer, as well as the inferred file extension.
+async fn multipart_to_buf(
     mut form: Multipart,
-) -> Result<Json<UploadResponse>, Error> {
+    size_limit: usize,
+) -> Result<(Vec<u8>, &'static str), Error> {
     let file = form
         .next_field()
         .await
         .map_err(|_| Error::BadRequest)?
         .ok_or(Error::NotFound)?;
 
-    // TODO: This is very hacky. Allow the user to provide their own file types.
-    let mut ext = mime_to_ext(&file.content_type().unwrap_or(&"???"));
-
-    let mut buf = file.bytes().await.map_err(|_| Error::BadRequest)?.to_vec();
-
-    if buf.len() > store.max_size {
+    let ext = mime_to_ext(&file.content_type().unwrap_or(&"???"));
+    let buf = file.bytes().await.map_err(|_| Error::BadRequest)?.to_vec();
+    if buf.len() > size_limit {
         return Err(Error::FileTooLarge);
     }
 
-    match store.store_type {
-        StoreType::Attachment => {}
-        StoreType::Image => {
-            // TODO: validate if actually image
-            // should be unnecessary, but just in case
-        }
-    }
+    Ok((buf, ext))
+}
+
+// not a route: this is a handler
+pub async fn upload(
+    store: &Store,
+    name: &str,
+    form: Multipart,
+) -> Result<Json<UploadResponse>, Error> {
+    let (mut buf, mut ext) = multipart_to_buf(form, store.max_size).await?;
 
     if let Some(resize) = &store.image_resize {
         let image = image::load_from_memory(&buf)?.resize_to_fill(
@@ -67,6 +67,6 @@ pub async fn upload(
     bucket().put_object(&store_path, &buf).await?;
 
     Ok(Json(UploadResponse {
-        url: format!("{}/{}", "TODO: Imageserver URL", &store_path),
+        url: format!("{}/{}", "", &store_path),
     }))
 }

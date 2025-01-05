@@ -14,9 +14,10 @@ chrono = { version = "0.4.38", features = ["serde"] }
 uuid = { version = "1.8.0", features = ["serde", "v4"] }
 nanoid = "0.4.0"
 hex = "0.4.3"
-thiserror = "1.0.63"
+thiserror = "2.0.9"
 strum = { version = "0.26", features = ["derive"] }
 url = "2.4.1"
+indexmap = "2.7.0"
 
 # env
 dotenvy = "0.15.7"

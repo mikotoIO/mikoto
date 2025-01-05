@@ -1,4 +1,12 @@
+use std::collections::BTreeMap;
+
+use aide::{
+    gen::GenContext,
+    openapi::{MediaType, Operation},
+    OperationOutput,
+};
 use axum::response::{IntoResponse, Response};
+use indexmap::IndexMap;
 use mime::Mime;
 use reqwest::{
     header::{self},
@@ -25,6 +33,21 @@ impl IntoResponse for FileResponse {
             self.data,
         )
             .into_response()
+    }
+}
+
+impl OperationOutput for FileResponse {
+    type Inner = Self;
+
+    fn operation_response(
+        _ctx: &mut GenContext,
+        _operation: &mut Operation,
+    ) -> Option<aide::openapi::Response> {
+        Some(aide::openapi::Response {
+            description: "Image Stream".into(),
+            content: IndexMap::from_iter([("image/png".into(), MediaType::default())]),
+            ..Default::default()
+        })
     }
 }
 

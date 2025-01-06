@@ -1,6 +1,7 @@
 use std::io::Cursor;
 
 use axum::extract::{Path, Query};
+use schemars::JsonSchema;
 
 use crate::{
     error::Error,
@@ -8,7 +9,7 @@ use crate::{
     services::bucket,
 };
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct ServeParams {
     pub w: Option<u32>,
     pub h: Option<u32>,

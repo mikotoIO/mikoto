@@ -55,6 +55,7 @@ pub fn router() -> Router {
                 .api_route("/", get_with(index, |o| o.id("index").summary("Index")))
                 .nest("/account", account::router())
                 .nest("/bots", bots::router())
+                .nest("/cdn", cdn::router())
         })
         .nest("users", "/users", users::router())
         .nest("relations", "/relations", users::relations::router())

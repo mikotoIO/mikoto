@@ -1,9 +1,5 @@
-use std::collections::BTreeMap;
-
 use aide::{
-    gen::GenContext,
-    openapi::{MediaType, Operation},
-    OperationOutput,
+    gen::GenContext, openapi::{MediaType, Operation}, OperationOutput
 };
 use axum::response::{IntoResponse, Response};
 use indexmap::IndexMap;

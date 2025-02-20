@@ -59,6 +59,7 @@ corepack enable
 
 # install dependencies
 pnpm install
+cargo check
 
 # Copy .env.example to .env and set the variables
 cp ./apps/superego/.env.example ./apps/superego/.env

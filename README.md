@@ -101,6 +101,32 @@ To build all apps and packages, run the following command:
 yarn build
 ```
 
+## Port Configuration
+
+All Mikoto services use ports in the `351X` or `351XX` range to avoid conflicts with other common services:
+
+### Application Services (351X)
+
+| Service        | Port | Description                      |
+| -------------- | ---- | -------------------------------- |
+| Server         | 3510 | API server                       |
+| Auth           | 3511 | Authentication service           |
+| Collab         | 3512 | Collaboration service            |
+| MediaServer    | 3513 | Media handling service           |
+| Superego       | 3514 | Core server                      |
+| Client         | 3519 | Web client (served via nginx)    |
+
+### Infrastructure Services (351XX)
+
+| Service        | Ports                | Description                      |
+| -------------- | -------------------- | -------------------------------- |
+| PostgreSQL     | 35101                | Database                         |
+| Redis          | 35102                | Cache & pub/sub                  |
+| MinIO (S3)     | 35103, 35104         | Object storage                   |
+| LiveKit        | 35105, 35106, 35107  | Real-time audio/video            |
+| MailHog        | 35108, 35109         | Development mail server          |
+| Meilisearch    | 35110                | Search engine                    |
+
 ## Project Structure
 
 | Package              | Description               | Stack               |

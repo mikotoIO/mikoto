@@ -1,59 +1,56 @@
 services:
   postgres:
-    image: ghcr.io/cloudnative-pg/postgresql:16.1
+    image: 'ghcr.io/cloudnative-pg/postgresql:16.1'
     restart: always
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
-      - '5432:5432'
-    volumes: 
-      - postgresql:/var/lib/postgresql/data
+      - '35101:5432'
+    volumes:
+      - 'postgresql:/var/lib/postgresql/data'
   redis:
-    image: redis:6.2-alpine
+    image: 'redis:6.2-alpine'
     restart: always
     ports:
-      - '6379:6379'
+      - '35102:6379'
     volumes:
-      - redis:/data
+      - 'redis:/data'
   minio:
-    image: minio/minio:RELEASE.2022-10-24T18-35-07Z
-    command: server --console-address ":9001" /data
+    image: 'minio/minio:RELEASE.2022-10-24T18-35-07Z'
+    command: 'server --console-address ":9001" /data'
     volumes:
       - './data/minio:/data'
     environment:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: password
     ports:
-      - '9000:9000'
-      - '9001:9001'
+      - '35103:9000'
+      - '35104:9001'
     restart: always
   livekit:
-    image: livekit/livekit-server:v1.4.3
+    image: 'livekit/livekit-server:v1.4.3'
     command: '--keys "devkey: secret1234567890abcdefghijklmnopqrtsuvwxyz"'
     ports:
-      - '7880:7880'
-      - '7881:7881'
-      - '7882:7882'
+      - '35105:7880'
+      - '35106:7881'
+      - '35107:7882'
   mailhog:
     image: mailhog/mailhog
-    # environment:
-    #   MH_HOSTNAME: localhost
     ports:
-      - '8025:8025'
-      - '1025:1025'
+      - '35108:8025'
+      - '35109:1025'
     logging:
       driver: none
   meilisearch:
-    image: getmeili/meilisearch:v1.4
+    image: 'getmeili/meilisearch:v1.4'
     ports:
-      - 7700:7700
+      - '35110:7700'
     volumes:
-      - meilisearch:/meili_data
-    restart: on-failure:0
-
+      - 'meilisearch:/meili_data'
+    restart: 'on-failure:0'
 volumes:
-  postgresql:
+  postgresql: null
   redis:
     driver: local
-  meilisearch:
+  meilisearch: null

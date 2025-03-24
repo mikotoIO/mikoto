@@ -35,13 +35,6 @@ services:
       - '35105:7880'
       - '35106:7881'
       - '35107:7882'
-  mailhog:
-    image: mailhog/mailhog
-    ports:
-      - '35108:8025'
-      - '35109:1025'
-    logging:
-      driver: none
   meilisearch:
     image: 'getmeili/meilisearch:v1.4'
     ports:

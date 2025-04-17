@@ -65,8 +65,7 @@ cargo check
 cp ./apps/superego/.env.example ./apps/superego/.env
 
 # migrate database (run in superego directory)
-sqlx database create
-sqlx migrate run
+sqlx database create && sqlx migrate run
 
 # start services (PostgreSQL, Redis, MinIO, etc.)
 docker-compose up
@@ -109,11 +108,9 @@ All Mikoto services use ports in the `351X` or `351XX` range to avoid conflicts 
 
 | Service        | Port | Description                      |
 | -------------- | ---- | -------------------------------- |
-| Server         | 3510 | API server                       |
-| Auth           | 3511 | Authentication service           |
+| Superego       | 3510 | API server                       |
 | Collab         | 3512 | Collaboration service            |
 | MediaServer    | 3513 | Media handling service           |
-| Superego       | 3514 | Core server                      |
 | Client         | 3519 | Web client (served via nginx)    |
 
 ### Infrastructure Services (351XX)

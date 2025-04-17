@@ -3,7 +3,7 @@ export const env = {
   PUBLIC_FRONTEND_URL:
     import.meta.env.PUBLIC_FRONTEND_URL ?? 'http://localhost:5173',
   PUBLIC_SERVER_URL:
-    import.meta.env.PUBLIC_SERVER_URL ?? 'http://localhost:9503',
+    import.meta.env.PUBLIC_SERVER_URL ?? 'http://localhost:3510',
   PUBLIC_MEDIASERVER_URL:
     import.meta.env.PUBLIC_MEDIASERVER_URL ?? 'http://localhost:9501',
   PUBLIC_COLLABORATION_URL:

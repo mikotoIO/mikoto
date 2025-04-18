@@ -1,12 +1,12 @@
-import { DockviewReadyEvent, DockviewReact, IDockviewPanelProps } from 'dockview-react';
+import { DockviewApi, DockviewReadyEvent, DockviewReact, IDockviewPanel, IDockviewPanelProps } from 'dockview-react';
 import { ReactNode, Suspense, useCallback, useMemo, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 import { WelcomePanel } from '@/components/WelcomePanel';
 import { ErrorSurface, LoadingSurface, surfaceMap } from '@/components/surfaces';
 import { TabName } from '@/components/tabs';
-import { TabContext, Tabable, tabNameFamily, useTabkit, useTabs } from '@/store/surface';
+import { TabContext, Tabable, tabNameFamily, tabsState, useActiveTabId, useTabkit, useTabs } from '@/store/surface';
 
 interface SurfaceComponentProps extends IDockviewPanelProps {
   params: {
@@ -41,8 +41,10 @@ interface TabContainerProps {
 
 export const DockViewSurface = ({ children }: TabContainerProps) => {
   const tabs = useTabs();
-  const dockviewRef = useRef<{ api: any }>({ api: null });
+  const activeTabId = useActiveTabId();
+  const dockviewRef = useRef<{ api: DockviewApi | null }>({ api: null });
   const tabkit = useTabkit();
+  const setTabs = useRecoilState(tabsState)[1];
   
   const components = useMemo(() => {
     return {
@@ -62,7 +64,15 @@ export const DockViewSurface = ({ children }: TabContainerProps) => {
         params: { tab },
       });
     });
-  }, [tabs]);
+
+    // Listen for any layout changes
+    event.api.onDidLayoutChange(() => {
+      // If all panels are closed, update our tab state
+      if (event.api.panels.length === 0) {
+        setTabs([]);
+      }
+    });
+  }, [tabs, tabkit, activeTabId, setTabs]);
 
   // Render panel titles
   const renderTabTitle = useCallback((id: string) => {

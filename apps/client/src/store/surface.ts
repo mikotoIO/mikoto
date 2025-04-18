@@ -107,6 +107,12 @@ export function useTabkit() {
       const newTabs = tabs.filter(tab => !(tab.kind === kind && tab.key === key));
       setTabs(newTabs);
       saveTabsToStorage(newTabs);
+      
+      // If we just removed the active tab, reset activeTabId if there are no tabs left
+      if (activeTabId === id && newTabs.length === 0) {
+        setActiveTabId(null);
+        saveActiveTabToStorage(null);
+      }
     },
     setActiveTab(id: string) {
       setActiveTabId(id);

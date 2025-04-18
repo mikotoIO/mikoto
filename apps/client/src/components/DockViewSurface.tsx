@@ -1,5 +1,4 @@
 import { DockviewReadyEvent, DockviewReact, IDockviewPanelProps } from 'dockview-react';
-import { observer } from 'mobx-react-lite';
 import { ReactNode, Suspense, useCallback, useMemo, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilValue } from 'recoil';
@@ -7,7 +6,7 @@ import { useRecoilValue } from 'recoil';
 import { WelcomePanel } from '@/components/WelcomePanel';
 import { ErrorSurface, LoadingSurface, surfaceMap } from '@/components/surfaces';
 import { TabName } from '@/components/tabs';
-import { TabContext, Tabable, tabNameFamily, useTabkit } from '@/store/surface';
+import { TabContext, Tabable, tabNameFamily, useTabkit, useTabs } from '@/store/surface';
 
 interface SurfaceComponentProps extends IDockviewPanelProps {
   params: {
@@ -37,11 +36,11 @@ function SurfaceComponent(props: SurfaceComponentProps) {
 }
 
 interface TabContainerProps {
-  tabs: Tabable[];
   children?: ReactNode;
 }
 
-export const DockViewSurface = observer(({ tabs }: TabContainerProps) => {
+export const DockViewSurface = ({ children }: TabContainerProps) => {
+  const tabs = useTabs();
   const dockviewRef = useRef<{ api: any }>({ api: null });
   const tabkit = useTabkit();
   
@@ -98,4 +97,4 @@ export const DockViewSurface = observer(({ tabs }: TabContainerProps) => {
       ))}
     </div>
   );
-});
+};

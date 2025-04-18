@@ -1,8 +1,7 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { IDockviewPanelHeaderProps, IGridviewPanelProps } from 'dockview-react';
-import { autorun, makeAutoObservable, runInAction } from 'mobx';
 import { createContext } from 'react';
-import { atomFamily } from 'recoil';
+import { atom, atomFamily, selector, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import type { TabBaseType } from '@/components/surfaces';
 
@@ -15,85 +14,31 @@ export interface DockViewLayout {
   activeGroup?: string;
 }
 
-export class SurfaceStore {
-  tabs: Tabable[];
-  layout: DockViewLayout | null;
-  activeTabId: string | null;
+// Recoil atoms for tab state
+export const tabsState = atom<Tabable[]>({
+  key: 'tabsState',
+  default: [],
+});
 
-  constructor() {
-    this.tabs = [];
-    this.layout = null;
-    this.activeTabId = null;
-    
-    try {
-      const storedTabs = localStorage.getItem('surface_tabs');
-      const storedLayout = localStorage.getItem('surface_layout');
-      const storedActiveTab = localStorage.getItem('surface_active_tab');
-      
-      if (storedTabs) {
-        this.tabs = JSON.parse(storedTabs);
-      }
-      
-      if (storedLayout) {
-        this.layout = JSON.parse(storedLayout);
-      }
-      
-      if (storedActiveTab) {
-        this.activeTabId = storedActiveTab;
-      }
-    } catch (_) {
-      // ignore
-    }
-    
-    makeAutoObservable(this);
-    
-    autorun(() => {
-      localStorage.setItem('surface_tabs', JSON.stringify(this.tabs));
-      if (this.layout) {
-        localStorage.setItem('surface_layout', JSON.stringify(this.layout));
-      }
-      if (this.activeTabId) {
-        localStorage.setItem('surface_active_tab', this.activeTabId);
-      }
-    });
-  }
+export const layoutState = atom<DockViewLayout | null>({
+  key: 'layoutState',
+  default: null,
+});
 
-  getTab(id: string): Tabable | undefined {
+export const activeTabIdState = atom<string | null>({
+  key: 'activeTabIdState',
+  default: null,
+});
+
+// Selector to get a tab by ID
+export const tabByIdSelector = selector({
+  key: 'tabByIdSelector',
+  get: ({ get }) => (id: string) => {
+    const tabs = get(tabsState);
     const [kind, key] = id.split('/');
-    return this.tabs.find(tab => tab.kind === kind && tab.key === key);
-  }
-
-  addTab(tab: Tabable) {
-    const existingTabIndex = this.tabs.findIndex(
-      t => t.kind === tab.kind && t.key === tab.key
-    );
-    
-    if (existingTabIndex === -1) {
-      this.tabs.push(tab);
-    }
-    
-    this.activeTabId = `${tab.kind}/${tab.key}`;
-  }
-
-  removeTab(id: string) {
-    const [kind, key] = id.split('/');
-    const index = this.tabs.findIndex(tab => tab.kind === kind && tab.key === key);
-    
-    if (index !== -1) {
-      this.tabs.splice(index, 1);
-    }
-  }
-
-  setActiveTab(id: string) {
-    this.activeTabId = id;
-  }
-
-  updateLayout(layout: DockViewLayout) {
-    this.layout = layout;
-  }
-}
-
-export const surfaceStore = new SurfaceStore();
+    return tabs.find(tab => tab.kind === kind && tab.key === key);
+  },
+});
 
 export interface TabNameProps {
   name: string;
@@ -112,30 +57,76 @@ export const TabContext = createContext<{ key: string }>({
 });
 
 export function useTabkit() {
+  const [tabs, setTabs] = useRecoilState(tabsState);
+  const [activeTabId, setActiveTabId] = useRecoilState(activeTabIdState);
+  const getTabById = useRecoilValue(tabByIdSelector);
+  
+  // Storage functions removed temporarily
+  const saveTabsToStorage = (_newTabs: Tabable[]) => {
+    // Removed localStorage persistence
+  };
+  
+  const saveActiveTabToStorage = (_tabId: string | null) => {
+    // Removed localStorage persistence
+  };
+
   function openNewChannel(ch: Tabable) {
-    runInAction(() => {
-      surfaceStore.addTab(ch);
-    });
+    const newTabs = [...tabs, ch];
+    setTabs(newTabs);
+    saveTabsToStorage(newTabs);
+    
+    const tabId = `${ch.kind}/${ch.key}`;
+    setActiveTabId(tabId);
+    saveActiveTabToStorage(tabId);
   }
 
   return {
     openNewChannel,
     openTab(tab: Tabable, openNew: boolean = false) {
-      if (surfaceStore.tabs.length === 0 || openNew) {
+      if (tabs.length === 0 || openNew) {
         openNewChannel(tab);
         return;
       }
 
-      runInAction(() => {
-        const tabId = `${tab.kind}/${tab.key}`;
-        const existingTab = surfaceStore.getTab(tabId);
-        
-        if (existingTab) {
-          surfaceStore.setActiveTab(tabId);
-        } else {
-          surfaceStore.addTab(tab);
-        }
-      });
+      const tabId = `${tab.kind}/${tab.key}`;
+      const existingTab = getTabById(tabId);
+      
+      if (existingTab) {
+        setActiveTabId(tabId);
+        saveActiveTabToStorage(tabId);
+      } else {
+        const newTabs = [...tabs, tab];
+        setTabs(newTabs);
+        saveTabsToStorage(newTabs);
+        setActiveTabId(tabId);
+        saveActiveTabToStorage(tabId);
+      }
+    },
+    removeTab(id: string) {
+      const [kind, key] = id.split('/');
+      const newTabs = tabs.filter(tab => !(tab.kind === kind && tab.key === key));
+      setTabs(newTabs);
+      saveTabsToStorage(newTabs);
+    },
+    setActiveTab(id: string) {
+      setActiveTabId(id);
+      saveActiveTabToStorage(id);
+    },
+    updateLayout(_layout: DockViewLayout) {
+      // Removed localStorage persistence
     },
   };
+}
+
+// Helper function to get tabs for components that were previously using surfaceStore directly
+export function useTabs() {
+  return useRecoilValue(tabsState);
+}
+
+export function useActiveTabId() {
+  return useRecoilValue(activeTabIdState);
+}
+
+export function useLayout() {
+  return useRecoilValue(layoutState);
 }

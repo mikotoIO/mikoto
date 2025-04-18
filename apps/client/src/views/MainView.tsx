@@ -2,7 +2,6 @@ import { Box, Center } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { observer } from 'mobx-react-lite';
 import { Resizable } from 're-resizable';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -23,7 +22,7 @@ import {
 } from '@/components/surfaces';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState, workspaceState } from '@/store';
-import { surfaceStore, Tabable } from '@/store/surface';
+import { Tabable } from '@/store/surface';
 
 import { MikotoClientProvider } from './MikotoClientProvider';
 import { WindowBar } from './WindowBar';
@@ -83,7 +82,7 @@ const SidebarRest = styled.div`
   -webkit-app-region: drag;
 `;
 
-const AppView = observer(() => {
+const AppView = () => {
   const leftSidebar = useRecoilValue(treebarSpaceState);
   const mikoto = useMikoto();
   const [workspace, setWorkspace] = useRecoilState(workspaceState);
@@ -121,7 +120,7 @@ const AppView = observer(() => {
         </div>
       </LeftBar>
       <DockViewContainer>
-        <DockViewSurface tabs={surfaceStore.tabs} />
+        <DockViewSurface />
       </DockViewContainer>
       {workspace.rightOpen && (
         <LeftBar>
@@ -143,7 +142,7 @@ const AppView = observer(() => {
       )}
     </AppContainer>
   );
-});
+};
 
 function Fallback() {
   return (

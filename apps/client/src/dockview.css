@@ -1,0 +1,40 @@
+/* Custom DockView styling to match Mikoto's theme */
+.dockview-theme-light {
+  --dv-background-color: var(--chakra-colors-surface);
+  --dv-tab-active-background-color: var(--chakra-colors-surface);
+  --dv-tab-active-foreground-color: var(--chakra-colors-gray-200);
+  --dv-tab-inactive-background-color: var(--chakra-colors-subsurface);
+  --dv-tab-inactive-foreground-color: var(--chakra-colors-gray-300);
+  --dv-tab-border-bottom-color: var(--chakra-colors-primary);
+  --dv-separator-border: 1px solid var(--chakra-colors-gray-700);
+  --dv-dragged-object-border: 1px solid var(--chakra-colors-primary);
+  --dv-palette-background-color: var(--chakra-colors-subsurface);
+  --dv-palette-foreground-color: var(--chakra-colors-gray-200);
+}
+
+/* Fix the tab sizing */
+.dockview-react-part-tabs {
+  height: 36px;
+}
+
+/* Make sure panels take full height */
+.panel-content {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Add border for active tabs */
+.tab.active {
+  border-bottom: 2px solid var(--chakra-colors-primary);
+}
+
+/* Handle empty state */
+.empty-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background-color: var(--chakra-colors-surface);
+  color: var(--chakra-colors-gray-300);
+}

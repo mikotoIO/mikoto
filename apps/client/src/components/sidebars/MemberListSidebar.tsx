@@ -1,20 +1,22 @@
 import { Box } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { faCrown } from '@fortawesome/free-solid-svg-icons';
+import { faBarsStaggered, faCrown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoMember, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 
 import { contextMenuState, useContextMenu } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';
 import { MemberContextMenu } from '@/components/atoms/MessageAvatar';
 import { hoverableButtonLike } from '@/components/design';
 import { UserContextMenu } from '@/components/modals/ContextMenus';
+import { TabBarButton } from '@/components/tabs';
 import { Tag } from '@/components/ui';
 import { useFetchMember } from '@/hooks';
+import { workspaceState } from '@/store';
 
 const StyledMember = styled.div`
   display: flex;
@@ -83,8 +85,18 @@ const StyledMemberListSidebar = styled.div`
   box-sizing: border-box;
 `;
 
+const HeaderContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 8px;
+  color: var(--chakra-colors-gray-200);
+  font-weight: bold;
+`;
+
 export const MemberListSidebar = ({ space }: { space: MikotoSpace }) => {
   useFetchMember(space);
+  const [workspace, setWorkspace] = useRecoilState(workspaceState);
 
   const spaceMembers = Array.from(space.members?.cache.values() ?? []).toSorted(
     (a, b) => a.user.name.localeCompare(b.user.name),
@@ -97,9 +109,19 @@ export const MemberListSidebar = ({ space }: { space: MikotoSpace }) => {
           components={{
             Header() {
               return (
-                <Box color="gray.200" p={4} fontWeight="bold">
-                  Members
-                </Box>
+                <HeaderContainer>
+                  <div>Members</div>
+                  <TabBarButton
+                    onClick={() => {
+                      setWorkspace((ws) => ({
+                        ...ws,
+                        rightOpen: !ws.rightOpen,
+                      }));
+                    }}
+                  >
+                    <FontAwesomeIcon icon={faBarsStaggered} />
+                  </TabBarButton>
+                </HeaderContainer>
               );
             },
           }}

@@ -112,7 +112,12 @@ function ExplorerInner({ space }: { space: MikotoSpace }) {
     text: channel.name,
     unread: isUnread(channel.lastUpdatedDate, acks[channel.id] ?? null),
     onClick(ev) {
-      tabkit.openTab(channelToTab(channel), ev.ctrlKey);
+      const tab = channelToTab(channel);
+      
+      // Always open in a new tab if Ctrl is pressed or if there are already tabs
+      const forceNewTab = ev.ctrlKey || tabkit.getTabs().length > 0;
+      
+      tabkit.openTab(tab, forceNewTab);
       ackChannel(channel);
     },
     onContextMenu: nodeContextMenu(() => (

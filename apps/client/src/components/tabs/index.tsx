@@ -12,6 +12,7 @@ import {
 export function TabName({ name, icon }: TabNameProps) {
   const tabInfo = useContext(TabContext);
   const [tabName, setTabName] = useRecoilState(tabNameFamily(tabInfo.key));
+  
   useEffect(() => {
     if (tabName.name !== name) {
       setTabName({
@@ -20,7 +21,7 @@ export function TabName({ name, icon }: TabNameProps) {
         icon,
       });
     }
-  }, [name]);
+  }, [name, tabName, setTabName, tabInfo.key, icon]);
 
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return <></>;

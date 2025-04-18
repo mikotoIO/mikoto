@@ -1,7 +1,7 @@
 import { DockviewApi, DockviewReadyEvent, DockviewReact, IDockviewPanel, IDockviewPanelProps } from 'dockview-react';
-import { ReactNode, Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
+import { ReactNode, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useRecoilCallback } from 'recoil';
 
 import { WelcomePanel } from '@/components/WelcomePanel';
 import { ErrorSurface, LoadingSurface, surfaceMap } from '@/components/surfaces';
@@ -76,6 +76,8 @@ export const DockViewSurface = ({ children }: TabContainerProps) => {
           params: { tab },
         });
       }
+      
+      // We'll handle updating panel titles in a separate effect
     });
     
     // Set active panel if activeTabId is set
@@ -89,6 +91,36 @@ export const DockViewSurface = ({ children }: TabContainerProps) => {
     // Update prevTabsRef
     prevTabsRef.current = [...tabs];
   }, [tabs, activeTabId]);
+  
+  // Update panel titles from tab names
+  const updatePanelTitles = useRecoilCallback(({ snapshot }) => async () => {
+    const api = dockviewRef.current.api;
+    if (!api) return;
+    
+    // For each panel, update its title from the corresponding tab name in Recoil state
+    tabs.forEach(async (tab) => {
+      const panelId = `${tab.kind}/${tab.key}`;
+      const panel = api.getPanel(panelId);
+      if (panel && panel.api.setTitle) {
+        // Get the tab name from Recoil state
+        const tabNameValue = await snapshot.getPromise(tabNameFamily(panelId));
+        if (tabNameValue?.name) {
+          panel.api.setTitle(tabNameValue.name);
+        }
+      }
+    });
+  }, [tabs]);
+  
+  // Set up an interval to update panel titles
+  useEffect(() => {
+    // Initial update
+    updatePanelTitles();
+    
+    // Update every second
+    const intervalId = setInterval(updatePanelTitles, 1000);
+    
+    return () => clearInterval(intervalId);
+  }, [updatePanelTitles]);
 
   const onReady = useCallback((event: DockviewReadyEvent) => {
     dockviewRef.current.api = event.api;
@@ -100,7 +132,11 @@ export const DockViewSurface = ({ children }: TabContainerProps) => {
         id: panelId,
         component: 'surface',
         params: { tab },
+        title: tab.kind,
       });
+      
+      // Panel is initially set up with the kind as title.
+      // Each component will update its own title via TabName component
     });
 
     // Store initial tabs
@@ -139,13 +175,7 @@ export const DockViewSurface = ({ children }: TabContainerProps) => {
         onReady={onReady}
         className="dockview-theme-light"
       />
-      {tabs.map(tab => (
-        <TabName
-          key={`${tab.kind}/${tab.key}`}
-          name={tab.kind}
-          icon={undefined}
-        />
-      ))}
+      {/* TabName components will be rendered by each surface component with the correct name and icon */}
     </div>
   );
 };

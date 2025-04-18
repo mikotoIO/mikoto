@@ -10,6 +10,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 
 import { CommandMenuKit } from '@/components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
+import { DockViewSurface } from '@/components/DockViewSurface';
 import { faMikoto } from '@/components/icons';
 import { RESIZABLE_DISABLES, Sidebar } from '@/components/sidebars/Base';
 import { FriendSidebar } from '@/components/sidebars/FriendSidebar';
@@ -20,15 +21,9 @@ import {
   LoadingSurface,
   surfaceMap,
 } from '@/components/surfaces';
-import { TabBarButton, TabbedView } from '@/components/tabs';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState, workspaceState } from '@/store';
-import {
-  SurfaceNode,
-  TabContext,
-  Tabable,
-  surfaceStore,
-} from '@/store/surface';
+import { surfaceStore, Tabable } from '@/store/surface';
 
 import { MikotoClientProvider } from './MikotoClientProvider';
 import { WindowBar } from './WindowBar';
@@ -68,69 +63,27 @@ const LeftBar = styled.div`
   }
 `;
 
-const SurfaceGroupContainer = styled.div`
-  display: flex;
+const DockViewContainer = styled.div`
   height: 100%;
   flex: 1;
-  & > div:not(:first-of-type) {
-    margin-left: 8px;
+  
+  .dockview-theme-light {
+    --dv-background-color: var(--chakra-colors-surface);
+    --dv-tab-active-background-color: var(--chakra-colors-surface);
+    --dv-tab-active-foreground-color: var(--chakra-colors-gray-200);
+    --dv-tab-inactive-background-color: var(--chakra-colors-subsurface);
+    --dv-tab-inactive-foreground-color: var(--chakra-colors-gray-300);
+    --dv-tab-border-bottom-color: var(--chakra-colors-primary);
+    --dv-separator-border: 1px solid var(--chakra-colors-gray-700);
   }
 `;
-
-const SurfaceGroup = observer(
-  ({ surfaceNode }: { surfaceNode: SurfaceNode }) => {
-    if ('children' in surfaceNode) {
-      const [head, ...tails] = surfaceNode.children;
-      return (
-        <SurfaceGroupContainer>
-          <SurfaceGroup surfaceNode={head} />
-          {tails.map((child, idx) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <Resizable
-              className="resizable"
-              key={idx}
-              enable={{ ...RESIZABLE_DISABLES, left: true }}
-            >
-              <SurfaceGroup surfaceNode={child} />
-            </Resizable>
-          ))}
-        </SurfaceGroupContainer>
-      );
-    }
-    return (
-      <TabbedView tabs={surfaceNode.tabs} surfaceNode={surfaceNode}>
-        {surfaceNode.tabs.map((tab, idx) => (
-          <TabContext.Provider
-            value={{ key: `${tab.kind}/${tab.key}` }}
-            key={`${tab.kind}/${tab.key}`}
-          >
-            <div
-              className="singletab"
-              style={
-                idx !== surfaceNode.index ? { display: 'none' } : undefined
-              }
-            >
-              <Box h="100%">
-                <ErrorBoundary FallbackComponent={ErrorSurface}>
-                  <Suspense fallback={<LoadingSurface />}>
-                    <TabViewSwitch tab={tab} />
-                  </Suspense>
-                </ErrorBoundary>
-              </Box>
-            </div>
-          </TabContext.Provider>
-        ))}
-      </TabbedView>
-    );
-  },
-);
 
 const SidebarRest = styled.div`
   flex-grow: 1;
   -webkit-app-region: drag;
 `;
 
-function AppView() {
+const AppView = observer(() => {
   const leftSidebar = useRecoilValue(treebarSpaceState);
   const mikoto = useMikoto();
   const [workspace, setWorkspace] = useRecoilState(workspaceState);
@@ -167,7 +120,9 @@ function AppView() {
           )}
         </div>
       </LeftBar>
-      <SurfaceGroup surfaceNode={surfaceStore.node} />
+      <DockViewContainer>
+        <DockViewSurface tabs={surfaceStore.tabs} />
+      </DockViewContainer>
       {workspace.rightOpen && (
         <LeftBar>
           <div className="bars">
@@ -188,7 +143,7 @@ function AppView() {
       )}
     </AppContainer>
   );
-}
+});
 
 function Fallback() {
   return (

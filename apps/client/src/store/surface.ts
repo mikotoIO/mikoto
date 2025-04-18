@@ -1,5 +1,6 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { action, autorun, makeAutoObservable, runInAction } from 'mobx';
+import { IDockviewPanelHeaderProps, IGridviewPanelProps } from 'dockview-react';
+import { autorun, makeAutoObservable, runInAction } from 'mobx';
 import { createContext } from 'react';
 import { atomFamily } from 'recoil';
 
@@ -9,38 +10,86 @@ export type Tabable = TabBaseType & {
   key: string;
 };
 
-export interface SurfaceLeaf {
-  index: number;
-  tabs: Tabable[];
+export interface DockViewLayout {
+  layout: string;
+  activeGroup?: string;
 }
-
-export interface MultiSurface {
-  direction: 'horizontal' | 'vertical';
-  children: SurfaceNode[];
-}
-
-export type SurfaceNode = SurfaceLeaf | MultiSurface;
 
 export class SurfaceStore {
-  node: SurfaceNode;
+  tabs: Tabable[];
+  layout: DockViewLayout | null;
+  activeTabId: string | null;
 
   constructor() {
-    this.node = {
-      index: 0,
-      tabs: [],
-    };
+    this.tabs = [];
+    this.layout = null;
+    this.activeTabId = null;
+    
     try {
-      const storedJson = localStorage.getItem('surface');
-      if (storedJson) {
-        this.node = JSON.parse(storedJson);
+      const storedTabs = localStorage.getItem('surface_tabs');
+      const storedLayout = localStorage.getItem('surface_layout');
+      const storedActiveTab = localStorage.getItem('surface_active_tab');
+      
+      if (storedTabs) {
+        this.tabs = JSON.parse(storedTabs);
+      }
+      
+      if (storedLayout) {
+        this.layout = JSON.parse(storedLayout);
+      }
+      
+      if (storedActiveTab) {
+        this.activeTabId = storedActiveTab;
       }
     } catch (_) {
       // ignore
     }
+    
     makeAutoObservable(this);
+    
     autorun(() => {
-      localStorage.setItem('surface', JSON.stringify(this.node));
+      localStorage.setItem('surface_tabs', JSON.stringify(this.tabs));
+      if (this.layout) {
+        localStorage.setItem('surface_layout', JSON.stringify(this.layout));
+      }
+      if (this.activeTabId) {
+        localStorage.setItem('surface_active_tab', this.activeTabId);
+      }
     });
+  }
+
+  getTab(id: string): Tabable | undefined {
+    const [kind, key] = id.split('/');
+    return this.tabs.find(tab => tab.kind === kind && tab.key === key);
+  }
+
+  addTab(tab: Tabable) {
+    const existingTabIndex = this.tabs.findIndex(
+      t => t.kind === tab.kind && t.key === tab.key
+    );
+    
+    if (existingTabIndex === -1) {
+      this.tabs.push(tab);
+    }
+    
+    this.activeTabId = `${tab.kind}/${tab.key}`;
+  }
+
+  removeTab(id: string) {
+    const [kind, key] = id.split('/');
+    const index = this.tabs.findIndex(tab => tab.kind === kind && tab.key === key);
+    
+    if (index !== -1) {
+      this.tabs.splice(index, 1);
+    }
+  }
+
+  setActiveTab(id: string) {
+    this.activeTabId = id;
+  }
+
+  updateLayout(layout: DockViewLayout) {
+    this.layout = layout;
   }
 }
 
@@ -62,81 +111,29 @@ export const TabContext = createContext<{ key: string }>({
   key: '',
 });
 
-export const pruneNode = action((node: SurfaceNode): SurfaceNode => {
-  // if leaf, return self
-  if ('tabs' in node) {
-    return node;
-  }
-  // nodes with only one child can be reduced to a its child
-  if (node.children.length === 1) {
-    return pruneNode(node.children[0]);
-  }
-  // remove empty children
-  node.children = node.children.filter((x) => 'children' in x || x.tabs.length);
-  return node;
-});
-
-function getFirstNode(node: SurfaceNode): SurfaceLeaf {
-  if ('tabs' in node) {
-    return node;
-  }
-  return getFirstNode(node.children[0]);
-}
-
-export const splitNode = action(() => {
-  const node = getFirstNode(surfaceStore.node);
-
-  const newSurface = {
-    index: node.index,
-    tabs: [...node.tabs],
-  };
-
-  if ('children' in surfaceStore.node) {
-    surfaceStore.node.children.push(newSurface);
-    return;
-  }
-
-  surfaceStore.node = {
-    direction: 'horizontal',
-    children: [
-      {
-        index: node.index,
-        tabs: node.tabs,
-      },
-      newSurface,
-    ],
-  };
-});
-
 export function useTabkit() {
-  const node = getFirstNode(surfaceStore.node);
   function openNewChannel(ch: Tabable) {
     runInAction(() => {
-      if (!node.tabs.some((x) => x.kind === ch.kind && x.key === ch.key)) {
-        node.tabs.push(ch);
-      }
-      node.index = node.tabs.length - 1;
+      surfaceStore.addTab(ch);
     });
   }
 
   return {
     openNewChannel,
     openTab(tab: Tabable, openNew: boolean = false) {
-      if (node.tabs.length === 0) {
+      if (surfaceStore.tabs.length === 0 || openNew) {
         openNewChannel(tab);
         return;
       }
 
       runInAction(() => {
-        const idx = node.tabs.findIndex(
-          (n) => n.kind === tab.kind && n.key === tab.key,
-        );
-        if (idx !== -1) {
-          node.index = idx;
-        } else if (openNew) {
-          openNewChannel(tab);
+        const tabId = `${tab.kind}/${tab.key}`;
+        const existingTab = surfaceStore.getTab(tabId);
+        
+        if (existingTab) {
+          surfaceStore.setActiveTab(tabId);
         } else {
-          node.tabs[node.index] = tab;
+          surfaceStore.addTab(tab);
         }
       });
     },

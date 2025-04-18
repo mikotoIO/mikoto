@@ -17,7 +17,9 @@ import { Provider as ChakraProvider } from '@/components/ui/provider';
 import { env } from '@/env';
 import reportWebVitals from '@/reportWebVitals';
 
-// eslint-disable-next-line import/no-relative-packages
+// Import styles
+import 'dockview-react/dist/styles/dockview.css';
+import './dockview.css';
 import './fonts.css';
 import { queryClient } from './functions/queryClient';
 import './i18n';

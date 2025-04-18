@@ -34,6 +34,7 @@ export function Sidebar({ children, position, size, onResize }: SidebarProps) {
       onResizeStop={(_, _1, _2, d) => {
         onResize?.(d);
       }}
+      style={{ flexShrink: 0 }}
     >
       <Box
         className="sidebar"
@@ -41,6 +42,7 @@ export function Sidebar({ children, position, size, onResize }: SidebarProps) {
         overflowY="auto"
         borderX="1px solid"
         borderColor="gray.650"
+        width="100%"
       >
         {children}
       </Box>

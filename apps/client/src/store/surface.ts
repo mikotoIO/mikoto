@@ -82,6 +82,9 @@ export function useTabkit() {
 
   return {
     openNewChannel,
+    getTabs() {
+      return tabs;
+    },
     openTab(tab: Tabable, openNew: boolean = false) {
       if (tabs.length === 0 || openNew) {
         openNewChannel(tab);

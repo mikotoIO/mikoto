@@ -35,6 +35,7 @@ const AppContainer = styled.div`
   width: 100%;
   height: 100%;
   flex: 1;
+  overflow: hidden;
 `;
 
 function TabViewSwitch({ tab }: { tab: Tabable }) {
@@ -50,6 +51,7 @@ const LeftBar = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
+  flex-shrink: 0;
 
   .top {
     display: flex;
@@ -65,6 +67,7 @@ const LeftBar = styled.div`
 const DockViewContainer = styled.div`
   height: 100%;
   flex: 1;
+  min-width: 0; /* Prevent flex items from overflowing */
   
   .dockview-theme-light {
     --dv-background-color: var(--chakra-colors-surface);
@@ -122,9 +125,9 @@ const AppView = () => {
       <DockViewContainer>
         <DockViewSurface />
       </DockViewContainer>
-      {workspace.rightOpen && (
-        <LeftBar>
-          <div className="bars">
+      <LeftBar>
+        <div className="bars">
+          {workspace.rightOpen ? (
             <Sidebar
               position="right"
               size={workspace.right}
@@ -137,9 +140,30 @@ const AppView = () => {
             >
               {space && <MemberListSidebar space={space} />}
             </Sidebar>
-          </div>
-        </LeftBar>
-      )}
+          ) : (
+            <Box 
+              as="button" 
+              h="100%" 
+              w="32px" 
+              bg="subsurface" 
+              borderLeft="1px solid" 
+              borderColor="gray.650"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              flexShrink={0}
+              onClick={() => {
+                setWorkspace((ws) => ({
+                  ...ws,
+                  rightOpen: true,
+                }));
+              }}
+            >
+              <FontAwesomeIcon icon={faBarsStaggered} />
+            </Box>
+          )}
+        </div>
+      </LeftBar>
     </AppContainer>
   );
 };

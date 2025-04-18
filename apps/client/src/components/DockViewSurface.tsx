@@ -1,5 +1,5 @@
 import { DockviewApi, DockviewReadyEvent, DockviewReact, IDockviewPanel, IDockviewPanelProps } from 'dockview-react';
-import { ReactNode, Suspense, useCallback, useMemo, useRef } from 'react';
+import { ReactNode, Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
@@ -45,6 +45,8 @@ export const DockViewSurface = ({ children }: TabContainerProps) => {
   const dockviewRef = useRef<{ api: DockviewApi | null }>({ api: null });
   const tabkit = useTabkit();
   const setTabs = useRecoilState(tabsState)[1];
+  // Keep track of the last processed tabs array
+  const prevTabsRef = useRef<Tabable[]>([]);
   
   const components = useMemo(() => {
     return {
@@ -52,10 +54,46 @@ export const DockViewSurface = ({ children }: TabContainerProps) => {
     };
   }, []);
 
+  // Process any tab changes - adding new tabs or updating active tab
+  useEffect(() => {
+    const api = dockviewRef.current.api;
+    if (!api) return;
+    
+    // Check for new tabs that need to be added
+    const prevTabs = prevTabsRef.current;
+    tabs.forEach(tab => {
+      const panelId = `${tab.kind}/${tab.key}`;
+      
+      // Check if this is a new tab that needs to be added
+      const isNewTab = !prevTabs.some(
+        prevTab => prevTab.kind === tab.kind && prevTab.key === tab.key
+      );
+      
+      if (isNewTab) {
+        api.addPanel({
+          id: panelId,
+          component: 'surface',
+          params: { tab },
+        });
+      }
+    });
+    
+    // Set active panel if activeTabId is set
+    if (activeTabId) {
+      const panel = api.getPanel(activeTabId);
+      if (panel) {
+        panel.api.setActive();
+      }
+    }
+    
+    // Update prevTabsRef
+    prevTabsRef.current = [...tabs];
+  }, [tabs, activeTabId]);
+
   const onReady = useCallback((event: DockviewReadyEvent) => {
     dockviewRef.current.api = event.api;
     
-    // Set up panels for tabs
+    // Set up panels for initial tabs
     tabs.forEach(tab => {
       const panelId = `${tab.kind}/${tab.key}`;
       event.api.addPanel({
@@ -65,6 +103,9 @@ export const DockViewSurface = ({ children }: TabContainerProps) => {
       });
     });
 
+    // Store initial tabs
+    prevTabsRef.current = [...tabs];
+
     // Listen for any layout changes
     event.api.onDidLayoutChange(() => {
       // If all panels are closed, update our tab state
@@ -72,7 +113,7 @@ export const DockViewSurface = ({ children }: TabContainerProps) => {
         setTabs([]);
       }
     });
-  }, [tabs, tabkit, activeTabId, setTabs]);
+  }, [tabs, setTabs]);
 
   // Render panel titles
   const renderTabTitle = useCallback((id: string) => {

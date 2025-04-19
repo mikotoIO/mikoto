@@ -100,6 +100,7 @@ export class MemberManager extends CachedManager<MikotoMember> {
     res.forEach((member) =>
       this._insert(new MikotoMember(member, this.client)),
     );
+    return res;
   }
 
   static _subscribe(client: MikotoClient) {

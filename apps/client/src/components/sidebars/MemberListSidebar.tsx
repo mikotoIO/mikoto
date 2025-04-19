@@ -4,9 +4,10 @@ import { faBarsStaggered, faCrown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoMember, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { observer } from 'mobx-react-lite';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useSnapshot } from 'valtio';
 
 import { contextMenuState, useContextMenu } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';
@@ -94,23 +95,45 @@ const HeaderContainer = styled.div`
   font-weight: bold;
 `;
 
-export const MemberListSidebar = ({ space }: { space: MikotoSpace }) => {
-  useFetchMember(space);
-  const [workspace, setWorkspace] = useRecoilState(workspaceState);
+export const MemberListSidebar = observer(
+  ({ space }: { space: MikotoSpace }) => {
+    const { isLoading, error } = useFetchMember(space);
+    const [workspace, setWorkspace] = useRecoilState(workspaceState);
 
-  const spaceMembers = Array.from(space.members?.cache.values() ?? []).toSorted(
-    (a, b) => a.user.name.localeCompare(b.user.name),
-  );
+    const fetchMembersManually = async () => {
+      console.log('Manually fetching members');
+      try {
+        const members = await space.members.list();
+        console.log(`Manually fetched ${members.length} members`);
+      } catch (err) {
+        console.error('Error manually fetching members:', err);
+      }
+    };
 
-  return (
-    <StyledMemberListSidebar>
-      {spaceMembers && (
+    // Force fetch on first render
+    useEffect(() => {
+      fetchMembersManually();
+    }, []);
+
+    // Use a snapshot of the members cache to ensure reactivity
+    const members = useSnapshot(space.members.cache);
+    const spaceMembers = Array.from(members.values() ?? []).toSorted((a, b) =>
+      a.user.name.localeCompare(b.user.name),
+    );
+
+    return (
+      <StyledMemberListSidebar>
         <Virtuoso
           components={{
             Header() {
               return (
                 <HeaderContainer>
-                  <div>Members</div>
+                  <div
+                    onClick={fetchMembersManually}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Members ({isLoading ? 'Loading' : spaceMembers.length})
+                  </div>
                   <TabBarButton
                     onClick={() => {
                       setWorkspace((ws) => ({
@@ -129,7 +152,7 @@ export const MemberListSidebar = ({ space }: { space: MikotoSpace }) => {
           data={spaceMembers}
           itemContent={(idx, member) => <MemberElement member={member} />}
         />
-      )}
-    </StyledMemberListSidebar>
-  );
-};
+      </StyledMemberListSidebar>
+    );
+  },
+);

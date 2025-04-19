@@ -41,6 +41,11 @@ export class MikotoSpace extends ZSchema(SimpleSpaceExt) {
     this.roles = new RoleManager(this, base.roles);
     this.members = ref(new MemberManager(this));
 
+    // Prefetch members when space is created
+    setTimeout(() => {
+      this.members.list();
+    }, 0);
+
     const instance = proxy(this);
     client.spaces._insert(instance);
     return instance;

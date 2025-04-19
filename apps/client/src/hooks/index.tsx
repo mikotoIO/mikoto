@@ -1,5 +1,5 @@
 import { AuthClient, MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Snapshot, getVersion, proxy, useSnapshot } from 'valtio';
 
 import { useInterval } from './useInterval';
@@ -21,9 +21,40 @@ export function useAuthClient() {
 export function useEvent() {}
 
 export const useFetchMember = (space: MikotoSpace) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  
   useEffect(() => {
-    space.members.list();
-  }, [space.id]);
+    let isMounted = true;
+    
+    const fetchMembers = async () => {
+      if (!space?.id) return;
+      
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        // Force a direct fetch from server
+        await space.members.list();
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err as Error);
+          setIsLoading(false);
+        }
+      }
+    };
+    
+    fetchMembers();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [space?.id]);
+  
+  return { isLoading, error };
 };
 
 const SENTINEL_PROXY = proxy({ __NOTHING__: true });

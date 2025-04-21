@@ -178,6 +178,6 @@
     "source-map-explorer": "^2.5.2",
     "ts-jest": "^29.1.0",
     "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "^0.18.0"
+    "vitest": "^3.1.1"
   }
 }

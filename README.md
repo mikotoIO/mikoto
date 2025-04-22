@@ -53,6 +53,7 @@ Prerequisites:
 - Node.js 22+
 - sqlx CLI (`cargo install sqlx-cli --no-default-features --features rustls,postgres`)
 
+
 ```sh
 # use corepack
 corepack enable
@@ -123,18 +124,6 @@ All Mikoto services use ports in the `351X` or `351XX` range to avoid conflicts 
 | LiveKit        | 35105, 35106, 35107  | Real-time audio/video            |
 | MailHog        | 35108, 35109         | Development mail server          |
 | Meilisearch    | 35110                | Search engine                    |
-
-## Project Structure
-
-| Package              | Description               | Stack               |
-| -------------------- | ------------------------- | ------------------- |
-| `apps/superego`      | Core server for Mikoto    | Rust + Axum + SQLX  |
-| `apps/content-proxy` | S3 Proxy                  | Rust                |
-| `apps/client`        | The web client for Mikoto | React               |
-| `apps/mobile`        | Mobile client for Mikoto  | React Native        |
-| `apps/desktop`       | Desktop client for Mikoto | Electron            |
-| `packages/mikoto.js` | Mikoto API for JS         | TypeScript + Valtio |
-| `packages/permcheck` | Permisson Calculator      | TypeScript          |
 
 ## License
 

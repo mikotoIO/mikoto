@@ -3,7 +3,7 @@ use sqlx::{
     migrate::MigrateDatabase,
     postgres::{PgPool, Postgres},
 };
-use std::env;
+use std::{env, process::Command};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -23,6 +23,29 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Running migrations...");
     sqlx::migrate!("./migrations").run(&pool).await?;
     println!("Migrations completed successfully!");
+
+    // Dump schema to schema.sql
+    println!("Dumping database schema...");
+    let output = Command::new("docker")
+        .args(&[
+            "exec",
+            "mikoto-postgres-1", // TODO: add a better check for the database container instead of trying to get it from docker-compose
+            "pg_dump",
+            "-d",
+            "mikoto",
+            "--schema-only",
+        ])
+        .output()?;
+
+    if output.status.success() {
+        std::fs::write("schema.sql", output.stdout)?;
+        println!("Schema dumped to schema.sql");
+    } else {
+        eprintln!(
+            "Failed to dump schema: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
 
     pool.close().await;
     Ok(())

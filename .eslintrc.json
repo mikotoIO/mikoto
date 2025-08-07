@@ -6,6 +6,7 @@
   },
   "rules": {
     "max-classes-per-file": 0,
+    "import/extensions": "off",
     "@typescript-eslint/lines-between-class-members": "off",
     "react/react-in-jsx-scope": "off",
     "react/jsx-no-constructed-context-values": "off",
@@ -29,6 +30,8 @@
     "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/no-redeclare": "off",
     "no-use-before-define": "off",
-    "react/style-prop-object": "off"
+    "react/style-prop-object": "off",
+    "no-underscore-dangle": "off", // Disabled because MikotoJS makes heavy use of this
+    "no-constructor-return": "off"
   }
 }

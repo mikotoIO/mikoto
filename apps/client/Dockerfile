@@ -10,6 +10,13 @@ WORKDIR /app/apps/client
 RUN ["pnpm", "build"]
 
 FROM nginx:stable-alpine
+
+ARG PUBLIC_AUTH_URL
+ARG PUBLIC_SERVER_URL
+ARG PUBLIC_CAPTCHA_KEY
+ARG PUBLIC_FRONTEND_URL
+ARG PUBLIC_MEDIASERVER_URL
+
 COPY --from=build /app/apps/client/dist /usr/share/nginx/html
 COPY ./apps/client/nginx.conf /etc/nginx/conf.d/default.conf
 

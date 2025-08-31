@@ -3,9 +3,9 @@ FROM node:20-alpine as build
 WORKDIR /app
 
 RUN corepack enable
-COPY ["package.json", "./"]
-RUN pnpm install --frozen-lockfile
+# COPY ["package.json", "./"]
 COPY . .
+RUN pnpm install --frozen-lockfile
 
 RUN ["pnpm", "build"]
 

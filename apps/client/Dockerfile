@@ -4,10 +4,10 @@ WORKDIR /app
 
 RUN corepack enable
 COPY ["package.json", "./"]
-RUN yarn
+RUN pnpm install --frozen-lockfile
 COPY . .
 
-RUN ["yarn", "build"]
+RUN ["pnpm", "build"]
 
 FROM nginx:stable-alpine
 COPY --from=build /app/dist /usr/share/nginx/html

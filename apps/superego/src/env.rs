@@ -5,7 +5,7 @@ pub struct Env {
     pub database_url: String,
     pub redis_url: String,
     pub issuer: String,
-    pub port: u16,
+    pub server_port: u16,
 
     // JWT
     pub secret: String,

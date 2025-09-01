@@ -6,6 +6,7 @@ use aide::{
 };
 use axum::{Extension, Json, Router};
 use channels::{documents::collab_ws, voice};
+use http::header::{AUTHORIZATION, CONTENT_TYPE};
 use router::AppRouter;
 use schemars::JsonSchema;
 use serde::Serialize;
@@ -103,5 +104,10 @@ pub fn router() -> Router {
             ..OpenApi::default()
         })
         .nest("/collab", collab_ws())
-        .layer(CorsLayer::permissive())
+        .layer(
+            CorsLayer::new()
+                .allow_origin(tower_http::cors::Any)
+                .allow_methods(tower_http::cors::Any)
+                .allow_headers([AUTHORIZATION, CONTENT_TYPE]),
+        )
 }

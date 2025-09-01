@@ -53,7 +53,6 @@ Prerequisites:
 - Node.js 22+
 - sqlx CLI (`cargo install sqlx-cli --no-default-features --features rustls,postgres`)
 
-
 ```sh
 # use corepack
 corepack enable
@@ -107,23 +106,23 @@ All Mikoto services use ports in the `351X` or `351XX` range to avoid conflicts 
 
 ### Application Services (351X)
 
-| Service        | Port | Description                      |
-| -------------- | ---- | -------------------------------- |
-| Superego       | 3510 | API server                       |
-| Collab         | 3512 | Collaboration service            |
-| MediaServer    | 3513 | Media handling service           |
-| Client         | 3519 | Web client (served via nginx)    |
+| Service     | Port | Description            |
+| ----------- | ---- | ---------------------- |
+| Client      | 3510 | Web client             |
+| Superego    | 3511 | API server             |
+| Collab      | 3512 | Collaboration service  |
+| MediaServer | 3513 | Media handling service |
 
 ### Infrastructure Services (351XX)
 
-| Service        | Ports                | Description                      |
-| -------------- | -------------------- | -------------------------------- |
-| PostgreSQL     | 35101                | Database                         |
-| Redis          | 35102                | Cache & pub/sub                  |
-| MinIO (S3)     | 35103, 35104         | Object storage                   |
-| LiveKit        | 35105, 35106, 35107  | Real-time audio/video            |
-| MailHog        | 35108, 35109         | Development mail server          |
-| Meilisearch    | 35110                | Search engine                    |
+| Service     | Ports               | Description             |
+| ----------- | ------------------- | ----------------------- |
+| PostgreSQL  | 35101               | Database                |
+| Redis       | 35102               | Cache & pub/sub         |
+| MinIO (S3)  | 35103, 35104        | Object storage          |
+| LiveKit     | 35105, 35106, 35107 | Real-time audio/video   |
+| MailHog     | 35108, 35109        | Development mail server |
+| Meilisearch | 35110               | Search engine           |
 
 ## License
 

@@ -52,6 +52,7 @@ Prerequisites:
 - Rust 1.81+
 - Node.js 22+
 - sqlx CLI (`cargo install sqlx-cli --no-default-features --features rustls,postgres`)
+- Moonrepo
 
 ```sh
 # use corepack
@@ -73,7 +74,7 @@ docker-compose up
 
 ### Development
 
-Mikoto uses a turborepo-based monorepo.
+Mikoto uses a Moon-based monorepo.
 
 Use Docker Compose to run the necessary services.
 

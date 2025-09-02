@@ -29,6 +29,5 @@ mikoto/
     ├── mikoto.py/            # Python client library
     ├── lexical-markdown/     # Custom markdown editor based on Lexical
     ├── tsconfig/             # Shared TypeScript configurations
-    ├── permcheck/            # Permission checking utilities
-    └── muonic/               # SQL query builder for Rust
+    └── permcheck/            # Permission checking utilities
 ```

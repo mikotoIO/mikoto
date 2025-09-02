@@ -20,8 +20,4 @@ jobs:
         with:
           node-version: 22
           cache: 'pnpm'
-      - uses: 'actions/checkout@v4'
-        with:
-          fetch-depth: 0
-      - uses: 'moonrepo/setup-toolchain@v0'
       - run: 'moon ci :typecheck'

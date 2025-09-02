@@ -7,9 +7,7 @@
     "typecheck": "moon :typecheck",
     "test": "moon :test",
     "lint": "eslint . --ext .ts,.tsx --fix",
-    "format": "prettier --write \"{apps,packages,docs}/**/*.{ts,tsx,md}\"",
-    "setup:server": "node .scripts/setup-env.js --force && node .scripts/setup-minio.js && yarn compose && yarn workspace server prisma migrate dev",
-    "dev": "yarn compose && yarn workspaces foreach -ptRvi --from '{server,client}' run dev"
+    "format": "prettier --write \"{apps,packages,docs}/**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",

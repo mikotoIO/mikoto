@@ -1,15 +1,17 @@
 # Mikoto Project Guide
 
 ## Commands
+
 - **Build**: `pnpm build` (all packages), `vite build` (client)
 - **Dev**: `pnpm start` (all services), `vite` (client)
 - **Test**: `jest` (client), `vitest run` (mikoto.js), `cargo test` (Rust)
 - **Single Test**: `jest -t "test name"`, `vitest run test.spec.ts`
 - **Lint**: `pnpm lint`, `cargo clippy`
-- **Typecheck**: `pnpm typecheck`, `tsc --noEmit`
+- **Typecheck**: `moon :typecheck` (uses tsc --noEmit for TS, uses cargo check for Rust)
 - **Format**: `pnpm format` (runs prettier)
 
 ## Code Style
+
 - **TypeScript**: Strict mode, Airbnb style guidelines
 - **Imports**: Sorted using @trivago/prettier-plugin-sort-imports
 - **Formatting**: Single quotes, trailing commas

@@ -1,0 +1,3 @@
+node:
+  packageManager: 'pnpm'
+  inferTasksFromScripts: true

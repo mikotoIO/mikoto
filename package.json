@@ -2,7 +2,6 @@
   "name": "mikoto-monorepo",
   "version": "0.0.0",
   "private": true,
-
   "scripts": {
     "compose": "docker compose up -d",
     "build": "turbo run build",
@@ -27,7 +26,6 @@
     "npm": ">=7.0.0",
     "node": ">=14.0.0"
   },
-  "packageManager": "pnpm@10.14.0",
   "dependencies": {
     "winston-transport": "^4.6.0"
   }

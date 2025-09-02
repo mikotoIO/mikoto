@@ -3,7 +3,7 @@ use sqlx::{
     migrate::MigrateDatabase,
     postgres::{PgPool, Postgres},
 };
-use std::{env, process::Command};
+use std::{env, path::Path, process::Command};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -38,7 +38,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .output()?;
 
     if output.status.success() {
-        std::fs::write("schema.sql", output.stdout)?;
+        std::fs::write(
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("./schema.sql"),
+            output.stdout,
+        )?;
         println!("Schema dumped to schema.sql");
     } else {
         eprintln!(

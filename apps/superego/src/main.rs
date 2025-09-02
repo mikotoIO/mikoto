@@ -35,7 +35,7 @@ async fn main() {
     let app = routes::router();
     let app = NormalizePathLayer::trim_trailing_slash().layer(app);
 
-    let addr = format!("0.0.0.0:{}", env.port);
+    let addr = format!("0.0.0.0:{}", env.server_port);
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     info!(
         "👉⚡🪙  Mikoto API server is running on on http://{}",

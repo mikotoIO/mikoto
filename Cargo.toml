@@ -1,9 +1,3 @@
 [workspace]
 resolver = "2"
-members = [
-    "apps/content-proxy",
-    "apps/superego",
-    "packages/muonic",
-    "packages/muonic/macros",
-    "packages/muonic/core",
-]
+members = ["apps/content-proxy", "apps/superego"]

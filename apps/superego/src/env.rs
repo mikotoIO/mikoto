@@ -2,10 +2,13 @@ use std::sync::OnceLock;
 
 #[derive(Deserialize, Debug)]
 pub struct Env {
+    pub mikoto_env: MikotoMode,
+
     pub database_url: String,
     pub redis_url: String,
     pub issuer: String,
     pub server_port: u16,
+    pub automigrate: Option<bool>,
 
     // JWT
     pub secret: String,
@@ -47,6 +50,14 @@ pub struct S3Env {
     pub bucket: String,
     pub use_ssl: bool,
     pub port: Option<u16>,
+}
+
+#[derive(Deserialize, Debug, Eq, PartialEq)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum MikotoMode {
+    Dev,
+    Test,
+    Production,
 }
 
 impl Env {

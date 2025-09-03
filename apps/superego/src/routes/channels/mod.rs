@@ -72,7 +72,7 @@ async fn create(
     emit_event(
         "channels.onCreate",
         &channel,
-        &format!("space:{}", space_id),
+        &format!("space:{space_id}"),
     )
     .await?;
 

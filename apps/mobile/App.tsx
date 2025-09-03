@@ -112,7 +112,7 @@ export default function App() {
         <ExpoStatusBar backgroundColor={theme.colors.N1000} style="light" />
 
         <View style={{ flex: 1, backgroundColor: theme.colors.N900 }}>
-          {/* @ts-expect-error */}
+          {/* @ts-expect-error I will replace this at some point when I fix the mobile app */}
           <SideMenu menu={<Explorer />} edgeHitWidth={400}>
             <MessageSurface />
           </SideMenu>

@@ -1,7 +1,12 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { IDockviewPanelHeaderProps, IGridviewPanelProps } from 'dockview-react';
 import { createContext } from 'react';
-import { atom, atomFamily, selector, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import {
+  atom,
+  atomFamily,
+  selector,
+  useRecoilState,
+  useRecoilValue,
+} from 'recoil';
 
 import type { TabBaseType } from '@/components/surfaces';
 
@@ -33,11 +38,13 @@ export const activeTabIdState = atom<string | null>({
 // Selector to get a tab by ID
 export const tabByIdSelector = selector({
   key: 'tabByIdSelector',
-  get: ({ get }) => (id: string) => {
-    const tabs = get(tabsState);
-    const [kind, key] = id.split('/');
-    return tabs.find(tab => tab.kind === kind && tab.key === key);
-  },
+  get:
+    ({ get }) =>
+    (id: string) => {
+      const tabs = get(tabsState);
+      const [kind, key] = id.split('/');
+      return tabs.find((tab) => tab.kind === kind && tab.key === key);
+    },
 });
 
 export interface TabNameProps {
@@ -60,12 +67,12 @@ export function useTabkit() {
   const [tabs, setTabs] = useRecoilState(tabsState);
   const [activeTabId, setActiveTabId] = useRecoilState(activeTabIdState);
   const getTabById = useRecoilValue(tabByIdSelector);
-  
+
   // Storage functions removed temporarily
   const saveTabsToStorage = (_newTabs: Tabable[]) => {
     // Removed localStorage persistence
   };
-  
+
   const saveActiveTabToStorage = (_tabId: string | null) => {
     // Removed localStorage persistence
   };
@@ -74,7 +81,7 @@ export function useTabkit() {
     const newTabs = [...tabs, ch];
     setTabs(newTabs);
     saveTabsToStorage(newTabs);
-    
+
     const tabId = `${ch.kind}/${ch.key}`;
     setActiveTabId(tabId);
     saveActiveTabToStorage(tabId);
@@ -93,7 +100,7 @@ export function useTabkit() {
 
       const tabId = `${tab.kind}/${tab.key}`;
       const existingTab = getTabById(tabId);
-      
+
       if (existingTab) {
         setActiveTabId(tabId);
         saveActiveTabToStorage(tabId);
@@ -107,10 +114,12 @@ export function useTabkit() {
     },
     removeTab(id: string) {
       const [kind, key] = id.split('/');
-      const newTabs = tabs.filter(tab => !(tab.kind === kind && tab.key === key));
+      const newTabs = tabs.filter(
+        (tab) => !(tab.kind === kind && tab.key === key),
+      );
       setTabs(newTabs);
       saveTabsToStorage(newTabs);
-      
+
       // If we just removed the active tab, reset activeTabId if there are no tabs left
       if (activeTabId === id && newTabs.length === 0) {
         setActiveTabId(null);

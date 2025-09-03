@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TabName } from '@/components/tabs';
+import { checkNonNull } from '@/utils/assertNonNull';
 import { SettingSurface } from '@/views';
 
 interface BaseSettingsSurfaceProps {
@@ -35,7 +36,7 @@ export function BaseSettingsSurface({
         ))}
       </SettingSurface.Sidebar>
       <TabName
-        name={t(categories.find((x) => x.code === nav)?.tkey!)}
+        name={t(checkNonNull(categories.find((x) => x.code === nav)?.tkey))}
         icon={faCog}
       />
       {switcher(nav)}

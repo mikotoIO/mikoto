@@ -8,29 +8,31 @@ use tokio::sync::RwLock;
 
 use crate::error::Error;
 
+type CommandFilter<S> = Box<dyn Fn(Value, Arc<RwLock<S>>) -> BoxFuture<'static, Result<(), Error>> + Send + Sync>;
+type EventFilter<S> = Box<
+    dyn Fn(Value, Arc<RwLock<S>>) -> BoxFuture<'static, Result<Option<Value>, Error>>
+        + Send
+        + Sync,
+>;
+
 pub struct WebSocketRouter<S> {
     pub commands: BTreeMap<String, Schema>,
     pub events: BTreeMap<String, Schema>,
 
-    pub command_filters: BTreeMap<
-        String,
-        Box<dyn Fn(Value, Arc<RwLock<S>>) -> BoxFuture<'static, Result<(), Error>> + Send + Sync>,
-    >,
-
-    pub event_filters: BTreeMap<
-        String,
-        Box<
-            dyn Fn(Value, Arc<RwLock<S>>) -> BoxFuture<'static, Result<Option<Value>, Error>>
-                + Send
-                + Sync,
-        >,
-    >,
+    pub command_filters: BTreeMap<String, CommandFilter<S>>,
+    pub event_filters: BTreeMap<String, EventFilter<S>>,
 }
 
 #[derive(Serialize, Clone)]
 pub struct WebSocketRouterSchema {
     pub commands: BTreeMap<String, Schema>,
     pub events: BTreeMap<String, Schema>,
+}
+
+impl<S: 'static + Send + Sync> Default for WebSocketRouter<S> {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl<S: 'static + Send + Sync> WebSocketRouter<S> {
@@ -123,6 +125,6 @@ impl<S: 'static + Send + Sync> WebSocketRouter<S> {
 
 fn prefix_map<T>(prefix: &str, map: BTreeMap<String, T>) -> BTreeMap<String, T> {
     map.into_iter()
-        .map(|(k, v)| (format!("{}.{}", prefix, k), v))
+        .map(|(k, v)| (format!("{prefix}.{k}"), v))
         .collect()
 }

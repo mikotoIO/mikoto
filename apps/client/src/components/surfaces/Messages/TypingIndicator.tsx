@@ -1,9 +1,9 @@
 import { Box } from '@chakra-ui/react';
+import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useState } from 'react';
 
 import { useInterval, useMikoto } from '@/hooks';
 import { TypingDots } from '@/ui';
-import { MikotoChannel } from '@mikoto-io/mikoto.js';
 
 export interface Typer {
   timestamp: number;

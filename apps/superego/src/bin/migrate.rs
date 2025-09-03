@@ -27,7 +27,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Dump schema to schema.sql
     println!("Dumping database schema...");
     let output = Command::new("docker")
-        .args(&[
+        .args([
             "exec",
             "mikoto-postgres-1", // TODO: add a better check for the database container instead of trying to get it from docker-compose
             "pg_dump",

@@ -1,0 +1,7 @@
+tasks:
+  lint:
+    command: 'cargo clippy && pnpm eslint .'
+  lint.fix:
+    command: 'cargo clippy --fix --allow-dirty && pnpm eslint . --fix'
+  format:
+    command: 'cargo fmt && pnpm prettier --write . --log-level warn'

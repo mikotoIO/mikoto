@@ -23,6 +23,12 @@ async fn serve_api(Extension(api): Extension<OpenApi>) -> impl IntoApiResponse {
     Json(api)
 }
 
+impl<W: WebSocketState> Default for AppRouter<W> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<W: WebSocketState> AppRouter<W> {
     pub fn new() -> Self {
         let http = ApiRouter::new();

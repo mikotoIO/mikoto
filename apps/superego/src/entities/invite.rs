@@ -49,9 +49,9 @@ impl Invite {
             "#,
         )
         .bind(&self.id)
-        .bind(&self.space_id)
-        .bind(&self.created_at)
-        .bind(&self.creator_id)
+        .bind(self.space_id)
+        .bind(self.created_at)
+        .bind(self.creator_id)
         .execute(db)
         .await?;
         Ok(())

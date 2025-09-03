@@ -40,7 +40,10 @@ export function DateSeparator({ date }: { date: Date }) {
   );
 }
 
-export function showDateSeparator(message: MessageExt, prevMessage?: MessageExt) {
+export function showDateSeparator(
+  message: MessageExt,
+  prevMessage?: MessageExt,
+) {
   if (!prevMessage) return true;
   const prevDate = new Date(prevMessage.timestamp);
   const currDate = new Date(message.timestamp);

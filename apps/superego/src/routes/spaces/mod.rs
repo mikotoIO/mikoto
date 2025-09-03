@@ -61,7 +61,7 @@ async fn join_space(space: &SpaceExt, user_id: Uuid) -> Result<(), Error> {
         &format!("space:{}", space.base.id),
     )
     .await?;
-    emit_event("spaces.onCreate", space, &format!("user:{}", user_id)).await?;
+    emit_event("spaces.onCreate", space, &format!("user:{user_id}")).await?;
     Ok(())
 }
 

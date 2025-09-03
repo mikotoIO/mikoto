@@ -9,7 +9,6 @@ import { modalState } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';
 import { DialogContent } from '@/components/ui';
 import { useMikoto } from '@/hooks';
-import { treebarSpaceState } from '@/store';
 
 const ProfileContainer = styled.div`
   width: 640px;
@@ -41,7 +40,6 @@ const MikotoId = styled.h2`
 
 export function ProfileModal({ user }: { user: User }) {
   const mikoto = useMikoto();
-  const setSpace = useSetRecoilState(treebarSpaceState);
   const setModal = useSetRecoilState(modalState);
 
   return (
@@ -84,12 +82,9 @@ export function ProfileModal({ user }: { user: User }) {
                       // const dm = await mikoto.client.relations.openDm({
                       //   relationId: user.id,
                       // });
-                      const dm = await mikoto.rest['relations.openDm'](
-                        undefined,
-                        {
-                          params: { relationId: user.id },
-                        },
-                      );
+                      await mikoto.rest['relations.openDm'](undefined, {
+                        params: { relationId: user.id },
+                      });
                       // TODO: Rework DMs
                       // const spaceId = dm.space?.id;
                       // if (spaceId) {

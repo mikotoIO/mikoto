@@ -3,7 +3,7 @@ import { faRobot } from '@fortawesome/free-solid-svg-icons';
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
 
-export function BotSettingSurface({ botId }: { botId: string }) {
+export function BotSettingSurface({ botId: _botId }: { botId: string }) {
   return (
     <Surface padded scroll>
       <TabName icon={faRobot} name="Manage Bot" />

@@ -13,9 +13,7 @@ import {
   TRANSFORMERS,
 } from '@lexical/markdown';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
-import { CollaborationPlugin } from '@lexical/react/LexicalCollaborationPlugin';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -26,18 +24,12 @@ import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { EditorState } from 'lexical';
 import { debounce } from 'lodash';
-import {
-  PropsWithChildren,
-  createContext,
-  useCallback,
-  useRef,
-  useState,
-} from 'react';
+import { PropsWithChildren, useCallback, useRef } from 'react';
 import { proxy, useSnapshot } from 'valtio';
 
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
-import { useInterval, useMikoto } from '@/hooks';
+import { useMikoto } from '@/hooks';
 import { createTooltip } from '@/ui';
 
 import { EDITOR_NODES } from './editorNodes';
@@ -103,7 +95,7 @@ function DocumentReaderPlaceholder() {
       <Box mb={8}>
         <FontAwesomeIcon icon={faFileLines} fontSize="100px" opacity={0.2} />
       </Box>
-      <Box>It's a blank page for now.</Box>
+      <Box>It&apos;s a blank page for now.</Box>
       <Box>but also an empty canvas to write something beautiful.</Box>
     </Flex>
   );

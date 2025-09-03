@@ -1,4 +1,5 @@
 import { chakra } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import {
   faChevronDown,
   faChevronRight,
@@ -7,7 +8,6 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import styled from '@emotion/styled';
 
 import { ExplorerNode, nodeSort } from './explorerNode';
 
@@ -65,9 +65,9 @@ function Node(props: ExplorerNode & { path: string[] }) {
     type: 'CHANNEL',
     item: props,
   });
-  const [{ isOver }, drop] = useDrop<ExplorerNode, any, { isOver: boolean }>({
+  const [, drop] = useDrop<ExplorerNode, any, { isOver: boolean }>({
     accept: 'CHANNEL',
-    async drop(item) {
+    async drop() {
       // console.log(`Dropped ${item.text} on ${props.text}`);
     },
 

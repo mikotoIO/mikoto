@@ -11,7 +11,7 @@ pub fn bucket() -> &'static Bucket {
     BUCKET.get_or_init(|| {
         let protocol = if env.s3_use_ssl { "https" } else { "http" };
         let port = match &env.s3_port {
-            Some(x) => format!(":{}", x),
+            Some(x) => format!(":{x}"),
             None => "".to_owned(),
         };
 

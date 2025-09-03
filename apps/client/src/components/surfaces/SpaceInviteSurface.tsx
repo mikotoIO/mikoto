@@ -5,7 +5,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SponsoredFeature } from '../Sponsor';
 import { Surface } from '../Surface';
 
-export function SpaceInviteSurface({ inviteCode }: { inviteCode: string }) {
+export function SpaceInviteSurface({
+  inviteCode: _invite,
+}: {
+  inviteCode: string;
+}) {
   return (
     <Surface>
       <Box>

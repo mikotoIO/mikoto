@@ -1,6 +1,6 @@
-import SwaggerParser from "@apidevtools/swagger-parser";
-import type { OpenAPIObject, ReferenceObject } from "openapi3-ts/oas30";
-import { generateZodClientFromOpenAPI } from "openapi-zod-client";
+import SwaggerParser from '@apidevtools/swagger-parser';
+import type { OpenAPIObject, ReferenceObject } from 'openapi3-ts/oas30';
+import { generateZodClientFromOpenAPI } from 'openapi-zod-client';
 
 type ExtendedOpenAPIObject = OpenAPIObject & {
   websocket?: {
@@ -11,13 +11,13 @@ type ExtendedOpenAPIObject = OpenAPIObject & {
 
 const objectMap = <T, U>(
   obj: Record<string, T>,
-  fn: (value: T, key: string, index: number) => U
+  fn: (value: T, key: string, index: number) => U,
 ): Record<string, U> =>
   Object.fromEntries(
     Object.entries(obj).map(([key, value], index) => [
       key,
       fn(value, key, index),
-    ])
+    ]),
   );
 
 function generateWebsocket(openApiDoc: ExtendedOpenAPIObject) {
@@ -33,12 +33,12 @@ function generateWebsocket(openApiDoc: ExtendedOpenAPIObject) {
   return {
     commands: objectMap(commands, (value) => {
       return {
-        schema: value.$ref.split("/").pop(),
+        schema: value.$ref.split('/').pop(),
       };
     }),
     events: objectMap(events, (value) => {
       return {
-        schema: value.$ref.split("/").pop(),
+        schema: value.$ref.split('/').pop(),
       };
     }),
   };
@@ -46,12 +46,12 @@ function generateWebsocket(openApiDoc: ExtendedOpenAPIObject) {
 
 const main = async () => {
   const openApiDoc = (await SwaggerParser.parse(
-    "http://0.0.0.0:9503/api.json"
+    'http://0.0.0.0:9503/api.json',
   )) as ExtendedOpenAPIObject;
-  const result = await generateZodClientFromOpenAPI({
+  await generateZodClientFromOpenAPI({
     openApiDoc,
-    distPath: "./src/api.gen.ts",
-    templatePath: "./generator/template.hbs",
+    distPath: './src/api.gen.ts',
+    templatePath: './generator/template.hbs',
     options: {
       withAlias: true,
       shouldExportAllSchemas: true,

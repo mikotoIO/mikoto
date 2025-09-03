@@ -1,14 +1,14 @@
-import { HStack, IconButton, NumberInput } from "@chakra-ui/react"
-import { forwardRef } from "react"
-import { LuMinus, LuPlus } from "react-icons/lu"
+import { HStack, IconButton, NumberInput } from '@chakra-ui/react';
+import { forwardRef } from 'react';
+import { LuMinus, LuPlus } from 'react-icons/lu';
 
 export interface StepperInputProps extends NumberInput.RootProps {
-  label?: React.ReactNode
+  label?: React.ReactNode;
 }
 
 export const StepperInput = forwardRef<HTMLDivElement, StepperInputProps>(
   function StepperInput(props, ref) {
-    const { label, ...rest } = props
+    const { label, ...rest } = props;
     return (
       <NumberInput.Root {...rest} unstyled ref={ref}>
         {label && <NumberInput.Label>{label}</NumberInput.Label>}
@@ -18,9 +18,9 @@ export const StepperInput = forwardRef<HTMLDivElement, StepperInputProps>(
           <IncrementTrigger />
         </HStack>
       </NumberInput.Root>
-    )
+    );
   },
-)
+);
 
 const DecrementTrigger = forwardRef<
   HTMLButtonElement,
@@ -32,8 +32,8 @@ const DecrementTrigger = forwardRef<
         <LuMinus />
       </IconButton>
     </NumberInput.DecrementTrigger>
-  )
-})
+  );
+});
 
 const IncrementTrigger = forwardRef<
   HTMLButtonElement,
@@ -45,5 +45,5 @@ const IncrementTrigger = forwardRef<
         <LuPlus />
       </IconButton>
     </NumberInput.IncrementTrigger>
-  )
-})
+  );
+});

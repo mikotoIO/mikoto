@@ -35,7 +35,7 @@ async fn multipart_to_buf(
         .map_err(|_| Error::BadRequest)?
         .ok_or(Error::NotFound)?;
 
-    let ext = mime_to_ext(&file.content_type().unwrap_or(&"???"));
+    let ext = mime_to_ext(file.content_type().unwrap_or("???"));
     let buf = file.bytes().await.map_err(|_| Error::BadRequest)?.to_vec();
     if buf.len() > size_limit {
         return Err(Error::FileTooLarge);

@@ -37,8 +37,8 @@ impl Account {
             VALUES ($1, $2, $3)
             "##,
         )
-        .bind(&Uuid::new_v4())
-        .bind(&self.email.trim().to_lowercase())
+        .bind(Uuid::new_v4())
+        .bind(self.email.trim().to_lowercase())
         .bind(&self.passhash)
         .execute(db)
         .await?;
@@ -61,9 +61,9 @@ impl Account {
             VALUES ((SELECT "id" FROM u), $3, $4)
             "##,
         )
-        .bind(&self.id)
+        .bind(self.id)
         .bind(name)
-        .bind(&self.email.trim().to_lowercase())
+        .bind(self.email.trim().to_lowercase())
         .bind(&self.passhash)
         .execute(db)
         .await?;
@@ -101,7 +101,7 @@ impl Account {
             "##,
         )
         .bind(&passhash)
-        .bind(&self.id)
+        .bind(self.id)
         .execute(db)
         .await?;
         Ok(())

@@ -34,7 +34,7 @@ pub async fn route(body: Json<ResetPasswordPayload>) -> Result<Json<()>, Error> 
     captcha().validate(body.captcha.as_deref()).await?;
 
     let account = Account::find_by_email(&body.email, db()).await?;
-    let verification = AccountVerification::create_password_reset(account.id.clone(), db()).await?;
+    let verification = AccountVerification::create_password_reset(account.id, db()).await?;
 
     mailer()
         .send(

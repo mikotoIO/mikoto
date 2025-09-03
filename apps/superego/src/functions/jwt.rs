@@ -18,7 +18,7 @@ pub struct Claims {
 
 fn header() -> &'static Header {
     static HEADER: OnceLock<Header> = OnceLock::new();
-    HEADER.get_or_init(|| Header::default())
+    HEADER.get_or_init(Header::default)
 }
 
 pub struct JwtKey {

@@ -61,12 +61,12 @@ impl Role {
             VALUES ($1, $2, $3, $4, $5, $6)
             "##,
         )
-        .bind(&self.id)
-        .bind(&self.space_id)
+        .bind(self.id)
+        .bind(self.space_id)
         .bind(&self.name)
         .bind(&self.color)
         .bind(&self.permissions)
-        .bind(&self.position)
+        .bind(self.position)
         .execute(db)
         .await?;
         Ok(())
@@ -89,11 +89,11 @@ impl Role {
             RETURNING *
             "##,
         )
-        .bind(&self.id)
+        .bind(self.id)
         .bind(&patch.name)
         .bind(&patch.color)
         .bind(&patch.permissions)
-        .bind(&patch.position)
+        .bind(patch.position)
         .fetch_optional(db)
         .await?
         .ok_or(Error::NotFound)?;
@@ -113,7 +113,7 @@ impl RoleToSpaceUser {
             SELECT * FROM "_RoleToSpaceUser" WHERE "B" = $1
             "##,
         )
-        .bind(&member_id)
+        .bind(member_id)
         .fetch_all(db)
         .await?;
         Ok(xs.into_iter().map(|x| x.role_id).collect())
@@ -148,8 +148,8 @@ impl RoleToSpaceUser {
             VALUES ($1, $2)
             "##,
         )
-        .bind(&role_id)
-        .bind(&member_id)
+        .bind(role_id)
+        .bind(member_id)
         .execute(db)
         .await?;
         Ok(())
@@ -166,8 +166,8 @@ impl RoleToSpaceUser {
             WHERE "A" = $1 AND "B" = $2
             "##,
         )
-        .bind(&role_id)
-        .bind(&member_id)
+        .bind(role_id)
+        .bind(member_id)
         .execute(db)
         .await?;
         Ok(())

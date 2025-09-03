@@ -26,7 +26,7 @@ impl Document {
             SELECT * FROM "Document" WHERE "channelId" = $1
             "##,
         )
-        .bind(&channel_id)
+        .bind(channel_id)
         .fetch_optional(db)
         .await?
         .ok_or(Error::NotFound)
@@ -48,8 +48,8 @@ impl Document {
             RETURNING *
             "##,
         )
-        .bind(&self.id)
-        .bind(&self.channel_id)
+        .bind(self.id)
+        .bind(self.channel_id)
         .bind(&self.content)
         .fetch_optional(db)
         .await?
@@ -69,7 +69,7 @@ impl Document {
             RETURNING *
             "##,
         )
-        .bind(&self.id)
+        .bind(self.id)
         .bind(&patch.content)
         .fetch_one(db)
         .await?;

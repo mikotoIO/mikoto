@@ -74,9 +74,9 @@ impl Message {
             LIMIT $3
             "#,
         )
-        .bind(&channel_id)
-        .bind(&pagination_time)
-        .bind(&limit)
+        .bind(channel_id)
+        .bind(pagination_time)
+        .bind(limit)
         .fetch_all(db)
         .await?;
         // reverse the order
@@ -90,11 +90,11 @@ impl Message {
             VALUES ($1, $2, $3, $4, $5, $6)
             "#,
         )
-        .bind(&self.id)
-        .bind(&self.channel_id)
-        .bind(&self.author_id)
-        .bind(&self.timestamp)
-        .bind(&self.edited_timestamp)
+        .bind(self.id)
+        .bind(self.channel_id)
+        .bind(self.author_id)
+        .bind(self.timestamp)
+        .bind(self.edited_timestamp)
         .bind(&self.content)
         .execute(db)
         .await?;
@@ -116,9 +116,9 @@ impl Message {
             RETURNING *
             "#,
         )
-        .bind(&self.id)
+        .bind(self.id)
         .bind(&patch.content)
-        .bind(&patch.edited_timestamp)
+        .bind(patch.edited_timestamp)
         .fetch_one(db)
         .await?;
         Ok(res)
@@ -156,7 +156,7 @@ impl MessageExt {
         messages: Vec<Message>,
         db: X,
     ) -> Result<Vec<Self>, Error> {
-        let author_ids: Vec<Uuid> = messages.iter().map(|m| m.author_id).flatten().collect();
+        let author_ids: Vec<Uuid> = messages.iter().filter_map(|m| m.author_id).collect();
         let authors = User::dataload(author_ids, db).await?;
 
         let res = messages

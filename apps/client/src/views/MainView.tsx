@@ -2,30 +2,22 @@ import { Box, Center } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Resizable } from 're-resizable';
-import { Suspense } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
 import { CommandMenuKit } from '@/components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
 import { DockViewSurface } from '@/components/DockViewSurface';
 import { faMikoto } from '@/components/icons';
-import { RESIZABLE_DISABLES, Sidebar } from '@/components/sidebars/Base';
+import { Sidebar } from '@/components/sidebars/Base';
 import { FriendSidebar } from '@/components/sidebars/FriendSidebar';
 import { MemberListSidebar } from '@/components/sidebars/MemberListSidebar';
 import { SpaceSidebar } from '@/components/sidebars/SpaceSidebar';
-import {
-  ErrorSurface,
-  LoadingSurface,
-  surfaceMap,
-} from '@/components/surfaces';
+import { surfaceMap } from '@/components/surfaces';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState, workspaceState } from '@/store';
 import { Tabable } from '@/store/surface';
 
 import { MikotoClientProvider } from './MikotoClientProvider';
-import { WindowBar } from './WindowBar';
 
 const AppContainer = styled.div`
   background-color: var(--chakra-colors-subsurface);
@@ -68,7 +60,7 @@ const DockViewContainer = styled.div`
   height: 100%;
   flex: 1;
   min-width: 0; /* Prevent flex items from overflowing */
-  
+
   .dockview-theme-light {
     --dv-background-color: var(--chakra-colors-surface);
     --dv-tab-active-background-color: var(--chakra-colors-surface);
@@ -78,11 +70,6 @@ const DockViewContainer = styled.div`
     --dv-tab-border-bottom-color: var(--chakra-colors-primary);
     --dv-separator-border: 1px solid var(--chakra-colors-gray-700);
   }
-`;
-
-const SidebarRest = styled.div`
-  flex-grow: 1;
-  -webkit-app-region: drag;
 `;
 
 const AppView = () => {
@@ -141,12 +128,12 @@ const AppView = () => {
               {space && <MemberListSidebar space={space} />}
             </Sidebar>
           ) : (
-            <Box 
-              as="button" 
-              h="100%" 
-              w="32px" 
-              bg="subsurface" 
-              borderLeft="1px solid" 
+            <Box
+              as="button"
+              h="100%"
+              w="32px"
+              bg="subsurface"
+              borderLeft="1px solid"
               borderColor="gray.650"
               display="flex"
               alignItems="center"

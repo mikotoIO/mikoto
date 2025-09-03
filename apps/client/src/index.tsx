@@ -1,6 +1,8 @@
 import { Global } from '@emotion/react';
 import * as Sentry from '@sentry/react';
 import { QueryClientProvider } from '@tanstack/react-query';
+// Import styles
+import 'dockview-react/dist/styles/dockview.css';
 import React from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -12,13 +14,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import { RecoilEnv, RecoilRoot } from 'recoil';
 
 import App from '@/App';
-import { chakraTheme, globalCss } from '@/components/chakraTheme';
+import { globalCss } from '@/components/chakraTheme';
 import { Provider as ChakraProvider } from '@/components/ui/provider';
 import { env } from '@/env';
 import reportWebVitals from '@/reportWebVitals';
 
-// Import styles
-import 'dockview-react/dist/styles/dockview.css';
 import './dockview.css';
 import './fonts.css';
 import { queryClient } from './functions/queryClient';

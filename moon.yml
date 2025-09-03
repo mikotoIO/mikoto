@@ -2,4 +2,4 @@ tasks:
   lint:
     command: 'pnpm eslint .'
   format:
-    command: 'pnpm prettier --write . --log-level warn'
+    command: 'cargo fmt && pnpm prettier --write . --log-level warn'

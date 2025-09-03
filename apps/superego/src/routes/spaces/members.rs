@@ -68,7 +68,7 @@ async fn add_role(
 
     RoleToSpaceUser::create(role.id, member.id, db()).await?;
     let member = MemberExt::dataload_one(member, db()).await?;
-    emit_event("members.onUpdate", &member, &format!("space:{}", space_id)).await?;
+    emit_event("members.onUpdate", &member, &format!("space:{space_id}")).await?;
     Ok(member.into())
 }
 
@@ -88,7 +88,7 @@ async fn remove_role(
 
     RoleToSpaceUser::delete(role.id, member.id, db()).await?;
     let member = MemberExt::dataload_one(member, db()).await?;
-    emit_event("members.onUpdate", &member, &format!("space:{}", space_id)).await?;
+    emit_event("members.onUpdate", &member, &format!("space:{space_id}")).await?;
     Ok(member.into())
 }
 
@@ -104,7 +104,7 @@ async fn delete(
     let member = SpaceUser::get_by_key(&key, db()).await?;
     let member = MemberExt::dataload_one(member, db()).await?;
     member.base.delete(db()).await?;
-    emit_event("members.onDelete", &member, &format!("space:{}", space_id)).await?;
+    emit_event("members.onDelete", &member, &format!("space:{space_id}")).await?;
     Ok(().into())
 }
 

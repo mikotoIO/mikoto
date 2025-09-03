@@ -33,7 +33,7 @@ pub async fn route(body: Json<ChangePasswordPayload>) -> Result<Json<TokenPair>,
         "##,
     )
     .bind(&new_passhash)
-    .bind(&body.id)
+    .bind(body.id)
     .execute(db())
     .await?;
 

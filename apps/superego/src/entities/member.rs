@@ -57,8 +57,8 @@ impl SpaceUser {
             WHERE "spaceId" = $1 AND "userId" = $2
             "##,
         )
-        .bind(&key.space_id)
-        .bind(&key.user_id)
+        .bind(key.space_id)
+        .bind(key.user_id)
         .fetch_optional(db)
         .await?
         .ok_or(Error::NotFound)?;
@@ -77,7 +77,7 @@ impl SpaceUser {
             LIMIT 500
             "##,
         )
-        .bind(&space_id)
+        .bind(space_id)
         .fetch_all(db)
         .await?;
         Ok(members)
@@ -90,9 +90,9 @@ impl SpaceUser {
             VALUES ($1, $2, $3, $4)
             "##,
         )
-        .bind(&self.id)
-        .bind(&self.space_id)
-        .bind(&self.user_id)
+        .bind(self.id)
+        .bind(self.space_id)
+        .bind(self.user_id)
         .bind(&self.name)
         .execute(db)
         .await?;
@@ -109,8 +109,8 @@ impl SpaceUser {
             WHERE "spaceId" = $1 AND "userId" = $2
             "##,
         )
-        .bind(&key.space_id)
-        .bind(&key.user_id)
+        .bind(key.space_id)
+        .bind(key.user_id)
         .execute(db)
         .await?;
         Ok(())
@@ -155,7 +155,7 @@ impl MemberExt {
                     user: users.get(&user_id).unwrap_or(&User::ghost()).clone(),
                     role_ids: role_ids
                         .get(&member_id)
-                        .map_or_else(|| vec![], |ids| ids.clone()),
+                        .map_or_else(std::vec::Vec::new, |ids| ids.clone()),
                 }
             })
             .collect())

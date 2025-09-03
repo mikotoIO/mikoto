@@ -62,11 +62,11 @@ impl AccountVerification {
             VALUES ($1, $2, $3, $4, $5)
             "#,
         )
-        .bind(&verification.id)
+        .bind(verification.id)
         .bind(&verification.category)
         .bind(&verification.token)
-        .bind(&verification.account_id)
-        .bind(&verification.expires_at)
+        .bind(verification.account_id)
+        .bind(verification.expires_at)
         .execute(db)
         .await?;
         Ok(verification)
@@ -79,7 +79,7 @@ impl AccountVerification {
             WHERE "id" = $1
             "#,
         )
-        .bind(&self.id)
+        .bind(self.id)
         .execute(db)
         .await?;
         Ok(())

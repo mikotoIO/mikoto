@@ -93,10 +93,10 @@ impl Space {
             VALUES ($1, $2, $3, $4, $5)
             "##,
         )
-        .bind(&self.id)
+        .bind(self.id)
         .bind(&self.name)
         .bind(&self.icon)
-        .bind(&self.owner_id)
+        .bind(self.owner_id)
         .bind(&self.space_type)
         .execute(db)
         .await?;
@@ -118,10 +118,10 @@ impl Space {
             RETURNING *
             "##,
         )
-        .bind(&self.id)
+        .bind(self.id)
         .bind(&patch.name)
         .bind(&patch.icon)
-        .bind(&patch.owner_id)
+        .bind(patch.owner_id)
         .fetch_optional(db)
         .await?
         .ok_or(Error::NotFound)?;

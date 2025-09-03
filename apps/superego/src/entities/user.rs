@@ -97,7 +97,7 @@ impl User {
             RETURNING *
             "##,
         )
-        .bind(&self.id)
+        .bind(self.id)
         .bind(patch.name)
         .bind(patch.avatar)
         .fetch_optional(db)

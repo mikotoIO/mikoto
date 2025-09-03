@@ -37,8 +37,7 @@ fn collect_permissions(space: &SpaceExt, member: &MemberExt) -> Permission {
         .filter_map(|role_id| {
             role_map
                 .get(role_id)
-                .map(|role| u64::from_str(&role.permissions).ok())
-                .flatten()
+                .and_then(|role| u64::from_str(&role.permissions).ok())
         })
         .collect();
     res.iter().fold(Permission::NONE, |acc, &x| {
@@ -57,12 +56,12 @@ pub fn permissions_with_bypass(
     if space.base.owner_id == Some(member.user.id) {
         return Ok(());
     }
-    let user_perms = collect_permissions(&space, &member);
+    let user_perms = collect_permissions(space, member);
     if user_perms.contains(bypass) || user_perms.contains(rule) {
         Ok(())
     } else {
         Err(Error::InsufficientPermissions {
-            message: format!("Expected {:?}, Got {:?}", rule, user_perms),
+            message: format!("Expected {rule:?}, Got {user_perms:?}"),
         })
     }
 }

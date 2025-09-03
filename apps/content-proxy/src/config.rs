@@ -34,7 +34,7 @@ pub struct Resize {
 
 impl Store {
     pub async fn upload(data: Vec<u8>) -> Result<ResponseData, Error> {
-        let res = bucket().put_object(format!("{}", "name"), &data).await?;
+        let res = bucket().put_object("name".to_string(), &data).await?;
         Ok(res)
     }
 }
@@ -43,6 +43,6 @@ pub fn config() -> &'static Config {
     static CONFIG: OnceLock<Config> = OnceLock::new();
     CONFIG.get_or_init(|| {
         let config = include_str!("../config.toml");
-        toml::from_str(&config).unwrap()
+        toml::from_str(config).unwrap()
     })
 }

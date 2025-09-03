@@ -33,6 +33,12 @@ pub struct WebSocketRouterSchema {
     pub events: BTreeMap<String, Schema>,
 }
 
+impl<S: 'static + Send + Sync> Default for WebSocketRouter<S> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<S: 'static + Send + Sync> WebSocketRouter<S> {
     pub fn new() -> Self {
         Self {
@@ -123,6 +129,6 @@ impl<S: 'static + Send + Sync> WebSocketRouter<S> {
 
 fn prefix_map<T>(prefix: &str, map: BTreeMap<String, T>) -> BTreeMap<String, T> {
     map.into_iter()
-        .map(|(k, v)| (format!("{}.{}", prefix, k), v))
+        .map(|(k, v)| (format!("{prefix}.{k}"), v))
         .collect()
 }

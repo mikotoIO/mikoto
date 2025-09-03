@@ -51,7 +51,7 @@ mod tests {
                 name: "Charlie".to_string(),
             },
         ];
-        let grouped = group_by(users.into_iter(), |user| user.id);
+        let grouped = group_by(users, |user| user.id);
         let mut expected: HashMap<u64, _> = HashMap::new();
         expected.insert(
             1,

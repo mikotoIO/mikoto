@@ -90,7 +90,7 @@ async fn edit(
     emit_event(
         "messages.onUpdate",
         &message,
-        &format!("space:{}", channel_id),
+        &format!("space:{channel_id}"),
     )
     .await?;
     Ok(message.into())

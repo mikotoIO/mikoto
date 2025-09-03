@@ -31,9 +31,9 @@ impl Bot {
             VALUES ($1, $2, $3, $4)
             "##,
         )
-        .bind(&self.id)
+        .bind(self.id)
         .bind(&self.name)
-        .bind(&self.owner_id)
+        .bind(self.owner_id)
         .bind(&self.secret)
         .execute(db)
         .await?;
@@ -56,10 +56,10 @@ impl Bot {
             VALUES ((SELECT "id" FROM u), $3, $4, $5)
             "##,
         )
-        .bind(&self.owner_id)
+        .bind(self.owner_id)
         .bind(name)
         .bind(&self.name)
-        .bind(&self.owner_id)
+        .bind(self.owner_id)
         .bind(&self.secret)
         .execute(db)
         .await?;

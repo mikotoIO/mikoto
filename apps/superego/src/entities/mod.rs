@@ -75,7 +75,7 @@ where
     let mut grouped: HashMap<K, Vec<T>> = HashMap::new();
     for item in items {
         let key = key_fn(&item);
-        grouped.entry(key).or_insert_with(Vec::new).push(item);
+        grouped.entry(key).or_default().push(item);
     }
     grouped
 }

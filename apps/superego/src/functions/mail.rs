@@ -44,7 +44,7 @@ impl MailSender {
                     )
                     .unwrap();
 
-                let mail = mail.into();
+                let mail = mail;
                 transport.send(mail).await.map_err(|_| Error::MailError)?;
             }
         }

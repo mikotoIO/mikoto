@@ -8,23 +8,19 @@ use tokio::sync::RwLock;
 
 use crate::error::Error;
 
+type CommandFilter<S> = Box<dyn Fn(Value, Arc<RwLock<S>>) -> BoxFuture<'static, Result<(), Error>> + Send + Sync>;
+type EventFilter<S> = Box<
+    dyn Fn(Value, Arc<RwLock<S>>) -> BoxFuture<'static, Result<Option<Value>, Error>>
+        + Send
+        + Sync,
+>;
+
 pub struct WebSocketRouter<S> {
     pub commands: BTreeMap<String, Schema>,
     pub events: BTreeMap<String, Schema>,
 
-    pub command_filters: BTreeMap<
-        String,
-        Box<dyn Fn(Value, Arc<RwLock<S>>) -> BoxFuture<'static, Result<(), Error>> + Send + Sync>,
-    >,
-
-    pub event_filters: BTreeMap<
-        String,
-        Box<
-            dyn Fn(Value, Arc<RwLock<S>>) -> BoxFuture<'static, Result<Option<Value>, Error>>
-                + Send
-                + Sync,
-        >,
-    >,
+    pub command_filters: BTreeMap<String, CommandFilter<S>>,
+    pub event_filters: BTreeMap<String, EventFilter<S>>,
 }
 
 #[derive(Serialize, Clone)]

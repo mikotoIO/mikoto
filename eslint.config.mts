@@ -1,49 +1,59 @@
-import css from '@eslint/css';
 import js from '@eslint/js';
-import json from '@eslint/json';
-import markdown from '@eslint/markdown';
 import pluginReact from 'eslint-plugin-react';
-import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-export default defineConfig([
+export default [
+  // Ignore patterns
+  {
+    ignores: [
+      'node_modules/**',
+      'apps/docs/.next/**',
+      'dist/**',
+      'build/**',
+      '**/*.min.js',
+      '.claude/**',
+      'target/**',
+    ],
+  },
+
+  // Base JS/TS configuration
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+
   {
     files: ['**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-    plugins: { js },
-    extends: ['js/recommended'],
-    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+    },
   },
-  tseslint.configs.recommended,
-  pluginReact.configs.flat.recommended,
+
+  // React configuration
   {
-    files: ['**/*.json'],
-    plugins: { json },
-    language: 'json/json',
-    extends: ['json/recommended'],
+    files: ['**/*.{jsx,tsx}'],
+    plugins: {
+      react: pluginReact,
+    },
+    languageOptions: {
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+    rules: {
+      ...pluginReact.configs.recommended.rules,
+      'react/react-in-jsx-scope': 'off',
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
   },
-  {
-    files: ['**/*.jsonc'],
-    plugins: { json },
-    language: 'json/jsonc',
-    extends: ['json/recommended'],
-  },
-  {
-    files: ['**/*.json5'],
-    plugins: { json },
-    language: 'json/json5',
-    extends: ['json/recommended'],
-  },
-  {
-    files: ['**/*.md'],
-    plugins: { markdown },
-    language: 'markdown/gfm',
-    extends: ['markdown/recommended'],
-  },
-  {
-    files: ['**/*.css'],
-    plugins: { css },
-    language: 'css/css',
-    extends: ['css/recommended'],
-  },
-]);
+];

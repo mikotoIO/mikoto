@@ -3,6 +3,10 @@ import pluginReact from 'eslint-plugin-react';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+const sharedRules = {
+  '@typescript-eslint/no-explicit-any': 'off',
+};
+
 export default [
   // Ignore patterns
   {
@@ -31,6 +35,9 @@ export default [
       ecmaVersion: 'latest',
       sourceType: 'module',
     },
+    rules: {
+      ...sharedRules,
+    },
   },
 
   // React configuration
@@ -49,7 +56,7 @@ export default [
     rules: {
       ...pluginReact.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
+      ...sharedRules,
     },
     settings: {
       react: {

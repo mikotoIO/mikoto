@@ -3,8 +3,7 @@ on:
   push:
     branches:
       - '**'
-      - 'dependabot/**'
-  pull_request:
+      - '!dependabot/**'
 jobs:
   typecheck:
     name: 'Typecheck'
@@ -44,3 +43,22 @@ jobs:
           fetch-depth: 0
       - uses: 'moonrepo/setup-toolchain@v0'
       - run: 'moon ci :typecheck'
+  lint:
+    name: 'Lint'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      - uses: 'actions/checkout@v4'
+        with:
+          fetch-depth: 0
+      - uses: 'moonrepo/setup-toolchain@v0'
+      - run: 'moon ci :lint'

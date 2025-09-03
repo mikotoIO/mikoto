@@ -97,8 +97,8 @@ const HeaderContainer = styled.div`
 
 export const MemberListSidebar = observer(
   ({ space }: { space: MikotoSpace }) => {
-    const { isLoading, error } = useFetchMember(space);
-    const [workspace, setWorkspace] = useRecoilState(workspaceState);
+    const { isLoading } = useFetchMember(space);
+    const [, setWorkspace] = useRecoilState(workspaceState);
 
     const fetchMembersManually = async () => {
       console.log('Manually fetching members');
@@ -150,7 +150,7 @@ export const MemberListSidebar = observer(
           }}
           style={{ height: '100%', overflowX: 'hidden' }}
           data={spaceMembers}
-          itemContent={(idx, member) => <MemberElement member={member} />}
+          itemContent={(_idx, member) => <MemberElement member={member} />}
         />
       </StyledMemberListSidebar>
     );

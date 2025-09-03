@@ -4,16 +4,9 @@ import {
   DockviewReadyEvent,
   IDockviewPanelProps,
 } from 'dockview-react';
-import {
-  ReactNode,
-  Suspense,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useRecoilCallback, useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilCallback, useRecoilState } from 'recoil';
 
 import { WelcomePanel } from '@/components/WelcomePanel';
 import {
@@ -27,7 +20,6 @@ import {
   tabNameFamily,
   tabsState,
   useActiveTabId,
-  useTabkit,
   useTabs,
 } from '@/store/surface';
 
@@ -58,15 +50,10 @@ function SurfaceComponent(props: SurfaceComponentProps) {
   );
 }
 
-interface TabContainerProps {
-  children?: ReactNode;
-}
-
-export const DockViewSurface = ({ children }: TabContainerProps) => {
+export const DockViewSurface = () => {
   const tabs = useTabs();
   const activeTabId = useActiveTabId();
   const dockviewRef = useRef<{ api: DockviewApi | null }>({ api: null });
-  const tabkit = useTabkit();
   const setTabs = useRecoilState(tabsState)[1];
   // Keep track of the last processed tabs array
   const prevTabsRef = useRef<Tabable[]>([]);

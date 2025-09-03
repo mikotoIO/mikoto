@@ -10,7 +10,6 @@ import { useCallback, useState } from 'react';
 import * as Y from 'yjs';
 
 import { env } from '@/env';
-import { useMikoto } from '@/hooks';
 
 export interface UseProviderFactoryProps {
   channel: MikotoChannel;
@@ -25,11 +24,8 @@ export function useProviderFactory({
   content,
   onSync,
 }: UseProviderFactoryProps) {
-  const mikoto = useMikoto();
   const [synced, setSynced] = useState<SyncState>('initial');
-  // const [changed, setChanged] = useState(false);
   const [editor] = useLexicalComposerContext();
-  const [editorContent, setEditorContent] = useState(content);
 
   const providerFactory = useCallback(
     (id: string, yjsDocMap: Map<string, Y.Doc>) => {

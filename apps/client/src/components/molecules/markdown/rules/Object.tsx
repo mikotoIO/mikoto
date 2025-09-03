@@ -13,7 +13,7 @@ function ObjectNotFound({ resource }: { resource: string }) {
   );
 }
 
-function Object({ resource, data }: { resource: string; data: string }) {
+function Object({ resource }: { resource: string; data: string }) {
   return <ObjectNotFound resource={resource} />;
 }
 

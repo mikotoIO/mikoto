@@ -65,9 +65,9 @@ function Node(props: ExplorerNode & { path: string[] }) {
     type: 'CHANNEL',
     item: props,
   });
-  const [{ isOver }, drop] = useDrop<ExplorerNode, any, { isOver: boolean }>({
+  const [, drop] = useDrop<ExplorerNode, any, { isOver: boolean }>({
     accept: 'CHANNEL',
-    async drop(item) {
+    async drop() {
       // console.log(`Dropped ${item.text} on ${props.text}`);
     },
 

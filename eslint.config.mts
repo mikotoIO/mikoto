@@ -5,6 +5,18 @@ import tseslint from 'typescript-eslint';
 
 const sharedRules = {
   '@typescript-eslint/no-explicit-any': 'off',
+  '@typescript-eslint/no-unused-vars': [
+    'warn',
+    {
+      args: 'all',
+      argsIgnorePattern: '^_',
+      caughtErrors: 'all',
+      caughtErrorsIgnorePattern: '^_',
+      destructuredArrayIgnorePattern: '^_',
+      varsIgnorePattern: '^_',
+      ignoreRestSiblings: true,
+    },
+  ],
 };
 
 export default [
@@ -16,6 +28,8 @@ export default [
       'dist/**',
       'build/**',
       '**/*.min.js',
+      '**/metro.config.js',
+      '**/*.gen.ts',
       '.claude/**',
       'target/**',
     ],

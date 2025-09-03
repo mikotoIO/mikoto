@@ -45,7 +45,7 @@ function General({ channel }: { channel: MikotoChannel }) {
   );
 }
 
-function Permissions({ channel }: { channel: MikotoChannel }) {
+function Permissions({ channel: _channel }: { channel: MikotoChannel }) {
   return (
     <SettingSurface>
       <Heading>Permissions</Heading>

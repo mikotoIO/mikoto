@@ -74,10 +74,8 @@ const MarkdownWrapper = styled.div<{ emojiSize: string }>`
 `;
 
 function emojiFest(nodes: SingleASTNode[]) {
-  // eslint-disable-next-line no-restricted-syntax
   for (const x of nodes) {
     if (x.type === 'paragraph') {
-      // eslint-disable-next-line no-restricted-syntax
       for (const y of x.content) {
         if (y.type !== 'emoji') {
           return '1.2em';
@@ -101,7 +99,6 @@ export function Markdown({ content }: { content: string }) {
   const output = reactOutput(parsed);
 
   return (
-    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <MarkdownWrapper emojiSize={emojiFest(parsed)}>{output}</MarkdownWrapper>
   );
 }

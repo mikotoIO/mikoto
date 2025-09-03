@@ -72,11 +72,6 @@ const DockViewContainer = styled.div`
   }
 `;
 
-const SidebarRest = styled.div`
-  flex-grow: 1;
-  -webkit-app-region: drag;
-`;
-
 const AppView = () => {
   const leftSidebar = useRecoilValue(treebarSpaceState);
   const mikoto = useMikoto();

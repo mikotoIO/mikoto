@@ -1,6 +1,6 @@
 import { AuthClient, MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
 import React, { useContext, useEffect, useState } from 'react';
-import { Snapshot, getVersion, proxy, useSnapshot } from 'valtio';
+import { getVersion, proxy, useSnapshot } from 'valtio';
 
 import { useInterval } from './useInterval';
 

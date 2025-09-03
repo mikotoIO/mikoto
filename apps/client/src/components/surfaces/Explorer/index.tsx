@@ -62,7 +62,6 @@ function isUnread(lastUpdate: Date | undefined, ack: Date | null) {
 }
 
 function useAcks(space: MikotoSpace) {
-  const mikoto = useMikoto();
   const [acks, setAcks] = useState<Record<string, Date>>({});
 
   useEffect(() => {
@@ -149,7 +148,6 @@ export function Explorer({ space }: { space: MikotoSpace }) {
 
 export const DMExplorer = ({
   space,
-  relation,
 }: {
   space: MikotoSpace;
   relation: Relationship;

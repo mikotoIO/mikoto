@@ -27,6 +27,7 @@ function WelcomeButton(props: WelcomeButtonProps) {
   return (
     <a
       target="_blank" // TODO: allow opening join links as a surface
+      rel="noreferrer"
       href={props.linkTo}
     >
       <Flex

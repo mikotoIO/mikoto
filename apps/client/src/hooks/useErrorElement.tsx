@@ -1,6 +1,4 @@
 import { Box, Flex } from '@chakra-ui/react';
-import { faClose } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 
 import { CloseButton } from '@/components/ui';

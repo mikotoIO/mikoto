@@ -95,7 +95,7 @@ function DocumentReaderPlaceholder() {
       <Box mb={8}>
         <FontAwesomeIcon icon={faFileLines} fontSize="100px" opacity={0.2} />
       </Box>
-      <Box>It's a blank page for now.</Box>
+      <Box>It&apos;s a blank page for now.</Box>
       <Box>but also an empty canvas to write something beautiful.</Box>
     </Flex>
   );

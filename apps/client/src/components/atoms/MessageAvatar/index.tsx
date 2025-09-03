@@ -4,7 +4,6 @@ import { MikotoMember, Role, User } from '@mikoto-io/mikoto.js';
 import { permissions } from '@mikoto-io/permcheck';
 import { useRef, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
-import { proxy, useSnapshot } from 'valtio';
 
 import {
   contextMenuState,
@@ -14,7 +13,8 @@ import {
 import { UserContextMenu } from '@/components/modals/ContextMenus';
 import { ProfileModal } from '@/components/modals/Profile';
 import { Checkbox } from '@/components/ui';
-import { useMaybeSnapshot, useMikoto } from '@/hooks';
+import { useMaybeSnapshot } from '@/hooks';
+import { checkNonNull } from '@/utils/assertNonNull';
 
 import { Avatar } from '../Avatar';
 import { BaseRoleBadge, RoleBadge } from './RoleBadge';
@@ -53,16 +53,14 @@ function RoleSetter({
   roles: Role[];
   member: MikotoMember;
 }) {
-  const [selectedRoles, setSelectedRoles] = useState<Record<string, boolean>>(
-    () => {
-      const o: Record<string, boolean> = {};
-      roles.forEach((role) => {
-        if (role.name === '@everyone') return;
-        o[role.id] = member.roleIds.includes(role.id);
-      });
-      return o;
-    },
-  );
+  const [selectedRoles] = useState<Record<string, boolean>>(() => {
+    const o: Record<string, boolean> = {};
+    roles.forEach((role) => {
+      if (role.name === '@everyone') return;
+      o[role.id] = member.roleIds.includes(role.id);
+    });
+    return o;
+  });
 
   return (
     <AvatarContextWrapper>
@@ -162,7 +160,10 @@ export function MemberContextMenu({
         )}
       </AvatarContextWrapper>
       {member && roleEditorOpen && (
-        <RoleSetter roles={member.space?.roles!.values()!} member={member!} />
+        <RoleSetter
+          roles={checkNonNull(checkNonNull(member.space?.roles).values())}
+          member={member!}
+        />
       )}
     </div>
   );

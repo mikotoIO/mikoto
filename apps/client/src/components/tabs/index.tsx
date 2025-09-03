@@ -18,7 +18,6 @@ export function TabName({ name, icon }: TabNameProps) {
     }
   }, [name, tabName, setTabName, tabInfo.key, icon]);
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <></>;
 }
 

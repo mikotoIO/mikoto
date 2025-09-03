@@ -185,19 +185,6 @@ export const DockViewSurface = ({ children }: TabContainerProps) => {
     [tabs, setTabs],
   );
 
-  // Render panel titles
-  const renderTabTitle = useCallback((id: string) => {
-    const tabName = useRecoilValue(tabNameFamily(id));
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        {typeof tabName.icon === 'string' ? (
-          <img src={tabName.icon} alt="" style={{ width: 16, height: 16 }} />
-        ) : null}
-        <span>{tabName.name}</span>
-      </div>
-    );
-  }, []);
-
   if (tabs.length === 0) {
     return <WelcomePanel />;
   }

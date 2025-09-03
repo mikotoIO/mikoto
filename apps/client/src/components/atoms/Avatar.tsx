@@ -5,9 +5,8 @@ import { env } from '@/env';
 
 function isUrl(string: string) {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const url = new URL(string);
-  } catch (__) {
+    new URL(string);
+  } catch {
     return false;
   }
   return true;

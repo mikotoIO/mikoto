@@ -1,7 +1,7 @@
+import styled from '@emotion/styled';
 import { faCheck, faMinus, faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
-import styled from '@emotion/styled';
 
 const StyledTriselector = styled.div`
   background-color: var(--chakra-colors-gray-850);

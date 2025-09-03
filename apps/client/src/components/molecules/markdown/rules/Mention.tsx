@@ -1,5 +1,5 @@
-import SimpleMarkdown from '@khanacademy/simple-markdown';
 import styled from '@emotion/styled';
+import SimpleMarkdown from '@khanacademy/simple-markdown';
 
 import { createRule } from '../rules';
 

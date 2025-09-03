@@ -113,10 +113,10 @@ function ExplorerInner({ space }: { space: MikotoSpace }) {
     unread: isUnread(channel.lastUpdatedDate, acks[channel.id] ?? null),
     onClick(ev) {
       const tab = channelToTab(channel);
-      
+
       // Always open in a new tab if Ctrl is pressed or if there are already tabs
       const forceNewTab = ev.ctrlKey || tabkit.getTabs().length > 0;
-      
+
       tabkit.openTab(tab, forceNewTab);
       ackChannel(channel);
     },

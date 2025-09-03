@@ -1,7 +1,7 @@
 import { chakra } from '@chakra-ui/react';
+import styled from '@emotion/styled';
 import { faClose, faExpand, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import styled from '@emotion/styled';
 
 const StyledWindowBar = styled.div`
   height: 36px;

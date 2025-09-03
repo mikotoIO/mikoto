@@ -26,7 +26,7 @@ export class MikotoMessage extends ZSchema(MessageExt) {
   }
 
   get member() {
-		if (!this.authorId) return undefined;
+    if (!this.authorId) return undefined;
     return this.channel?.space?.members._get(this.authorId);
   }
 

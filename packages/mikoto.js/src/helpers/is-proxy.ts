@@ -1,5 +1,5 @@
-import { getVersion } from "valtio/vanilla";
+import { getVersion } from 'valtio/vanilla';
 
 export function isValtioProxy(obj: any) {
-	return typeof getVersion(obj) === "number";
+  return typeof getVersion(obj) === 'number';
 }

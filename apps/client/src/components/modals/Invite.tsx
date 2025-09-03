@@ -3,8 +3,8 @@ import styled from '@emotion/styled';
 import { Invite, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useState } from 'react';
 
+import '@/components/ui';
 import { env } from '@/env';
-import { } from '@/components/ui'
 import { useMikoto } from '@/hooks';
 
 const InviteLink = styled.button`

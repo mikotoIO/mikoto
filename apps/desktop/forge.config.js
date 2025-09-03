@@ -30,13 +30,13 @@ module.exports = {
       name: '@electron-forge/publisher-gcs',
       config: {
         storageOptions: {
-          projectId: 'agile-ratio-354703'
+          projectId: 'agile-ratio-354703',
         },
         bucket: 'mikoto-app',
         folder: 'mikoto-desktop',
         public: true,
-      }
-    }
+      },
+    },
   ],
   plugins: [
     {

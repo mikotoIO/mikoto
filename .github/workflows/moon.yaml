@@ -1,4 +1,6 @@
 name: 'Moon'
+permissions:
+  contents: read
 on:
   push:
     branches:

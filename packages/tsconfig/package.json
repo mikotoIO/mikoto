@@ -4,6 +4,6 @@
   "private": true,
   "main": "index.js",
   "files": [
-    "server.tsconfig.json"
+    "package.tsconfig.json"
   ]
 }

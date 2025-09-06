@@ -2,17 +2,12 @@ import styled from '@emotion/styled';
 import { useContext, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 
-import {
-  TabContext,
-  TabNameProps,
-  tabNameFamily,
-} from '@/store/surface';
-
+import { TabContext, TabNameProps, tabNameFamily } from '@/store/surface';
 
 export function TabName({ name, icon }: TabNameProps) {
   const tabInfo = useContext(TabContext);
   const [tabName, setTabName] = useRecoilState(tabNameFamily(tabInfo.key));
-  
+
   useEffect(() => {
     if (tabName.name !== name) {
       setTabName({
@@ -23,7 +18,6 @@ export function TabName({ name, icon }: TabNameProps) {
     }
   }, [name, tabName, setTabName, tabInfo.key, icon]);
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <></>;
 }
 
@@ -40,5 +34,3 @@ export const TabBarButton = styled.button`
     background-color: var(--chakra-colors-gray-700);
   }
 `;
-
-const TAB_HEIGHT = 36;

@@ -70,12 +70,6 @@ export const onlineState = atom<boolean>({
   default: true,
 });
 
-// themePersist
-interface ThemeState {
-  theme: string;
-  accent: string;
-}
-
 export const DEFAULT_THEME_SETTINGS = {
   theme: 'dark',
   accent: '#3b83ff',

@@ -86,13 +86,13 @@ impl Channel {
             VALUES ($1, $2, $3, $4, $5, $6, $7)
             "##,
         )
-        .bind(&self.id)
-        .bind(&self.space_id)
-        .bind(&self.parent_id)
-        .bind(&self.order)
+        .bind(self.id)
+        .bind(self.space_id)
+        .bind(self.parent_id)
+        .bind(self.order)
         .bind(&self.name)
         .bind(&self.category)
-        .bind(&self.last_updated)
+        .bind(self.last_updated)
         .execute(db)
         .await?;
         Ok(())
@@ -111,7 +111,7 @@ impl Channel {
             RETURNING *
             "##,
         )
-        .bind(&self.id)
+        .bind(self.id)
         .bind(&patch.name)
         .fetch_optional(db)
         .await?

@@ -3,7 +3,7 @@ import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { Field, SelectRoot } from '@/components/ui';
+import { Field } from '@/components/ui';
 import { DEFAULT_THEME_SETTINGS, themeDB } from '@/store';
 import { useLocalDB } from '@/store/LocalDB';
 import { Form } from '@/ui';

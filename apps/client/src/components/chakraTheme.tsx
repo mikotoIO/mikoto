@@ -102,7 +102,7 @@ export const globalCss = css`
 
   input {
     border-style: solid;
-    background-color:  var(--chakra-colors-subsurface);
+    background-color: var(--chakra-colors-subsurface);
   }
 
   background-color: var(--chakra-colors-subsurface);

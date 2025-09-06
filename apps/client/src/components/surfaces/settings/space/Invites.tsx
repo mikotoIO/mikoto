@@ -1,5 +1,5 @@
 import { Box, Button } from '@chakra-ui/react';
-import { Invite, MikotoSpace, SpaceExt } from '@mikoto-io/mikoto.js';
+import { Invite, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useEffect, useState } from 'react';
 
 import { useMikoto } from '@/hooks';

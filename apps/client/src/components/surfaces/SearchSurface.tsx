@@ -5,7 +5,7 @@ import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
 import { Form } from '@/ui';
 
-export function SearchSurface({ spaceId }: { spaceId: string }) {
+export function SearchSurface({ spaceId: _spaceId }: { spaceId: string }) {
   return (
     <Surface padded scroll>
       <TabName name="Search" icon={faMagnifyingGlass} />

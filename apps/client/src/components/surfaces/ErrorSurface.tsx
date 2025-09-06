@@ -1,12 +1,4 @@
-import {
-  Box,
-  Button,
-  Center,
-  Code,
-  Flex,
-  Group,
-  Heading,
-} from '@chakra-ui/react';
+import { Box, Button, Code, Flex, Group, Heading } from '@chakra-ui/react';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
@@ -23,7 +15,7 @@ export function ErrorSurface({ error, resetErrorBoundary }: FallbackProps) {
       <Flex direction="column" alignItems="center" gap={4}>
         <Heading m={0}>Error!</Heading>
         <Box>You were probably not supposed to see this.</Box>
-        <Box>Please contact the devs, and they'll fix it soon!</Box>
+        <Box>Please contact the devs, and they&apos;ll fix it soon!</Box>
         <Group>
           <Button size="sm" onClick={resetErrorBoundary} colorPalette="primary">
             <FontAwesomeIcon icon={faRefresh} />

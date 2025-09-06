@@ -1,4 +1,3 @@
-import styled from '@emotion/styled';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { eventFiles } from '@lexical/rich-text';
 import { calculateZoomLevel, mergeRegister } from '@lexical/utils';
@@ -30,45 +29,6 @@ const Upward = -1;
 const Indeterminate = 0;
 
 let prevIndex = Infinity;
-
-const DragWrapper = styled.div`
-  .draggable-block-menu {
-    border-radius: 4px;
-    padding: 2px 1px;
-    cursor: grab;
-    opacity: 0;
-    position: absolute;
-    left: 0;
-    top: 0;
-    will-change: transform;
-  }
-
-  .draggable-block-menu .icon {
-    width: 16px;
-    height: 16px;
-    opacity: 0.3;
-    background-image: url(/images/icons/draggable-block-menu.svg);
-  }
-
-  .draggable-block-menu:active {
-    cursor: grabbing;
-  }
-
-  .draggable-block-menu:hover {
-    background-color: #efefef;
-  }
-
-  .draggable-block-target-line {
-    pointer-events: none;
-    background: deepskyblue;
-    height: 4px;
-    position: absolute;
-    left: 0;
-    top: 0;
-    opacity: 0;
-    will-change: transform;
-  }
-`;
 
 function getCurrentIndex(keysLength: number): number {
   if (keysLength === 0) {

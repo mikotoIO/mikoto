@@ -93,8 +93,5 @@ async fn peer(room: String, ws: WebSocket, bcg_map: BroadcastMap) {
     let sink = Arc::new(Mutex::new(AxumSink::from(sink)));
     let stream = AxumStream::from(stream);
     let sub = bcast.subscribe(sink, stream);
-    match sub.completed().await {
-        Ok(_) => {}
-        Err(_) => {}
-    }
+    if (sub.completed().await).is_ok() {}
 }

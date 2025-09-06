@@ -5,7 +5,6 @@ import path from 'node:path';
 import { URL, fileURLToPath } from 'node:url';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 dotenv.config();
 

@@ -4,11 +4,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { env } from '@/env';
-import { notifyFromMessage } from '@/functions/notify';
-import { AuthContext, MikotoContext, useInterval } from '@/hooks';
+import { AuthContext, MikotoContext } from '@/hooks';
 import { authClient } from '@/store/authClient';
 
-function registerNotifications(mikoto: MikotoClient) {
+function registerNotifications(_mikoto: MikotoClient) {
   // mikoto.client.messages.onCreate((msg) => {
   //   notifyFromMessage(mikoto, msg);
   // });

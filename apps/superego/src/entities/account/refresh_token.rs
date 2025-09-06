@@ -37,10 +37,10 @@ impl RefreshToken {
             VALUES ($1, $2, $3, $4)
             "##,
         )
-        .bind(&self.id)
+        .bind(self.id)
         .bind(&self.token)
-        .bind(&self.expires_at)
-        .bind(&self.account_id)
+        .bind(self.expires_at)
+        .bind(self.account_id)
         .execute(db)
         .await?;
         Ok(())
@@ -66,7 +66,7 @@ impl RefreshToken {
             DELETE FROM "RefreshToken" WHERE "accountId" = $1
             "##,
         )
-        .bind(&account_id)
+        .bind(account_id)
         .execute(db)
         .await?;
 

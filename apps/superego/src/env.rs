@@ -77,6 +77,6 @@ static ENV: OnceLock<Env> = OnceLock::new();
 pub fn env() -> &'static Env {
     ENV.get_or_init(|| {
         dotenvy::dotenv().ok();
-        serde_env::from_env().unwrap_or_else(|err| panic!("{:#?}", err))
+        serde_env::from_env().unwrap_or_else(|err| panic!("{err:#?}"))
     })
 }

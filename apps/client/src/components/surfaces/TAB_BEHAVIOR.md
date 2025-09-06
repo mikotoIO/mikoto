@@ -9,10 +9,12 @@ This document describes how tab behavior works in the Mikoto client, particularl
 When clicking on an explorer node (e.g., a channel in the space sidebar):
 
 1. **Ctrl+Click** (on any node):
+
    - Always opens the node in a new tab, regardless of existing tabs
    - Useful for deliberately creating multiple instances of the same panel
 
 2. **Regular Click** (when no tabs exist):
+
    - Opens the node in the first tab
    - This is the default behavior when starting the application
 
@@ -26,6 +28,7 @@ When clicking on an explorer node (e.g., a channel in the space sidebar):
 The tab behavior is implemented through two main components:
 
 1. **Explorer Component** (`components/surfaces/Explorer/index.tsx`):
+
    - Handles node clicks and determines whether to create a new tab
    - Uses a simple rule: if tabs exist or Ctrl is pressed, create a new tab
 
@@ -36,6 +39,7 @@ The tab behavior is implemented through two main components:
    - Keeps track of previously processed tabs to prevent duplicate panels
 
 The state management occurs through:
+
 - Recoil atoms for tab state
 - A tabs array that maps to panels in the DockView
 - The tabkit utility for tab operations

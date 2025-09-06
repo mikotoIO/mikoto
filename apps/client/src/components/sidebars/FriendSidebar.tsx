@@ -11,7 +11,6 @@ import { useRecoilState } from 'recoil';
 
 import { Avatar } from '@/components/atoms/Avatar';
 import { hoverableButtonLike } from '@/components/design';
-import { useMikoto } from '@/hooks';
 import { treebarSpaceState } from '@/store';
 import { useTabkit } from '@/store/surface';
 
@@ -32,7 +31,6 @@ const StyledButtonBase = styled.div`
 
 export const FriendSidebar = observer(() => {
   const tabkit = useTabkit();
-  const mikoto = useMikoto();
   const [, setLeftSidebar] = useRecoilState(treebarSpaceState);
 
   useEffect(() => {

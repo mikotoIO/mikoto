@@ -1,4 +1,3 @@
-/* eslint-disable no-bitwise */
 export const permissions = {
   superuser: 1n << 0n,
   // Management permissions

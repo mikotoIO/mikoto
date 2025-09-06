@@ -5,16 +5,18 @@ on:
   pull_request_target:
     types: [opened, closed, synchronize]
 
-# explicitly configure permissions, in case your GITHUB_TOKEN workflow permissions are set to read-only in repository settings
+# Explicitly configure minimal permissions following principle of least privilege
 permissions:
-  actions: write
-  contents: write # this can be 'read' if the signatures are in remote repository
-  pull-requests: write
-  statuses: write
+  actions: read
+  contents: read # signatures are stored in remote repository, only read access needed
+  pull-requests: write # needed to comment on PRs
+  statuses: write # needed to set PR status checks
 
 jobs:
   CLAAssistant:
     runs-on: ubuntu-latest
+    # Additional security for pull_request_target events
+    if: github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'issue_comment'
     steps:
       - name: 'CLA Assistant'
         if: (github.event.comment.body == 'recheck' || github.event.comment.body == 'I have read the CLA Document and I hereby sign the CLA') || github.event_name == 'pull_request_target'

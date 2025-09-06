@@ -52,13 +52,15 @@ impl Captcha for Hcaptcha {
 }
 
 static CAPTCHA: OnceLock<Box<dyn Captcha>> = OnceLock::new();
-pub fn captcha() -> &'static Box<dyn Captcha> {
-    CAPTCHA.get_or_init(|| match env().captcha.provider.as_str() {
-        "disabled" => Box::new(CaptchaDisabled),
-        "hcaptcha" => Box::new(Hcaptcha {
-            secret: env().captcha.secret.clone(),
-            url: env().captcha.url.clone(),
-        }),
-        _ => panic!("Invalid captcha provider"),
-    })
+pub fn captcha() -> &'static dyn Captcha {
+    CAPTCHA
+        .get_or_init(|| match env().captcha.provider.as_str() {
+            "disabled" => Box::new(CaptchaDisabled),
+            "hcaptcha" => Box::new(Hcaptcha {
+                secret: env().captcha.secret.clone(),
+                url: env().captcha.url.clone(),
+            }),
+            _ => panic!("Invalid captcha provider"),
+        })
+        .as_ref()
 }

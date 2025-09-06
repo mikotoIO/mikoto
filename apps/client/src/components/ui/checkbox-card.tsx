@@ -1,14 +1,14 @@
-import { CheckboxCard as ChakraCheckboxCard } from "@chakra-ui/react"
-import { Fragment, forwardRef } from "react"
+import { CheckboxCard as ChakraCheckboxCard } from '@chakra-ui/react';
+import { Fragment, forwardRef } from 'react';
 
 export interface CheckboxCardProps extends ChakraCheckboxCard.RootProps {
-  icon?: React.ReactElement
-  label?: React.ReactNode
-  description?: React.ReactNode
-  addon?: React.ReactNode
-  indicator?: React.ReactNode | null
-  indicatorPlacement?: "start" | "end" | "inside"
-  inputProps?: React.InputHTMLAttributes<HTMLInputElement>
+  icon?: React.ReactElement;
+  label?: React.ReactNode;
+  description?: React.ReactNode;
+  addon?: React.ReactNode;
+  indicator?: React.ReactNode | null;
+  indicatorPlacement?: 'start' | 'end' | 'inside';
+  inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 }
 
 export const CheckboxCard = forwardRef<HTMLInputElement, CheckboxCardProps>(
@@ -20,18 +20,18 @@ export const CheckboxCard = forwardRef<HTMLInputElement, CheckboxCardProps>(
       icon,
       addon,
       indicator = <ChakraCheckboxCard.Indicator />,
-      indicatorPlacement = "end",
+      indicatorPlacement = 'end',
       ...rest
-    } = props
+    } = props;
 
-    const hasContent = label || description || icon
-    const ContentWrapper = indicator ? ChakraCheckboxCard.Content : Fragment
+    const hasContent = label || description || icon;
+    const ContentWrapper = indicator ? ChakraCheckboxCard.Content : Fragment;
 
     return (
       <ChakraCheckboxCard.Root {...rest}>
         <ChakraCheckboxCard.HiddenInput ref={ref} {...inputProps} />
         <ChakraCheckboxCard.Control>
-          {indicatorPlacement === "start" && indicator}
+          {indicatorPlacement === 'start' && indicator}
           {hasContent && (
             <ContentWrapper>
               {icon}
@@ -43,15 +43,15 @@ export const CheckboxCard = forwardRef<HTMLInputElement, CheckboxCardProps>(
                   {description}
                 </ChakraCheckboxCard.Description>
               )}
-              {indicatorPlacement === "inside" && indicator}
+              {indicatorPlacement === 'inside' && indicator}
             </ContentWrapper>
           )}
-          {indicatorPlacement === "end" && indicator}
+          {indicatorPlacement === 'end' && indicator}
         </ChakraCheckboxCard.Control>
         {addon && <ChakraCheckboxCard.Addon>{addon}</ChakraCheckboxCard.Addon>}
       </ChakraCheckboxCard.Root>
-    )
+    );
   },
-)
+);
 
-export const CheckboxCardIndicator = ChakraCheckboxCard.Indicator
+export const CheckboxCardIndicator = ChakraCheckboxCard.Indicator;

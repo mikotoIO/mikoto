@@ -42,7 +42,7 @@ pub async fn route(
         .ok_or(Error::NotFound)?;
 
     // TODO: This is very hacky. Allow the user to provide their own file types.
-    let mut ext = mime_to_ext(&file.content_type().unwrap_or(&"???"));
+    let mut ext = mime_to_ext(file.content_type().unwrap_or("???"));
 
     let mut buf = file.bytes().await.map_err(|_| Error::BadRequest)?.to_vec();
 

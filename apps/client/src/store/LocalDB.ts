@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
 import { z } from 'zod';
 
@@ -24,7 +23,7 @@ export class LocalDB<T> {
 
     try {
       return this.schema.parse(JSON.parse(value));
-    } catch (_) {
+    } catch {
       return this.init();
     }
   }

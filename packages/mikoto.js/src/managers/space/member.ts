@@ -31,7 +31,6 @@ export class MikotoMember extends ZSchema(MemberExt) {
   }
 
   get roleColor() {
-    // eslint-disable-next-line no-restricted-syntax
     for (const roleId of this.roleIds) {
       const role = this.space!.roles._get(roleId);
       if (role && role.color) {
@@ -69,6 +68,8 @@ export class MikotoMember extends ZSchema(MemberExt) {
 
     let act = typeof action === 'string' ? BigInt(action) : action;
     if (superuserOverride) {
+      // TODO: Check this at a later point to check for security
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       act |= BigInt(
         roles.find((x) => x.name === '@everyone')?.permissions ?? 0n,
       );

@@ -1,6 +1,6 @@
 import { AuthClient, MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
 import React, { useContext, useEffect, useState } from 'react';
-import { Snapshot, getVersion, proxy, useSnapshot } from 'valtio';
+import { getVersion, proxy, useSnapshot } from 'valtio';
 
 import { useInterval } from './useInterval';
 
@@ -23,17 +23,17 @@ export function useEvent() {}
 export const useFetchMember = (space: MikotoSpace) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  
+
   useEffect(() => {
     let isMounted = true;
-    
+
     const fetchMembers = async () => {
       if (!space?.id) return;
-      
+
       try {
         setIsLoading(true);
         setError(null);
-        
+
         // Force a direct fetch from server
         await space.members.list();
         if (isMounted) {
@@ -46,14 +46,14 @@ export const useFetchMember = (space: MikotoSpace) => {
         }
       }
     };
-    
+
     fetchMembers();
-    
+
     return () => {
       isMounted = false;
     };
   }, [space?.id]);
-  
+
   return { isLoading, error };
 };
 

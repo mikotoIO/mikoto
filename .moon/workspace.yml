@@ -9,4 +9,4 @@ projects:
   - 'packages/*'
 vcs:
   manager: 'git'
-  defaultBranch: 'main'
+  defaultBranch: 'dev'

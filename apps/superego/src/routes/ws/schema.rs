@@ -8,11 +8,10 @@ use tokio::sync::RwLock;
 
 use crate::error::Error;
 
-type CommandFilter<S> = Box<dyn Fn(Value, Arc<RwLock<S>>) -> BoxFuture<'static, Result<(), Error>> + Send + Sync>;
+type CommandFilter<S> =
+    Box<dyn Fn(Value, Arc<RwLock<S>>) -> BoxFuture<'static, Result<(), Error>> + Send + Sync>;
 type EventFilter<S> = Box<
-    dyn Fn(Value, Arc<RwLock<S>>) -> BoxFuture<'static, Result<Option<Value>, Error>>
-        + Send
-        + Sync,
+    dyn Fn(Value, Arc<RwLock<S>>) -> BoxFuture<'static, Result<Option<Value>, Error>> + Send + Sync,
 >;
 
 pub struct WebSocketRouter<S> {

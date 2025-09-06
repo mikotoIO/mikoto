@@ -69,12 +69,7 @@ async fn create(
         .create(db())
         .await?;
     }
-    emit_event(
-        "channels.onCreate",
-        &channel,
-        &format!("space:{space_id}"),
-    )
-    .await?;
+    emit_event("channels.onCreate", &channel, &format!("space:{space_id}")).await?;
 
     Ok(channel.into())
 }

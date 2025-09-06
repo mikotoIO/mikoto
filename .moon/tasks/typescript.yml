@@ -1,5 +1,0 @@
-tasks:
-  typecheck:
-    command: 'cargo check'
-  test:
-    command: 'cargo test'

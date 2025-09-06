@@ -60,7 +60,6 @@ corepack enable
 
 # install dependencies
 pnpm install
-cargo check
 
 # Copy .env.example to .env and set the variables
 cp ./apps/superego/.env.example ./apps/superego/.env
@@ -81,16 +80,10 @@ Use Docker Compose to run the necessary services.
 To develop apps and packages, run the following command:
 
 ```sh
-pnpm start
-```
+cargo run --bin superego # Backend
+cargo run --bin content-proxy # CDN
 
-To browse/edit the Database run the following command:
-
-Check Dockerfiles and Github Actions for more details, until more documentation is added.
-
-```sh
-cd apps/server
-prisma studio
+cd ./apps/client && pnpm start # Frontend-
 ```
 
 ### Build

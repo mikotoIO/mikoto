@@ -91,7 +91,7 @@ cd ./apps/client && pnpm start # Frontend-
 To build all apps and packages, run the following command:
 
 ```sh
-yarn build
+pnpm build
 ```
 
 ## Port Configuration

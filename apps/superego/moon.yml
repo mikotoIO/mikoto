@@ -1,1 +1,5 @@
 language: 'rust'
+tags: ['core-app']
+tasks:
+  start:
+    command: cargo run --bin superego

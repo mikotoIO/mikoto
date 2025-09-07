@@ -11,8 +11,7 @@
   <a href='https://mikoto.io'>Website</a> · 
   <a href='https://alpha.mikoto.io'>Alpha</a> ·
   <a href='https://docs.mikoto.io'>Docs</a> ·
-  <a href='https://blog.mikoto.io'>Blog</a> ·
-  <a href='https://twitter.com/mikotoIO'>Twitter</a>
+  <a href='https://blog.mikoto.io'>Blog</a>
 </p>
 <br>
 
@@ -75,15 +74,11 @@ docker-compose up
 
 Mikoto uses a Moon-based monorepo.
 
-Use Docker Compose to run the necessary services.
-
 To develop apps and packages, run the following command:
 
 ```sh
-cargo run --bin superego # Backend
-cargo run --bin content-proxy # CDN
-
-cd ./apps/client && pnpm start # Frontend-
+docker compose up -d # Run auxiliary services
+moon :start --query "tag~core-app" # superego, content-proxy and client
 ```
 
 ### Build

@@ -23,10 +23,28 @@ const AppContainer = styled.div`
   background-color: var(--chakra-colors-subsurface);
   color: var(--chakra-colors-text);
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   flex: 1;
+  overflow: hidden;
+`;
+
+const TopBar = styled.div`
+  background-color: var(--chakra-colors-surface);
+  height: 32px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--chakra-colors-gray-700);
+  flex-shrink: 0;
+`;
+
+const MainContent = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 `;
 
@@ -86,71 +104,76 @@ const AppView = () => {
 
   return (
     <AppContainer>
-      <LeftBar>
-        <div className="bars">
-          <SpaceSidebar />
-          {workspace.leftOpen && (
-            <Sidebar
-              position="left"
-              size={workspace.left}
-              onResize={(size) => {
-                setWorkspace((ws) => ({
-                  ...ws,
-                  left: ws.left + size.width,
-                }));
-              }}
-            >
-              {leftSidebar ? (
-                <TabViewSwitch tab={leftSidebar} />
-              ) : (
-                <FriendSidebar />
-              )}
-            </Sidebar>
-          )}
-        </div>
-      </LeftBar>
-      <DockViewContainer>
-        <DockViewSurface />
-      </DockViewContainer>
-      <LeftBar>
-        <div className="bars">
-          {workspace.rightOpen ? (
-            <Sidebar
-              position="right"
-              size={workspace.right}
-              onResize={(size) => {
-                setWorkspace((ws) => ({
-                  ...ws,
-                  right: ws.right + size.width,
-                }));
-              }}
-            >
-              {space && <MemberListSidebar space={space} />}
-            </Sidebar>
-          ) : (
-            <Box
-              as="button"
-              h="100%"
-              w="32px"
-              bg="subsurface"
-              borderLeft="1px solid"
-              borderColor="gray.650"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              flexShrink={0}
-              onClick={() => {
-                setWorkspace((ws) => ({
-                  ...ws,
-                  rightOpen: true,
-                }));
-              }}
-            >
-              <FontAwesomeIcon icon={faBarsStaggered} />
-            </Box>
-          )}
-        </div>
-      </LeftBar>
+      <TopBar>
+        <FontAwesomeIcon icon={faMikoto} />
+      </TopBar>
+      <MainContent>
+        <LeftBar>
+          <div className="bars">
+            <SpaceSidebar />
+            {workspace.leftOpen && (
+              <Sidebar
+                position="left"
+                size={workspace.left}
+                onResize={(size) => {
+                  setWorkspace((ws) => ({
+                    ...ws,
+                    left: ws.left + size.width,
+                  }));
+                }}
+              >
+                {leftSidebar ? (
+                  <TabViewSwitch tab={leftSidebar} />
+                ) : (
+                  <FriendSidebar />
+                )}
+              </Sidebar>
+            )}
+          </div>
+        </LeftBar>
+        <DockViewContainer>
+          <DockViewSurface />
+        </DockViewContainer>
+        <LeftBar>
+          <div className="bars">
+            {workspace.rightOpen ? (
+              <Sidebar
+                position="right"
+                size={workspace.right}
+                onResize={(size) => {
+                  setWorkspace((ws) => ({
+                    ...ws,
+                    right: ws.right + size.width,
+                  }));
+                }}
+              >
+                {space && <MemberListSidebar space={space} />}
+              </Sidebar>
+            ) : (
+              <Box
+                as="button"
+                h="100%"
+                w="32px"
+                bg="subsurface"
+                borderLeft="1px solid"
+                borderColor="gray.650"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                flexShrink={0}
+                onClick={() => {
+                  setWorkspace((ws) => ({
+                    ...ws,
+                    rightOpen: true,
+                  }));
+                }}
+              >
+                <FontAwesomeIcon icon={faBarsStaggered} />
+              </Box>
+            )}
+          </div>
+        </LeftBar>
+      </MainContent>
     </AppContainer>
   );
 };

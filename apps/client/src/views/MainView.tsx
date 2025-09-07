@@ -13,6 +13,7 @@ import { FriendSidebar } from '@/components/sidebars/FriendSidebar';
 import { MemberListSidebar } from '@/components/sidebars/MemberListSidebar';
 import { SpaceSidebar } from '@/components/sidebars/SpaceSidebar';
 import { surfaceMap } from '@/components/surfaces';
+import { TabBarButton } from '@/components/tabs';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState, workspaceState } from '@/store';
 import { Tabable } from '@/store/surface';
@@ -35,9 +36,22 @@ const TopBar = styled.div`
   height: 32px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 16px;
   border-bottom: 1px solid var(--chakra-colors-gray-700);
   flex-shrink: 0;
+`;
+
+const TopBarLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const TopBarRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;
 
 const MainContent = styled.div`
@@ -105,7 +119,33 @@ const AppView = () => {
   return (
     <AppContainer>
       <TopBar>
-        <FontAwesomeIcon icon={faMikoto} />
+        <TopBarLeft>
+          <TabBarButton
+            onClick={() => {
+              setWorkspace((ws) => ({
+                ...ws,
+                leftOpen: !ws.leftOpen,
+              }));
+            }}
+          >
+            <FontAwesomeIcon icon={faBarsStaggered} />
+          </TabBarButton>
+          <FontAwesomeIcon icon={faMikoto} />
+        </TopBarLeft>
+        <TopBarRight>
+          {space && (
+            <TabBarButton
+              onClick={() => {
+                setWorkspace((ws) => ({
+                  ...ws,
+                  rightOpen: !ws.rightOpen,
+                }));
+              }}
+            >
+              <FontAwesomeIcon icon={faBarsStaggered} />
+            </TabBarButton>
+          )}
+        </TopBarRight>
       </TopBar>
       <MainContent>
         <LeftBar>
@@ -136,7 +176,7 @@ const AppView = () => {
         </DockViewContainer>
         <LeftBar>
           <div className="bars">
-            {workspace.rightOpen ? (
+            {workspace.rightOpen && (
               <Sidebar
                 position="right"
                 size={workspace.right}
@@ -149,27 +189,6 @@ const AppView = () => {
               >
                 {space && <MemberListSidebar space={space} />}
               </Sidebar>
-            ) : (
-              <Box
-                as="button"
-                h="100%"
-                w="32px"
-                bg="subsurface"
-                borderLeft="1px solid"
-                borderColor="gray.650"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                flexShrink={0}
-                onClick={() => {
-                  setWorkspace((ws) => ({
-                    ...ws,
-                    rightOpen: true,
-                  }));
-                }}
-              >
-                <FontAwesomeIcon icon={faBarsStaggered} />
-              </Box>
             )}
           </div>
         </LeftBar>

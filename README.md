@@ -86,7 +86,7 @@ moon :start --query "tag~core-app" # superego, content-proxy and client
 To build all apps and packages, run the following command:
 
 ```sh
-yarn build
+pnpm build
 ```
 
 ## Port Configuration

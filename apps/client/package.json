@@ -125,7 +125,7 @@
   },
   "scripts": {
     "start": "vite",
-    "dev": "yarn start",
+    "dev": "pnpm start",
     "build": "vite build",
     "test": "vitest run",
     "test:watch": "vitest",

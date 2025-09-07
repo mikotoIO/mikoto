@@ -1,6 +1,6 @@
 import { Box, Center } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
+import { faBarsStaggered, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
@@ -129,7 +129,7 @@ const AppView = () => {
           >
             <FontAwesomeIcon icon={faBarsStaggered} />
           </TabBarButton>
-          <FontAwesomeIcon icon={faMikoto} />
+          {/* <FontAwesomeIcon icon={faMikoto} /> */}
         </TopBarLeft>
         <TopBarRight>
           {space && (
@@ -141,7 +141,7 @@ const AppView = () => {
                 }));
               }}
             >
-              <FontAwesomeIcon icon={faBarsStaggered} />
+              <FontAwesomeIcon icon={faUsers} />
             </TabBarButton>
           )}
         </TopBarRight>

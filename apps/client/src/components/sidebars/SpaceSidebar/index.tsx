@@ -186,7 +186,6 @@ export function SpaceSidebar() {
 
   useSnapshot(mikoto.spaces);
   const contextMenu = useContextMenu(() => <SpaceBackContextMenu />);
-  const setWorkspace = useSetRecoilState(workspaceState);
 
   const [order, setOrder] = useState<string[]>(() =>
     // TODO: persist to server

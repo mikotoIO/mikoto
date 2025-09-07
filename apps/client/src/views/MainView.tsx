@@ -37,7 +37,6 @@ const TopBar = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
   border-bottom: 1px solid var(--chakra-colors-gray-700);
   flex-shrink: 0;
 `;

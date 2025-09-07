@@ -17,7 +17,6 @@ import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import { SpaceIconLike, StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
 import { faMikoto } from '@/components/icons';
 import { SpaceJoinModal } from '@/components/modals/SpaceJoin';
-import { TabBarButton } from '@/components/tabs';
 import { reorder } from '@/functions/reorder';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState, workspaceState } from '@/store';
@@ -204,16 +203,6 @@ export function SpaceSidebar() {
 
   return (
     <StyledSpaceSidebar onContextMenu={contextMenu}>
-      <TabBarButton
-        onClick={() => {
-          setWorkspace((ws) => ({
-            ...ws,
-            leftOpen: !ws.leftOpen,
-          }));
-        }}
-      >
-        <FontAwesomeIcon icon={faBarsStaggered} />
-      </TabBarButton>
       <StyledIconWrapper>
         <UserAreaAvatar />
       </StyledIconWrapper>

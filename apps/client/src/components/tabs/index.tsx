@@ -31,6 +31,6 @@ export const TabBarButton = styled.button`
   color: var(--chakra-colors-gray-300);
   background-color: transparent;
   &:hover {
-    background-color: var(--chakra-colors-gray-700);
+    background-color: var(--chakra-colors-gray-600);
   }
 `;

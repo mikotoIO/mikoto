@@ -98,7 +98,6 @@ const HeaderContainer = styled.div`
 export const MemberListSidebar = observer(
   ({ space }: { space: MikotoSpace }) => {
     const { isLoading } = useFetchMember(space);
-    const [, setWorkspace] = useRecoilState(workspaceState);
 
     const fetchMembersManually = async () => {
       console.log('Manually fetching members');
@@ -134,16 +133,6 @@ export const MemberListSidebar = observer(
                   >
                     Members ({isLoading ? 'Loading' : spaceMembers.length})
                   </div>
-                  <TabBarButton
-                    onClick={() => {
-                      setWorkspace((ws) => ({
-                        ...ws,
-                        rightOpen: !ws.rightOpen,
-                      }));
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faBarsStaggered} />
-                  </TabBarButton>
                 </HeaderContainer>
               );
             },

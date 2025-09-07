@@ -1,2 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
+@font-face {
+  font-family: 'Inter';
+  src: url(/fonts/inter.ttf);
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url(/fonts/jetbrains-mono.ttf);
+}

@@ -10,7 +10,6 @@ import {
 } from '@mikoto-io/mikoto.js';
 import throttle from 'lodash/throttle';
 import { runInAction } from 'mobx';
-import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
@@ -70,7 +69,7 @@ function ChannelHead({ channel }: { channel: Channel }) {
 // as Virtuoso does not allow negative values
 const FUNNY_NUMBER = 69_420_000;
 
-const RealMessageView = observer(({ channel }: { channel: MikotoChannel }) => {
+function RealMessageView({ channel }: { channel: MikotoChannel }) {
   useFetchMember(channel.space!);
 
   const virtuosoRef = useRef<VirtuosoHandle>(null);
@@ -284,7 +283,7 @@ const RealMessageView = observer(({ channel }: { channel: MikotoChannel }) => {
       </Grid>
     </Surface>
   );
-});
+}
 
 export function MessageSurface({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();

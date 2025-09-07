@@ -1,5 +1,4 @@
 import { Box, Button, Flex, Heading, Input, Textarea } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -104,7 +103,7 @@ function NameChangeModal() {
   );
 }
 
-const Overview = observer(() => {
+function Overview() {
   const setModal = useSetRecoilState(modalState);
   const { t } = useTranslation();
 
@@ -188,7 +187,7 @@ const Overview = observer(() => {
       <Box mb="80px" />
     </SettingSurface>
   );
-});
+}
 
 function Switch({ nav }: { nav: string }) {
   switch (nav) {

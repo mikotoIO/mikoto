@@ -5,7 +5,6 @@ import {
   faUserGroup,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 
@@ -29,7 +28,7 @@ const StyledButtonBase = styled.div`
   }
 `;
 
-export const FriendSidebar = observer(() => {
+export function FriendSidebar() {
   const tabkit = useTabkit();
   const [, setLeftSidebar] = useRecoilState(treebarSpaceState);
 
@@ -103,4 +102,4 @@ export const FriendSidebar = observer(() => {
       ))}
     </Box>
   );
-});
+}

@@ -6,9 +6,13 @@ on:
     branches:
       - '**'
       - '!dependabot/**'
+
 jobs:
-  typecheck:
-    name: 'Typecheck'
+  ci:
+    strategy:
+      matrix:
+        task: [typecheck, test, lint]
+    name: ${{ matrix.task }}
     runs-on: 'ubuntu-latest'
     permissions:
       contents: read
@@ -26,44 +30,4 @@ jobs:
           node-version: 22
           cache: 'pnpm'
       - uses: 'moonrepo/setup-toolchain@v0'
-      - run: 'moon ci :typecheck'
-  test:
-    name: 'Test'
-    runs-on: 'ubuntu-latest'
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - name: Use Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'pnpm'
-      - uses: 'moonrepo/setup-toolchain@v0'
-      - run: 'moon ci :test'
-  lint:
-    name: 'Lint'
-    runs-on: 'ubuntu-latest'
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - name: Use Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'pnpm'
-      - uses: 'moonrepo/setup-toolchain@v0'
-      - run: 'moon ci :lint'
+      - run: 'moon ci :${{ matrix.task }}'

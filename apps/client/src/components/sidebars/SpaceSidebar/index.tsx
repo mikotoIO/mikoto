@@ -1,9 +1,6 @@
 import { Separator } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import {
-  faBarsStaggered,
-  faCirclePlus,
-} from '@fortawesome/free-solid-svg-icons';
+import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
 import React, { useRef, useState } from 'react';

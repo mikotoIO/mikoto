@@ -8,8 +8,7 @@
     "start": "tsc && electron-forge start",
     "package": "tsc && electron-forge package",
     "make": "tsc && electron-forge make",
-    "publish": "tsc && electron-forge publish",
-    "lint": "echo \"No linting configured\""
+    "publish": "tsc && electron-forge publish"
   },
   "keywords": [],
   "author": {

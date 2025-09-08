@@ -1,8 +1,7 @@
 import { Box, Flex } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { MikotoMessage } from '@mikoto-io/mikoto.js';
-import { makeAutoObservable, runInAction } from 'mobx';
-import { atom } from 'jotai';
+import { atom, useSetAtom } from 'jotai';
 import { useSnapshot } from 'valtio/react';
 
 import { ContextMenu, useContextMenu } from '@/components/ContextMenu';
@@ -79,29 +78,22 @@ const Name = styled.div<{ color?: string | null }>`
 interface MessageProps {
   message: MikotoMessage;
   isSimple?: boolean;
-  editState: MessageEditState;
 }
 
 export const messageEditIdState = atom<{ id: string; content: string } | null>(null);
 
-export class MessageEditState {
-  message: MikotoMessage | null = null;
-  constructor() {
-    makeAutoObservable(this);
-  }
-}
+export const messageEditState = atom<MikotoMessage | null>(null);
 
-export const MessageItem = ({ message, editState, isSimple }: MessageProps) => {
+export const MessageItem = ({ message, isSimple }: MessageProps) => {
   const messageSnap = useSnapshot(message);
   const mikoto = useMikoto();
+  const setEditState = useSetAtom(messageEditState);
   const menu = useContextMenu(() => (
     <ContextMenu>
       {message.authorId === mikoto.user.me!.id && (
         <ContextMenu.Link
           onClick={() => {
-            runInAction(() => {
-              editState.message = message;
-            });
+            setEditState(message);
           }}
         >
           Edit Message

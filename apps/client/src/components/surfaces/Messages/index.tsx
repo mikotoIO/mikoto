@@ -8,9 +8,8 @@ import {
   MikotoChannel,
   MikotoMessage,
 } from '@mikoto-io/mikoto.js';
+import { useAtomValue, useSetAtom } from 'jotai';
 import throttle from 'lodash/throttle';
-import { runInAction } from 'mobx';
-import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
@@ -21,7 +20,7 @@ import { CurrentSpaceContext } from '@/store';
 import { Spinner } from '@/ui/Spinner';
 
 import { DateSeparator, showDateSeparator } from './DateSeparator';
-import { MessageEditState, MessageItem } from './Message';
+import { MessageItem, messageEditState } from './Message';
 import { MessageEditor } from './MessageEditor';
 import { TypingIndicator, useTyping } from './TypingIndicator';
 
@@ -70,7 +69,7 @@ function ChannelHead({ channel }: { channel: Channel }) {
 // as Virtuoso does not allow negative values
 const FUNNY_NUMBER = 69_420_000;
 
-const RealMessageView = observer(({ channel }: { channel: MikotoChannel }) => {
+function RealMessageView({ channel }: { channel: MikotoChannel }) {
   useFetchMember(channel.space!);
 
   const virtuosoRef = useRef<VirtuosoHandle>(null);
@@ -81,7 +80,8 @@ const RealMessageView = observer(({ channel }: { channel: MikotoChannel }) => {
 
   const [currentTypers, setCurrentTypers] = useTyping();
   const [bottomState, setBottomState] = useState(false);
-  const [messageEditState] = useState(() => new MessageEditState());
+  const currentEditState = useAtomValue(messageEditState);
+  const setEditState = useSetAtom(messageEditState);
 
   // TODO: When I wrote this code, only God and I understood what I was doing
   // At this point, I don't think God understands it either
@@ -239,7 +239,6 @@ const RealMessageView = observer(({ channel }: { channel: MikotoChannel }) => {
                     <DateSeparator date={new Date(msg.timestamp)} />
                   )}
                   <MessageItem
-                    editState={messageEditState}
                     message={msg}
                     // message={new ClientMessage(mikoto, msg)}
                     isSimple={isMessageSimple(
@@ -252,9 +251,8 @@ const RealMessageView = observer(({ channel }: { channel: MikotoChannel }) => {
             />
           )}
           <MessageEditor
-            editState={messageEditState}
             placeholder={`Message #${channel.name}`}
-            key={messageEditState.message?.id ?? 'base'}
+            key={currentEditState?.id ?? 'base'}
             onTyping={() => {
               typing();
             }}
@@ -268,11 +266,9 @@ const RealMessageView = observer(({ channel }: { channel: MikotoChannel }) => {
               }
             }}
             onSubmit={async (msg) => {
-              if (messageEditState.message) {
-                const m = messageEditState.message;
-                runInAction(() => {
-                  messageEditState.message = null;
-                });
+              if (currentEditState) {
+                const m = currentEditState;
+                setEditState(null);
                 await m.edit(msg);
               } else {
                 await channel.sendMessage(msg);
@@ -284,7 +280,7 @@ const RealMessageView = observer(({ channel }: { channel: MikotoChannel }) => {
       </Grid>
     </Surface>
   );
-});
+}
 
 export function MessageSurface({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();

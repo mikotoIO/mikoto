@@ -3,10 +3,10 @@ import styled from '@emotion/styled';
 import { faBarsStaggered, faCrown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoMember, MikotoSpace } from '@mikoto-io/mikoto.js';
+import { useSetAtom } from 'jotai';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
-import { useSetAtom } from 'jotai';
 import { useSnapshot } from 'valtio';
 
 import { contextMenuState, useContextMenu } from '@/components/ContextMenu';
@@ -14,10 +14,8 @@ import { Avatar } from '@/components/atoms/Avatar';
 import { MemberContextMenu } from '@/components/atoms/MessageAvatar';
 import { hoverableButtonLike } from '@/components/design';
 import { UserContextMenu } from '@/components/modals/ContextMenus';
-import { TabBarButton } from '@/components/tabs';
 import { Tag } from '@/components/ui';
 import { useFetchMember } from '@/hooks';
-import { workspaceState } from '@/store';
 
 const StyledMember = styled.div`
   display: flex;

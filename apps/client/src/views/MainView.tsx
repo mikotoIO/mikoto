@@ -153,11 +153,11 @@ const AppView = () => {
             {workspace.leftOpen && (
               <Sidebar
                 position="left"
-                size={workspace.left}
+                size={workspace.left || 300}
                 onResize={(size) => {
                   setWorkspace((ws) => ({
                     ...ws,
-                    left: ws.left + size.width,
+                    left: (ws.left || 300) + size.width,
                   }));
                 }}
               >
@@ -178,11 +178,11 @@ const AppView = () => {
             {workspace.rightOpen && (
               <Sidebar
                 position="right"
-                size={workspace.right}
+                size={workspace.right || 300}
                 onResize={(size) => {
                   setWorkspace((ws) => ({
                     ...ws,
-                    right: ws.right + size.width,
+                    right: (ws.right || 300) + size.width,
                   }));
                 }}
               >

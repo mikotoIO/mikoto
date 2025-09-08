@@ -1,6 +1,6 @@
 import { MikotoMember, User } from '@mikoto-io/mikoto.js';
 import { permissions } from '@mikoto-io/permcheck';
-import { useSetRecoilState } from 'recoil';
+import { useSetAtom } from 'jotai';
 
 import { ContextMenu, modalState } from '@/components/ContextMenu';
 import { ProfileModal } from '@/components/modals/Profile';
@@ -11,7 +11,7 @@ interface UserContextMenuProps {
 }
 
 export function UserContextMenu({ user, member }: UserContextMenuProps) {
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
 
   return (
     <ContextMenu>

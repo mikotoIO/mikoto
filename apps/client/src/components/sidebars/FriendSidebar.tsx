@@ -7,7 +7,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import { useRecoilState } from 'recoil';
+import { useAtom } from 'jotai';
 
 import { Avatar } from '@/components/atoms/Avatar';
 import { hoverableButtonLike } from '@/components/design';
@@ -31,7 +31,7 @@ const StyledButtonBase = styled.div`
 
 export const FriendSidebar = observer(() => {
   const tabkit = useTabkit();
-  const [, setLeftSidebar] = useRecoilState(treebarSpaceState);
+  const [, setLeftSidebar] = useAtom(treebarSpaceState);
 
   useEffect(() => {
     // mikoto.relations.list(true);

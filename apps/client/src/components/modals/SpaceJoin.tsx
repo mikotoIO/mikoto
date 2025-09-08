@@ -3,7 +3,7 @@ import { Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { AxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
-import { useSetRecoilState } from 'recoil';
+import { useSetAtom } from 'jotai';
 
 import { modalState } from '@/components/ContextMenu';
 import { Field } from '@/components/ui';
@@ -70,7 +70,7 @@ function SpaceJoinForm({ closeModal }: { closeModal: () => void }) {
 }
 
 export function SpaceJoinModal() {
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
 
   return (
     <DialogContent rounded="md" p={4} maxW="480px">

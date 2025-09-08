@@ -1,7 +1,8 @@
 import { Flex, Heading } from '@chakra-ui/react';
 import { User } from '@mikoto-io/mikoto.js';
 import { useEffect } from 'react';
-import { atom, useRecoilState } from 'recoil';
+import { atom } from 'jotai';
+import { useAtom } from 'jotai';
 
 import { ContextMenu, useContextMenu } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';
@@ -10,10 +11,7 @@ import { useMikoto } from '@/hooks';
 import { useModalKit } from '@/store';
 import { useTabkit } from '@/store/surface';
 
-export const userState = atom<User | null>({
-  default: null,
-  key: 'user',
-});
+export const userState = atom<User | null>(null);
 
 function UserAreaMenuItems() {
   const tabkit = useTabkit();
@@ -103,7 +101,7 @@ function UserAreaMenu() {
 
 export function UserAreaAvatar() {
   const mikoto = useMikoto();
-  const [user, setUser] = useRecoilState(userState);
+  const [user, setUser] = useAtom(userState);
   const contextMenu = useContextMenu(() => <UserAreaMenu />, {
     top: 32,
     left: 64,

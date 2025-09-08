@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
 import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useAtom, useSetAtom } from 'jotai';
 import { useSnapshot } from 'valtio/react';
 
 import { modalState, useContextMenu } from '@/components/ContextMenu';
@@ -97,12 +97,12 @@ function CombinedDnD<T>({
 
 function SidebarSpaceIcon({ space }: SidebarSpaceIconProps) {
   // TODO: TF is this name?
-  const [leftSidebar, setLeftSidebar] = useRecoilState(treebarSpaceState);
+  const [leftSidebar, setLeftSidebar] = useAtom(treebarSpaceState);
   const isActive =
     leftSidebar &&
     leftSidebar.kind === 'explorer' &&
     leftSidebar.spaceId === space.id;
-  const setWorkspace = useSetRecoilState(workspaceState);
+  const setWorkspace = useSetAtom(workspaceState);
 
   const contextMenu = useContextMenu(() => <SpaceContextMenu space={space} />);
 
@@ -159,7 +159,7 @@ function orderSpaces(mikoto: MikotoClient, order: string[]) {
 }
 
 function JoinSpaceButon() {
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
 
   return (
     <SpaceIconTooltip tooltip="Add / Join Space">
@@ -185,11 +185,11 @@ const ICON_SIZE = '40px';
 
 export function SpaceSidebar() {
   const mikoto = useMikoto();
-  const [spaceId, setSpaceId] = useRecoilState(treebarSpaceState);
+  const [spaceId, setSpaceId] = useAtom(treebarSpaceState);
 
   useSnapshot(mikoto.spaces);
   const contextMenu = useContextMenu(() => <SpaceBackContextMenu />);
-  const setWorkspace = useSetRecoilState(workspaceState);
+  const setWorkspace = useSetAtom(workspaceState);
 
   const [order, setOrder] = useState<string[]>(() =>
     // TODO: persist to server

@@ -2,7 +2,7 @@ import { Box, Center } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faBarsStaggered, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useAtom, useAtomValue } from 'jotai';
 
 import { CommandMenuKit } from '@/components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
@@ -104,9 +104,9 @@ const DockViewContainer = styled.div`
 `;
 
 const AppView = () => {
-  const leftSidebar = useRecoilValue(treebarSpaceState);
+  const leftSidebar = useAtomValue(treebarSpaceState);
   const mikoto = useMikoto();
-  const [workspace, setWorkspace] = useRecoilState(workspaceState);
+  const [workspace, setWorkspace] = useAtom(workspaceState);
 
   const spaceId =
     leftSidebar && leftSidebar.kind === 'explorer'

@@ -1,12 +1,7 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { createContext } from 'react';
-import {
-  atom,
-  atomFamily,
-  selector,
-  useRecoilState,
-  useRecoilValue,
-} from 'recoil';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { atomFamily } from 'jotai/utils';
 
 import type { TabBaseType } from '@/components/surfaces';
 
@@ -19,32 +14,18 @@ export interface DockViewLayout {
   activeGroup?: string;
 }
 
-// Recoil atoms for tab state
-export const tabsState = atom<Tabable[]>({
-  key: 'tabsState',
-  default: [],
-});
+// Jotai atoms for tab state
+export const tabsState = atom<Tabable[]>([]);
 
-export const layoutState = atom<DockViewLayout | null>({
-  key: 'layoutState',
-  default: null,
-});
+export const layoutState = atom<DockViewLayout | null>(null);
 
-export const activeTabIdState = atom<string | null>({
-  key: 'activeTabIdState',
-  default: null,
-});
+export const activeTabIdState = atom<string | null>(null);
 
-// Selector to get a tab by ID
-export const tabByIdSelector = selector({
-  key: 'tabByIdSelector',
-  get:
-    ({ get }) =>
-    (id: string) => {
-      const tabs = get(tabsState);
-      const [kind, key] = id.split('/');
-      return tabs.find((tab) => tab.kind === kind && tab.key === key);
-    },
+// Derived atom to get a tab by ID
+export const tabByIdSelector = atom((get) => (id: string) => {
+  const tabs = get(tabsState);
+  const [kind, key] = id.split('/');
+  return tabs.find((tab) => tab.kind === kind && tab.key === key);
 });
 
 export interface TabNameProps {
@@ -52,21 +33,20 @@ export interface TabNameProps {
   icon?: IconDefinition | string;
 }
 
-export const tabNameFamily = atomFamily<TabNameProps, string>({
-  key: 'tabName',
-  default: {
+export const tabNameFamily = atomFamily((param: string) => 
+  atom<TabNameProps>({
     name: '',
-  },
-});
+  })
+);
 
 export const TabContext = createContext<{ key: string }>({
   key: '',
 });
 
 export function useTabkit() {
-  const [tabs, setTabs] = useRecoilState(tabsState);
-  const [activeTabId, setActiveTabId] = useRecoilState(activeTabIdState);
-  const getTabById = useRecoilValue(tabByIdSelector);
+  const [tabs, setTabs] = useAtom(tabsState);
+  const [activeTabId, setActiveTabId] = useAtom(activeTabIdState);
+  const getTabById = useAtomValue(tabByIdSelector);
 
   // Storage functions removed temporarily
   const saveTabsToStorage = (_newTabs: Tabable[]) => {
@@ -138,13 +118,13 @@ export function useTabkit() {
 
 // Helper function to get tabs for components that were previously using surfaceStore directly
 export function useTabs() {
-  return useRecoilValue(tabsState);
+  return useAtomValue(tabsState);
 }
 
 export function useActiveTabId() {
-  return useRecoilValue(activeTabIdState);
+  return useAtomValue(activeTabIdState);
 }
 
 export function useLayout() {
-  return useRecoilValue(layoutState);
+  return useAtomValue(layoutState);
 }

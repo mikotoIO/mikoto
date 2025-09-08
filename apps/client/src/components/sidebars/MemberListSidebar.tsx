@@ -6,7 +6,7 @@ import { MikotoMember, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useSetAtom } from 'jotai';
 import { useSnapshot } from 'valtio';
 
 import { contextMenuState, useContextMenu } from '@/components/ContextMenu';
@@ -29,7 +29,7 @@ const StyledMember = styled.div`
 `;
 
 const MemberElement = observer(({ member }: { member: MikotoMember }) => {
-  const setContextMenu = useSetRecoilState(contextMenuState);
+  const setContextMenu = useSetAtom(contextMenuState);
   const elemRef = useRef<HTMLDivElement>(null);
 
   const userContextMenu = useContextMenu(() => (

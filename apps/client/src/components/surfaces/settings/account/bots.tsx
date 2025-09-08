@@ -6,7 +6,7 @@ import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { useSetRecoilState } from 'recoil';
+import { useSetAtom } from 'jotai';
 
 import { modalState } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';
@@ -84,7 +84,7 @@ function BotCard({ id, name, secret }: BotProps) {
 function BotCreateModal() {
   const authClient = useAuthClient();
   const { register, handleSubmit } = useForm();
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
 
   return (
     <DialogContent rounded="md" p={4} maxW="480px">
@@ -108,7 +108,7 @@ function BotCreateModal() {
 
 export function BotsSurface() {
   const authClient = useAuthClient();
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
   const { t } = useTranslation();
 
   const { result: bots } = useAsync(() => authClient.listBots(), []);

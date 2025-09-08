@@ -3,7 +3,7 @@ import { MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useSetRecoilState } from 'recoil';
+import { useSetAtom } from 'jotai';
 import { useSnapshot } from 'valtio';
 
 import { modalState } from '@/components/ContextMenu';
@@ -23,7 +23,7 @@ import { RolesSubsurface } from './Roles';
 function AddBotModal({ space }: { space: MikotoSpace }) {
   const form = useForm();
   const mikoto = useMikoto();
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
   return (
     <DialogContent rounded="md" p={4} maxW="480px">
       <Form
@@ -55,7 +55,7 @@ function AddBotModal({ space }: { space: MikotoSpace }) {
 function Overview({ space }: { space: MikotoSpace }) {
   const { t } = useTranslation();
   const [spaceName, setSpaceName] = useState(space.name);
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
   const spaceSnap = useSnapshot(space);
 
   return (

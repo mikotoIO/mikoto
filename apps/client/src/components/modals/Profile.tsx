@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { User } from '@mikoto-io/mikoto.js';
-import { useSetRecoilState } from 'recoil';
+import { useSetAtom } from 'jotai';
 
 import { modalState } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';
@@ -40,7 +40,7 @@ const MikotoId = styled.h2`
 
 export function ProfileModal({ user }: { user: User }) {
   const mikoto = useMikoto();
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
 
   return (
     <DialogContent rounded="md" p={0} width="640px">

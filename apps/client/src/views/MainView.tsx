@@ -2,7 +2,7 @@ import { Box, Center } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faBarsStaggered, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useAtom, useAtomValue } from 'jotai';
 
 import { CommandMenuKit } from '@/components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
@@ -104,9 +104,9 @@ const DockViewContainer = styled.div`
 `;
 
 const AppView = () => {
-  const leftSidebar = useRecoilValue(treebarSpaceState);
+  const leftSidebar = useAtomValue(treebarSpaceState);
   const mikoto = useMikoto();
-  const [workspace, setWorkspace] = useRecoilState(workspaceState);
+  const [workspace, setWorkspace] = useAtom(workspaceState);
 
   const spaceId =
     leftSidebar && leftSidebar.kind === 'explorer'
@@ -153,11 +153,11 @@ const AppView = () => {
             {workspace.leftOpen && (
               <Sidebar
                 position="left"
-                size={workspace.left}
+                size={workspace.left || 300}
                 onResize={(size) => {
                   setWorkspace((ws) => ({
                     ...ws,
-                    left: ws.left + size.width,
+                    left: (ws.left || 300) + size.width,
                   }));
                 }}
               >
@@ -178,11 +178,11 @@ const AppView = () => {
             {workspace.rightOpen && (
               <Sidebar
                 position="right"
-                size={workspace.right}
+                size={workspace.right || 300}
                 onResize={(size) => {
                   setWorkspace((ws) => ({
                     ...ws,
-                    right: ws.right + size.width,
+                    right: (ws.right || 300) + size.width,
                   }));
                 }}
               >

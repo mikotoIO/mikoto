@@ -11,7 +11,6 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { RecoilEnv, RecoilRoot } from 'recoil';
 
 import App from '@/App';
 import { globalCss } from '@/components/chakraTheme';
@@ -43,29 +42,25 @@ if (SENTRY) {
   });
 }
 
-RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = !env.DEV;
-
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <HelmetProvider>
-      <RecoilRoot>
-        <ChakraProvider forcedTheme="dark">
-          <QueryClientProvider client={queryClient}>
-            <DndProvider backend={HTML5Backend}>
-              <>
-                <Helmet>
-                  {env.DEV && (
-                    <link rel="icon" type="image/png" href="/favicon-dev.ico" />
-                  )}
-                </Helmet>
-                <Global styles={globalCss} />
-                <App />
-                <ToastContainer theme="dark" limit={3} />
-              </>
-            </DndProvider>
-          </QueryClientProvider>
-        </ChakraProvider>
-      </RecoilRoot>
+      <ChakraProvider forcedTheme="dark">
+        <QueryClientProvider client={queryClient}>
+          <DndProvider backend={HTML5Backend}>
+            <>
+              <Helmet>
+                {env.DEV && (
+                  <link rel="icon" type="image/png" href="/favicon-dev.ico" />
+                )}
+              </Helmet>
+              <Global styles={globalCss} />
+              <App />
+              <ToastContainer theme="dark" limit={3} />
+            </>
+          </DndProvider>
+        </QueryClientProvider>
+      </ChakraProvider>
     </HelmetProvider>
   </React.StrictMode>,
 );

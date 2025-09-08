@@ -2,7 +2,7 @@ import { Box, Flex } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { MikotoMessage } from '@mikoto-io/mikoto.js';
 import { makeAutoObservable, runInAction } from 'mobx';
-import { atom } from 'recoil';
+import { atom } from 'jotai';
 import { useSnapshot } from 'valtio/react';
 
 import { ContextMenu, useContextMenu } from '@/components/ContextMenu';
@@ -82,10 +82,7 @@ interface MessageProps {
   editState: MessageEditState;
 }
 
-export const messageEditIdState = atom<{ id: string; content: string } | null>({
-  key: 'messageEditId',
-  default: null,
-});
+export const messageEditIdState = atom<{ id: string; content: string } | null>(null);
 
 export class MessageEditState {
   message: MikotoMessage | null = null;

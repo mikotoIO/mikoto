@@ -1,13 +1,13 @@
 import { Button, Heading, Input } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
-import { useSetRecoilState } from 'recoil';
+import { useSetAtom } from 'jotai';
 
 import { modalState } from '@/components/ContextMenu';
 import { DialogContent, Field } from '@/components/ui';
 import { Form } from '@/ui';
 
 export function SetStatusModal() {
-  const setModalState = useSetRecoilState(modalState);
+  const setModalState = useSetAtom(modalState);
   const form = useForm();
 
   return (

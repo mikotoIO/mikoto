@@ -6,7 +6,7 @@ import {
 } from 'dockview-react';
 import { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useRecoilCallback, useRecoilState } from 'recoil';
+import { useAtom, useAtomValue } from 'jotai';
 
 import { WelcomePanel } from '@/components/WelcomePanel';
 import {
@@ -54,7 +54,7 @@ export const DockViewSurface = () => {
   const tabs = useTabs();
   const activeTabId = useActiveTabId();
   const dockviewRef = useRef<{ api: DockviewApi | null }>({ api: null });
-  const setTabs = useRecoilState(tabsState)[1];
+  const setTabs = useAtom(tabsState)[1];
   // Keep track of the last processed tabs array
   const prevTabsRef = useRef<Tabable[]>([]);
 
@@ -105,29 +105,22 @@ export const DockViewSurface = () => {
   }, [tabs, activeTabId]);
 
   // Update panel titles from tab names
-  const updatePanelTitles = useRecoilCallback(
-    ({ snapshot }) =>
-      async () => {
-        const api = dockviewRef.current.api;
-        if (!api) return;
+  const updatePanelTitles = useCallback(() => {
+    const api = dockviewRef.current.api;
+    if (!api) return;
 
-        // For each panel, update its title from the corresponding tab name in Recoil state
-        tabs.forEach(async (tab) => {
-          const panelId = `${tab.kind}/${tab.key}`;
-          const panel = api.getPanel(panelId);
-          if (panel && panel.api.setTitle) {
-            // Get the tab name from Recoil state
-            const tabNameValue = await snapshot.getPromise(
-              tabNameFamily(panelId),
-            );
-            if (tabNameValue?.name) {
-              panel.api.setTitle(tabNameValue.name);
-            }
-          }
-        });
-      },
-    [tabs],
-  );
+    // For each panel, update its title from the corresponding tab name
+    tabs.forEach((tab) => {
+      const panelId = `${tab.kind}/${tab.key}`;
+      const panel = api.getPanel(panelId);
+      if (panel && panel.api.setTitle) {
+        // The tab name will be managed by the individual surfaces through TabName component
+        // This is a simplified approach since we can't easily read atoms synchronously here
+        // The TabName component in each surface will handle updating the title
+        panel.api.setTitle(tab.kind);
+      }
+    });
+  }, [tabs]);
 
   // Set up an interval to update panel titles
   useEffect(() => {

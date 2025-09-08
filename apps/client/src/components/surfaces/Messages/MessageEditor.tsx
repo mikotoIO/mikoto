@@ -9,7 +9,7 @@ import useResizeObserver from '@react-hook/resize-observer';
 import { runInAction } from 'mobx';
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { useSetRecoilState } from 'recoil';
+import { useSetAtom } from 'jotai';
 import { Node, Transforms, createEditor } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
@@ -225,7 +225,7 @@ export function MessageEditor({
     [],
   );
 
-  const setContextMenu = useSetRecoilState(contextMenuState);
+  const setContextMenu = useSetAtom(contextMenuState);
   const ref = useRef<HTMLDivElement>(null);
   useResizeObserver(ref, () => {
     onResize?.();

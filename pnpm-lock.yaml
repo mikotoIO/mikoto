@@ -252,6 +252,12 @@ importers:
       immer:
         specifier: ^10.1.1
         version: 10.1.1
+      jotai:
+        specifier: ^2.13.1
+        version: 2.13.1(@babel/core@7.25.2)(@babel/template@7.27.2)(@types/react@18.3.9)(react@18.3.1)
+      jotai-immer:
+        specifier: ^0.4.1
+        version: 0.4.1(immer@10.1.1)(jotai@2.13.1(@babel/core@7.25.2)(@babel/template@7.27.2)(@types/react@18.3.9)(react@18.3.1))
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -348,12 +354,6 @@ importers:
       reactjs-popup:
         specifier: ^2.0.5
         version: 2.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      recoil:
-        specifier: ^0.7.7
-        version: 0.7.7(react-dom@18.3.1(react@18.3.1))(react-native@0.72.6(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(encoding@0.1.13)(react@18.3.1))(react@18.3.1)
-      recoil-persist:
-        specifier: ^5.1.0
-        version: 5.1.0(recoil@0.7.7(react-dom@18.3.1(react@18.3.1))(react-native@0.72.6(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(encoding@0.1.13)(react@18.3.1))(react@18.3.1))
       rollup-plugin-visualizer:
         specifier: ^5.9.2
         version: 5.12.0(rollup@4.22.4)
@@ -2184,7 +2184,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {'0': node >=0.10.0}
+    engines: {node: '>=0.10.0'}
 
   '@expo/cli@0.17.13':
     resolution: {integrity: sha512-n13yxOmI3I0JidzMdFCH68tYKGDtK4XlDFk1vysZX7AIRKeDVRsSbHhma5jCla2bDt25RKmJBHA9KtzielwzAA==}
@@ -6677,9 +6677,6 @@ packages:
     resolution: {integrity: sha512-ax7ZYomf6jqPTQ4+XCpUGyXKHk5WweS+e05MBO4/y3WJ5RkmPXNKvX+bx1behVILVwr6JSQvZAku021CHPXG3Q==}
     engines: {node: '>=10'}
 
-  hamt_plus@1.0.2:
-    resolution: {integrity: sha512-t2JXKaehnMb9paaYA7J0BX8QQAY8lwfQ9Gjf4pg/mk4krt+cmwmU652HOoWonf+7+EQV97ARPMhhVgU1ra2GhA==}
-
   handlebars@4.7.8:
     resolution: {integrity: sha512-vafaFqs8MZkRrSX7sFVUdo3ap/eNiLnb4IakshzvP56X5Nr1iGKAIqdX6tMlm6HcNRIkr6AxO5jFEoJzzpT8aQ==}
     engines: {node: '>=0.4.7'}
@@ -7282,6 +7279,30 @@ packages:
 
   join-component@1.1.0:
     resolution: {integrity: sha512-bF7vcQxbODoGK1imE2P9GS9aw4zD0Sd+Hni68IMZLj7zRnquH7dXUmMw9hDI5S/Jzt7q+IyTXN0rSg2GI0IKhQ==}
+
+  jotai-immer@0.4.1:
+    resolution: {integrity: sha512-nQTt1HBKie/5OJDck1qLpV1PeBA6bjJLAczEYAx70PD8R4Mbu7gtexfBUCzJh6W6ecsOfwHksAYAesVth6SN9A==}
+    peerDependencies:
+      immer: '>=9.0.0'
+      jotai: '>=2.0.0'
+
+  jotai@2.13.1:
+    resolution: {integrity: sha512-cRsw6kFeGC9Z/D3egVKrTXRweycZ4z/k7i2MrfCzPYsL9SIWcPXTyqv258/+Ay8VUEcihNiE/coBLE6Kic6b8A==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@babel/core': '>=7.0.0'
+      '@babel/template': '>=7.0.0'
+      '@types/react': '>=17.0.0'
+      react: '>=17.0.0'
+    peerDependenciesMeta:
+      '@babel/core':
+        optional: true
+      '@babel/template':
+        optional: true
+      '@types/react':
+        optional: true
+      react:
+        optional: true
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -9358,23 +9379,6 @@ packages:
   rechoir@0.8.0:
     resolution: {integrity: sha512-/vxpCXddiX8NGfGO/mTafwjq4aFa/71pvamip0++IQk3zG8cbCj0fifNPrjjF1XMXUne91jL9OoxmdykoEtifQ==}
     engines: {node: '>= 10.13.0'}
-
-  recoil-persist@5.1.0:
-    resolution: {integrity: sha512-sew4k3uBVJjRWKCSFuBw07Y1p1pBOb0UxLJPxn4G2bX/9xNj+r2xlqYy/BRfyofR/ANfqBU04MIvulppU4ZC0w==}
-    peerDependencies:
-      recoil: ^0.7.2
-
-  recoil@0.7.7:
-    resolution: {integrity: sha512-8Og5KPQW9LwC577Vc7Ug2P0vQshkv1y3zG3tSSkWMqkWSwHmE+by06L8JtnGocjW6gcCvfwB3YtrJG6/tWivNQ==}
-    peerDependencies:
-      react: '>=16.13.1'
-      react-dom: '*'
-      react-native: '*'
-    peerDependenciesMeta:
-      react-dom:
-        optional: true
-      react-native:
-        optional: true
 
   redeyed@2.1.1:
     resolution: {integrity: sha512-FNpGGo1DycYAdnrKFxCMmKYgo/mILAqtRYbkdQD8Ep/Hk2PQ5+aEAEx+IU713RTDmuBaH0c8P5ZozurNu5ObRQ==}
@@ -19640,8 +19644,6 @@ snapshots:
     dependencies:
       duplexer: 0.1.2
 
-  hamt_plus@1.0.2: {}
-
   handlebars@4.7.8:
     dependencies:
       minimist: 1.2.8
@@ -20233,6 +20235,18 @@ snapshots:
       '@sideway/pinpoint': 2.0.0
 
   join-component@1.1.0: {}
+
+  jotai-immer@0.4.1(immer@10.1.1)(jotai@2.13.1(@babel/core@7.25.2)(@babel/template@7.27.2)(@types/react@18.3.9)(react@18.3.1)):
+    dependencies:
+      immer: 10.1.1
+      jotai: 2.13.1(@babel/core@7.25.2)(@babel/template@7.27.2)(@types/react@18.3.9)(react@18.3.1)
+
+  jotai@2.13.1(@babel/core@7.25.2)(@babel/template@7.27.2)(@types/react@18.3.9)(react@18.3.1):
+    optionalDependencies:
+      '@babel/core': 7.25.2
+      '@babel/template': 7.27.2
+      '@types/react': 18.3.9
+      react: 18.3.1
 
   js-tokens@4.0.0: {}
 
@@ -22942,18 +22956,6 @@ snapshots:
   rechoir@0.8.0:
     dependencies:
       resolve: 1.22.8
-
-  recoil-persist@5.1.0(recoil@0.7.7(react-dom@18.3.1(react@18.3.1))(react-native@0.72.6(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(encoding@0.1.13)(react@18.3.1))(react@18.3.1)):
-    dependencies:
-      recoil: 0.7.7(react-dom@18.3.1(react@18.3.1))(react-native@0.72.6(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(encoding@0.1.13)(react@18.3.1))(react@18.3.1)
-
-  recoil@0.7.7(react-dom@18.3.1(react@18.3.1))(react-native@0.72.6(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(encoding@0.1.13)(react@18.3.1))(react@18.3.1):
-    dependencies:
-      hamt_plus: 1.0.2
-      react: 18.3.1
-    optionalDependencies:
-      react-dom: 18.3.1(react@18.3.1)
-      react-native: 0.72.6(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(encoding@0.1.13)(react@18.3.1)
 
   redeyed@2.1.1:
     dependencies:

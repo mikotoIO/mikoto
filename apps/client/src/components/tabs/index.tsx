@@ -1,12 +1,12 @@
 import styled from '@emotion/styled';
 import { useContext, useEffect } from 'react';
-import { useRecoilState } from 'recoil';
+import { useAtom } from 'jotai';
 
 import { TabContext, TabNameProps, tabNameFamily } from '@/store/surface';
 
 export function TabName({ name, icon }: TabNameProps) {
   const tabInfo = useContext(TabContext);
-  const [tabName, setTabName] = useRecoilState(tabNameFamily(tabInfo.key));
+  const [tabName, setTabName] = useAtom(tabNameFamily(tabInfo.key));
 
   useEffect(() => {
     if (tabName.name !== name) {

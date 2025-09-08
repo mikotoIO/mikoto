@@ -1,7 +1,7 @@
 import { Box, Link } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import SimpleMarkdown from '@khanacademy/simple-markdown';
-import { useSetRecoilState } from 'recoil';
+import { useSetAtom } from 'jotai';
 
 import { modalState } from '@/components/ContextMenu';
 import { DialogContent } from '@/components/ui';
@@ -23,7 +23,7 @@ const MImage = styled.img`
 `;
 
 export function MessageImage({ src, alt }: MessageImageProps) {
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
 
   return (
     <MImage

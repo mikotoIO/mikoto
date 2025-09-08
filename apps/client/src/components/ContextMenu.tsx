@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import useEventListener from '@use-it/event-listener';
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import { atom, useRecoilState, useSetRecoilState } from 'recoil';
+import { atom, useAtom, useSetAtom } from 'jotai';
 
 import { DialogBackdrop, DialogRoot } from '@/components/ui';
 
@@ -17,10 +17,7 @@ interface ContextMenuData {
   elem: React.ReactNode;
 }
 
-export const contextMenuState = atom<ContextMenuData | null>({
-  key: 'contextComponent',
-  default: null,
-});
+export const contextMenuState = atom<ContextMenuData | null>(null);
 
 const StyledContextMenuOverlay = styled.div`
   position: fixed;
@@ -56,7 +53,7 @@ const StyledContextMenu = styled.div<StyledContextMenuProps>`
 `;
 
 export function ContextMenuKit() {
-  const [context, setContext] = useRecoilState(contextMenuState);
+  const [context, setContext] = useAtom(contextMenuState);
   const [bottomPin, setBottomPin] = useState<boolean>(false);
 
   const ref = useRef<HTMLDivElement>(null);
@@ -101,7 +98,7 @@ interface ContextMenuFns {
 }
 
 function ContextMenuLink({ onClick, ...props }: JSX.IntrinsicElements['a']) {
-  const setContextMenu = useSetRecoilState(contextMenuState);
+  const setContextMenu = useSetAtom(contextMenuState);
 
   return (
     <a
@@ -131,7 +128,7 @@ export const ContextMenu = Object.assign(ContextMenuBase, {
 });
 
 export function useContextMenuX(position?: Positions) {
-  const setContextMenu = useSetRecoilState(contextMenuState);
+  const setContextMenu = useSetAtom(contextMenuState);
   return (Elem: React.ReactNode | React.FC) => (ev: React.MouseEvent) => {
     ev.preventDefault();
     ev.stopPropagation();
@@ -146,7 +143,7 @@ export function useContextMenu(
   fn: (fns: ContextMenuFns) => React.ReactNode,
   position?: Positions,
 ) {
-  const setContextMenu = useSetRecoilState(contextMenuState);
+  const setContextMenu = useSetAtom(contextMenuState);
   return (ev: React.MouseEvent) => {
     ev.preventDefault();
     ev.stopPropagation();
@@ -166,13 +163,10 @@ interface ModalData {
   elem: React.ReactNode;
 }
 
-export const modalState = atom<ModalData | null>({
-  key: 'modal',
-  default: null,
-});
+export const modalState = atom<ModalData | null>(null);
 
 export function ModalKit() {
-  const [modal, setModal] = useRecoilState(modalState);
+  const [modal, setModal] = useAtom(modalState);
 
   // opened={modal !== null}
   return (

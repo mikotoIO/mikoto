@@ -1,8 +1,7 @@
 import { Flex, Heading } from '@chakra-ui/react';
 import { User } from '@mikoto-io/mikoto.js';
+import { atom, useAtom } from 'jotai';
 import { useEffect } from 'react';
-import { atom } from 'jotai';
-import { useAtom } from 'jotai';
 
 import { ContextMenu, useContextMenu } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';

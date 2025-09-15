@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 
 # the basic dependencies
-tokio = { version = "1.40.0", features = ["full"] }
+tokio = { version = "1.47.1", features = ["full"] }
 serde = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0.108"
 async-trait = "0.1.81"
@@ -15,7 +15,7 @@ uuid = { version = "1.8.0", features = ["serde", "v4"] }
 nanoid = "0.4.0"
 hex = "0.4.3"
 thiserror = "2.0.9"
-strum = { version = "0.26", features = ["derive"] }
+strum = { version = "0.27.2", features = ["derive"] }
 url = "2.4.1"
 indexmap = "2.7.0"
 
@@ -38,8 +38,8 @@ aide = { version = "0.13.4", features = [
     "macros",
 ] }
 
-itertools = "0.12.1"
-bcrypt = "0.15.1"
+itertools = "0.14.0"
+bcrypt = "0.17.1"
 jsonwebtoken = "9.3.0"
 sha3 = "0.10.8"
 

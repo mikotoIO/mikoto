@@ -77,7 +77,7 @@ image = "0.24.7"
 
 # database
 [dependencies.sqlx]
-version = "0.7"
+version = "0.8"
 features = [
     "runtime-tokio",
     "tls-rustls",

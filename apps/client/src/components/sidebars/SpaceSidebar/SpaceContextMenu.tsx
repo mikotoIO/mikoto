@@ -1,5 +1,5 @@
 import { MikotoSpace } from '@mikoto-io/mikoto.js';
-import { useSetRecoilState } from 'recoil';
+import { useSetAtom } from 'jotai';
 
 import { ContextMenu, modalState } from '@/components/ContextMenu';
 import { InviteModal } from '@/components/modals/Invite';
@@ -8,7 +8,7 @@ import { useTabkit } from '@/store/surface';
 
 export function SpaceContextMenu({ space }: { space: MikotoSpace }) {
   const tabkit = useTabkit();
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
 
   return (
     <ContextMenu>
@@ -52,7 +52,7 @@ export function SpaceContextMenu({ space }: { space: MikotoSpace }) {
 }
 
 export function SpaceBackContextMenu() {
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
 
   return (
     <ContextMenu>

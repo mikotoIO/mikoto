@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { MikotoMember, Role, User } from '@mikoto-io/mikoto.js';
 import { permissions } from '@mikoto-io/permcheck';
 import { useRef, useState } from 'react';
-import { useSetRecoilState } from 'recoil';
+import { useSetAtom } from 'jotai';
 
 import {
   contextMenuState,
@@ -114,10 +114,10 @@ export function MemberContextMenu({
   member?: MikotoMember;
 }) {
   const memberSnap = useMaybeSnapshot(member);
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
 
   const [roleEditorOpen, setRoleEditorOpen] = useState(false);
-  const setContextMenu = useSetRecoilState(contextMenuState);
+  const setContextMenu = useSetAtom(contextMenuState);
 
   return (
     <div style={{ display: 'grid', gridGap: '8px' }}>
@@ -178,7 +178,7 @@ interface MessageAvatarProps extends AvatarProps {
  * An avatar that when clicked, shows a user profile menu.
  */
 export function MessageAvatar({ src, member, size }: MessageAvatarProps) {
-  const setContextMenu = useSetRecoilState(contextMenuState);
+  const setContextMenu = useSetAtom(contextMenuState);
   const avatarRef = useRef<HTMLDivElement>(null);
   useMaybeSnapshot(member);
 

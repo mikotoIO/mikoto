@@ -56,7 +56,7 @@ The client uses a sophisticated architecture with:
 - **Surface-based UI** - Main interface uses "surfaces" for different views (Messages, Documents, Settings)
 - **Tab system** - Multi-tab interface with dockable panels using dockview-react
 - **Real-time collaboration** - Uses Y.js for collaborative document editing with TipTap/Lexical editors
-- **State Management** - Combination of React Query, Recoil, MobX, and Valtio for different concerns
+- **State Management** - Combination of React Query, Jotai, and Valtio for different concerns
 - **WebSocket integration** - Real-time messaging through superego WebSocket API
 
 Key client directories:

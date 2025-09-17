@@ -6,17 +6,16 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import useResizeObserver from '@react-hook/resize-observer';
-import { runInAction } from 'mobx';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { useSetRecoilState } from 'recoil';
 import { Node, Transforms, createEditor } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 
 import { contextMenuState } from '@/components/ContextMenu';
 
-import { MessageEditState } from './Message';
+import { messageEditState } from './Message';
 
 const EmojiPicker = lazy(() => import('./EmojiPicker'));
 
@@ -73,7 +72,6 @@ function isInputLike() {
 
 interface MessageEditorProps {
   placeholder: string;
-  editState: MessageEditState;
   onSubmit: (content: string, files: FileUpload[]) => void;
   onTyping?: () => void;
   onResize?: () => void;
@@ -196,13 +194,14 @@ type FileUpload = {
 
 export function MessageEditor({
   placeholder,
-  editState,
   onSubmit,
   onTyping,
   onResize,
 }: MessageEditorProps) {
+  const currentEditState = useAtomValue(messageEditState);
+  const setEditState = useSetAtom(messageEditState);
   const [editorValue, setEditorValue] = useState<Node[]>(() => [
-    { children: [{ text: editState.message?.content ?? '' }] },
+    { children: [{ text: currentEditState?.content ?? '' }] },
   ]);
   const [files, setFiles] = useState<FileUpload[]>([]);
 
@@ -225,7 +224,7 @@ export function MessageEditor({
     [],
   );
 
-  const setContextMenu = useSetRecoilState(contextMenuState);
+  const setContextMenu = useSetAtom(contextMenuState);
   const ref = useRef<HTMLDivElement>(null);
   useResizeObserver(ref, () => {
     onResize?.();
@@ -234,10 +233,8 @@ export function MessageEditor({
   useEffect(() => {
     ReactEditor.focus(editor);
     const fn = (ev: KeyboardEvent) => {
-      if (ev.key === 'Escape' && editState.message) {
-        runInAction(() => {
-          editState.message = null;
-        });
+      if (ev.key === 'Escape' && currentEditState) {
+        setEditState(null);
         setEditorValue(initialEditorValue);
       }
       if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
@@ -267,7 +264,7 @@ export function MessageEditor({
 
   return (
     <TopContainer>
-      {editState.message && <EditMode>Editing Message</EditMode>}
+      {currentEditState && <EditMode>Editing Message</EditMode>}
       {files.length !== 0 && (
         <UploadSection>
           {files.map((fileUpload) => (
@@ -316,7 +313,7 @@ export function MessageEditor({
           />
         </Slate>
         <EditorButtons>
-          {editState.message === null && (
+          {currentEditState === null && (
             <EditorButton
               onClick={() => {
                 dropzone.open();

@@ -11,7 +11,7 @@ use crate::{
 use super::group_by_key;
 
 db_enum!(
-    #[sqlx(type_name = "ChannelType")]
+    #[sqlx(type_name = "\"ChannelType\"")]
     pub enum ChannelType {
         Text,
         Voice,

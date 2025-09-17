@@ -1,8 +1,8 @@
 use std::{process::Command, time::Duration};
 
 use fred::{
-    prelude::{ClientLike, RedisClient},
-    types::{Builder, RedisConfig},
+    clients::Client as RedisClient, prelude::ClientLike, types::config::Config as RedisConfig,
+    types::Builder,
 };
 use sqlx::migrate::MigrateDatabase;
 use sqlx::{PgPool, Postgres};

@@ -6,7 +6,7 @@ use crate::{db_entity_delete, db_enum, db_find_by_id, entities::Role, entity, er
 use super::Channel;
 
 db_enum!(
-    #[sqlx(type_name = "SpaceType")]
+    #[sqlx(type_name = "\"SpaceType\"")]
     pub enum SpaceType {
         None,
         Dm,
@@ -97,7 +97,7 @@ impl Space {
         .bind(&self.name)
         .bind(&self.icon)
         .bind(self.owner_id)
-        .bind(&self.space_type)
+        .bind(self.space_type)
         .execute(db)
         .await?;
         Ok(())

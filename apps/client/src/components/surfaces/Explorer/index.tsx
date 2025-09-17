@@ -2,7 +2,7 @@ import { Box, Flex, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { MikotoChannel, MikotoSpace, Relationship } from '@mikoto-io/mikoto.js';
 import { useEffect, useState } from 'react';
-import { useSetRecoilState } from 'recoil';
+import { useSetAtom } from 'jotai';
 import { useSnapshot } from 'valtio/react';
 
 import {
@@ -26,7 +26,7 @@ const StyledTree = styled.div`
 `;
 
 function TreebarContextMenu({ space }: { space: MikotoSpace }) {
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
   const tabkit = useTabkit();
   return (
     <ContextMenu>

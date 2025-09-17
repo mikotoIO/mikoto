@@ -1,8 +1,7 @@
 import { Box, Button, Flex, Heading, Input, Textarea } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useAtomValue, useSetAtom } from 'jotai';
 
 import { modalState } from '@/components/ContextMenu';
 import { userState } from '@/components/UserArea';
@@ -25,7 +24,7 @@ const bgUrl = '/images/artworks/2.jpg';
 
 export function PasswordChangeModal() {
   const authClient = useAuthClient();
-  const user = useRecoilValue(userState);
+  const user = useAtomValue(userState);
 
   const { register, handleSubmit, getValues } = useForm();
   const error = useErrorElement();
@@ -83,7 +82,7 @@ export function PasswordChangeModal() {
 function NameChangeModal() {
   const { register, handleSubmit } = useForm();
   const mikoto = useMikoto();
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
 
   return (
     <DialogContent rounded="md" p={4} maxW="480px">
@@ -104,8 +103,8 @@ function NameChangeModal() {
   );
 }
 
-const Overview = observer(() => {
-  const setModal = useSetRecoilState(modalState);
+function Overview() {
+  const setModal = useSetAtom(modalState);
   const { t } = useTranslation();
 
   const mikoto = useMikoto();
@@ -188,7 +187,7 @@ const Overview = observer(() => {
       <Box mb="80px" />
     </SettingSurface>
   );
-});
+}
 
 function Switch({ nav }: { nav: string }) {
   switch (nav) {

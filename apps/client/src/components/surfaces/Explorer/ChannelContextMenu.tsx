@@ -15,7 +15,7 @@ import {
 import { permissions } from '@mikoto-io/permcheck';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useSetRecoilState } from 'recoil';
+import { useSetAtom } from 'jotai';
 
 import { ContextMenu, modalState } from '@/components/ContextMenu';
 import { DialogContent, Field } from '@/components/ui';
@@ -59,7 +59,7 @@ export function CreateChannelModal({
   space: MikotoSpace;
   channel?: Channel;
 }) {
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
   const { register, handleSubmit } = useForm();
 
   const [channelType, setChannelType] = useState<ChannelType>('TEXT');
@@ -121,7 +121,7 @@ export function CreateChannelModal({
 }
 
 function DeleteChannelModal({ channel }: { channel: MikotoChannel }) {
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
 
   return (
     <DialogContent rounded="md" p={4} maxW="480px">
@@ -154,7 +154,7 @@ function DeleteChannelModal({ channel }: { channel: MikotoChannel }) {
 
 export const ChannelContextMenu = ({ channel }: { channel: MikotoChannel }) => {
   const tabkit = useTabkit();
-  const setModal = useSetRecoilState(modalState);
+  const setModal = useSetAtom(modalState);
 
   return (
     <ContextMenu>

@@ -1,12 +1,11 @@
 import { Box } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { faBarsStaggered, faCrown } from '@fortawesome/free-solid-svg-icons';
+import { faCrown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoMember, MikotoSpace } from '@mikoto-io/mikoto.js';
-import { observer } from 'mobx-react-lite';
+import { useSetAtom } from 'jotai';
 import { useEffect, useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
-import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useSnapshot } from 'valtio';
 
 import { contextMenuState, useContextMenu } from '@/components/ContextMenu';
@@ -14,10 +13,8 @@ import { Avatar } from '@/components/atoms/Avatar';
 import { MemberContextMenu } from '@/components/atoms/MessageAvatar';
 import { hoverableButtonLike } from '@/components/design';
 import { UserContextMenu } from '@/components/modals/ContextMenus';
-import { TabBarButton } from '@/components/tabs';
 import { Tag } from '@/components/ui';
 import { useFetchMember } from '@/hooks';
-import { workspaceState } from '@/store';
 
 const StyledMember = styled.div`
   display: flex;
@@ -28,8 +25,8 @@ const StyledMember = styled.div`
   ${hoverableButtonLike}
 `;
 
-const MemberElement = observer(({ member }: { member: MikotoMember }) => {
-  const setContextMenu = useSetRecoilState(contextMenuState);
+function MemberElement({ member }: { member: MikotoMember }) {
+  const setContextMenu = useSetAtom(contextMenuState);
   const elemRef = useRef<HTMLDivElement>(null);
 
   const userContextMenu = useContextMenu(() => (
@@ -78,7 +75,7 @@ const MemberElement = observer(({ member }: { member: MikotoMember }) => {
       )}
     </StyledMember>
   );
-});
+}
 
 const StyledMemberListSidebar = styled.div`
   height: 100%;
@@ -95,8 +92,7 @@ const HeaderContainer = styled.div`
   font-weight: bold;
 `;
 
-export const MemberListSidebar = observer(
-  ({ space }: { space: MikotoSpace }) => {
+export function MemberListSidebar({ space }: { space: MikotoSpace }) {
     const { isLoading } = useFetchMember(space);
 
     const fetchMembersManually = async () => {
@@ -143,5 +139,4 @@ export const MemberListSidebar = observer(
         />
       </StyledMemberListSidebar>
     );
-  },
-);
+}

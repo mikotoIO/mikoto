@@ -1442,9 +1442,9 @@ dependencies = [
 
 [[package]]
 name = "hcaptcha"
-version = "2.7.6"
+version = "3.0.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b12a7e8be821bc1a948f4e9a3dc50600c0df0749bf43cf0a532d12c914870651"
+checksum = "a8d834f5a453df5e2cee59d2bd0e8457cfd09444309f6944d6e91996bd5f0d90"
 dependencies = [
  "async-trait",
  "hcaptcha_derive",
@@ -1453,16 +1453,16 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_urlencoded",
- "thiserror 1.0.69",
+ "thiserror 2.0.16",
  "url",
  "uuid",
 ]
 
 [[package]]
 name = "hcaptcha_derive"
-version = "2.7.6"
+version = "3.0.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "35215e8509062a2f773646828be925b4d0db065db7dd3fbeebfb938f41d7512f"
+checksum = "b6246ddf72d95b2ce7b10adf6b5801a8c73de9fb0b19e7d9dadfaa21d7eb03cd"
 dependencies = [
  "proc-macro-error2",
  "proc-macro2",

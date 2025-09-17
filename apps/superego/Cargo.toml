@@ -59,7 +59,7 @@ hcaptcha = { version = "2.4.7", default-features = false, features = [
     "hex",
 ] }
 futures-util = "0.3.30"
-fred = "9.1.2"
+fred = "10.1.0"
 tower-layer = "0.3.3"
 
 yrs = "0.18.2"

@@ -73,7 +73,7 @@ bitflags = "2.6.0"
 # media processing
 mime = "0.3.17"
 mime_guess = "2.0.4"
-image = "0.24.7"
+image = "0.25.8"
 
 # database
 [dependencies.sqlx]

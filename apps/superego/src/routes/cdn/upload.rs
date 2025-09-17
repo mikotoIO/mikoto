@@ -59,7 +59,7 @@ pub async fn upload(
             FilterType::Lanczos3,
         );
         buf = Vec::new();
-        image.write_to(&mut Cursor::new(&mut buf), image::ImageOutputFormat::Png)?;
+        image.write_to(&mut Cursor::new(&mut buf), image::ImageFormat::Png)?;
         ext = "png";
     }
 

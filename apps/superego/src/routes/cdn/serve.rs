@@ -28,7 +28,7 @@ pub async fn route(
         (Some(w), Some(h)) => {
             let image = image::load_from_memory(data.bytes())?.thumbnail(w, h);
             let mut buf = Vec::new();
-            image.write_to(&mut Cursor::new(&mut buf), image::ImageOutputFormat::Png)?;
+            image.write_to(&mut Cursor::new(&mut buf), image::ImageFormat::Png)?;
             FileResponse::new(buf, mime::IMAGE_PNG)
         }
         _ => FileResponse::new(data.bytes().to_vec(), get_content_type(&path)),

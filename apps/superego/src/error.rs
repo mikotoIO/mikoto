@@ -30,7 +30,7 @@ pub enum Error {
     #[error("{0}")]
     DatabaseError(#[from] sqlx::Error),
     #[error("{0}")]
-    RedisError(#[from] fred::error::RedisError),
+    RedisError(#[from] fred::error::Error),
     #[error("{0}")]
     SerdeError(#[from] serde_json::Error),
 

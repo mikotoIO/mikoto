@@ -1,6 +1,6 @@
 use std::sync::OnceLock;
 
-use hcaptcha::{HcaptchaCaptcha, HcaptchaClient, HcaptchaRequest};
+use hcaptcha::{Captcha as HCaptcha, Client as HcaptchaClient, Request as HcaptchaRequest};
 
 use crate::{env::env, error::Error};
 
@@ -34,12 +34,12 @@ impl Captcha for Hcaptcha {
             HcaptchaClient::new()
         };
         let captcha = captcha.ok_or(Error::CaptchaFailed)?;
-        let req = HcaptchaCaptcha::new(captcha)
+        let req = HCaptcha::new(captcha)
             .and_then(|captcha| HcaptchaRequest::new(&self.secret, captcha))
             .map_err(|_| Error::CaptchaFailed)?;
 
         let resp = client
-            .verify_client_response(req)
+            .verify_request(req)
             .await
             .map_err(|_| Error::CaptchaFailed)?;
 

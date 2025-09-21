@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Heading, Input, Textarea } from '@chakra-ui/react';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useAtomValue, useSetAtom } from 'jotai';
 
 import { modalState } from '@/components/ContextMenu';
 import { userState } from '@/components/UserArea';
@@ -109,47 +109,60 @@ function Overview() {
 
   const mikoto = useMikoto();
   const user = mikoto.user.me!;
+  const { register, handleSubmit } = useForm({
+    defaultValues: {
+      description: user?.description || '',
+    },
+  });
 
   return (
     <SettingSurface>
       <h1>{t('accountSettings.general.title')}</h1>
-      <Form>
-        <Box rounded={8} bg="gray.800" w="100%" maxW="600px">
-          <Box
-            h={40}
-            bg={`url(${bgUrl}) no-repeat center center`}
-            bgSize="cover"
-            rounded={8}
+      <Box rounded={8} bg="gray.800" w="100%" maxW="600px">
+        <Box
+          h={40}
+          bg={`url(${bgUrl}) no-repeat center center`}
+          bgSize="cover"
+          rounded={8}
+        />
+        <Flex p="16px" align="center">
+          <AvatarEditor
+            avatar={user?.avatar ?? undefined}
+            onDrop={async (file) => {
+              const { data } = await uploadFile('/avatar', file);
+              await mikoto.rest['user.update']({ avatar: data.url }, {});
+            }}
           />
-          <Flex p="16px" align="center">
-            <AvatarEditor
-              avatar={user?.avatar ?? undefined}
-              onDrop={async (file) => {
-                const { data } = await uploadFile('/avatar', file);
-                await mikoto.rest['user.update']({ avatar: data.url }, {});
-              }}
-            />
-            <Heading as="h2" ml="16px" fontSize="2xl">
-              {user?.name}
-            </Heading>
-          </Flex>
-          <Box p={4}>
-            <Button
-              type="button"
-              onClick={() => {
-                setModal({
-                  elem: <NameChangeModal />,
-                });
-              }}
-            >
-              Edit Name
-            </Button>
-          </Box>
+          <Heading as="h2" ml="16px" fontSize="2xl">
+            {user?.name}
+          </Heading>
+        </Flex>
+        <Box p={4}>
+          <Button
+            type="button"
+            onClick={() => {
+              setModal({
+                elem: <NameChangeModal />,
+              });
+            }}
+          >
+            Edit Name
+          </Button>
         </Box>
-        <Field label="Bio">
-          <Textarea h={160} />
+      </Box>
+      <Form
+        onSubmit={handleSubmit(async (form) => {
+          await mikoto.rest['user.update']({ description: form.description }, {});
+        })}
+      >
+        <Field label="User description">
+          <Textarea
+            h={160}
+            backgroundColor="gray.750"
+            {...register('description')}
+          />
         </Field>
-        <Button colorPalette="primary">Save</Button>
+        <Button colorPalette="primary" type="submit">Save</Button>
       </Form>
 
       <h2>{t('accountSettings.general.authentication')}</h2>

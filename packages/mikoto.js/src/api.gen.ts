@@ -77,6 +77,7 @@ export type User = z.infer<typeof User>;
 export const UserPatch = z
   .object({
     avatar: z.union([z.string(), z.null()]),
+    description: z.union([z.string(), z.null()]),
     name: z.union([z.string(), z.null()]),
   })
   .partial();
@@ -100,6 +101,9 @@ export const Relationship = z.object({
 });
 export type Relationship = z.infer<typeof Relationship>;
 
+export const Timestamp = z.string();
+export type Timestamp = z.infer<typeof Timestamp>;
+
 export const ChannelType = z.enum([
   "TEXT",
   "VOICE",
@@ -112,7 +116,7 @@ export type ChannelType = z.infer<typeof ChannelType>;
 
 export const Channel = z.object({
   id: z.string().uuid(),
-  lastUpdated: z.union([z.string(), z.null()]).optional(),
+  lastUpdated: z.union([Timestamp, z.null()]).optional(),
   name: z.string(),
   order: z.number().int(),
   parentId: z.union([z.string(), z.null()]).optional(),
@@ -170,7 +174,7 @@ export type ChannelPatch = z.infer<typeof ChannelPatch>;
 
 export const ChannelUnread = z.object({
   channelId: z.string().uuid(),
-  timestamp: z.string(),
+  timestamp: Timestamp.datetime({ offset: true }),
   userId: z.string().uuid(),
 });
 export type ChannelUnread = z.infer<typeof ChannelUnread>;
@@ -186,9 +190,9 @@ export const MessageExt = z.object({
   authorId: z.union([z.string(), z.null()]).optional(),
   channelId: z.string().uuid(),
   content: z.string(),
-  editedTimestamp: z.union([z.string(), z.null()]).optional(),
+  editedTimestamp: z.union([Timestamp, z.null()]).optional(),
   id: z.string().uuid(),
-  timestamp: z.string(),
+  timestamp: Timestamp.datetime({ offset: true }),
 });
 export type MessageExt = z.infer<typeof MessageExt>;
 
@@ -247,7 +251,7 @@ export const RolePatch = z.object({
 export type RolePatch = z.infer<typeof RolePatch>;
 
 export const Invite = z.object({
-  createdAt: z.string(),
+  createdAt: Timestamp.datetime({ offset: true }),
   creatorId: z.string().uuid(),
   id: z.string(),
   spaceId: z.string().uuid(),
@@ -277,6 +281,14 @@ export type ObjectWithId = z.infer<typeof ObjectWithId>;
 export const Ping = z.object({ message: z.string() });
 export type Ping = z.infer<typeof Ping>;
 
+export const ServeParams = z
+  .object({
+    h: z.union([z.number(), z.null()]),
+    w: z.union([z.number(), z.null()]),
+  })
+  .partial();
+export type ServeParams = z.infer<typeof ServeParams>;
+
 export const schemas = {
   IndexResponse,
   RegisterPayload,
@@ -293,6 +305,7 @@ export const schemas = {
   UserPatch,
   RelationState,
   Relationship,
+  Timestamp,
   ChannelType,
   Channel,
   Role,
@@ -322,6 +335,7 @@ export const schemas = {
   MessageKey,
   ObjectWithId,
   Ping,
+  ServeParams,
 };
 
 const endpoints = makeApi([

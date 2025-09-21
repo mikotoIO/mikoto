@@ -46,7 +46,7 @@ function generateWebsocket(openApiDoc: ExtendedOpenAPIObject) {
 
 const main = async () => {
   const openApiDoc = (await SwaggerParser.parse(
-    'http://0.0.0.0:9503/api.json',
+    'http://0.0.0.0:3511/api.json',
   )) as ExtendedOpenAPIObject;
   await generateZodClientFromOpenAPI({
     openApiDoc,

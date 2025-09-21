@@ -40,6 +40,8 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+*.local
+
 # TODO: separate the envfiles
 /apps/superego/.env
 

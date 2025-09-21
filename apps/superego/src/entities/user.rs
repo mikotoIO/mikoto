@@ -52,6 +52,7 @@ entity!(
 pub struct UserPatch {
     pub name: Option<String>,
     pub avatar: Option<String>,
+    pub description: Option<String>,
 }
 
 impl User {
@@ -92,7 +93,8 @@ impl User {
             UPDATE "User"
             SET
             "name" = COALESCE($2, "name"),
-            "avatar" = COALESCE($3, "avatar")
+            "avatar" = COALESCE($3, "avatar"),
+            "description" = COALESCE($4, "description")
             WHERE "id" = $1
             RETURNING *
             "##,
@@ -100,6 +102,7 @@ impl User {
         .bind(self.id)
         .bind(patch.name)
         .bind(patch.avatar)
+        .bind(patch.description)
         .fetch_optional(db)
         .await?
         .ok_or(Error::NotFound)?;

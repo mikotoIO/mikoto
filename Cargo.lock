@@ -2345,6 +2345,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "misaka"
+version = "0.1.0"
+
+[[package]]
 name = "moxcms"
 version = "0.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"

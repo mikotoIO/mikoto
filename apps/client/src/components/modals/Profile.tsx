@@ -58,7 +58,11 @@ export function ProfileModal({ user }: { user: User }) {
               <Heading fontSize="24px" mb={0}>
                 {user.name}
               </Heading>
-              <MikotoId>@{user.id}</MikotoId>
+              <MikotoId>
+                @{'<'}
+                {user.id}
+                {'>'}
+              </MikotoId>
             </div>
             <div>
               {mikoto.user.me?.id !== user.id && (
@@ -103,10 +107,7 @@ export function ProfileModal({ user }: { user: User }) {
               )}
             </div>
           </Flex>
-          <Heading as="h2" fontSize="xl" mt={2}>
-            Bio
-          </Heading>
-          <p>Bio Should go here. Lorem ipsum dolor sit amet consectetur.</p>
+          <p>{user.description}</p>
         </Box>
       </ProfileContainer>
     </DialogContent>

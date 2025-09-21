@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Heading, Input, Textarea } from '@chakra-ui/react';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useAtomValue, useSetAtom } from 'jotai';
 
 import { modalState } from '@/components/ContextMenu';
 import { userState } from '@/components/UserArea';
@@ -147,7 +147,7 @@ function Overview() {
           </Box>
         </Box>
         <Field label="Bio">
-          <Textarea h={160} />
+          <Textarea h={160} backgroundColor="gray.750" />
         </Field>
         <Button colorPalette="primary">Save</Button>
       </Form>

@@ -123,6 +123,7 @@ export const globalCss = css`
   }
 
   * {
+    font-family: var(--font-main);
     box-sizing: border-box;
   }
 

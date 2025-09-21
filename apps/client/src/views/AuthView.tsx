@@ -120,7 +120,7 @@ export function LoginView() {
 
         <Captcha name="captcha" control={control} />
         <Button
-          colorPalette="primary"
+          colorPalette="blue"
           type="submit"
           loading={formState.isSubmitting}
         >
@@ -177,7 +177,7 @@ export function RegisterView() {
         <Captcha name="captcha" control={control} />
 
         <Button
-          colorPalette="primary"
+          colorPalette="blue"
           type="submit"
           loading={formState.isSubmitting}
         >
@@ -217,7 +217,7 @@ export function ResetPasswordView() {
             <Field label="Email">
               <Input {...register('email')} />
             </Field>
-            <Button colorPalette="primary" type="submit">
+            <Button colorPalette="blue" type="submit">
               Send Password Reset Email
             </Button>
             <Captcha name="captcha" control={control} />
@@ -284,7 +284,7 @@ export function ResetChangePasswordView() {
               <Input type="password" {...register('passwordConfirm')} />
             </Field>
 
-            <Button colorPalette="primary" type="submit">
+            <Button colorPalette="blue" type="submit">
               Confirm new password
             </Button>
           </>

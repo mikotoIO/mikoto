@@ -43,7 +43,7 @@ export function ProfileModal({ user }: { user: User }) {
   const setModal = useSetAtom(modalState);
 
   return (
-    <DialogContent rounded="md" p={0} width="640px">
+    <DialogContent rounded="lg" p={0} maxWidth="640px">
       <ProfileContainer>
         <div className="banner">
           <Avatar
@@ -58,7 +58,7 @@ export function ProfileModal({ user }: { user: User }) {
               <Heading fontSize="24px" mb={0}>
                 {user.name}
               </Heading>
-              <MikotoId>@cactus.mikoto.io</MikotoId>
+              <MikotoId>@{user.id}</MikotoId>
             </div>
             <div>
               {mikoto.user.me?.id !== user.id && (

@@ -1,9 +1,9 @@
 use axum::{extract::Request, ServiceExt};
-use futures_util::join;
+use futures_util::try_join;
 use tower_http::normalize_path::NormalizePathLayer;
 use tower_layer::Layer;
 
-use crate::dump::dump;
+use crate::{dump::dump, error::Error};
 
 #[macro_use]
 extern crate log;
@@ -25,24 +25,22 @@ pub mod routes;
 pub mod services;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Error> {
     let env = env::env();
     pretty_env_logger::init();
 
     println!("{}", include_str!("./ascii2.txt"));
     env.print_env_info();
 
-    let (db, redis) = join!(db::init(), db::init_redis());
-    db.unwrap();
-    redis.unwrap();
+    let (_db, _redis) = try_join!(db::init(), db::init_redis())?;
 
-    dump().await.unwrap();
+    dump().await?;
 
     let app = routes::router();
     let app = NormalizePathLayer::trim_trailing_slash().layer(app);
 
     let addr = format!("0.0.0.0:{}", env.server_port);
-    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(&addr).await?;
     info!(
         "👉⚡🪙  Mikoto API server is running on on http://{}",
         &addr
@@ -51,7 +49,5 @@ async fn main() {
         "You can see the API documentation on http://{}/scalar",
         &addr
     );
-    axum::serve(listener, ServiceExt::<Request>::into_make_service(app))
-        .await
-        .unwrap();
+    Ok(axum::serve(listener, ServiceExt::<Request>::into_make_service(app)).await?)
 }

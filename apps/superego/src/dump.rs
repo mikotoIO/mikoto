@@ -1,10 +1,11 @@
-use std::error::Error;
-
 use tokio::{fs, process::Command, try_join};
 
-use crate::env::{env, MikotoMode};
+use crate::{
+    env::{env, MikotoMode},
+    error::Error,
+};
 
-pub async fn dump() -> Result<(), Box<dyn Error>> {
+pub async fn dump() -> Result<(), Error> {
     let env = env();
     if env.mikoto_env == MikotoMode::Dev {
         let _ = try_join!(dump_postgres(), dump_api())?;
@@ -13,7 +14,7 @@ pub async fn dump() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-pub async fn dump_postgres() -> Result<(), Box<dyn Error>> {
+pub async fn dump_postgres() -> Result<(), Error> {
     // Dump schema to schema.sql
     info!("Dumping database schema...");
     let output = Command::new("docker")
@@ -40,7 +41,7 @@ pub async fn dump_postgres() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-pub async fn dump_api() -> Result<(), Box<dyn Error>> {
+pub async fn dump_api() -> Result<(), Error> {
     // dump OpenAPI to openapi.json
     info!("Dumping OpenAPI schema...");
     let openapi = crate::routes::build_openapi_schema();

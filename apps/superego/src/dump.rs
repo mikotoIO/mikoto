@@ -1,16 +1,13 @@
 use std::error::Error;
 
-use tokio::{fs, join, process::Command};
+use tokio::{fs, process::Command, try_join};
 
 use crate::env::{env, MikotoMode};
 
 pub async fn dump() -> Result<(), Box<dyn Error>> {
     let env = env();
     if env.mikoto_env == MikotoMode::Dev {
-        // dump OpenAPI to openapi.json
-        let (pg, api) = join!(dump_postgres(), dump_api());
-        pg?;
-        api?;
+        let _ = try_join!(dump_postgres(), dump_api())?;
     }
 
     Ok(())

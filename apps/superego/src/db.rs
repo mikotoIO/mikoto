@@ -1,4 +1,4 @@
-use std::{process::Command, time::Duration};
+use std::time::Duration;
 
 use fred::{
     clients::Client as RedisClient, prelude::ClientLike, types::config::Config as RedisConfig,
@@ -8,10 +8,7 @@ use sqlx::migrate::MigrateDatabase;
 use sqlx::{PgPool, Postgres};
 use tokio::{sync::OnceCell, time::timeout};
 
-use crate::{
-    env::{env, MikotoMode},
-    error::Error,
-};
+use crate::{env::env, error::Error};
 
 static DB: OnceCell<PgPool> = OnceCell::const_new();
 
@@ -76,29 +73,5 @@ async fn migrate() -> Result<(), Box<dyn std::error::Error>> {
 
     pool.close().await;
 
-    if env.mikoto_env == MikotoMode::Dev {
-        // Dump schema to schema.sql
-        info!("Dumping database schema...");
-        let output = Command::new("docker")
-            .args([
-                "exec",
-                "mikoto-postgres-1", // TODO: add a better check for the database container instead of trying to get it from docker-compose
-                "pg_dump",
-                "-d",
-                "mikoto",
-                "--schema-only",
-            ])
-            .output()?;
-
-        if output.status.success() {
-            std::fs::write("schema.sql", output.stdout)?;
-            info!("Schema dumped to schema.sql");
-        } else {
-            error!(
-                "Failed to dump schema: {}",
-                String::from_utf8_lossy(&output.stderr)
-            );
-        }
-    }
     Ok(())
 }

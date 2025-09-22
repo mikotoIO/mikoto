@@ -3,6 +3,8 @@ use futures_util::join;
 use tower_http::normalize_path::NormalizePathLayer;
 use tower_layer::Layer;
 
+use crate::dump::dump;
+
 #[macro_use]
 extern crate log;
 
@@ -13,6 +15,7 @@ extern crate serde;
 extern crate async_trait;
 
 pub mod db;
+pub mod dump;
 pub mod entities;
 pub mod env;
 pub mod error;
@@ -32,6 +35,9 @@ async fn main() {
     let (db, redis) = join!(db::init(), db::init_redis());
     db.unwrap();
     redis.unwrap();
+
+    dump().unwrap();
+
     let app = routes::router();
     let app = NormalizePathLayer::trim_trailing_slash().layer(app);
 

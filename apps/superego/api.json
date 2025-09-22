@@ -1,0 +1,2215 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Mikoto Superego",
+    "version": ""
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Index",
+        "operationId": "index",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/register": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "User Registration",
+        "operationId": "account.register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPair"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/login": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "User Login",
+        "operationId": "account.login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPair"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/refresh": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Refresh Access Token",
+        "operationId": "account.refresh",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPair"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/change_password": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Change Password",
+        "operationId": "account.change_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPair"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/reset_password": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Reset Password",
+        "operationId": "account.reset_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/reset_password/submit": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Confirm Password Reset",
+        "operationId": "account.reset_password.confirm",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordConfirmData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bots/": {
+      "get": {
+        "tags": [
+          "Bots"
+        ],
+        "summary": "List Bots",
+        "operationId": "bots.list",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Bot"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Bots"
+        ],
+        "summary": "Create a Bot",
+        "operationId": "bots.create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBotPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Bot"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get Current User",
+        "operationId": "user.get",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update User",
+        "operationId": "user.update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relations/": {
+      "get": {
+        "tags": [
+          "Relations"
+        ],
+        "summary": "List Relationships",
+        "operationId": "relations.list",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Relationship"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relations/{relationId}": {
+      "get": {
+        "tags": [
+          "Relations"
+        ],
+        "summary": "Get Relationship",
+        "operationId": "relations.get",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Relationship"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relations/{relationId}/dm": {
+      "post": {
+        "tags": [
+          "Relations"
+        ],
+        "summary": "Open Direct Messages",
+        "operationId": "relations.openDm",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/": {
+      "get": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "List Spaces",
+        "operationId": "spaces.list",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SpaceExt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Create Space",
+        "operationId": "spaces.create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpaceCreatePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpaceExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}": {
+      "get": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Get Space",
+        "operationId": "spaces.get",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpaceExt"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Delete Space",
+        "operationId": "spaces.delete",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Update Space",
+        "operationId": "spaces.update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpaceUpdatePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpaceExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/join/{invite}": {
+      "get": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Preview Space Invite",
+        "operationId": "spaces.preview",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpaceExt"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Join Space",
+        "operationId": "spaces.join",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpaceExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/leave": {
+      "delete": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Leave Space",
+        "operationId": "spaces.leave",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/channels/": {
+      "get": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "List Channels",
+        "operationId": "channels.list",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Channel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "Create Channel",
+        "operationId": "channels.create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelCreatePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Channel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/channels/{channelId}": {
+      "get": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "Get Channel",
+        "operationId": "channels.get",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Channel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "Delete Channel",
+        "operationId": "channels.delete",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "Update Channel",
+        "operationId": "channels.update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Channel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/channels/unreads": {
+      "get": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "List Unreads",
+        "operationId": "channels.unreads",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChannelUnread"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/channels/{channelId}/ack": {
+      "post": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "Acknowledge Channel",
+        "operationId": "channels.acknowledge",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/channels/{channelId}/messages/": {
+      "get": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "List Messages",
+        "operationId": "messages.list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int32"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageExt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Create Message",
+        "operationId": "messages.create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageSendPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/channels/{channelId}/messages/{messageId}": {
+      "get": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Get Message",
+        "operationId": "messages.get",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageExt"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Delete Message",
+        "operationId": "messages.delete",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Update Message",
+        "operationId": "messages.update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageEditPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/channels/{channelId}/voice/": {
+      "post": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Join Voice Channel",
+        "operationId": "voice.join",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceToken"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/channels/{channelId}/documents/": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Get Document",
+        "operationId": "documents.get",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Update Document",
+        "operationId": "documents.update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/members/": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "List Members in Space",
+        "operationId": "members.list",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MemberExt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Add Bot Member",
+        "operationId": "members.create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberCreatePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/members/{userId}": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Get Member from Space",
+        "operationId": "members.get",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberExt"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Ban Member",
+        "operationId": "members.delete",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Update Member",
+        "operationId": "members.update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberUpdatePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/members/{userId}/roles/{roleId}": {
+      "post": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Add Role to Member",
+        "operationId": "members.addRole",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberExt"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Remove Role from Member",
+        "operationId": "members.removeRole",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/roles/": {
+      "post": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Create Role",
+        "operationId": "roles.create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleCreatePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/roles/{roleId}": {
+      "delete": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Delete Role",
+        "operationId": "roles.delete",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Update Role",
+        "operationId": "roles.update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolePatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/invites/": {
+      "get": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "List Invites",
+        "operationId": "invites.list",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Invite"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Create Invite",
+        "operationId": "invites.create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteCreatePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invite"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/invites/{inviteId}": {
+      "delete": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Delete Invite",
+        "operationId": "invites.delete",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Bot": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "ownerId",
+          "secret"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "secret": {
+            "type": "string"
+          }
+        }
+      },
+      "ChangePasswordPayload": {
+        "type": "object",
+        "required": [
+          "id",
+          "newPassword",
+          "oldPassword"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "newPassword": {
+            "type": "string"
+          },
+          "oldPassword": {
+            "type": "string"
+          }
+        }
+      },
+      "Channel": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "order",
+          "spaceId",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lastUpdated": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Timestamp"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "spaceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ChannelType"
+          }
+        }
+      },
+      "ChannelCreatePayload": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChannelType"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "ChannelPatch": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "ChannelType": {
+        "type": "string",
+        "enum": [
+          "TEXT",
+          "VOICE",
+          "DOCUMENT",
+          "APPLICATION",
+          "THREAD",
+          "CATEGORY"
+        ]
+      },
+      "ChannelUnread": {
+        "type": "object",
+        "required": [
+          "channelId",
+          "timestamp",
+          "userId"
+        ],
+        "properties": {
+          "channelId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "timestamp": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "CreateBotPayload": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "Document": {
+        "type": "object",
+        "required": [
+          "channelId",
+          "content",
+          "id"
+        ],
+        "properties": {
+          "channelId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "content": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "DocumentPatch": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "IndexResponse": {
+        "type": "object",
+        "required": [
+          "name",
+          "version"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "Invite": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "creatorId",
+          "id",
+          "spaceId"
+        ],
+        "properties": {
+          "createdAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "creatorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "id": {
+            "type": "string"
+          },
+          "spaceId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "InviteCreatePayload": {
+        "type": "object"
+      },
+      "ListQuery": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "LoginPayload": {
+        "examples": [
+          {
+            "email": "misaka.mikoto@tokiwadai.ac.jp",
+            "password": "correcthorsebatterystaple"
+          }
+        ],
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "MemberCreatePayload": {
+        "type": "object",
+        "required": [
+          "userId"
+        ],
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "MemberExt": {
+        "type": "object",
+        "required": [
+          "id",
+          "roleIds",
+          "spaceId",
+          "user",
+          "userId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "roleIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "spaceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "MemberUpdatePayload": {
+        "type": "object",
+        "required": [
+          "roleIds"
+        ],
+        "properties": {
+          "roleIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "MessageEditPayload": {
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "properties": {
+          "content": {
+            "type": "string"
+          }
+        }
+      },
+      "MessageExt": {
+        "type": "object",
+        "required": [
+          "channelId",
+          "content",
+          "id",
+          "timestamp"
+        ],
+        "properties": {
+          "author": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/User"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "authorId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "channelId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "content": {
+            "type": "string"
+          },
+          "editedTimestamp": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Timestamp"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "timestamp": {
+            "$ref": "#/components/schemas/Timestamp"
+          }
+        }
+      },
+      "MessageKey": {
+        "type": "object",
+        "required": [
+          "channelId",
+          "messageId"
+        ],
+        "properties": {
+          "channelId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "messageId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "MessageSendPayload": {
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "properties": {
+          "content": {
+            "type": "string"
+          }
+        }
+      },
+      "ObjectWithId": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "Ping": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "RefreshPayload": {
+        "type": "object",
+        "required": [
+          "refreshToken"
+        ],
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          }
+        }
+      },
+      "RegisterPayload": {
+        "examples": [
+          {
+            "email": "misaka.mikoto@tokiwadai.ac.jp",
+            "name": "biribiri",
+            "password": "correcthorsebatterystaple"
+          }
+        ],
+        "type": "object",
+        "required": [
+          "email",
+          "name",
+          "password"
+        ],
+        "properties": {
+          "captcha": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "RelationState": {
+        "type": "string",
+        "enum": [
+          "NONE",
+          "FRIEND",
+          "BLOCKED",
+          "INCOMING_REQUEST",
+          "OUTGOING_REQUEST"
+        ]
+      },
+      "Relationship": {
+        "type": "object",
+        "required": [
+          "id",
+          "relationId",
+          "state",
+          "userId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "relationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "spaceId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "state": {
+            "$ref": "#/components/schemas/RelationState"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "ResetPasswordConfirmData": {
+        "type": "object",
+        "required": [
+          "password",
+          "token"
+        ],
+        "properties": {
+          "password": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "ResetPasswordPayload": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "captcha": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "Role": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "permissions",
+          "position",
+          "spaceId"
+        ],
+        "properties": {
+          "color": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "spaceId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "RoleCreatePayload": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "RolePatch": {
+        "type": "object",
+        "required": [
+          "name",
+          "permissions",
+          "position"
+        ],
+        "properties": {
+          "color": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ServeParams": {
+        "type": "object",
+        "properties": {
+          "h": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "w": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "uint32",
+            "minimum": 0.0
+          }
+        }
+      },
+      "SpaceCreatePayload": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "SpaceExt": {
+        "title": "Space",
+        "description": "Represents a Mikoto Space.",
+        "type": "object",
+        "required": [
+          "channels",
+          "id",
+          "name",
+          "roles",
+          "type"
+        ],
+        "properties": {
+          "channels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Channel"
+            }
+          },
+          "icon": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          },
+          "type": {
+            "$ref": "#/components/schemas/SpaceType"
+          }
+        }
+      },
+      "SpaceType": {
+        "type": "string",
+        "enum": [
+          "NONE",
+          "DM",
+          "GROUP"
+        ]
+      },
+      "SpaceUpdatePayload": {
+        "type": "object",
+        "properties": {
+          "icon": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Timestamp": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "TokenPair": {
+        "type": "object",
+        "required": [
+          "accessToken"
+        ],
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "description": "If the refresh token is not provided, you can continue using the same refresh token.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "avatar": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserCategory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "UserCategory": {
+        "type": "string",
+        "enum": [
+          "BOT",
+          "UNVERIFIED"
+        ]
+      },
+      "UserPatch": {
+        "type": "object",
+        "properties": {
+          "avatar": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "VoiceToken": {
+        "type": "object",
+        "required": [
+          "channelId",
+          "token",
+          "url"
+        ],
+        "properties": {
+          "channelId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "token": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "websocket": {
+    "commands": {
+      "ping": {
+        "$ref": "#/components/schemas/Ping"
+      }
+    },
+    "events": {
+      "channels.onCreate": {
+        "$ref": "#/components/schemas/Channel"
+      },
+      "channels.onDelete": {
+        "$ref": "#/components/schemas/Channel"
+      },
+      "channels.onUpdate": {
+        "$ref": "#/components/schemas/Channel"
+      },
+      "members.onCreate": {
+        "$ref": "#/components/schemas/MemberExt"
+      },
+      "members.onDelete": {
+        "$ref": "#/components/schemas/MemberExt"
+      },
+      "members.onUpdate": {
+        "$ref": "#/components/schemas/MemberExt"
+      },
+      "messages.onCreate": {
+        "$ref": "#/components/schemas/MessageExt"
+      },
+      "messages.onDelete": {
+        "$ref": "#/components/schemas/MessageKey"
+      },
+      "messages.onUpdate": {
+        "$ref": "#/components/schemas/MessageExt"
+      },
+      "pong": {
+        "$ref": "#/components/schemas/Ping"
+      },
+      "roles.onCreate": {
+        "$ref": "#/components/schemas/Role"
+      },
+      "roles.onDelete": {
+        "$ref": "#/components/schemas/Role"
+      },
+      "roles.onUpdate": {
+        "$ref": "#/components/schemas/Role"
+      },
+      "spaces.onCreate": {
+        "$ref": "#/components/schemas/SpaceExt"
+      },
+      "spaces.onDelete": {
+        "$ref": "#/components/schemas/SpaceExt"
+      },
+      "spaces.onUpdate": {
+        "$ref": "#/components/schemas/SpaceExt"
+      },
+      "users.onCreate": {
+        "$ref": "#/components/schemas/User"
+      },
+      "users.onDelete": {
+        "$ref": "#/components/schemas/ObjectWithId"
+      },
+      "users.onUpdate": {
+        "$ref": "#/components/schemas/User"
+      }
+    }
+  }
+}

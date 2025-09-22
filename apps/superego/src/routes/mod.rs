@@ -49,8 +49,8 @@ pub struct Ping {
     pub message: String,
 }
 
-pub fn router() -> Router {
-    let router = AppRouter::<State>::new()
+fn build_app_router() -> AppRouter<State> {
+    AppRouter::<State>::new()
         .on_http(|router| {
             router
                 .api_route("/", get_with(index, |o| o.id("index").summary("Index")))
@@ -93,7 +93,11 @@ pub fn router() -> Router {
             emit_event("pong", ping, &format!("conn:{}", reader.conn_id)).await?;
             Ok(())
         })
-        .ws_event("pong", |ping: Ping, _| async move { Some(ping) });
+        .ws_event("pong", |ping: Ping, _| async move { Some(ping) })
+}
+
+pub fn router() -> Router {
+    let router = build_app_router();
 
     router
         .build(OpenApi {
@@ -110,4 +114,23 @@ pub fn router() -> Router {
                 .allow_methods(tower_http::cors::Any)
                 .allow_headers([AUTHORIZATION, CONTENT_TYPE]),
         )
+}
+
+pub fn build_openapi_schema() -> OpenApi {
+    let router = build_app_router();
+
+    let mut api = OpenApi {
+        info: Info {
+            title: "Mikoto Superego".to_string(),
+            ..Info::default()
+        },
+        ..OpenApi::default()
+    };
+
+    // Add websocket extension to the OpenAPI schema
+    api.extensions
+        .insert("websocket".to_string(), router.ws.build_schema_ext());
+
+    let _ = router.http.finish_api(&mut api);
+    api
 }

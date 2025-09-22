@@ -36,7 +36,7 @@ async fn main() {
     db.unwrap();
     redis.unwrap();
 
-    dump().unwrap();
+    dump().await.unwrap();
 
     let app = routes::router();
     let app = NormalizePathLayer::trim_trailing_slash().layer(app);

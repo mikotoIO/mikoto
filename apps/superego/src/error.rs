@@ -56,6 +56,8 @@ pub enum Error {
     TemplatingError,
     #[error("Mail error")]
     MailError,
+    #[error("IO error")]
+    IOError(#[from] std::io::Error),
     #[error("Unimplemented so far")]
     Todo,
 

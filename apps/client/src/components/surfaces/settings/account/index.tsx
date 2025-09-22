@@ -151,24 +151,31 @@ function Overview() {
         </Box>
       </Box>
       <Form
+        mb={4}
         onSubmit={handleSubmit(async (form) => {
-          await mikoto.rest['user.update']({ description: form.description }, {});
+          await mikoto.rest['user.update'](
+            { description: form.description },
+            {},
+          );
         })}
       >
-        <Field label="User description">
+        <Field label="User description" mt={4} fontSize="">
           <Textarea
             h={160}
             backgroundColor="gray.750"
             {...register('description')}
           />
         </Field>
-        <Button colorPalette="primary" type="submit">Save</Button>
+        <Button colorPalette="blue" type="submit">
+          Save
+        </Button>
       </Form>
 
       <h2>{t('accountSettings.general.authentication')}</h2>
 
       <Flex gap={2}>
         <Button
+          variant="subtle"
           onClick={() => {
             setModal({
               elem: <PasswordChangeModal />,
@@ -178,7 +185,7 @@ function Overview() {
           {t('accountSettings.general.changePassword')}
         </Button>
         <Button
-          colorPalette="warning"
+          colorPalette="yellow"
           type="submit"
           height="auto"
           blockSize="auto"
@@ -191,12 +198,14 @@ function Overview() {
         Warning: This action is irreversible. You will lose all your data.
       </Box>
       <Flex gap={2}>
-        <Button colorPalette="danger">
+        <Button colorPalette="red">
           {t('accountSettings.general.deleteAccount')}
         </Button>
       </Flex>
       <h2>Debug</h2>
-      <Button size="md">Open Design Palette</Button>
+      <Button size="md" variant="subtle">
+        Open Design Palette
+      </Button>
       <Box mb="80px" />
     </SettingSurface>
   );

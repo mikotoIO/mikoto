@@ -1,6 +1,7 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import type { OpenAPIObject, ReferenceObject } from 'openapi3-ts/oas30';
 import { generateZodClientFromOpenAPI } from 'openapi-zod-client';
+import path from 'path';
 
 type ExtendedOpenAPIObject = OpenAPIObject & {
   websocket?: {
@@ -46,7 +47,7 @@ function generateWebsocket(openApiDoc: ExtendedOpenAPIObject) {
 
 const main = async () => {
   const openApiDoc = (await SwaggerParser.parse(
-    'http://0.0.0.0:3511/api.json',
+    path.join(__dirname, '../../../apps/superego/api.json'),
   )) as ExtendedOpenAPIObject;
   await generateZodClientFromOpenAPI({
     openApiDoc,

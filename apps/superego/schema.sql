@@ -272,7 +272,8 @@ CREATE TABLE public."Space" (
     name character varying(64) NOT NULL,
     icon character varying(256),
     "ownerId" uuid,
-    type public."SpaceType" DEFAULT 'NONE'::public."SpaceType" NOT NULL
+    type public."SpaceType" DEFAULT 'NONE'::public."SpaceType" NOT NULL,
+    handle character varying(64)
 );
 
 
@@ -589,6 +590,13 @@ CREATE INDEX "SpaceUser_spaceId_idx" ON public."SpaceUser" USING btree ("spaceId
 --
 
 CREATE UNIQUE INDEX "SpaceUser_userId_spaceId_key" ON public."SpaceUser" USING btree ("userId", "spaceId");
+
+
+--
+-- Name: Space_handle_key; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX "Space_handle_key" ON public."Space" USING btree (handle);
 
 
 --

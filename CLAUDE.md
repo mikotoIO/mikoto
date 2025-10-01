@@ -145,17 +145,15 @@ All services use ports in the 351X range:
 - Cargo clippy for Rust linting
 - PNPM workspaces for JavaScript package management
 
-## Development Workflow
-
-1. Start infrastructure: `docker compose up -d`
-2. Install dependencies: `pnpm install && cargo check`
-3. Run database migrations: `cd apps/superego && sqlx migrate run`
-4. Start development servers: `pnpm start`
-5. Access client at http://localhost:3510
-6. API documentation at http://localhost:3511/scalar
-
 ## Testing
 
 - **Client**: Vitest for unit/integration tests
 - **Server**: Cargo test for Rust unit tests
 - **E2E**: Not currently configured
+
+## Important Tips
+
+- Use the rustdoc MCP, if available, to get up-to-date information about Rust crate documentations, instead of web searching by default.
+- Before adding any new package, use the rustdoc crate search to check for the version.
+- Instead of reading the migrations, you can read schema.sql for the up-to-date dump of the database schema.
+- at the end of your task, run moon :typecheck to check both Rust and TypeScript parts of the codebase.

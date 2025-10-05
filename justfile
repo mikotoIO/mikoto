@@ -10,3 +10,21 @@ new-migration name:
     filename="${timestamp}_{{name}}.sql"
     echo "-- Add migration script here" > "$filename"
     echo "Created migration: $filename"
+
+# Reset Docker services (database, S3, and Redis)
+docker-start:
+    echo "Starting Docker services..."
+    docker compose up -d
+    echo "Docker started!"
+
+# Reset Docker services (database, S3, and Redis)
+reset-dev-env:
+    #!/usr/bin/env bash
+    echo "Stopping Docker services..."
+    docker compose down
+    echo "Removing volumes..."
+    docker volume rm mikoto_postgresql mikoto_redis mikoto_meilisearch 2>/dev/null || true
+    rm -rf ./data/minio
+    echo "Starting Docker services..."
+    docker compose up -d
+    echo "Docker services reset complete!"

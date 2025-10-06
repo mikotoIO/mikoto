@@ -79,7 +79,7 @@ pub async fn start_verification(
         let delegate_endpoint = config
             .endpoint
             .as_ref()
-            .ok_or_else(|| Error::internal(&"No delegate endpoint found".to_string()))?;
+            .ok_or_else(|| Error::internal("No delegate endpoint found"))?;
 
         endpoint = Some(delegate_endpoint.clone());
 
@@ -143,7 +143,7 @@ pub async fn complete_verification(
     // Check if expired
     if verification_request.expires_at < chrono::Utc::now() {
         HandleVerificationRequest::update_status(request_id, "expired", pool).await?;
-        return Err(Error::internal(&"Verification request expired".to_string()));
+        return Err(Error::internal("Verification request expired"));
     }
 
     // Discover handle configuration again to get public key
@@ -224,12 +224,12 @@ pub async fn poll_verification(
     // Check if expired
     if verification_request.expires_at < chrono::Utc::now() {
         HandleVerificationRequest::update_status(request_id, "expired", pool).await?;
-        return Err(Error::internal(&"Verification request expired".to_string()));
+        return Err(Error::internal("Verification request expired"));
     }
 
     let delegate_request_id = verification_request
         .request_id
-        .ok_or_else(|| Error::internal(&"No delegate request ID found".to_string()))?;
+        .ok_or_else(|| Error::internal("No delegate request ID found"))?;
 
     // Discover handle config to get endpoint
     let config = verifier
@@ -239,7 +239,7 @@ pub async fn poll_verification(
 
     let endpoint = config
         .endpoint
-        .ok_or_else(|| Error::internal(&"No delegate endpoint found".to_string()))?;
+        .ok_or_else(|| Error::internal("No delegate endpoint found"))?;
 
     // Try to get the token (single attempt)
     let client = DelegateClient::new(&endpoint);

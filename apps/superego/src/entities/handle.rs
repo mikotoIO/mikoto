@@ -195,7 +195,7 @@ impl HandleVerificationRequest {
             r#"
             DELETE FROM "HandleVerificationRequest"
             WHERE "expiresAt" < CURRENT_TIMESTAMP AND status = 'pending'
-            "#
+            "#,
         )
         .execute(db)
         .await?;

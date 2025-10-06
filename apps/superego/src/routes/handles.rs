@@ -3,7 +3,11 @@ use aide::axum::{
     ApiRouter, IntoApiResponse,
 };
 use axum::{extract::Path, Json};
-use libdelve::{delegate_client::DelegateClient, types::{ChallengeRequest, VerificationToken}, VerificationMode};
+use libdelve::{
+    delegate_client::DelegateClient,
+    types::{ChallengeRequest, VerificationToken},
+    VerificationMode,
+};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -89,12 +93,9 @@ pub async fn start_verification(
             metadata: None,
         };
 
-        let response = client
-            .submit_challenge(&challenge_req)
-            .await
-            .map_err(|e| {
-                Error::internal(&format!("Failed to submit challenge to delegate: {}", e))
-            })?;
+        let response = client.submit_challenge(&challenge_req).await.map_err(|e| {
+            Error::internal(&format!("Failed to submit challenge to delegate: {}", e))
+        })?;
 
         delegate_request_id = Some(response.request_id);
     }
@@ -272,18 +273,14 @@ pub async fn poll_verification(
     Ok(Json(verified_handle))
 }
 
-pub async fn list_verified_handles(
-    claims: Claims,
-) -> Result<impl IntoApiResponse, Error> {
+pub async fn list_verified_handles(claims: Claims) -> Result<impl IntoApiResponse, Error> {
     let user_id = Uuid::parse_str(&claims.sub)?;
     let pool = db();
     let handles = VerifiedHandle::get_by_user(user_id, pool).await?;
     Ok(Json(handles))
 }
 
-pub async fn list_pending_requests(
-    claims: Claims,
-) -> Result<impl IntoApiResponse, Error> {
+pub async fn list_pending_requests(claims: Claims) -> Result<impl IntoApiResponse, Error> {
     let user_id = Uuid::parse_str(&claims.sub)?;
     let pool = db();
     let requests = HandleVerificationRequest::get_pending_by_user(user_id, pool).await?;

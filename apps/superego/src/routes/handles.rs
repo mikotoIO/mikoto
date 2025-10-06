@@ -10,7 +10,7 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{DomainVerificationRequest, VerifiedDomain},
+    entities::{HandleVerificationRequest, VerifiedHandle},
     error::Error,
     functions::jwt::Claims,
     services::verifier,
@@ -43,7 +43,7 @@ pub struct CompleteVerificationRequest {
 #[serde(rename_all = "camelCase")]
 pub struct VerificationStatusResponse {
     pub status: String,
-    pub domain: String,
+    pub handle: String,
     pub challenge: String,
     pub expires_at: chrono::DateTime<chrono::Utc>,
 }
@@ -56,11 +56,11 @@ pub async fn start_verification(
     let verifier = verifier();
     let pool = db();
 
-    // Discover domain configuration
+    // Discover handle configuration
     let config = verifier
         .discover(&req.domain)
         .await
-        .map_err(|e| Error::internal(&format!("Failed to discover domain config: {}", e)))?;
+        .map_err(|e| Error::internal(&format!("Failed to discover handle config: {}", e)))?;
 
     // Generate challenge
     let (challenge, expires_at) = verifier
@@ -100,7 +100,7 @@ pub async fn start_verification(
     }
 
     // Store verification request
-    let verification_request = DomainVerificationRequest::create(
+    let verification_request = HandleVerificationRequest::create(
         user_id,
         &req.domain,
         &challenge,
@@ -130,7 +130,7 @@ pub async fn complete_verification(
     let pool = db();
 
     // Get verification request
-    let verification_request = DomainVerificationRequest::get_by_id(request_id, pool)
+    let verification_request = HandleVerificationRequest::get_by_id(request_id, pool)
         .await?
         .ok_or(Error::NotFound)?;
 
@@ -141,15 +141,15 @@ pub async fn complete_verification(
 
     // Check if expired
     if verification_request.expires_at < chrono::Utc::now() {
-        DomainVerificationRequest::update_status(request_id, "expired", pool).await?;
+        HandleVerificationRequest::update_status(request_id, "expired", pool).await?;
         return Err(Error::internal(&"Verification request expired".to_string()));
     }
 
-    // Discover domain configuration again to get public key
+    // Discover handle configuration again to get public key
     let config = verifier
-        .discover(&verification_request.domain)
+        .discover(&verification_request.handle)
         .await
-        .map_err(|e| Error::internal(&format!("Failed to discover domain config: {}", e)))?;
+        .map_err(|e| Error::internal(&format!("Failed to discover handle config: {}", e)))?;
 
     // Parse and verify the token
     let token: VerificationToken = serde_json::from_value(req.token)
@@ -158,25 +158,25 @@ pub async fn complete_verification(
     verifier
         .verify_token(
             &token,
-            &verification_request.domain,
+            &verification_request.handle,
             &verification_request.challenge,
             &config.public_key,
         )
         .map_err(|e| Error::internal(&format!("Token verification failed: {}", e)))?;
 
-    // Create verified domain
-    let verified_domain = VerifiedDomain::create(
+    // Create verified handle
+    let verified_handle = VerifiedHandle::create(
         user_id,
-        &verification_request.domain,
+        &verification_request.handle,
         &config.public_key,
         pool,
     )
     .await?;
 
     // Update request status
-    DomainVerificationRequest::update_status(request_id, "completed", pool).await?;
+    HandleVerificationRequest::update_status(request_id, "completed", pool).await?;
 
-    Ok(Json(verified_domain))
+    Ok(Json(verified_handle))
 }
 
 pub async fn get_verification_status(
@@ -186,7 +186,7 @@ pub async fn get_verification_status(
     let user_id = Uuid::parse_str(&claims.sub)?;
     let pool = db();
 
-    let verification_request = DomainVerificationRequest::get_by_id(request_id, pool)
+    let verification_request = HandleVerificationRequest::get_by_id(request_id, pool)
         .await?
         .ok_or(Error::NotFound)?;
 
@@ -197,7 +197,7 @@ pub async fn get_verification_status(
 
     Ok(Json(VerificationStatusResponse {
         status: verification_request.status,
-        domain: verification_request.domain,
+        handle: verification_request.handle,
         challenge: verification_request.challenge,
         expires_at: verification_request.expires_at,
     }))
@@ -211,7 +211,7 @@ pub async fn poll_verification(
     let verifier = verifier();
     let pool = db();
 
-    let verification_request = DomainVerificationRequest::get_by_id(request_id, pool)
+    let verification_request = HandleVerificationRequest::get_by_id(request_id, pool)
         .await?
         .ok_or(Error::NotFound)?;
 
@@ -222,7 +222,7 @@ pub async fn poll_verification(
 
     // Check if expired
     if verification_request.expires_at < chrono::Utc::now() {
-        DomainVerificationRequest::update_status(request_id, "expired", pool).await?;
+        HandleVerificationRequest::update_status(request_id, "expired", pool).await?;
         return Err(Error::internal(&"Verification request expired".to_string()));
     }
 
@@ -230,11 +230,11 @@ pub async fn poll_verification(
         .request_id
         .ok_or_else(|| Error::internal(&"No delegate request ID found".to_string()))?;
 
-    // Discover domain config to get endpoint
+    // Discover handle config to get endpoint
     let config = verifier
-        .discover(&verification_request.domain)
+        .discover(&verification_request.handle)
         .await
-        .map_err(|e| Error::internal(&format!("Failed to discover domain config: {}", e)))?;
+        .map_err(|e| Error::internal(&format!("Failed to discover handle config: {}", e)))?;
 
     let endpoint = config
         .endpoint
@@ -251,34 +251,34 @@ pub async fn poll_verification(
     verifier
         .verify_token(
             &token,
-            &verification_request.domain,
+            &verification_request.handle,
             &verification_request.challenge,
             &config.public_key,
         )
         .map_err(|e| Error::internal(&format!("Token verification failed: {}", e)))?;
 
-    // Create verified domain
-    let verified_domain = VerifiedDomain::create(
+    // Create verified handle
+    let verified_handle = VerifiedHandle::create(
         user_id,
-        &verification_request.domain,
+        &verification_request.handle,
         &config.public_key,
         pool,
     )
     .await?;
 
     // Update request status
-    DomainVerificationRequest::update_status(request_id, "completed", pool).await?;
+    HandleVerificationRequest::update_status(request_id, "completed", pool).await?;
 
-    Ok(Json(verified_domain))
+    Ok(Json(verified_handle))
 }
 
-pub async fn list_verified_domains(
+pub async fn list_verified_handles(
     claims: Claims,
 ) -> Result<impl IntoApiResponse, Error> {
     let user_id = Uuid::parse_str(&claims.sub)?;
     let pool = db();
-    let domains = VerifiedDomain::get_by_user(user_id, pool).await?;
-    Ok(Json(domains))
+    let handles = VerifiedHandle::get_by_user(user_id, pool).await?;
+    Ok(Json(handles))
 }
 
 pub async fn list_pending_requests(
@@ -286,17 +286,17 @@ pub async fn list_pending_requests(
 ) -> Result<impl IntoApiResponse, Error> {
     let user_id = Uuid::parse_str(&claims.sub)?;
     let pool = db();
-    let requests = DomainVerificationRequest::get_pending_by_user(user_id, pool).await?;
+    let requests = HandleVerificationRequest::get_pending_by_user(user_id, pool).await?;
     Ok(Json(requests))
 }
 
-pub async fn delete_verified_domain(
+pub async fn delete_verified_handle(
     claims: Claims,
-    Path(domain): Path<String>,
+    Path(handle): Path<String>,
 ) -> Result<impl IntoApiResponse, Error> {
     let user_id = Uuid::parse_str(&claims.sub)?;
     let pool = db();
-    VerifiedDomain::delete(user_id, &domain, pool).await?;
+    VerifiedHandle::delete(user_id, &handle, pool).await?;
     Ok(Json(serde_json::json!({"success": true})))
 }
 
@@ -306,15 +306,15 @@ pub fn router() -> ApiRouter {
             "/start",
             post_with(start_verification, |o| {
                 o.id("startVerification")
-                    .summary("Start domain verification")
-                    .description("Initiates the domain verification process")
+                    .summary("Start handle verification")
+                    .description("Initiates the handle verification process")
             }),
         )
         .api_route(
             "/:requestId/complete",
             post_with(complete_verification, |o| {
                 o.id("completeVerification")
-                    .summary("Complete domain verification")
+                    .summary("Complete handle verification")
                     .description("Completes the verification with a signed token")
             }),
         )
@@ -336,10 +336,10 @@ pub fn router() -> ApiRouter {
         )
         .api_route(
             "/verified",
-            get_with(list_verified_domains, |o| {
-                o.id("listVerifiedDomains")
-                    .summary("List verified domains")
-                    .description("Lists all verified domains for the user")
+            get_with(list_verified_handles, |o| {
+                o.id("listVerifiedHandles")
+                    .summary("List verified handles")
+                    .description("Lists all verified handles for the user")
             }),
         )
         .api_route(
@@ -351,11 +351,11 @@ pub fn router() -> ApiRouter {
             }),
         )
         .api_route(
-            "/verified/:domain",
-            aide::axum::routing::delete_with(delete_verified_domain, |o| {
-                o.id("deleteVerifiedDomain")
-                    .summary("Delete verified domain")
-                    .description("Removes a verified domain from the user's account")
+            "/verified/:handle",
+            aide::axum::routing::delete_with(delete_verified_handle, |o| {
+                o.id("deleteVerifiedHandle")
+                    .summary("Delete verified handle")
+                    .description("Removes a verified handle from the user's account")
             }),
         )
 }

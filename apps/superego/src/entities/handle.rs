@@ -4,33 +4,33 @@ use uuid::Uuid;
 use crate::{entity, error::Error};
 
 entity!(
-    pub struct VerifiedDomain {
+    pub struct VerifiedHandle {
         pub id: Uuid,
         pub user_id: Uuid,
-        pub domain: String,
+        pub handle: String,
         pub public_key: String,
         pub verified_at: DateTime<Utc>,
     }
 );
 
-impl VerifiedDomain {
+impl VerifiedHandle {
     pub async fn create<'c, X: sqlx::PgExecutor<'c>>(
         user_id: Uuid,
-        domain: &str,
+        handle: &str,
         public_key: &str,
         db: X,
     ) -> Result<Self, Error> {
         let result = sqlx::query_as(
             r#"
-            INSERT INTO "VerifiedDomain" ("userId", domain, "publicKey")
+            INSERT INTO "VerifiedHandle" ("userId", handle, "publicKey")
             VALUES ($1, $2, $3)
-            ON CONFLICT ("userId", domain) DO UPDATE
+            ON CONFLICT ("userId", handle) DO UPDATE
             SET "publicKey" = $3, "verifiedAt" = CURRENT_TIMESTAMP
             RETURNING *
             "#,
         )
         .bind(user_id)
-        .bind(domain)
+        .bind(handle)
         .bind(public_key)
         .fetch_one(db)
         .await?;
@@ -42,9 +42,9 @@ impl VerifiedDomain {
         user_id: Uuid,
         db: X,
     ) -> Result<Vec<Self>, Error> {
-        let domains = sqlx::query_as(
+        let handles = sqlx::query_as(
             r#"
-            SELECT * FROM "VerifiedDomain"
+            SELECT * FROM "VerifiedHandle"
             WHERE "userId" = $1
             ORDER BY "verifiedAt" DESC
             "#,
@@ -53,22 +53,22 @@ impl VerifiedDomain {
         .fetch_all(db)
         .await?;
 
-        Ok(domains)
+        Ok(handles)
     }
 
-    pub async fn get_by_domain<'c, X: sqlx::PgExecutor<'c>>(
+    pub async fn get_by_handle<'c, X: sqlx::PgExecutor<'c>>(
         user_id: Uuid,
-        domain: &str,
+        handle: &str,
         db: X,
     ) -> Result<Option<Self>, Error> {
         let result = sqlx::query_as(
             r#"
-            SELECT * FROM "VerifiedDomain"
-            WHERE "userId" = $1 AND domain = $2
+            SELECT * FROM "VerifiedHandle"
+            WHERE "userId" = $1 AND handle = $2
             "#,
         )
         .bind(user_id)
-        .bind(domain)
+        .bind(handle)
         .fetch_optional(db)
         .await?;
 
@@ -77,17 +77,17 @@ impl VerifiedDomain {
 
     pub async fn delete<'c, X: sqlx::PgExecutor<'c>>(
         user_id: Uuid,
-        domain: &str,
+        handle: &str,
         db: X,
     ) -> Result<(), Error> {
         sqlx::query(
             r#"
-            DELETE FROM "VerifiedDomain"
-            WHERE "userId" = $1 AND domain = $2
+            DELETE FROM "VerifiedHandle"
+            WHERE "userId" = $1 AND handle = $2
             "#,
         )
         .bind(user_id)
-        .bind(domain)
+        .bind(handle)
         .execute(db)
         .await?;
 
@@ -96,10 +96,10 @@ impl VerifiedDomain {
 }
 
 entity!(
-    pub struct DomainVerificationRequest {
+    pub struct HandleVerificationRequest {
         pub id: Uuid,
         pub user_id: Uuid,
-        pub domain: String,
+        pub handle: String,
         pub challenge: String,
         pub request_id: Option<String>,
         pub expires_at: DateTime<Utc>,
@@ -108,10 +108,10 @@ entity!(
     }
 );
 
-impl DomainVerificationRequest {
+impl HandleVerificationRequest {
     pub async fn create<'c, X: sqlx::PgExecutor<'c>>(
         user_id: Uuid,
-        domain: &str,
+        handle: &str,
         challenge: &str,
         expires_at: DateTime<Utc>,
         request_id: Option<String>,
@@ -119,13 +119,13 @@ impl DomainVerificationRequest {
     ) -> Result<Self, Error> {
         let request = sqlx::query_as(
             r#"
-            INSERT INTO "DomainVerificationRequest" ("userId", domain, challenge, "expiresAt", "requestId")
+            INSERT INTO "HandleVerificationRequest" ("userId", handle, challenge, "expiresAt", "requestId")
             VALUES ($1, $2, $3, $4, $5)
             RETURNING *
             "#,
         )
         .bind(user_id)
-        .bind(domain)
+        .bind(handle)
         .bind(challenge)
         .bind(expires_at)
         .bind(request_id)
@@ -141,7 +141,7 @@ impl DomainVerificationRequest {
     ) -> Result<Option<Self>, Error> {
         let request = sqlx::query_as(
             r#"
-            SELECT * FROM "DomainVerificationRequest"
+            SELECT * FROM "HandleVerificationRequest"
             WHERE id = $1
             "#,
         )
@@ -158,7 +158,7 @@ impl DomainVerificationRequest {
     ) -> Result<Vec<Self>, Error> {
         let requests = sqlx::query_as(
             r#"
-            SELECT * FROM "DomainVerificationRequest"
+            SELECT * FROM "HandleVerificationRequest"
             WHERE "userId" = $1 AND status = 'pending' AND "expiresAt" > CURRENT_TIMESTAMP
             ORDER BY "createdAt" DESC
             "#,
@@ -177,7 +177,7 @@ impl DomainVerificationRequest {
     ) -> Result<(), Error> {
         sqlx::query(
             r#"
-            UPDATE "DomainVerificationRequest"
+            UPDATE "HandleVerificationRequest"
             SET status = $2
             WHERE id = $1
             "#,
@@ -193,7 +193,7 @@ impl DomainVerificationRequest {
     pub async fn cleanup_expired<'c, X: sqlx::PgExecutor<'c>>(db: X) -> Result<u64, Error> {
         let result = sqlx::query(
             r#"
-            DELETE FROM "DomainVerificationRequest"
+            DELETE FROM "HandleVerificationRequest"
             WHERE "expiresAt" < CURRENT_TIMESTAMP AND status = 'pending'
             "#
         )

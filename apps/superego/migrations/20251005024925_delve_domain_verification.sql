@@ -1,7 +1,7 @@
 -- DelVe Domain Verification Tables
 
--- Table to store verified domains for users
-CREATE TABLE "VerifiedDomain" (
+-- Table to store verified handles (domains) for users
+CREATE TABLE "VerifiedHandle" (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "userId" UUID NOT NULL REFERENCES "User"(id) ON DELETE CASCADE,
     domain TEXT NOT NULL,
@@ -10,11 +10,11 @@ CREATE TABLE "VerifiedDomain" (
     UNIQUE("userId", domain)
 );
 
-CREATE INDEX "VerifiedDomain_userId_idx" ON "VerifiedDomain" USING btree ("userId");
-CREATE INDEX "VerifiedDomain_domain_idx" ON "VerifiedDomain" USING btree (domain);
+CREATE INDEX "VerifiedHandle_userId_idx" ON "VerifiedHandle" USING btree ("userId");
+CREATE INDEX "VerifiedHandle_domain_idx" ON "VerifiedHandle" USING btree (domain);
 
 -- Table to store pending verification requests (for delegate mode)
-CREATE TABLE "DomainVerificationRequest" (
+CREATE TABLE "HandleVerificationRequest" (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "userId" UUID NOT NULL REFERENCES "User"(id) ON DELETE CASCADE,
     domain TEXT NOT NULL,
@@ -25,6 +25,6 @@ CREATE TABLE "DomainVerificationRequest" (
     status TEXT NOT NULL DEFAULT 'pending' -- pending, completed, failed, expired
 );
 
-CREATE INDEX "DomainVerificationRequest_userId_idx" ON "DomainVerificationRequest" USING btree ("userId");
-CREATE INDEX "DomainVerificationRequest_status_idx" ON "DomainVerificationRequest" USING btree (status);
-CREATE INDEX "DomainVerificationRequest_expiresAt_idx" ON "DomainVerificationRequest" USING btree ("expiresAt");
+CREATE INDEX "HandleVerificationRequest_userId_idx" ON "HandleVerificationRequest" USING btree ("userId");
+CREATE INDEX "HandleVerificationRequest_status_idx" ON "HandleVerificationRequest" USING btree (status);
+CREATE INDEX "HandleVerificationRequest_expiresAt_idx" ON "HandleVerificationRequest" USING btree ("expiresAt");

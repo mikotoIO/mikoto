@@ -275,14 +275,14 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
                 // Upload all files first
                 const attachments = await Promise.all(
                   files.map(async ({ file }) => {
-                    const response = await uploadFile('/upload/attachment', file);
+                    const response = await uploadFile('/attachment', file);
                     return {
                       url: response.data.url,
                       filename: file.name,
                       contentType: file.type,
                       size: file.size,
                     };
-                  })
+                  }),
                 );
 
                 await channel.sendMessage(msg, attachments);

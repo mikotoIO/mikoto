@@ -6,7 +6,7 @@ use crate::{
     db_entity_delete, db_find_by_id, entity, error::Error, functions::time::Timestamp, model,
 };
 
-use super::{Channel, User};
+use super::{Channel, MessageAttachment, User};
 
 entity!(
     pub struct Message {
@@ -31,6 +31,7 @@ pub struct MessageExt {
     #[serde(flatten)]
     pub base: Message,
     pub author: Option<User>,
+    pub attachments: Vec<MessageAttachment>,
 }
 
 model!(
@@ -137,7 +138,7 @@ impl MessagePatch {
 }
 
 impl MessageExt {
-    pub async fn dataload_one<'c, X: sqlx::PgExecutor<'c>>(
+    pub async fn dataload_one<'c, X: sqlx::PgExecutor<'c> + Copy>(
         message: Message,
         db: X,
     ) -> Result<Self, Error> {
@@ -146,18 +147,39 @@ impl MessageExt {
         } else {
             None
         };
+        let attachments = MessageAttachment::list_by_message(message.id, db).await?;
         Ok(MessageExt {
             base: message,
             author,
+            attachments,
         })
     }
 
-    pub async fn dataload<'c, X: sqlx::PgExecutor<'c>>(
+    pub async fn dataload<'c, X: sqlx::PgExecutor<'c> + Copy>(
         messages: Vec<Message>,
         db: X,
     ) -> Result<Vec<Self>, Error> {
         let author_ids: Vec<Uuid> = messages.iter().filter_map(|m| m.author_id).collect();
         let authors = User::dataload(author_ids, db).await?;
+
+        // Load all attachments for all messages
+        let message_ids: Vec<Uuid> = messages.iter().map(|m| m.id).collect();
+        let all_attachments = if !message_ids.is_empty() {
+            sqlx::query_as::<_, MessageAttachment>(
+                r#"
+                SELECT * FROM "MessageAttachment"
+                WHERE "messageId" = ANY($1)
+                ORDER BY "messageId", "order"
+                "#,
+            )
+            .bind(&message_ids)
+            .fetch_all(db)
+            .await?
+        } else {
+            Vec::new()
+        };
+
+        let attachments_by_message = crate::entities::group_by_key(all_attachments, |a| a.message_id);
 
         let res = messages
             .into_iter()
@@ -167,9 +189,14 @@ impl MessageExt {
                 } else {
                     None
                 };
+                let attachments = attachments_by_message
+                    .get(&message.id)
+                    .cloned()
+                    .unwrap_or_default();
                 MessageExt {
                     base: message,
                     author,
+                    attachments,
                 }
             })
             .collect();

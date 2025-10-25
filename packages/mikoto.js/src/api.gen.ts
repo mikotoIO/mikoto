@@ -185,7 +185,19 @@ export type cursor = z.infer<typeof cursor>;
 export const limit = z.union([z.number(), z.null()]).optional();
 export type limit = z.infer<typeof limit>;
 
+export const MessageAttachment = z.object({
+  contentType: z.string(),
+  filename: z.string(),
+  id: z.string().uuid(),
+  messageId: z.string().uuid(),
+  order: z.number().int(),
+  size: z.number().int(),
+  url: z.string(),
+});
+export type MessageAttachment = z.infer<typeof MessageAttachment>;
+
 export const MessageExt = z.object({
+  attachments: z.array(MessageAttachment),
   author: z.union([User, z.null()]).optional(),
   authorId: z.union([z.string(), z.null()]).optional(),
   channelId: z.string().uuid(),
@@ -196,7 +208,18 @@ export const MessageExt = z.object({
 });
 export type MessageExt = z.infer<typeof MessageExt>;
 
-export const MessageSendPayload = z.object({ content: z.string() });
+export const MessageAttachmentInput = z.object({
+  contentType: z.string(),
+  filename: z.string(),
+  size: z.number().int(),
+  url: z.string(),
+});
+export type MessageAttachmentInput = z.infer<typeof MessageAttachmentInput>;
+
+export const MessageSendPayload = z.object({
+  attachments: z.array(MessageAttachmentInput).optional().default([]),
+  content: z.string(),
+});
 export type MessageSendPayload = z.infer<typeof MessageSendPayload>;
 
 export const MessageEditPayload = z.object({ content: z.string() });
@@ -318,7 +341,9 @@ export const schemas = {
   ChannelUnread,
   cursor,
   limit,
+  MessageAttachment,
   MessageExt,
+  MessageAttachmentInput,
   MessageSendPayload,
   MessageEditPayload,
   VoiceToken,
@@ -626,7 +651,7 @@ const endpoints = makeApi([
       {
         name: "body",
         type: "Body",
-        schema: z.object({ content: z.string() }),
+        schema: MessageSendPayload,
       },
     ],
     response: MessageExt,

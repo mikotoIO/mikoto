@@ -1,4 +1,4 @@
-import { Box, Flex } from '@chakra-ui/react';
+import { Box, Flex, Link } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { MikotoMessage } from '@mikoto-io/mikoto.js';
 import { atom, useSetAtom } from 'jotai';
@@ -159,6 +159,51 @@ export const MessageItem = ({ message, isSimple }: MessageProps) => {
             </Box>
           )}
         </div>
+        {messageSnap.attachments && messageSnap.attachments.length > 0 && (
+          <Flex mt={2} gap={2} flexWrap="wrap">
+            {messageSnap.attachments.map((attachment) => {
+              const isImage = attachment.contentType.startsWith('image/');
+              return (
+                <Link
+                  key={attachment.id}
+                  href={attachment.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  maxW={isImage ? '400px' : 'auto'}
+                  _hover={{ textDecoration: 'none' }}
+                >
+                  {isImage ? (
+                    <img
+                      src={attachment.url}
+                      alt={attachment.filename}
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '300px',
+                        borderRadius: '4px',
+                      }}
+                    />
+                  ) : (
+                    <Box
+                      p={2}
+                      bg="gray.700"
+                      borderRadius="4px"
+                      _hover={{ bg: 'gray.600' }}
+                    >
+                      <Flex align="center" gap={2}>
+                        <Box fontSize="sm" fontWeight="medium">
+                          {attachment.filename}
+                        </Box>
+                        <Box fontSize="xs" color="gray.400">
+                          ({(attachment.size / 1024).toFixed(1)} KB)
+                        </Box>
+                      </Flex>
+                    </Box>
+                  )}
+                </Link>
+              );
+            })}
+          </Flex>
+        )}
       </MessageInner>
     </MessageContainer>
   );

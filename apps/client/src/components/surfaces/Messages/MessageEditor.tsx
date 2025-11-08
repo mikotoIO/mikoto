@@ -295,16 +295,13 @@ export function MessageEditor({
 
               ev.preventDefault();
 
-              // no empty message
-              if (serialize(editorValue).trim() === '' && files.length === 0) {
+              const text = serialize(editorValue).trim();
+              // no empty message - require either text content or file attachments
+              if (text === '' && files.length === 0) {
                 return;
               }
 
-              const text = serialize(editorValue).trim();
-              if (text.length === 0) return;
-
               // audio.play();
-
               onSubmit(text, files);
               setEditorValue(initialEditorValue);
               resetEditor(editor);

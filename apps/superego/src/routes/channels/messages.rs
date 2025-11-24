@@ -8,7 +8,7 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Channel, Message, MessageExt, MessageKey, MessagePatch},
+    entities::{Channel, Message, MessageAttachment, MessageAttachmentInput, MessageExt, MessageKey, MessagePatch},
     error::Error,
     functions::{jwt::Claims, pubsub::emit_event},
     routes::{router::AppRouter, ws::state::State},
@@ -18,6 +18,8 @@ use crate::{
 #[serde(rename_all = "camelCase")]
 pub struct MessageSendPayload {
     pub content: String,
+    #[serde(default)]
+    pub attachments: Vec<MessageAttachmentInput>,
 }
 
 #[derive(Deserialize, JsonSchema)]
@@ -65,6 +67,13 @@ async fn send(
     let channel = Channel::find_by_id(channel_id, db()).await?;
     let message = Message::new(&channel, claim.sub.parse()?, body.content);
     message.create(db()).await?;
+
+    // Create attachments if any
+    for (i, attachment_input) in body.attachments.into_iter().enumerate() {
+        let attachment = MessageAttachment::new(message.id, attachment_input, i as i32);
+        attachment.create(db()).await?;
+    }
+
     let message = MessageExt::dataload_one(message, db()).await?;
 
     emit_event(

@@ -15,6 +15,7 @@ import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
+import { uploadFile } from '@/functions/fileUpload';
 import { useFetchMember, useMikoto } from '@/hooks';
 import { CurrentSpaceContext } from '@/store';
 import { Spinner } from '@/ui/Spinner';
@@ -265,13 +266,26 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
                 virtuosoRef.current.autoscrollToBottom();
               }
             }}
-            onSubmit={async (msg) => {
+            onSubmit={async (msg, files) => {
               if (currentEditState) {
                 const m = currentEditState;
                 setEditState(null);
                 await m.edit(msg);
               } else {
-                await channel.sendMessage(msg);
+                // Upload all files first
+                const attachments = await Promise.all(
+                  files.map(async ({ file }) => {
+                    const response = await uploadFile('/attachment', file);
+                    return {
+                      url: response.data.url,
+                      filename: file.name,
+                      contentType: file.type,
+                      size: file.size,
+                    };
+                  }),
+                );
+
+                await channel.sendMessage(msg, attachments);
               }
             }}
           />

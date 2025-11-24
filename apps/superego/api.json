@@ -1623,6 +1623,69 @@
           }
         }
       },
+      "MessageAttachment": {
+        "type": "object",
+        "required": [
+          "contentType",
+          "filename",
+          "id",
+          "messageId",
+          "order",
+          "size",
+          "url"
+        ],
+        "properties": {
+          "contentType": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "messageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "MessageAttachmentInput": {
+        "type": "object",
+        "required": [
+          "contentType",
+          "filename",
+          "size",
+          "url"
+        ],
+        "properties": {
+          "contentType": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
       "MessageEditPayload": {
         "type": "object",
         "required": [
@@ -1637,12 +1700,19 @@
       "MessageExt": {
         "type": "object",
         "required": [
+          "attachments",
           "channelId",
           "content",
           "id",
           "timestamp"
         ],
         "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageAttachment"
+            }
+          },
           "author": {
             "anyOf": [
               {
@@ -1709,6 +1779,13 @@
           "content"
         ],
         "properties": {
+          "attachments": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageAttachmentInput"
+            }
+          },
           "content": {
             "type": "string"
           }

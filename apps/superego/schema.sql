@@ -206,6 +206,23 @@ CREATE TABLE public."Message" (
 ALTER TABLE public."Message" OWNER TO postgres;
 
 --
+-- Name: MessageAttachment; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."MessageAttachment" (
+    id uuid NOT NULL,
+    "messageId" uuid NOT NULL,
+    url text NOT NULL,
+    filename text NOT NULL,
+    "contentType" text NOT NULL,
+    size integer NOT NULL,
+    "order" integer DEFAULT 0 NOT NULL
+);
+
+
+ALTER TABLE public."MessageAttachment" OWNER TO postgres;
+
+--
 -- Name: RefreshToken; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -414,6 +431,14 @@ ALTER TABLE ONLY public."Invite"
 
 
 --
+-- Name: MessageAttachment MessageAttachment_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."MessageAttachment"
+    ADD CONSTRAINT "MessageAttachment_pkey" PRIMARY KEY (id);
+
+
+--
 -- Name: Message Message_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -526,6 +551,13 @@ CREATE INDEX "Channel_spaceId_idx" ON public."Channel" USING btree ("spaceId");
 --
 
 CREATE UNIQUE INDEX "Document_channelId_key" ON public."Document" USING btree ("channelId");
+
+
+--
+-- Name: MessageAttachment_messageId_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "MessageAttachment_messageId_idx" ON public."MessageAttachment" USING btree ("messageId");
 
 
 --
@@ -707,6 +739,14 @@ ALTER TABLE ONLY public."Invite"
 
 ALTER TABLE ONLY public."Invite"
     ADD CONSTRAINT "Invite_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES public."Space"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: MessageAttachment MessageAttachment_messageId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."MessageAttachment"
+    ADD CONSTRAINT "MessageAttachment_messageId_fkey" FOREIGN KEY ("messageId") REFERENCES public."Message"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

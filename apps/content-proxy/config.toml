@@ -8,3 +8,8 @@ image_resize = { width = 512, height = 512 }
 store_type = "image"
 max_size = 10485760
 image_resize = { width = 512, height = 512 }
+
+[stores.attachment]
+store_type = "attachment"
+# 50 MB
+max_size = 52428800

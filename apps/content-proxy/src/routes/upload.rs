@@ -33,18 +33,32 @@ pub async fn route(
     Path(store_name): Path<String>,
     mut form: Multipart,
 ) -> Result<Json<UploadResponse>, Error> {
+    log::info!("Upload request received for store: {}", store_name);
     let store = config().stores.get(&store_name).ok_or(Error::NotFound)?;
 
+    log::debug!("Reading first multipart field");
     let file = form
         .next_field()
         .await
-        .map_err(|_| Error::BadRequest)?
-        .ok_or(Error::NotFound)?;
+        .map_err(|e| {
+            let msg = format!("Failed to read multipart field: {:?}", e);
+            Error::BadRequest { message: Some(msg) }
+        })?
+        .ok_or_else(|| Error::NotFound)?;
+
+    let content_type = file.content_type().map(|s| s.to_string());
 
     // TODO: This is very hacky. Allow the user to provide their own file types.
-    let mut ext = mime_to_ext(file.content_type().unwrap_or("???"));
+    let mut ext = mime_to_ext(content_type.as_deref().unwrap_or("???"));
 
-    let mut buf = file.bytes().await.map_err(|_| Error::BadRequest)?.to_vec();
+    let mut buf = file
+        .bytes()
+        .await
+        .map_err(|e| {
+            let msg = format!("Failed to read file bytes: {:?}", e);
+            Error::BadRequest { message: Some(msg) }
+        })?
+        .to_vec();
 
     if buf.len() > store.max_size {
         return Err(Error::FileTooLarge);

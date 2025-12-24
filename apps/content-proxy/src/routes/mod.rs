@@ -1,6 +1,7 @@
 use std::sync::OnceLock;
 
 use axum::{
+    extract::DefaultBodyLimit,
     routing::{get, post},
     Json, Router,
 };
@@ -27,17 +28,17 @@ pub async fn index() -> Json<&'static IndexResponse> {
 
 pub fn router() -> Router {
     Router::new()
-        .layer(
-            CorsLayer::new()
-                .allow_origin(Any)
-                .allow_methods(Any)
-                .allow_headers(Any),
-        )
         .route("/", get(index))
         .route("/proxy", get(proxy::route))
         .route("/:store/*path", get(serve::route))
         .route(
             "/:store",
             post(upload::route).layer(DefaultBodyLimit::disable()),
+        )
+        .layer(
+            CorsLayer::new()
+                .allow_origin(Any)
+                .allow_methods(Any)
+                .allow_headers(Any),
         )
 }

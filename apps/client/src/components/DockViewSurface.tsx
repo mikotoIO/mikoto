@@ -4,9 +4,9 @@ import {
   DockviewReadyEvent,
   IDockviewPanelProps,
 } from 'dockview-react';
+import { useAtom, useAtomValue } from 'jotai';
 import { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useAtom, useAtomValue } from 'jotai';
 
 import { WelcomePanel } from '@/components/WelcomePanel';
 import {
@@ -50,6 +50,44 @@ function SurfaceComponent(props: SurfaceComponentProps) {
   );
 }
 
+// Helper component to sync a single tab name with its panel title
+function SingleTabTitleSync({
+  panelId,
+  api,
+}: {
+  panelId: string;
+  api: DockviewApi;
+}) {
+  const tabName = useAtomValue(tabNameFamily(panelId));
+
+  useEffect(() => {
+    const panel = api.getPanel(panelId);
+    if (panel) {
+      // Set title even if empty to override the panel ID default
+      // Use a loading placeholder if name is not set yet
+      const title = tabName.name || 'Loading...';
+      panel.api.setTitle(title);
+    }
+  }, [tabName.name, panelId, api]);
+
+  return null;
+}
+
+// Helper component to sync all tab names with panel titles
+function TabTitleSync({ tabs, api }: { tabs: Tabable[]; api: DockviewApi }) {
+  return (
+    <>
+      {tabs.map((tab) => (
+        <SingleTabTitleSync
+          key={`${tab.kind}/${tab.key}`}
+          panelId={`${tab.kind}/${tab.key}`}
+          api={api}
+        />
+      ))}
+    </>
+  );
+}
+
 export const DockViewSurface = () => {
   const tabs = useTabs();
   const activeTabId = useActiveTabId();
@@ -86,6 +124,7 @@ export const DockViewSurface = () => {
           id: panelId,
           component: 'surface',
           params: { tab },
+          title: 'Loading...', // Temporary title until TabName component sets the actual name
         });
       }
 
@@ -104,35 +143,6 @@ export const DockViewSurface = () => {
     prevTabsRef.current = [...tabs];
   }, [tabs, activeTabId]);
 
-  // Update panel titles from tab names
-  const updatePanelTitles = useCallback(() => {
-    const api = dockviewRef.current.api;
-    if (!api) return;
-
-    // For each panel, update its title from the corresponding tab name
-    tabs.forEach((tab) => {
-      const panelId = `${tab.kind}/${tab.key}`;
-      const panel = api.getPanel(panelId);
-      if (panel && panel.api.setTitle) {
-        // The tab name will be managed by the individual surfaces through TabName component
-        // This is a simplified approach since we can't easily read atoms synchronously here
-        // The TabName component in each surface will handle updating the title
-        panel.api.setTitle(tab.kind);
-      }
-    });
-  }, [tabs]);
-
-  // Set up an interval to update panel titles
-  useEffect(() => {
-    // Initial update
-    updatePanelTitles();
-
-    // Update every second
-    const intervalId = setInterval(updatePanelTitles, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [updatePanelTitles]);
-
   const onReady = useCallback(
     (event: DockviewReadyEvent) => {
       dockviewRef.current.api = event.api;
@@ -144,11 +154,11 @@ export const DockViewSurface = () => {
           id: panelId,
           component: 'surface',
           params: { tab },
-          title: tab.kind,
+          title: 'Loading...', // Temporary title until TabName component sets the actual name
         });
 
-        // Panel is initially set up with the kind as title.
-        // Each component will update its own title via TabName component
+        // Panel title will be updated by TabTitleSync component
+        // which reads from the tabNameFamily atom
       });
 
       // Store initial tabs
@@ -176,7 +186,10 @@ export const DockViewSurface = () => {
         onReady={onReady}
         className="dockview-theme-light"
       />
-      {/* TabName components will be rendered by each surface component with the correct name and icon */}
+      {/* Sync tab names from TabName components to DockView panel titles */}
+      {dockviewRef.current.api && (
+        <TabTitleSync tabs={tabs} api={dockviewRef.current.api} />
+      )}
     </div>
   );
 };

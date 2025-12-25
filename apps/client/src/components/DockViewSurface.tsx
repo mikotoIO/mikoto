@@ -5,7 +5,14 @@ import {
   IDockviewPanelProps,
 } from 'dockview-react';
 import { useAtom, useAtomValue } from 'jotai';
-import { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import { WelcomePanel } from '@/components/WelcomePanel';
@@ -92,6 +99,7 @@ export const DockViewSurface = () => {
   const tabs = useTabs();
   const activeTabId = useActiveTabId();
   const dockviewRef = useRef<{ api: DockviewApi | null }>({ api: null });
+  const [dockviewApi, setDockviewApi] = useState<DockviewApi | null>(null);
   const setTabs = useAtom(tabsState)[1];
   // Keep track of the last processed tabs array
   const prevTabsRef = useRef<Tabable[]>([]);
@@ -146,6 +154,7 @@ export const DockViewSurface = () => {
   const onReady = useCallback(
     (event: DockviewReadyEvent) => {
       dockviewRef.current.api = event.api;
+      setDockviewApi(event.api); // Trigger re-render so TabTitleSync component renders
 
       // Set up panels for initial tabs
       tabs.forEach((tab) => {
@@ -187,9 +196,7 @@ export const DockViewSurface = () => {
         className="dockview-theme-light"
       />
       {/* Sync tab names from TabName components to DockView panel titles */}
-      {dockviewRef.current.api && (
-        <TabTitleSync tabs={tabs} api={dockviewRef.current.api} />
-      )}
+      {dockviewApi && <TabTitleSync tabs={tabs} api={dockviewApi} />}
     </div>
   );
 };

@@ -9,7 +9,7 @@ use s3::error::S3Error;
 #[derive(Serialize, Debug)]
 #[serde(tag = "code")]
 pub enum Error {
-    BadRequest,
+    BadRequest { message: Option<String> },
     NotFound,
     InternalServerError,
     InvalidContentType,
@@ -24,7 +24,7 @@ impl IntoResponse for Error {
     fn into_response(self) -> Response {
         let status = match self {
             Error::NotFound => StatusCode::NOT_FOUND,
-            Error::BadRequest => StatusCode::BAD_REQUEST,
+            Error::BadRequest { .. } => StatusCode::BAD_REQUEST,
             Error::FileTooLarge => StatusCode::PAYLOAD_TOO_LARGE,
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         };

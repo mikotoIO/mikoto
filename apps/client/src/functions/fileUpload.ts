@@ -7,10 +7,14 @@ const mediaServerAxios = axios.create({
   baseURL: env.PUBLIC_MEDIASERVER_URL,
 });
 
-export function uploadFile(path: string, file: File) {
+export async function uploadFile(path: string, file: File) {
   const formData = new FormData();
   formData.append('file', file);
-  return mediaServerAxios.post<{ url: string }>(path, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
+  try {
+    const response = await mediaServerAxios.post<{ url: string }>(path, formData);
+    return response;
+  } catch (error) {
+    console.error('Upload error details:', error);
+    throw error;
+  }
 }

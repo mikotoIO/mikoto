@@ -264,6 +264,7 @@ export function MessageEditor({
 
   return (
     <TopContainer>
+      <input {...dropzone.getInputProps()} />
       {currentEditState && <EditMode>Editing Message</EditMode>}
       {files.length !== 0 && (
         <UploadSection>

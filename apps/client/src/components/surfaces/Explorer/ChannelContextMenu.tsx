@@ -13,9 +13,9 @@ import {
   MikotoSpace,
 } from '@mikoto-io/mikoto.js';
 import { permissions } from '@mikoto-io/permcheck';
+import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useSetAtom } from 'jotai';
 
 import { ContextMenu, modalState } from '@/components/ContextMenu';
 import { DialogContent, Field } from '@/components/ui';
@@ -111,7 +111,7 @@ export function CreateChannelModal({
             <Input placeholder="New Channel" {...register('name')} />
           </Field>
 
-          <Button colorPalette="primary" type="submit">
+          <Button colorPalette="blue" type="submit">
             Create Channel
           </Button>
         </Form>

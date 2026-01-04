@@ -92,6 +92,10 @@ const DockViewContainer = styled.div`
   flex: 1;
   min-width: 0; /* Prevent flex items from overflowing */
 
+  .dv-tab {
+    font-size: 14px;
+  }
+
   .dockview-theme-light {
     --dv-background-color: var(--chakra-colors-surface);
     --dv-tab-active-background-color: var(--chakra-colors-surface);

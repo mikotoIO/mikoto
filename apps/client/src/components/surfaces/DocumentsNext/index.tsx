@@ -36,6 +36,7 @@ import { createTooltip } from '@/ui';
 
 import { EDITOR_NODES } from './editorNodes';
 import { HotkeyPlugin } from './plugins/HotkeyPlugin';
+import { ListBehaviorPlugin } from './plugins/ListBehaviorPlugin';
 import { lexicalTheme } from './theme';
 
 const EditorWrapper = styled.div`
@@ -213,6 +214,7 @@ function DocumentEditor({
       <MarkdownShortcutPlugin />
       <AutoFocusPlugin />
       <HotkeyPlugin channel={channel} />
+      <ListBehaviorPlugin />
       <OnChangePlugin ignoreSelectionChange onChange={onChange} />
       <HistoryPlugin />
     </LexicalComposer>

@@ -231,9 +231,7 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
           <Group>
             <ActionTooltip tooltip="Edit">
               <Button
-                colorPalette={
-                  documentSnap.type === 'edit' ? 'primary' : undefined
-                }
+                variant="ghost"
                 p={2}
                 onClick={() => {
                   if (documentSnap.type === 'read') {
@@ -252,7 +250,7 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
               </Button>
             </ActionTooltip>
             <ActionTooltip tooltip="Publish">
-              <Button p={2}>
+              <Button p={2} variant="ghost">
                 <FontAwesomeIcon icon={faBookAtlas} />
               </Button>
             </ActionTooltip>

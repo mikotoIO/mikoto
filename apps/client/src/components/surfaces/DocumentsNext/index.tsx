@@ -5,6 +5,7 @@ import {
   faCircleNotch,
   faFileLines,
   faPencilSquare,
+  faSave,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -251,10 +252,12 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
                   }
                 }}
               >
-                {documentSnap.save === 'saving' ? (
+                {documentSnap.type === 'read' ? (
+                  <FontAwesomeIcon icon={faPencilSquare} />
+                ) : documentSnap.save === 'saving' ? (
                   <FontAwesomeIcon icon={faCircleNotch} spin />
                 ) : (
-                  <FontAwesomeIcon icon={faPencilSquare} />
+                  <FontAwesomeIcon icon={faSave} />
                 )}
               </Button>
             </ActionTooltip>

@@ -69,11 +69,11 @@ const ActionTooltip = createTooltip({
 function DocumentActions({ children }: PropsWithChildren) {
   return (
     <Flex
-      bg="gray.750"
+      borderBottom="1px solid"
+      borderBottomColor="gray.650"
       px={4}
       py={2}
-      mb={4}
-      rounded="md"
+      mb={8}
       align="center"
       justify="space-between"
     >
@@ -221,10 +221,12 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
   const documentSnap = useSnapshot(documentState);
 
   return (
-    <Surface scroll padded>
+    <Surface scroll>
       <TabName name={channel.name} icon={faFileLines} />
       <DocumentActions>
-        <Box className="left">#{channel.name}</Box>
+        <Box className="left" fontWeight="semibold" color="gray.400">
+          #{channel.name}
+        </Box>
         <Flex className="right" fontSize="xl" gap={3}>
           <Group>
             <ActionTooltip tooltip="Edit">
@@ -257,10 +259,12 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
           </Group>
         </Flex>
       </DocumentActions>
-      {documentSnap.type === 'read' && <DocumentReader channel={channel} />}
-      {documentSnap.type === 'edit' && (
-        <DocumentEditor channel={channel} documentState={documentState} />
-      )}
+      <Box px={8}>
+        {documentSnap.type === 'read' && <DocumentReader channel={channel} />}
+        {documentSnap.type === 'edit' && (
+          <DocumentEditor channel={channel} documentState={documentState} />
+        )}
+      </Box>
     </Surface>
   );
 }

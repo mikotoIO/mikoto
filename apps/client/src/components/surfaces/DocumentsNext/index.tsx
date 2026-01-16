@@ -14,6 +14,7 @@ import {
 } from '@lexical/markdown';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -39,9 +40,11 @@ import { lexicalTheme } from './theme';
 const EditorWrapper = styled.div`
   line-height: 1.1;
   position: relative;
+  cursor: text;
 
   .editor-input {
     outline: none;
+    min-height: calc(100vh - 200px);
   }
 
   blockquote {
@@ -53,8 +56,14 @@ const EditorWrapper = styled.div`
 `;
 
 function MikotoContentEditable() {
+  const [editor] = useLexicalComposerContext();
+
+  const handleClick = () => {
+    editor.focus();
+  };
+
   return (
-    <EditorWrapper>
+    <EditorWrapper onClick={handleClick}>
       <ContentEditable className="editor-input" />
     </EditorWrapper>
   );

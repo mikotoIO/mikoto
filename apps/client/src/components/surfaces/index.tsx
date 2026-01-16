@@ -18,7 +18,7 @@ import { SpaceSettingsSurface } from './settings/space';
 export const surfaceMap = {
   textChannel: MessageSurface,
   voiceChannel: lazy(() => import('./Voice')),
-  documentChannel: lazy(() => import('./DocumentsNext')),
+  documentChannel: lazy(() => import('./Documents')),
   search: SearchSurface,
   spaceSettings: SpaceSettingsSurface,
   accountSettings: AccountSettingsSurface,

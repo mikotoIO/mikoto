@@ -4,3 +4,5 @@ data/
 hs-client.ts
 *.gen.ts
 *.hbs
+api.json
+pnpm-lock.yaml

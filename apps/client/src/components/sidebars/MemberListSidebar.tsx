@@ -93,50 +93,50 @@ const HeaderContainer = styled.div`
 `;
 
 export function MemberListSidebar({ space }: { space: MikotoSpace }) {
-    const { isLoading } = useFetchMember(space);
+  const { isLoading } = useFetchMember(space);
 
-    const fetchMembersManually = async () => {
-      console.log('Manually fetching members');
-      try {
-        const members = await space.members.list();
-        console.log(`Manually fetched ${members.length} members`);
-      } catch (err) {
-        console.error('Error manually fetching members:', err);
-      }
-    };
+  const fetchMembersManually = async () => {
+    console.log('Manually fetching members');
+    try {
+      const members = await space.members.list();
+      console.log(`Manually fetched ${members.length} members`);
+    } catch (err) {
+      console.error('Error manually fetching members:', err);
+    }
+  };
 
-    // Force fetch on first render
-    useEffect(() => {
-      fetchMembersManually();
-    }, []);
+  // Force fetch on first render
+  useEffect(() => {
+    fetchMembersManually();
+  }, []);
 
-    // Use a snapshot of the members cache to ensure reactivity
-    const members = useSnapshot(space.members.cache);
-    const spaceMembers = Array.from(members.values() ?? []).toSorted((a, b) =>
-      a.user.name.localeCompare(b.user.name),
-    );
+  // Use a snapshot of the members cache to ensure reactivity
+  const members = useSnapshot(space.members.cache);
+  const spaceMembers = Array.from(members.values() ?? []).toSorted((a, b) =>
+    a.user.name.localeCompare(b.user.name),
+  );
 
-    return (
-      <StyledMemberListSidebar>
-        <Virtuoso
-          components={{
-            Header() {
-              return (
-                <HeaderContainer>
-                  <div
-                    onClick={fetchMembersManually}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    Members ({isLoading ? 'Loading' : spaceMembers.length})
-                  </div>
-                </HeaderContainer>
-              );
-            },
-          }}
-          style={{ height: '100%', overflowX: 'hidden' }}
-          data={spaceMembers}
-          itemContent={(_idx, member) => <MemberElement member={member} />}
-        />
-      </StyledMemberListSidebar>
-    );
+  return (
+    <StyledMemberListSidebar>
+      <Virtuoso
+        components={{
+          Header() {
+            return (
+              <HeaderContainer>
+                <div
+                  onClick={fetchMembersManually}
+                  style={{ cursor: 'pointer' }}
+                >
+                  Members ({isLoading ? 'Loading' : spaceMembers.length})
+                </div>
+              </HeaderContainer>
+            );
+          },
+        }}
+        style={{ height: '100%', overflowX: 'hidden' }}
+        data={spaceMembers}
+        itemContent={(_idx, member) => <MemberElement member={member} />}
+      />
+    </StyledMemberListSidebar>
+  );
 }

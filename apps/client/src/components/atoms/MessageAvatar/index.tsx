@@ -2,8 +2,8 @@ import { Box, Flex } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { MikotoMember, Role, User } from '@mikoto-io/mikoto.js';
 import { permissions } from '@mikoto-io/permcheck';
-import { useRef, useState } from 'react';
 import { useSetAtom } from 'jotai';
+import { useRef, useState } from 'react';
 
 import {
   contextMenuState,

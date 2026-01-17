@@ -1,7 +1,7 @@
 import { MikotoSpace } from '@mikoto-io/mikoto.js';
-import React from 'react';
 import { atom, useSetAtom } from 'jotai';
 import { atomWithStorage } from 'jotai/vanilla/utils';
+import React from 'react';
 import { z } from 'zod';
 
 import { modalState } from '@/components/ContextMenu';
@@ -9,7 +9,10 @@ import { modalState } from '@/components/ContextMenu';
 import { LocalDB } from './LocalDB';
 import { Tabable } from './surface';
 
-export const treebarSpaceState = atomWithStorage<Tabable | null>('leftSidebar', null);
+export const treebarSpaceState = atomWithStorage<Tabable | null>(
+  'leftSidebar',
+  null,
+);
 
 // surface systems
 

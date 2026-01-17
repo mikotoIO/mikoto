@@ -1,9 +1,9 @@
 import { Button, Group, Input } from '@chakra-ui/react';
 import { MikotoSpace } from '@mikoto-io/mikoto.js';
+import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useSetAtom } from 'jotai';
 import { useSnapshot } from 'valtio';
 
 import { modalState } from '@/components/ContextMenu';

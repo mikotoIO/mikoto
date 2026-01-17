@@ -38,7 +38,13 @@ impl MessageAttachment {
     }
 
     db_find_by_id!("MessageAttachment");
-    db_list_where!("MessageAttachment", list_by_message, "messageId", message_id, Uuid);
+    db_list_where!(
+        "MessageAttachment",
+        list_by_message,
+        "messageId",
+        message_id,
+        Uuid
+    );
 
     pub async fn create<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
         sqlx::query(

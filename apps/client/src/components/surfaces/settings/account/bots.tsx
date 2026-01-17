@@ -2,11 +2,11 @@ import { Box, Group, Input } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faCog, faCopy, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useSetAtom } from 'jotai';
 import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { useSetAtom } from 'jotai';
 
 import { modalState } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';

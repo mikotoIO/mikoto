@@ -179,7 +179,8 @@ impl MessageExt {
             Vec::new()
         };
 
-        let attachments_by_message = crate::entities::group_by_key(all_attachments, |a| a.message_id);
+        let attachments_by_message =
+            crate::entities::group_by_key(all_attachments, |a| a.message_id);
 
         let res = messages
             .into_iter()

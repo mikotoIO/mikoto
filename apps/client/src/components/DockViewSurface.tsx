@@ -193,7 +193,7 @@ export const DockViewSurface = () => {
       <DockviewReact
         components={components}
         onReady={onReady}
-        className="dockview-theme-light"
+        className="dockview-theme-mikoto"
       />
       {/* Sync tab names from TabName components to DockView panel titles */}
       {dockviewApi && <TabTitleSync tabs={tabs} api={dockviewApi} />}

@@ -100,6 +100,67 @@ export const globalCss = css`
     --font-code: 'JetBrains Mono', monospace;
   }
 
+  /* Dockview Mikoto theme - uses Chakra color tokens */
+  .dockview-theme-mikoto {
+    --dv-paneview-active-outline-color: var(--chakra-colors-blue-500);
+    --dv-tabs-and-actions-container-font-size: 13px;
+    --dv-tabs-and-actions-container-height: 35px;
+    --dv-drag-over-background-color: hsla(230, 16%, 27%, 0.5);
+    --dv-drag-over-border-color: var(--chakra-colors-blue-500);
+    --dv-tabs-container-scrollbar-color: var(--chakra-colors-gray-600);
+    --dv-icon-hover-background-color: hsla(230, 16%, 35%, 0.5);
+    --dv-floating-box-shadow: 8px 8px 16px 0px rgba(0, 0, 0, 0.4);
+    --dv-overlay-z-index: 999;
+    --dv-tab-font-size: 13px;
+    --dv-border-radius: 0px;
+    --dv-tab-margin: 0;
+    --dv-sash-color: transparent;
+    --dv-active-sash-color: var(--chakra-colors-blue-500);
+    --dv-active-sash-transition-duration: 0.1s;
+    --dv-active-sash-transition-delay: 0.3s;
+
+    /* Background colors using Mikoto gray palette */
+    --dv-group-view-background-color: var(--chakra-colors-gray-750);
+    --dv-tabs-and-actions-container-background-color: var(
+      --chakra-colors-gray-800
+    );
+
+    /* Active group tab colors */
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+      --chakra-colors-gray-750
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+      --chakra-colors-gray-800
+    );
+
+    /* Inactive group tab colors */
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+      --chakra-colors-gray-750
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+      --chakra-colors-gray-800
+    );
+
+    /* Tab divider and text colors */
+    --dv-tab-divider-color: var(--chakra-colors-gray-700);
+    --dv-activegroup-visiblepanel-tab-color: var(--chakra-colors-gray-50);
+    --dv-activegroup-hiddenpanel-tab-color: var(--chakra-colors-gray-400);
+    --dv-inactivegroup-visiblepanel-tab-color: var(--chakra-colors-gray-300);
+    --dv-inactivegroup-hiddenpanel-tab-color: var(--chakra-colors-gray-500);
+
+    /* Borders and separators */
+    --dv-separator-border: var(--chakra-colors-gray-700);
+    --dv-paneview-header-border-color: var(--chakra-colors-gray-650);
+    --dv-scrollbar-background-color: hsla(230, 16%, 35%, 0.4);
+  }
+
+  .dockview-theme-mikoto
+    .dv-drop-target-container
+    .dv-drop-target-anchor.dv-drop-target-anchor-container-changed {
+    opacity: 0;
+    transition: none;
+  }
+
   input {
     border-style: solid;
     background-color: var(--chakra-colors-subsurface);

@@ -13,29 +13,6 @@ import {
   $convertToMarkdownString,
   TRANSFORMERS,
 } from '@lexical/markdown';
-
-// Zero-width space used as placeholder for empty lines
-const ZERO_WIDTH_SPACE = '\u200B';
-
-// Preserve multiple line breaks in markdown
-// Standard markdown collapses multiple newlines, so we use zero-width spaces
-function markdownToEditor(markdown: string): void {
-  // Each ZWS paragraph represents 2 extra newlines in markdown
-  // So for N newlines, we need (N-2)/2 ZWS paragraphs
-  const preserved = markdown.replace(/\n{3,}/g, (match) => {
-    const numZwsParagraphs = Math.floor((match.length - 2) / 2);
-    if (numZwsParagraphs < 1) return '\n\n';
-    const zwsContent = Array(numZwsParagraphs).fill(ZERO_WIDTH_SPACE).join('\n\n');
-    return '\n\n' + zwsContent + '\n\n';
-  });
-  $convertFromMarkdownString(preserved, TRANSFORMERS);
-}
-
-function editorToMarkdown(): string {
-  const markdown = $convertToMarkdownString(TRANSFORMERS);
-  // Remove zero-width space placeholders - they just become empty lines
-  return markdown.replace(new RegExp(ZERO_WIDTH_SPACE, 'g'), '');
-}
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -58,9 +35,35 @@ import { useMikoto } from '@/hooks';
 import { createTooltip } from '@/ui';
 
 import { EDITOR_NODES } from './editorNodes';
+import { EmptyParagraphPlugin } from './plugins/EmptyParagraphPlugin';
 import { HotkeyPlugin } from './plugins/HotkeyPlugin';
 import { ListBehaviorPlugin } from './plugins/ListBehaviorPlugin';
 import { lexicalTheme } from './theme';
+
+// Zero-width space used as placeholder for empty lines
+const ZERO_WIDTH_SPACE = '\u200B';
+
+// Preserve multiple line breaks in markdown
+// Standard markdown collapses multiple newlines, so we use zero-width spaces
+function markdownToEditor(markdown: string): void {
+  // Each ZWS paragraph represents 2 extra newlines in markdown
+  // So for N newlines, we need (N-2)/2 ZWS paragraphs
+  const preserved = markdown.replace(/\n{3,}/g, (match) => {
+    const numZwsParagraphs = Math.floor((match.length - 2) / 2);
+    if (numZwsParagraphs < 1) return '\n\n';
+    const zwsContent = Array(numZwsParagraphs)
+      .fill(ZERO_WIDTH_SPACE)
+      .join('\n\n');
+    return '\n\n' + zwsContent + '\n\n';
+  });
+  $convertFromMarkdownString(preserved, TRANSFORMERS);
+}
+
+function editorToMarkdown(): string {
+  const markdown = $convertToMarkdownString(TRANSFORMERS);
+  // Remove zero-width space placeholders - they just become empty lines
+  return markdown.replace(new RegExp(ZERO_WIDTH_SPACE, 'g'), '');
+}
 
 const EditorWrapper = styled.div`
   line-height: 1.1;
@@ -234,6 +237,7 @@ function DocumentEditor({
       <AutoFocusPlugin />
       <HotkeyPlugin channel={channel} />
       <ListBehaviorPlugin />
+      <EmptyParagraphPlugin />
       <OnChangePlugin ignoreSelectionChange onChange={onChange} />
       <HistoryPlugin />
     </LexicalComposer>

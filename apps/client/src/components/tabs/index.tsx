@@ -23,7 +23,7 @@ export function TabName({ name, icon }: TabNameProps) {
 
 export const TabBarButton = styled.button`
   border: none;
-  margin: 4px 0 0;
+  margin: 4px 0 4px;
   width: 32px;
   height: 32px;
   border-radius: 4px;

@@ -83,7 +83,15 @@ export class MikotoChannel extends ZSchema(Channel) {
     return msgs.map((x) => new MikotoMessage(x, this.client));
   }
 
-  async sendMessage(content: string, attachments: Array<{ url: string; filename: string; contentType: string; size: number }> = []) {
+  async sendMessage(
+    content: string,
+    attachments: Array<{
+      url: string;
+      filename: string;
+      contentType: string;
+      size: number;
+    }> = [],
+  ) {
     await this.client.rest['messages.create'](
       {
         content,

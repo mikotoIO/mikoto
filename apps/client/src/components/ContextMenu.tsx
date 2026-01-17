@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import useEventListener from '@use-it/event-listener';
-import React, { useLayoutEffect, useRef, useState } from 'react';
 import { atom, useAtom, useSetAtom } from 'jotai';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 
 import { DialogBackdrop, DialogRoot } from '@/components/ui';
 

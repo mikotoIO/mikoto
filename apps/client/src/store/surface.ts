@@ -1,7 +1,7 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { createContext } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
+import { createContext } from 'react';
 
 import type { TabBaseType } from '@/components/surfaces';
 
@@ -33,10 +33,10 @@ export interface TabNameProps {
   icon?: IconDefinition | string;
 }
 
-export const tabNameFamily = atomFamily((param: string) => 
+export const tabNameFamily = atomFamily((param: string) =>
   atom<TabNameProps>({
     name: '',
-  })
+  }),
 );
 
 export const TabContext = createContext<{ key: string }>({

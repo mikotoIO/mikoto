@@ -11,7 +11,10 @@ export async function uploadFile(path: string, file: File) {
   const formData = new FormData();
   formData.append('file', file);
   try {
-    const response = await mediaServerAxios.post<{ url: string }>(path, formData);
+    const response = await mediaServerAxios.post<{ url: string }>(
+      path,
+      formData,
+    );
     return response;
   } catch (error) {
     console.error('Upload error details:', error);

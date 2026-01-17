@@ -1,8 +1,8 @@
 import { Box, Flex, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { MikotoChannel, MikotoSpace, Relationship } from '@mikoto-io/mikoto.js';
-import { useEffect, useState } from 'react';
 import { useSetAtom } from 'jotai';
+import { useEffect, useState } from 'react';
 import { useSnapshot } from 'valtio/react';
 
 import {

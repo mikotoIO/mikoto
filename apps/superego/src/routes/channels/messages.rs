@@ -8,7 +8,10 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Channel, Message, MessageAttachment, MessageAttachmentInput, MessageExt, MessageKey, MessagePatch},
+    entities::{
+        Channel, Message, MessageAttachment, MessageAttachmentInput, MessageExt, MessageKey,
+        MessagePatch,
+    },
     error::Error,
     functions::{jwt::Claims, pubsub::emit_event},
     routes::{router::AppRouter, ws::state::State},

@@ -5,6 +5,7 @@ import {
   faCircleNotch,
   faFileLines,
   faPencilSquare,
+  faSave,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -14,6 +15,7 @@ import {
 } from '@lexical/markdown';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -34,14 +36,17 @@ import { createTooltip } from '@/ui';
 
 import { EDITOR_NODES } from './editorNodes';
 import { HotkeyPlugin } from './plugins/HotkeyPlugin';
+import { ListBehaviorPlugin } from './plugins/ListBehaviorPlugin';
 import { lexicalTheme } from './theme';
 
 const EditorWrapper = styled.div`
   line-height: 1.1;
   position: relative;
+  cursor: text;
 
   .editor-input {
     outline: none;
+    min-height: calc(100vh - 200px);
   }
 
   blockquote {
@@ -53,8 +58,14 @@ const EditorWrapper = styled.div`
 `;
 
 function MikotoContentEditable() {
+  const [editor] = useLexicalComposerContext();
+
+  const handleClick = () => {
+    editor.focus();
+  };
+
   return (
-    <EditorWrapper>
+    <EditorWrapper onClick={handleClick}>
       <ContentEditable className="editor-input" />
     </EditorWrapper>
   );
@@ -69,11 +80,11 @@ const ActionTooltip = createTooltip({
 function DocumentActions({ children }: PropsWithChildren) {
   return (
     <Flex
-      bg="gray.750"
+      borderBottom="1px solid"
+      borderBottomColor="gray.650"
       px={4}
       py={2}
-      mb={4}
-      rounded="md"
+      mb={8}
       align="center"
       justify="space-between"
     >
@@ -203,6 +214,7 @@ function DocumentEditor({
       <MarkdownShortcutPlugin />
       <AutoFocusPlugin />
       <HotkeyPlugin channel={channel} />
+      <ListBehaviorPlugin />
       <OnChangePlugin ignoreSelectionChange onChange={onChange} />
       <HistoryPlugin />
     </LexicalComposer>
@@ -221,17 +233,17 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
   const documentSnap = useSnapshot(documentState);
 
   return (
-    <Surface scroll padded>
+    <Surface scroll>
       <TabName name={channel.name} icon={faFileLines} />
       <DocumentActions>
-        <Box className="left">#{channel.name}</Box>
+        <Box className="left" fontWeight="semibold" color="gray.400">
+          #{channel.name}
+        </Box>
         <Flex className="right" fontSize="xl" gap={3}>
           <Group>
             <ActionTooltip tooltip="Edit">
               <Button
-                colorPalette={
-                  documentSnap.type === 'edit' ? 'primary' : undefined
-                }
+                variant="ghost"
                 p={2}
                 onClick={() => {
                   if (documentSnap.type === 'read') {
@@ -242,25 +254,29 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
                   }
                 }}
               >
-                {documentSnap.save === 'saving' ? (
+                {documentSnap.type === 'read' ? (
+                  <FontAwesomeIcon icon={faPencilSquare} />
+                ) : documentSnap.save === 'saving' ? (
                   <FontAwesomeIcon icon={faCircleNotch} spin />
                 ) : (
-                  <FontAwesomeIcon icon={faPencilSquare} />
+                  <FontAwesomeIcon icon={faSave} />
                 )}
               </Button>
             </ActionTooltip>
             <ActionTooltip tooltip="Publish">
-              <Button p={2}>
+              <Button p={2} variant="ghost">
                 <FontAwesomeIcon icon={faBookAtlas} />
               </Button>
             </ActionTooltip>
           </Group>
         </Flex>
       </DocumentActions>
-      {documentSnap.type === 'read' && <DocumentReader channel={channel} />}
-      {documentSnap.type === 'edit' && (
-        <DocumentEditor channel={channel} documentState={documentState} />
-      )}
+      <Box px={8}>
+        {documentSnap.type === 'read' && <DocumentReader channel={channel} />}
+        {documentSnap.type === 'edit' && (
+          <DocumentEditor channel={channel} documentState={documentState} />
+        )}
+      </Box>
     </Surface>
   );
 }

@@ -96,7 +96,8 @@ const DockViewContainer = styled.div`
     font-size: 14px;
   }
 
-  .dockview-theme-light {
+  .dockview-theme-light,
+  .dockview-theme-abyss {
     --dv-background-color: var(--chakra-colors-surface);
     --dv-tab-active-background-color: var(--chakra-colors-surface);
     --dv-tab-active-foreground-color: var(--chakra-colors-gray-200);

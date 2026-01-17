@@ -44,7 +44,7 @@ pub async fn route(
             let msg = format!("Failed to read multipart field: {:?}", e);
             Error::BadRequest { message: Some(msg) }
         })?
-        .ok_or_else(|| Error::NotFound)?;
+        .ok_or(Error::NotFound)?;
 
     let content_type = file.content_type().map(|s| s.to_string());
 

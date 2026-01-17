@@ -91,7 +91,7 @@ impl Channel {
         .bind(self.parent_id)
         .bind(self.order)
         .bind(&self.name)
-        .bind(&self.category)
+        .bind(self.category)
         .bind(self.last_updated)
         .execute(db)
         .await?;

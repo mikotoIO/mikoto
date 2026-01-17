@@ -95,16 +95,6 @@ const DockViewContainer = styled.div`
   .dv-tab {
     font-size: 14px;
   }
-
-  .dockview-theme-light {
-    --dv-background-color: var(--chakra-colors-surface);
-    --dv-tab-active-background-color: var(--chakra-colors-surface);
-    --dv-tab-active-foreground-color: var(--chakra-colors-gray-200);
-    --dv-tab-inactive-background-color: var(--chakra-colors-subsurface);
-    --dv-tab-inactive-foreground-color: var(--chakra-colors-gray-300);
-    --dv-tab-border-bottom-color: var(--chakra-colors-primary);
-    --dv-separator-border: 1px solid var(--chakra-colors-gray-700);
-  }
 `;
 
 const AppView = () => {

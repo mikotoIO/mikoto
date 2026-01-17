@@ -18,7 +18,6 @@ import { Provider as ChakraProvider } from '@/components/ui/provider';
 import { env } from '@/env';
 import reportWebVitals from '@/reportWebVitals';
 
-import './dockview.css';
 import './fonts.css';
 import { queryClient } from './functions/queryClient';
 import './i18n';

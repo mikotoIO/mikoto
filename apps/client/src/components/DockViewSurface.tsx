@@ -173,12 +173,15 @@ export const DockViewSurface = () => {
       // Store initial tabs
       prevTabsRef.current = [...tabs];
 
-      // Listen for any layout changes
-      event.api.onDidLayoutChange(() => {
-        // If all panels are closed, update our tab state
-        if (event.api.panels.length === 0) {
-          setTabs([]);
-        }
+      // Listen for panel removal to sync tabs state
+      event.api.onDidRemovePanel((panel) => {
+        const panelId = panel.id;
+        const [kind, key] = panelId.split('/');
+        setTabs((currentTabs) =>
+          currentTabs.filter(
+            (tab) => !(tab.kind === kind && tab.key === key),
+          ),
+        );
       });
     },
     [tabs, setTabs],

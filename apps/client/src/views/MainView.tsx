@@ -20,7 +20,7 @@ import { surfaceMap } from '@/components/surfaces';
 import { TabBarButton } from '@/components/tabs';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState, workspaceState } from '@/store';
-import { Tabable } from '@/store/surface';
+import { Tabable, useTabkit } from '@/store/surface';
 
 import { MikotoClientProvider } from './MikotoClientProvider';
 
@@ -106,6 +106,7 @@ const AppView = () => {
   const leftSidebar = useAtomValue(treebarSpaceState);
   const mikoto = useMikoto();
   const [workspace, setWorkspace] = useAtom(workspaceState);
+  const tabkit = useTabkit();
 
   const spaceId =
     leftSidebar && leftSidebar.kind === 'explorer'
@@ -118,7 +119,11 @@ const AppView = () => {
     <AppContainer>
       <TopBar>
         <TopBarLeft>
-          <TabBarButton onClick={() => {}}>
+          <TabBarButton
+            onClick={() => {
+              tabkit.openTab({ kind: 'spaceExplorer', key: 'spaceExplorer' });
+            }}
+          >
             <FontAwesomeIcon icon={faGlobe} />
           </TabBarButton>
           <TabBarButton

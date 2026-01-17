@@ -6,9 +6,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
+import { useAtom, useSetAtom } from 'jotai';
 import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { useAtom, useSetAtom } from 'jotai';
 import { useSnapshot } from 'valtio/react';
 
 import { modalState, useContextMenu } from '@/components/ContextMenu';

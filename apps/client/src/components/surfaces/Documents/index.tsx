@@ -13,6 +13,29 @@ import {
   $convertToMarkdownString,
   TRANSFORMERS,
 } from '@lexical/markdown';
+
+// Zero-width space used as placeholder for empty lines
+const ZERO_WIDTH_SPACE = '\u200B';
+
+// Preserve multiple line breaks in markdown
+// Standard markdown collapses multiple newlines, so we use zero-width spaces
+function markdownToEditor(markdown: string): void {
+  // Each ZWS paragraph represents 2 extra newlines in markdown
+  // So for N newlines, we need (N-2)/2 ZWS paragraphs
+  const preserved = markdown.replace(/\n{3,}/g, (match) => {
+    const numZwsParagraphs = Math.floor((match.length - 2) / 2);
+    if (numZwsParagraphs < 1) return '\n\n';
+    const zwsContent = Array(numZwsParagraphs).fill(ZERO_WIDTH_SPACE).join('\n\n');
+    return '\n\n' + zwsContent + '\n\n';
+  });
+  $convertFromMarkdownString(preserved, TRANSFORMERS);
+}
+
+function editorToMarkdown(): string {
+  const markdown = $convertToMarkdownString(TRANSFORMERS);
+  // Remove zero-width space placeholders - they just become empty lines
+  return markdown.replace(new RegExp(ZERO_WIDTH_SPACE, 'g'), '');
+}
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -144,8 +167,7 @@ function DocumentReader({ channel }: { channel: MikotoChannel }) {
         editable: false,
         nodes: EDITOR_NODES,
         theme: lexicalTheme,
-        editorState: () =>
-          $convertFromMarkdownString(document.content, TRANSFORMERS),
+        editorState: () => markdownToEditor(document.content),
         onError(error: Error) {
           throw error;
         },
@@ -177,9 +199,7 @@ function DocumentEditor({
   const onChange = useCallback(
     debounce((editorState: EditorState) => {
       documentState.save = 'saving';
-      const content = editorState.read(() =>
-        $convertToMarkdownString(TRANSFORMERS),
-      );
+      const content = editorState.read(() => editorToMarkdown());
       channel
         .updateDocument({ content })
         .then(() => {
@@ -199,8 +219,7 @@ function DocumentEditor({
         editable: true,
         nodes: EDITOR_NODES,
         theme: lexicalTheme,
-        editorState: () =>
-          $convertFromMarkdownString(document.content, TRANSFORMERS),
+        editorState: () => markdownToEditor(document.content),
         onError(error: Error) {
           throw error;
         },

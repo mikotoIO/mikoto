@@ -18,9 +18,8 @@ pub async fn route(
     params: Query<ServeParams>,
 ) -> Result<FileResponse, Error> {
     let data = bucket().get_object(format!("/{store}/{path}")).await?;
-    match data.status_code() {
-        404 => return Err(Error::NotFound),
-        _ => {}
+    if data.status_code() == 404 {
+        return Err(Error::NotFound);
     }
 
     let resp = match (params.w, params.h) {

@@ -9,6 +9,7 @@ import { DMExplorerSurface, ExplorerSurface } from './Explorer';
 import { FriendsSurface } from './FriendsSurface';
 import { MessageSurface } from './Messages';
 import { SearchSurface } from './SearchSurface';
+import { SpaceExplorerSurface } from './SpaceExplorerSurface';
 import { SpaceInviteSurface } from './SpaceInviteSurface';
 import { WelcomeSurface } from './WelcomeSurface';
 import { AccountSettingsSurface } from './settings/account';
@@ -31,6 +32,7 @@ export const surfaceMap = {
   explorer: ExplorerSurface,
   dmExplorer: DMExplorerSurface,
   spaceInvite: SpaceInviteSurface,
+  spaceExplorer: SpaceExplorerSurface,
 };
 
 type SurfaceMap = {

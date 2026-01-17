@@ -1,6 +1,10 @@
 import { Box, Center } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { faBarsStaggered, faUsers } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBarsStaggered,
+  faGlobe,
+  faUsers,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAtom, useAtomValue } from 'jotai';
 
@@ -45,6 +49,7 @@ const TopBarLeft = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-left: 8px;
 `;
 
 const TopBarRight = styled.div`
@@ -113,6 +118,9 @@ const AppView = () => {
     <AppContainer>
       <TopBar>
         <TopBarLeft>
+          <TabBarButton onClick={() => {}}>
+            <FontAwesomeIcon icon={faGlobe} />
+          </TabBarButton>
           <TabBarButton
             onClick={() => {
               setWorkspace((ws) => ({

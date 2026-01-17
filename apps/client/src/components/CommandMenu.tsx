@@ -1,7 +1,10 @@
 import { Box } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { Command } from 'cmdk';
-import { useEffect, useState } from 'react';
+import { atom, useAtom } from 'jotai';
+import { useEffect } from 'react';
+
+export const commandMenuOpenAtom = atom(false);
 
 const Dialog = styled(Command.Dialog)`
   position: fixed;
@@ -26,7 +29,6 @@ const Input = styled(Command.Input)`
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   background-color: var(--chakra-colors-gray-750);
-  font-family: var(--font-code);
 
   &:focus {
     outline: none;
@@ -34,7 +36,7 @@ const Input = styled(Command.Input)`
 `;
 
 export function CommandMenuKit() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useAtom(commandMenuOpenAtom);
 
   // Toggle the menu when ⌘K is pressed
   useEffect(() => {
@@ -52,7 +54,7 @@ export function CommandMenuKit() {
   return (
     <Dialog open={open} onOpenChange={setOpen} label="Global Command Menu">
       <Box bg="surface" rounded="md" maxW="60%" w="600px" h="400px">
-        <Input placeholder="> Search for commands..." />
+        <Input placeholder="Search for commands..." />
         <Box p={4}>
           <Command.List>
             <Command.Empty>No matching results</Command.Empty>

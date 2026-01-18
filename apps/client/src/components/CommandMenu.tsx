@@ -55,7 +55,7 @@ const StyledItem = styled(Command.Item)`
   font-size: 14px;
 
   &[data-selected='true'] {
-    background-color: var(--chakra-colors-gray-700);
+    background-color: var(--chakra-colors-gray-800);
   }
 
   &:hover {

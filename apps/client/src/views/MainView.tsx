@@ -1,10 +1,15 @@
 import { Box, Center } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { faBarsStaggered, faUsers } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBarsStaggered,
+  faGlobe,
+  faMagnifyingGlass,
+  faUsers,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 
-import { CommandMenuKit } from '@/components/CommandMenu';
+import { CommandMenuKit, commandMenuOpenAtom } from '@/components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
 import { DockViewSurface } from '@/components/DockViewSurface';
 import { faMikoto } from '@/components/icons';
@@ -16,7 +21,7 @@ import { surfaceMap } from '@/components/surfaces';
 import { TabBarButton } from '@/components/tabs';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState, workspaceState } from '@/store';
-import { Tabable } from '@/store/surface';
+import { Tabable, useTabkit } from '@/store/surface';
 
 import { MikotoClientProvider } from './MikotoClientProvider';
 
@@ -45,6 +50,46 @@ const TopBarLeft = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-left: 8px;
+`;
+
+const TopBarCenter = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+`;
+
+const SearchBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--chakra-colors-gray-650);
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 13px;
+  color: var(--chakra-colors-gray-400);
+  min-width: 240px;
+  cursor: pointer;
+  :hover {
+    background-color: var(--chakra-colors-gray-600);
+  }
+
+  &:focus-within {
+    background-color: var(--chakra-colors-gray-600);
+  }
+
+  input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--chakra-colors-text);
+    width: 100%;
+
+    &::placeholder {
+      color: var(--chakra-colors-gray-400);
+    }
+  }
 `;
 
 const TopBarRight = styled.div`
@@ -101,6 +146,8 @@ const AppView = () => {
   const leftSidebar = useAtomValue(treebarSpaceState);
   const mikoto = useMikoto();
   const [workspace, setWorkspace] = useAtom(workspaceState);
+  const tabkit = useTabkit();
+  const setCommandMenuOpen = useSetAtom(commandMenuOpenAtom);
 
   const spaceId =
     leftSidebar && leftSidebar.kind === 'explorer'
@@ -115,6 +162,13 @@ const AppView = () => {
         <TopBarLeft>
           <TabBarButton
             onClick={() => {
+              tabkit.openTab({ kind: 'spaceExplorer', key: 'spaceExplorer' });
+            }}
+          >
+            <FontAwesomeIcon icon={faGlobe} />
+          </TabBarButton>
+          <TabBarButton
+            onClick={() => {
               setWorkspace((ws) => ({
                 ...ws,
                 leftOpen: !ws.leftOpen,
@@ -125,6 +179,12 @@ const AppView = () => {
           </TabBarButton>
           {/* <FontAwesomeIcon icon={faMikoto} /> */}
         </TopBarLeft>
+        <TopBarCenter>
+          <SearchBar onClick={() => setCommandMenuOpen(true)}>
+            <FontAwesomeIcon icon={faMagnifyingGlass} />
+            <span>Search...</span>
+          </SearchBar>
+        </TopBarCenter>
         <TopBarRight>
           {space && (
             <TabBarButton

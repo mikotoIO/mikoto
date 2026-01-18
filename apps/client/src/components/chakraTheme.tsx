@@ -149,8 +149,8 @@ export const globalCss = css`
     --dv-inactivegroup-hiddenpanel-tab-color: var(--chakra-colors-gray-500);
 
     /* Borders and separators */
-    --dv-separator-border: var(--chakra-colors-gray-700);
-    --dv-paneview-header-border-color: var(--chakra-colors-gray-650);
+    --dv-separator-border: var(--chakra-colors-gray-650);
+    --dv-paneview-header-border-color: var(--chakra-colors-gray-500);
     --dv-scrollbar-background-color: hsla(230, 16%, 35%, 0.4);
   }
 
@@ -159,6 +159,37 @@ export const globalCss = css`
     .dv-drop-target-anchor.dv-drop-target-anchor-container-changed {
     opacity: 0;
     transition: none;
+  }
+
+  /* Show thin border between dockview panels on inside edges only */
+  .dockview-theme-mikoto
+    .dv-split-view-container.dv-horizontal
+    > .dv-view-container
+    > .dv-view:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    pointer-events: none;
+    background-color: var(--dv-separator-border);
+    height: 100%;
+    width: 1px;
+  }
+
+  .dockview-theme-mikoto
+    .dv-split-view-container.dv-vertical
+    > .dv-view-container
+    > .dv-view:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    pointer-events: none;
+    background-color: var(--dv-separator-border);
+    height: 1px;
+    width: 100%;
   }
 
   input {

@@ -42,6 +42,7 @@ import { EDITOR_NODES } from './editorNodes';
 import { EmptyParagraphPlugin } from './plugins/EmptyParagraphPlugin';
 import { HotkeyPlugin } from './plugins/HotkeyPlugin';
 import { ListBehaviorPlugin } from './plugins/ListBehaviorPlugin';
+import { MarkdownPastePlugin } from './plugins/MarkdownPastePlugin';
 import { lexicalTheme } from './theme';
 
 // Zero-width space used as placeholder for empty lines
@@ -255,6 +256,7 @@ function DocumentEditor({
         ErrorBoundary={LexicalErrorBoundary}
       />
       <MarkdownShortcutPlugin />
+      <MarkdownPastePlugin />
       <AutoFocusPlugin />
       <AutoLinkPlugin matchers={LINK_MATCHERS} />
       <HotkeyPlugin channel={channel} />

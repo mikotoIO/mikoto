@@ -81,6 +81,10 @@ const EditorWrapper = styled.div`
     margin: 0;
     padding-left: 1em;
   }
+
+  a {
+    color: #00aff4;
+  }
 `;
 
 function MikotoContentEditable() {

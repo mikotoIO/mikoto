@@ -192,7 +192,8 @@ export const globalCss = css`
     width: 100%;
   }
 
-  input {
+  input,
+  textarea {
     border-style: solid;
     background-color: var(--chakra-colors-subsurface);
   }

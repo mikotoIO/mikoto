@@ -14,6 +14,10 @@ import {
   TRANSFORMERS,
 } from '@lexical/markdown';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
+import {
+  AutoLinkPlugin,
+  createLinkMatcherWithRegExp,
+} from '@lexical/react/LexicalAutoLinkPlugin';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
@@ -38,10 +42,24 @@ import { EDITOR_NODES } from './editorNodes';
 import { EmptyParagraphPlugin } from './plugins/EmptyParagraphPlugin';
 import { HotkeyPlugin } from './plugins/HotkeyPlugin';
 import { ListBehaviorPlugin } from './plugins/ListBehaviorPlugin';
+import { MarkdownPastePlugin } from './plugins/MarkdownPastePlugin';
 import { lexicalTheme } from './theme';
 
 // Zero-width space used as placeholder for empty lines
 const ZERO_WIDTH_SPACE = '\u200B';
+
+const URL_REGEX =
+  /((https?:\/\/(www\.)?)|(www\.))[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
+
+const EMAIL_REGEX =
+  /(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
+
+const LINK_MATCHERS = [
+  createLinkMatcherWithRegExp(URL_REGEX, (text) =>
+    text.startsWith('http') ? text : `https://${text}`,
+  ),
+  createLinkMatcherWithRegExp(EMAIL_REGEX, (text) => `mailto:${text}`),
+];
 
 // Preserve multiple line breaks in markdown
 // Standard markdown collapses multiple newlines, so we use zero-width spaces
@@ -80,6 +98,10 @@ const EditorWrapper = styled.div`
     color: var(--chakra-colors-gray-400);
     margin: 0;
     padding-left: 1em;
+  }
+
+  a {
+    color: #00aff4;
   }
 `;
 
@@ -234,7 +256,9 @@ function DocumentEditor({
         ErrorBoundary={LexicalErrorBoundary}
       />
       <MarkdownShortcutPlugin />
+      <MarkdownPastePlugin />
       <AutoFocusPlugin />
+      <AutoLinkPlugin matchers={LINK_MATCHERS} />
       <HotkeyPlugin channel={channel} />
       <ListBehaviorPlugin />
       <EmptyParagraphPlugin />

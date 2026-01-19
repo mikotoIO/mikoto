@@ -37,9 +37,7 @@ function General({ channel }: { channel: MikotoChannel }) {
           <Textarea h={200} {...form.register('description')} />
         </Field>
 
-        <Button colorPalette="primary" type="submit">
-          Save
-        </Button>
+        <Button type="submit">Save</Button>
       </Form>
     </SettingSurface>
   );

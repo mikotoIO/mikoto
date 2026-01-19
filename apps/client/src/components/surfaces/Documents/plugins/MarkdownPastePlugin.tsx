@@ -10,22 +10,6 @@ import {
 } from 'lexical';
 import { useEffect } from 'react';
 
-// Patterns that indicate markdown content
-const MARKDOWN_PATTERNS = [
-  /^#{1,6}\s/, // Headers
-  /\*\*[^*]+\*\*/, // Bold
-  /\*[^*]+\*/, // Italic (single asterisk)
-  /_[^_]+_/, // Italic (underscore)
-  /`[^`]+`/, // Inline code
-  /```[\s\S]*```/, // Code blocks
-  /^\s*[-*+]\s/, // Unordered lists
-  /^\s*\d+\.\s/, // Ordered lists
-  /\[.+\]\(.+\)/, // Links
-  /^>\s/, // Blockquotes
-  /^---\s*$/, // Horizontal rule
-  /^\*\*\*\s*$/, // Horizontal rule (asterisks)
-];
-
 export function MarkdownPastePlugin() {
   const [editor] = useLexicalComposerContext();
 

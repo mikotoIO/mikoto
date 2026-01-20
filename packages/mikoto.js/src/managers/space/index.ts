@@ -111,6 +111,18 @@ export class SpaceManager extends CachedManager<MikotoSpace> {
     return proxy(this);
   }
 
+  /**
+   * Get a space by its handle (searches cached spaces)
+   */
+  _getByHandle(handle: string): MikotoSpace | undefined {
+    for (const space of this.cache.values()) {
+      if (space.handle === handle) {
+        return space;
+      }
+    }
+    return undefined;
+  }
+
   async list() {
     const spaces = await this.client.rest['spaces.list']();
     return spaces.map((space) => new MikotoSpace(space, this.client));

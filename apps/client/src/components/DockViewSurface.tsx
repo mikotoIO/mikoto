@@ -247,6 +247,18 @@ export const DockViewSurface = () => {
   const navigate = useNavigate();
   const mikoto = useMikoto();
 
+  // Helper to get the URL segment for a space (uses @handle if available, otherwise UUID)
+  const getSpaceUrlSegment = useCallback(
+    (spaceId: string) => {
+      const space = mikoto.spaces._get(spaceId);
+      if (space?.handle) {
+        return `@${space.handle}`;
+      }
+      return spaceId;
+    },
+    [mikoto],
+  );
+
   // Helper to get URL path from an active panel
   const getUrlFromPanel = useCallback(
     (panel: IDockviewPanel | undefined) => {
@@ -265,7 +277,7 @@ export const DockViewSurface = () => {
         case 'welcome':
           return GLOBAL_SURFACE_ROUTES[tab.kind];
 
-        // Channel surfaces: /space/:spaceId/channel/:channelId
+        // Channel surfaces: /space/:spaceRef/channel/:channelId
         case 'textChannel':
         case 'voiceChannel':
         case 'documentChannel': {
@@ -273,30 +285,30 @@ export const DockViewSurface = () => {
           if (!channelId) return '/';
           const channel = mikoto.channels._get(channelId);
           if (!channel) return '/';
-          return `/space/${channel.spaceId}/channel/${channel.id}`;
+          return `/space/${getSpaceUrlSegment(channel.spaceId)}/channel/${channel.id}`;
         }
 
-        // Channel settings: /space/:spaceId/channel/:channelId/settings
+        // Channel settings: /space/:spaceRef/channel/:channelId/settings
         case 'channelSettings': {
           const channelId = (tab as any).channelId;
           if (!channelId) return '/';
           const channel = mikoto.channels._get(channelId);
           if (!channel) return '/';
-          return `/space/${channel.spaceId}/channel/${channel.id}/settings`;
+          return `/space/${getSpaceUrlSegment(channel.spaceId)}/channel/${channel.id}/settings`;
         }
 
-        // Space settings: /space/:spaceId/settings
+        // Space settings: /space/:spaceRef/settings
         case 'spaceSettings': {
           const spaceId = (tab as any).spaceId;
           if (!spaceId) return '/';
-          return `/space/${spaceId}/settings`;
+          return `/space/${getSpaceUrlSegment(spaceId)}/settings`;
         }
 
-        // Search: /space/:spaceId/search
+        // Search: /space/:spaceRef/search
         case 'search': {
           const spaceId = (tab as any).spaceId;
           if (!spaceId) return '/';
-          return `/space/${spaceId}/search`;
+          return `/space/${getSpaceUrlSegment(spaceId)}/search`;
         }
 
         // Bot settings: /settings/bots/:botId
@@ -310,7 +322,7 @@ export const DockViewSurface = () => {
           return '/';
       }
     },
-    [mikoto],
+    [mikoto, getSpaceUrlSegment],
   );
 
   // Store navigate and getUrlFromPanel in refs so onReady callback can use them

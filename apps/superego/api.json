@@ -2055,6 +2055,12 @@
               "$ref": "#/components/schemas/Channel"
             }
           },
+          "handle": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "icon": {
             "type": [
               "string",
@@ -2097,6 +2103,12 @@
       "SpaceUpdatePayload": {
         "type": "object",
         "properties": {
+          "handle": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "icon": {
             "type": [
               "string",

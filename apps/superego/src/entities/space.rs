@@ -21,6 +21,7 @@ entity!(
         pub name: String,
         pub icon: Option<String>,
         pub owner_id: Option<Uuid>,
+        pub handle: Option<String>,
 
         #[serde(rename = "type")]
         #[sqlx(rename = "type")]
@@ -44,6 +45,7 @@ pub struct SpacePatch {
     pub name: Option<String>,
     pub icon: Option<String>,
     pub owner_id: Option<Uuid>,
+    pub handle: Option<String>,
 }
 
 impl Space {
@@ -53,6 +55,7 @@ impl Space {
             name,
             icon: None,
             owner_id: Some(owner_id),
+            handle: None,
             space_type: SpaceType::None,
         }
     }
@@ -89,8 +92,8 @@ impl Space {
                 VALUES (gen_random_uuid(), $1, '@everyone', -1, '0')
                 RETURNING "id"
             )
-            INSERT INTO "Space" ("id", "name", "icon", "ownerId", "type")
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO "Space" ("id", "name", "icon", "ownerId", "type", "handle")
+            VALUES ($1, $2, $3, $4, $5, $6)
             "##,
         )
         .bind(self.id)
@@ -98,6 +101,7 @@ impl Space {
         .bind(&self.icon)
         .bind(self.owner_id)
         .bind(self.space_type)
+        .bind(&self.handle)
         .execute(db)
         .await?;
         Ok(())
@@ -113,7 +117,8 @@ impl Space {
             UPDATE "Space" SET
             "name" = COALESCE($2, "name"),
             "icon" = COALESCE($3, "icon"),
-            "ownerId" = COALESCE($4, "ownerId")
+            "ownerId" = COALESCE($4, "ownerId"),
+            "handle" = COALESCE($5, "handle")
             WHERE "id" = $1
             RETURNING *
             "##,
@@ -122,6 +127,7 @@ impl Space {
         .bind(&patch.name)
         .bind(&patch.icon)
         .bind(patch.owner_id)
+        .bind(&patch.handle)
         .fetch_optional(db)
         .await?
         .ok_or(Error::NotFound)?;

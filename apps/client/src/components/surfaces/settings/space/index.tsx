@@ -55,6 +55,7 @@ function AddBotModal({ space }: { space: MikotoSpace }) {
 function Overview({ space }: { space: MikotoSpace }) {
   const { t } = useTranslation();
   const [spaceName, setSpaceName] = useState(space.name);
+  const [spaceHandle, setSpaceHandle] = useState(space.handle ?? '');
   const setModal = useSetAtom(modalState);
   const spaceSnap = useSnapshot(space);
 
@@ -69,7 +70,6 @@ function Overview({ space }: { space: MikotoSpace }) {
 
             await space.edit({
               icon: data.url,
-              name: null,
             });
           }}
         />
@@ -82,12 +82,23 @@ function Overview({ space }: { space: MikotoSpace }) {
           />
         </Field>
 
+        <Field label="Space Handle">
+          <Input
+            value={spaceHandle}
+            onChange={(x) => setSpaceHandle(x.target.value)}
+            placeholder="my-space"
+          />
+        </Field>
+
         <Group>
           <Button
             colorPalette="primary"
             type="button"
-            onClick={() => {
-              // TODO: Implement Space Update
+            onClick={async () => {
+              await space.edit({
+                name: spaceName,
+                handle: spaceHandle || null,
+              });
             }}
           >
             Update

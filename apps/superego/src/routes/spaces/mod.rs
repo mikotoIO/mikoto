@@ -38,6 +38,7 @@ pub struct SpaceCreatePayload {
 pub struct SpaceUpdatePayload {
     pub name: Option<String>,
     pub icon: Option<String>,
+    pub handle: Option<String>,
 }
 
 impl From<SpaceUpdatePayload> for SpacePatch {
@@ -45,6 +46,7 @@ impl From<SpaceUpdatePayload> for SpacePatch {
         Self {
             name: body.name,
             icon: body.icon,
+            handle: body.handle,
             ..Default::default()
         }
     }

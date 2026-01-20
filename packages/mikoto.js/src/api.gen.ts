@@ -140,6 +140,7 @@ export type SpaceType = z.infer<typeof SpaceType>;
 
 export const SpaceExt = z.object({
   channels: z.array(Channel),
+  handle: z.union([z.string(), z.null()]).optional(),
   icon: z.union([z.string(), z.null()]).optional(),
   id: z.string().uuid(),
   name: z.string(),
@@ -154,6 +155,7 @@ export type SpaceCreatePayload = z.infer<typeof SpaceCreatePayload>;
 
 export const SpaceUpdatePayload = z
   .object({
+    handle: z.union([z.string(), z.null()]),
     icon: z.union([z.string(), z.null()]),
     name: z.union([z.string(), z.null()]),
   })

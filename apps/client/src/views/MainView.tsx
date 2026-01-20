@@ -8,6 +8,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { CommandMenuKit, commandMenuOpenAtom } from '@/components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
@@ -18,6 +20,7 @@ import { FriendSidebar } from '@/components/sidebars/FriendSidebar';
 import { MemberListSidebar } from '@/components/sidebars/MemberListSidebar';
 import { SpaceSidebar } from '@/components/sidebars/SpaceSidebar';
 import { surfaceMap } from '@/components/surfaces';
+import { channelToTab } from '@/components/surfaces/Explorer/channelToTab';
 import { TabBarButton } from '@/components/tabs';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState, workspaceState } from '@/store';
@@ -148,6 +151,22 @@ const AppView = () => {
   const [workspace, setWorkspace] = useAtom(workspaceState);
   const tabkit = useTabkit();
   const setCommandMenuOpen = useSetAtom(commandMenuOpenAtom);
+  const { spaceId: routeSpaceId, channelId: routeChannelId } = useParams<{
+    spaceId: string;
+    channelId: string;
+  }>();
+  const hasHandledRouteRef = useRef(false);
+
+  // Handle URL-based navigation to open channel tab
+  useEffect(() => {
+    if (!routeSpaceId || !routeChannelId || hasHandledRouteRef.current) return;
+
+    const channel = mikoto.channels._get(routeChannelId);
+    if (channel && channel.spaceId === routeSpaceId) {
+      tabkit.openTab(channelToTab(channel));
+      hasHandledRouteRef.current = true;
+    }
+  }, [routeSpaceId, routeChannelId, mikoto, tabkit]);
 
   const spaceId =
     leftSidebar && leftSidebar.kind === 'explorer'

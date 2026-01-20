@@ -25,6 +25,10 @@ const router = createBrowserRouter([
     element: <MainView />,
   },
   {
+    path: '/space/:spaceId/channel/:channelId',
+    element: <MainView />,
+  },
+  {
     path: '/login',
     element: <LoginView />,
   },

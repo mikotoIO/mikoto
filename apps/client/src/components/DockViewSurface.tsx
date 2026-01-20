@@ -33,13 +33,7 @@ import {
   useTabs,
 } from '@/store/surface';
 
-// Channel surface kinds that have channelId
-const CHANNEL_KINDS = ['textChannel', 'voiceChannel', 'documentChannel'];
-
-// Surface kinds that have spaceId
-const SPACE_KINDS = ['spaceSettings', 'search'];
-
-// Global surface kinds (no params)
+// Global surface kinds mapped to their static routes
 const GLOBAL_SURFACE_ROUTES: Record<string, string> = {
   friends: '/friends',
   discovery: '/discover',
@@ -133,56 +127,60 @@ export const DockViewSurface = () => {
       const tab = panel.params?.tab as Tabable | undefined;
       if (!tab) return '/';
 
-      // Global surfaces with static routes
-      if (tab.kind in GLOBAL_SURFACE_ROUTES) {
-        return GLOBAL_SURFACE_ROUTES[tab.kind];
+      switch (tab.kind) {
+        // Global surfaces with static routes
+        case 'friends':
+        case 'discovery':
+        case 'spaceExplorer':
+        case 'accountSettings':
+        case 'palette':
+        case 'welcome':
+          return GLOBAL_SURFACE_ROUTES[tab.kind];
+
+        // Channel surfaces: /space/:spaceId/channel/:channelId
+        case 'textChannel':
+        case 'voiceChannel':
+        case 'documentChannel': {
+          const channelId = (tab as any).channelId;
+          if (!channelId) return '/';
+          const channel = mikoto.channels._get(channelId);
+          if (!channel) return '/';
+          return `/space/${channel.spaceId}/channel/${channel.id}`;
+        }
+
+        // Channel settings: /space/:spaceId/channel/:channelId/settings
+        case 'channelSettings': {
+          const channelId = (tab as any).channelId;
+          if (!channelId) return '/';
+          const channel = mikoto.channels._get(channelId);
+          if (!channel) return '/';
+          return `/space/${channel.spaceId}/channel/${channel.id}/settings`;
+        }
+
+        // Space settings: /space/:spaceId/settings
+        case 'spaceSettings': {
+          const spaceId = (tab as any).spaceId;
+          if (!spaceId) return '/';
+          return `/space/${spaceId}/settings`;
+        }
+
+        // Search: /space/:spaceId/search
+        case 'search': {
+          const spaceId = (tab as any).spaceId;
+          if (!spaceId) return '/';
+          return `/space/${spaceId}/search`;
+        }
+
+        // Bot settings: /settings/bots/:botId
+        case 'botSettings': {
+          const botId = (tab as any).botId;
+          if (!botId) return '/';
+          return `/settings/bots/${botId}`;
+        }
+
+        default:
+          return '/';
       }
-
-      // Channel surfaces: /space/:spaceId/channel/:channelId
-      if (CHANNEL_KINDS.includes(tab.kind)) {
-        const channelId = (tab as any).channelId;
-        if (!channelId) return '/';
-
-        const channel = mikoto.channels._get(channelId);
-        if (!channel) return '/';
-
-        return `/space/${channel.spaceId}/channel/${channel.id}`;
-      }
-
-      // Channel settings: /space/:spaceId/channel/:channelId/settings
-      if (tab.kind === 'channelSettings') {
-        const channelId = (tab as any).channelId;
-        if (!channelId) return '/';
-
-        const channel = mikoto.channels._get(channelId);
-        if (!channel) return '/';
-
-        return `/space/${channel.spaceId}/channel/${channel.id}/settings`;
-      }
-
-      // Space settings: /space/:spaceId/settings
-      if (tab.kind === 'spaceSettings') {
-        const spaceId = (tab as any).spaceId;
-        if (!spaceId) return '/';
-        return `/space/${spaceId}/settings`;
-      }
-
-      // Search: /space/:spaceId/search
-      if (tab.kind === 'search') {
-        const spaceId = (tab as any).spaceId;
-        if (!spaceId) return '/';
-        return `/space/${spaceId}/search`;
-      }
-
-      // Bot settings: /settings/bots/:botId
-      if (tab.kind === 'botSettings') {
-        const botId = (tab as any).botId;
-        if (!botId) return '/';
-        return `/settings/bots/${botId}`;
-      }
-
-      // Default fallback
-      return '/';
     },
     [mikoto],
   );

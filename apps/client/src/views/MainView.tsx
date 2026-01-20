@@ -9,7 +9,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 import { CommandMenuKit, commandMenuOpenAtom } from '@/components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
@@ -151,22 +151,84 @@ const AppView = () => {
   const [workspace, setWorkspace] = useAtom(workspaceState);
   const tabkit = useTabkit();
   const setCommandMenuOpen = useSetAtom(commandMenuOpenAtom);
-  const { spaceId: routeSpaceId, channelId: routeChannelId } = useParams<{
-    spaceId: string;
-    channelId: string;
-  }>();
-  const hasHandledRouteRef = useRef(false);
+  const { spaceId: routeSpaceId, channelId: routeChannelId, botId: routeBotId } =
+    useParams<{
+      spaceId: string;
+      channelId: string;
+      botId: string;
+    }>();
+  const location = useLocation();
+  const hasHandledRouteRef = useRef<string | null>(null);
 
-  // Handle URL-based navigation to open channel tab
+  // Handle URL-based navigation to open appropriate tab
   useEffect(() => {
-    if (!routeSpaceId || !routeChannelId || hasHandledRouteRef.current) return;
+    const pathname = location.pathname;
 
-    const channel = mikoto.channels._get(routeChannelId);
-    if (channel && channel.spaceId === routeSpaceId) {
-      tabkit.openTab(channelToTab(channel));
-      hasHandledRouteRef.current = true;
+    // Skip if we already handled this exact path
+    if (hasHandledRouteRef.current === pathname) return;
+
+    let tabToOpen: Tabable | null = null;
+
+    // Global routes (no params)
+    if (pathname === '/spaces') {
+      tabToOpen = { kind: 'spaceExplorer', key: 'spaceExplorer' };
+    } else if (pathname === '/friends') {
+      tabToOpen = { kind: 'friends', key: 'friends' };
+    } else if (pathname === '/discover') {
+      tabToOpen = { kind: 'discovery', key: 'discovery' };
+    } else if (pathname === '/settings') {
+      tabToOpen = { kind: 'accountSettings', key: 'accountSettings' };
+    } else if (pathname === '/palette') {
+      tabToOpen = { kind: 'palette', key: 'palette' };
     }
-  }, [routeSpaceId, routeChannelId, mikoto, tabkit]);
+    // Bot settings: /settings/bots/:botId
+    else if (pathname.startsWith('/settings/bots/') && routeBotId) {
+      tabToOpen = { kind: 'botSettings', key: routeBotId, botId: routeBotId };
+    }
+    // Space settings: /space/:spaceId/settings
+    else if (
+      routeSpaceId &&
+      !routeChannelId &&
+      pathname.endsWith('/settings')
+    ) {
+      tabToOpen = {
+        kind: 'spaceSettings',
+        key: routeSpaceId,
+        spaceId: routeSpaceId,
+      };
+    }
+    // Space search: /space/:spaceId/search
+    else if (routeSpaceId && !routeChannelId && pathname.endsWith('/search')) {
+      tabToOpen = { kind: 'search', key: routeSpaceId, spaceId: routeSpaceId };
+    }
+    // Channel settings: /space/:spaceId/channel/:channelId/settings
+    else if (
+      routeSpaceId &&
+      routeChannelId &&
+      pathname.endsWith('/settings')
+    ) {
+      const channel = mikoto.channels._get(routeChannelId);
+      if (channel && channel.spaceId === routeSpaceId) {
+        tabToOpen = {
+          kind: 'channelSettings',
+          key: routeChannelId,
+          channelId: routeChannelId,
+        };
+      }
+    }
+    // Channel: /space/:spaceId/channel/:channelId
+    else if (routeSpaceId && routeChannelId) {
+      const channel = mikoto.channels._get(routeChannelId);
+      if (channel && channel.spaceId === routeSpaceId) {
+        tabToOpen = channelToTab(channel);
+      }
+    }
+
+    if (tabToOpen) {
+      tabkit.openTab(tabToOpen);
+      hasHandledRouteRef.current = pathname;
+    }
+  }, [location.pathname, routeSpaceId, routeChannelId, routeBotId, mikoto, tabkit]);
 
   const spaceId =
     leftSidebar && leftSidebar.kind === 'explorer'

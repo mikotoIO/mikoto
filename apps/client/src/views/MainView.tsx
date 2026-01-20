@@ -151,12 +151,15 @@ const AppView = () => {
   const [workspace, setWorkspace] = useAtom(workspaceState);
   const tabkit = useTabkit();
   const setCommandMenuOpen = useSetAtom(commandMenuOpenAtom);
-  const { spaceId: routeSpaceId, channelId: routeChannelId, botId: routeBotId } =
-    useParams<{
-      spaceId: string;
-      channelId: string;
-      botId: string;
-    }>();
+  const {
+    spaceId: routeSpaceId,
+    channelId: routeChannelId,
+    botId: routeBotId,
+  } = useParams<{
+    spaceId: string;
+    channelId: string;
+    botId: string;
+  }>();
   const location = useLocation();
   const hasHandledRouteRef = useRef<string | null>(null);
 
@@ -170,65 +173,91 @@ const AppView = () => {
     let tabToOpen: Tabable | null = null;
 
     // Global routes (no params)
-    if (pathname === '/spaces') {
-      tabToOpen = { kind: 'spaceExplorer', key: 'spaceExplorer' };
-    } else if (pathname === '/friends') {
-      tabToOpen = { kind: 'friends', key: 'friends' };
-    } else if (pathname === '/discover') {
-      tabToOpen = { kind: 'discovery', key: 'discovery' };
-    } else if (pathname === '/settings') {
-      tabToOpen = { kind: 'accountSettings', key: 'accountSettings' };
-    } else if (pathname === '/palette') {
-      tabToOpen = { kind: 'palette', key: 'palette' };
-    }
-    // Bot settings: /settings/bots/:botId
-    else if (pathname.startsWith('/settings/bots/') && routeBotId) {
-      tabToOpen = { kind: 'botSettings', key: routeBotId, botId: routeBotId };
-    }
-    // Space settings: /space/:spaceId/settings
-    else if (
-      routeSpaceId &&
-      !routeChannelId &&
-      pathname.endsWith('/settings')
-    ) {
-      tabToOpen = {
-        kind: 'spaceSettings',
-        key: routeSpaceId,
-        spaceId: routeSpaceId,
-      };
-    }
-    // Space search: /space/:spaceId/search
-    else if (routeSpaceId && !routeChannelId && pathname.endsWith('/search')) {
-      tabToOpen = { kind: 'search', key: routeSpaceId, spaceId: routeSpaceId };
-    }
-    // Channel settings: /space/:spaceId/channel/:channelId/settings
-    else if (
-      routeSpaceId &&
-      routeChannelId &&
-      pathname.endsWith('/settings')
-    ) {
-      const channel = mikoto.channels._get(routeChannelId);
-      if (channel && channel.spaceId === routeSpaceId) {
-        tabToOpen = {
-          kind: 'channelSettings',
-          key: routeChannelId,
-          channelId: routeChannelId,
-        };
-      }
-    }
-    // Channel: /space/:spaceId/channel/:channelId
-    else if (routeSpaceId && routeChannelId) {
-      const channel = mikoto.channels._get(routeChannelId);
-      if (channel && channel.spaceId === routeSpaceId) {
-        tabToOpen = channelToTab(channel);
-      }
+    switch (pathname) {
+      case '/spaces':
+        tabToOpen = { kind: 'spaceExplorer', key: 'spaceExplorer' };
+        break;
+      case '/friends':
+        tabToOpen = { kind: 'friends', key: 'friends' };
+        break;
+      case '/discover':
+        tabToOpen = { kind: 'discovery', key: 'discovery' };
+        break;
+      case '/settings':
+        tabToOpen = { kind: 'accountSettings', key: 'accountSettings' };
+        break;
+      case '/palette':
+        tabToOpen = { kind: 'palette', key: 'palette' };
+        break;
+      default:
+        // Bot settings: /settings/bots/:botId
+        if (pathname.startsWith('/settings/bots/') && routeBotId) {
+          tabToOpen = {
+            kind: 'botSettings',
+            key: routeBotId,
+            botId: routeBotId,
+          };
+        }
+        // Space settings: /space/:spaceId/settings
+        else if (
+          routeSpaceId &&
+          !routeChannelId &&
+          pathname.endsWith('/settings')
+        ) {
+          tabToOpen = {
+            kind: 'spaceSettings',
+            key: routeSpaceId,
+            spaceId: routeSpaceId,
+          };
+        }
+        // Space search: /space/:spaceId/search
+        else if (
+          routeSpaceId &&
+          !routeChannelId &&
+          pathname.endsWith('/search')
+        ) {
+          tabToOpen = {
+            kind: 'search',
+            key: routeSpaceId,
+            spaceId: routeSpaceId,
+          };
+        }
+        // Channel settings: /space/:spaceId/channel/:channelId/settings
+        else if (
+          routeSpaceId &&
+          routeChannelId &&
+          pathname.endsWith('/settings')
+        ) {
+          const channel = mikoto.channels._get(routeChannelId);
+          if (channel && channel.spaceId === routeSpaceId) {
+            tabToOpen = {
+              kind: 'channelSettings',
+              key: routeChannelId,
+              channelId: routeChannelId,
+            };
+          }
+        }
+        // Channel: /space/:spaceId/channel/:channelId
+        else if (routeSpaceId && routeChannelId) {
+          const channel = mikoto.channels._get(routeChannelId);
+          if (channel && channel.spaceId === routeSpaceId) {
+            tabToOpen = channelToTab(channel);
+          }
+        }
     }
 
     if (tabToOpen) {
       tabkit.openTab(tabToOpen);
       hasHandledRouteRef.current = pathname;
     }
-  }, [location.pathname, routeSpaceId, routeChannelId, routeBotId, mikoto, tabkit]);
+  }, [
+    location.pathname,
+    routeSpaceId,
+    routeChannelId,
+    routeBotId,
+    mikoto,
+    tabkit,
+  ]);
 
   const spaceId =
     leftSidebar && leftSidebar.kind === 'explorer'

@@ -2,6 +2,7 @@ import {
   DockviewApi,
   DockviewReact,
   DockviewReadyEvent,
+  IDockviewPanel,
   IDockviewPanelProps,
 } from 'dockview-react';
 import { useAtom, useAtomValue } from 'jotai';
@@ -14,6 +15,7 @@ import {
   useState,
 } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import { useNavigate } from 'react-router-dom';
 
 import { WelcomePanel } from '@/components/WelcomePanel';
 import {
@@ -21,6 +23,7 @@ import {
   LoadingSurface,
   surfaceMap,
 } from '@/components/surfaces';
+import { useMikoto } from '@/hooks';
 import {
   TabContext,
   Tabable,
@@ -29,6 +32,16 @@ import {
   useActiveTabId,
   useTabs,
 } from '@/store/surface';
+
+// Global surface kinds mapped to their static routes
+const GLOBAL_SURFACE_ROUTES: Record<string, string> = {
+  friends: '/friends',
+  discovery: '/discover',
+  spaceExplorer: '/spaces',
+  accountSettings: '/settings',
+  palette: '/palette',
+  welcome: '/',
+};
 
 interface SurfaceComponentProps extends IDockviewPanelProps {
   params: {
@@ -103,6 +116,80 @@ export const DockViewSurface = () => {
   const setTabs = useAtom(tabsState)[1];
   // Keep track of the last processed tabs array
   const prevTabsRef = useRef<Tabable[]>([]);
+  const navigate = useNavigate();
+  const mikoto = useMikoto();
+
+  // Helper to get URL path from an active panel
+  const getUrlFromPanel = useCallback(
+    (panel: IDockviewPanel | undefined) => {
+      if (!panel) return '/';
+
+      const tab = panel.params?.tab as Tabable | undefined;
+      if (!tab) return '/';
+
+      switch (tab.kind) {
+        // Global surfaces with static routes
+        case 'friends':
+        case 'discovery':
+        case 'spaceExplorer':
+        case 'accountSettings':
+        case 'palette':
+        case 'welcome':
+          return GLOBAL_SURFACE_ROUTES[tab.kind];
+
+        // Channel surfaces: /space/:spaceId/channel/:channelId
+        case 'textChannel':
+        case 'voiceChannel':
+        case 'documentChannel': {
+          const channelId = (tab as any).channelId;
+          if (!channelId) return '/';
+          const channel = mikoto.channels._get(channelId);
+          if (!channel) return '/';
+          return `/space/${channel.spaceId}/channel/${channel.id}`;
+        }
+
+        // Channel settings: /space/:spaceId/channel/:channelId/settings
+        case 'channelSettings': {
+          const channelId = (tab as any).channelId;
+          if (!channelId) return '/';
+          const channel = mikoto.channels._get(channelId);
+          if (!channel) return '/';
+          return `/space/${channel.spaceId}/channel/${channel.id}/settings`;
+        }
+
+        // Space settings: /space/:spaceId/settings
+        case 'spaceSettings': {
+          const spaceId = (tab as any).spaceId;
+          if (!spaceId) return '/';
+          return `/space/${spaceId}/settings`;
+        }
+
+        // Search: /space/:spaceId/search
+        case 'search': {
+          const spaceId = (tab as any).spaceId;
+          if (!spaceId) return '/';
+          return `/space/${spaceId}/search`;
+        }
+
+        // Bot settings: /settings/bots/:botId
+        case 'botSettings': {
+          const botId = (tab as any).botId;
+          if (!botId) return '/';
+          return `/settings/bots/${botId}`;
+        }
+
+        default:
+          return '/';
+      }
+    },
+    [mikoto],
+  );
+
+  // Store navigate and getUrlFromPanel in refs so onReady callback can use them
+  const navigateRef = useRef(navigate);
+  const getUrlFromPanelRef = useRef(getUrlFromPanel);
+  navigateRef.current = navigate;
+  getUrlFromPanelRef.current = getUrlFromPanel;
 
   const components = useMemo(() => {
     return {
@@ -156,7 +243,28 @@ export const DockViewSurface = () => {
       dockviewRef.current.api = event.api;
       setDockviewApi(event.api); // Trigger re-render so TabTitleSync component renders
 
-      // Set up panels for initial tabs
+      // Set up event listeners BEFORE adding panels so we catch the first activation
+      // Listen for panel removal to sync tabs state
+      event.api.onDidRemovePanel((panel) => {
+        const panelId = panel.id;
+        const [kind, key] = panelId.split('/');
+        setTabs((currentTabs) =>
+          currentTabs.filter(
+            (tab) => !(tab.kind === kind && tab.key === key),
+          ),
+        );
+      });
+
+      // Listen for active panel changes to sync URL
+      event.api.onDidActivePanelChange((panel) => {
+        const newPath = getUrlFromPanelRef.current(panel);
+        // Only navigate if the path actually changes
+        if (window.location.pathname !== newPath) {
+          navigateRef.current(newPath, { replace: true });
+        }
+      });
+
+      // Set up panels for initial tabs (after listeners are ready)
       tabs.forEach((tab) => {
         const panelId = `${tab.kind}/${tab.key}`;
         event.api.addPanel({
@@ -172,17 +280,6 @@ export const DockViewSurface = () => {
 
       // Store initial tabs
       prevTabsRef.current = [...tabs];
-
-      // Listen for panel removal to sync tabs state
-      event.api.onDidRemovePanel((panel) => {
-        const panelId = panel.id;
-        const [kind, key] = panelId.split('/');
-        setTabs((currentTabs) =>
-          currentTabs.filter(
-            (tab) => !(tab.kind === kind && tab.key === key),
-          ),
-        );
-      });
     },
     [tabs, setTabs],
   );

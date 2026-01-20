@@ -20,10 +20,56 @@ const AppShell = styled.div`
 `;
 
 const router = createBrowserRouter([
+  // Base route
   {
     path: '/',
     element: <MainView />,
   },
+  // Global surfaces
+  {
+    path: '/spaces',
+    element: <MainView />,
+  },
+  {
+    path: '/friends',
+    element: <MainView />,
+  },
+  {
+    path: '/discover',
+    element: <MainView />,
+  },
+  {
+    path: '/palette',
+    element: <MainView />,
+  },
+  // Account settings
+  {
+    path: '/settings',
+    element: <MainView />,
+  },
+  {
+    path: '/settings/bots/:botId',
+    element: <MainView />,
+  },
+  // Space routes
+  {
+    path: '/space/:spaceId/settings',
+    element: <MainView />,
+  },
+  {
+    path: '/space/:spaceId/search',
+    element: <MainView />,
+  },
+  // Channel routes
+  {
+    path: '/space/:spaceId/channel/:channelId',
+    element: <MainView />,
+  },
+  {
+    path: '/space/:spaceId/channel/:channelId/settings',
+    element: <MainView />,
+  },
+  // Auth routes
   {
     path: '/login',
     element: <LoginView />,

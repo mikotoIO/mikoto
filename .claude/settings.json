@@ -1,0 +1,13 @@
+{
+  "enabledPlugins": {
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
+  },
+  "allow": [
+    "Bash(moon :typecheck:*)",
+    "Bash(moon :lint:*)",
+    "Bash(moon :format:*)",
+    "WebSearch",
+    "WebFetch(domain:raw.githubusercontent.com)"
+  ]
+}

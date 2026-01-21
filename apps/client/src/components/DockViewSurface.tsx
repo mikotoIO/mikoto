@@ -1,8 +1,11 @@
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   DockviewApi,
   DockviewReact,
   DockviewReadyEvent,
   IDockviewPanel,
+  IDockviewPanelHeaderProps,
   IDockviewPanelProps,
 } from 'dockview-react';
 import { useAtom, useAtomValue } from 'jotai';
@@ -67,6 +70,131 @@ function SurfaceComponent(props: SurfaceComponentProps) {
         </Suspense>
       </ErrorBoundary>
     </TabContext.Provider>
+  );
+}
+
+// Helper to check if an icon is a FontAwesome icon definition
+function isFontAwesomeIcon(
+  icon: IconDefinition | string,
+): icon is IconDefinition {
+  return typeof icon === 'object' && 'icon' in icon;
+}
+
+// Hook to sync with panel title changes
+function useTitle(api: { title: string | undefined; onDidTitleChange: any }) {
+  const [title, setTitle] = useState<string | undefined>(api.title);
+
+  useEffect(() => {
+    const disposable = api.onDidTitleChange(
+      (event: { title: string | undefined }) => {
+        setTitle(event.title);
+      },
+    );
+    if (title !== api.title) {
+      setTitle(api.title);
+    }
+    return () => disposable.dispose();
+  }, [api, title]);
+
+  return title;
+}
+
+// Custom tab component that displays the space icon before the title
+function CustomTabComponent(props: IDockviewPanelHeaderProps) {
+  const { api } = props;
+  const panelId = api.id;
+  const tabName = useAtomValue(tabNameFamily(panelId));
+  const title = useTitle(api);
+  const isMiddleMouseButton = useRef<boolean>(false);
+
+  const onClose = useCallback(
+    (event: React.MouseEvent) => {
+      event.preventDefault();
+      api.close();
+    },
+    [api],
+  );
+
+  const onBtnPointerDown = useCallback((event: React.MouseEvent) => {
+    event.preventDefault();
+  }, []);
+
+  const onPointerDown = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      isMiddleMouseButton.current = event.button === 1;
+    },
+    [],
+  );
+
+  const onPointerUp = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (isMiddleMouseButton.current && event.button === 1) {
+        isMiddleMouseButton.current = false;
+        onClose(event);
+      }
+    },
+    [onClose],
+  );
+
+  const onPointerLeave = useCallback(() => {
+    isMiddleMouseButton.current = false;
+  }, []);
+
+  return (
+    <div
+      className="dv-default-tab"
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerLeave={onPointerLeave}
+    >
+      <span
+        className="dv-default-tab-content"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {tabName.icon && (
+          <span
+            style={{
+              marginRight: '6px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              flexShrink: 0,
+            }}
+          >
+            {isFontAwesomeIcon(tabName.icon) ? (
+              <FontAwesomeIcon
+                icon={tabName.icon}
+                style={{ fontSize: '12px' }}
+              />
+            ) : (
+              <img
+                src={tabName.icon}
+                alt=""
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '3px',
+                  objectFit: 'cover',
+                }}
+              />
+            )}
+          </span>
+        )}
+        {title}
+      </span>
+      <div
+        className="dv-default-tab-action"
+        onPointerDown={onBtnPointerDown}
+        onClick={onClose}
+      >
+        <svg viewBox="0 0 11 11" width="11" height="11">
+          <path d="M2.1 2.1 L8.9 8.9 M8.9 2.1 L2.1 8.9" stroke="currentColor" />
+        </svg>
+      </div>
+    </div>
   );
 }
 
@@ -294,6 +422,7 @@ export const DockViewSurface = () => {
         components={components}
         onReady={onReady}
         className="dockview-theme-mikoto"
+        defaultTabComponent={CustomTabComponent}
       />
       {/* Sync tab names from TabName components to DockView panel titles */}
       {dockviewApi && <TabTitleSync tabs={tabs} api={dockviewApi} />}

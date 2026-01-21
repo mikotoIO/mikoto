@@ -281,7 +281,7 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
 
   return (
     <Surface scroll>
-      <TabName name={channel.name} icon={faFileLines} />
+      <TabName name={channel.name} icon={channel.space?.icon ?? faFileLines} />
       <DocumentActions>
         <Box className="left" fontWeight="semibold" color="gray.400">
           #{channel.name}

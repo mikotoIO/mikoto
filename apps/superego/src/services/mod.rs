@@ -4,6 +4,10 @@ use s3::Bucket;
 
 use crate::env::env;
 
+mod delve;
+
+pub use delve::verifier;
+
 static BUCKET: OnceLock<Bucket> = OnceLock::new();
 
 pub fn bucket() -> &'static Bucket {

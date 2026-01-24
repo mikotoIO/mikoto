@@ -66,3 +66,9 @@ Check `ARCHITECTURE.md`.
 - Before adding any new package, use the rustdoc crate search to check for the version.
 - Instead of reading the migrations, you can read schema.sql for the up-to-date dump of the database schema.
 - at the end of your task, run moon :typecheck to check both Rust and TypeScript parts of the codebase.
+
+# Skills
+
+- If you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.
+- If you think a skill might apply, invoke the skill. It is okay to invoke the wrong skills - you're not forced to use it if you invoke a wrong skill by mistake.
+- Activate domain skills BEFORE starting work in a specific part of the codebase to understand the existing patterns.

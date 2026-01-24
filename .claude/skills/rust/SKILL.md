@@ -286,3 +286,55 @@ mod tests {
 - **IDs**: Always UUID
 - **Timestamps**: `DateTime<Utc>` with chrono
 - **Optionals**: `Option<T>` for nullable fields
+
+## Best Practices
+
+### Safety
+
+- **Never use `unsafe` Rust** - This codebase has no need for unsafe code. All functionality can be achieved with safe Rust.
+- **Never use `.unwrap()` or `.expect()` in production code** - Always use `?` operator or handle errors explicitly. The only exception is in tests or when the value is guaranteed to exist (with a comment explaining why).
+- **Avoid `.clone()` unless necessary** - Prefer borrowing. If cloning is needed, consider if the data structure should use `Arc` instead.
+
+### Researching Crates
+
+- **Use WebFetch on docs.rs** to explore crate APIs before using them. Example: `https://docs.rs/axum/latest/axum/`
+- **Check crate versions before adding** - Search docs.rs or crates.io to find the latest version before adding to Cargo.toml.
+- **Prefer crates already in use** - Check `apps/superego/Cargo.toml` before adding new dependencies. The codebase already includes many utilities.
+
+### Code Quality
+
+- **Run `moon :typecheck` after changes** - This checks both Rust and TypeScript. Always run before committing.
+- **Follow clippy suggestions** - Run `moon :lint` and address all warnings. Clippy catches common mistakes and suggests idiomatic Rust.
+- **Use existing patterns** - Look at similar code in the codebase before implementing. Follow established patterns for entities, routes, and error handling.
+
+### Database
+
+- **Read `schema.sql` for current schema** - Don't read individual migrations. The schema dump is always up-to-date and easier to understand.
+- **Use parameterized queries** - Never interpolate user input into SQL strings. Always use `.bind()`.
+- **Batch load relations** - Use the `dataload` pattern to avoid N+1 query problems.
+
+### Error Handling
+
+- **Use the custom `Error` type** - Don't create new error types. Use `Error::new()`, `Error::internal()`, `Error::forbidden()`, etc.
+- **Propagate with `?`** - Let errors bubble up. The error type automatically converts to HTTP responses.
+- **Provide helpful messages** - Error messages should help the API consumer understand what went wrong.
+
+### Performance
+
+- **Use `db()` singleton** - Never create new database connections. The pool is managed globally.
+- **Avoid blocking in async code** - Use `tokio::task::spawn_blocking` for CPU-intensive work.
+- **Batch database operations** - Use `dataload` patterns and batch inserts/updates when possible.
+
+## Common Commands
+
+```bash
+moon :typecheck          # Type-check Rust and TypeScript
+moon :lint               # Run clippy and eslint
+moon :lint.fix           # Auto-fix linting issues
+moon :format             # Format all code
+moon :test               # Run all tests
+cargo run -p superego    # Run just the Rust server
+cargo test -p superego   # Run Rust tests only
+cargo check -p superego  # Quick compilation check
+just new-migration name  # Create new migration
+```

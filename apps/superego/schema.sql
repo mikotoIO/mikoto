@@ -180,9 +180,11 @@ ALTER TABLE public."Document" OWNER TO postgres;
 --
 
 CREATE TABLE public."Handle" (
-    handle character varying(64) NOT NULL,
+    handle character varying(253) NOT NULL,
     "userId" uuid,
     "spaceId" uuid,
+    "verifiedAt" timestamp(3) without time zone,
+    attestation jsonb,
     "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CONSTRAINT handle_single_owner CHECK ((("userId" IS NULL) <> ("spaceId" IS NULL)))
 );

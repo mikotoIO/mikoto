@@ -29,8 +29,8 @@ entity!(
     }
 );
 
-/// Attestation stored in the database for verified custom domains
 model!(
+    /// Attestation stored in the database for verified custom domains
     pub struct HandleAttestation {
         pub handle: String,
         pub entity_type: String, // "user" or "space"

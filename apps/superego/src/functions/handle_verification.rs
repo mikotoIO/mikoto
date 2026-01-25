@@ -17,8 +17,8 @@ use crate::{
 /// DNS TXT record prefix for handle verification
 const DNS_TXT_PREFIX: &str = "_mikoto";
 
-/// Verification challenge sent to the user
 model!(
+    /// Verification challenge sent to the user
     pub struct VerificationChallenge {
         /// The domain being verified
         pub handle: String,
@@ -41,16 +41,16 @@ model!(
     }
 );
 
-/// Request to initiate handle verification
 model!(
+    /// Request to initiate handle verification
     pub struct VerifyHandleRequest {
         /// The domain to verify
         pub handle: String,
     }
 );
 
-/// Result of a verification attempt
 model!(
+    /// Result of a verification attempt
     pub struct VerificationResult {
         pub success: bool,
         pub method: Option<String>,
@@ -58,8 +58,8 @@ model!(
     }
 );
 
-/// Well-known file content structure
 model!(
+    /// Well-known file content structure
     pub struct WellKnownContent {
         pub home_instance: String,
         pub entity_type: String,
@@ -252,9 +252,9 @@ fn get_signing_key() -> Result<Option<SigningKey>> {
         return Ok(None);
     };
 
-    let private_key_bytes = BASE64.decode(private_key_b64).map_err(|_| {
-        Error::internal("Invalid HANDLE_PRIVATE_KEY: not valid base64")
-    })?;
+    let private_key_bytes = BASE64
+        .decode(private_key_b64)
+        .map_err(|_| Error::internal("Invalid HANDLE_PRIVATE_KEY: not valid base64"))?;
 
     if private_key_bytes.len() != 32 {
         return Err(Error::internal(
@@ -274,9 +274,9 @@ pub fn get_verifying_key() -> Result<Option<VerifyingKey>> {
         return Ok(None);
     };
 
-    let public_key_bytes = BASE64.decode(public_key_b64).map_err(|_| {
-        Error::internal("Invalid HANDLE_PUBLIC_KEY: not valid base64")
-    })?;
+    let public_key_bytes = BASE64
+        .decode(public_key_b64)
+        .map_err(|_| Error::internal("Invalid HANDLE_PUBLIC_KEY: not valid base64"))?;
 
     if public_key_bytes.len() != 32 {
         return Err(Error::internal(
@@ -318,11 +318,7 @@ pub fn create_attestation(
     // Create the attestation data to sign
     let attestation_data = format!(
         "{}:{}:{}:{}:{}",
-        handle,
-        entity_type,
-        entity_id,
-        instance,
-        verified_at
+        handle, entity_type, entity_id, instance, verified_at
     );
 
     // Sign the attestation

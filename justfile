@@ -38,3 +38,5 @@ reset-dev-env:
     echo "Starting Docker services..."
     docker compose up -d
     echo "Docker services reset complete!"
+    cd apps/superego && cargo run --bin seed
+    echo "Seeding complete!"

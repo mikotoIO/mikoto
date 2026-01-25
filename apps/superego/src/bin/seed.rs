@@ -28,6 +28,11 @@ struct TestUser {
 
 const TEST_USERS: &[TestUser] = &[
     TestUser {
+        id: Uuid::from_u128(0x10000000_0000_0000_0000_000000000001),
+        name: "Hayley",
+        email: "hayley@example.com",
+    },
+    TestUser {
         id: Uuid::from_u128(0x00000000_0000_0000_0000_000000000001),
         name: "Alice",
         email: "alice@example.com",

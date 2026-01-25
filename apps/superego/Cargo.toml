@@ -19,6 +19,10 @@ path = "src/bin/migrate.rs"
 name = "dump_api"
 path = "src/bin/dump_api.rs"
 
+[[bin]]
+name = "seed"
+path = "src/bin/seed.rs"
+
 [dependencies]
 
 # the basic dependencies

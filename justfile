@@ -4,6 +4,14 @@ run-core:
 migrate:
     cd apps/superego && cargo run --bin migrate
 
+# Dump the OpenAPI schema from superego
+dump-api:
+    cd apps/superego && cargo run --bin dump_api
+
+# Seed the database with placeholder data for development
+seed:
+    cd apps/superego && cargo run --bin seed
+
 # Create a new migration file
 new-migration name:
     #!/usr/bin/env bash

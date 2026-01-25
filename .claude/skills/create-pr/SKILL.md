@@ -11,4 +11,4 @@ Steps:
 
 Write a concise PR title and description summarizing the changes. The description should include a comprehensive, yet concise description of everything that changed in the PR.
 
-Do not describe every change verbatim: the diff viewer exists for that. Describe why, not how.
+Do not describe every change verbatim: the diff viewer exists for that. Describe why, not how. Do NOT add Claude co-authorship footer to commits.

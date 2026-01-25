@@ -1,14 +1,14 @@
 import { proxy, ref } from 'valtio/vanilla';
 
 import type { MikotoClient } from '../MikotoClient';
-import { User } from '../api.gen';
+import { UserExt } from '../api.gen';
 import { ZSchema } from '../helpers/ZSchema';
 import { Manager } from './base';
 
-export class MikotoUser extends ZSchema(User) {
+export class MikotoUser extends ZSchema(UserExt) {
   client!: MikotoClient;
 
-  constructor(base: User, client: MikotoClient) {
+  constructor(base: UserExt, client: MikotoClient) {
     super(base);
     this.client = ref(client);
     return proxy(this);

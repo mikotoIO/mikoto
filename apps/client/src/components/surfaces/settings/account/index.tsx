@@ -1,5 +1,16 @@
-import { Box, Button, Flex, Heading, Input, Textarea } from '@chakra-ui/react';
+import {
+  Box,
+  Code,
+  Flex,
+  Group,
+  Heading,
+  Input,
+  Text,
+  Textarea,
+} from '@chakra-ui/react';
+import { VerificationChallenge } from '@mikoto-io/mikoto.js';
 import { useAtomValue, useSetAtom } from 'jotai';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -7,7 +18,8 @@ import { modalState } from '@/components/ContextMenu';
 import { userState } from '@/components/UserArea';
 import { AvatarEditor } from '@/components/molecules/AvatarEditor';
 import { BaseSettingsSurface } from '@/components/surfaces/BaseSettings';
-import { DialogContent, Field } from '@/components/ui';
+import { Alert } from '@/components/ui/alert';
+import { Button, DialogContent, Field } from '@/components/ui';
 import { uploadFile } from '@/functions/fileUpload';
 import { useAuthClient, useMikoto } from '@/hooks';
 import { useErrorElement } from '@/hooks/useErrorElement';
@@ -103,17 +115,204 @@ function NameChangeModal() {
   );
 }
 
+function HandleVerificationModal({
+  challenge,
+  onVerify,
+}: {
+  challenge: VerificationChallenge;
+  onVerify: () => Promise<void>;
+}) {
+  const setModal = useSetAtom(modalState);
+  const [verifying, setVerifying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleVerify = async () => {
+    setVerifying(true);
+    setError(null);
+    try {
+      await onVerify();
+      setModal(null);
+    } catch (e: unknown) {
+      const errorMessage =
+        (e as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? 'Verification failed. Please try again.';
+      setError(errorMessage);
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  return (
+    <DialogContent rounded="md" p={4} maxW="600px">
+      <h1>Verify Domain Ownership</h1>
+      <Text color="gray.400" fontSize="sm" mb={4}>
+        To use <strong>{challenge.handle}</strong> as your handle, you need to
+        verify that you own this domain using one of the methods below.
+      </Text>
+
+      <Box bg="gray.800" p={4} rounded="md" mb={4}>
+        <Text fontWeight="bold" mb={2}>
+          Option 1: DNS TXT Record
+        </Text>
+        <Text fontSize="sm" color="gray.400" mb={2}>
+          Add a TXT record to your domain&apos;s DNS settings:
+        </Text>
+        <Field label="Record Name">
+          <Code
+            p={2}
+            w="100%"
+            display="block"
+            bg="gray.900"
+            fontSize="sm"
+            wordBreak="break-all"
+          >
+            {challenge.dnsTxtName}
+          </Code>
+        </Field>
+        <Field label="Record Value" mt={2}>
+          <Code
+            p={2}
+            w="100%"
+            display="block"
+            bg="gray.900"
+            fontSize="sm"
+            wordBreak="break-all"
+          >
+            {challenge.dnsTxtRecord}
+          </Code>
+        </Field>
+      </Box>
+
+      <Box bg="gray.800" p={4} rounded="md" mb={4}>
+        <Text fontWeight="bold" mb={2}>
+          Option 2: Well-Known File
+        </Text>
+        <Text fontSize="sm" color="gray.400" mb={2}>
+          Create a file at the following URL with the content below:
+        </Text>
+        <Field label="URL">
+          <Code
+            p={2}
+            w="100%"
+            display="block"
+            bg="gray.900"
+            fontSize="sm"
+            wordBreak="break-all"
+          >
+            {challenge.wellKnownUrl}
+          </Code>
+        </Field>
+        <Field label="File Content" mt={2}>
+          <Code
+            p={2}
+            w="100%"
+            display="block"
+            bg="gray.900"
+            fontSize="sm"
+            whiteSpace="pre-wrap"
+            wordBreak="break-all"
+          >
+            {challenge.wellKnownContent}
+          </Code>
+        </Field>
+      </Box>
+
+      {error && (
+        <Alert status="error" mb={4} title="Verification Failed">
+          {error}
+        </Alert>
+      )}
+
+      <Group>
+        <Button
+          colorPalette="primary"
+          onClick={handleVerify}
+          loading={verifying}
+        >
+          Verify Domain
+        </Button>
+        <Button variant="ghost" onClick={() => setModal(null)}>
+          Cancel
+        </Button>
+      </Group>
+    </DialogContent>
+  );
+}
+
 function Overview() {
   const setModal = useSetAtom(modalState);
   const { t } = useTranslation();
 
   const mikoto = useMikoto();
   const user = mikoto.user.me!;
+  const [userHandle, setUserHandle] = useState(user?.handle ?? '');
+  const [handleLoading, setHandleLoading] = useState(false);
+  const handleError = useErrorElement();
   const { register, handleSubmit } = useForm({
     defaultValues: {
       description: user?.description || '',
     },
   });
+
+  // Check if a handle looks like a custom domain (contains . but is not a default handle)
+  const isCustomDomain = (handle: string) => {
+    if (!handle.includes('.')) return false;
+    // Default handles end with the instance domain (e.g., .mikoto.io)
+    // Custom domains are anything else with a dot
+    const parts = handle.split('.');
+    // If it's just username.domain.tld (3 parts) and ends with mikoto.io, it's a default handle
+    // Otherwise treat as custom domain
+    return !(parts.length === 3 && handle.endsWith('.mikoto.io'));
+  };
+
+  const handleSaveHandle = async () => {
+    if (!userHandle.trim()) {
+      await mikoto.rest['user.deleteHandle'](undefined, {});
+      return;
+    }
+
+    setHandleLoading(true);
+    handleError.setError(null);
+
+    try {
+      if (isCustomDomain(userHandle)) {
+        // Custom domain - start verification flow
+        const challenge = await mikoto.rest['user.startHandleVerification'](
+          { handle: userHandle },
+          {},
+        );
+
+        setModal({
+          elem: (
+            <HandleVerificationModal
+              challenge={challenge}
+              onVerify={async () => {
+                const result = await mikoto.rest[
+                  'user.completeHandleVerification'
+                ]({ handle: userHandle }, {});
+                if (!result.success) {
+                  throw new Error(
+                    result.error ??
+                      'Verification failed. Please check your DNS or well-known file.',
+                  );
+                }
+              }}
+            />
+          ),
+        });
+      } else {
+        // Simple username or default handle - set directly
+        await mikoto.rest['user.setHandle']({ handle: userHandle }, {});
+      }
+    } catch (e: unknown) {
+      const errorMessage =
+        (e as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? 'Failed to update handle';
+      handleError.setError({ name: 'HandleError', message: errorMessage });
+    } finally {
+      setHandleLoading(false);
+    }
+  };
 
   return (
     <SettingSurface>
@@ -150,6 +349,60 @@ function Overview() {
           </Button>
         </Box>
       </Box>
+
+      <h2>Handle</h2>
+      <Text color="gray.400" fontSize="sm" mb={2}>
+        Your handle is your unique identifier. Use a simple username (e.g.,
+        &quot;hayley&quot;) or verify a custom domain (e.g.,
+        &quot;hayley.moe&quot;).
+      </Text>
+      {handleError.el}
+      <Form
+        mb={4}
+        onSubmit={async (e) => {
+          e.preventDefault();
+          await handleSaveHandle();
+        }}
+      >
+        <Field label="Handle">
+          <Input
+            value={userHandle}
+            onChange={(e) => setUserHandle(e.target.value)}
+            placeholder="your-handle or your-domain.com"
+          />
+        </Field>
+        {userHandle && isCustomDomain(userHandle) && (
+          <Text fontSize="xs" color="blue.300" mt={1}>
+            This looks like a custom domain. You&apos;ll need to verify
+            ownership.
+          </Text>
+        )}
+        <Group mt={2}>
+          <Button
+            colorPalette="primary"
+            type="submit"
+            loading={handleLoading}
+          >
+            {userHandle && isCustomDomain(userHandle)
+              ? 'Verify & Save Handle'
+              : 'Save Handle'}
+          </Button>
+          {user?.handle && (
+            <Button
+              variant="outline"
+              colorPalette="red"
+              type="button"
+              onClick={async () => {
+                await mikoto.rest['user.deleteHandle'](undefined, {});
+                setUserHandle('');
+              }}
+            >
+              Release Handle
+            </Button>
+          )}
+        </Group>
+      </Form>
+
       <Form
         mb={4}
         onSubmit={handleSubmit(async (form) => {

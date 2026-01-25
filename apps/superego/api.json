@@ -283,6 +283,28 @@
         }
       }
     },
+    "/.well-known/mikoto/instance.json": {
+      "get": {
+        "tags": [
+          "Instance"
+        ],
+        "summary": "Get Instance Information",
+        "description": "Returns instance information for federation, including the public key for verifying handle attestations.",
+        "operationId": "instance.info",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstanceInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/users/me": {
       "get": {
         "tags": [
@@ -376,6 +398,72 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me/handle/verify": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Start Custom Domain Verification",
+        "description": "Generates a verification challenge for a custom domain handle. Returns the DNS TXT record and well-known file content to add for verification.",
+        "operationId": "user.startHandleVerification",
+        "requestBody": {
+          "description": "Request to initiate handle verification",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyHandleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationChallenge"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me/handle/verify/complete": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Complete Custom Domain Verification",
+        "description": "Verifies the custom domain by checking DNS TXT records or well-known files. On success, updates the user's handle to the verified domain.",
+        "operationId": "user.completeHandleVerification",
+        "requestBody": {
+          "description": "Request to initiate handle verification",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyHandleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationResult"
                 }
               }
             }
@@ -625,6 +713,72 @@
               "application/json": {
                 "schema": {
                   "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/handle/verify": {
+      "post": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Start Custom Domain Verification",
+        "description": "Generates a verification challenge for a custom domain handle. Returns the DNS TXT record and well-known file content to add for verification.",
+        "operationId": "spaces.startHandleVerification",
+        "requestBody": {
+          "description": "Request to initiate handle verification",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyHandleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationChallenge"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/handle/verify/complete": {
+      "post": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Complete Custom Domain Verification",
+        "description": "Verifies the custom domain by checking DNS TXT records or well-known files. On success, updates the space's handle to the verified domain.",
+        "operationId": "spaces.completeHandleVerification",
+        "requestBody": {
+          "description": "Request to initiate handle verification",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyHandleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationResult"
                 }
               }
             }
@@ -1616,6 +1770,13 @@
           },
           "owner": {
             "$ref": "#/components/schemas/HandleOwner"
+          },
+          "verifiedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "partial-date-time"
           }
         }
       },
@@ -1631,6 +1792,31 @@
           },
           "version": {
             "type": "string"
+          }
+        }
+      },
+      "InstanceInfo": {
+        "type": "object",
+        "required": [
+          "apiEndpoint",
+          "domain",
+          "handleDomain"
+        ],
+        "properties": {
+          "apiEndpoint": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "handleDomain": {
+            "type": "string"
+          },
+          "publicKey": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -2403,6 +2589,98 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "VerificationChallenge": {
+        "description": "Verification challenge sent to the user",
+        "type": "object",
+        "required": [
+          "createdAt",
+          "dnsTxtName",
+          "dnsTxtRecord",
+          "entityId",
+          "entityType",
+          "handle",
+          "nonce",
+          "wellKnownContent",
+          "wellKnownUrl"
+        ],
+        "properties": {
+          "createdAt": {
+            "description": "When this challenge was created",
+            "type": "string",
+            "format": "date-time"
+          },
+          "dnsTxtName": {
+            "description": "The DNS TXT record name (subdomain)",
+            "type": "string"
+          },
+          "dnsTxtRecord": {
+            "description": "The DNS TXT record to add",
+            "type": "string"
+          },
+          "entityId": {
+            "description": "The entity ID",
+            "type": "string",
+            "format": "uuid"
+          },
+          "entityType": {
+            "description": "The entity type (user or space)",
+            "type": "string"
+          },
+          "handle": {
+            "description": "The domain being verified",
+            "type": "string"
+          },
+          "nonce": {
+            "description": "Random nonce for this challenge",
+            "type": "string"
+          },
+          "wellKnownContent": {
+            "description": "The well-known file content",
+            "type": "string"
+          },
+          "wellKnownUrl": {
+            "description": "The well-known file URL",
+            "type": "string"
+          }
+        }
+      },
+      "VerificationResult": {
+        "description": "Result of a verification attempt",
+        "type": "object",
+        "required": [
+          "success"
+        ],
+        "properties": {
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "method": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      },
+      "VerifyHandleRequest": {
+        "description": "Request to initiate handle verification",
+        "type": "object",
+        "required": [
+          "handle"
+        ],
+        "properties": {
+          "handle": {
+            "description": "The domain to verify",
+            "type": "string"
           }
         }
       },

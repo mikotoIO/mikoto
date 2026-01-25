@@ -1,57 +1,14 @@
 use chrono::NaiveDateTime;
 use regex::Regex;
-use std::sync::LazyLock;
 use schemars::JsonSchema;
+use std::sync::LazyLock;
 use uuid::Uuid;
 
 use crate::{entity, error::Error};
 
-/// Reserved handles that cannot be claimed
-const RESERVED_HANDLES: &[&str] = &[
-    "admin",
-    "administrator",
-    "api",
-    "app",
-    "auth",
-    "bot",
-    "bots",
-    "cdn",
-    "channel",
-    "channels",
-    "collab",
-    "docs",
-    "help",
-    "home",
-    "invite",
-    "invites",
-    "login",
-    "logout",
-    "me",
-    "member",
-    "members",
-    "mikoto",
-    "mod",
-    "moderator",
-    "null",
-    "register",
-    "role",
-    "roles",
-    "root",
-    "search",
-    "settings",
-    "space",
-    "spaces",
-    "support",
-    "system",
-    "undefined",
-    "user",
-    "users",
-    "voice",
-    "ws",
-];
-
-static HANDLE_REGEX: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"^[a-z0-9][a-z0-9_-]*[a-z0-9]$|^[a-z0-9]$").expect("invalid regex"));
+static HANDLE_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^[a-z0-9][a-z0-9_-]*[a-z0-9]$|^[a-z0-9]$").expect("invalid regex")
+});
 
 entity!(
     pub struct Handle {
@@ -106,15 +63,6 @@ impl Handle {
                 "InvalidHandle",
                 axum::http::StatusCode::BAD_REQUEST,
                 "Handle must contain only lowercase letters, numbers, hyphens, and underscores, and cannot start or end with a hyphen or underscore",
-            ));
-        }
-
-        // Reserved words check
-        if RESERVED_HANDLES.contains(&handle) {
-            return Err(Error::new(
-                "ReservedHandle",
-                axum::http::StatusCode::BAD_REQUEST,
-                "This handle is reserved and cannot be used",
             ));
         }
 
@@ -421,9 +369,5 @@ mod tests {
 
         // Contains invalid characters
         assert!(Handle::validate("user@name").is_err());
-
-        // Reserved
-        assert!(Handle::validate("admin").is_err());
-        assert!(Handle::validate("api").is_err());
     }
 }

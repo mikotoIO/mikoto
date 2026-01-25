@@ -24,6 +24,7 @@ pub mod handles;
 pub mod router;
 pub mod spaces;
 pub mod users;
+pub mod well_known;
 pub mod ws;
 
 #[derive(Debug, Serialize, JsonSchema)]
@@ -59,6 +60,7 @@ fn build_app_router() -> AppRouter<State> {
                 .nest("/bots", bots::router())
                 .nest("/cdn", cdn::router())
                 .nest("/handles", handles::router().http)
+                .nest("/.well-known", well_known::router())
         })
         .nest("users", "/users", users::router())
         .nest("relations", "/relations", users::relations::router())

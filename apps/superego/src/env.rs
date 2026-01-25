@@ -19,6 +19,7 @@ pub struct Env {
     pub smtp: Option<SmtpEnv>,
     pub captcha: CaptchaEnv,
     pub livekit: Option<LivekitEnv>,
+    pub handle: HandleEnv,
 }
 
 #[derive(Deserialize, Debug)]
@@ -50,6 +51,16 @@ pub struct S3Env {
     pub bucket: String,
     pub use_ssl: bool,
     pub port: Option<u16>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct HandleEnv {
+    /// Domain for default handles (e.g., "mikoto.io" -> handles like "hayley.mikoto.io")
+    pub domain: String,
+    /// Ed25519 private key (base64 encoded) for signing attestations
+    pub private_key: Option<String>,
+    /// Ed25519 public key (base64 encoded) for verifying attestations
+    pub public_key: Option<String>,
 }
 
 #[derive(Deserialize, Debug, Eq, PartialEq)]

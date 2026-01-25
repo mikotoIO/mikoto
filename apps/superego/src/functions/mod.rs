@@ -4,6 +4,7 @@ use std::iter::IntoIterator;
 
 pub mod captcha;
 pub mod filetypes;
+pub mod handle_verification;
 pub mod jwt;
 pub mod mail;
 pub mod permissions;

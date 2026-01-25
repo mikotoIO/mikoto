@@ -1,8 +1,11 @@
 -- Create unified Handle table for both users and spaces
+-- Handles are domain-based identifiers (e.g., "hayley.mikoto.io" or "hayley.moe")
 CREATE TABLE "Handle" (
-    handle VARCHAR(64) PRIMARY KEY,
+    handle VARCHAR(253) PRIMARY KEY,  -- Max domain name length
     "userId" UUID REFERENCES "User"(id) ON DELETE CASCADE,
     "spaceId" UUID REFERENCES "Space"(id) ON DELETE CASCADE,
+    "verifiedAt" TIMESTAMP(3),  -- null for default handles, set when custom domain is verified
+    attestation JSONB,  -- signed proof for federation trust
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
 
     -- Exactly one of userId or spaceId must be set

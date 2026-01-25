@@ -1,13 +1,21 @@
 use chrono::NaiveDateTime;
 use regex::Regex;
 use schemars::JsonSchema;
+use serde_json::Value as JsonValue;
 use std::sync::LazyLock;
 use uuid::Uuid;
 
-use crate::{entity, error::Error};
+use crate::{entity, env::env, error::Error, model};
 
-static HANDLE_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+/// Regex for validating the username portion of a default handle
+/// (e.g., "hayley" in "hayley.mikoto.io")
+static USERNAME_REGEX: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"^[a-z0-9][a-z0-9_-]*[a-z0-9]$|^[a-z0-9]$").expect("invalid regex")
+});
+
+/// Regex for validating a domain name (custom handle)
+static DOMAIN_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$").expect("invalid regex")
 });
 
 entity!(
@@ -15,7 +23,22 @@ entity!(
         pub handle: String,
         pub user_id: Option<Uuid>,
         pub space_id: Option<Uuid>,
+        pub verified_at: Option<NaiveDateTime>,
+        pub attestation: Option<JsonValue>,
         pub created_at: NaiveDateTime,
+    }
+);
+
+/// Attestation stored in the database for verified custom domains
+model!(
+    pub struct HandleAttestation {
+        pub handle: String,
+        pub entity_type: String, // "user" or "space"
+        pub entity_id: Uuid,
+        pub instance: String,
+        pub verified_at: String,
+        pub dns_record_hash: Option<String>,
+        pub signature: String,
     }
 );
 
@@ -33,40 +56,127 @@ pub enum HandleOwner {
 pub struct HandleResolution {
     pub handle: String,
     pub owner: HandleOwner,
+    pub verified_at: Option<NaiveDateTime>,
     pub created_at: NaiveDateTime,
 }
 
 impl Handle {
-    /// Validate a handle string
-    pub fn validate(handle: &str) -> Result<(), Error> {
-        // Length check: 3-64 characters (single char handled by regex)
-        if handle.len() < 2 || handle.len() > 64 {
+    /// Check if a handle is a default handle (subdomain of the instance domain)
+    pub fn is_default_handle(handle: &str) -> bool {
+        let domain = &env().handle.domain;
+        handle.ends_with(&format!(".{}", domain))
+    }
+
+    /// Extract the username from a default handle
+    /// e.g., "hayley.mikoto.io" -> Some("hayley")
+    pub fn extract_username(handle: &str) -> Option<&str> {
+        let domain = &env().handle.domain;
+        let suffix = format!(".{}", domain);
+        handle.strip_suffix(&suffix)
+    }
+
+    /// Create a default handle from a username
+    /// e.g., "hayley" -> "hayley.mikoto.io"
+    pub fn make_default_handle(username: &str) -> String {
+        format!("{}.{}", username, env().handle.domain)
+    }
+
+    /// Validate a username (the portion before the instance domain)
+    pub fn validate_username(username: &str) -> Result<(), Error> {
+        // Length check: 2-64 characters
+        if username.len() < 2 || username.len() > 64 {
             return Err(Error::new(
                 "InvalidHandle",
                 axum::http::StatusCode::BAD_REQUEST,
-                "Handle must be between 2 and 64 characters",
+                "Username must be between 2 and 64 characters",
             ));
         }
 
         // Must be lowercase
-        if handle != handle.to_lowercase() {
+        if username != username.to_lowercase() {
             return Err(Error::new(
                 "InvalidHandle",
                 axum::http::StatusCode::BAD_REQUEST,
-                "Handle must be lowercase",
+                "Username must be lowercase",
             ));
         }
 
         // Pattern check: alphanumeric + hyphens/underscores, cannot start/end with hyphen or underscore
-        if !HANDLE_REGEX.is_match(handle) {
+        if !USERNAME_REGEX.is_match(username) {
             return Err(Error::new(
                 "InvalidHandle",
                 axum::http::StatusCode::BAD_REQUEST,
-                "Handle must contain only lowercase letters, numbers, hyphens, and underscores, and cannot start or end with a hyphen or underscore",
+                "Username must contain only lowercase letters, numbers, hyphens, and underscores, and cannot start or end with a hyphen or underscore",
             ));
         }
 
         Ok(())
+    }
+
+    /// Validate a custom domain handle
+    pub fn validate_custom_domain(domain: &str) -> Result<(), Error> {
+        // Max domain length
+        if domain.len() > 253 {
+            return Err(Error::new(
+                "InvalidHandle",
+                axum::http::StatusCode::BAD_REQUEST,
+                "Domain name is too long",
+            ));
+        }
+
+        // Must be lowercase
+        if domain != domain.to_lowercase() {
+            return Err(Error::new(
+                "InvalidHandle",
+                axum::http::StatusCode::BAD_REQUEST,
+                "Domain must be lowercase",
+            ));
+        }
+
+        // Check if it's a valid domain name format
+        if !DOMAIN_REGEX.is_match(domain) {
+            return Err(Error::new(
+                "InvalidHandle",
+                axum::http::StatusCode::BAD_REQUEST,
+                "Invalid domain format. Must be a valid domain name without protocol or path",
+            ));
+        }
+
+        // Cannot be a subdomain of the instance handle domain (use default handles for that)
+        let handle_domain = &env().handle.domain;
+        if domain.ends_with(&format!(".{}", handle_domain)) || domain == handle_domain.as_str() {
+            return Err(Error::new(
+                "InvalidHandle",
+                axum::http::StatusCode::BAD_REQUEST,
+                "Cannot use a subdomain of the instance domain as a custom handle. Use a default handle instead.",
+            ));
+        }
+
+        Ok(())
+    }
+
+    /// Validate a handle string (either default or custom domain)
+    pub fn validate(handle: &str) -> Result<(), Error> {
+        if Self::is_default_handle(handle) {
+            // For default handles, validate the username portion
+            if let Some(username) = Self::extract_username(handle) {
+                Self::validate_username(username)
+            } else {
+                Err(Error::new(
+                    "InvalidHandle",
+                    axum::http::StatusCode::BAD_REQUEST,
+                    "Invalid default handle format",
+                ))
+            }
+        } else {
+            // For custom handles, validate as domain
+            Self::validate_custom_domain(handle)
+        }
+    }
+
+    /// Whether this handle is verified (custom domain that passed verification)
+    pub fn is_verified(&self) -> bool {
+        self.verified_at.is_some()
     }
 
     /// Claim a handle for a user
@@ -335,6 +445,7 @@ impl Handle {
         Some(HandleResolution {
             handle: self.handle.clone(),
             owner,
+            verified_at: self.verified_at,
             created_at: self.created_at,
         })
     }
@@ -345,29 +456,52 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_valid_handles() {
-        assert!(Handle::validate("rust-lang").is_ok());
-        assert!(Handle::validate("user123").is_ok());
-        assert!(Handle::validate("my_handle").is_ok());
-        assert!(Handle::validate("a1").is_ok());
-        assert!(Handle::validate("test-user_123").is_ok());
+    fn test_valid_usernames() {
+        assert!(Handle::validate_username("rust-lang").is_ok());
+        assert!(Handle::validate_username("user123").is_ok());
+        assert!(Handle::validate_username("my_handle").is_ok());
+        assert!(Handle::validate_username("a1").is_ok());
+        assert!(Handle::validate_username("test-user_123").is_ok());
     }
 
     #[test]
-    fn test_invalid_handles() {
+    fn test_invalid_usernames() {
         // Too short
-        assert!(Handle::validate("a").is_err());
+        assert!(Handle::validate_username("a").is_err());
 
         // Starts with hyphen
-        assert!(Handle::validate("-user").is_err());
+        assert!(Handle::validate_username("-user").is_err());
 
         // Ends with underscore
-        assert!(Handle::validate("user_").is_err());
+        assert!(Handle::validate_username("user_").is_err());
 
         // Contains uppercase
-        assert!(Handle::validate("User").is_err());
+        assert!(Handle::validate_username("User").is_err());
 
         // Contains invalid characters
-        assert!(Handle::validate("user@name").is_err());
+        assert!(Handle::validate_username("user@name").is_err());
+    }
+
+    #[test]
+    fn test_valid_custom_domains() {
+        assert!(Handle::validate_custom_domain("hayley.moe").is_ok());
+        assert!(Handle::validate_custom_domain("rust-lang.org").is_ok());
+        assert!(Handle::validate_custom_domain("example.co.uk").is_ok());
+        assert!(Handle::validate_custom_domain("a1.com").is_ok());
+    }
+
+    #[test]
+    fn test_invalid_custom_domains() {
+        // No TLD
+        assert!(Handle::validate_custom_domain("example").is_err());
+
+        // Contains uppercase
+        assert!(Handle::validate_custom_domain("Example.com").is_err());
+
+        // Invalid characters
+        assert!(Handle::validate_custom_domain("example@.com").is_err());
+
+        // Just TLD
+        assert!(Handle::validate_custom_domain(".com").is_err());
     }
 }

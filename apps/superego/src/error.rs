@@ -164,4 +164,14 @@ impl From<ImageError> for Error {
     }
 }
 
+impl From<reqwest::Error> for Error {
+    fn from(err: reqwest::Error) -> Self {
+        Self::Miscallaneous {
+            code: "NetworkError".to_string(),
+            status: StatusCode::BAD_GATEWAY,
+            message: err.to_string(),
+        }
+    }
+}
+
 pub type Result<T, E = Error> = std::result::Result<T, E>;

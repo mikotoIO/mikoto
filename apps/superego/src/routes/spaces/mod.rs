@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use aide::axum::routing::{delete_with, get_with, patch_with, post_with};
 use axum::{extract::Path, Json};
+use chrono::Utc;
 use schemars::JsonSchema;
 use tokio::sync::RwLock;
 use uuid::Uuid;
@@ -11,6 +12,10 @@ use crate::{
     entities::{Handle, Invite, MemberExt, MemberKey, Space, SpaceExt, SpacePatch, SpaceUser},
     error::Error,
     functions::{
+        handle_verification::{
+            create_attestation, generate_challenge, verify_handle, VerificationChallenge,
+            VerificationResult, VerifyHandleRequest,
+        },
         jwt::Claims,
         permissions::{permissions_or_admin, Permission},
         pubsub::emit_event,
@@ -119,8 +124,25 @@ async fn update(
             // Empty string means release the handle
             Handle::release_for_space(space_id, db()).await?;
         } else {
-            // Change or claim the handle
-            Handle::change_space_handle(space_id, new_handle.clone(), db()).await?;
+            // Determine the full handle
+            let full_handle = if !new_handle.contains('.') {
+                // Plain name -> create default handle (e.g., "rust-lang" -> "rust-lang.mikoto.io")
+                Handle::validate_username(new_handle)?;
+                Handle::make_default_handle(new_handle)
+            } else if Handle::is_default_handle(new_handle) {
+                // Already a default handle, validate and use as-is
+                Handle::validate(new_handle)?;
+                new_handle.clone()
+            } else {
+                // Looks like a custom domain - must go through verification
+                return Err(Error::new(
+                    "CustomDomainRequiresVerification",
+                    axum::http::StatusCode::BAD_REQUEST,
+                    "Custom domain handles require verification. Use the /:spaceId/handle/verify endpoint to verify your domain.",
+                ));
+            };
+
+            Handle::change_space_handle(space_id, full_handle, db()).await?;
         }
     }
 
@@ -175,6 +197,82 @@ async fn leave(Path(space_id): Path<Uuid>, claims: Claims) -> Result<Json<()>, E
     Ok(().into())
 }
 
+/// Start the custom domain verification process for a space
+async fn start_handle_verification(
+    Path(space_id): Path<Uuid>,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
+    Json(body): Json<VerifyHandleRequest>,
+) -> Result<Json<VerificationChallenge>, Error> {
+    permissions_or_admin(&space, &member, Permission::MANAGE_SPACE)?;
+
+    // Validate this is a custom domain (not a default handle)
+    Handle::validate_custom_domain(&body.handle)?;
+
+    // Generate a challenge
+    let challenge = generate_challenge(&body.handle, "space", space_id)?;
+
+    Ok(challenge.into())
+}
+
+/// Complete the custom domain verification for a space
+async fn complete_handle_verification(
+    Path(space_id): Path<Uuid>,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
+    Json(body): Json<VerifyHandleRequest>,
+) -> Result<Json<VerificationResult>, Error> {
+    permissions_or_admin(&space, &member, Permission::MANAGE_SPACE)?;
+
+    // Validate this is a custom domain
+    Handle::validate_custom_domain(&body.handle)?;
+
+    // Verify the domain
+    let result = verify_handle(&body.handle, "space", space_id).await?;
+
+    if result.success {
+        // Create attestation and update the handle
+        let attestation = create_attestation(&body.handle, "space", space_id, None)?;
+        let attestation_json = serde_json::to_value(&attestation)?;
+
+        // Atomically replace the handle with the verified custom domain
+        sqlx::query(
+            r#"
+            WITH deleted AS (
+                DELETE FROM "Handle" WHERE "spaceId" = $1
+            )
+            INSERT INTO "Handle" (handle, "spaceId", "verifiedAt", attestation)
+            VALUES ($2, $1, $3, $4)
+            "#,
+        )
+        .bind(space_id)
+        .bind(&body.handle)
+        .bind(Utc::now().naive_utc())
+        .bind(&attestation_json)
+        .execute(db())
+        .await
+        .map_err(|e| match e {
+            sqlx::Error::Database(ref db_err) if db_err.is_unique_violation() => Error::new(
+                "HandleTaken",
+                axum::http::StatusCode::CONFLICT,
+                "This handle is already taken",
+            ),
+            _ => Error::from(e),
+        })?;
+
+        let space = Space::find_by_id(space_id, db()).await?;
+        let space = SpaceExt::dataload_one(space, db()).await?;
+        emit_event(
+            "spaces.onUpdate",
+            &space,
+            &format!("space:{}", space.base.id),
+        )
+        .await?;
+    }
+
+    Ok(result.into())
+}
+
 static TAG: &str = "Spaces";
 
 pub fn router() -> AppRouter<State> {
@@ -223,6 +321,24 @@ pub fn router() -> AppRouter<State> {
             "/:spaceId/leave",
             delete_with(leave, |o| {
                 o.tag(TAG).id("spaces.leave").summary("Leave Space")
+            }),
+        )
+        .route(
+            "/:spaceId/handle/verify",
+            post_with(start_handle_verification, |o| {
+                o.tag(TAG)
+                    .id("spaces.startHandleVerification")
+                    .summary("Start Custom Domain Verification")
+                    .description("Generates a verification challenge for a custom domain handle. Returns the DNS TXT record and well-known file content to add for verification.")
+            }),
+        )
+        .route(
+            "/:spaceId/handle/verify/complete",
+            post_with(complete_handle_verification, |o| {
+                o.tag(TAG)
+                    .id("spaces.completeHandleVerification")
+                    .summary("Complete Custom Domain Verification")
+                    .description("Verifies the custom domain by checking DNS TXT records or well-known files. On success, updates the space's handle to the verified domain.")
             }),
         )
         .ws_event(

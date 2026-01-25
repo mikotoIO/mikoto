@@ -252,7 +252,7 @@ Use the permission functions in `src/functions/permissions.rs`:
 use crate::functions::permissions::{permissions, Permissions};
 
 async fn admin_action(claim: Claims, Load(space): Load<SpaceExt>) -> Result<Json<()>> {
-    permissions(&claim, &space, Permissions::ADMIN)?;`
+    permissions(&claim, &space, Permissions::ADMIN)?;
     // ... admin-only logic
 }
 ```
@@ -350,6 +350,7 @@ This uses `openapi-zod-client` to generate Zod schemas and API client types in `
 ### When to Regenerate
 
 Regenerate after any changes to:
+
 - Route handlers (new endpoints, changed paths)
 - Request/response types (entities, payloads)
 - API documentation annotations

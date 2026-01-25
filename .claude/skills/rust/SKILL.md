@@ -252,7 +252,7 @@ Use the permission functions in `src/functions/permissions.rs`:
 use crate::functions::permissions::{permissions, Permissions};
 
 async fn admin_action(claim: Claims, Load(space): Load<SpaceExt>) -> Result<Json<()>> {
-    permissions(&claim, &space, Permissions::ADMIN)?;
+    permissions(&claim, &space, Permissions::ADMIN)?;`
     // ... admin-only logic
 }
 ```
@@ -325,6 +325,53 @@ mod tests {
 - **Avoid blocking in async code** - Use `tokio::task::spawn_blocking` for CPU-intensive work.
 - **Batch database operations** - Use `dataload` patterns and batch inserts/updates when possible.
 
+## OpenAPI Schema Generation
+
+The backend uses `aide` to automatically generate OpenAPI documentation from route definitions. When you add or modify routes, entities, or API payloads, you need to regenerate the schema and frontend types.
+
+### Regenerating the API Schema
+
+```bash
+just dump-api  # Generates apps/superego/api.json
+```
+
+This runs the `dump_api` binary (`src/bin/dump_api.rs`) which builds the router and extracts the OpenAPI schema without starting the server.
+
+### Regenerating Frontend Types
+
+After updating `api.json`, regenerate the TypeScript types:
+
+```bash
+cd packages/mikoto.js && pnpm run generate
+```
+
+This uses `openapi-zod-client` to generate Zod schemas and API client types in `packages/mikoto.js/src/api.gen.ts`.
+
+### When to Regenerate
+
+Regenerate after any changes to:
+- Route handlers (new endpoints, changed paths)
+- Request/response types (entities, payloads)
+- API documentation annotations
+- WebSocket events or commands
+
+### Full Workflow
+
+```bash
+# 1. Make backend changes
+# 2. Verify Rust compiles
+moon superego:typecheck
+
+# 3. Regenerate API schema
+just dump-api
+
+# 4. Regenerate frontend types
+cd packages/mikoto.js && pnpm run generate
+
+# 5. Verify everything compiles
+moon :typecheck
+```
+
 ## Common Commands
 
 ```bash
@@ -337,4 +384,5 @@ cargo run -p superego    # Run just the Rust server
 cargo test -p superego   # Run Rust tests only
 cargo check -p superego  # Quick compilation check
 just new-migration name  # Create new migration
+just dump-api            # Regenerate OpenAPI schema
 ```

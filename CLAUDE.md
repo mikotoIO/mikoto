@@ -66,6 +66,7 @@ Check `ARCHITECTURE.md`.
 - Before adding any new package, use the rustdoc crate search to check for the version.
 - Instead of reading the migrations, you can read schema.sql for the up-to-date dump of the database schema.
 - at the end of your task, run moon :typecheck to check both Rust and TypeScript parts of the codebase.
+- the main branch is named `dev`, not `main`.
 
 # Skills
 

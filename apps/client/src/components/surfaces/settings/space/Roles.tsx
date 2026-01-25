@@ -173,10 +173,11 @@ function RoleEditor({ role, space }: { space: MikotoSpace; role: Role }) {
       {role.name !== '@everyone' && (
         <>
           <Field label="Role Name">
-            <Input {...form.register('name')} />
+            <Input autoComplete="off" {...form.register('name')} />
           </Field>
           <Field label="Role Priority">
             <Input
+              autoComplete="off"
               type="number"
               min={0}
               max={99}

@@ -42,7 +42,7 @@ function AddBotModal({ space }: { space: MikotoSpace }) {
         })}
       >
         <Field label="Bot ID">
-          <Input {...form.register('botId')} />
+          <Input autoComplete="off" {...form.register('botId')} />
         </Field>
         <Button type="submit" colorPalette="primary">
           Submit
@@ -76,6 +76,7 @@ function Overview({ space }: { space: MikotoSpace }) {
 
         <Field label="Space Name">
           <Input
+            autoComplete="off"
             value={spaceName}
             onChange={(x) => setSpaceName(x.target.value)}
           />

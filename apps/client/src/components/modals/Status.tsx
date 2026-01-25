@@ -20,7 +20,7 @@ export function SetStatusModal() {
         })}
       >
         <Field label="Your Status">
-          <Input {...form.register('status')} />
+          <Input autoComplete="off" {...form.register('status')} />
         </Field>
 
         <Button colorPalette="primary" type="submit">

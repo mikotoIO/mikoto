@@ -32,7 +32,7 @@ function SpaceCreateForm({ closeModal }: { closeModal: () => void }) {
       })}
     >
       <Field label="Space Name">
-        <Input placeholder="Academy City" {...form.register('spaceName')} />
+        <Input autoComplete="off" placeholder="Academy City" {...form.register('spaceName')} />
       </Field>
       <Button colorPalette="primary" type="submit">
         Create Space
@@ -62,7 +62,7 @@ function SpaceJoinForm({ closeModal }: { closeModal: () => void }) {
     >
       {error.el}
       <Field label="Invite Link/Code">
-        <Input {...register('inviteCode')} />
+        <Input autoComplete="off" {...register('inviteCode')} />
       </Field>
       <Button>Join Space</Button>
     </Form>

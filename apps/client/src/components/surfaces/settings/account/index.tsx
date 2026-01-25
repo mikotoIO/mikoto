@@ -93,7 +93,7 @@ function NameChangeModal() {
         })}
       >
         <Field label="New Name">
-          <Input {...register('name')} />
+          <Input autoComplete="off" {...register('name')} />
         </Field>
         <Button type="submit" colorPalette="primary">
           Change Name
@@ -161,6 +161,7 @@ function Overview() {
       >
         <Field label="User description" mt={4} fontSize="">
           <Textarea
+            autoComplete="off"
             h={160}
             backgroundColor="gray.750"
             {...register('description')}

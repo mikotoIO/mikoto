@@ -31,10 +31,10 @@ function General({ channel }: { channel: MikotoChannel }) {
         })}
       >
         <Field label="Channel Name">
-          <Input {...form.register('name')} />
+          <Input autoComplete="off" {...form.register('name')} />
         </Field>
         <Field label="Description">
-          <Textarea h={200} {...form.register('description')} />
+          <Textarea autoComplete="off" h={200} {...form.register('description')} />
         </Field>
 
         <Button type="submit">Save</Button>

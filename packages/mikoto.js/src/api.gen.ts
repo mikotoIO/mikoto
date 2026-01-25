@@ -62,17 +62,31 @@ export type Bot = z.infer<typeof Bot>;
 export const CreateBotPayload = z.object({ name: z.string() });
 export type CreateBotPayload = z.infer<typeof CreateBotPayload>;
 
+export const HandleOwner = z.union([
+  z.object({ id: z.string().uuid(), type: z.literal("user") }),
+  z.object({ id: z.string().uuid(), type: z.literal("space") }),
+]);
+export type HandleOwner = z.infer<typeof HandleOwner>;
+
+export const HandleResolution = z.object({
+  createdAt: z.string(),
+  handle: z.string(),
+  owner: HandleOwner,
+});
+export type HandleResolution = z.infer<typeof HandleResolution>;
+
 export const UserCategory = z.enum(["BOT", "UNVERIFIED"]);
 export type UserCategory = z.infer<typeof UserCategory>;
 
-export const User = z.object({
+export const UserExt = z.object({
   avatar: z.union([z.string(), z.null()]).optional(),
   category: z.union([UserCategory, z.null()]).optional(),
   description: z.union([z.string(), z.null()]).optional(),
+  handle: z.union([z.string(), z.null()]).optional(),
   id: z.string().uuid(),
   name: z.string(),
 });
-export type User = z.infer<typeof User>;
+export type UserExt = z.infer<typeof UserExt>;
 
 export const UserPatch = z
   .object({
@@ -82,6 +96,9 @@ export const UserPatch = z
   })
   .partial();
 export type UserPatch = z.infer<typeof UserPatch>;
+
+export const HandlePayload = z.object({ handle: z.string() });
+export type HandlePayload = z.infer<typeof HandlePayload>;
 
 export const RelationState = z.enum([
   "NONE",
@@ -100,6 +117,15 @@ export const Relationship = z.object({
   userId: z.string().uuid(),
 });
 export type Relationship = z.infer<typeof Relationship>;
+
+export const User = z.object({
+  avatar: z.union([z.string(), z.null()]).optional(),
+  category: z.union([UserCategory, z.null()]).optional(),
+  description: z.union([z.string(), z.null()]).optional(),
+  id: z.string().uuid(),
+  name: z.string(),
+});
+export type User = z.infer<typeof User>;
 
 export const Timestamp = z.string();
 export type Timestamp = z.infer<typeof Timestamp>;
@@ -325,11 +351,15 @@ export const schemas = {
   ResetPasswordConfirmData,
   Bot,
   CreateBotPayload,
+  HandleOwner,
+  HandleResolution,
   UserCategory,
-  User,
+  UserExt,
   UserPatch,
+  HandlePayload,
   RelationState,
   Relationship,
+  User,
   Timestamp,
   ChannelType,
   Channel,
@@ -477,6 +507,13 @@ const endpoints = makeApi([
       },
     ],
     response: Bot,
+  },
+  {
+    method: "get",
+    path: "/handles/:handle",
+    alias: "handles.resolve",
+    requestFormat: "json",
+    response: HandleResolution,
   },
   {
     method: "get",
@@ -852,7 +889,7 @@ const endpoints = makeApi([
     path: "/users/me",
     alias: "user.get",
     requestFormat: "json",
-    response: User,
+    response: UserExt,
   },
   {
     method: "patch",
@@ -866,7 +903,28 @@ const endpoints = makeApi([
         schema: UserPatch,
       },
     ],
-    response: User,
+    response: UserExt,
+  },
+  {
+    method: "post",
+    path: "/users/me/handle",
+    alias: "user.setHandle",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: z.object({ handle: z.string() }),
+      },
+    ],
+    response: UserExt,
+  },
+  {
+    method: "delete",
+    path: "/users/me/handle",
+    alias: "user.deleteHandle",
+    requestFormat: "json",
+    response: UserExt,
   },
 ]);
 
@@ -897,9 +955,9 @@ export const websocketEvents = {
   "spaces.onCreate": SpaceExt,
   "spaces.onDelete": SpaceExt,
   "spaces.onUpdate": SpaceExt,
-  "users.onCreate": User,
+  "users.onCreate": UserExt,
   "users.onDelete": ObjectWithId,
-  "users.onUpdate": User,
+  "users.onUpdate": UserExt,
 };
 
 export type Api = typeof api;

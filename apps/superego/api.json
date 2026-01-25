@@ -262,6 +262,27 @@
         }
       }
     },
+    "/handles/{handle}": {
+      "get": {
+        "tags": [
+          "Handles"
+        ],
+        "summary": "Resolve a Handle",
+        "operationId": "handles.resolve",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HandleResolution"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/users/me": {
       "get": {
         "tags": [
@@ -275,7 +296,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/UserExt"
                 }
               }
             }
@@ -304,7 +325,57 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/UserExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me/handle": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Set or Change User Handle",
+        "operationId": "user.setHandle",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HandlePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserExt"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Release User Handle",
+        "operationId": "user.deleteHandle",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserExt"
                 }
               }
             }
@@ -1473,6 +1544,81 @@
           }
         }
       },
+      "HandleOwner": {
+        "description": "Represents what entity type owns a handle",
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "user"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "space"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "HandlePayload": {
+        "type": "object",
+        "required": [
+          "handle"
+        ],
+        "properties": {
+          "handle": {
+            "type": "string"
+          }
+        }
+      },
+      "HandleResolution": {
+        "description": "Response for handle resolution",
+        "type": "object",
+        "required": [
+          "createdAt",
+          "handle",
+          "owner"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "partial-date-time"
+          },
+          "handle": {
+            "type": "string"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/HandleOwner"
+          }
+        }
+      },
       "IndexResponse": {
         "type": "object",
         "required": [
@@ -2056,6 +2202,7 @@
             }
           },
           "handle": {
+            "description": "The space's handle (if claimed)",
             "type": [
               "string",
               "null"
@@ -2190,6 +2337,52 @@
           "UNVERIFIED"
         ]
       },
+      "UserExt": {
+        "description": "User with extended data including handle",
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "avatar": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserCategory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "handle": {
+            "description": "The user's handle (if claimed)",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "UserPatch": {
         "type": "object",
         "properties": {
@@ -2291,13 +2484,13 @@
         "$ref": "#/components/schemas/SpaceExt"
       },
       "users.onCreate": {
-        "$ref": "#/components/schemas/User"
+        "$ref": "#/components/schemas/UserExt"
       },
       "users.onDelete": {
         "$ref": "#/components/schemas/ObjectWithId"
       },
       "users.onUpdate": {
-        "$ref": "#/components/schemas/User"
+        "$ref": "#/components/schemas/UserExt"
       }
     }
   }

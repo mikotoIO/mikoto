@@ -3,7 +3,7 @@ use uuid::Uuid;
 
 use crate::{db_entity_delete, db_enum, db_find_by_id, entities::Role, entity, error::Error};
 
-use super::Channel;
+use super::{Channel, Handle};
 
 db_enum!(
     #[sqlx(type_name = "\"SpaceType\"")]
@@ -21,7 +21,6 @@ entity!(
         pub name: String,
         pub icon: Option<String>,
         pub owner_id: Option<Uuid>,
-        pub handle: Option<String>,
 
         #[serde(rename = "type")]
         #[sqlx(rename = "type")]
@@ -36,6 +35,8 @@ entity!(
 pub struct SpaceExt {
     #[serde(flatten)]
     pub base: Space,
+    /// The space's handle (if claimed)
+    pub handle: Option<String>,
     pub roles: Vec<Role>,
     pub channels: Vec<Channel>,
 }
@@ -45,7 +46,6 @@ pub struct SpacePatch {
     pub name: Option<String>,
     pub icon: Option<String>,
     pub owner_id: Option<Uuid>,
-    pub handle: Option<String>,
 }
 
 impl Space {
@@ -55,7 +55,6 @@ impl Space {
             name,
             icon: None,
             owner_id: Some(owner_id),
-            handle: None,
             space_type: SpaceType::None,
         }
     }
@@ -92,8 +91,8 @@ impl Space {
                 VALUES (gen_random_uuid(), $1, '@everyone', -1, '0')
                 RETURNING "id"
             )
-            INSERT INTO "Space" ("id", "name", "icon", "ownerId", "type", "handle")
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO "Space" ("id", "name", "icon", "ownerId", "type")
+            VALUES ($1, $2, $3, $4, $5)
             "##,
         )
         .bind(self.id)
@@ -101,7 +100,6 @@ impl Space {
         .bind(&self.icon)
         .bind(self.owner_id)
         .bind(self.space_type)
-        .bind(&self.handle)
         .execute(db)
         .await?;
         Ok(())
@@ -117,8 +115,7 @@ impl Space {
             UPDATE "Space" SET
             "name" = COALESCE($2, "name"),
             "icon" = COALESCE($3, "icon"),
-            "ownerId" = COALESCE($4, "ownerId"),
-            "handle" = COALESCE($5, "handle")
+            "ownerId" = COALESCE($4, "ownerId")
             WHERE "id" = $1
             RETURNING *
             "##,
@@ -127,7 +124,6 @@ impl Space {
         .bind(&patch.name)
         .bind(&patch.icon)
         .bind(patch.owner_id)
-        .bind(&patch.handle)
         .fetch_optional(db)
         .await?
         .ok_or(Error::NotFound)?;
@@ -142,11 +138,15 @@ impl SpaceExt {
         space: Space,
         db: X,
     ) -> Result<Self, Error> {
-        let (channels, roles) =
-            tokio::try_join!(Channel::list(space.id, db), Role::list(space.id, db))?;
+        let (channels, roles, handle) = tokio::try_join!(
+            Channel::list(space.id, db),
+            Role::list(space.id, db),
+            Handle::for_space(space.id, db)
+        )?;
 
         Ok(SpaceExt {
             base: space,
+            handle: handle.map(|h| h.handle),
             channels,
             roles,
         })
@@ -156,9 +156,12 @@ impl SpaceExt {
         spaces: Vec<Space>,
         db: X,
     ) -> Result<Vec<Self>, Error> {
-        let (mut channels, mut roles) = tokio::try_join!(
-            Channel::dataload_space(spaces.iter().map(|s| s.id).collect(), db),
-            Role::dataload_space(spaces.iter().map(|s| s.id).collect(), db),
+        let space_ids: Vec<Uuid> = spaces.iter().map(|s| s.id).collect();
+
+        let (mut channels, mut roles, handles) = tokio::try_join!(
+            Channel::dataload_space(space_ids.clone(), db),
+            Role::dataload_space(space_ids.clone(), db),
+            Handle::for_spaces(&space_ids, db),
         )?;
 
         let res = spaces
@@ -166,9 +169,11 @@ impl SpaceExt {
             .map(|space| {
                 let channels = channels.remove(&space.id).unwrap_or_default();
                 let roles = roles.remove(&space.id).unwrap_or_default();
+                let handle = handles.get(&space.id).cloned();
 
                 SpaceExt {
                     base: space,
+                    handle,
                     channels,
                     roles,
                 }

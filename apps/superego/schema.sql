@@ -176,6 +176,21 @@ CREATE TABLE public."Document" (
 ALTER TABLE public."Document" OWNER TO postgres;
 
 --
+-- Name: Handle; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Handle" (
+    handle character varying(64) NOT NULL,
+    "userId" uuid,
+    "spaceId" uuid,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT handle_single_owner CHECK ((("userId" IS NULL) <> ("spaceId" IS NULL)))
+);
+
+
+ALTER TABLE public."Handle" OWNER TO postgres;
+
+--
 -- Name: Invite; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -289,8 +304,7 @@ CREATE TABLE public."Space" (
     name character varying(64) NOT NULL,
     icon character varying(256),
     "ownerId" uuid,
-    type public."SpaceType" DEFAULT 'NONE'::public."SpaceType" NOT NULL,
-    handle character varying(64)
+    type public."SpaceType" DEFAULT 'NONE'::public."SpaceType" NOT NULL
 );
 
 
@@ -421,6 +435,14 @@ ALTER TABLE ONLY public."Channel"
 
 ALTER TABLE ONLY public."Document"
     ADD CONSTRAINT "Document_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: Handle Handle_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Handle"
+    ADD CONSTRAINT "Handle_pkey" PRIMARY KEY (handle);
 
 
 --
@@ -555,6 +577,20 @@ CREATE UNIQUE INDEX "Document_channelId_key" ON public."Document" USING btree ("
 
 
 --
+-- Name: Handle_spaceId_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "Handle_spaceId_idx" ON public."Handle" USING btree ("spaceId");
+
+
+--
+-- Name: Handle_userId_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "Handle_userId_idx" ON public."Handle" USING btree ("userId");
+
+
+--
 -- Name: MessageAttachment_messageId_idx; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -622,13 +658,6 @@ CREATE INDEX "SpaceUser_spaceId_idx" ON public."SpaceUser" USING btree ("spaceId
 --
 
 CREATE UNIQUE INDEX "SpaceUser_userId_spaceId_key" ON public."SpaceUser" USING btree ("userId", "spaceId");
-
-
---
--- Name: Space_handle_key; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE UNIQUE INDEX "Space_handle_key" ON public."Space" USING btree (handle);
 
 
 --
@@ -731,6 +760,22 @@ ALTER TABLE ONLY public."Channel"
 
 ALTER TABLE ONLY public."Document"
     ADD CONSTRAINT "Document_channelId_fkey" FOREIGN KEY ("channelId") REFERENCES public."Channel"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: Handle Handle_spaceId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Handle"
+    ADD CONSTRAINT "Handle_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES public."Space"(id) ON DELETE CASCADE;
+
+
+--
+-- Name: Handle Handle_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Handle"
+    ADD CONSTRAINT "Handle_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."User"(id) ON DELETE CASCADE;
 
 
 --

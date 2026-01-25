@@ -8,7 +8,7 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Invite, MemberExt, MemberKey, Space, SpaceExt, SpacePatch, SpaceUser},
+    entities::{Handle, Invite, MemberExt, MemberKey, Space, SpaceExt, SpacePatch, SpaceUser},
     error::Error,
     functions::{
         jwt::Claims,
@@ -41,12 +41,11 @@ pub struct SpaceUpdatePayload {
     pub handle: Option<String>,
 }
 
-impl From<SpaceUpdatePayload> for SpacePatch {
-    fn from(body: SpaceUpdatePayload) -> Self {
-        Self {
-            name: body.name,
-            icon: body.icon,
-            handle: body.handle,
+impl SpaceUpdatePayload {
+    fn to_patch(&self) -> SpacePatch {
+        SpacePatch {
+            name: self.name.clone(),
+            icon: self.icon.clone(),
             ..Default::default()
         }
     }
@@ -112,11 +111,21 @@ async fn update(
     Load(member): Load<MemberExt>,
     Json(body): Json<SpaceUpdatePayload>,
 ) -> Result<Json<SpaceExt>, Error> {
-    // TODO: Check update rights
     permissions_or_admin(&space, &member, Permission::MANAGE_SPACE)?;
 
+    // Update handle if provided
+    if let Some(ref new_handle) = body.handle {
+        if new_handle.is_empty() {
+            // Empty string means release the handle
+            Handle::release_for_space(space_id, db()).await?;
+        } else {
+            // Change or claim the handle
+            Handle::change_space_handle(space_id, new_handle.clone(), db()).await?;
+        }
+    }
+
     let space = Space::find_by_id(space_id, db()).await?;
-    let space = space.update(body.into(), db()).await?;
+    let space = space.update(body.to_patch(), db()).await?;
     let space = SpaceExt::dataload_one(space, db()).await?;
     emit_event(
         "spaces.onUpdate",

@@ -20,6 +20,7 @@ pub mod account;
 pub mod bots;
 pub mod cdn;
 pub mod channels;
+pub mod handles;
 pub mod router;
 pub mod spaces;
 pub mod users;
@@ -57,6 +58,7 @@ fn build_app_router() -> AppRouter<State> {
                 .nest("/account", account::router())
                 .nest("/bots", bots::router())
                 .nest("/cdn", cdn::router())
+                .nest("/handles", handles::router().http)
         })
         .nest("users", "/users", users::router())
         .nest("relations", "/relations", users::relations::router())

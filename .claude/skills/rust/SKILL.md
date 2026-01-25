@@ -252,7 +252,7 @@ Use the permission functions in `src/functions/permissions.rs`:
 use crate::functions::permissions::{permissions, Permissions};
 
 async fn admin_action(claim: Claims, Load(space): Load<SpaceExt>) -> Result<Json<()>> {
-    permissions(&claim, &space, Permissions::ADMIN)?;`
+    permissions(&claim, &space, Permissions::ADMIN)?;
     // ... admin-only logic
 }
 ```

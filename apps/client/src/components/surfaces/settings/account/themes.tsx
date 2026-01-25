@@ -33,7 +33,7 @@ export function ThemesSubsurface() {
         </Field> */}
 
         <Field label="Color">
-          <Input {...form.register('accent')} />
+          <Input autoComplete="off" {...form.register('accent')} />
         </Field>
         <HexColorPicker
           color={form.getValues('accent')}

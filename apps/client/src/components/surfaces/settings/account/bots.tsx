@@ -96,7 +96,7 @@ function BotCreateModal() {
       >
         <h1>Create Bot</h1>
         <Field label="Bot Name">
-          <Input {...register('name', { required: true })} />
+          <Input autoComplete="off" {...register('name', { required: true })} />
         </Field>
         <Button colorPalette="primary" type="submit">
           Create Bot

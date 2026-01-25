@@ -11,7 +11,7 @@ export function SearchSurface({ spaceId: _spaceId }: { spaceId: string }) {
       <TabName name="Search" icon={faMagnifyingGlass} />
       <Heading size="2xl">Search</Heading>
       <Form>
-        <Input placeholder="Search" />
+        <Input autoComplete="off" placeholder="Search" />
       </Form>
     </Surface>
   );

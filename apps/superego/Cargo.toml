@@ -3,6 +3,22 @@ name = "superego"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "superego"
+path = "src/lib.rs"
+
+[[bin]]
+name = "superego"
+path = "src/main.rs"
+
+[[bin]]
+name = "migrate"
+path = "src/bin/migrate.rs"
+
+[[bin]]
+name = "dump_api"
+path = "src/bin/dump_api.rs"
+
 [dependencies]
 
 # the basic dependencies
@@ -39,6 +55,7 @@ aide = { version = "0.13.5", features = [
 ] }
 
 itertools = "0.14.0"
+regex = "1.12.2"
 bcrypt = "0.17.1"
 jsonwebtoken = "9.3.0"
 sha3 = "0.10.8"

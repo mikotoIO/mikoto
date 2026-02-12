@@ -1,6 +1,6 @@
 import { Box, Flex } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { MikotoMember, Role, User } from '@mikoto-io/mikoto.js';
+import { MikotoMember, Role, UserExt } from '@mikoto-io/mikoto.js';
 import { permissions } from '@mikoto-io/permcheck';
 import { useSetAtom } from 'jotai';
 import { useRef, useState } from 'react';
@@ -110,7 +110,7 @@ export function MemberContextMenu({
   user,
   member,
 }: {
-  user: User;
+  user: UserExt;
   member?: MikotoMember;
 }) {
   const memberSnap = useMaybeSnapshot(member);
@@ -170,7 +170,7 @@ export function MemberContextMenu({
 }
 
 interface MessageAvatarProps extends AvatarProps {
-  user?: User;
+  user?: UserExt;
   member?: MikotoMember;
 }
 

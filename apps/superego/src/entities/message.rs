@@ -6,7 +6,7 @@ use crate::{
     db_entity_delete, db_find_by_id, entity, error::Error, functions::time::Timestamp, model,
 };
 
-use super::{Channel, MessageAttachment, User};
+use super::{Channel, Handle, MessageAttachment, User, UserExt};
 
 entity!(
     pub struct Message {
@@ -30,7 +30,7 @@ pub struct MessagePatch {
 pub struct MessageExt {
     #[serde(flatten)]
     pub base: Message,
-    pub author: Option<User>,
+    pub author: Option<UserExt>,
     pub attachments: Vec<MessageAttachment>,
 }
 
@@ -143,7 +143,8 @@ impl MessageExt {
         db: X,
     ) -> Result<Self, Error> {
         let author = if let Some(author_id) = message.author_id {
-            Some(User::find_by_id(author_id, db).await?)
+            let user = User::find_by_id(author_id, db).await?;
+            Some(UserExt::from_user(user, db).await?)
         } else {
             None
         };
@@ -160,7 +161,10 @@ impl MessageExt {
         db: X,
     ) -> Result<Vec<Self>, Error> {
         let author_ids: Vec<Uuid> = messages.iter().filter_map(|m| m.author_id).collect();
-        let authors = User::dataload(author_ids, db).await?;
+        let (authors, handles) = tokio::try_join!(
+            User::dataload(author_ids.clone(), db),
+            Handle::for_users(&author_ids, db),
+        )?;
 
         // Load all attachments for all messages
         let message_ids: Vec<Uuid> = messages.iter().map(|m| m.id).collect();
@@ -186,7 +190,16 @@ impl MessageExt {
             .into_iter()
             .map(|message| {
                 let author = if let Some(author_id) = message.author_id {
-                    authors.get(&author_id).cloned()
+                    authors.get(&author_id).cloned().map(|user| {
+                        let handle = handles
+                            .get(&author_id)
+                            .cloned()
+                            .unwrap_or_else(|| UserExt::default_handle(&user.name));
+                        UserExt {
+                            base: user,
+                            handle: Some(handle),
+                        }
+                    })
                 } else {
                     None
                 };

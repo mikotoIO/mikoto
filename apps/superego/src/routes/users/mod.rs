@@ -41,7 +41,10 @@ pub struct HandlePayload {
     pub handle: String,
 }
 
-async fn set_handle(claim: Claims, Json(body): Json<HandlePayload>) -> Result<Json<UserExt>, Error> {
+async fn set_handle(
+    claim: Claims,
+    Json(body): Json<HandlePayload>,
+) -> Result<Json<UserExt>, Error> {
     let user_id = claim.sub.parse()?;
 
     // Determine the full handle

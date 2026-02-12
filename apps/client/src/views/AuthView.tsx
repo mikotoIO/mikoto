@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Turnstile } from '@marsidev/react-turnstile';
 import { useState } from 'react';
 import { Control, useController, useForm } from 'react-hook-form';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 
 import { faMikoto } from '@/components/icons';
 import { Button, Field } from '@/components/ui';

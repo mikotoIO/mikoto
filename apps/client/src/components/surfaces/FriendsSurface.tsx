@@ -28,7 +28,11 @@ export function FriendsSurface() {
         })}
       >
         <Field label="Friend ID">
-          <Input autoComplete="off" placeholder="Friend ID" {...form.register('friendId')} />
+          <Input
+            autoComplete="off"
+            placeholder="Friend ID"
+            {...form.register('friendId')}
+          />
         </Field>
         <Button type="submit" colorPalette="success">
           Send Friend Request (Debug)

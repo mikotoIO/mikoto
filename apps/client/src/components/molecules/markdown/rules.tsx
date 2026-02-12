@@ -9,7 +9,7 @@ export interface RuleOption<T> {
   order: number;
   match: MatchFunction;
   parse(capture: Capture, nestedParse: Parser, state: State): T;
-  react(node: T, _: any, state: any): JSX.Element;
+  react(node: T, _: any, state: any): React.JSX.Element;
 }
 
 export function createRule<T>(option: RuleOption<T>) {

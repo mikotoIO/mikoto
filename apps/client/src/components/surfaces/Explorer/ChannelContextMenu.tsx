@@ -108,7 +108,11 @@ export function CreateChannelModal({
             ))}
           </div>
           <Field label="Channel Name">
-            <Input autoComplete="off" placeholder="New Channel" {...register('name')} />
+            <Input
+              autoComplete="off"
+              placeholder="New Channel"
+              {...register('name')}
+            />
           </Field>
 
           <Button colorPalette="blue" type="submit">

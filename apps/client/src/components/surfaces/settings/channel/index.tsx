@@ -34,7 +34,11 @@ function General({ channel }: { channel: MikotoChannel }) {
           <Input autoComplete="off" {...form.register('name')} />
         </Field>
         <Field label="Description">
-          <Textarea autoComplete="off" h={200} {...form.register('description')} />
+          <Textarea
+            autoComplete="off"
+            h={200}
+            {...form.register('description')}
+          />
         </Field>
 
         <Button type="submit">Save</Button>

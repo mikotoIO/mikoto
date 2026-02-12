@@ -34,7 +34,7 @@ pub enum Error {
     #[error("{0}")]
     SerdeError(#[from] serde_json::Error),
 
-    #[error("Unknown internal server error")]
+    #[error("{message}")]
     InternalServerError { message: String },
 
     #[error("Wrong password")]

@@ -111,9 +111,10 @@ pub async fn verify_dns(handle: &str, entity_type: &str, entity_id: Uuid) -> Res
     let instance = &env().handle.domain;
 
     // Create resolver using system configuration
-    let resolver = Resolver::builder_tokio()
-        .map_err(|e| Error::internal(&format!("Failed to create DNS resolver: {}", e)))?
-        .build();
+    let resolver = match Resolver::builder_tokio() {
+        Ok(builder) => builder.build(),
+        Err(_) => return Ok(false),
+    };
 
     // Look up TXT records at _mikoto.domain.com
     let txt_name = format!("{}.{}.", DNS_TXT_PREFIX, handle);

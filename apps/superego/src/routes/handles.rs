@@ -1,7 +1,11 @@
 use aide::axum::routing::get_with;
 use axum::{extract::Path, Json};
 
-use crate::{db::db, entities::{Handle, HandleResolution}, error::Error};
+use crate::{
+    db::db,
+    entities::{Handle, HandleResolution},
+    error::Error,
+};
 
 use super::{router::AppRouter, ws::state::State};
 
@@ -23,9 +27,7 @@ pub fn router() -> AppRouter<State> {
     AppRouter::new().route(
         "/:handle",
         get_with(resolve, |o| {
-            o.tag(TAG)
-                .id("handles.resolve")
-                .summary("Resolve a Handle")
+            o.tag(TAG).id("handles.resolve").summary("Resolve a Handle")
         }),
     )
 }

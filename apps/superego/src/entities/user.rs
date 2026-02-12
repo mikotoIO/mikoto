@@ -127,7 +127,13 @@ impl UserExt {
         let sanitized: String = name
             .to_lowercase()
             .chars()
-            .map(|c| if c.is_ascii_alphanumeric() || c == '-' || c == '_' { c } else { '-' })
+            .map(|c| {
+                if c.is_ascii_alphanumeric() || c == '-' || c == '_' {
+                    c
+                } else {
+                    '-'
+                }
+            })
             .collect();
         let trimmed = sanitized.trim_matches('-').trim_matches('_');
         let username = if trimmed.is_empty() { "user" } else { trimmed };

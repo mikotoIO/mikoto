@@ -32,7 +32,11 @@ function SpaceCreateForm({ closeModal }: { closeModal: () => void }) {
       })}
     >
       <Field label="Space Name">
-        <Input autoComplete="off" placeholder="Academy City" {...form.register('spaceName')} />
+        <Input
+          autoComplete="off"
+          placeholder="Academy City"
+          {...form.register('spaceName')}
+        />
       </Field>
       <Button colorPalette="primary" type="submit">
         Create Space

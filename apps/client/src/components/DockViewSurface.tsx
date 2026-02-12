@@ -389,9 +389,7 @@ export const DockViewSurface = () => {
         const panelId = panel.id;
         const [kind, key] = panelId.split('/');
         setTabs((currentTabs) =>
-          currentTabs.filter(
-            (tab) => !(tab.kind === kind && tab.key === key),
-          ),
+          currentTabs.filter((tab) => !(tab.kind === kind && tab.key === key)),
         );
       });
 

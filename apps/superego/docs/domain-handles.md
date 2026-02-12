@@ -62,6 +62,7 @@ CREATE TABLE "Handle" (
 ### Setting Default Handles
 
 **Users:**
+
 ```
 POST /users/me/handle
 Content-Type: application/json
@@ -72,6 +73,7 @@ Content-Type: application/json
 ```
 
 **Spaces:**
+
 ```
 PATCH /spaces/:spaceId
 Content-Type: application/json
@@ -88,6 +90,7 @@ Plain usernames are automatically expanded to full default handles.
 #### Step 1: Start Verification
 
 **Users:**
+
 ```
 POST /users/me/handle/verify
 Content-Type: application/json
@@ -98,6 +101,7 @@ Content-Type: application/json
 ```
 
 **Spaces:**
+
 ```
 POST /spaces/:spaceId/handle/verify
 Content-Type: application/json
@@ -108,6 +112,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "handle": "hayley.moe",
@@ -129,6 +134,7 @@ Users can verify via either method:
 **Option A: DNS TXT Record**
 
 Add a TXT record at `_mikoto.hayley.moe`:
+
 ```
 v=1 home=mikoto.io user=550e8400-e29b-41d4-a716-446655440000 nonce=abc123...
 ```
@@ -136,6 +142,7 @@ v=1 home=mikoto.io user=550e8400-e29b-41d4-a716-446655440000 nonce=abc123...
 **Option B: Well-Known File**
 
 Host a file at `https://hayley.moe/.well-known/mikoto.json`:
+
 ```json
 {
   "home_instance": "mikoto.io",
@@ -147,6 +154,7 @@ Host a file at `https://hayley.moe/.well-known/mikoto.json`:
 #### Step 3: Complete Verification
 
 **Users:**
+
 ```
 POST /users/me/handle/verify/complete
 Content-Type: application/json
@@ -157,6 +165,7 @@ Content-Type: application/json
 ```
 
 **Spaces:**
+
 ```
 POST /spaces/:spaceId/handle/verify/complete
 Content-Type: application/json
@@ -167,10 +176,11 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
-  "method": "dns",  // or "well-known"
+  "method": "dns", // or "well-known"
   "error": null
 }
 ```
@@ -184,6 +194,7 @@ GET /.well-known/mikoto/instance.json
 ```
 
 **Response:**
+
 ```json
 {
   "domain": "mikoto.io",
@@ -212,6 +223,7 @@ When a custom domain is verified, an attestation is created and stored:
 The signature covers: `{handle}:{entity_type}:{entity_id}:{instance}:{verified_at}`
 
 Other instances can verify attestations by:
+
 1. Fetching the instance's public key from `/.well-known/mikoto/instance.json`
 2. Verifying the Ed25519 signature
 
@@ -222,6 +234,7 @@ GET /handles/:handle
 ```
 
 **Response:**
+
 ```json
 {
   "handle": "hayley.moe",
@@ -236,11 +249,11 @@ GET /handles/:handle
 
 ## Error Codes
 
-| Code | Status | Description |
-|------|--------|-------------|
-| `InvalidHandle` | 400 | Handle format is invalid |
-| `HandleTaken` | 409 | Handle is already claimed |
-| `CustomDomainRequiresVerification` | 400 | Custom domains cannot be set directly |
+| Code                               | Status | Description                           |
+| ---------------------------------- | ------ | ------------------------------------- |
+| `InvalidHandle`                    | 400    | Handle format is invalid              |
+| `HandleTaken`                      | 409    | Handle is already claimed             |
+| `CustomDomainRequiresVerification` | 400    | Custom domains cannot be set directly |
 
 ## Rust API
 

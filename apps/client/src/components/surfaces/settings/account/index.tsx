@@ -18,8 +18,8 @@ import { modalState } from '@/components/ContextMenu';
 import { userState } from '@/components/UserArea';
 import { AvatarEditor } from '@/components/molecules/AvatarEditor';
 import { BaseSettingsSurface } from '@/components/surfaces/BaseSettings';
-import { Alert } from '@/components/ui/alert';
 import { Button, DialogContent, Field } from '@/components/ui';
+import { Alert } from '@/components/ui/alert';
 import { uploadFile } from '@/functions/fileUpload';
 import { useAuthClient, useMikoto } from '@/hooks';
 import { useErrorElement } from '@/hooks/useErrorElement';
@@ -332,9 +332,16 @@ function Overview() {
               await mikoto.rest['user.update']({ avatar: data.url }, {});
             }}
           />
-          <Heading as="h2" ml="16px" fontSize="2xl">
-            {user?.name}
-          </Heading>
+          <Flex ml="16px" gap={1} pt={2} direction="column">
+            <Heading as="h2" fontSize="2xl" mb={0}>
+              {user?.name}
+            </Heading>
+            {user?.handle && (
+              <Text color="gray.400" fontSize="sm" mt={0} fontFamily="mono">
+                @{user.handle}
+              </Text>
+            )}
+          </Flex>
         </Flex>
         <Box p={4}>
           <Button
@@ -378,11 +385,7 @@ function Overview() {
           </Text>
         )}
         <Group mt={2}>
-          <Button
-            colorPalette="primary"
-            type="submit"
-            loading={handleLoading}
-          >
+          <Button colorPalette="primary" type="submit" loading={handleLoading}>
             {userHandle && isCustomDomain(userHandle)
               ? 'Verify & Save Handle'
               : 'Save Handle'}

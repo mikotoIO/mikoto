@@ -32,6 +32,7 @@ Capture knowledge into reusable skills that persist across conversations. This c
 **3. Write the skill content:**
 
 Structure the skill with:
+
 - Clear, actionable guidance
 - Code examples where relevant
 - Common patterns and anti-patterns

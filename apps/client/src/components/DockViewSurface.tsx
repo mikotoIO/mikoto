@@ -18,7 +18,7 @@ import {
   useState,
 } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { WelcomePanel } from '@/components/WelcomePanel';
 import {
@@ -326,8 +326,8 @@ export const DockViewSurface = () => {
   );
 
   // Store navigate and getUrlFromPanel in refs so onReady callback can use them
-  const navigateRef = useRef(navigate);
-  const getUrlFromPanelRef = useRef(getUrlFromPanel);
+  const navigateRef = useRef<typeof navigate>(navigate);
+  const getUrlFromPanelRef = useRef<typeof getUrlFromPanel>(getUrlFromPanel);
   navigateRef.current = navigate;
   getUrlFromPanelRef.current = getUrlFromPanel;
 

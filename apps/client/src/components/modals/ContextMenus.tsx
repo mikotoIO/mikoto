@@ -1,4 +1,4 @@
-import { MikotoMember, User } from '@mikoto-io/mikoto.js';
+import { MikotoMember, UserExt } from '@mikoto-io/mikoto.js';
 import { permissions } from '@mikoto-io/permcheck';
 import { useSetAtom } from 'jotai';
 
@@ -6,7 +6,7 @@ import { ContextMenu, modalState } from '@/components/ContextMenu';
 import { ProfileModal } from '@/components/modals/Profile';
 
 interface UserContextMenuProps {
-  user: User;
+  user: UserExt;
   member?: MikotoMember;
 }
 

@@ -123,7 +123,7 @@ impl User {
 impl UserExt {
     /// Generate a default handle from a user's display name.
     /// Lowercases, replaces spaces/invalid chars with hyphens, and appends the handle domain.
-    fn default_handle(name: &str) -> String {
+    pub fn default_handle(name: &str) -> String {
         let sanitized: String = name
             .to_lowercase()
             .chars()

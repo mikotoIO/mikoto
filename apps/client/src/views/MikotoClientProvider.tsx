@@ -1,7 +1,7 @@
 import { MikotoClient } from '@mikoto-io/mikoto.js';
 import { AxiosError } from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router';
 
 import { env } from '@/env';
 import { AuthContext, MikotoContext } from '@/hooks';
@@ -48,7 +48,7 @@ export function MikotoClientProvider({
     }
   };
 
-  const initialized = useRef(false);
+  const initialized = useRef<boolean>(false);
 
   useEffect(() => {
     if (!initialized.current) {

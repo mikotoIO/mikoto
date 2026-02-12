@@ -10,7 +10,11 @@ export type DynamicComponentProps<
 export function DynamicComponent<
   K extends keyof any,
   T extends { [P in K]: React.ComponentType<any> },
->({ componentMap, name, props }: DynamicComponentProps<K, T>): JSX.Element {
+>({
+  componentMap,
+  name,
+  props,
+}: DynamicComponentProps<K, T>): React.JSX.Element {
   const Component = componentMap[name];
   if (!Component) return <></>;
 

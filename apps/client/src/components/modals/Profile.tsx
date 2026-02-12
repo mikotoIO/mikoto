@@ -2,7 +2,7 @@ import { Box, Button, Flex, Group, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { User } from '@mikoto-io/mikoto.js';
+import { UserExt } from '@mikoto-io/mikoto.js';
 import { useSetAtom } from 'jotai';
 
 import { modalState } from '@/components/ContextMenu';
@@ -38,7 +38,7 @@ const MikotoId = styled.h2`
   color: var(--chakra-colors-gray-500);
 `;
 
-export function ProfileModal({ user }: { user: User }) {
+export function ProfileModal({ user }: { user: UserExt }) {
   const mikoto = useMikoto();
   const setModal = useSetAtom(modalState);
 
@@ -58,6 +58,7 @@ export function ProfileModal({ user }: { user: User }) {
               <Heading fontSize="24px" mb={0}>
                 {user.name}
               </Heading>
+              {user.handle && <MikotoId>@{user.handle}</MikotoId>}
               <MikotoId>
                 @{'<'}
                 {user.id}

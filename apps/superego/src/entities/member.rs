@@ -3,7 +3,7 @@ use uuid::Uuid;
 
 use crate::{db_entity_delete, entity, error::Error, model};
 
-use super::{RoleToSpaceUser, User};
+use super::{Handle, RoleToSpaceUser, User, UserExt};
 
 entity!(
     pub struct SpaceUser {
@@ -20,7 +20,7 @@ entity!(
 pub struct MemberExt {
     #[serde(flatten)]
     pub base: SpaceUser,
-    pub user: User,
+    pub user: UserExt,
     pub role_ids: Vec<Uuid>,
 }
 
@@ -128,6 +128,7 @@ impl MemberExt {
             RoleToSpaceUser::get_role_ids_by_member(base.id, db),
             User::find_by_id(base.user_id, db)
         )?;
+        let user = UserExt::from_user(user, db).await?;
 
         Ok(Self {
             base,
@@ -140,9 +141,11 @@ impl MemberExt {
         members: Vec<SpaceUser>,
         db: X,
     ) -> Result<Vec<Self>, Error> {
-        let (users, role_ids) = tokio::try_join!(
-            User::dataload(members.iter().map(|member| member.user_id).collect(), db),
+        let user_ids: Vec<Uuid> = members.iter().map(|member| member.user_id).collect();
+        let (users, role_ids, handles) = tokio::try_join!(
+            User::dataload(user_ids.clone(), db),
             RoleToSpaceUser::dataload_members(members.iter().map(|member| member.id).collect(), db),
+            Handle::for_users(&user_ids, db),
         )?;
 
         Ok(members
@@ -150,9 +153,17 @@ impl MemberExt {
             .map(|member| {
                 let user_id = member.user_id;
                 let member_id = member.id;
+                let user = users.get(&user_id).unwrap_or(&User::ghost()).clone();
+                let handle = handles
+                    .get(&user_id)
+                    .cloned()
+                    .unwrap_or_else(|| UserExt::default_handle(&user.name));
                 Self {
                     base: member,
-                    user: users.get(&user_id).unwrap_or(&User::ghost()).clone(),
+                    user: UserExt {
+                        base: user,
+                        handle: Some(handle),
+                    },
                     role_ids: role_ids
                         .get(&member_id)
                         .map_or_else(std::vec::Vec::new, |ids| ids.clone()),

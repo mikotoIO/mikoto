@@ -258,7 +258,7 @@ export type MessageAttachment = z.infer<typeof MessageAttachment>;
 
 export const MessageExt = z.object({
   attachments: z.array(MessageAttachment),
-  author: z.union([User, z.null()]).optional(),
+  author: z.union([UserExt, z.null()]).optional(),
   authorId: z.union([z.string(), z.null()]).optional(),
   channelId: z.string().uuid(),
   content: z.string(),
@@ -309,7 +309,7 @@ export const MemberExt = z.object({
   name: z.union([z.string(), z.null()]).optional(),
   roleIds: z.array(z.string().uuid()),
   spaceId: z.string().uuid(),
-  user: User,
+  user: UserExt,
   userId: z.string().uuid(),
 });
 export type MemberExt = z.infer<typeof MemberExt>;

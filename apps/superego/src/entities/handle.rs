@@ -113,8 +113,8 @@ impl Handle {
         Ok(())
     }
 
-    /// Validate a custom domain handle
-    pub fn validate_custom_domain(domain: &str) -> Result<(), Error> {
+    /// Validate a custom domain handle (format only, no instance domain check)
+    fn validate_custom_domain_format(domain: &str) -> Result<(), Error> {
         // Max domain length
         if domain.len() > 253 {
             return Err(Error::new(
@@ -141,6 +141,13 @@ impl Handle {
                 "Invalid domain format. Must be a valid domain name without protocol or path",
             ));
         }
+
+        Ok(())
+    }
+
+    /// Validate a custom domain handle
+    pub fn validate_custom_domain(domain: &str) -> Result<(), Error> {
+        Self::validate_custom_domain_format(domain)?;
 
         // Cannot be a subdomain of the instance handle domain (use default handles for that)
         let handle_domain = &env().handle.domain;
@@ -484,24 +491,24 @@ mod tests {
 
     #[test]
     fn test_valid_custom_domains() {
-        assert!(Handle::validate_custom_domain("hayley.moe").is_ok());
-        assert!(Handle::validate_custom_domain("rust-lang.org").is_ok());
-        assert!(Handle::validate_custom_domain("example.co.uk").is_ok());
-        assert!(Handle::validate_custom_domain("a1.com").is_ok());
+        assert!(Handle::validate_custom_domain_format("hayley.moe").is_ok());
+        assert!(Handle::validate_custom_domain_format("rust-lang.org").is_ok());
+        assert!(Handle::validate_custom_domain_format("example.co.uk").is_ok());
+        assert!(Handle::validate_custom_domain_format("a1.com").is_ok());
     }
 
     #[test]
     fn test_invalid_custom_domains() {
         // No TLD
-        assert!(Handle::validate_custom_domain("example").is_err());
+        assert!(Handle::validate_custom_domain_format("example").is_err());
 
         // Contains uppercase
-        assert!(Handle::validate_custom_domain("Example.com").is_err());
+        assert!(Handle::validate_custom_domain_format("Example.com").is_err());
 
         // Invalid characters
-        assert!(Handle::validate_custom_domain("example@.com").is_err());
+        assert!(Handle::validate_custom_domain_format("example@.com").is_err());
 
         // Just TLD
-        assert!(Handle::validate_custom_domain(".com").is_err());
+        assert!(Handle::validate_custom_domain_format(".com").is_err());
     }
 }

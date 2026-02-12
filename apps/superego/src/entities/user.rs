@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::{db_enum, db_find_by_id, entity, error::Error};
 
-use super::hashmap_by_key;
+use super::{hashmap_by_key, Handle};
 
 db_enum!(
     #[sqlx(type_name = "\"UserCategory\"")]
@@ -46,6 +46,16 @@ entity!(
         space_id: Option<Uuid>,
     }
 );
+
+/// User with extended data including handle
+#[derive(Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct UserExt {
+    #[serde(flatten)]
+    pub base: User,
+    /// The user's handle (if claimed)
+    pub handle: Option<String>,
+}
 
 #[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
@@ -107,5 +117,53 @@ impl User {
         .await?
         .ok_or(Error::NotFound)?;
         Ok(res)
+    }
+}
+
+impl UserExt {
+    /// Generate a default handle from a user's display name.
+    /// Lowercases, replaces spaces/invalid chars with hyphens, and appends the handle domain.
+    fn default_handle(name: &str) -> String {
+        let sanitized: String = name
+            .to_lowercase()
+            .chars()
+            .map(|c| if c.is_ascii_alphanumeric() || c == '-' || c == '_' { c } else { '-' })
+            .collect();
+        let trimmed = sanitized.trim_matches('-').trim_matches('_');
+        let username = if trimmed.is_empty() { "user" } else { trimmed };
+        Handle::make_default_handle(username)
+    }
+
+    pub async fn from_user<'c, X: sqlx::PgExecutor<'c>>(user: User, db: X) -> Result<Self, Error> {
+        let handle = Handle::for_user(user.id, db).await?;
+        let handle = handle
+            .map(|h| h.handle)
+            .unwrap_or_else(|| Self::default_handle(&user.name));
+        Ok(Self {
+            handle: Some(handle),
+            base: user,
+        })
+    }
+
+    pub async fn dataload<'c, X: sqlx::PgExecutor<'c>>(
+        users: Vec<User>,
+        db: X,
+    ) -> Result<Vec<Self>, Error> {
+        let user_ids: Vec<Uuid> = users.iter().map(|u| u.id).collect();
+        let handles = Handle::for_users(&user_ids, db).await?;
+
+        Ok(users
+            .into_iter()
+            .map(|user| {
+                let handle = handles
+                    .get(&user.id)
+                    .cloned()
+                    .unwrap_or_else(|| Self::default_handle(&user.name));
+                Self {
+                    handle: Some(handle),
+                    base: user,
+                }
+            })
+            .collect())
     }
 }

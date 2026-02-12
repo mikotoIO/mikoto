@@ -34,7 +34,7 @@ pub enum Error {
     #[error("{0}")]
     SerdeError(#[from] serde_json::Error),
 
-    #[error("Unknown internal server error")]
+    #[error("{message}")]
     InternalServerError { message: String },
 
     #[error("Wrong password")]
@@ -159,6 +159,16 @@ impl From<ImageError> for Error {
         Self::Miscallaneous {
             code: "ImageError".to_string(),
             status: StatusCode::INTERNAL_SERVER_ERROR,
+            message: err.to_string(),
+        }
+    }
+}
+
+impl From<reqwest::Error> for Error {
+    fn from(err: reqwest::Error) -> Self {
+        Self::Miscallaneous {
+            code: "NetworkError".to_string(),
+            status: StatusCode::BAD_GATEWAY,
             message: err.to_string(),
         }
     }

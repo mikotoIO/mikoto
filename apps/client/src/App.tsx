@@ -51,22 +51,22 @@ const router = createBrowserRouter([
     path: '/settings/bots/:botId',
     element: <MainView />,
   },
-  // Space routes
+  // Space routes (spaceRef can be a UUID or @handle)
   {
-    path: '/space/:spaceId/settings',
+    path: '/space/:spaceRef/settings',
     element: <MainView />,
   },
   {
-    path: '/space/:spaceId/search',
+    path: '/space/:spaceRef/search',
     element: <MainView />,
   },
-  // Channel routes
+  // Channel routes (spaceRef can be a UUID or @handle)
   {
-    path: '/space/:spaceId/channel/:channelId',
+    path: '/space/:spaceRef/channel/:channelId',
     element: <MainView />,
   },
   {
-    path: '/space/:spaceId/channel/:channelId/settings',
+    path: '/space/:spaceRef/channel/:channelId/settings',
     element: <MainView />,
   },
   // Auth routes

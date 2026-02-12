@@ -176,6 +176,23 @@ CREATE TABLE public."Document" (
 ALTER TABLE public."Document" OWNER TO postgres;
 
 --
+-- Name: Handle; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Handle" (
+    handle character varying(253) NOT NULL,
+    "userId" uuid,
+    "spaceId" uuid,
+    "verifiedAt" timestamp(3) without time zone,
+    attestation jsonb,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT handle_single_owner CHECK ((("userId" IS NULL) <> ("spaceId" IS NULL)))
+);
+
+
+ALTER TABLE public."Handle" OWNER TO postgres;
+
+--
 -- Name: Invite; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -423,6 +440,14 @@ ALTER TABLE ONLY public."Document"
 
 
 --
+-- Name: Handle Handle_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Handle"
+    ADD CONSTRAINT "Handle_pkey" PRIMARY KEY (handle);
+
+
+--
 -- Name: Invite Invite_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -551,6 +576,20 @@ CREATE INDEX "Channel_spaceId_idx" ON public."Channel" USING btree ("spaceId");
 --
 
 CREATE UNIQUE INDEX "Document_channelId_key" ON public."Document" USING btree ("channelId");
+
+
+--
+-- Name: Handle_spaceId_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "Handle_spaceId_idx" ON public."Handle" USING btree ("spaceId");
+
+
+--
+-- Name: Handle_userId_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "Handle_userId_idx" ON public."Handle" USING btree ("userId");
 
 
 --
@@ -723,6 +762,22 @@ ALTER TABLE ONLY public."Channel"
 
 ALTER TABLE ONLY public."Document"
     ADD CONSTRAINT "Document_channelId_fkey" FOREIGN KEY ("channelId") REFERENCES public."Channel"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: Handle Handle_spaceId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Handle"
+    ADD CONSTRAINT "Handle_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES public."Space"(id) ON DELETE CASCADE;
+
+
+--
+-- Name: Handle Handle_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Handle"
+    ADD CONSTRAINT "Handle_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."User"(id) ON DELETE CASCADE;
 
 
 --

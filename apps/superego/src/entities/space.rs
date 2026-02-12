@@ -3,7 +3,7 @@ use uuid::Uuid;
 
 use crate::{db_entity_delete, db_enum, db_find_by_id, entities::Role, entity, error::Error};
 
-use super::Channel;
+use super::{Channel, Handle};
 
 db_enum!(
     #[sqlx(type_name = "\"SpaceType\"")]
@@ -35,6 +35,8 @@ entity!(
 pub struct SpaceExt {
     #[serde(flatten)]
     pub base: Space,
+    /// The space's handle (if claimed)
+    pub handle: Option<String>,
     pub roles: Vec<Role>,
     pub channels: Vec<Channel>,
 }
@@ -136,11 +138,15 @@ impl SpaceExt {
         space: Space,
         db: X,
     ) -> Result<Self, Error> {
-        let (channels, roles) =
-            tokio::try_join!(Channel::list(space.id, db), Role::list(space.id, db))?;
+        let (channels, roles, handle) = tokio::try_join!(
+            Channel::list(space.id, db),
+            Role::list(space.id, db),
+            Handle::for_space(space.id, db)
+        )?;
 
         Ok(SpaceExt {
             base: space,
+            handle: handle.map(|h| h.handle),
             channels,
             roles,
         })
@@ -150,9 +156,12 @@ impl SpaceExt {
         spaces: Vec<Space>,
         db: X,
     ) -> Result<Vec<Self>, Error> {
-        let (mut channels, mut roles) = tokio::try_join!(
-            Channel::dataload_space(spaces.iter().map(|s| s.id).collect(), db),
-            Role::dataload_space(spaces.iter().map(|s| s.id).collect(), db),
+        let space_ids: Vec<Uuid> = spaces.iter().map(|s| s.id).collect();
+
+        let (mut channels, mut roles, handles) = tokio::try_join!(
+            Channel::dataload_space(space_ids.clone(), db),
+            Role::dataload_space(space_ids.clone(), db),
+            Handle::for_spaces(&space_ids, db),
         )?;
 
         let res = spaces
@@ -160,9 +169,11 @@ impl SpaceExt {
             .map(|space| {
                 let channels = channels.remove(&space.id).unwrap_or_default();
                 let roles = roles.remove(&space.id).unwrap_or_default();
+                let handle = handles.get(&space.id).cloned();
 
                 SpaceExt {
                     base: space,
+                    handle,
                     channels,
                     roles,
                 }

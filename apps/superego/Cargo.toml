@@ -90,6 +90,12 @@ livekit-api = { version = "0.4.0", features = [
     "signal-client-tokio",
 ] }
 bitflags = "2.6.0"
+base64 = "0.22"
+
+# DNS resolution and cryptographic signing for handle verification
+hickory-resolver = { version = "0.25.2", features = ["tokio", "https-ring"] }
+ed25519-dalek = { version = "2.2.0", features = ["rand_core"] }
+rand = "0.8"
 
 # media processing
 mime = "0.3.17"

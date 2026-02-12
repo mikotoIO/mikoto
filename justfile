@@ -12,6 +12,7 @@ dump-api:
 seed:
     cd apps/superego && cargo run --bin seed
 
+
 # Create a new migration file
 new-migration name:
     #!/usr/bin/env bash

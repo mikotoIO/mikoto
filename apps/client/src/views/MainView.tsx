@@ -152,14 +152,21 @@ const AppView = () => {
   const tabkit = useTabkit();
   const setCommandMenuOpen = useSetAtom(commandMenuOpenAtom);
   const {
-    spaceId: routeSpaceId,
+    spaceRef: routeSpaceRef,
     channelId: routeChannelId,
     botId: routeBotId,
   } = useParams<{
-    spaceId: string;
+    spaceRef: string;
     channelId: string;
     botId: string;
   }>();
+
+  // Resolve spaceRef to spaceId (handles @handle format)
+  const routeSpaceId = routeSpaceRef
+    ? routeSpaceRef.startsWith('@')
+      ? mikoto.spaces._getByHandle(routeSpaceRef.slice(1))?.id
+      : routeSpaceRef
+    : undefined;
   const location = useLocation();
   const hasHandledRouteRef = useRef<string | null>(null);
 

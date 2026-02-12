@@ -62,17 +62,40 @@ export type Bot = z.infer<typeof Bot>;
 export const CreateBotPayload = z.object({ name: z.string() });
 export type CreateBotPayload = z.infer<typeof CreateBotPayload>;
 
+export const HandleOwner = z.union([
+  z.object({ id: z.string().uuid(), type: z.literal("user") }),
+  z.object({ id: z.string().uuid(), type: z.literal("space") }),
+]);
+export type HandleOwner = z.infer<typeof HandleOwner>;
+
+export const HandleResolution = z.object({
+  createdAt: z.string(),
+  handle: z.string(),
+  owner: HandleOwner,
+  verifiedAt: z.union([z.string(), z.null()]).optional(),
+});
+export type HandleResolution = z.infer<typeof HandleResolution>;
+
+export const InstanceInfo = z.object({
+  apiEndpoint: z.string(),
+  domain: z.string(),
+  handleDomain: z.string(),
+  publicKey: z.union([z.string(), z.null()]).optional(),
+});
+export type InstanceInfo = z.infer<typeof InstanceInfo>;
+
 export const UserCategory = z.enum(["BOT", "UNVERIFIED"]);
 export type UserCategory = z.infer<typeof UserCategory>;
 
-export const User = z.object({
+export const UserExt = z.object({
   avatar: z.union([z.string(), z.null()]).optional(),
   category: z.union([UserCategory, z.null()]).optional(),
   description: z.union([z.string(), z.null()]).optional(),
+  handle: z.union([z.string(), z.null()]).optional(),
   id: z.string().uuid(),
   name: z.string(),
 });
-export type User = z.infer<typeof User>;
+export type UserExt = z.infer<typeof UserExt>;
 
 export const UserPatch = z
   .object({
@@ -82,6 +105,32 @@ export const UserPatch = z
   })
   .partial();
 export type UserPatch = z.infer<typeof UserPatch>;
+
+export const HandlePayload = z.object({ handle: z.string() });
+export type HandlePayload = z.infer<typeof HandlePayload>;
+
+export const VerifyHandleRequest = z.object({ handle: z.string() });
+export type VerifyHandleRequest = z.infer<typeof VerifyHandleRequest>;
+
+export const VerificationChallenge = z.object({
+  createdAt: z.string().datetime({ offset: true }),
+  dnsTxtName: z.string(),
+  dnsTxtRecord: z.string(),
+  entityId: z.string().uuid(),
+  entityType: z.string(),
+  handle: z.string(),
+  nonce: z.string(),
+  wellKnownContent: z.string(),
+  wellKnownUrl: z.string(),
+});
+export type VerificationChallenge = z.infer<typeof VerificationChallenge>;
+
+export const VerificationResult = z.object({
+  error: z.union([z.string(), z.null()]).optional(),
+  method: z.union([z.string(), z.null()]).optional(),
+  success: z.boolean(),
+});
+export type VerificationResult = z.infer<typeof VerificationResult>;
 
 export const RelationState = z.enum([
   "NONE",
@@ -100,6 +149,15 @@ export const Relationship = z.object({
   userId: z.string().uuid(),
 });
 export type Relationship = z.infer<typeof Relationship>;
+
+export const User = z.object({
+  avatar: z.union([z.string(), z.null()]).optional(),
+  category: z.union([UserCategory, z.null()]).optional(),
+  description: z.union([z.string(), z.null()]).optional(),
+  id: z.string().uuid(),
+  name: z.string(),
+});
+export type User = z.infer<typeof User>;
 
 export const Timestamp = z.string();
 export type Timestamp = z.infer<typeof Timestamp>;
@@ -140,6 +198,7 @@ export type SpaceType = z.infer<typeof SpaceType>;
 
 export const SpaceExt = z.object({
   channels: z.array(Channel),
+  handle: z.union([z.string(), z.null()]).optional(),
   icon: z.union([z.string(), z.null()]).optional(),
   id: z.string().uuid(),
   name: z.string(),
@@ -154,6 +213,7 @@ export type SpaceCreatePayload = z.infer<typeof SpaceCreatePayload>;
 
 export const SpaceUpdatePayload = z
   .object({
+    handle: z.union([z.string(), z.null()]),
     icon: z.union([z.string(), z.null()]),
     name: z.union([z.string(), z.null()]),
   })
@@ -323,11 +383,19 @@ export const schemas = {
   ResetPasswordConfirmData,
   Bot,
   CreateBotPayload,
+  HandleOwner,
+  HandleResolution,
+  InstanceInfo,
   UserCategory,
-  User,
+  UserExt,
   UserPatch,
+  HandlePayload,
+  VerifyHandleRequest,
+  VerificationChallenge,
+  VerificationResult,
   RelationState,
   Relationship,
+  User,
   Timestamp,
   ChannelType,
   Channel,
@@ -370,6 +438,14 @@ const endpoints = makeApi([
     alias: "index",
     requestFormat: "json",
     response: IndexResponse,
+  },
+  {
+    method: "get",
+    path: "/.well-known/mikoto/instance.json",
+    alias: "instance.info",
+    description: `Returns instance information for federation, including the public key for verifying handle attestations.`,
+    requestFormat: "json",
+    response: InstanceInfo,
   },
   {
     method: "post",
@@ -475,6 +551,13 @@ const endpoints = makeApi([
       },
     ],
     response: Bot,
+  },
+  {
+    method: "get",
+    path: "/handles/:handle",
+    alias: "handles.resolve",
+    requestFormat: "json",
+    response: HandleResolution,
   },
   {
     method: "get",
@@ -699,6 +782,38 @@ const endpoints = makeApi([
     response: z.array(ChannelUnread),
   },
   {
+    method: "post",
+    path: "/spaces/:spaceId/handle/verify",
+    alias: "spaces.startHandleVerification",
+    description: `Generates a verification challenge for a custom domain handle. Returns the DNS TXT record and well-known file content to add for verification.`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        description: `Request to initiate handle verification`,
+        type: "Body",
+        schema: z.object({ handle: z.string() }),
+      },
+    ],
+    response: VerificationChallenge,
+  },
+  {
+    method: "post",
+    path: "/spaces/:spaceId/handle/verify/complete",
+    alias: "spaces.completeHandleVerification",
+    description: `Verifies the custom domain by checking DNS TXT records or well-known files. On success, updates the space&#x27;s handle to the verified domain.`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        description: `Request to initiate handle verification`,
+        type: "Body",
+        schema: z.object({ handle: z.string() }),
+      },
+    ],
+    response: VerificationResult,
+  },
+  {
     method: "get",
     path: "/spaces/:spaceId/invites/",
     alias: "invites.list",
@@ -850,7 +965,7 @@ const endpoints = makeApi([
     path: "/users/me",
     alias: "user.get",
     requestFormat: "json",
-    response: User,
+    response: UserExt,
   },
   {
     method: "patch",
@@ -864,7 +979,60 @@ const endpoints = makeApi([
         schema: UserPatch,
       },
     ],
-    response: User,
+    response: UserExt,
+  },
+  {
+    method: "post",
+    path: "/users/me/handle",
+    alias: "user.setHandle",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: z.object({ handle: z.string() }),
+      },
+    ],
+    response: UserExt,
+  },
+  {
+    method: "delete",
+    path: "/users/me/handle",
+    alias: "user.deleteHandle",
+    requestFormat: "json",
+    response: UserExt,
+  },
+  {
+    method: "post",
+    path: "/users/me/handle/verify",
+    alias: "user.startHandleVerification",
+    description: `Generates a verification challenge for a custom domain handle. Returns the DNS TXT record and well-known file content to add for verification.`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        description: `Request to initiate handle verification`,
+        type: "Body",
+        schema: z.object({ handle: z.string() }),
+      },
+    ],
+    response: VerificationChallenge,
+  },
+  {
+    method: "post",
+    path: "/users/me/handle/verify/complete",
+    alias: "user.completeHandleVerification",
+    description: `Verifies the custom domain by checking DNS TXT records or well-known files. On success, updates the user&#x27;s handle to the verified domain.`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        description: `Request to initiate handle verification`,
+        type: "Body",
+        schema: z.object({ handle: z.string() }),
+      },
+    ],
+    response: VerificationResult,
   },
 ]);
 
@@ -895,9 +1063,9 @@ export const websocketEvents = {
   "spaces.onCreate": SpaceExt,
   "spaces.onDelete": SpaceExt,
   "spaces.onUpdate": SpaceExt,
-  "users.onCreate": User,
+  "users.onCreate": UserExt,
   "users.onDelete": ObjectWithId,
-  "users.onUpdate": User,
+  "users.onUpdate": UserExt,
 };
 
 export type Api = typeof api;

@@ -262,6 +262,49 @@
         }
       }
     },
+    "/handles/{handle}": {
+      "get": {
+        "tags": [
+          "Handles"
+        ],
+        "summary": "Resolve a Handle",
+        "operationId": "handles.resolve",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HandleResolution"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/.well-known/mikoto/instance.json": {
+      "get": {
+        "tags": [
+          "Instance"
+        ],
+        "summary": "Get Instance Information",
+        "description": "Returns instance information for federation, including the public key for verifying handle attestations.",
+        "operationId": "instance.info",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstanceInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/users/me": {
       "get": {
         "tags": [
@@ -275,7 +318,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/UserExt"
                 }
               }
             }
@@ -304,7 +347,123 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/UserExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me/handle": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Set or Change User Handle",
+        "operationId": "user.setHandle",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HandlePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserExt"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Release User Handle",
+        "operationId": "user.deleteHandle",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me/handle/verify": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Start Custom Domain Verification",
+        "description": "Generates a verification challenge for a custom domain handle. Returns the DNS TXT record and well-known file content to add for verification.",
+        "operationId": "user.startHandleVerification",
+        "requestBody": {
+          "description": "Request to initiate handle verification",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyHandleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationChallenge"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me/handle/verify/complete": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Complete Custom Domain Verification",
+        "description": "Verifies the custom domain by checking DNS TXT records or well-known files. On success, updates the user's handle to the verified domain.",
+        "operationId": "user.completeHandleVerification",
+        "requestBody": {
+          "description": "Request to initiate handle verification",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyHandleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationResult"
                 }
               }
             }
@@ -554,6 +713,72 @@
               "application/json": {
                 "schema": {
                   "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/handle/verify": {
+      "post": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Start Custom Domain Verification",
+        "description": "Generates a verification challenge for a custom domain handle. Returns the DNS TXT record and well-known file content to add for verification.",
+        "operationId": "spaces.startHandleVerification",
+        "requestBody": {
+          "description": "Request to initiate handle verification",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyHandleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationChallenge"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/handle/verify/complete": {
+      "post": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Complete Custom Domain Verification",
+        "description": "Verifies the custom domain by checking DNS TXT records or well-known files. On success, updates the space's handle to the verified domain.",
+        "operationId": "spaces.completeHandleVerification",
+        "requestBody": {
+          "description": "Request to initiate handle verification",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyHandleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationResult"
                 }
               }
             }
@@ -1473,6 +1698,88 @@
           }
         }
       },
+      "HandleOwner": {
+        "description": "Represents what entity type owns a handle",
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "user"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "space"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "HandlePayload": {
+        "type": "object",
+        "required": [
+          "handle"
+        ],
+        "properties": {
+          "handle": {
+            "type": "string"
+          }
+        }
+      },
+      "HandleResolution": {
+        "description": "Response for handle resolution",
+        "type": "object",
+        "required": [
+          "createdAt",
+          "handle",
+          "owner"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "partial-date-time"
+          },
+          "handle": {
+            "type": "string"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/HandleOwner"
+          },
+          "verifiedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "partial-date-time"
+          }
+        }
+      },
       "IndexResponse": {
         "type": "object",
         "required": [
@@ -1485,6 +1792,31 @@
           },
           "version": {
             "type": "string"
+          }
+        }
+      },
+      "InstanceInfo": {
+        "type": "object",
+        "required": [
+          "apiEndpoint",
+          "domain",
+          "handleDomain"
+        ],
+        "properties": {
+          "apiEndpoint": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "handleDomain": {
+            "type": "string"
+          },
+          "publicKey": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -2055,6 +2387,13 @@
               "$ref": "#/components/schemas/Channel"
             }
           },
+          "handle": {
+            "description": "The space's handle (if claimed)",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "icon": {
             "type": [
               "string",
@@ -2097,6 +2436,12 @@
       "SpaceUpdatePayload": {
         "type": "object",
         "properties": {
+          "handle": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "icon": {
             "type": [
               "string",
@@ -2178,6 +2523,52 @@
           "UNVERIFIED"
         ]
       },
+      "UserExt": {
+        "description": "User with extended data including handle",
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "avatar": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserCategory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "handle": {
+            "description": "The user's handle (if claimed)",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "UserPatch": {
         "type": "object",
         "properties": {
@@ -2198,6 +2589,98 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "VerificationChallenge": {
+        "description": "Verification challenge sent to the user",
+        "type": "object",
+        "required": [
+          "createdAt",
+          "dnsTxtName",
+          "dnsTxtRecord",
+          "entityId",
+          "entityType",
+          "handle",
+          "nonce",
+          "wellKnownContent",
+          "wellKnownUrl"
+        ],
+        "properties": {
+          "createdAt": {
+            "description": "When this challenge was created",
+            "type": "string",
+            "format": "date-time"
+          },
+          "dnsTxtName": {
+            "description": "The DNS TXT record name (subdomain)",
+            "type": "string"
+          },
+          "dnsTxtRecord": {
+            "description": "The DNS TXT record to add",
+            "type": "string"
+          },
+          "entityId": {
+            "description": "The entity ID",
+            "type": "string",
+            "format": "uuid"
+          },
+          "entityType": {
+            "description": "The entity type (user or space)",
+            "type": "string"
+          },
+          "handle": {
+            "description": "The domain being verified",
+            "type": "string"
+          },
+          "nonce": {
+            "description": "Random nonce for this challenge",
+            "type": "string"
+          },
+          "wellKnownContent": {
+            "description": "The well-known file content",
+            "type": "string"
+          },
+          "wellKnownUrl": {
+            "description": "The well-known file URL",
+            "type": "string"
+          }
+        }
+      },
+      "VerificationResult": {
+        "description": "Result of a verification attempt",
+        "type": "object",
+        "required": [
+          "success"
+        ],
+        "properties": {
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "method": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      },
+      "VerifyHandleRequest": {
+        "description": "Request to initiate handle verification",
+        "type": "object",
+        "required": [
+          "handle"
+        ],
+        "properties": {
+          "handle": {
+            "description": "The domain to verify",
+            "type": "string"
           }
         }
       },
@@ -2279,13 +2762,13 @@
         "$ref": "#/components/schemas/SpaceExt"
       },
       "users.onCreate": {
-        "$ref": "#/components/schemas/User"
+        "$ref": "#/components/schemas/UserExt"
       },
       "users.onDelete": {
         "$ref": "#/components/schemas/ObjectWithId"
       },
       "users.onUpdate": {
-        "$ref": "#/components/schemas/User"
+        "$ref": "#/components/schemas/UserExt"
       }
     }
   }

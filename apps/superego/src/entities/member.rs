@@ -1,9 +1,11 @@
+use std::collections::HashMap;
+
 use schemars::JsonSchema;
 use uuid::Uuid;
 
 use crate::{db_entity_delete, entity, error::Error, model};
 
-use super::{RoleToSpaceUser, User};
+use super::{RoleToSpaceUser, User, UserExt};
 
 entity!(
     pub struct SpaceUser {
@@ -20,7 +22,7 @@ entity!(
 pub struct MemberExt {
     #[serde(flatten)]
     pub base: SpaceUser,
-    pub user: User,
+    pub user: UserExt,
     pub role_ids: Vec<Uuid>,
 }
 
@@ -128,6 +130,7 @@ impl MemberExt {
             RoleToSpaceUser::get_role_ids_by_member(base.id, db),
             User::find_by_id(base.user_id, db)
         )?;
+        let user = UserExt::from_user(user, db).await?;
 
         Ok(Self {
             base,
@@ -145,6 +148,14 @@ impl MemberExt {
             RoleToSpaceUser::dataload_members(members.iter().map(|member| member.id).collect(), db),
         )?;
 
+        let plain_users: Vec<User> = members
+            .iter()
+            .map(|member| users.get(&member.user_id).unwrap_or(&User::ghost()).clone())
+            .collect();
+        let user_exts = UserExt::dataload(plain_users, db).await?;
+        let user_ext_map: HashMap<Uuid, UserExt> =
+            user_exts.into_iter().map(|u| (u.base.id, u)).collect();
+
         Ok(members
             .into_iter()
             .map(|member| {
@@ -152,7 +163,13 @@ impl MemberExt {
                 let member_id = member.id;
                 Self {
                     base: member,
-                    user: users.get(&user_id).unwrap_or(&User::ghost()).clone(),
+                    user: user_ext_map
+                        .get(&user_id)
+                        .cloned()
+                        .unwrap_or_else(|| UserExt {
+                            base: User::ghost(),
+                            handle: None,
+                        }),
                     role_ids: role_ids
                         .get(&member_id)
                         .map_or_else(std::vec::Vec::new, |ids| ids.clone()),

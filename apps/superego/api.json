@@ -1932,7 +1932,7 @@
             "format": "uuid"
           },
           "user": {
-            "$ref": "#/components/schemas/User"
+            "$ref": "#/components/schemas/UserExt"
           },
           "userId": {
             "type": "string",

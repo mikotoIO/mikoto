@@ -309,7 +309,7 @@ export const MemberExt = z.object({
   name: z.union([z.string(), z.null()]).optional(),
   roleIds: z.array(z.string().uuid()),
   spaceId: z.string().uuid(),
-  user: User,
+  user: UserExt,
   userId: z.string().uuid(),
 });
 export type MemberExt = z.infer<typeof MemberExt>;

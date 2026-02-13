@@ -87,9 +87,10 @@ export function MikotoClientProvider({
   // }, PING_INTERVAL);
 
   if (err !== null) {
-    console.log('this should only redirect auth-related errors');
-    console.log(err);
-    return <Navigate to="/login" />;
+    const status = err.response?.status;
+    if (status === 401 || status === 403) {
+      return <Navigate to="/login" />;
+    }
   }
   if (!(mikoto instanceof MikotoClient)) return fallback;
 

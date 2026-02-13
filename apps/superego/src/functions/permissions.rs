@@ -53,7 +53,7 @@ pub fn permissions_with_bypass(
     rule: Permission,
     bypass: Permission,
 ) -> Result<(), Error> {
-    if space.base.owner_id == Some(member.user.id) {
+    if space.base.owner_id == Some(member.user.base.id) {
         return Ok(());
     }
     let user_perms = collect_permissions(space, member);

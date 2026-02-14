@@ -2,7 +2,6 @@
 import react from '@vitejs/plugin-react';
 import * as dotenv from 'dotenv';
 import path from 'node:path';
-import { URL, fileURLToPath } from 'node:url';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 
@@ -23,9 +22,6 @@ export default ({ mode }: { mode: string }) =>
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src'),
-        '@mikoto-io/permcheck': fileURLToPath(
-          new URL('../../packages/permcheck/src/index.ts', import.meta.url),
-        ),
       },
     },
     plugins: [

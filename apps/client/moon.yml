@@ -1,2 +1,7 @@
 language: 'typescript'
 tags: ['core-app']
+
+tasks:
+  typecheck:
+    deps:
+      - 'mikoto.js:build'

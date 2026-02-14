@@ -1,11 +1,12 @@
 {
   "name": "@mikoto-io/permcheck",
   "version": "0.0.1",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "license": "MIT",
   "scripts": {
-    "build": "tsc"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "tsconfig": "workspace:*",

@@ -19,8 +19,6 @@
   "license": "MIT",
   "dependencies": {
     "@electron-forge/maker-dmg": "^7.2.0",
-    "electron": "^29.2.0",
-    "electron-builder": "24.9.1",
     "electron-squirrel-startup": "^1.0.0"
   },
   "devDependencies": {
@@ -33,7 +31,8 @@
     "@electron-forge/publisher-gcs": "^7.2.0",
     "@electron-forge/publisher-github": "^7.2.0",
     "@types/electron-squirrel-startup": "^1.0.0",
-    "electron": "^27.0.3",
+    "electron": "^29.2.0",
+    "electron-builder": "24.9.1",
     "typescript": "^5.4.2"
   }
 }

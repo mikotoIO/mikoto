@@ -2,20 +2,18 @@
   "name": "@mikoto-io/mikoto.js",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/index.js",
-  "module": "dist/module/index.js",
-  "typings": "dist/types/index.d.ts",
+  "type": "module",
   "exports": {
     ".": {
-      "import": "./src/index.ts",
-      "require": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
   },
+  "files": ["dist"],
   "scripts": {
+    "build": "tsup",
     "typecheck": "tsc --noEmit",
-    "build": "run-p build:*",
-    "build:main": "tsc -p tsconfig.json",
-    "build:module": "tsc -p tsconfig.module.json",
     "generate": "tsx ./generator/openapi.ts",
     "test": "vitest run"
   },
@@ -41,6 +39,7 @@
     "@types/ws": "^8.5.12",
     "openapi-zod-client": "^1.18.2",
     "openapi3-ts": "^4.4.0",
+    "tsup": "^8.5.1",
     "typescript": "^5.4.2",
     "vitest": "^0.18.0"
   }

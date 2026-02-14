@@ -1,13 +1,14 @@
+import { Box, Link } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import SimpleMarkdown, { SingleASTNode } from '@khanacademy/simple-markdown';
+import React, { Suspense, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
-import { codeBlockRule } from './rules/CodeBlock';
-import { emojiRule } from './rules/Emoji';
-import { imageRule } from './rules/Image';
-import { linkRule } from './rules/Link';
-import { mentionRule } from './rules/Mention';
-import { objectRule } from './rules/Object';
-import { spoilerRule } from './rules/Spoiler';
+import { MessageImage } from './rules/Image';
+import { CodeBlock, CodeHighlight } from './rules/CodeBlock';
+import { remarkCustomSyntax } from './remarkCustomSyntax';
+
+const EmojiElement = React.lazy(() => import('./EmojiElement'));
 
 function isUrl(s: string) {
   let url;
@@ -25,21 +26,9 @@ function isUrlImage(url: string): boolean {
   return url.match(/\.(jpeg|jpg|gif|png)$/) !== null;
 }
 
-const rules = {
-  ...SimpleMarkdown.defaultRules,
-  image: imageRule,
-  paragraph: {
-    ...SimpleMarkdown.defaultRules.paragraph,
-    match: SimpleMarkdown.blockRegex(/^((?:[^\n])+)(?:\n *)+/),
-  },
-
-  link: linkRule,
-  codeBlock: codeBlockRule,
-  object: objectRule,
-  emoji: emojiRule,
-  spoiler: spoilerRule,
-  mention: mentionRule,
-};
+function isEmojiOnly(content: string): boolean {
+  return /^(\s*:(?:\+1|[-\w]+):\s*)+$/.test(content.trim());
+}
 
 const MarkdownWrapper = styled.div<{ emojiSize: string }>`
   gap: 8px;
@@ -73,21 +62,109 @@ const MarkdownWrapper = styled.div<{ emojiSize: string }>`
   }
 `;
 
-function emojiFest(nodes: SingleASTNode[]) {
-  for (const x of nodes) {
-    if (x.type === 'paragraph') {
-      for (const y of x.content) {
-        if (y.type !== 'emoji') {
-          return '1.2em';
-        }
-      }
-    }
-  }
-  return '3em';
+const Mention = styled.span`
+  background-color: #7591ff80;
+  border-radius: 4px;
+  padding: 0 2px;
+`;
+
+function Spoiler({ children }: { children: React.ReactNode }) {
+  const [hidden, setHidden] = useState(true);
+  return (
+    <Box
+      display="inline-block"
+      backgroundColor={hidden ? 'gray.900' : 'gray.650'}
+      color={hidden ? 'transparent' : 'text'}
+      px={1}
+      borderRadius="4px"
+      cursor="pointer"
+      onClick={() => {
+        setHidden(!hidden);
+      }}
+    >
+      {children}
+    </Box>
+  );
 }
 
-const rawBuiltParser = SimpleMarkdown.parserFor(rules as any);
-const reactOutput = SimpleMarkdown.outputFor(rules, 'react');
+function ObjectNotFound({ resource }: { resource: string }) {
+  return (
+    <Box m={1} p={4} bg="gray.800" rounded="md" maxW="300px">
+      Object not found: {resource}
+    </Box>
+  );
+}
+
+const remarkPlugins = [remarkGfm, remarkCustomSyntax];
+
+const components: Record<string, React.ComponentType<any>> = {
+  mention: ({ username }: { username: string }) => (
+    <Mention>@{username}</Mention>
+  ),
+  emoji: ({ id }: { id: string }) => (
+    <Suspense>
+      <EmojiElement emoji={id} />
+    </Suspense>
+  ),
+  spoiler: ({ children }: { children: React.ReactNode }) => (
+    <Spoiler>{children}</Spoiler>
+  ),
+  'object-embed': ({ resource }: { resource: string }) => (
+    <ObjectNotFound resource={resource} />
+  ),
+  a: ({
+    href,
+    children,
+  }: {
+    href?: string;
+    children: React.ReactNode;
+  }) => (
+    <Link href={href ?? '#'} target="_blank">
+      {children}
+    </Link>
+  ),
+  img: ({ src, alt }: { src?: string; alt?: string }) => (
+    <MessageImage src={src} alt={alt} />
+  ),
+  code: ({
+    inline,
+    className,
+    children,
+  }: {
+    inline?: boolean;
+    className?: string;
+    children: React.ReactNode;
+  }) => {
+    if (inline) {
+      return <code>{children}</code>;
+    }
+
+    const langMatch = className?.match(/language-(\S+)/);
+    const lang = langMatch?.[1];
+    const content = String(children).replace(/\n$/, '');
+
+    return (
+      <CodeBlock>
+        {lang === undefined ? (
+          <pre>
+            <code>{content}</code>
+          </pre>
+        ) : (
+          <Suspense
+            fallback={
+              <pre>
+                <code>{content}</code>
+              </pre>
+            }
+          >
+            <CodeHighlight language={lang} content={content} />
+          </Suspense>
+        )}
+      </CodeBlock>
+    );
+  },
+  pre: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+};
 
 export function Markdown({ content }: { content: string }) {
   const co =
@@ -95,10 +172,13 @@ export function Markdown({ content }: { content: string }) {
       ? `![Image Embed](${content})`
       : content;
 
-  const parsed = rawBuiltParser(co, { inline: false });
-  const output = reactOutput(parsed);
+  const emojiSize = isEmojiOnly(co) ? '3em' : '1.2em';
 
   return (
-    <MarkdownWrapper emojiSize={emojiFest(parsed)}>{output}</MarkdownWrapper>
+    <MarkdownWrapper emojiSize={emojiSize}>
+      <ReactMarkdown remarkPlugins={remarkPlugins} components={components}>
+        {co}
+      </ReactMarkdown>
+    </MarkdownWrapper>
   );
 }

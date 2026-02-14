@@ -1,12 +1,9 @@
 import { Box, Link } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import SimpleMarkdown from '@khanacademy/simple-markdown';
 import { useSetAtom } from 'jotai';
 
 import { modalState } from '@/components/ContextMenu';
 import { DialogContent } from '@/components/ui';
-
-import { createRule } from '../rules';
 
 interface MessageImageProps {
   src?: string;
@@ -46,10 +43,3 @@ export function MessageImage({ src, alt }: MessageImageProps) {
     />
   );
 }
-
-export const imageRule = createRule({
-  ...SimpleMarkdown.defaultRules.image,
-  react: (node: any, _: any, state: any) => (
-    <MessageImage src={node.target} alt={node.alt} key={state.key} />
-  ),
-});

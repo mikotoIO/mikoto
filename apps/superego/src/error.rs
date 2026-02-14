@@ -106,8 +106,14 @@ impl IntoResponse for Error {
             Error::InsufficientPermissions { .. } => StatusCode::FORBIDDEN,
 
             Error::Unauthorized { .. } => StatusCode::UNAUTHORIZED,
+            Error::TokenExpired => StatusCode::UNAUTHORIZED,
+            Error::JwtValidationError { .. } => StatusCode::UNAUTHORIZED,
+            Error::WrongAuthenticationType => StatusCode::UNAUTHORIZED,
             Error::Forbidden { .. } => StatusCode::FORBIDDEN,
             Error::ValidationFailed => StatusCode::BAD_REQUEST,
+            Error::BadRequest => StatusCode::BAD_REQUEST,
+            Error::FileTooLarge => StatusCode::BAD_REQUEST,
+            Error::CaptchaFailed => StatusCode::BAD_REQUEST,
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         };
 

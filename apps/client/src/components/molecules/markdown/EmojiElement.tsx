@@ -1,6 +1,10 @@
+import emojiData from '@emoji-mart/data/sets/14/twitter.json';
 import Tippy from '@tippyjs/react';
+import { init } from 'emoji-mart';
 
 import { Tooltip } from '@/ui';
+
+init({ data: emojiData });
 
 export default function Emoji({ emoji }: { emoji: string }) {
   return (

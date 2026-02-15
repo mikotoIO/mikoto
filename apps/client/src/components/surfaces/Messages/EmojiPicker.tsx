@@ -1,12 +1,5 @@
 import emojiData from '@emoji-mart/data/sets/14/twitter.json';
 import Picker from '@emoji-mart/react';
-import { init } from 'emoji-mart';
-
-let emojiInitialized = false;
-if (!emojiInitialized) {
-  init({ data: emojiData });
-  emojiInitialized = true;
-}
 
 export default function EmojiPicker({
   onEmojiSelect,

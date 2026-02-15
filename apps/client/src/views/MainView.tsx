@@ -4,7 +4,6 @@ import {
   faBarsStaggered,
   faGlobe,
   faMagnifyingGlass,
-  faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
@@ -17,7 +16,6 @@ import { DockViewSurface } from '@/components/DockViewSurface';
 import { faMikoto } from '@/components/icons';
 import { Sidebar } from '@/components/sidebars/Base';
 import { FriendSidebar } from '@/components/sidebars/FriendSidebar';
-import { MemberListSidebar } from '@/components/sidebars/MemberListSidebar';
 import { SpaceSidebar } from '@/components/sidebars/SpaceSidebar';
 import { surfaceMap } from '@/components/surfaces';
 import { channelToTab } from '@/components/surfaces/Explorer/channelToTab';
@@ -266,13 +264,6 @@ const AppView = () => {
     tabkit,
   ]);
 
-  const spaceId =
-    leftSidebar && leftSidebar.kind === 'explorer'
-      ? leftSidebar.spaceId
-      : undefined;
-
-  const space = spaceId ? mikoto.spaces._get(spaceId) : undefined;
-
   return (
     <AppContainer>
       <TopBar>
@@ -302,20 +293,8 @@ const AppView = () => {
             <span>Search...</span>
           </SearchBar>
         </TopBarCenter>
-        <TopBarRight>
-          {space && (
-            <TabBarButton
-              onClick={() => {
-                setWorkspace((ws) => ({
-                  ...ws,
-                  rightOpen: !ws.rightOpen,
-                }));
-              }}
-            >
-              <FontAwesomeIcon icon={faUsers} />
-            </TabBarButton>
-          )}
-        </TopBarRight>
+        <TopBarRight />
+
       </TopBar>
       <MainContent>
         <LeftBar>
@@ -344,24 +323,6 @@ const AppView = () => {
         <DockViewContainer>
           <DockViewSurface />
         </DockViewContainer>
-        <LeftBar>
-          <div className="bars">
-            {workspace.rightOpen && (
-              <Sidebar
-                position="right"
-                size={workspace.right || 300}
-                onResize={(size) => {
-                  setWorkspace((ws) => ({
-                    ...ws,
-                    right: (ws.right || 300) + size.width,
-                  }));
-                }}
-              >
-                {space && <MemberListSidebar space={space} />}
-              </Sidebar>
-            )}
-          </div>
-        </LeftBar>
       </MainContent>
     </AppContainer>
   );

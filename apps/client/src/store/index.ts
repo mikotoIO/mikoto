@@ -31,6 +31,21 @@ export const CurrentSpaceContext = React.createContext<MikotoSpace | undefined>(
 
 export const rightBarOpenState = atom<boolean>(false);
 
+interface ExplorerPanels {
+  channelsHeight: number;
+  channelsCollapsed: boolean;
+  membersCollapsed: boolean;
+}
+
+export const explorerPanelsState = atomWithStorage<ExplorerPanels>(
+  'explorerPanels',
+  {
+    channelsHeight: 300,
+    channelsCollapsed: false,
+    membersCollapsed: false,
+  },
+);
+
 interface Workspace {
   left: number;
   leftOpen: boolean;

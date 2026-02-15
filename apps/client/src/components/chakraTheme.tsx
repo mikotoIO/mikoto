@@ -217,8 +217,11 @@ export const globalCss = css`
   }
 
   * {
-    font-family: var(--font-main);
     box-sizing: border-box;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
   }
 
   button {

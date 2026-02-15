@@ -4,6 +4,11 @@
 }
 
 @font-face {
+  font-family: 'Outfit';
+  src: url(/fonts/outfit.ttf);
+}
+
+@font-face {
   font-family: 'JetBrains Mono';
   src: url(/fonts/jetbrains-mono.ttf);
 }

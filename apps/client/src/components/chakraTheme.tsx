@@ -78,7 +78,7 @@ export const chakraTheme = defineConfig({
         },
       },
       fonts: {
-        heading: { value: '"Inter", sans-serif' },
+        heading: { value: '"Outfit", sans-serif' },
         body: { value: '"Inter", sans-serif' },
         code: { value: '"JetBrains Mono", monospace' },
       },
@@ -96,6 +96,7 @@ export const chakraTheme = defineConfig({
 
 export const globalCss = css`
   :root {
+    --font-heading: 'Outfit', sans-serif;
     --font-main: 'Inter', sans-serif;
     --font-code: 'JetBrains Mono', monospace;
   }

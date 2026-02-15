@@ -21,36 +21,72 @@ export const chakraTheme = defineConfig({
     tokens: {
       colors: {
         gray: {
-          900: { value: 'hsl(230, 12%, 11%)' },
-          850: { value: 'hsl(230, 12%, 12.5%)' },
-          800: { value: 'hsl(230, 12%, 14%)' },
-          750: { value: 'hsl(230, 12%, 17%)' },
-          700: { value: 'hsl(230, 16%, 20%)' },
-          650: { value: 'hsl(230, 16%, 27%)' },
-          600: { value: 'hsl(230, 16%, 35%)' },
-          550: { value: 'hsl(230, 16%, 42%)' },
-          500: { value: 'hsl(230, 16%, 52%)' },
-          450: { value: 'hsl(230, 16%, 60%)' },
-          400: { value: 'hsl(230, 16%, 69%)' },
-          350: { value: 'hsl(230, 16%, 75%)' },
-          300: { value: 'hsl(230, 20%, 84%)' },
-          250: { value: 'hsl(230, 20%, 88%)' },
-          200: { value: 'hsl(230, 20%, 91%)' },
-          150: { value: 'hsl(230, 20%, 93%)' },
-          100: { value: 'hsl(230, 20%, 95%)' },
-          50: { value: 'hsl(230, 25%, 98%)' },
+          900: { value: '#0A0A0C' },
+          850: { value: '#0D0D10' },
+          800: { value: '#141418' },
+          750: { value: '#1C1C22' },
+          700: { value: '#26262E' },
+          650: { value: '#2E2E38' },
+          600: { value: '#3A3A46' },
+          550: { value: '#4A4A56' },
+          500: { value: '#6B7280' },
+          450: { value: '#7C8290' },
+          400: { value: '#9CA3AF' },
+          350: { value: '#B0B6C0' },
+          300: { value: '#D1D5DB' },
+          250: { value: '#DCDFE4' },
+          200: { value: '#E5E7EB' },
+          150: { value: '#ECEEF1' },
+          100: { value: '#F3F4F6' },
+          50: { value: '#F9FAFB' },
         },
         blue: {
-          900: { value: 'hsl(214, 100%, 11%)' },
-          800: { value: 'hsl(214, 100%, 20%)' },
-          700: { value: 'hsl(214, 100%, 37%)' },
-          600: { value: 'hsl(214, 100%, 50%)' },
-          500: { value: 'hsl(214, 96%, 60%)' },
-          400: { value: 'hsl(214, 92%, 70%)' },
-          300: { value: 'hsl(214, 90%, 75%)' },
-          200: { value: 'hsl(214, 88%, 80%)' },
-          100: { value: 'hsl(214, 86%, 85%)' },
-          50: { value: 'hsl(214, 84%, 90%)' },
+          900: { value: '#1E3A8A' },
+          800: { value: '#1E40AF' },
+          700: { value: '#1D4ED8' },
+          600: { value: '#2563EB' },
+          500: { value: '#3B82F6' },
+          400: { value: '#60A5FA' },
+          300: { value: '#93C5FD' },
+          200: { value: '#BFDBFE' },
+          100: { value: '#DBEAFE' },
+          50: { value: '#EFF6FF' },
+        },
+        cyan: {
+          900: { value: '#164E63' },
+          800: { value: '#155E75' },
+          700: { value: '#0E7490' },
+          600: { value: '#0891B2' },
+          500: { value: '#06B6D4' },
+          400: { value: '#22D3EE' },
+          300: { value: '#67E8F9' },
+          200: { value: '#A5F3FC' },
+          100: { value: '#CFFAFE' },
+          50: { value: '#ECFEFF' },
+        },
+        magenta: {
+          900: { value: '#831843' },
+          800: { value: '#9D174D' },
+          700: { value: '#BE185D' },
+          600: { value: '#DB2777' },
+          500: { value: '#EC4899' },
+          400: { value: '#F472B6' },
+          300: { value: '#F9A8D4' },
+          200: { value: '#FBCFE8' },
+          100: { value: '#FCE7F3' },
+          50: { value: '#FDF2F8' },
+        },
+        purple: {
+          900: { value: '#4C1D95' },
+          800: { value: '#5B21B6' },
+          700: { value: '#6D28D9' },
+          600: { value: '#7C3AED' },
+          500: { value: '#8B5CF6' },
+          400: { value: '#A78BFA' },
+          300: { value: '#C4B5FD' },
+          200: { value: '#DDD6FE' },
+          100: { value: '#EDE9FE' },
+          50: { value: '#F5F3FF' },
         },
         yellow: {
           900: { value: 'hsl(33, 100%, 21%)' },
@@ -78,7 +114,7 @@ export const chakraTheme = defineConfig({
         },
       },
       fonts: {
-        heading: { value: '"Inter", sans-serif' },
+        heading: { value: '"Outfit", sans-serif' },
         body: { value: '"Inter", sans-serif' },
         code: { value: '"JetBrains Mono", monospace' },
       },
@@ -96,8 +132,19 @@ export const chakraTheme = defineConfig({
 
 export const globalCss = css`
   :root {
+    --font-heading: 'Outfit', sans-serif;
     --font-main: 'Inter', sans-serif;
     --font-code: 'JetBrains Mono', monospace;
+
+    --bg-page: var(--chakra-colors-gray-900);
+    --bg-dark: var(--chakra-colors-gray-850);
+    --bg-mid: var(--chakra-colors-gray-800);
+    --bg-light: var(--chakra-colors-gray-750);
+    --bg-lighter: var(--chakra-colors-gray-700);
+    --border: var(--chakra-colors-gray-650);
+    --text-primary: #ffffff;
+    --text-secondary: var(--chakra-colors-gray-400);
+    --text-dim: var(--chakra-colors-gray-500);
   }
 
   /* Dockview Mikoto theme - uses Chakra color tokens */
@@ -216,8 +263,11 @@ export const globalCss = css`
   }
 
   * {
-    font-family: var(--font-main);
     box-sizing: border-box;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
   }
 
   button {

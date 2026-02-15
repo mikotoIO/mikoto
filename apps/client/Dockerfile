@@ -12,6 +12,8 @@ RUN corepack enable
 COPY . .
 RUN pnpm install --frozen-lockfile
 
+RUN pnpm --filter "...^client" --if-present run build
+
 WORKDIR /app/apps/client
 RUN ["pnpm", "build"]
 

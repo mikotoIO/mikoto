@@ -5,7 +5,13 @@ import { faMikoto } from '@/components/icons';
 
 export function WelcomePanel() {
   return (
-    <Center w="100%" h="100%" flexDir="column" className="empty-view">
+    <Center
+      w="100%"
+      h="100%"
+      flexDir="column"
+      className="empty-view"
+      bg="surface"
+    >
       <FontAwesomeIcon icon={faMikoto} fontSize="10vw" />
       <Box fontSize="20px" mt="10px" mb="4px">
         Welcome to Mikoto

@@ -12,6 +12,7 @@ import { useLocation, useParams } from 'react-router-dom';
 
 import { CommandMenuKit, commandMenuOpenAtom } from '@/components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
+import { UserAreaAvatar } from '@/components/UserArea';
 import { DockViewSurface } from '@/components/DockViewSurface';
 import { faMikoto } from '@/components/icons';
 import { Sidebar } from '@/components/sidebars/Base';
@@ -268,6 +269,7 @@ const AppView = () => {
     <AppContainer>
       <TopBar>
         <TopBarLeft>
+          <UserAreaAvatar />
           <TabBarButton
             onClick={() => {
               tabkit.openTab({ kind: 'spaceExplorer', key: 'spaceExplorer' });

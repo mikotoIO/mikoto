@@ -318,6 +318,13 @@ export const DockViewSurface = () => {
           return `/settings/bots/${botId}`;
         }
 
+        // Space invite: /invite/:inviteCode
+        case 'spaceInvite': {
+          const inviteCode = (tab as any).inviteCode;
+          if (!inviteCode) return '/';
+          return `/invite/${inviteCode}`;
+        }
+
         default:
           return '/';
       }

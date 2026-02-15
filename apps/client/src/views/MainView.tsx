@@ -155,10 +155,12 @@ const AppView = () => {
     spaceRef: routeSpaceRef,
     channelId: routeChannelId,
     botId: routeBotId,
+    inviteCode: routeInviteCode,
   } = useParams<{
     spaceRef: string;
     channelId: string;
     botId: string;
+    inviteCode: string;
   }>();
 
   // Resolve spaceRef to spaceId (handles @handle format)
@@ -179,8 +181,17 @@ const AppView = () => {
 
     let tabToOpen: Tabable | null = null;
 
+    // Invite route: /invite/:inviteCode
+    if (routeInviteCode) {
+      tabToOpen = {
+        kind: 'spaceInvite',
+        key: routeInviteCode,
+        inviteCode: routeInviteCode,
+      };
+    }
+
     // Global routes (no params)
-    switch (pathname) {
+    if (!tabToOpen) switch (pathname) {
       case '/spaces':
         tabToOpen = { kind: 'spaceExplorer', key: 'spaceExplorer' };
         break;
@@ -262,6 +273,7 @@ const AppView = () => {
     routeSpaceId,
     routeChannelId,
     routeBotId,
+    routeInviteCode,
     mikoto,
     tabkit,
   ]);

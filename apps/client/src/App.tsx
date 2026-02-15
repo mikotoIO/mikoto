@@ -8,9 +8,7 @@ import {
   ResetPasswordView,
 } from '@/views/AuthView';
 import MainView from '@/views/MainView';
-import { MikotoClientProvider } from '@/views/MikotoClientProvider';
 import { NotFound } from '@/views/NotFoundPage';
-import { SpaceInviteView } from '@/views/SpaceInviteView';
 
 const AppShell = styled.div`
   height: 100vh;
@@ -88,11 +86,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/invite/:inviteCode',
-    element: (
-      <MikotoClientProvider>
-        <SpaceInviteView />
-      </MikotoClientProvider>
-    ),
+    element: <MainView />,
   },
   {
     path: '*',

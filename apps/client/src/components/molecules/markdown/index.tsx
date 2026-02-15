@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 
 import { markdownComponents } from './components';
@@ -70,7 +71,7 @@ export function Markdown({ content }: { content: string }) {
   return (
     <MarkdownWrapper emojiSize={emojiSize}>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkEmoji, remarkMention, remarkSpoiler]}
+        remarkPlugins={[remarkGfm, remarkBreaks, remarkEmoji, remarkMention, remarkSpoiler]}
         components={markdownComponents}
       >
         {co}

@@ -4,11 +4,7 @@
   "description": "",
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    }
+    ".": "./src/index.ts"
   },
   "files": ["dist"],
   "scripts": {

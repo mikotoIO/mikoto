@@ -28,7 +28,7 @@ function isUrlImage(url: string): boolean {
   return url.match(/\.(jpeg|jpg|gif|png)$/) !== null;
 }
 
-const EMOJI_ONLY_REGEX = /^(\s*:(\+1|[-\w]+):\s*)+$/;
+const EMOJI_ONLY_REGEX = /^\s*:(\+1|[-\w]+):(\s*:(\+1|[-\w]+):)*\s*$/;
 
 function isEmojiOnly(content: string): boolean {
   return EMOJI_ONLY_REGEX.test(content);

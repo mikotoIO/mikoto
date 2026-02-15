@@ -76,16 +76,26 @@ export function ColorsSection() {
           <tbody>
             <tr>
               <td>
-                <span className="token-name" style={{ color: 'var(--blue-bright)' }}>
+                <span
+                  className="token-name"
+                  style={{ color: 'var(--blue-bright)' }}
+                >
                   Blue
                 </span>
               </td>
-              <td className="token-desc">Primary actions, active states, key CTAs</td>
-              <td className="token-value">Buttons, active tabs, primary links</td>
+              <td className="token-desc">
+                Primary actions, active states, key CTAs
+              </td>
+              <td className="token-value">
+                Buttons, active tabs, primary links
+              </td>
             </tr>
             <tr>
               <td>
-                <span className="token-name" style={{ color: 'var(--cyan-bright)' }}>
+                <span
+                  className="token-name"
+                  style={{ color: 'var(--cyan-bright)' }}
+                >
                   Cyan
                 </span>
               </td>
@@ -94,16 +104,24 @@ export function ColorsSection() {
             </tr>
             <tr>
               <td>
-                <span className="token-name" style={{ color: 'var(--magenta-bright)' }}>
+                <span
+                  className="token-name"
+                  style={{ color: 'var(--magenta-bright)' }}
+                >
                   Magenta
                 </span>
               </td>
               <td className="token-desc">Highlights, accents, emphasis</td>
-              <td className="token-value">Stats, feature callouts, hover effects</td>
+              <td className="token-value">
+                Stats, feature callouts, hover effects
+              </td>
             </tr>
             <tr>
               <td>
-                <span className="token-name" style={{ color: 'var(--purple-bright)' }}>
+                <span
+                  className="token-name"
+                  style={{ color: 'var(--purple-bright)' }}
+                >
                   Purple
                 </span>
               </td>
@@ -141,18 +159,30 @@ export function TypographySection() {
           </thead>
           <tbody>
             <tr>
-              <td><span className="token-name">Zen Kaku Gothic New</span></td>
-              <td className="token-desc">Headlines, display text — Japanese-influenced, bold character</td>
+              <td>
+                <span className="token-name">Zen Kaku Gothic New</span>
+              </td>
+              <td className="token-desc">
+                Headlines, display text — Japanese-influenced, bold character
+              </td>
               <td className="token-value">700, 900</td>
             </tr>
             <tr>
-              <td><span className="token-name">Outfit</span></td>
-              <td className="token-desc">Body text, descriptions — clean, modern, readable</td>
+              <td>
+                <span className="token-name">Outfit</span>
+              </td>
+              <td className="token-desc">
+                Body text, descriptions — clean, modern, readable
+              </td>
               <td className="token-value">400, 500, 600</td>
             </tr>
             <tr>
-              <td><span className="token-name">JetBrains Mono</span></td>
-              <td className="token-desc">System text, labels, code — technical, precise</td>
+              <td>
+                <span className="token-name">JetBrains Mono</span>
+              </td>
+              <td className="token-desc">
+                System text, labels, code — technical, precise
+              </td>
               <td className="token-value">400, 500, 600</td>
             </tr>
           </tbody>
@@ -167,14 +197,18 @@ export function TypographySection() {
               <div className="type-label-name">H1</div>
               <div className="type-label-size">48px / 900</div>
             </div>
-            <div className="type-sample type-sample-h1">Where conversations grow</div>
+            <div className="type-sample type-sample-h1">
+              Where conversations grow
+            </div>
           </div>
           <div className="type-row">
             <div className="type-label">
               <div className="type-label-name">H2</div>
               <div className="type-label-size">36px / 900</div>
             </div>
-            <div className="type-sample type-sample-h2">Everything in one place</div>
+            <div className="type-sample type-sample-h2">
+              Everything in one place
+            </div>
           </div>
           <div className="type-row">
             <div className="type-label">
@@ -189,8 +223,8 @@ export function TypographySection() {
               <div className="type-label-size">15px / 400</div>
             </div>
             <div className="type-sample type-sample-body">
-              Real-time chat that doesn't forget. Documentation that stays alive.
-              Built for communities that build things.
+              Real-time chat that doesn't forget. Documentation that stays
+              alive. Built for communities that build things.
             </div>
           </div>
           <div className="type-row">
@@ -198,14 +232,18 @@ export function TypographySection() {
               <div className="type-label-name">Mono</div>
               <div className="type-label-size">12px / 400</div>
             </div>
-            <div className="type-sample type-sample-mono">git clone mikoto-io/mikoto</div>
+            <div className="type-sample type-sample-mono">
+              git clone mikoto-io/mikoto
+            </div>
           </div>
           <div className="type-row">
             <div className="type-label">
               <div className="type-label-name">Tag</div>
               <div className="type-label-size">10px / 600</div>
             </div>
-            <div className="type-sample type-sample-tag">// Open Source Platform</div>
+            <div className="type-sample type-sample-tag">
+              // Open Source Platform
+            </div>
           </div>
         </div>
       </div>
@@ -237,22 +275,30 @@ export function SpacingSection() {
           </thead>
           <tbody>
             <tr>
-              <td><span className="token-name">--cell-gap</span></td>
+              <td>
+                <span className="token-name">--cell-gap</span>
+              </td>
               <td className="token-value">1px</td>
               <td className="token-desc">Gap between grid cells</td>
             </tr>
             <tr>
-              <td><span className="token-name">--group-gap</span></td>
+              <td>
+                <span className="token-name">--group-gap</span>
+              </td>
               <td className="token-value">24px</td>
               <td className="token-desc">Margin between drawer groups</td>
             </tr>
             <tr>
-              <td><span className="token-name">--page-padding</span></td>
+              <td>
+                <span className="token-name">--page-padding</span>
+              </td>
               <td className="token-value">48px</td>
               <td className="token-desc">Page edge padding</td>
             </tr>
             <tr>
-              <td><span className="token-name">--cell-padding</span></td>
+              <td>
+                <span className="token-name">--cell-padding</span>
+              </td>
               <td className="token-value">24px</td>
               <td className="token-desc">Internal cell padding</td>
             </tr>

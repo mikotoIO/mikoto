@@ -5,8 +5,8 @@ export function ButtonsSection() {
         <div className="doc-section-tag">// 010</div>
         <h1 className="doc-section-title">Buttons</h1>
         <p className="doc-section-desc">
-          Buttons are sharp-edged and use monospace text for a technical feel. No
-          rounded corners.
+          Buttons are sharp-edged and use monospace text for a technical feel.
+          No rounded corners.
         </p>
       </header>
 
@@ -36,23 +36,33 @@ export function ButtonsSection() {
           </thead>
           <tbody>
             <tr>
-              <td><span className="token-name">Font</span></td>
+              <td>
+                <span className="token-name">Font</span>
+              </td>
               <td className="token-value">JetBrains Mono, 10px, 600</td>
             </tr>
             <tr>
-              <td><span className="token-name">Text Transform</span></td>
+              <td>
+                <span className="token-name">Text Transform</span>
+              </td>
               <td className="token-value">uppercase</td>
             </tr>
             <tr>
-              <td><span className="token-name">Letter Spacing</span></td>
+              <td>
+                <span className="token-name">Letter Spacing</span>
+              </td>
               <td className="token-value">1px</td>
             </tr>
             <tr>
-              <td><span className="token-name">Padding</span></td>
+              <td>
+                <span className="token-name">Padding</span>
+              </td>
               <td className="token-value">12px 20px</td>
             </tr>
             <tr>
-              <td><span className="token-name">Border Radius</span></td>
+              <td>
+                <span className="token-name">Border Radius</span>
+              </td>
               <td className="token-value">0 (none)</td>
             </tr>
           </tbody>
@@ -69,8 +79,8 @@ export function TagsSection() {
         <div className="doc-section-tag">// 011</div>
         <h1 className="doc-section-title">Tags & Labels</h1>
         <p className="doc-section-desc">
-          Section tags and labels provide wayfinding and reinforce the systematic
-          aesthetic.
+          Section tags and labels provide wayfinding and reinforce the
+          systematic aesthetic.
         </p>
       </header>
 
@@ -86,10 +96,16 @@ export function TagsSection() {
           </div>
           <div className="component-demo-body">
             <span className="type-sample-tag">// Features</span>
-            <span className="type-sample-tag" style={{ color: 'var(--blue-bright)' }}>
+            <span
+              className="type-sample-tag"
+              style={{ color: 'var(--blue-bright)' }}
+            >
               // 001
             </span>
-            <span className="type-sample-tag" style={{ color: 'var(--magenta-bright)' }}>
+            <span
+              className="type-sample-tag"
+              style={{ color: 'var(--magenta-bright)' }}
+            >
               // Built For
             </span>
           </div>
@@ -105,9 +121,11 @@ export function TagsSection() {
           <span className="prop">font-family</span>:{' '}
           <span className="value">'JetBrains Mono', monospace</span>;{'\n'}
           {'  '}
-          <span className="prop">font-size</span>: <span className="value">9px</span>;{'\n'}
+          <span className="prop">font-size</span>:{' '}
+          <span className="value">9px</span>;{'\n'}
           {'  '}
-          <span className="prop">font-weight</span>: <span className="value">600</span>;{'\n'}
+          <span className="prop">font-weight</span>:{' '}
+          <span className="value">600</span>;{'\n'}
           {'  '}
           <span className="prop">text-transform</span>:{' '}
           <span className="value">uppercase</span>;{'\n'}
@@ -139,8 +157,8 @@ export function UIElementsSection() {
       <div className="doc-block">
         <h2 className="doc-block-title">Tabs</h2>
         <p className="doc-block-text">
-          Tab buttons for switching between content panels. Active state uses the
-          primary blue.
+          Tab buttons for switching between content panels. Active state uses
+          the primary blue.
         </p>
         <div className="component-demo">
           <div className="component-demo-header">
@@ -149,7 +167,11 @@ export function UIElementsSection() {
           <div className="component-demo-body">
             <button
               className="btn"
-              style={{ background: 'var(--blue)', color: 'white', padding: '10px 16px' }}
+              style={{
+                background: 'var(--blue)',
+                color: 'white',
+                padding: '10px 16px',
+              }}
             >
               Active
             </button>
@@ -191,7 +213,9 @@ export function UIElementsSection() {
           </div>
           <div className="component-demo-body component-demo-centered">
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Off</span>
+              <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                Off
+              </span>
               <div
                 style={{
                   width: 36,
@@ -214,7 +238,9 @@ export function UIElementsSection() {
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>On</span>
+              <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                On
+              </span>
               <div
                 style={{
                   width: 36,
@@ -259,7 +285,8 @@ export function UIElementsSection() {
           <span className="selector">.ui-bar</span>
           {' {\n'}
           {'  '}
-          <span className="prop">display</span>: <span className="value">flex</span>;{'\n'}
+          <span className="prop">display</span>:{' '}
+          <span className="value">flex</span>;{'\n'}
           {'  '}
           <span className="prop">justify-content</span>:{' '}
           <span className="value">space-between</span>;{'\n'}

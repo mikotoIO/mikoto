@@ -17,18 +17,42 @@ export function GridSection() {
           columns (3, 4, 6, etc.) to create layouts that always complete to 12.
         </p>
         <div className="live-grid-demo">
-          <div className="demo-cell mid" style={{ gridColumn: 'span 12' }}>w12</div>
-          <div className="demo-cell light" style={{ gridColumn: 'span 6' }}>w6</div>
-          <div className="demo-cell light" style={{ gridColumn: 'span 6' }}>w6</div>
-          <div className="demo-cell mid" style={{ gridColumn: 'span 4' }}>w4</div>
-          <div className="demo-cell mid" style={{ gridColumn: 'span 4' }}>w4</div>
-          <div className="demo-cell mid" style={{ gridColumn: 'span 4' }}>w4</div>
-          <div className="demo-cell light" style={{ gridColumn: 'span 3' }}>w3</div>
-          <div className="demo-cell light" style={{ gridColumn: 'span 3' }}>w3</div>
-          <div className="demo-cell light" style={{ gridColumn: 'span 3' }}>w3</div>
-          <div className="demo-cell light" style={{ gridColumn: 'span 3' }}>w3</div>
-          <div className="demo-cell mid" style={{ gridColumn: 'span 8' }}>w8</div>
-          <div className="demo-cell mid" style={{ gridColumn: 'span 4' }}>w4</div>
+          <div className="demo-cell mid" style={{ gridColumn: 'span 12' }}>
+            w12
+          </div>
+          <div className="demo-cell light" style={{ gridColumn: 'span 6' }}>
+            w6
+          </div>
+          <div className="demo-cell light" style={{ gridColumn: 'span 6' }}>
+            w6
+          </div>
+          <div className="demo-cell mid" style={{ gridColumn: 'span 4' }}>
+            w4
+          </div>
+          <div className="demo-cell mid" style={{ gridColumn: 'span 4' }}>
+            w4
+          </div>
+          <div className="demo-cell mid" style={{ gridColumn: 'span 4' }}>
+            w4
+          </div>
+          <div className="demo-cell light" style={{ gridColumn: 'span 3' }}>
+            w3
+          </div>
+          <div className="demo-cell light" style={{ gridColumn: 'span 3' }}>
+            w3
+          </div>
+          <div className="demo-cell light" style={{ gridColumn: 'span 3' }}>
+            w3
+          </div>
+          <div className="demo-cell light" style={{ gridColumn: 'span 3' }}>
+            w3
+          </div>
+          <div className="demo-cell mid" style={{ gridColumn: 'span 8' }}>
+            w8
+          </div>
+          <div className="demo-cell mid" style={{ gridColumn: 'span 4' }}>
+            w4
+          </div>
         </div>
       </div>
 
@@ -44,27 +68,37 @@ export function GridSection() {
           </thead>
           <tbody>
             <tr>
-              <td><span className="token-name">Hero</span></td>
+              <td>
+                <span className="token-name">Hero</span>
+              </td>
               <td className="token-value">6 + 6</td>
               <td className="token-desc">Main headline with visual</td>
             </tr>
             <tr>
-              <td><span className="token-name">Stats Row</span></td>
+              <td>
+                <span className="token-name">Stats Row</span>
+              </td>
               <td className="token-value">3 + 3 + 3 + 3</td>
               <td className="token-desc">Four equal stat cells</td>
             </tr>
             <tr>
-              <td><span className="token-name">Features</span></td>
+              <td>
+                <span className="token-name">Features</span>
+              </td>
               <td className="token-value">4 + 4 + 4</td>
               <td className="token-desc">Three feature cards</td>
             </tr>
             <tr>
-              <td><span className="token-name">Content + Visual</span></td>
+              <td>
+                <span className="token-name">Content + Visual</span>
+              </td>
               <td className="token-value">5 + 7 or 6 + 6</td>
               <td className="token-desc">Text with screenshot/demo</td>
             </tr>
             <tr>
-              <td><span className="token-name">Full Width</span></td>
+              <td>
+                <span className="token-name">Full Width</span>
+              </td>
               <td className="token-value">12</td>
               <td className="token-desc">Section headers, tabs</td>
             </tr>
@@ -86,9 +120,15 @@ export function GridSection() {
           >
             w6 h2
           </div>
-          <div className="demo-cell mid" style={{ gridColumn: 'span 6' }}>w6</div>
-          <div className="demo-cell mid" style={{ gridColumn: 'span 3' }}>w3</div>
-          <div className="demo-cell fill-cyan" style={{ gridColumn: 'span 3' }}>w3</div>
+          <div className="demo-cell mid" style={{ gridColumn: 'span 6' }}>
+            w6
+          </div>
+          <div className="demo-cell mid" style={{ gridColumn: 'span 3' }}>
+            w3
+          </div>
+          <div className="demo-cell fill-cyan" style={{ gridColumn: 'span 3' }}>
+            w3
+          </div>
         </div>
       </div>
     </section>
@@ -198,21 +238,26 @@ export function CellsSection() {
           <span className="selector">.cell-id</span>
           {' {\n'}
           {'  '}
-          <span className="prop">position</span>: <span className="value">absolute</span>;{'\n'}
+          <span className="prop">position</span>:{' '}
+          <span className="value">absolute</span>;{'\n'}
           {'  '}
-          <span className="prop">top</span>: <span className="value">8px</span>;{'\n'}
+          <span className="prop">top</span>: <span className="value">8px</span>;
+          {'\n'}
           {'  '}
-          <span className="prop">right</span>: <span className="value">8px</span>;{'\n'}
+          <span className="prop">right</span>:{' '}
+          <span className="value">8px</span>;{'\n'}
           {'  '}
           <span className="prop">font-family</span>:{' '}
           <span className="value">'JetBrains Mono', monospace</span>;{'\n'}
           {'  '}
-          <span className="prop">font-size</span>: <span className="value">8px</span>;{'\n'}
+          <span className="prop">font-size</span>:{' '}
+          <span className="value">8px</span>;{'\n'}
           {'  '}
           <span className="prop">color</span>:{' '}
           <span className="value">var(--text-dim)</span>;{'\n'}
           {'  '}
-          <span className="prop">opacity</span>: <span className="value">0.5</span>;{'\n'}
+          <span className="prop">opacity</span>:{' '}
+          <span className="value">0.5</span>;{'\n'}
           {'}'}
         </div>
       </div>
@@ -250,7 +295,8 @@ export function GroupsSection() {
           <span className="selector">.grid</span>
           {' {\n'}
           {'  '}
-          <span className="prop">display</span>: <span className="value">grid</span>;{'\n'}
+          <span className="prop">display</span>:{' '}
+          <span className="value">grid</span>;{'\n'}
           {'  '}
           <span className="prop">grid-template-columns</span>:{' '}
           <span className="value">repeat(12, 1fr)</span>;{'\n'}
@@ -285,37 +331,51 @@ export function GroupsSection() {
           </thead>
           <tbody>
             <tr>
-              <td><span className="token-name">Hero</span></td>
+              <td>
+                <span className="token-name">Hero</span>
+              </td>
               <td className="token-desc">Main headline, mockup, stats</td>
               <td className="token-value">6+6, 3+3+3+3</td>
             </tr>
             <tr>
-              <td><span className="token-name">Problem</span></td>
+              <td>
+                <span className="token-name">Problem</span>
+              </td>
               <td className="token-desc">Pain points, illustration</td>
               <td className="token-value">8+4, 4+4+4</td>
             </tr>
             <tr>
-              <td><span className="token-name">Features</span></td>
+              <td>
+                <span className="token-name">Features</span>
+              </td>
               <td className="token-desc">Feature cards overview</td>
               <td className="token-value">12, 4+4+4</td>
             </tr>
             <tr>
-              <td><span className="token-name">Showcase</span></td>
+              <td>
+                <span className="token-name">Showcase</span>
+              </td>
               <td className="token-desc">Tabbed feature demos</td>
               <td className="token-value">12, 4+8, 4</td>
             </tr>
             <tr>
-              <td><span className="token-name">Deep Dive</span></td>
+              <td>
+                <span className="token-name">Deep Dive</span>
+              </td>
               <td className="token-desc">Feature details, UI demos</td>
               <td className="token-value">6+6, 6+6</td>
             </tr>
             <tr>
-              <td><span className="token-name">Audience</span></td>
+              <td>
+                <span className="token-name">Audience</span>
+              </td>
               <td className="token-desc">Target communities</td>
               <td className="token-value">12, 4+4+4, 3+3+3+3</td>
             </tr>
             <tr>
-              <td><span className="token-name">Open Source</span></td>
+              <td>
+                <span className="token-name">Open Source</span>
+              </td>
               <td className="token-desc">GitHub CTA, code block</td>
               <td className="token-value">12, 6+6</td>
             </tr>

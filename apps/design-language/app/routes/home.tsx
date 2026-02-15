@@ -1,26 +1,27 @@
 import { useEffect, useState } from 'react';
-import type { Route } from './+types/home';
+
 import { DocNav } from '../components/DocNav';
-import {
-  PhilosophySection,
-  PrinciplesSection,
-  CactuspunkSection,
-} from '../components/sections/FoundationSections';
-import {
-  ColorsSection,
-  TypographySection,
-  SpacingSection,
-} from '../components/sections/TokenSections';
-import {
-  GridSection,
-  CellsSection,
-  GroupsSection,
-} from '../components/sections/LayoutSections';
 import {
   ButtonsSection,
   TagsSection,
   UIElementsSection,
 } from '../components/sections/ComponentSections';
+import {
+  CactuspunkSection,
+  PhilosophySection,
+  PrinciplesSection,
+} from '../components/sections/FoundationSections';
+import {
+  CellsSection,
+  GridSection,
+  GroupsSection,
+} from '../components/sections/LayoutSections';
+import {
+  ColorsSection,
+  SpacingSection,
+  TypographySection,
+} from '../components/sections/TokenSections';
+import type { Route } from './+types/home';
 
 export function meta({}: Route.MetaArgs) {
   return [

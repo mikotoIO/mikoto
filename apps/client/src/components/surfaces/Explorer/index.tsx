@@ -7,8 +7,8 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoChannel, MikotoSpace, Relationship } from '@mikoto-io/mikoto.js';
 import { useAtom, useSetAtom } from 'jotai';
-import { useEffect, useState } from 'react';
 import { NumberSize, Resizable } from 're-resizable';
+import { useEffect, useState } from 'react';
 import { useSnapshot } from 'valtio/react';
 
 import {
@@ -45,7 +45,7 @@ const PanelHeader = styled.button`
   display: flex;
   align-items: center;
   gap: 6px;
-  height: 28px;
+  height: 32px;
   flex-shrink: 0;
   padding: 0 12px;
   background: var(--chakra-colors-gray-800);
@@ -53,12 +53,12 @@ const PanelHeader = styled.button`
   border-top: 1px solid var(--chakra-colors-gray-700);
   color: var(--chakra-colors-gray-300);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   cursor: pointer;
   user-select: none;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-heading);
 
   &:hover {
     background: var(--chakra-colors-gray-750);
@@ -210,7 +210,12 @@ export function Explorer({ space }: { space: MikotoSpace }) {
           enable={{ ...RESIZABLE_DISABLES, bottom: true }}
           size={{ width: '100%', height: panels.channelsHeight }}
           minHeight={60}
-          onResizeStop={(_e: unknown, _dir: unknown, _ref: unknown, d: NumberSize) => {
+          onResizeStop={(
+            _e: unknown,
+            _dir: unknown,
+            _ref: unknown,
+            d: NumberSize,
+          ) => {
             setPanels((p) => ({
               ...p,
               channelsHeight: p.channelsHeight + d.height,

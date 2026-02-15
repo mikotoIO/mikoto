@@ -4,7 +4,13 @@ import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 
 import { markdownComponents } from './components';
-import { remarkEmoji, remarkMention, remarkSpoiler } from './plugins';
+import {
+  preprocessEscapes,
+  remarkCleanEscapes,
+  remarkEmoji,
+  remarkMention,
+  remarkSpoiler,
+} from './plugins';
 
 function isUrl(s: string) {
   let url;
@@ -64,14 +70,14 @@ export function Markdown({ content }: { content: string }) {
   const co =
     isUrl(content) && isUrlImage(content)
       ? `![Image Embed](${content})`
-      : content;
+      : preprocessEscapes(content);
 
   const emojiSize = isEmojiOnly(content) ? '3em' : '1.2em';
 
   return (
     <MarkdownWrapper emojiSize={emojiSize}>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkBreaks, remarkEmoji, remarkMention, remarkSpoiler]}
+        remarkPlugins={[remarkGfm, remarkBreaks, remarkEmoji, remarkMention, remarkSpoiler, remarkCleanEscapes]}
         components={markdownComponents}
       >
         {co}

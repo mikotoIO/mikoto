@@ -22,6 +22,8 @@ data/
 .next/
 out/
 build
+.react-router/
+build/
 
 # misc
 .DS_Store

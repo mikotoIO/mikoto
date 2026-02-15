@@ -1,13 +1,16 @@
 import styled from '@emotion/styled';
-import SimpleMarkdown, { SingleASTNode } from '@khanacademy/simple-markdown';
+import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
+import remarkGfm from 'remark-gfm';
 
-import { codeBlockRule } from './rules/CodeBlock';
-import { emojiRule } from './rules/Emoji';
-import { imageRule } from './rules/Image';
-import { linkRule } from './rules/Link';
-import { mentionRule } from './rules/Mention';
-import { objectRule } from './rules/Object';
-import { spoilerRule } from './rules/Spoiler';
+import { markdownComponents } from './components';
+import {
+  preprocessEscapes,
+  remarkCleanEscapes,
+  remarkEmoji,
+  remarkMention,
+  remarkSpoiler,
+} from './plugins';
 
 function isUrl(s: string) {
   let url;
@@ -25,21 +28,11 @@ function isUrlImage(url: string): boolean {
   return url.match(/\.(jpeg|jpg|gif|png)$/) !== null;
 }
 
-const rules = {
-  ...SimpleMarkdown.defaultRules,
-  image: imageRule,
-  paragraph: {
-    ...SimpleMarkdown.defaultRules.paragraph,
-    match: SimpleMarkdown.blockRegex(/^((?:[^\n])+)(?:\n *)+/),
-  },
+const EMOJI_ONLY_REGEX = /^\s*:(\+1|[-\w]+):(\s*:(\+1|[-\w]+):)*\s*$/;
 
-  link: linkRule,
-  codeBlock: codeBlockRule,
-  object: objectRule,
-  emoji: emojiRule,
-  spoiler: spoilerRule,
-  mention: mentionRule,
-};
+function isEmojiOnly(content: string): boolean {
+  return EMOJI_ONLY_REGEX.test(content);
+}
 
 const MarkdownWrapper = styled.div<{ emojiSize: string }>`
   gap: 8px;
@@ -50,7 +43,7 @@ const MarkdownWrapper = styled.div<{ emojiSize: string }>`
     max-height: ${(p) => p.emojiSize} !important;
   }
 
-  .paragraph code {
+  p code {
     border-radius: 4px;
     padding: 2px;
     background-color: var(--chakra-colors-gray-800);
@@ -73,32 +66,22 @@ const MarkdownWrapper = styled.div<{ emojiSize: string }>`
   }
 `;
 
-function emojiFest(nodes: SingleASTNode[]) {
-  for (const x of nodes) {
-    if (x.type === 'paragraph') {
-      for (const y of x.content) {
-        if (y.type !== 'emoji') {
-          return '1.2em';
-        }
-      }
-    }
-  }
-  return '3em';
-}
-
-const rawBuiltParser = SimpleMarkdown.parserFor(rules as any);
-const reactOutput = SimpleMarkdown.outputFor(rules, 'react');
-
 export function Markdown({ content }: { content: string }) {
   const co =
     isUrl(content) && isUrlImage(content)
       ? `![Image Embed](${content})`
-      : content;
+      : preprocessEscapes(content);
 
-  const parsed = rawBuiltParser(co, { inline: false });
-  const output = reactOutput(parsed);
+  const emojiSize = isEmojiOnly(content) ? '3em' : '1.2em';
 
   return (
-    <MarkdownWrapper emojiSize={emojiFest(parsed)}>{output}</MarkdownWrapper>
+    <MarkdownWrapper emojiSize={emojiSize}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkBreaks, remarkEmoji, remarkMention, remarkSpoiler, remarkCleanEscapes]}
+        components={markdownComponents}
+      >
+        {co}
+      </ReactMarkdown>
+    </MarkdownWrapper>
   );
 }

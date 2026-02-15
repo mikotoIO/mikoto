@@ -23,6 +23,7 @@ export default ({ mode }: { mode: string }) =>
       alias: {
         '@': path.resolve(__dirname, 'src'),
       },
+      dedupe: ['valtio', 'react', 'react-dom'],
     },
     plugins: [
       react({

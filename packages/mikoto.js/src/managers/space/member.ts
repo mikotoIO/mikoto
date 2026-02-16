@@ -10,7 +10,7 @@ export class MikotoMember extends ZSchema(MemberExt) {
   client!: MikotoClient;
 
   constructor(base: MemberExt, client: MikotoClient) {
-    const cached = client.spaces._get(base.spaceId)?.members._get(base.id);
+    const cached = client.spaces._get(base.spaceId)?.members._get(base.userId);
     if (cached) {
       cached._patch(base);
       return cached;
@@ -114,7 +114,7 @@ export class MemberManager extends CachedManager<MikotoMember> {
     client.ws.on('members.onUpdate', (data) => {
       const space = client.spaces.cache.get(data.spaceId);
       if (!space) return;
-      const member = space.members._get(data.id);
+      const member = space.members._get(data.userId);
       if (member) member._patch(data);
     });
 

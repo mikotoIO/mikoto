@@ -60,27 +60,18 @@ export class MikotoMember extends ZSchema(MemberExt) {
     });
   }
 
-  checkPermission(action: string | bigint, superuserOverride = true) {
+  checkPermission(action: string | bigint) {
     if (!this.space) return false;
     if (this.isOwner) return true;
 
-    const roles = [...this.space.roles.cache.values()];
+    const act = typeof action === 'string' ? BigInt(action) : action;
 
-    let act = typeof action === 'string' ? BigInt(action) : action;
-    if (superuserOverride) {
-      // TODO: Check this at a later point to check for security
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      act |= BigInt(
-        roles.find((x) => x.name === '@everyone')?.permissions ?? 0n,
-      );
-    }
+    const totalPerms = this.roles.reduce(
+      (acc, x) => (x ? acc | BigInt(x.permissions) : acc),
+      0n,
+    );
 
-    // const totalPerms = roles.reduce(
-    //   (acc, x) => acc | BigInt(x.permissions),
-    //   0n,
-    // );
-    return true; // FIXME: correct this
-    // return this.client.checkPermission(act, totalPerms);
+    return (act & totalPerms) !== 0n;
   }
 }
 

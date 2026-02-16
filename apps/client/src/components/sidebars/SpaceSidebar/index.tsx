@@ -1,9 +1,6 @@
 import { Separator } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import {
-  faBarsStaggered,
-  faCirclePlus,
-} from '@fortawesome/free-solid-svg-icons';
+import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useAtom, useSetAtom } from 'jotai';
@@ -12,7 +9,6 @@ import { useDrag, useDrop } from 'react-dnd';
 import { useSnapshot } from 'valtio/react';
 
 import { modalState, useContextMenu } from '@/components/ContextMenu';
-import { UserAreaAvatar } from '@/components/UserArea';
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import { SpaceIconLike, StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
 import { faMikoto } from '@/components/icons';
@@ -189,7 +185,6 @@ export function SpaceSidebar() {
 
   useSnapshot(mikoto.spaces);
   const contextMenu = useContextMenu(() => <SpaceBackContextMenu />);
-  const setWorkspace = useSetAtom(workspaceState);
 
   const [order, setOrder] = useState<string[]>(() =>
     // TODO: persist to server
@@ -203,9 +198,6 @@ export function SpaceSidebar() {
 
   return (
     <StyledSpaceSidebar onContextMenu={contextMenu}>
-      <StyledIconWrapper>
-        <UserAreaAvatar />
-      </StyledIconWrapper>
       <StyledIconWrapper>
         <SpaceIconLike
           style={{

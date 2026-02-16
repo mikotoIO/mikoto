@@ -36,7 +36,6 @@ const MessageContainer = styled.div<{ isSimple?: boolean }>`
 const MessageInner = styled.div`
   flex: 1;
   margin: 0;
-  padding-top: 4px;
   font-size: 14px;
 
   a {
@@ -64,6 +63,7 @@ const MessageInner = styled.div`
 `;
 
 const Name = styled.div<{ color?: string | null }>`
+  font-family: var(--font-heading);
   font-size: 14px;
   font-weight: 600;
   margin: 0;

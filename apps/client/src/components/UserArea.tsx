@@ -102,8 +102,8 @@ export function UserAreaAvatar() {
   const mikoto = useMikoto();
   const [user, setUser] = useAtom(userState);
   const contextMenu = useContextMenu(() => <UserAreaMenu />, {
-    top: 32,
-    left: 64,
+    top: 36,
+    left: 8,
   });
   useEffect(() => {
     mikoto.rest['user.get']().then((x) => {
@@ -114,10 +114,9 @@ export function UserAreaAvatar() {
   return (
     user && (
       <Avatar
-        size={40}
+        size={24}
         onClick={contextMenu}
         src={user.avatar ?? undefined}
-        style={{ marginTop: '8px' }}
       />
     )
   );

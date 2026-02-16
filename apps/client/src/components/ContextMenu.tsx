@@ -31,10 +31,11 @@ const StyledContextMenuOverlay = styled.div`
 const ContextMenuBase = styled.div`
   color: var(--chakra-colors-text);
   width: 160px;
-  padding: 8px;
+  padding: 4px;
   font-size: 14px;
-  border-radius: 4px;
-  background-color: var(--chakra-colors-gray-900);
+  border-radius: 8px;
+  background-color: var(--chakra-colors-gray-650);
+  border: 1px solid var(--chakra-colors-gray-600);
   box-shadow: rgba(0, 0, 0, 0.1) 0 8px 24px;
 `;
 
@@ -113,7 +114,7 @@ function ContextMenuLink({ onClick, ...props }: JSX.IntrinsicElements['a']) {
 
 const StyledContextMenuLink = styled(ContextMenuLink)`
   display: block;
-  padding: 6px 8px;
+  padding: 4px;
   box-sizing: border-box;
   border-radius: 4px;
   width: 100%;

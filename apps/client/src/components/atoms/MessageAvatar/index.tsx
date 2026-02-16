@@ -89,12 +89,6 @@ function RoleSetter({
                     },
                   });
                 }
-
-                // await member.update({
-                //   roleIds: Object.keys(newSelectedRoles).filter(
-                //     (id) => newSelectedRoles[id],
-                //   ),
-                // });
               }}
             >
               {role.name}

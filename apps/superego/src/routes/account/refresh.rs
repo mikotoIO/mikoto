@@ -16,7 +16,12 @@ pub struct RefreshPayload {
 }
 
 pub async fn route(body: Json<RefreshPayload>) -> Result<Json<TokenPair>, Error> {
-    let refresh = RefreshToken::find_token(&body.refresh_token, db()).await?;
+    let refresh = RefreshToken::find_token(&body.refresh_token, db())
+        .await
+        .map_err(|e| match e {
+            Error::NotFound => Error::unauthorized("Invalid refresh token"),
+            other => other,
+        })?;
 
     if refresh.expires_at.0 < Utc::now().naive_utc() {
         return Err(Error::TokenExpired);

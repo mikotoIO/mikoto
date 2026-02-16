@@ -3,5 +3,6 @@ tags: ['core-app']
 
 tasks:
   typecheck:
+    command: 'tsc --noEmit'
     deps:
       - 'mikoto.js:build'

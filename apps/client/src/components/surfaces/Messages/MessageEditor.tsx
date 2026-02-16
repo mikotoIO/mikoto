@@ -226,7 +226,7 @@ export function MessageEditor({
 
   const setContextMenu = useSetAtom(contextMenuState);
   const ref = useRef<HTMLDivElement>(null);
-  useResizeObserver(ref, () => {
+  useResizeObserver(ref as React.RefObject<HTMLElement>, () => {
     onResize?.();
   });
 

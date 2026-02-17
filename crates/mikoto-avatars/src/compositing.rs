@@ -83,8 +83,7 @@ pub fn add_outline(image: &mut RgbaImage) {
     }
 }
 
-pub fn pick_random_png<'a>(dir: &Dir<'a>) -> (&'a str, &'a [u8]) {
-    let mut rng = rand::thread_rng();
+pub fn pick_random_png<'a>(dir: &Dir<'a>, rng: &mut impl Rng) -> (&'a str, &'a [u8]) {
     let pngs: Vec<_> = dir
         .files()
         .filter(|f| f.path().extension().is_some_and(|ext| ext == "png"))

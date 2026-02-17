@@ -5,6 +5,7 @@ use include_dir::Dir;
 use rand::Rng;
 use std::collections::HashMap;
 
+
 pub enum Source {
     File(&'static str),
     RandomFrom(&'static str),
@@ -84,8 +85,7 @@ pub struct GenerateResult {
     pub layers: Vec<LayerDetail>,
 }
 
-pub fn generate(assets: &Dir<'static>) -> GenerateResult {
-    let mut rng = rand::thread_rng();
+pub fn generate(assets: &Dir<'static>, rng: &mut impl Rng) -> GenerateResult {
     let mut canvas: Option<RgbaImage> = None;
     let mut hue_rotations: HashMap<&str, f32> = HashMap::new();
     let mut layers = Vec::new();
@@ -102,7 +102,7 @@ pub fn generate(assets: &Dir<'static>) -> GenerateResult {
                 let dir = assets
                     .get_dir(dir_name)
                     .unwrap_or_else(|| panic!("missing embedded {dir_name} dir"));
-                let (name, data) = pick_random_png(dir);
+                let (name, data) = pick_random_png(dir, rng);
                 (name, load_png(data))
             }
         };

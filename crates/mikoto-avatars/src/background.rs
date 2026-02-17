@@ -13,8 +13,7 @@ const ROWS: u32 = H / CELL;
 const BG: Rgba<u8> = Rgba([18, 16, 24, 255]);
 
 /// Generate a procedural circuit/pipe background.
-pub fn generate(hue_degrees: f32) -> RgbaImage {
-    let mut rng = rand::thread_rng();
+pub fn generate(hue_degrees: f32, rng: &mut impl Rng) -> RgbaImage {
     let mut img: RgbaImage = ImageBuffer::from_pixel(W, H, BG);
 
     // Derive trace colors from hue
@@ -91,7 +90,7 @@ pub fn generate(hue_degrees: f32) -> RgbaImage {
 
     // Scatter small circuit components along traces
     for _ in 0..rng.gen_range(3..7) {
-        place_component(&mut img, &h_edges, &v_edges, &mut rng, node_color, dim);
+        place_component(&mut img, &h_edges, &v_edges, rng, node_color, dim);
     }
 
     // Add a few random single-pixel glow dots for atmosphere

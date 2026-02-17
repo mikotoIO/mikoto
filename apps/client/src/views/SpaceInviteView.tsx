@@ -2,7 +2,7 @@ import { Button, Flex, Grid } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { SpaceExt } from '@mikoto-io/mikoto.js';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import { StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
@@ -24,15 +24,21 @@ const InvitationBox = styled.div`
 
 export function SpaceInviteViewInner() {
   const mikoto = useMikoto();
+  const navigate = useNavigate();
   const [space, setSpace] = useState<SpaceExt | null>(null);
   const inviteCode = useParams<{ inviteCode: string }>().inviteCode ?? '';
 
   useEffect(() => {
-    // mikoto.client.spaces.getSpaceFromInvite({ inviteCode }).then((x) => {
-    //   setSpace(x);
-    // });
     mikoto.rest['spaces.preview']({ params: { invite: inviteCode } }).then(
       (x) => {
+        const existing = mikoto.spaces.cache.get(x.id);
+        if (existing) {
+          navigate(
+            `/space/${existing.handle ? `@${existing.handle}` : existing.id}`,
+            { replace: true },
+          );
+          return;
+        }
         setSpace(x);
       },
     );

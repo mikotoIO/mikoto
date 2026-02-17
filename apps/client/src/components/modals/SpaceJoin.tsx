@@ -68,7 +68,7 @@ function SpaceJoinForm({ closeModal }: { closeModal: () => void }) {
       <Field label="Invite Link/Code">
         <Input autoComplete="off" {...register('inviteCode')} />
       </Field>
-      <Button>Join Space</Button>
+      <Button type="submit">Join Space</Button>
     </Form>
   );
 }

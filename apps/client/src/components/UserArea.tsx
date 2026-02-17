@@ -87,7 +87,7 @@ function UserAreaMenu() {
     <ContextMenu style={{ width: '280px' }}>
       {user && (
         <Flex gap={2} bg="gray.800" p="16px" rounded="md" direction="column">
-          <Avatar src={user.avatar ?? undefined} size={80} />
+          <Avatar src={user.avatar ?? undefined} userId={user.id} size={80} />
           <Heading fontSize="18px" mb={0}>
             {user.name}
           </Heading>
@@ -117,6 +117,7 @@ export function UserAreaAvatar() {
         size={24}
         onClick={contextMenu}
         src={user.avatar ?? undefined}
+        userId={user.id}
       />
     )
   );

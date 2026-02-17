@@ -122,6 +122,7 @@ export function MemberContextMenu({
           <div>
             <Avatar
               src={user.avatar ?? undefined}
+              userId={user.id}
               size={80}
               onClick={() => {
                 setModal({
@@ -187,6 +188,7 @@ export function MessageAvatar({ src, member, size }: MessageAvatarProps) {
       <Avatar
         className="avatar"
         src={src}
+        userId={user?.id}
         size={size ?? 40}
         onContextMenu={user && userContextMenu}
         onClick={(ev) => {

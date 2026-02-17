@@ -668,6 +668,7 @@ dependencies = [
  "envy",
  "image 0.24.9",
  "log",
+ "mikoto-avatars",
  "mime",
  "mime_guess",
  "nanoid",

@@ -6,7 +6,7 @@ mod layers;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
-use image::{DynamicImage, imageops::FilterType};
+use image::{DynamicImage, ImageFormat, imageops::FilterType};
 use include_dir::{Dir, include_dir};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -28,4 +28,13 @@ pub fn generate(seed: &str) -> DynamicImage {
 
     let (w, h) = (canvas.width(), canvas.height());
     image::DynamicImage::ImageRgba8(canvas).resize_exact(w * 20, h * 20, FilterType::Nearest)
+}
+
+pub fn generate_png(seed: &str) -> Vec<u8> {
+    let image = generate(seed);
+    let mut buf = Vec::new();
+    image
+        .write_to(&mut std::io::Cursor::new(&mut buf), ImageFormat::Png)
+        .expect("PNG encoding should not fail");
+    buf
 }

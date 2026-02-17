@@ -50,7 +50,7 @@ function MemberElement({ member }: { member: MikotoMember }) {
       }}
       onContextMenu={userContextMenu}
     >
-      <Avatar size={32} src={member.user.avatar ?? undefined} />
+      <Avatar size={32} src={member.user.avatar ?? undefined} userId={member.user.id} />
       <Box className="name" color={member.roleColor}>
         {member.user.name}
       </Box>

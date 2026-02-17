@@ -135,7 +135,7 @@ export function MemberContextMenu({
             {memberSnap && (
               <>
                 <h2>Roles</h2>
-                <Box gap={2}>
+                <Flex gap={1}>
                   {memberSnap.roles.map(
                     (r) => r && <RoleBadge key={r.id} role={r} />,
                   )}
@@ -147,7 +147,7 @@ export function MemberContextMenu({
                       +
                     </BaseRoleBadge>
                   )}
-                </Box>
+                </Flex>
               </>
             )}
           </div>

@@ -1,0 +1,9 @@
+[package]
+name = "mikoto-avatars"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+image = "0.25"
+rand = "0.8"
+include_dir = "0.7.4"

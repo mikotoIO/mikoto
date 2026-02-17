@@ -96,6 +96,7 @@ export function FriendSidebar() {
             className="avatar"
             size={32}
             src={friend?.relation?.avatar ?? undefined}
+            userId={friend?.relation?.id}
           />
           <div>{friend?.relation?.name ?? 'Deleted User'}</div>
         </StyledButtonBase>

@@ -49,6 +49,7 @@ export function ProfileModal({ user }: { user: UserExt }) {
           <Avatar
             className="avatar"
             src={user.avatar ?? undefined}
+            userId={user.id}
             size={100}
           />
         </div>

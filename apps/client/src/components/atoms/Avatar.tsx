@@ -30,18 +30,24 @@ const StyledAvatar = styled.img<{ size?: number | string }>`
 
 interface AvatarProps {
   src?: string | null;
+  userId?: string;
   size?: number;
 }
 
 export function Avatar({
   src,
+  userId,
   size,
   ...rest
 }: AvatarProps & React.HTMLAttributes<HTMLImageElement>) {
+  const fallback = userId
+    ? `${env.PUBLIC_MEDIASERVER_URL}/default-avatar/${userId}`
+    : '/images/default_avatar.png';
+
   return (
     <StyledAvatar
       src={
-        normalizeMediaUrl(src, '/images/default_avatar.png') +
+        normalizeMediaUrl(src, fallback) +
         (typeof size === 'number' ? `?w=${size * 2}&h=${size * 2}` : '')
       }
       size={`${size ?? 40}px`}

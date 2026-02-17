@@ -7,6 +7,7 @@ use axum::{
 };
 use tower_http::cors::{Any, CorsLayer};
 
+pub mod default_avatar;
 pub mod proxy;
 pub mod serve;
 pub mod upload;
@@ -30,6 +31,7 @@ pub fn router() -> Router {
     Router::new()
         .route("/", get(index))
         .route("/proxy", get(proxy::route))
+        .route("/default-avatar/:id", get(default_avatar::route))
         .route("/:store/*path", get(serve::route))
         .route(
             "/:store",

@@ -24,6 +24,7 @@ url = "2.4.1"
 image = "0.24.7"
 toml = "0.8.8"
 nanoid = "0.4.0"
+mikoto-avatars = { path = "../../crates/mikoto-avatars" }
 
 [dependencies.rust-s3]
 git = "https://github.com/ScuffleTV/rust-s3.git"

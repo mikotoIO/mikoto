@@ -12,8 +12,8 @@ import { useLocation, useParams } from 'react-router-dom';
 
 import { CommandMenuKit, commandMenuOpenAtom } from '@/components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
-import { UserAreaAvatar } from '@/components/UserArea';
 import { DockViewSurface } from '@/components/DockViewSurface';
+import { UserAreaAvatar } from '@/components/UserArea';
 import { faMikoto } from '@/components/icons';
 import { Sidebar } from '@/components/sidebars/Base';
 import { FriendSidebar } from '@/components/sidebars/FriendSidebar';
@@ -296,7 +296,6 @@ const AppView = () => {
           </SearchBar>
         </TopBarCenter>
         <TopBarRight />
-
       </TopBar>
       <MainContent>
         <LeftBar>

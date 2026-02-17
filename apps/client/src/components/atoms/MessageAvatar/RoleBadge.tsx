@@ -6,19 +6,17 @@ export const BaseRoleBadge = chakra('div', {
     display: 'inline-block',
     px: 2,
     py: 1,
-    border: '1px solid',
     borderColor: 'text',
     bgColor: 'gray.700',
     color: 'text',
     borderRadius: '4px',
-    m: 1,
     fontSize: '12px',
   },
 });
 
 export function RoleBadge({ role }: { role: Role }) {
   return (
-    <BaseRoleBadge borderColor={role.color ?? undefined}>
+    <BaseRoleBadge>
       <Circle
         display="inline-block"
         mr={1}

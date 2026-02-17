@@ -122,6 +122,7 @@ export function MemberContextMenu({
           <div>
             <Avatar
               src={user.avatar ?? undefined}
+              userId={user.id}
               size={80}
               onClick={() => {
                 setModal({
@@ -135,7 +136,7 @@ export function MemberContextMenu({
             {memberSnap && (
               <>
                 <h2>Roles</h2>
-                <Box gap={2}>
+                <Flex gap={1}>
                   {memberSnap.roles.map(
                     (r) => r && <RoleBadge key={r.id} role={r} />,
                   )}
@@ -147,7 +148,7 @@ export function MemberContextMenu({
                       +
                     </BaseRoleBadge>
                   )}
-                </Box>
+                </Flex>
               </>
             )}
           </div>
@@ -187,6 +188,7 @@ export function MessageAvatar({ src, member, size }: MessageAvatarProps) {
       <Avatar
         className="avatar"
         src={src}
+        userId={user?.id}
         size={size ?? 40}
         onContextMenu={user && userContextMenu}
         onClick={(ev) => {

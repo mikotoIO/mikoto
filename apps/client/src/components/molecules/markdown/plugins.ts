@@ -1,6 +1,6 @@
 import {
-  findAndReplace,
   type ReplaceFunction,
+  findAndReplace,
 } from 'mdast-util-find-and-replace';
 
 type TreeParam = Parameters<typeof findAndReplace>[0];
@@ -50,8 +50,7 @@ export function remarkSpoiler() {
     findAndReplace(tree, [
       [
         /\|\|([\s\S]+?)\|\|(?!\|)/g,
-        (_: string, content: string) =>
-          hNode('spoiler', { content }, content),
+        (_: string, content: string) => hNode('spoiler', { content }, content),
       ],
     ]);
   };

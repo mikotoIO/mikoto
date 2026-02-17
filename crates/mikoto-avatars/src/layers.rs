@@ -5,7 +5,6 @@ use include_dir::Dir;
 use rand::Rng;
 use std::collections::HashMap;
 
-
 pub enum Source {
     File(&'static str),
     RandomFrom(&'static str),

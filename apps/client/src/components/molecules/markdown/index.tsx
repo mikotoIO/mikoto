@@ -77,7 +77,14 @@ export function Markdown({ content }: { content: string }) {
   return (
     <MarkdownWrapper emojiSize={emojiSize}>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkBreaks, remarkEmoji, remarkMention, remarkSpoiler, remarkCleanEscapes]}
+        remarkPlugins={[
+          remarkGfm,
+          remarkBreaks,
+          remarkEmoji,
+          remarkMention,
+          remarkSpoiler,
+          remarkCleanEscapes,
+        ]}
         components={markdownComponents}
       >
         {co}

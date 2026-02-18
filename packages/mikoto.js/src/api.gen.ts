@@ -201,6 +201,7 @@ export const SpaceExt = z.object({
   handle: z.union([z.string(), z.null()]).optional(),
   icon: z.union([z.string(), z.null()]).optional(),
   id: z.string().uuid(),
+  memberCount: z.number().int(),
   name: z.string(),
   ownerId: z.union([z.string(), z.null()]).optional(),
   roles: z.array(Role),

@@ -6,7 +6,7 @@ import {
   faMagnifyingGlass,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useEffect, useRef } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
@@ -145,7 +145,7 @@ const DockViewContainer = styled.div`
 `;
 
 const AppView = () => {
-  const leftSidebar = useAtomValue(treebarSpaceState);
+  const [leftSidebar, setLeftSidebar] = useAtom(treebarSpaceState);
   const mikoto = useMikoto();
   const [workspace, setWorkspace] = useAtom(workspaceState);
   const tabkit = useTabkit();
@@ -249,6 +249,15 @@ const AppView = () => {
           if (channel && channel.spaceId === routeSpaceId) {
             tabToOpen = channelToTab(channel);
           }
+        }
+        // Space only: /space/:spaceRef (focus sidebar on space, no tab)
+        else if (routeSpaceId && !routeChannelId) {
+          setLeftSidebar({
+            kind: 'explorer',
+            key: `explorer/${routeSpaceId}`,
+            spaceId: routeSpaceId,
+          });
+          hasHandledRouteRef.current = pathname;
         }
     }
 

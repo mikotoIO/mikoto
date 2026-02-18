@@ -53,6 +53,10 @@ const router = createBrowserRouter([
   },
   // Space routes (spaceRef can be a UUID or @handle)
   {
+    path: '/space/:spaceRef',
+    element: <MainView />,
+  },
+  {
     path: '/space/:spaceRef/settings',
     element: <MainView />,
   },

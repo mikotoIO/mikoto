@@ -2376,6 +2376,7 @@
         "required": [
           "channels",
           "id",
+          "memberCount",
           "name",
           "roles",
           "type"
@@ -2403,6 +2404,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "memberCount": {
+            "type": "integer",
+            "format": "int64"
           },
           "name": {
             "type": "string"

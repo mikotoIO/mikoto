@@ -2,6 +2,9 @@ import SwaggerParser from '@apidevtools/swagger-parser';
 import type { OpenAPIObject, ReferenceObject } from 'openapi3-ts/oas30';
 import { generateZodClientFromOpenAPI } from 'openapi-zod-client';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 type ExtendedOpenAPIObject = OpenAPIObject & {
   websocket?: {

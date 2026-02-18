@@ -1,8 +1,8 @@
-import { Button, Flex, Grid } from '@chakra-ui/react';
+import { Box, Button, Flex, Grid, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { SpaceExt } from '@mikoto-io/mikoto.js';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import { StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
@@ -24,15 +24,21 @@ const InvitationBox = styled.div`
 
 export function SpaceInviteViewInner() {
   const mikoto = useMikoto();
+  const navigate = useNavigate();
   const [space, setSpace] = useState<SpaceExt | null>(null);
   const inviteCode = useParams<{ inviteCode: string }>().inviteCode ?? '';
 
   useEffect(() => {
-    // mikoto.client.spaces.getSpaceFromInvite({ inviteCode }).then((x) => {
-    //   setSpace(x);
-    // });
     mikoto.rest['spaces.preview']({ params: { invite: inviteCode } }).then(
       (x) => {
+        const existing = mikoto.spaces.cache.get(x.id);
+        if (existing) {
+          navigate(
+            `/space/${existing.handle ? `@${existing.handle}` : existing.id}`,
+            { replace: true },
+          );
+          return;
+        }
         setSpace(x);
       },
     );
@@ -42,11 +48,25 @@ export function SpaceInviteViewInner() {
     <Grid templateColumns="400px 1fr" h="100vh">
       <InvitationBox>
         {space ? (
-          <>
+          <Flex direction="column" alignItems="center" gap={4}>
             <StyledSpaceIcon size="100px" icon={normalizeMediaUrl(space.icon)}>
               {space.icon === null ? space.name[0] : ''}
             </StyledSpaceIcon>
-            <h1>{space.name}</h1>
+            <Heading fontSize="32px" my={0}>
+              {space.name}
+            </Heading>
+            <Flex
+              alignItems="center"
+              gap={2}
+              bg="gray.700"
+              color="gray.0"
+              px={4}
+              py={1}
+              borderRadius={16}
+            >
+              <Box w={2} h={2} borderRadius="50%" bg="gray.400" />
+              {space.memberCount}
+            </Flex>
             <Button
               colorPalette="primary"
               onClick={async () => {
@@ -68,7 +88,7 @@ export function SpaceInviteViewInner() {
             >
               Accept Invite
             </Button>
-          </>
+          </Flex>
         ) : (
           <Spinner />
         )}

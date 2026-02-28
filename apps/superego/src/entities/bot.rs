@@ -1,6 +1,6 @@
 use uuid::Uuid;
 
-use crate::{entity, error::Error};
+use crate::{entity, error::Error, model};
 
 entity!(
     pub struct Bot {
@@ -8,7 +8,19 @@ entity!(
         pub name: String,
         pub owner_id: Uuid,
 
+        #[serde(skip_serializing)]
         pub secret: String,
+    }
+);
+
+// Response returned only when creating a bot, containing the plaintext token.
+// This is the only time the token is visible.
+model!(
+    pub struct BotCreatedResponse {
+        pub id: Uuid,
+        pub name: String,
+        pub owner_id: Uuid,
+        pub token: String,
     }
 );
 

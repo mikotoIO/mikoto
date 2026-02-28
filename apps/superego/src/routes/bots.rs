@@ -7,7 +7,7 @@ use nanoid::nanoid;
 use schemars::JsonSchema;
 use uuid::Uuid;
 
-use crate::{db::db, entities::Bot, error::Error, functions::jwt::Claims};
+use crate::{db::db, entities::{Bot, BotCreatedResponse}, error::Error, functions::jwt::Claims};
 
 pub fn router() -> ApiRouter {
     ApiRouter::<()>::new()
@@ -31,19 +31,30 @@ pub struct CreateBotPayload {
     pub name: String,
 }
 
-// FIXME: the API keys should be hashed as well
-async fn create_bot(account: Claims, body: Json<CreateBotPayload>) -> Result<Json<Bot>, Error> {
-    let random_token = nanoid!(32);
+async fn create_bot(
+    account: Claims,
+    body: Json<CreateBotPayload>,
+) -> Result<Json<BotCreatedResponse>, Error> {
+    let plaintext_token = nanoid!(32);
+    let hashed_secret = bcrypt::hash(&plaintext_token, bcrypt::DEFAULT_COST)?;
 
+    let owner_id = Uuid::parse_str(&account.sub)?;
     let bot = Bot {
         id: Uuid::new_v4(),
         name: body.name.clone(),
-        owner_id: Uuid::parse_str(&account.sub)?,
-        secret: random_token,
+        owner_id,
+        secret: hashed_secret,
     };
 
     bot.create_with_user(&body.name, db()).await?;
-    Ok(Json(bot))
+
+    // Return the plaintext token only this once
+    Ok(Json(BotCreatedResponse {
+        id: bot.id,
+        name: bot.name,
+        owner_id: bot.owner_id,
+        token: plaintext_token,
+    }))
 }
 
 async fn list_bots(account: Claims) -> Result<Json<Vec<Bot>>, Error> {

@@ -9,11 +9,16 @@ use uuid::Uuid;
 use crate::{
     db::db,
     entities::{
-        Channel, Message, MessageAttachment, MessageAttachmentInput, MessageExt, MessageKey,
-        MessagePatch,
+        Channel, MemberExt, Message, MessageAttachment, MessageAttachmentInput, MessageExt,
+        MessageKey, MessagePatch, SpaceExt,
     },
     error::Error,
-    functions::{jwt::Claims, pubsub::emit_event},
+    functions::{
+        jwt::Claims,
+        permissions::{permissions_or_moderator, Permission},
+        pubsub::emit_event,
+    },
+    middlewares::load::Load,
     routes::{router::AppRouter, ws::state::State},
 };
 
@@ -32,6 +37,8 @@ pub struct MessageEditPayload {
 }
 
 async fn get(
+    _claim: Claims,
+    _member: Load<MemberExt>,
     Path((_, _, message_id)): Path<(Uuid, Uuid, Uuid)>,
 ) -> Result<Json<MessageExt>, Error> {
     let message = Message::find_by_id(message_id, db()).await?;
@@ -48,6 +55,8 @@ struct ListQuery {
 }
 
 async fn list(
+    _claim: Claims,
+    _member: Load<MemberExt>,
     Path((_, channel_id)): Path<(Uuid, Uuid)>,
     Query(query): Query<ListQuery>,
 ) -> Result<Json<Vec<MessageExt>>, Error> {
@@ -63,8 +72,9 @@ async fn list(
 }
 
 async fn send(
-    Path((_, channel_id)): Path<(Uuid, Uuid)>,
     claim: Claims,
+    _member: Load<MemberExt>,
+    Path((_, channel_id)): Path<(Uuid, Uuid)>,
     Json(body): Json<MessageSendPayload>,
 ) -> Result<Json<MessageExt>, Error> {
     let channel = Channel::find_by_id(channel_id, db()).await?;
@@ -89,11 +99,20 @@ async fn send(
 }
 
 async fn edit(
+    claim: Claims,
+    _member: Load<MemberExt>,
     Path((_, channel_id, message_id)): Path<(Uuid, Uuid, Uuid)>,
     Json(body): Json<MessageEditPayload>,
 ) -> Result<Json<MessageExt>, Error> {
     let _channel = Channel::find_by_id(channel_id, db()).await?;
     let message = Message::find_by_id(message_id, db()).await?;
+
+    // Only the message author can edit their own messages
+    let user_id: Uuid = claim.sub.parse()?;
+    if message.author_id != Some(user_id) {
+        return Err(Error::forbidden("You can only edit your own messages"));
+    }
+
     let message = message
         .update(MessagePatch::edit(body.content), db())
         .await?;
@@ -109,10 +128,20 @@ async fn edit(
 }
 
 async fn delete(
+    claim: Claims,
+    Load(space): Load<SpaceExt>,
+    Load(member): Load<MemberExt>,
     Path((_, channel_id, message_id)): Path<(Uuid, Uuid, Uuid)>,
 ) -> Result<Json<()>, Error> {
     let channel = Channel::find_by_id(channel_id, db()).await?;
     let message = Message::find_by_id(message_id, db()).await?;
+
+    // Author can delete their own messages; moderators+ can delete anyone's
+    let user_id: Uuid = claim.sub.parse()?;
+    if message.author_id != Some(user_id) {
+        permissions_or_moderator(&space, &member, Permission::MANAGE_MESSAGES)?;
+    }
+
     message.delete(db()).await?;
 
     emit_event(

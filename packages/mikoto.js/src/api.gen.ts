@@ -415,27 +415,27 @@ export type Invite = z.infer<typeof Invite>;
 export const InviteCreatePayload = z.object({}).partial();
 export type InviteCreatePayload = z.infer<typeof InviteCreatePayload>;
 
-export const ListQuery = z
+export const MemberListQuery = z
   .object({
     cursor: z.union([z.string(), z.null()]),
     limit: z.union([z.number(), z.null()]),
   })
   .partial();
-export type ListQuery = z.infer<typeof ListQuery>;
-
-export const ListQuery2 = z
-  .object({
-    cursor: z.union([z.string(), z.null()]),
-    limit: z.union([z.number(), z.null()]),
-  })
-  .partial();
-export type ListQuery2 = z.infer<typeof ListQuery2>;
+export type MemberListQuery = z.infer<typeof MemberListQuery>;
 
 export const MessageKey = z.object({
   channelId: z.string().uuid(),
   messageId: z.string().uuid(),
 });
 export type MessageKey = z.infer<typeof MessageKey>;
+
+export const MessageListQuery = z
+  .object({
+    cursor: z.union([z.string(), z.null()]),
+    limit: z.union([z.number(), z.null()]),
+  })
+  .partial();
+export type MessageListQuery = z.infer<typeof MessageListQuery>;
 
 export const ObjectWithId = z.object({ id: z.string().uuid() });
 export type ObjectWithId = z.infer<typeof ObjectWithId>;
@@ -523,9 +523,9 @@ export const schemas = {
   BanCreatePayload,
   Invite,
   InviteCreatePayload,
-  ListQuery,
-  ListQuery2,
+  MemberListQuery,
   MessageKey,
+  MessageListQuery,
   ObjectWithId,
   Ping,
   ServeParams,

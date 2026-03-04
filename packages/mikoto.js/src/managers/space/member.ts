@@ -98,6 +98,13 @@ export class MemberManager extends CachedManager<MikotoMember> {
     this.cache.set(data.userId, data);
   }
 
+  reset() {
+    this.cache.clear();
+    this.hasMore = true;
+    this.nextCursor = undefined;
+    this.fetching = false;
+  }
+
   async list() {
     if (!this.hasMore || this.fetching) return;
     this.fetching = true;

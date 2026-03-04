@@ -70,7 +70,7 @@ impl SpaceUser {
     pub async fn list_from_space<'c, X: sqlx::PgExecutor<'c>>(
         space_id: Uuid,
         cursor: Option<Uuid>,
-        limit: i32,
+        limit: i64,
         db: X,
     ) -> Result<Vec<Self>, Error> {
         let members = if let Some(cursor_id) = cursor {

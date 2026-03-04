@@ -352,19 +352,27 @@ export type Invite = z.infer<typeof Invite>;
 export const InviteCreatePayload = z.object({}).partial();
 export type InviteCreatePayload = z.infer<typeof InviteCreatePayload>;
 
-export const ListQuery = z
+export const MemberListQuery = z
   .object({
     cursor: z.union([z.string(), z.null()]),
     limit: z.union([z.number(), z.null()]),
   })
   .partial();
-export type ListQuery = z.infer<typeof ListQuery>;
+export type MemberListQuery = z.infer<typeof MemberListQuery>;
 
 export const MessageKey = z.object({
   channelId: z.string().uuid(),
   messageId: z.string().uuid(),
 });
 export type MessageKey = z.infer<typeof MessageKey>;
+
+export const MessageListQuery = z
+  .object({
+    cursor: z.union([z.string(), z.null()]),
+    limit: z.union([z.number(), z.null()]),
+  })
+  .partial();
+export type MessageListQuery = z.infer<typeof MessageListQuery>;
 
 export const ObjectWithId = z.object({ id: z.string().uuid() });
 export type ObjectWithId = z.infer<typeof ObjectWithId>;
@@ -433,8 +441,9 @@ export const schemas = {
   RolePatch,
   Invite,
   InviteCreatePayload,
-  ListQuery,
+  MemberListQuery,
   MessageKey,
+  MessageListQuery,
   ObjectWithId,
   Ping,
   ServeParams,
@@ -862,6 +871,18 @@ const endpoints = makeApi([
     path: "/spaces/:spaceId/members/",
     alias: "members.list",
     requestFormat: "json",
+    parameters: [
+      {
+        name: "cursor",
+        type: "Query",
+        schema: cursor,
+      },
+      {
+        name: "limit",
+        type: "Query",
+        schema: limit,
+      },
+    ],
     response: z.array(MemberExt),
   },
   {

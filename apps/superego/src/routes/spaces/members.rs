@@ -1,5 +1,8 @@
 use aide::axum::routing::{delete_with, get_with, patch_with, post_with};
-use axum::{extract::Path, Json};
+use axum::{
+    extract::{Path, Query},
+    Json,
+};
 use schemars::JsonSchema;
 use uuid::Uuid;
 
@@ -33,8 +36,23 @@ async fn get(Path((space_id, user_id)): Path<(Uuid, Uuid)>) -> Result<Json<Membe
     Ok(member.into())
 }
 
-async fn list(Path(space_id): Path<Uuid>) -> Result<Json<Vec<MemberExt>>, Error> {
-    let members = SpaceUser::list_from_space(space_id, db()).await?;
+#[derive(Deserialize, JsonSchema)]
+struct MemberListQuery {
+    limit: Option<i64>,
+    cursor: Option<Uuid>,
+}
+
+async fn list(
+    Path(space_id): Path<Uuid>,
+    Query(query): Query<MemberListQuery>,
+) -> Result<Json<Vec<MemberExt>>, Error> {
+    let members = SpaceUser::list_from_space(
+        space_id,
+        query.cursor,
+        query.limit.unwrap_or(100).clamp(1, 200) as i64,
+        db(),
+    )
+    .await?;
     let members = MemberExt::dataload(members, db()).await?;
 
     Ok(members.into())

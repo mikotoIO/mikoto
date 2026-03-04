@@ -1179,6 +1179,32 @@
         ],
         "summary": "List Members in Space",
         "operationId": "members.list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            },
+            "style": "form"
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1869,25 +1895,6 @@
       "InviteCreatePayload": {
         "type": "object"
       },
-      "ListQuery": {
-        "type": "object",
-        "properties": {
-          "cursor": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "uuid"
-          },
-          "limit": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
-          }
-        }
-      },
       "LoginPayload": {
         "examples": [
           {
@@ -1958,6 +1965,25 @@
           "userId": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "MemberListQuery": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
           }
         }
       },
@@ -2123,6 +2149,25 @@
           "messageId": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "MessageListQuery": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
           }
         }
       },

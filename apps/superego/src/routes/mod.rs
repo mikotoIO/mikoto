@@ -14,7 +14,10 @@ use tokio::sync::RwLock;
 use tower_http::cors::CorsLayer;
 use ws::state::State;
 
-use crate::functions::pubsub::emit_event;
+use crate::{
+    env::{env, MikotoMode},
+    functions::pubsub::emit_event,
+};
 
 pub mod account;
 pub mod bots;
@@ -112,12 +115,21 @@ pub fn router() -> Router {
             ..OpenApi::default()
         })
         .nest("/collab", collab_ws())
-        .layer(
-            CorsLayer::new()
-                .allow_origin(tower_http::cors::Any)
+        .layer({
+            let cors = CorsLayer::new()
                 .allow_methods(tower_http::cors::Any)
-                .allow_headers([AUTHORIZATION, CONTENT_TYPE]),
-        )
+                .allow_headers([AUTHORIZATION, CONTENT_TYPE]);
+
+            if env().mikoto_env == MikotoMode::Production {
+                let origin = env()
+                    .web_url
+                    .parse::<http::HeaderValue>()
+                    .expect("WEB_URL must be a valid header value");
+                cors.allow_origin(origin)
+            } else {
+                cors.allow_origin(tower_http::cors::Any)
+            }
+        })
 }
 
 pub fn build_openapi_schema() -> OpenApi {

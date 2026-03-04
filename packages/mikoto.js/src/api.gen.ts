@@ -33,7 +33,6 @@ export const RefreshPayload = z.object({ refreshToken: z.string() });
 export type RefreshPayload = z.infer<typeof RefreshPayload>;
 
 export const ChangePasswordPayload = z.object({
-  id: z.string().uuid(),
   newPassword: z.string(),
   oldPassword: z.string(),
 });
@@ -61,6 +60,14 @@ export type Bot = z.infer<typeof Bot>;
 
 export const CreateBotPayload = z.object({ name: z.string() });
 export type CreateBotPayload = z.infer<typeof CreateBotPayload>;
+
+export const BotCreatedResponse = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  ownerId: z.string().uuid(),
+  token: z.string(),
+});
+export type BotCreatedResponse = z.infer<typeof BotCreatedResponse>;
 
 export const HandleOwner = z.union([
   z.object({ id: z.string().uuid(), type: z.literal("user") }),
@@ -384,6 +391,7 @@ export const schemas = {
   ResetPasswordConfirmData,
   Bot,
   CreateBotPayload,
+  BotCreatedResponse,
   HandleOwner,
   HandleResolution,
   InstanceInfo,
@@ -551,7 +559,7 @@ const endpoints = makeApi([
         schema: z.object({ name: z.string() }),
       },
     ],
-    response: Bot,
+    response: BotCreatedResponse,
   },
   {
     method: "get",

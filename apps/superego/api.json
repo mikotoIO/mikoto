@@ -254,7 +254,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Bot"
+                  "$ref": "#/components/schemas/BotCreatedResponse"
                 }
               }
             }
@@ -1513,6 +1513,32 @@
             "format": "uuid"
           },
           "secret": {
+            "writeOnly": true,
+            "type": "string"
+          }
+        }
+      },
+      "BotCreatedResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "ownerId",
+          "token"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "token": {
             "type": "string"
           }
         }
@@ -1520,15 +1546,10 @@
       "ChangePasswordPayload": {
         "type": "object",
         "required": [
-          "id",
           "newPassword",
           "oldPassword"
         ],
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "newPassword": {
             "type": "string"
           },

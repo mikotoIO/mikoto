@@ -12,19 +12,22 @@ use crate::{
 #[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct ChangePasswordPayload {
-    pub id: Uuid,
     pub old_password: String,
     pub new_password: String,
 }
 
-pub async fn route(body: Json<ChangePasswordPayload>) -> Result<Json<TokenPair>, Error> {
-    let acc = Account::find_by_id(&body.id, db()).await?;
+pub async fn route(
+    claim: Claims,
+    body: Json<ChangePasswordPayload>,
+) -> Result<Json<TokenPair>, Error> {
+    let user_id = Uuid::parse_str(&claim.sub)?;
+    let acc = Account::find_by_id(&user_id, db()).await?;
 
     if !bcrypt::verify(&body.old_password, &acc.passhash)? {
         return Err(Error::WrongPassword);
     }
 
-    RefreshToken::clear_all(body.id, db()).await?;
+    RefreshToken::clear_all(user_id, db()).await?;
 
     let new_passhash = bcrypt::hash(&body.new_password, bcrypt::DEFAULT_COST)?;
     sqlx::query(
@@ -33,7 +36,7 @@ pub async fn route(body: Json<ChangePasswordPayload>) -> Result<Json<TokenPair>,
         "##,
     )
     .bind(&new_passhash)
-    .bind(body.id)
+    .bind(user_id)
     .execute(db())
     .await?;
 

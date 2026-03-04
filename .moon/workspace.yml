@@ -8,7 +8,8 @@ projects:
   - 'apps/*'
   - 'packages/*'
 vcs:
-  manager: 'git'
+  client: 'git'
+  provider: 'github'
   defaultBranch: 'dev'
 
 remoteCandidates: []

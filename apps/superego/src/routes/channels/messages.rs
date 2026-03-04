@@ -47,10 +47,8 @@ async fn get(
 }
 
 #[derive(Deserialize, JsonSchema)]
-struct ListQuery {
-    #[serde(skip_serializing_if = "Option::is_none")]
+struct MessageListQuery {
     limit: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     cursor: Option<Uuid>,
 }
 
@@ -58,7 +56,7 @@ async fn list(
     _claim: Claims,
     _member: Load<MemberExt>,
     Path((_, channel_id)): Path<(Uuid, Uuid)>,
-    Query(query): Query<ListQuery>,
+    Query(query): Query<MessageListQuery>,
 ) -> Result<Json<Vec<MessageExt>>, Error> {
     let messages = Message::paginate(
         channel_id,

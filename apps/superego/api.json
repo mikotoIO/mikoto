@@ -1200,7 +1200,7 @@
                 "integer",
                 "null"
               ],
-              "format": "int32"
+              "format": "int64"
             },
             "style": "form"
           }
@@ -1895,44 +1895,6 @@
       "InviteCreatePayload": {
         "type": "object"
       },
-      "ListQuery": {
-        "type": "object",
-        "properties": {
-          "cursor": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "uuid"
-          },
-          "limit": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
-          }
-        }
-      },
-      "ListQuery2": {
-        "type": "object",
-        "properties": {
-          "cursor": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "uuid"
-          },
-          "limit": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
-          }
-        }
-      },
       "LoginPayload": {
         "examples": [
           {
@@ -2003,6 +1965,25 @@
           "userId": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "MemberListQuery": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
           }
         }
       },
@@ -2168,6 +2149,25 @@
           "messageId": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "MessageListQuery": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
           }
         }
       },

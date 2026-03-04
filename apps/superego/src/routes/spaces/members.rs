@@ -37,21 +37,19 @@ async fn get(Path((space_id, user_id)): Path<(Uuid, Uuid)>) -> Result<Json<Membe
 }
 
 #[derive(Deserialize, JsonSchema)]
-struct ListQuery {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    limit: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+struct MemberListQuery {
+    limit: Option<i64>,
     cursor: Option<Uuid>,
 }
 
 async fn list(
     Path(space_id): Path<Uuid>,
-    Query(query): Query<ListQuery>,
+    Query(query): Query<MemberListQuery>,
 ) -> Result<Json<Vec<MemberExt>>, Error> {
     let members = SpaceUser::list_from_space(
         space_id,
         query.cursor,
-        query.limit.unwrap_or(100).clamp(1, 200),
+        query.limit.unwrap_or(100).clamp(1, 200) as i64,
         db(),
     )
     .await?;

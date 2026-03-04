@@ -52,10 +52,8 @@ pub enum Error {
     #[error("JWT is invalid")]
     JwtValidationError { message: String },
 
-    #[error("Templating error")]
-    TemplatingError,
-    #[error("Mail error")]
-    MailError,
+    #[error("Mail error: {message}")]
+    MailError { message: String },
     #[error("IO error")]
     IOError(#[from] std::io::Error),
     #[error("Unimplemented so far")]

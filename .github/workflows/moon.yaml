@@ -32,5 +32,5 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - uses: 'moonrepo/setup-toolchain@v0'
+      - uses: 'moonrepo/setup-toolchain@v0.6.2'
       - run: 'moon ci :${{ matrix.task }}'

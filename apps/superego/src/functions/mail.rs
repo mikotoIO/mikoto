@@ -30,21 +30,33 @@ impl MailSender {
             MailTransport::Smtp(transport) => {
                 let handlebars = Handlebars::new();
                 let mail = lettre::Message::builder()
-                    .from(self.from.parse().map_err(|_| Error::MailError)?)
-                    .to(to.parse().map_err(|_| Error::MailError)?)
+                    .from(self.from.parse().map_err(|e| Error::MailError {
+                        message: format!("invalid 'from' address: {e}"),
+                    })?)
+                    .to(to.parse().map_err(|e| Error::MailError {
+                        message: format!("invalid 'to' address: {e}"),
+                    })?)
                     .subject(
                         handlebars
                             .render_template(template.subject, &data)
-                            .map_err(|_| Error::TemplatingError)?,
+                            .map_err(|e| Error::MailError {
+                                message: format!("failed to render subject: {e}"),
+                            })?,
                     )
                     .body(
                         handlebars
                             .render_template(template.body, &data)
-                            .map_err(|_| Error::TemplatingError)?,
+                            .map_err(|e| Error::MailError {
+                                message: format!("failed to render body: {e}"),
+                            })?,
                     )
-                    .unwrap();
+                    .map_err(|e| Error::MailError {
+                        message: format!("failed to build message: {e}"),
+                    })?;
 
-                transport.send(mail).await.map_err(|_| Error::MailError)?;
+                transport.send(mail).await.map_err(|e| Error::MailError {
+                    message: format!("failed to send mail: {e}"),
+                })?;
             }
         }
         Ok(())

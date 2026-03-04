@@ -360,6 +360,14 @@ export const ListQuery = z
   .partial();
 export type ListQuery = z.infer<typeof ListQuery>;
 
+export const ListQuery2 = z
+  .object({
+    cursor: z.union([z.string(), z.null()]),
+    limit: z.union([z.number(), z.null()]),
+  })
+  .partial();
+export type ListQuery2 = z.infer<typeof ListQuery2>;
+
 export const MessageKey = z.object({
   channelId: z.string().uuid(),
   messageId: z.string().uuid(),
@@ -434,6 +442,7 @@ export const schemas = {
   Invite,
   InviteCreatePayload,
   ListQuery,
+  ListQuery2,
   MessageKey,
   ObjectWithId,
   Ping,
@@ -862,6 +871,18 @@ const endpoints = makeApi([
     path: "/spaces/:spaceId/members/",
     alias: "members.list",
     requestFormat: "json",
+    parameters: [
+      {
+        name: "cursor",
+        type: "Query",
+        schema: cursor,
+      },
+      {
+        name: "limit",
+        type: "Query",
+        schema: limit,
+      },
+    ],
     response: z.array(MemberExt),
   },
   {

@@ -1157,6 +1157,18 @@ const endpoints = makeApi([
     path: "/spaces/:spaceId/members/",
     alias: "members.list",
     requestFormat: "json",
+    parameters: [
+      {
+        name: "cursor",
+        type: "Query",
+        schema: cursor,
+      },
+      {
+        name: "limit",
+        type: "Query",
+        schema: limit,
+      },
+    ],
     response: z.array(MemberExt),
   },
   {

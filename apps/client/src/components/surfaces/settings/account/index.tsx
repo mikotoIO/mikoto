@@ -48,7 +48,6 @@ export function PasswordChangeModal() {
         onSubmit={handleSubmit(async (form) => {
           try {
             await authClient.changePassword({
-              id: user!.id,
               oldPassword: form.oldPassword,
               newPassword: form.newPassword,
             });

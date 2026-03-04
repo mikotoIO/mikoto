@@ -69,19 +69,38 @@ impl SpaceUser {
 
     pub async fn list_from_space<'c, X: sqlx::PgExecutor<'c>>(
         space_id: Uuid,
+        cursor: Option<Uuid>,
+        limit: i32,
         db: X,
     ) -> Result<Vec<Self>, Error> {
-        // TODO: pagination
-        let members = sqlx::query_as(
-            r##"
-            SELECT * FROM "SpaceUser"
-            WHERE "spaceId" = $1
-            LIMIT 500
-            "##,
-        )
-        .bind(space_id)
-        .fetch_all(db)
-        .await?;
+        let members = if let Some(cursor_id) = cursor {
+            sqlx::query_as(
+                r##"
+                SELECT * FROM "SpaceUser"
+                WHERE "spaceId" = $1 AND "id" > $2
+                ORDER BY "id"
+                LIMIT $3
+                "##,
+            )
+            .bind(space_id)
+            .bind(cursor_id)
+            .bind(limit)
+            .fetch_all(db)
+            .await?
+        } else {
+            sqlx::query_as(
+                r##"
+                SELECT * FROM "SpaceUser"
+                WHERE "spaceId" = $1
+                ORDER BY "id"
+                LIMIT $2
+                "##,
+            )
+            .bind(space_id)
+            .bind(limit)
+            .fetch_all(db)
+            .await?
+        };
         Ok(members)
     }
 

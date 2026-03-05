@@ -8,7 +8,7 @@ use tokio::sync::{Mutex, RwLock};
 
 use aide::axum::routing::{get_with, patch_with};
 use axum::{
-    extract::{ws::WebSocket, Path, WebSocketUpgrade},
+    extract::{ws::WebSocket, Path, Query, WebSocketUpgrade},
     response::Response,
     Extension, Json, Router,
 };
@@ -22,9 +22,9 @@ use yrs_axum::{
 
 use crate::{
     db::db,
-    entities::{Document, DocumentPatch, MemberExt},
+    entities::{Channel, Document, DocumentPatch, MemberExt, MemberKey, SpaceUser},
     error::Error,
-    functions::jwt::Claims,
+    functions::jwt::{jwt_key, Claims},
     middlewares::load::Load,
     routes::{router::AppRouter, ws::state::State},
 };
@@ -69,6 +69,11 @@ pub fn router() -> AppRouter<State> {
 
 type BroadcastMap = Arc<Mutex<HashMap<String, Weak<BroadcastGroup>>>>;
 
+#[derive(Deserialize)]
+struct CollabParams {
+    token: Option<String>,
+}
+
 pub fn collab_ws() -> Router<()> {
     let bcg_map: BroadcastMap = Arc::new(Mutex::new(HashMap::new()));
 
@@ -79,10 +84,25 @@ pub fn collab_ws() -> Router<()> {
 
 async fn ws_handler(
     Path(room): Path<String>,
+    Query(params): Query<CollabParams>,
     ws: WebSocketUpgrade,
     Extension(bcast): Extension<BroadcastMap>,
-) -> Response {
-    ws.on_upgrade(move |socket| peer(room, socket, bcast))
+) -> Result<Response, Error> {
+    // Authenticate the WebSocket connection
+    let token = params
+        .token
+        .ok_or(Error::unauthorized("Token not provided"))?;
+    let claims = Claims::decode(&token, jwt_key())?;
+    let user_id: Uuid = claims.sub.parse()?;
+
+    // The room format is the channel ID; verify the user is a member of the channel's space
+    let channel_id: Uuid = room.parse().map_err(|_| Error::NotFound)?;
+    let channel = Channel::find_by_id(channel_id, db()).await?;
+    SpaceUser::get_by_key(&MemberKey::new(channel.space_id, user_id), db())
+        .await
+        .map_err(|_| Error::unauthorized("You are not a member of this space"))?;
+
+    Ok(ws.on_upgrade(move |socket| peer(room, socket, bcast)))
 }
 
 async fn peer(room: String, ws: WebSocket, bcg_map: BroadcastMap) {

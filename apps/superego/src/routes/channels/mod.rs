@@ -8,6 +8,7 @@ use crate::{
     entities::{Channel, ChannelPatch, ChannelType, ChannelUnread, Document, MemberExt, SpaceExt},
     error::Error,
     functions::{
+        jwt::Claims,
         permissions::{permissions_or_admin, Permission},
         pubsub::emit_event,
         time::Timestamp,
@@ -31,12 +32,20 @@ pub struct ChannelCreatePayload {
     pub kind: Option<ChannelType>,
 }
 
-async fn get(Path((_, channel_id)): Path<(Uuid, Uuid)>) -> Result<Json<Channel>, Error> {
+async fn get(
+    _claim: Claims,
+    _member: Load<MemberExt>,
+    Path((_, channel_id)): Path<(Uuid, Uuid)>,
+) -> Result<Json<Channel>, Error> {
     let channel = Channel::find_by_id(channel_id, db()).await?;
     Ok(channel.into())
 }
 
-async fn list(Path(space_id): Path<Uuid>) -> Result<Json<Vec<Channel>>, Error> {
+async fn list(
+    _claim: Claims,
+    _member: Load<MemberExt>,
+    Path(space_id): Path<Uuid>,
+) -> Result<Json<Vec<Channel>>, Error> {
     let channels = Channel::list(space_id, db()).await?;
     Ok(channels.into())
 }

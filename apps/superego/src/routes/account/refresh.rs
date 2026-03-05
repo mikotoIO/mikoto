@@ -29,8 +29,13 @@ pub async fn route(body: Json<RefreshPayload>) -> Result<Json<TokenPair>, Error>
 
     let acc = Account::find_by_id(&refresh.account_id, db()).await?;
 
+    // Rotate: delete old token and issue a new one
+    refresh.delete(db()).await?;
+    let (new_refresh, new_token) = RefreshToken::new(acc.id);
+    new_refresh.create(db()).await?;
+
     Ok(Json(TokenPair {
         access_token: Claims::from(&acc).encode(jwt_key())?,
-        refresh_token: None,
+        refresh_token: Some(new_token),
     }))
 }

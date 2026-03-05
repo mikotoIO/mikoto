@@ -33,7 +33,11 @@ pub struct ResetPasswordData {
 pub async fn route(body: Json<ResetPasswordPayload>) -> Result<Json<()>, Error> {
     captcha().validate(body.captcha.as_deref()).await?;
 
-    let account = Account::find_by_email(&body.email, db()).await?;
+    // Always return success to prevent account enumeration
+    let account = match Account::find_by_email(&body.email, db()).await {
+        Ok(acc) => acc,
+        Err(_) => return Ok(Json(())),
+    };
     let verification = AccountVerification::create_password_reset(account.id, db()).await?;
 
     mailer()
@@ -61,5 +65,7 @@ pub async fn confirm(data: Json<ResetPasswordConfirmData>) -> Result<Json<()>, E
         AccountVerification::find_by_token(&data.token, "PASSWORD_RESET", db()).await?;
     let account = Account::find_by_id(&verification.account_id, db()).await?;
     account.update_password(&data.password, db()).await?;
+    // Delete the token so it cannot be reused
+    verification.delete(db()).await?;
     Ok(Json(()))
 }

@@ -25,7 +25,11 @@ pub struct LoginPayload {
 }
 
 pub async fn route(body: Json<LoginPayload>) -> Result<Json<TokenPair>, Error> {
-    let acc = Account::find_by_email(&body.email, db()).await?;
+    let acc = match Account::find_by_email(&body.email, db()).await {
+        Ok(acc) => acc,
+        Err(Error::NotFound) => return Err(Error::WrongPassword),
+        Err(e) => return Err(e),
+    };
 
     if !bcrypt::verify(&body.password, &acc.passhash)? {
         return Err(Error::WrongPassword);

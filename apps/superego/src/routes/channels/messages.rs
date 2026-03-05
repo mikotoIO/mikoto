@@ -9,8 +9,8 @@ use uuid::Uuid;
 use crate::{
     db::db,
     entities::{
-        Channel, MemberExt, Message, MessageAttachment, MessageAttachmentInput, MessageExt,
-        MessageKey, MessagePatch, SpaceExt,
+        Channel, MemberExt, Message, MessageAttachment, MessageAttachmentInput,
+        MessageExt, MessageKey, MessagePatch, SpaceExt,
     },
     error::Error,
     functions::{
@@ -39,9 +39,15 @@ pub struct MessageEditPayload {
 async fn get(
     _claim: Claims,
     _member: Load<MemberExt>,
+    Load(space): Load<SpaceExt>,
     Path((_, _, message_id)): Path<(Uuid, Uuid, Uuid)>,
 ) -> Result<Json<MessageExt>, Error> {
     let message = Message::find_by_id(message_id, db()).await?;
+    // Verify message's channel belongs to this space
+    let channel = Channel::find_by_id(message.channel_id, db()).await?;
+    if channel.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     let message = MessageExt::dataload_one(message, db()).await?;
     Ok(message.into())
 }
@@ -57,9 +63,15 @@ struct ListQuery {
 async fn list(
     _claim: Claims,
     _member: Load<MemberExt>,
+    Load(space): Load<SpaceExt>,
     Path((_, channel_id)): Path<(Uuid, Uuid)>,
     Query(query): Query<ListQuery>,
 ) -> Result<Json<Vec<MessageExt>>, Error> {
+    // Verify channel belongs to this space
+    let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     let messages = Message::paginate(
         channel_id,
         query.cursor,
@@ -74,10 +86,14 @@ async fn list(
 async fn send(
     claim: Claims,
     _member: Load<MemberExt>,
+    Load(space): Load<SpaceExt>,
     Path((_, channel_id)): Path<(Uuid, Uuid)>,
     Json(body): Json<MessageSendPayload>,
 ) -> Result<Json<MessageExt>, Error> {
     let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     let message = Message::new(&channel, claim.sub.parse()?, body.content);
     message.create(db()).await?;
 
@@ -101,10 +117,14 @@ async fn send(
 async fn edit(
     claim: Claims,
     _member: Load<MemberExt>,
+    Load(space): Load<SpaceExt>,
     Path((_, channel_id, message_id)): Path<(Uuid, Uuid, Uuid)>,
     Json(body): Json<MessageEditPayload>,
 ) -> Result<Json<MessageExt>, Error> {
-    let _channel = Channel::find_by_id(channel_id, db()).await?;
+    let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     let message = Message::find_by_id(message_id, db()).await?;
 
     // Only the message author can edit their own messages
@@ -121,7 +141,7 @@ async fn edit(
     emit_event(
         "messages.onUpdate",
         &message,
-        &format!("space:{channel_id}"),
+        &format!("space:{}", channel.space_id),
     )
     .await?;
     Ok(message.into())
@@ -134,6 +154,9 @@ async fn delete(
     Path((_, channel_id, message_id)): Path<(Uuid, Uuid, Uuid)>,
 ) -> Result<Json<()>, Error> {
     let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     let message = Message::find_by_id(message_id, db()).await?;
 
     // Author can delete their own messages; moderators+ can delete anyone's

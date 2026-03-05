@@ -83,6 +83,9 @@ async fn update(
     permissions_or_admin(&space, &member, Permission::MANAGE_CHANNELS)?;
 
     let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     let channel = channel.update(patch, db()).await?;
     emit_event(
         "channels.onUpdate",
@@ -101,6 +104,9 @@ async fn delete(
     permissions_or_admin(&space, &member, Permission::MANAGE_CHANNELS)?;
 
     let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     channel.delete(db()).await?;
     emit_event(
         "channels.onDelete",

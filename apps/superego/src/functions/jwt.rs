@@ -56,7 +56,7 @@ impl From<&Account> for Claims {
     fn from(user: &Account) -> Self {
         let expiry = Utc::now() + TimeDelta::hours(1);
         Self {
-            exp: expiry.timestamp_millis() as usize,
+            exp: expiry.timestamp() as usize,
             sub: user.id.to_string(),
             // iss: env().issuer.clone(),
         }

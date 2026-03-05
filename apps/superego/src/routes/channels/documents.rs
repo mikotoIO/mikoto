@@ -22,17 +22,25 @@ use yrs_axum::{
 
 use crate::{
     db::db,
-    entities::{Document, DocumentPatch},
+    entities::{Document, DocumentPatch, MemberExt},
     error::Error,
+    functions::jwt::Claims,
+    middlewares::load::Load,
     routes::{router::AppRouter, ws::state::State},
 };
 
-async fn get(Path((_, channel_id)): Path<(Uuid, Uuid)>) -> Result<Json<Document>, Error> {
+async fn get(
+    _claim: Claims,
+    _member: Load<MemberExt>,
+    Path((_, channel_id)): Path<(Uuid, Uuid)>,
+) -> Result<Json<Document>, Error> {
     let document = Document::get_by_channel_id(channel_id, db()).await?;
     Ok(document.into())
 }
 
 async fn update(
+    _claim: Claims,
+    _member: Load<MemberExt>,
     Path((_, channel_id)): Path<(Uuid, Uuid)>,
     Json(patch): Json<DocumentPatch>,
 ) -> Result<Json<Document>, Error> {

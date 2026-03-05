@@ -29,7 +29,7 @@ impl Bot {
         owner_id: Uuid,
         db: X,
     ) -> Result<Vec<Self>, Error> {
-        let bots = sqlx::query_as(r#"SELECT * FROM "Bots" WHERE "ownerId" = $1"#)
+        let bots = sqlx::query_as(r#"SELECT * FROM "Bot" WHERE "ownerId" = $1"#)
             .bind(owner_id)
             .fetch_all(db)
             .await?;
@@ -39,7 +39,7 @@ impl Bot {
     pub async fn create<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
         sqlx::query(
             r##"
-            INSERT INTO "Bots" ("id", "name", "ownerId", "secret")
+            INSERT INTO "Bot" ("id", "name", "ownerId", "secret")
             VALUES ($1, $2, $3, $4)
             "##,
         )
@@ -64,7 +64,7 @@ impl Bot {
                 VALUES ($1, $2, 'BOT')
                 RETURNING "id"
             )
-            INSERT INTO "Bots" ("id", "name", "ownerId", "secret")
+            INSERT INTO "Bot" ("id", "name", "ownerId", "secret")
             VALUES ((SELECT "id" FROM u), $3, $4, $5)
             "##,
         )
@@ -79,7 +79,7 @@ impl Bot {
     }
 
     pub async fn delete<'c, X: sqlx::PgExecutor<'c>>(id: Uuid, db: X) -> Result<(), Error> {
-        sqlx::query(r#"DELETE FROM "Bots" WHERE "id" = $1"#)
+        sqlx::query(r#"DELETE FROM "Bot" WHERE "id" = $1"#)
             .bind(id)
             .execute(db)
             .await?;

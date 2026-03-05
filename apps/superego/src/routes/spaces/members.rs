@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{MemberExt, MemberKey, Role, RoleToSpaceUser, SpaceExt, SpaceUser},
+    entities::{Ban, MemberExt, MemberKey, Role, RoleToSpaceUser, SpaceExt, SpaceUser},
     error::Error,
     functions::{
         jwt::Claims,
@@ -109,6 +109,14 @@ async fn delete(
     permissions_or_admin(&space, &acting_member, Permission::BAN)?;
 
     // ban user
+    let ban = Ban {
+        id: Uuid::new_v4(),
+        user_id,
+        space_id,
+        reason: None,
+    };
+    ban.create(db()).await?;
+
     let key = MemberKey::new(space_id, user_id);
     let member = SpaceUser::get_by_key(&key, db()).await?;
     let member = MemberExt::dataload_one(member, db()).await?;

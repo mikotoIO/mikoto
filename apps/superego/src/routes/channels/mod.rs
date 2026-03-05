@@ -35,9 +35,13 @@ pub struct ChannelCreatePayload {
 async fn get(
     _claim: Claims,
     _member: Load<MemberExt>,
+    Load(space): Load<SpaceExt>,
     Path((_, channel_id)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<Channel>, Error> {
     let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     Ok(channel.into())
 }
 

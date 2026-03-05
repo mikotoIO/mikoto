@@ -22,7 +22,7 @@ use yrs_axum::{
 
 use crate::{
     db::db,
-    entities::{Channel, Document, DocumentPatch, MemberExt, MemberKey, SpaceUser},
+    entities::{Channel, Document, DocumentPatch, MemberExt, MemberKey, SpaceExt, SpaceUser},
     error::Error,
     functions::jwt::{jwt_key, Claims},
     middlewares::load::Load,
@@ -32,8 +32,13 @@ use crate::{
 async fn get(
     _claim: Claims,
     _member: Load<MemberExt>,
+    Load(space): Load<SpaceExt>,
     Path((_, channel_id)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<Document>, Error> {
+    let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     let document = Document::get_by_channel_id(channel_id, db()).await?;
     Ok(document.into())
 }
@@ -41,9 +46,14 @@ async fn get(
 async fn update(
     _claim: Claims,
     _member: Load<MemberExt>,
+    Load(space): Load<SpaceExt>,
     Path((_, channel_id)): Path<(Uuid, Uuid)>,
     Json(patch): Json<DocumentPatch>,
 ) -> Result<Json<Document>, Error> {
+    let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     let document = Document::get_by_channel_id(channel_id, db()).await?;
     let document = document.update(patch, db()).await?;
     Ok(document.into())

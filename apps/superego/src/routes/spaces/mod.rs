@@ -9,7 +9,7 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Handle, Invite, MemberExt, MemberKey, Space, SpaceExt, SpacePatch, SpaceUser},
+    entities::{Ban, Handle, Invite, MemberExt, MemberKey, Space, SpaceExt, SpacePatch, SpaceUser},
     error::Error,
     functions::{
         handle_verification::{
@@ -57,6 +57,12 @@ impl SpaceUpdatePayload {
 }
 
 async fn join_space(space: &SpaceExt, user_id: Uuid) -> Result<(), Error> {
+    if Ban::find_by_space_and_user(space.base.id, user_id, db())
+        .await?
+        .is_some()
+    {
+        return Err(Error::forbidden("You are banned from this space"));
+    }
     let member = SpaceUser::new(space.base.id, user_id);
     member.create(db()).await?;
     let member = MemberExt::dataload_one(member, db()).await?;

@@ -103,18 +103,24 @@ fn build_app_router() -> AppRouter<State> {
         .ws_event("pong", |ping: Ping, _| async move { Some(ping) })
 }
 
-async fn security_headers(
-    request: Request,
-    next: middleware::Next,
-) -> axum::response::Response {
+async fn security_headers(request: Request, next: middleware::Next) -> axum::response::Response {
     let mut response = next.run(request).await;
     let headers = response.headers_mut();
     headers.insert("X-Content-Type-Options", "nosniff".parse().unwrap());
     headers.insert("X-Frame-Options", "DENY".parse().unwrap());
-    headers.insert("Referrer-Policy", "strict-origin-when-cross-origin".parse().unwrap());
+    headers.insert(
+        "Referrer-Policy",
+        "strict-origin-when-cross-origin".parse().unwrap(),
+    );
     headers.insert(
         "Permissions-Policy",
         "camera=(), microphone=(), geolocation=()".parse().unwrap(),
+    );
+    headers.insert(
+        "Content-Security-Policy",
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' wss: ws: https:; frame-ancestors 'none'"
+            .parse()
+            .unwrap(),
     );
     if env().mikoto_env == MikotoMode::Production {
         headers.insert(

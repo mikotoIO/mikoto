@@ -5,6 +5,7 @@ import type { WebsocketEventEmitter, websocketCommands } from './api.gen';
 
 export interface WebsocketApiOptions {
   url: string;
+  token?: string;
 }
 
 type WebsocketCommands = typeof websocketCommands;
@@ -14,6 +15,19 @@ export class WebsocketApi extends (EventEmitter as new () => WebsocketEventEmitt
   constructor(options: WebsocketApiOptions) {
     super();
     this.ws = new WebSocket(options.url);
+
+    this.ws.onopen = () => {
+      // Send token as first message instead of in URL query params
+      if (options.token) {
+        this.ws.send(
+          JSON.stringify({
+            op: 'authenticate',
+            data: { token: options.token },
+          }),
+        );
+      }
+    };
+
     this.ws.onmessage = (event) => {
       const msg = JSON.parse((event as any).data);
       this.emit(msg.op, msg.data);

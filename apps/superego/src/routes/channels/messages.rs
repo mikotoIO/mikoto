@@ -9,8 +9,8 @@ use uuid::Uuid;
 use crate::{
     db::db,
     entities::{
-        Channel, MemberExt, Message, MessageAttachment, MessageAttachmentInput,
-        MessageExt, MessageKey, MessagePatch, SpaceExt,
+        Channel, MemberExt, Message, MessageAttachment, MessageAttachmentInput, MessageExt,
+        MessageKey, MessagePatch, SpaceExt,
     },
     error::Error,
     functions::{
@@ -126,6 +126,9 @@ async fn edit(
         return Err(Error::NotFound);
     }
     let message = Message::find_by_id(message_id, db()).await?;
+    if message.channel_id != channel_id {
+        return Err(Error::NotFound);
+    }
 
     // Only the message author can edit their own messages
     let user_id: Uuid = claim.sub.parse()?;
@@ -158,6 +161,9 @@ async fn delete(
         return Err(Error::NotFound);
     }
     let message = Message::find_by_id(message_id, db()).await?;
+    if message.channel_id != channel_id {
+        return Err(Error::NotFound);
+    }
 
     // Author can delete their own messages; moderators+ can delete anyone's
     let user_id: Uuid = claim.sub.parse()?;

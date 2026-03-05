@@ -28,19 +28,29 @@ fn is_private_ip(ip: IpAddr) -> bool {
 }
 
 fn validate_proxy_url(raw_url: &str) -> Result<(), Error> {
-    let parsed = Url::parse(raw_url).map_err(|_| Error::BadRequest { message: Some("Invalid URL".to_string()) })?;
+    let parsed = Url::parse(raw_url).map_err(|_| Error::BadRequest {
+        message: Some("Invalid URL".to_string()),
+    })?;
 
     match parsed.scheme() {
         "http" | "https" => {}
-        _ => return Err(Error::BadRequest { message: Some("Only HTTP(S) URLs are allowed".to_string()) }),
+        _ => {
+            return Err(Error::BadRequest {
+                message: Some("Only HTTP(S) URLs are allowed".to_string()),
+            })
+        }
     }
 
-    let host = parsed.host_str().ok_or(Error::BadRequest { message: Some("URL must have a host".to_string()) })?;
+    let host = parsed.host_str().ok_or(Error::BadRequest {
+        message: Some("URL must have a host".to_string()),
+    })?;
 
     // Block direct IP addresses that are private
     if let Ok(ip) = host.parse::<IpAddr>() {
         if is_private_ip(ip) {
-            return Err(Error::BadRequest { message: Some("Private IP addresses are not allowed".to_string()) });
+            return Err(Error::BadRequest {
+                message: Some("Private IP addresses are not allowed".to_string()),
+            });
         }
     }
 
@@ -50,7 +60,9 @@ fn validate_proxy_url(raw_url: &str) -> Result<(), Error> {
         || host_lower.ends_with(".local")
         || host_lower.ends_with(".internal")
     {
-        return Err(Error::BadRequest { message: Some("Internal hostnames are not allowed".to_string()) });
+        return Err(Error::BadRequest {
+            message: Some("Internal hostnames are not allowed".to_string()),
+        });
     }
 
     Ok(())
@@ -105,9 +117,8 @@ pub async fn route(params: Query<ProxyParams>) -> Result<FileResponse, Error> {
 
     let mut res = client().get(&params.url).send().await?;
     if !res.status().is_success() {
-        return Err(Error::ProxyError {
-            internal: res.status().to_string(),
-        });
+        log::warn!("Proxy request failed with status: {}", res.status());
+        return Err(Error::ProxyError);
     }
     let mime = get_mime_type(&res)?;
     match mime.type_() {

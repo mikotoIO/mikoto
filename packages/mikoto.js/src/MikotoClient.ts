@@ -55,7 +55,8 @@ export class MikotoClient {
     const websocketUrl = new URL(this.options.url);
     websocketUrl.protocol = websocketUrl.protocol.replace('http', 'ws');
     this.ws = new WebsocketApi({
-      url: `${websocketUrl.origin}/ws?token=${this.token}`,
+      url: `${websocketUrl.origin}/ws`,
+      token: this.token,
     });
 
     SpaceManager._subscribe(this);

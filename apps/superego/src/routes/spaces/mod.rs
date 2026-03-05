@@ -89,7 +89,11 @@ async fn leave_space(space: &SpaceExt, member: &MemberExt) -> Result<(), Error> 
     Ok(())
 }
 
-async fn get(Load(space): Load<SpaceExt>) -> Result<Json<SpaceExt>, Error> {
+async fn get(
+    _claim: Claims,
+    _member: Load<MemberExt>,
+    Load(space): Load<SpaceExt>,
+) -> Result<Json<SpaceExt>, Error> {
     Ok(space.into())
 }
 

@@ -5,6 +5,12 @@ pub struct Env {
     pub mediaserver_port: u16,
     pub public_mediaserver_url: String,
 
+    /// Shared secret for authenticating upload requests from the superego API
+    pub upload_secret: Option<String>,
+
+    /// Allowed CORS origin (defaults to "*" if not set)
+    pub cors_origin: Option<String>,
+
     #[serde(default)]
     pub s3_use_ssl: bool,
     pub s3_endpoint: String,

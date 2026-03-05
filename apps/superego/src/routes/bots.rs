@@ -7,7 +7,12 @@ use nanoid::nanoid;
 use schemars::JsonSchema;
 use uuid::Uuid;
 
-use crate::{db::db, entities::{Bot, BotCreatedResponse}, error::Error, functions::jwt::Claims};
+use crate::{
+    db::db,
+    entities::{Bot, BotCreatedResponse},
+    error::Error,
+    functions::jwt::Claims,
+};
 
 pub fn router() -> ApiRouter {
     ApiRouter::<()>::new()

@@ -16,7 +16,7 @@ pub struct State {
     pub actions: Vec<SocketAction>,
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct WebsocketParams {
     pub token: Option<String>,
 }

@@ -140,7 +140,7 @@ export function MemberContextMenu({
                   {memberSnap.roles.map(
                     (r) => r && <RoleBadge key={r.id} role={r} />,
                   )}
-                  {memberSnap.checkPermission(permissions.manageRoles) && (
+                  {member?.space?.member?.checkPermission(permissions.manageRoles) && (
                     <BaseRoleBadge
                       cursor="pointer"
                       onClick={() => setRoleEditorOpen((x) => !x)}

@@ -50,12 +50,27 @@ fn verify_upload_auth(headers: &HeaderMap) -> Result<(), Error> {
     Ok(())
 }
 
+fn validate_store_name(name: &str) -> Result<(), Error> {
+    if name.contains('/')
+        || name.contains('\\')
+        || name.contains("..")
+        || name.contains('\0')
+        || name.starts_with('.')
+    {
+        return Err(Error::BadRequest {
+            message: Some("Invalid store name".to_string()),
+        });
+    }
+    Ok(())
+}
+
 pub async fn route(
     headers: HeaderMap,
     Path(store_name): Path<String>,
     mut form: Multipart,
 ) -> Result<Json<UploadResponse>, Error> {
     verify_upload_auth(&headers)?;
+    validate_store_name(&store_name)?;
 
     log::info!("Upload request received for store: {}", store_name);
     let store = config().stores.get(&store_name).ok_or(Error::NotFound)?;

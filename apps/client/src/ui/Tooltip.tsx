@@ -1,16 +1,15 @@
-import { cloneElement, useState } from 'react';
-
 import { chakra } from '@chakra-ui/react';
 import {
+  FloatingPortal,
+  type Placement,
+  flip,
+  offset,
+  shift,
   useFloating,
   useHover,
   useInteractions,
-  offset,
-  flip,
-  shift,
-  FloatingPortal,
-  type Placement,
 } from '@floating-ui/react';
+import { cloneElement, useState } from 'react';
 
 export const Tooltip = chakra('div', {
   base: {

@@ -7,7 +7,11 @@ init({ data: emojiData });
 
 export default function Emoji({ emoji }: { emoji: string }) {
   return (
-    <FloatingTooltip tooltip={`:${emoji}:`} placement="top" offsetOptions={[0, 32]}>
+    <FloatingTooltip
+      tooltip={`:${emoji}:`}
+      placement="top"
+      offsetOptions={[0, 32]}
+    >
       {/* @ts-expect-error 2339 */}
       <em-emoji
         id={emoji}

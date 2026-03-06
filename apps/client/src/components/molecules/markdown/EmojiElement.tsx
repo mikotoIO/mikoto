@@ -1,18 +1,16 @@
 import emojiData from '@emoji-mart/data/sets/14/twitter.json';
-import Tippy from '@tippyjs/react';
 import { init } from 'emoji-mart';
 
-import { Tooltip } from '@/ui';
+import { FloatingTooltip } from '@/ui';
 
 init({ data: emojiData });
 
 export default function Emoji({ emoji }: { emoji: string }) {
   return (
-    <Tippy
-      animation={false}
-      content={<Tooltip>:{emoji}:</Tooltip>}
+    <FloatingTooltip
+      tooltip={`:${emoji}:`}
       placement="top"
-      offset={[0, 32]}
+      offsetOptions={[0, 32]}
     >
       {/* @ts-expect-error 2339 */}
       <em-emoji
@@ -23,6 +21,6 @@ export default function Emoji({ emoji }: { emoji: string }) {
         fallback={`:${emoji}:`}
         style={{ verticalAlign: 'middle' }}
       />
-    </Tippy>
+    </FloatingTooltip>
   );
 }

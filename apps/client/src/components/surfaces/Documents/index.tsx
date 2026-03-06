@@ -120,7 +120,6 @@ function MikotoContentEditable() {
 }
 
 const ActionTooltip = createTooltip({
-  animation: false,
   placement: 'bottom',
   offset: [0, 4],
 });

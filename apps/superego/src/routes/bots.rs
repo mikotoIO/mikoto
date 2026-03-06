@@ -9,7 +9,7 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Bot, BotCreatedResponse},
+    entities::{Bot, BotCreatedResponse, BotInfo},
     error::Error,
     functions::jwt::Claims,
 };
@@ -62,7 +62,15 @@ async fn create_bot(
     }))
 }
 
-async fn list_bots(account: Claims) -> Result<Json<Vec<Bot>>, Error> {
+async fn list_bots(account: Claims) -> Result<Json<Vec<BotInfo>>, Error> {
     let bots = Bot::list(Uuid::parse_str(&account.sub)?, db()).await?;
+    let bots = bots
+        .into_iter()
+        .map(|b| BotInfo {
+            id: b.id,
+            name: b.name,
+            owner_id: b.owner_id,
+        })
+        .collect();
     Ok(Json(bots))
 }

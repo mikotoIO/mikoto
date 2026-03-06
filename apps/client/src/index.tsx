@@ -4,8 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 // Import styles
 import 'dockview-react/dist/styles/dockview.css';
 import React from 'react';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+
 import ReactDOM from 'react-dom/client';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -46,7 +45,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <HelmetProvider>
       <ChakraProvider forcedTheme="dark">
         <QueryClientProvider client={queryClient}>
-          <DndProvider backend={HTML5Backend}>
             <>
               <Helmet>
                 {env.DEV && (
@@ -57,7 +55,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               <App />
               <ToastContainer theme="dark" limit={3} />
             </>
-          </DndProvider>
         </QueryClientProvider>
       </ChakraProvider>
     </HelmetProvider>

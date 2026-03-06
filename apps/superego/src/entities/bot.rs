@@ -13,6 +13,15 @@ entity!(
     }
 );
 
+// Public bot info returned by list endpoint (no secret)
+model!(
+    pub struct BotInfo {
+        pub id: Uuid,
+        pub name: String,
+        pub owner_id: Uuid,
+    }
+);
+
 // Response returned only when creating a bot, containing the plaintext token.
 // This is the only time the token is visible.
 model!(
@@ -68,7 +77,7 @@ impl Bot {
             VALUES ((SELECT "id" FROM u), $3, $4, $5)
             "##,
         )
-        .bind(self.owner_id)
+        .bind(self.id)
         .bind(name)
         .bind(&self.name)
         .bind(self.owner_id)

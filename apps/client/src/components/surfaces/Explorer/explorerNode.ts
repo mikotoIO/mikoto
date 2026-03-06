@@ -9,6 +9,7 @@ export interface ExplorerNode {
   unread?: boolean;
   onClick?(ev: React.MouseEvent): void;
   onContextMenu?(ev: React.MouseEvent): void;
+  onDragStart?(ev: React.DragEvent): void;
 }
 
 /**

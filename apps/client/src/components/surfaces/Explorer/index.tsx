@@ -172,6 +172,15 @@ function ExplorerInner({ space }: { space: MikotoSpace }) {
     onContextMenu: nodeContextMenu(() => (
       <ChannelContextMenu channel={channel} />
     )),
+    onDragStart(ev) {
+      const tab = channelToTab(channel);
+      ev.dataTransfer.effectAllowed = 'move';
+      ev.dataTransfer.setData(
+        'application/mikoto-tab',
+        JSON.stringify(tab),
+      );
+      ev.dataTransfer.setData('text/plain', channel.name);
+    },
   }));
 
   return <ChannelTree nodes={channelTree.descendant ?? []} />;

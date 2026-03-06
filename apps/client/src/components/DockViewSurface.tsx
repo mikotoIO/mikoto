@@ -2,11 +2,13 @@ import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   DockviewApi,
+  DockviewDidDropEvent,
   DockviewReact,
   DockviewReadyEvent,
   IDockviewPanel,
   IDockviewPanelHeaderProps,
   IDockviewPanelProps,
+  positionToDirection,
 } from 'dockview-react';
 import { useAtom, useAtomValue } from 'jotai';
 import {
@@ -30,6 +32,7 @@ import { useMikoto } from '@/hooks';
 import {
   TabContext,
   Tabable,
+  activeTabIdState,
   tabNameFamily,
   tabsState,
   useActiveTabId,
@@ -242,8 +245,10 @@ export const DockViewSurface = () => {
   const dockviewRef = useRef<{ api: DockviewApi | null }>({ api: null });
   const [dockviewApi, setDockviewApi] = useState<DockviewApi | null>(null);
   const setTabs = useAtom(tabsState)[1];
+  const setActiveTabId = useAtom(activeTabIdState)[1];
   // Keep track of the last processed tabs array
   const prevTabsRef = useRef<Tabable[]>([]);
+  const prevActiveTabIdRef = useRef<string | null>(null);
   const navigate = useNavigate();
   const mikoto = useMikoto();
 
@@ -339,44 +344,42 @@ export const DockViewSurface = () => {
     };
   }, []);
 
-  // Process any tab changes - adding new tabs or updating active tab
+  // Sync new tabs from state → dockview (for tabs opened via click, not drag-drop)
   useEffect(() => {
     const api = dockviewRef.current.api;
     if (!api) return;
 
-    // Check for new tabs that need to be added
     const prevTabs = prevTabsRef.current;
     tabs.forEach((tab) => {
       const panelId = `${tab.kind}/${tab.key}`;
-
-      // Check if this is a new tab that needs to be added
       const isNewTab = !prevTabs.some(
         (prevTab) => prevTab.kind === tab.kind && prevTab.key === tab.key,
       );
-
-      if (isNewTab) {
+      if (isNewTab && !api.getPanel(panelId)) {
         api.addPanel({
           id: panelId,
           component: 'surface',
           params: { tab },
-          title: 'Loading...', // Temporary title until TabName component sets the actual name
+          title: 'Loading...',
         });
       }
-
-      // We'll handle updating panel titles in a separate effect
     });
 
-    // Set active panel if activeTabId is set
-    if (activeTabId) {
-      const panel = api.getPanel(activeTabId);
-      if (panel) {
-        panel.api.setActive();
-      }
-    }
-
-    // Update prevTabsRef
     prevTabsRef.current = [...tabs];
-  }, [tabs, activeTabId]);
+  }, [tabs]);
+
+  // Sync active tab — only when activeTabId actually changes
+  useEffect(() => {
+    const api = dockviewRef.current.api;
+    if (!api || !activeTabId) return;
+    if (activeTabId === prevActiveTabIdRef.current) return;
+    prevActiveTabIdRef.current = activeTabId;
+
+    const panel = api.getPanel(activeTabId);
+    if (panel) {
+      panel.api.setActive();
+    }
+  }, [activeTabId]);
 
   const onReady = useCallback(
     (event: DockviewReadyEvent) => {
@@ -391,6 +394,15 @@ export const DockViewSurface = () => {
         setTabs((currentTabs) =>
           currentTabs.filter((tab) => !(tab.kind === kind && tab.key === key)),
         );
+      });
+
+      // Accept external drag-and-drop (e.g. channels from sidebar)
+      event.api.onUnhandledDragOverEvent((e) => {
+        if (
+          e.nativeEvent.dataTransfer?.types.includes('application/mikoto-tab')
+        ) {
+          e.accept();
+        }
       });
 
       // Listen for active panel changes to sync URL
@@ -422,6 +434,49 @@ export const DockViewSurface = () => {
     [tabs, setTabs],
   );
 
+  const onDidDrop = useCallback(
+    (event: DockviewDidDropEvent) => {
+      const rawTab = event.nativeEvent.dataTransfer?.getData(
+        'application/mikoto-tab',
+      );
+      if (!rawTab) return;
+
+      const tab: Tabable = JSON.parse(rawTab);
+      const panelId = `${tab.kind}/${tab.key}`;
+
+      // Don't add duplicate panels — just activate existing one
+      const api = dockviewRef.current.api;
+      if (api?.getPanel(panelId)) {
+        api.getPanel(panelId)!.api.setActive();
+        return;
+      }
+
+      // Add panel at the drop position in dockview first
+      event.api.addPanel({
+        id: panelId,
+        component: 'surface',
+        params: { tab },
+        title: 'Loading...',
+        position: {
+          direction: positionToDirection(event.position),
+          referenceGroup: event.group ?? undefined,
+        },
+      });
+
+      // Then sync tab to state (effect will skip addPanel since it already exists)
+      setTabs((currentTabs) => {
+        if (currentTabs.some((t) => t.kind === tab.kind && t.key === tab.key)) {
+          return currentTabs;
+        }
+        return [...currentTabs, tab];
+      });
+      // Sync activeTabId so it doesn't fight with dockview's activation
+      setActiveTabId(panelId);
+      prevActiveTabIdRef.current = panelId;
+    },
+    [setTabs, setActiveTabId],
+  );
+
   if (tabs.length === 0) {
     return <WelcomePanel />;
   }
@@ -431,6 +486,7 @@ export const DockViewSurface = () => {
       <DockviewReact
         components={components}
         onReady={onReady}
+        onDidDrop={onDidDrop}
         className="dockview-theme-mikoto"
         defaultTabComponent={CustomTabComponent}
       />

@@ -1,11 +1,12 @@
 import { Separator } from '@chakra-ui/react';
+import { DragDropProvider } from '@dnd-kit/react';
+import { useSortable } from '@dnd-kit/react/sortable';
 import styled from '@emotion/styled';
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useAtom, useSetAtom } from 'jotai';
-import React, { useRef, useState } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
+import { useState } from 'react';
 import { useSnapshot } from 'valtio/react';
 
 import { modalState, useContextMenu } from '@/components/ContextMenu';
@@ -46,49 +47,20 @@ interface SidebarSpaceIconProps {
   space: MikotoSpace;
 }
 
-interface UseCombinedDnDProps<T> {
-  type: string;
-  item: T;
-  onDrop: (from: T, to: T) => void;
-}
+function SortableSpaceIcon({
+  space,
+  index,
+}: SidebarSpaceIconProps & { index: number }) {
+  const { ref } = useSortable({
+    id: space.id,
+    index,
+  });
 
-function useCombinedDnD<T>(
-  { type, item, onDrop }: UseCombinedDnDProps<T>,
-  deps?: unknown[],
-) {
-  const [, drag] = useDrag<T>(
-    () => ({
-      type,
-      item,
-    }),
-    deps,
+  return (
+    <div ref={ref}>
+      <SidebarSpaceIcon space={space} />
+    </div>
   );
-  const [, drop] = useDrop<T>(
-    {
-      accept: type,
-      drop: (from) => {
-        onDrop(from, item);
-      },
-    },
-    deps,
-  );
-  return { drag, drop };
-}
-
-function CombinedDnD<T>({
-  type,
-  item,
-  onDrop,
-  children,
-  deps,
-}: UseCombinedDnDProps<T> & {
-  children: React.ReactNode;
-  deps?: unknown[];
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { drag, drop } = useCombinedDnD({ type, item, onDrop }, deps);
-  drag(drop(ref));
-  return <div ref={ref}>{children}</div>;
 }
 
 function SidebarSpaceIcon({ space }: SidebarSpaceIconProps) {
@@ -197,44 +169,47 @@ export function SpaceSidebar() {
   }
 
   return (
-    <StyledSpaceSidebar onContextMenu={contextMenu}>
-      <StyledIconWrapper>
-        <SpaceIconLike
-          style={{
-            background:
-              spaceId === null
-                ? 'linear-gradient(133deg, #2298ff 0%, rgba(59,108,255,1) 100%)'
-                : undefined,
-          }}
-          onClick={() => {
-            setSpaceId(null);
-          }}
-        >
-          <FontAwesomeIcon icon={faMikoto} fontSize="24px" />
-        </SpaceIconLike>
-      </StyledIconWrapper>
-      <Separator w={8} />
+    <DragDropProvider
+      onDragEnd={(event) => {
+        const { source, target } = event.operation;
+        if (!source || !target) return;
 
-      {spaceArray
-        .filter((x) => x.type === 'NONE') // TODO: filter this on the server
-        .map((space, index) => (
-          <CombinedDnD
-            key={space.id}
-            type="SPACE"
-            item={{ spaceId: space.id, index }}
-            onDrop={(from, to) => {
-              setOrder((spaceOrders) => {
-                const reordered = reorder(spaceOrders, from.index, to.index);
-                localStorage.setItem('spaceOrder', JSON.stringify(reordered));
-                return reordered;
-              });
+        const fromIndex = spaceArray.findIndex((s) => s.id === source.id);
+        const toIndex = spaceArray.findIndex((s) => s.id === target.id);
+        if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return;
+
+        setOrder((spaceOrders) => {
+          const reordered = reorder(spaceOrders, fromIndex, toIndex);
+          localStorage.setItem('spaceOrder', JSON.stringify(reordered));
+          return reordered;
+        });
+      }}
+    >
+      <StyledSpaceSidebar onContextMenu={contextMenu}>
+        <StyledIconWrapper>
+          <SpaceIconLike
+            style={{
+              background:
+                spaceId === null
+                  ? 'linear-gradient(133deg, #2298ff 0%, rgba(59,108,255,1) 100%)'
+                  : undefined,
             }}
-            deps={[index]}
+            onClick={() => {
+              setSpaceId(null);
+            }}
           >
-            <SidebarSpaceIcon space={space} />
-          </CombinedDnD>
-        ))}
-      <JoinSpaceButon />
-    </StyledSpaceSidebar>
+            <FontAwesomeIcon icon={faMikoto} fontSize="24px" />
+          </SpaceIconLike>
+        </StyledIconWrapper>
+        <Separator w={8} />
+
+        {spaceArray
+          .filter((x) => x.type === 'NONE') // TODO: filter this on the server
+          .map((space, index) => (
+            <SortableSpaceIcon key={space.id} space={space} index={index} />
+          ))}
+        <JoinSpaceButon />
+      </StyledSpaceSidebar>
+    </DragDropProvider>
   );
 }

@@ -15,6 +15,9 @@ pub struct Claims {
     pub sub: String, // user ID
     pub iss: String, // issuer
     pub aud: String, // audience
+    /// "bot" for bot tokens, absent for regular user tokens
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub category: Option<String>,
 }
 
 fn header() -> &'static Header {
@@ -66,6 +69,21 @@ impl From<&Account> for Claims {
             sub: user.id.to_string(),
             iss: env().issuer.clone(),
             aud: JWT_AUDIENCE.to_string(),
+            category: None,
+        }
+    }
+}
+
+impl Claims {
+    /// Create claims for a bot user. Bot tokens expire after 24 hours.
+    pub fn for_bot(bot_user_id: uuid::Uuid) -> Self {
+        let expiry = Utc::now() + TimeDelta::hours(24);
+        Self {
+            exp: expiry.timestamp() as usize,
+            sub: bot_user_id.to_string(),
+            iss: env().issuer.clone(),
+            aud: JWT_AUDIENCE.to_string(),
+            category: Some("bot".to_string()),
         }
     }
 }
@@ -116,6 +134,7 @@ mod tests {
             sub: acc.id.to_string(),
             iss: TEST_ISSUER.to_string(),
             aud: JWT_AUDIENCE.to_string(),
+            category: None,
         }
     }
 

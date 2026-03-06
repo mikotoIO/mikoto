@@ -1,6 +1,6 @@
 use uuid::Uuid;
 
-use crate::{entity, error::Error, model};
+use crate::{db_find_by_id, entity, error::Error, model};
 
 entity!(
     pub struct Bot {
@@ -34,6 +34,8 @@ model!(
 );
 
 impl Bot {
+    db_find_by_id!("Bot");
+
     pub async fn list<'c, X: sqlx::PgExecutor<'c>>(
         owner_id: Uuid,
         db: X,

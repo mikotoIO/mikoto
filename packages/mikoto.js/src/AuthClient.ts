@@ -3,6 +3,7 @@ import { pluginToken } from '@zodios/plugins';
 
 import {
   Api,
+  BotLoginPayload,
   ChangePasswordPayload,
   CreateBotPayload,
   LoginPayload,
@@ -16,6 +17,12 @@ export interface AuthClientOptions {
   url: string;
   refreshToken?: () => string;
   setRefreshToken?: (token: string) => void;
+}
+
+export interface BotAuthClientOptions {
+  url: string;
+  botId: string;
+  token: string;
 }
 
 export class AuthClient {
@@ -97,5 +104,33 @@ export class AuthClient {
   async listBots() {
     const res = await this.api['bots.list']();
     return res;
+  }
+
+  async botLogin(payload: BotLoginPayload) {
+    const res = await this.api['bots.login'](payload);
+    return res;
+  }
+}
+
+/**
+ * Auth client for bot users. Authenticates using bot ID + secret token
+ * instead of email/password + refresh tokens.
+ */
+export class BotAuthClient extends AuthClient {
+  private botId: string;
+  private botToken: string;
+
+  constructor(options: BotAuthClientOptions) {
+    super({ url: options.url });
+    this.botId = options.botId;
+    this.botToken = options.token;
+  }
+
+  override async refresh(): Promise<string> {
+    const res = await this.api['bots.login']({
+      botId: this.botId,
+      token: this.botToken,
+    });
+    return res.accessToken;
   }
 }

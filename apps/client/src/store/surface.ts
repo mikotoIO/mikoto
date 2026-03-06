@@ -73,17 +73,14 @@ export function useTabkit() {
       return tabs;
     },
     openTab(tab: Tabable, openNew: boolean = false) {
-      if (tabs.length === 0 || openNew) {
-        openNewChannel(tab);
-        return;
-      }
-
       const tabId = `${tab.kind}/${tab.key}`;
       const existingTab = getTabById(tabId);
 
       if (existingTab) {
         setActiveTabId(tabId);
         saveActiveTabToStorage(tabId);
+      } else if (tabs.length === 0 || openNew) {
+        openNewChannel(tab);
       } else {
         const newTabs = [...tabs, tab];
         setTabs(newTabs);

@@ -14,6 +14,9 @@ export default defineConfig({
       projects: ['./tsconfig.json'],
     }),
   ],
+  server: {
+    port: 3514,
+  },
   ssr: {
     external: ['@takumi-rs/image-response'],
   },

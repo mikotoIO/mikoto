@@ -1,0 +1,6 @@
+language: 'typescript'
+tags: ['core-app']
+
+tasks:
+  typecheck:
+    command: 'react-router typegen && fumadocs-mdx && tsc --noEmit'

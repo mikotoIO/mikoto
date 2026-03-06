@@ -24,7 +24,8 @@ export default [
   {
     ignores: [
       'node_modules/**',
-      'apps/docs/.next/**',
+      'apps/docs/.source/**',
+      'apps/docs/.react-router/**',
       'dist/**',
       'build/**',
       '**/*.min.js',

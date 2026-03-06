@@ -73,3 +73,7 @@ target/
 .moon/docker
 
 .brainstorm/
+
+# fumadocs
+.source/
+.react-router/

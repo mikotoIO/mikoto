@@ -1554,12 +1554,21 @@
         "required": [
           "id",
           "name",
-          "ownerId"
+          "ownerId",
+          "permissions",
+          "visibility"
         ],
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "lastTokenRegeneratedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
           },
           "name": {
             "type": "string"
@@ -1567,6 +1576,25 @@
           "ownerId": {
             "type": "string",
             "format": "uuid"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "user": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserExt"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/BotVisibility"
           }
         }
       },
@@ -1585,6 +1613,35 @@
             "type": "string"
           }
         }
+      },
+      "BotSpaceInfo": {
+        "type": "object",
+        "required": [
+          "spaceId",
+          "spaceName"
+        ],
+        "properties": {
+          "spaceIcon": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "spaceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "spaceName": {
+            "type": "string"
+          }
+        }
+      },
+      "BotVisibility": {
+        "type": "string",
+        "enum": [
+          "PUBLIC",
+          "PRIVATE"
+        ]
       },
       "ChangePasswordPayload": {
         "type": "object",
@@ -1856,6 +1913,18 @@
           },
           "version": {
             "type": "string"
+          }
+        }
+      },
+      "InstallBotPayload": {
+        "type": "object",
+        "required": [
+          "spaceId"
+        ],
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },
@@ -2543,6 +2612,48 @@
             "type": [
               "string",
               "null"
+            ]
+          }
+        }
+      },
+      "UpdateBotPayload": {
+        "type": "object",
+        "properties": {
+          "avatar": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "permissions": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "visibility": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BotVisibility"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         }

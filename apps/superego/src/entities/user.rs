@@ -48,7 +48,7 @@ entity!(
 );
 
 /// User with extended data including handle
-#[derive(Serialize, Deserialize, Clone, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UserExt {
     #[serde(flatten)]

@@ -107,6 +107,8 @@ const EditMode = styled.div`
 
 const TopContainer = styled.div`
   margin: 16px 16px 4px;
+  border: 1px solid var(--chakra-colors-gray-600);
+  border-radius: 8px;
 
   & > *:first-of-type {
     border-top-left-radius: 8px;

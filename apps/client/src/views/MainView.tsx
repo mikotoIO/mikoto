@@ -139,6 +139,10 @@ const DockViewContainer = styled.div`
   flex: 1;
   min-width: 0; /* Prevent flex items from overflowing */
 
+  .dv-tabs-container {
+    border-right: 1px solid var(--chakra-colors-gray-700);
+  }
+
   .dv-tab {
     font-size: 14px;
   }

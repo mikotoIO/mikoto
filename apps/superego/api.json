@@ -224,7 +224,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Bot"
+                    "$ref": "#/components/schemas/BotInfo"
                   }
                 }
               }
@@ -1492,32 +1492,6 @@
   },
   "components": {
     "schemas": {
-      "Bot": {
-        "type": "object",
-        "required": [
-          "id",
-          "name",
-          "ownerId",
-          "secret"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "ownerId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "secret": {
-            "writeOnly": true,
-            "type": "string"
-          }
-        }
-      },
       "BotCreatedResponse": {
         "type": "object",
         "required": [
@@ -1540,6 +1514,27 @@
           },
           "token": {
             "type": "string"
+          }
+        }
+      },
+      "BotInfo": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "ownerId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },

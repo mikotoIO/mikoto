@@ -32,10 +32,9 @@ const BotCardContainer = styled.div`
 interface BotProps {
   id: string;
   name: string;
-  secret: string;
 }
 
-function BotCard({ id, name, secret }: BotProps) {
+function BotCard({ id, name }: BotProps) {
   const tabkit = useTabkit();
   return (
     <BotCardContainer>
@@ -63,13 +62,13 @@ function BotCard({ id, name, secret }: BotProps) {
           </Button>
           <Button
             onClick={() => {
-              navigator.clipboard.writeText(`${id}:${secret}`);
-              toast.success('Copied bot token to clipboard!');
+              navigator.clipboard.writeText(id);
+              toast.success('Copied bot ID to clipboard!');
             }}
             type="button"
           >
             <FontAwesomeIcon icon={faCopy} />
-            Copy Bot Token
+            Copy Bot ID
           </Button>
           <Button type="button" colorPalette="danger">
             <FontAwesomeIcon icon={faTrash} />

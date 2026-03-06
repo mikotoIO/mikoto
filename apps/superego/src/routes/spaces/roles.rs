@@ -51,6 +51,9 @@ async fn update(
     permissions_or_admin(&space, &member, Permission::MANAGE_ROLES)?;
 
     let role = Role::find_by_id(role_id, db()).await?;
+    if role.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     let role = role.update(&patch, db()).await?;
     emit_event("roles.onUpdate", &role, &format!("space:{}", space.base.id)).await?;
     Ok(role.into())
@@ -64,6 +67,9 @@ async fn delete(
     permissions_or_admin(&space, &member, Permission::MANAGE_ROLES)?;
 
     let role = Role::find_by_id(role_id, db()).await?;
+    if role.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     role.delete(db()).await?;
     emit_event("roles.onDelete", &role, &format!("space:{}", space.base.id)).await?;
     Ok(Json(()))

@@ -4,7 +4,7 @@ use aide::{
     axum::{routing::get_with, IntoApiResponse},
     openapi::{Info, OpenApi},
 };
-use axum::{Extension, Json, Router};
+use axum::{extract::Request, middleware, Extension, Json, Router};
 use channels::{documents::collab_ws, voice};
 use http::header::{AUTHORIZATION, CONTENT_TYPE};
 use router::AppRouter;
@@ -103,6 +103,34 @@ fn build_app_router() -> AppRouter<State> {
         .ws_event("pong", |ping: Ping, _| async move { Some(ping) })
 }
 
+async fn security_headers(request: Request, next: middleware::Next) -> axum::response::Response {
+    let mut response = next.run(request).await;
+    let headers = response.headers_mut();
+    headers.insert("X-Content-Type-Options", "nosniff".parse().unwrap());
+    headers.insert("X-Frame-Options", "DENY".parse().unwrap());
+    headers.insert(
+        "Referrer-Policy",
+        "strict-origin-when-cross-origin".parse().unwrap(),
+    );
+    headers.insert(
+        "Permissions-Policy",
+        "camera=(), microphone=(), geolocation=()".parse().unwrap(),
+    );
+    headers.insert(
+        "Content-Security-Policy",
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' wss: ws: https:; frame-ancestors 'none'"
+            .parse()
+            .unwrap(),
+    );
+    if env().mikoto_env == MikotoMode::Production {
+        headers.insert(
+            "Strict-Transport-Security",
+            "max-age=63072000; includeSubDomains".parse().unwrap(),
+        );
+    }
+    response
+}
+
 pub fn router() -> Router {
     let router = build_app_router();
 
@@ -115,6 +143,7 @@ pub fn router() -> Router {
             ..OpenApi::default()
         })
         .nest("/collab", collab_ws())
+        .layer(middleware::from_fn(security_headers))
         .layer({
             let cors = CorsLayer::new()
                 .allow_methods(tower_http::cors::Any)

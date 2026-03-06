@@ -1,4 +1,4 @@
-use axum::Json;
+use axum::{http::HeaderMap, Json};
 use schemars::JsonSchema;
 use serde_json::json;
 use uuid::Uuid;
@@ -10,6 +10,8 @@ use crate::{
     functions::{
         captcha::captcha,
         jwt::{jwt_key, Claims},
+        rate_limit::auth_rate_limiter,
+        validation::validate_password,
     },
 };
 
@@ -31,8 +33,15 @@ pub struct RegisterPayload {
     pub captcha: Option<String>,
 }
 
-pub async fn route(body: Json<RegisterPayload>) -> Result<Json<TokenPair>, Error> {
+pub async fn route(
+    headers: HeaderMap,
+    body: Json<RegisterPayload>,
+) -> Result<Json<TokenPair>, Error> {
+    let ip = crate::functions::rate_limit::client_ip_from_headers(&headers);
+    auth_rate_limiter().check(&ip)?;
+
     captcha().validate(body.captcha.as_deref()).await?;
+    validate_password(&body.password)?;
 
     let account = Account {
         id: Uuid::new_v4(),

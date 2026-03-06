@@ -6,7 +6,10 @@ use crate::{
     db::db,
     entities::{Account, RefreshToken, TokenPair},
     error::Error,
-    functions::jwt::{jwt_key, Claims},
+    functions::{
+        jwt::{jwt_key, Claims},
+        validation::validate_password,
+    },
 };
 
 #[derive(Deserialize, JsonSchema)]
@@ -27,6 +30,7 @@ pub async fn route(
         return Err(Error::WrongPassword);
     }
 
+    validate_password(&body.new_password)?;
     RefreshToken::clear_all(user_id, db()).await?;
 
     let new_passhash = bcrypt::hash(&body.new_password, bcrypt::DEFAULT_COST)?;

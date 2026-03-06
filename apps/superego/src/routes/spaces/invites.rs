@@ -53,13 +53,17 @@ async fn list(
 }
 
 async fn delete(
-    Path((_space_id, invite_id)): Path<(Uuid, Uuid)>,
+    Path((_space_id, invite_id)): Path<(Uuid, String)>,
     Load(space): Load<SpaceExt>,
     Load(member): Load<MemberExt>,
 ) -> Result<Json<()>, Error> {
     permissions_or_moderator(&space, &member, Permission::MANAGE_INVITES)?;
 
-    Invite::delete(&invite_id.to_string(), db()).await?;
+    let invite = Invite::find_by_id(&invite_id, db()).await?;
+    if invite.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
+    Invite::delete(&invite_id, db()).await?;
     Ok(Json(()))
 }
 

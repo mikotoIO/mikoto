@@ -27,9 +27,9 @@ pub enum Error {
     FileTooLarge,
 
     // errors relating to services
-    #[error("{0}")]
+    #[error("Database error")]
     DatabaseError(#[from] sqlx::Error),
-    #[error("{0}")]
+    #[error("Cache error")]
     RedisError(#[from] fred::error::Error),
     #[error("{0}")]
     SerdeError(#[from] serde_json::Error),
@@ -150,30 +150,33 @@ impl From<jsonwebtoken::errors::Error> for Error {
 
 impl From<S3Error> for Error {
     fn from(err: S3Error) -> Self {
+        log::error!("S3 error: {}", err);
         Self::Miscallaneous {
             code: "S3Error".to_string(),
             status: StatusCode::INTERNAL_SERVER_ERROR,
-            message: err.to_string(),
+            message: "Internal storage error".to_string(),
         }
     }
 }
 
 impl From<ImageError> for Error {
     fn from(err: ImageError) -> Self {
+        log::error!("Image error: {}", err);
         Self::Miscallaneous {
             code: "ImageError".to_string(),
             status: StatusCode::INTERNAL_SERVER_ERROR,
-            message: err.to_string(),
+            message: "Image processing error".to_string(),
         }
     }
 }
 
 impl From<reqwest::Error> for Error {
     fn from(err: reqwest::Error) -> Self {
+        log::error!("Network error: {}", err);
         Self::Miscallaneous {
             code: "NetworkError".to_string(),
             status: StatusCode::BAD_GATEWAY,
-            message: err.to_string(),
+            message: "Network error".to_string(),
         }
     }
 }

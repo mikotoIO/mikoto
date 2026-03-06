@@ -57,6 +57,14 @@ impl RefreshToken {
             .ok_or(Error::NotFound)
     }
 
+    pub async fn delete<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
+        sqlx::query(r##"DELETE FROM "RefreshToken" WHERE "id" = $1"##)
+            .bind(self.id)
+            .execute(db)
+            .await?;
+        Ok(())
+    }
+
     pub async fn clear_all<'c, X: sqlx::PgExecutor<'c>>(
         account_id: Uuid,
         db: X,

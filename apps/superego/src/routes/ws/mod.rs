@@ -23,7 +23,7 @@ pub mod state;
 
 #[async_trait]
 pub trait WebSocketState: Sized + Send + Sync + 'static {
-    type Initial: DeserializeOwned + Send + Sync + 'static;
+    type Initial: Serialize + DeserializeOwned + Send + Sync + 'static;
 
     async fn initialize(q: Self::Initial) -> Result<(Self, Vec<String>), Error>;
     fn clear_actions(&mut self) -> Vec<SocketAction>;
@@ -59,6 +59,56 @@ async fn ws_send<T: Serialize>(
     Ok(())
 }
 
+/// Read the first message from the client to extract the authentication token.
+/// Supports both first-message auth (preferred) and legacy query param auth.
+async fn read_auth_token<S: WebSocketState>(
+    reader: &mut futures_util::stream::SplitStream<WebSocket>,
+    legacy_params: S::Initial,
+) -> Result<S::Initial, Error> {
+    // Try to deserialize the legacy params; if token is present, use that (backwards compat)
+    // The Initial type for our State is WebsocketParams { token: Option<String> }
+    // We check if the legacy token was provided via query params
+    let serialized = serde_json::to_value(&legacy_params).ok();
+    let has_legacy_token = serialized
+        .as_ref()
+        .and_then(|v| v.get("token"))
+        .and_then(|v| v.as_str())
+        .is_some();
+
+    if has_legacy_token {
+        // Legacy: token was in query params (backwards compatibility)
+        return Ok(legacy_params);
+    }
+
+    // First-message auth: read the first message which should contain { op: "authenticate", data: { token: "..." } }
+    let msg = tokio::time::timeout(std::time::Duration::from_secs(10), reader.next())
+        .await
+        .map_err(|_| Error::unauthorized("Authentication timeout"))?
+        .ok_or(Error::WebSocketTerminated)?
+        .map_err(|_| Error::WebSocketTerminated)?;
+
+    let text = match msg {
+        ws::Message::Text(text) => text,
+        _ => {
+            return Err(Error::unauthorized(
+                "Expected text message for authentication",
+            ))
+        }
+    };
+
+    let op: Operation = serde_json::from_str(&text)
+        .map_err(|_| Error::unauthorized("Invalid authentication message"))?;
+
+    if op.op != "authenticate" {
+        return Err(Error::unauthorized("First message must be 'authenticate'"));
+    }
+
+    let params: S::Initial = serde_json::from_value(op.data)
+        .map_err(|_| Error::unauthorized("Invalid authentication data"))?;
+
+    Ok(params)
+}
+
 async fn handle_socket<S: WebSocketState>(
     socket: ws::WebSocket,
     query: S::Initial,
@@ -66,7 +116,8 @@ async fn handle_socket<S: WebSocketState>(
 ) -> Result<(), Error> {
     let (mut writer, mut reader) = socket.split();
 
-    let (state, initial_subscriptions) = S::initialize(query).await?;
+    let params = read_auth_token::<S>(&mut reader, query).await?;
+    let (state, initial_subscriptions) = S::initialize(params).await?;
 
     let redis = {
         let redis = redis().clone_new();

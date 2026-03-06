@@ -2,6 +2,7 @@ use std::io::Cursor;
 
 use axum::{
     extract::{Multipart, Path},
+    http::HeaderMap,
     Json,
 };
 use image::imageops::FilterType;
@@ -29,10 +30,48 @@ pub struct UploadResponse {
     pub url: String,
 }
 
+fn verify_upload_auth(headers: &HeaderMap) -> Result<(), Error> {
+    let secret = match &env().upload_secret {
+        Some(s) => s,
+        None => return Ok(()), // No secret configured = auth disabled (dev mode)
+    };
+
+    let auth = headers
+        .get("authorization")
+        .and_then(|v| v.to_str().ok())
+        .ok_or(Error::Unauthorized)?;
+
+    let token = auth.strip_prefix("Bearer ").ok_or(Error::Unauthorized)?;
+
+    if token != secret {
+        return Err(Error::Unauthorized);
+    }
+
+    Ok(())
+}
+
+fn validate_store_name(name: &str) -> Result<(), Error> {
+    if name.contains('/')
+        || name.contains('\\')
+        || name.contains("..")
+        || name.contains('\0')
+        || name.starts_with('.')
+    {
+        return Err(Error::BadRequest {
+            message: Some("Invalid store name".to_string()),
+        });
+    }
+    Ok(())
+}
+
 pub async fn route(
+    headers: HeaderMap,
     Path(store_name): Path<String>,
     mut form: Multipart,
 ) -> Result<Json<UploadResponse>, Error> {
+    verify_upload_auth(&headers)?;
+    validate_store_name(&store_name)?;
+
     log::info!("Upload request received for store: {}", store_name);
     let store = config().stores.get(&store_name).ok_or(Error::NotFound)?;
 
@@ -48,7 +87,6 @@ pub async fn route(
 
     let content_type = file.content_type().map(|s| s.to_string());
 
-    // TODO: This is very hacky. Allow the user to provide their own file types.
     let mut ext = mime_to_ext(content_type.as_deref().unwrap_or("???"));
 
     let mut buf = file
@@ -67,8 +105,12 @@ pub async fn route(
     match store.store_type {
         StoreType::Attachment => {}
         StoreType::Image => {
-            // TODO: validate if actually image
-            // should be unnecessary, but just in case
+            // Validate actual image content by attempting to decode
+            if image::guess_format(&buf).is_err() {
+                return Err(Error::BadRequest {
+                    message: Some("File is not a valid image".to_string()),
+                });
+            }
         }
     }
 

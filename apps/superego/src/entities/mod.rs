@@ -6,6 +6,7 @@ use std::hash::Hash;
 use uuid::Uuid;
 
 mod account;
+mod ban;
 mod bot;
 mod channel;
 mod document;
@@ -21,6 +22,7 @@ mod space;
 mod user;
 
 pub use account::*;
+pub use ban::*;
 pub use bot::*;
 pub use channel::*;
 pub use document::*;

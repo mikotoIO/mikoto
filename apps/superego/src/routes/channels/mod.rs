@@ -8,6 +8,7 @@ use crate::{
     entities::{Channel, ChannelPatch, ChannelType, ChannelUnread, Document, MemberExt, SpaceExt},
     error::Error,
     functions::{
+        jwt::Claims,
         permissions::{permissions_or_admin, Permission},
         pubsub::emit_event,
         time::Timestamp,
@@ -31,12 +32,24 @@ pub struct ChannelCreatePayload {
     pub kind: Option<ChannelType>,
 }
 
-async fn get(Path((_, channel_id)): Path<(Uuid, Uuid)>) -> Result<Json<Channel>, Error> {
+async fn get(
+    _claim: Claims,
+    _member: Load<MemberExt>,
+    Load(space): Load<SpaceExt>,
+    Path((_, channel_id)): Path<(Uuid, Uuid)>,
+) -> Result<Json<Channel>, Error> {
     let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     Ok(channel.into())
 }
 
-async fn list(Path(space_id): Path<Uuid>) -> Result<Json<Vec<Channel>>, Error> {
+async fn list(
+    _claim: Claims,
+    _member: Load<MemberExt>,
+    Path(space_id): Path<Uuid>,
+) -> Result<Json<Vec<Channel>>, Error> {
     let channels = Channel::list(space_id, db()).await?;
     Ok(channels.into())
 }
@@ -83,6 +96,9 @@ async fn update(
     permissions_or_admin(&space, &member, Permission::MANAGE_CHANNELS)?;
 
     let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     let channel = channel.update(patch, db()).await?;
     emit_event(
         "channels.onUpdate",
@@ -101,6 +117,9 @@ async fn delete(
     permissions_or_admin(&space, &member, Permission::MANAGE_CHANNELS)?;
 
     let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     channel.delete(db()).await?;
     emit_event(
         "channels.onDelete",

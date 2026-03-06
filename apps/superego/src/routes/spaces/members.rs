@@ -5,9 +5,10 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{MemberExt, MemberKey, Role, RoleToSpaceUser, SpaceExt, SpaceUser},
+    entities::{Ban, MemberExt, MemberKey, Role, RoleToSpaceUser, SpaceExt, SpaceUser},
     error::Error,
     functions::{
+        jwt::Claims,
         permissions::{permissions_or_admin, Permission},
         pubsub::emit_event,
     },
@@ -27,13 +28,21 @@ pub struct MemberUpdatePayload {
     pub role_ids: Vec<Uuid>,
 }
 
-async fn get(Path((space_id, user_id)): Path<(Uuid, Uuid)>) -> Result<Json<MemberExt>, Error> {
+async fn get(
+    _claim: Claims,
+    _acting_member: Load<MemberExt>,
+    Path((space_id, user_id)): Path<(Uuid, Uuid)>,
+) -> Result<Json<MemberExt>, Error> {
     let member = SpaceUser::get_by_key(&MemberKey::new(space_id, user_id), db()).await?;
     let member = MemberExt::dataload_one(member, db()).await?;
     Ok(member.into())
 }
 
-async fn list(Path(space_id): Path<Uuid>) -> Result<Json<Vec<MemberExt>>, Error> {
+async fn list(
+    _claim: Claims,
+    _acting_member: Load<MemberExt>,
+    Path(space_id): Path<Uuid>,
+) -> Result<Json<Vec<MemberExt>>, Error> {
     let members = SpaceUser::list_from_space(space_id, db()).await?;
     let members = MemberExt::dataload(members, db()).await?;
 
@@ -100,6 +109,14 @@ async fn delete(
     permissions_or_admin(&space, &acting_member, Permission::BAN)?;
 
     // ban user
+    let ban = Ban {
+        id: Uuid::new_v4(),
+        user_id,
+        space_id,
+        reason: None,
+    };
+    ban.create(db()).await?;
+
     let key = MemberKey::new(space_id, user_id);
     let member = SpaceUser::get_by_key(&key, db()).await?;
     let member = MemberExt::dataload_one(member, db()).await?;

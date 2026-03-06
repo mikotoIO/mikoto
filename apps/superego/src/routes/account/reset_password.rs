@@ -1,4 +1,4 @@
-use axum::Json;
+use axum::{http::HeaderMap, Json};
 use schemars::JsonSchema;
 
 use crate::{
@@ -9,6 +9,8 @@ use crate::{
     functions::{
         captcha::captcha,
         mail::{mailer, MailTemplate},
+        rate_limit::auth_rate_limiter,
+        validation::validate_password,
     },
 };
 
@@ -30,10 +32,20 @@ pub struct ResetPasswordData {
     pub link: String,
 }
 
-pub async fn route(body: Json<ResetPasswordPayload>) -> Result<Json<()>, Error> {
+pub async fn route(
+    headers: HeaderMap,
+    body: Json<ResetPasswordPayload>,
+) -> Result<Json<()>, Error> {
+    let ip = crate::functions::rate_limit::client_ip_from_headers(&headers);
+    auth_rate_limiter().check(&ip)?;
+
     captcha().validate(body.captcha.as_deref()).await?;
 
-    let account = Account::find_by_email(&body.email, db()).await?;
+    // Always return success to prevent account enumeration
+    let account = match Account::find_by_email(&body.email, db()).await {
+        Ok(acc) => acc,
+        Err(_) => return Ok(Json(())),
+    };
     let verification = AccountVerification::create_password_reset(account.id, db()).await?;
 
     mailer()
@@ -57,9 +69,12 @@ pub struct ResetPasswordConfirmData {
 }
 
 pub async fn confirm(data: Json<ResetPasswordConfirmData>) -> Result<Json<()>, Error> {
+    validate_password(&data.password)?;
     let verification =
         AccountVerification::find_by_token(&data.token, "PASSWORD_RESET", db()).await?;
     let account = Account::find_by_id(&verification.account_id, db()).await?;
     account.update_password(&data.password, db()).await?;
+    // Delete the token so it cannot be reused
+    verification.delete(db()).await?;
     Ok(Json(()))
 }

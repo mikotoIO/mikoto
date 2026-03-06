@@ -8,7 +8,7 @@ use tokio::sync::{Mutex, RwLock};
 
 use aide::axum::routing::{get_with, patch_with};
 use axum::{
-    extract::{ws::WebSocket, Path, WebSocketUpgrade},
+    extract::{ws::WebSocket, Path, Query, WebSocketUpgrade},
     response::Response,
     Extension, Json, Router,
 };
@@ -22,20 +22,38 @@ use yrs_axum::{
 
 use crate::{
     db::db,
-    entities::{Document, DocumentPatch},
+    entities::{Channel, Document, DocumentPatch, MemberExt, MemberKey, SpaceExt, SpaceUser},
     error::Error,
+    functions::jwt::{jwt_key, Claims},
+    middlewares::load::Load,
     routes::{router::AppRouter, ws::state::State},
 };
 
-async fn get(Path((_, channel_id)): Path<(Uuid, Uuid)>) -> Result<Json<Document>, Error> {
+async fn get(
+    _claim: Claims,
+    _member: Load<MemberExt>,
+    Load(space): Load<SpaceExt>,
+    Path((_, channel_id)): Path<(Uuid, Uuid)>,
+) -> Result<Json<Document>, Error> {
+    let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     let document = Document::get_by_channel_id(channel_id, db()).await?;
     Ok(document.into())
 }
 
 async fn update(
+    _claim: Claims,
+    _member: Load<MemberExt>,
+    Load(space): Load<SpaceExt>,
     Path((_, channel_id)): Path<(Uuid, Uuid)>,
     Json(patch): Json<DocumentPatch>,
 ) -> Result<Json<Document>, Error> {
+    let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != space.base.id {
+        return Err(Error::NotFound);
+    }
     let document = Document::get_by_channel_id(channel_id, db()).await?;
     let document = document.update(patch, db()).await?;
     Ok(document.into())
@@ -61,6 +79,11 @@ pub fn router() -> AppRouter<State> {
 
 type BroadcastMap = Arc<Mutex<HashMap<String, Weak<BroadcastGroup>>>>;
 
+#[derive(Deserialize)]
+struct CollabParams {
+    token: Option<String>,
+}
+
 pub fn collab_ws() -> Router<()> {
     let bcg_map: BroadcastMap = Arc::new(Mutex::new(HashMap::new()));
 
@@ -71,10 +94,25 @@ pub fn collab_ws() -> Router<()> {
 
 async fn ws_handler(
     Path(room): Path<String>,
+    Query(params): Query<CollabParams>,
     ws: WebSocketUpgrade,
     Extension(bcast): Extension<BroadcastMap>,
-) -> Response {
-    ws.on_upgrade(move |socket| peer(room, socket, bcast))
+) -> Result<Response, Error> {
+    // Authenticate the WebSocket connection
+    let token = params
+        .token
+        .ok_or(Error::unauthorized("Token not provided"))?;
+    let claims = Claims::decode(&token, jwt_key())?;
+    let user_id: Uuid = claims.sub.parse()?;
+
+    // The room format is the channel ID; verify the user is a member of the channel's space
+    let channel_id: Uuid = room.parse().map_err(|_| Error::NotFound)?;
+    let channel = Channel::find_by_id(channel_id, db()).await?;
+    SpaceUser::get_by_key(&MemberKey::new(channel.space_id, user_id), db())
+        .await
+        .map_err(|_| Error::unauthorized("You are not a member of this space"))?;
+
+    Ok(ws.on_upgrade(move |socket| peer(room, socket, bcast)))
 }
 
 async fn peer(room: String, ws: WebSocket, bcg_map: BroadcastMap) {

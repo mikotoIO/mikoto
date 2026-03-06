@@ -1,22 +1,16 @@
-import Tippy from '@tippyjs/react';
-
-import { Tooltip } from '@/ui';
+import { FloatingTooltip } from '@/ui';
 
 export function SpaceIconTooltip({
   children,
   tooltip,
 }: {
-  children: React.ReactElement;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  children: React.ReactElement<any>;
   tooltip: string;
 }) {
   return (
-    <Tippy
-      animation={false}
-      content={<Tooltip>{tooltip}</Tooltip>}
-      placement="right"
-      offset={[0, 0]}
-    >
+    <FloatingTooltip tooltip={tooltip} placement="right" offsetOptions={[0, 0]}>
       {children}
-    </Tippy>
+    </FloatingTooltip>
   );
 }

@@ -212,7 +212,7 @@ export const globalCss = css`
   .dockview-theme-mikoto
     .dv-split-view-container.dv-horizontal
     > .dv-view-container
-    > .dv-view:not(:first-child)::before {
+    > .dv-view:not(:first-of-type)::before {
     content: '';
     position: absolute;
     top: 0;
@@ -227,7 +227,7 @@ export const globalCss = css`
   .dockview-theme-mikoto
     .dv-split-view-container.dv-vertical
     > .dv-view-container
-    > .dv-view:not(:first-child)::before {
+    > .dv-view:not(:first-of-type)::before {
     content: '';
     position: absolute;
     top: 0;

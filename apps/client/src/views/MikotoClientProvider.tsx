@@ -50,7 +50,7 @@ export function MikotoClientProvider({
 
   useEffect(() => {
     if (!initialized.current) {
-      // initialized.current = true;
+      initialized.current = true;
 
       const mi = new MikotoClient({
         url: env.PUBLIC_SERVER_URL,

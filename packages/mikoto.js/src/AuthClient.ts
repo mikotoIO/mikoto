@@ -20,6 +20,7 @@ export interface AuthClientOptions {
 export class AuthClient {
   api: Api;
   refreshToken?: string;
+  private setRefreshToken?: (token: string) => void;
 
   // this prevents multiple refresh calls from happening at the same time
   // when multiple requests are made in the same tick
@@ -30,6 +31,7 @@ export class AuthClient {
       });
       if (res.refreshToken) {
         this.refreshToken = res.refreshToken;
+        this.setRefreshToken?.(res.refreshToken);
       }
       return res.accessToken;
     },
@@ -43,6 +45,7 @@ export class AuthClient {
   constructor(options: AuthClientOptions) {
     this.api = createApiClient(options.url, {});
     this.refreshToken = options.refreshToken?.();
+    this.setRefreshToken = options.setRefreshToken;
   }
 
   async refresh(): Promise<string> {

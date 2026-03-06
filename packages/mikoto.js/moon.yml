@@ -1,0 +1,9 @@
+language: 'typescript'
+
+tasks:
+  typecheck:
+    command: 'tsc --noEmit'
+  generate:
+    command: 'pnpm generate'
+    deps:
+      - 'superego:generate'

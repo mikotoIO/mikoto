@@ -3,3 +3,5 @@ tags: ['core-app']
 tasks:
   start:
     command: cargo run --bin superego
+  generate:
+    command: cargo run --bin dump_api

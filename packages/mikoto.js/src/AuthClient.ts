@@ -1,4 +1,5 @@
 import { debounce } from 'lodash-es';
+import { pluginToken } from '@zodios/plugins';
 
 import {
   Api,
@@ -42,14 +43,24 @@ export class AuthClient {
     },
   );
 
+  private accessToken?: string;
+
   constructor(options: AuthClientOptions) {
     this.api = createApiClient(options.url, {});
     this.refreshToken = options.refreshToken?.();
     this.setRefreshToken = options.setRefreshToken;
+
+    this.api.use(
+      pluginToken({
+        getToken: async () => this.accessToken ?? '',
+      }),
+    );
   }
 
   async refresh(): Promise<string> {
-    return this.debouncedRefresh();
+    const token = await this.debouncedRefresh();
+    this.accessToken = token;
+    return token;
   }
 
   async register(payload: RegisterPayload) {

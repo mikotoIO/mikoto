@@ -43,9 +43,20 @@ export function WelcomePanel() {
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
-      outline={dragOver ? '2px dashed var(--chakra-colors-blue-400)' : 'none'}
-      outlineOffset="-2px"
+      position="relative"
+      overflow="hidden"
     >
+      {dragOver && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundColor: 'hsla(230, 16%, 27%, 0.5)',
+            zIndex: 1,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
       <FontAwesomeIcon icon={faMikoto} fontSize="10vw" />
       <Heading mb="4px">Welcome to Mikoto</Heading>
       <Text color="gray.400" fontSize="14px">

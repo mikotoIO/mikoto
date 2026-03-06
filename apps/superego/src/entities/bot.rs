@@ -68,7 +68,7 @@ impl Bot {
             VALUES ((SELECT "id" FROM u), $3, $4, $5)
             "##,
         )
-        .bind(self.owner_id)
+        .bind(self.id)
         .bind(name)
         .bind(&self.name)
         .bind(self.owner_id)

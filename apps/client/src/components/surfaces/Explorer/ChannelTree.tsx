@@ -6,8 +6,7 @@ import {
   faHashtag,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useRef, useState } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
+import React, { useState } from 'react';
 
 import { ExplorerNode, nodeSort } from './explorerNode';
 
@@ -60,33 +59,9 @@ function Node(props: ExplorerNode & { path: string[] }) {
   const [open, setOpen] = useState(false);
   const isLeaf = props.descendant === undefined;
 
-  const ref = useRef<HTMLAnchorElement>(null);
-  const [, drag] = useDrag<ExplorerNode>({
-    type: 'CHANNEL',
-    item: props,
-  });
-  const [, drop] = useDrop<ExplorerNode, any, { isOver: boolean }>({
-    accept: 'CHANNEL',
-    async drop() {
-      // console.log(`Dropped ${item.text} on ${props.text}`);
-    },
-
-    canDrop(item) {
-      return !props.path.includes(item.id);
-    },
-
-    collect(monitor) {
-      return {
-        isOver: monitor.isOver() && monitor.canDrop(),
-      };
-    },
-  });
-  drag(drop(ref));
-
   return (
     <div>
       <NodeBase
-        ref={ref}
         onClick={props.onClick}
         onContextMenu={props.onContextMenu}
         color={props.unread ? 'text' : undefined}

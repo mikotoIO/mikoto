@@ -62,8 +62,10 @@ function Node(props: ExplorerNode & { path: string[] }) {
   return (
     <div>
       <NodeBase
+        draggable={!!props.onDragStart}
         onClick={props.onClick}
         onContextMenu={props.onContextMenu}
+        onDragStart={props.onDragStart}
         color={props.unread ? 'text' : undefined}
         fontWeight={props.unread ? '600' : undefined}
       >

@@ -4,7 +4,8 @@
   "description": "",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./e2e": "./src/e2e/index.ts"
   },
   "files": [
     "dist"

@@ -35,6 +35,9 @@ export const chakraTheme = defineConfig({
         },
       },
       textarea: {
+        base: {
+          fontFamily: 'body',
+        },
         variants: {
           variant: {
             outline: {
@@ -323,6 +326,10 @@ export const globalCss = css`
   code {
     font-family: var(--chakra-fonts-code);
   }
+
+  /* button {
+    border: none;
+  } */
 
   ::-webkit-scrollbar {
     width: 6px;

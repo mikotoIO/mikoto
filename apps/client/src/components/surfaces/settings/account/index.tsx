@@ -414,11 +414,11 @@ function Overview() {
           );
         })}
       >
-        <Field label="User description" mt={4} fontSize="">
+        <Field label="Bio" mt={4} fontSize="">
           <Textarea
+            placeholder="A little bit about yourself, what you like, your socials, etc"
             autoComplete="off"
             h={160}
-            backgroundColor="gray.750"
             {...register('description')}
           />
         </Field>

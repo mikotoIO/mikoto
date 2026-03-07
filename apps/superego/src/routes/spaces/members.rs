@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Ban, MemberExt, MemberKey, Role, RoleToSpaceUser, SpaceExt, SpaceUser},
+    entities::{Ban, Bot, MemberExt, MemberKey, Role, RoleToSpaceUser, SpaceExt, SpaceUser, User, UserCategory},
     error::Error,
     functions::{
         jwt::Claims,
@@ -49,9 +49,46 @@ async fn list(
     Ok(members.into())
 }
 
-async fn create(_body: Json<MemberCreatePayload>) -> Result<Json<MemberExt>, Error> {
-    // Bot-related
-    Err(Error::Todo)
+async fn create(
+    claim: Claims,
+    Load(space): Load<SpaceExt>,
+    Load(acting_member): Load<MemberExt>,
+    Path(space_id): Path<Uuid>,
+    Json(body): Json<MemberCreatePayload>,
+) -> Result<Json<MemberExt>, Error> {
+    permissions_or_admin(&space, &acting_member, Permission::MANAGE_BOTS)?;
+
+    // Verify the target user is a bot owned by the requesting user
+    let user = User::find_by_id(body.user_id, db()).await?;
+    if user.category != Some(UserCategory::Bot) {
+        return Err(Error::forbidden("Only bot users can be added as members via this endpoint"));
+    }
+    let bot = Bot::find_by_id(body.user_id, db()).await?;
+    let owner_id: Uuid = claim.sub.parse()?;
+    if bot.owner_id != owner_id {
+        return Err(Error::forbidden("You can only add your own bots to a space"));
+    }
+
+    // Check ban
+    if Ban::find_by_space_and_user(space_id, body.user_id, db())
+        .await?
+        .is_some()
+    {
+        return Err(Error::forbidden("This bot is banned from the space"));
+    }
+
+    let member = SpaceUser::new(space_id, body.user_id);
+    member.create(db()).await?;
+    let member = MemberExt::dataload_one(member, db()).await?;
+
+    emit_event(
+        "members.onCreate",
+        &member,
+        &format!("space:{space_id}"),
+    )
+    .await?;
+
+    Ok(member.into())
 }
 
 async fn update(

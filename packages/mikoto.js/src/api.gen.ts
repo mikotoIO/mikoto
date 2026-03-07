@@ -68,6 +68,12 @@ export const BotCreatedResponse = z.object({
 });
 export type BotCreatedResponse = z.infer<typeof BotCreatedResponse>;
 
+export const BotLoginPayload = z.object({
+  botId: z.string().uuid(),
+  token: z.string(),
+});
+export type BotLoginPayload = z.infer<typeof BotLoginPayload>;
+
 export const HandleOwner = z.union([
   z.object({ id: z.string().uuid(), type: z.literal("user") }),
   z.object({ id: z.string().uuid(), type: z.literal("space") }),
@@ -391,6 +397,7 @@ export const schemas = {
   BotInfo,
   CreateBotPayload,
   BotCreatedResponse,
+  BotLoginPayload,
   HandleOwner,
   HandleResolution,
   InstanceInfo,
@@ -559,6 +566,21 @@ const endpoints = makeApi([
       },
     ],
     response: BotCreatedResponse,
+  },
+  {
+    method: "post",
+    path: "/bots/login",
+    alias: "bots.login",
+    description: `Exchange a bot ID and secret token for a JWT access token.`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: BotLoginPayload,
+      },
+    ],
+    response: TokenPair,
   },
   {
     method: "get",

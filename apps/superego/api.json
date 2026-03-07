@@ -262,6 +262,38 @@
         }
       }
     },
+    "/bots/login": {
+      "post": {
+        "tags": [
+          "Bots"
+        ],
+        "summary": "Authenticate as Bot",
+        "description": "Exchange a bot ID and secret token for a JWT access token.",
+        "operationId": "bots.login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BotLoginPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPair"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/handles/{handle}": {
       "get": {
         "tags": [
@@ -1535,6 +1567,22 @@
           "ownerId": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "BotLoginPayload": {
+        "type": "object",
+        "required": [
+          "botId",
+          "token"
+        ],
+        "properties": {
+          "botId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "token": {
+            "type": "string"
           }
         }
       },

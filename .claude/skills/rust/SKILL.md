@@ -332,7 +332,7 @@ The backend uses `aide` to automatically generate OpenAPI documentation from rou
 ### Regenerating the API Schema
 
 ```bash
-just dump-api  # Generates apps/superego/api.json
+moon :generate  # Generates apps/superego/api.json and regenerates client bindings
 ```
 
 This runs the `dump_api` binary (`src/bin/dump_api.rs`) which builds the router and extracts the OpenAPI schema without starting the server.
@@ -363,11 +363,8 @@ Regenerate after any changes to:
 # 2. Verify Rust compiles
 moon superego:typecheck
 
-# 3. Regenerate API schema
-just dump-api
-
-# 4. Regenerate frontend types
-cd packages/mikoto.js && pnpm run generate
+# 3. Regenerate API schema and frontend types
+moon :generate
 
 # 5. Verify everything compiles
 moon :typecheck
@@ -385,5 +382,5 @@ cargo run -p superego    # Run just the Rust server
 cargo test -p superego   # Run Rust tests only
 cargo check -p superego  # Quick compilation check
 just new-migration name  # Create new migration
-just dump-api            # Regenerate OpenAPI schema
+moon :generate           # Regenerate OpenAPI schema and client bindings
 ```

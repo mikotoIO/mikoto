@@ -328,6 +328,7 @@ function Overview({ space }: { space: MikotoSpace }) {
 
       <h2>Bots</h2>
       <Button
+        variant="plain"
         type="button"
         onClick={() => {
           setModal({

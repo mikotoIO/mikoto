@@ -153,7 +153,15 @@ export const chakraTheme = defineConfig({
     },
     semanticTokens: {
       colors: {
-        primary: { value: '{colors.blue.500}' },
+        primary: {
+          solid: { value: '{colors.blue.600}' },
+          contrast: { value: 'white' },
+          fg: { value: '{colors.blue.500}' },
+          muted: { value: '{colors.blue.200}' },
+          subtle: { value: '{colors.blue.900}' },
+          emphasized: { value: '{colors.blue.800}' },
+          focusRing: { value: '{colors.blue.500}' },
+        },
         text: { value: '{colors.gray.50}' },
         surface: { value: '{colors.gray.750}' },
         subsurface: { value: '{colors.gray.800}' },
@@ -299,10 +307,6 @@ export const globalCss = css`
   h5,
   h6 {
     font-family: var(--font-heading);
-  }
-
-  button {
-    border: none;
   }
 
   body {

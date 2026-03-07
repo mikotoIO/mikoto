@@ -600,21 +600,6 @@ const endpoints = makeApi([
     response: BotCreatedResponse,
   },
   {
-    method: "post",
-    path: "/bots/login",
-    alias: "bots.login",
-    description: `Exchange a bot ID and secret token for a JWT access token.`,
-    requestFormat: "json",
-    parameters: [
-      {
-        name: "body",
-        type: "Body",
-        schema: BotLoginPayload,
-      },
-    ],
-    response: TokenPair,
-  },
-  {
     method: "get",
     path: "/bots/:botId",
     alias: "bots.get",
@@ -676,6 +661,21 @@ const endpoints = makeApi([
     alias: "bots.removeFromSpace",
     requestFormat: "json",
     response: z.null(),
+  },
+  {
+    method: "post",
+    path: "/bots/login",
+    alias: "bots.login",
+    description: `Exchange a bot ID and secret token for a JWT access token.`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: BotLoginPayload,
+      },
+    ],
+    response: TokenPair,
   },
   {
     method: "get",

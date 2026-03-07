@@ -64,7 +64,7 @@ export function AuthView({ children }: { children: React.ReactNode }) {
   return (
     <Flex h="100%" align="center" justify="center" bg="gray.900">
       <Flex rounded="lg" overflow="hidden">
-        <Box p={8} bg="gray.700">
+        <Box p={8} bg="gray.800">
           <Flex align="center" justify="center" direction="column" h="100%">
             <Logo />
             {children}

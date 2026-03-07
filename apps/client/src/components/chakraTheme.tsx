@@ -18,6 +18,38 @@ export const chakraTheme = defineConfig({
     },
   },
   theme: {
+    recipes: {
+      input: {
+        variants: {
+          variant: {
+            outline: {
+              bg: 'gray.700',
+              borderStyle: 'solid',
+              borderColor: 'gray.600',
+              focusVisibleRing: 'none',
+              _focusVisible: {
+                borderColor: 'gray.550',
+              },
+            },
+          },
+        },
+      },
+      textarea: {
+        variants: {
+          variant: {
+            outline: {
+              bg: 'gray.700',
+              borderStyle: 'solid',
+              borderColor: 'gray.600',
+              focusVisibleRing: 'none',
+              _focusVisible: {
+                borderColor: 'gray.550',
+              },
+            },
+          },
+        },
+      },
+    },
     tokens: {
       colors: {
         gray: {
@@ -123,8 +155,8 @@ export const chakraTheme = defineConfig({
       colors: {
         primary: { value: '{colors.blue.500}' },
         text: { value: '{colors.gray.50}' },
-        surface: { value: '{colors.gray.700}' },
-        subsurface: { value: '{colors.gray.750}' },
+        surface: { value: '{colors.gray.750}' },
+        subsurface: { value: '{colors.gray.800}' },
       },
     },
   },
@@ -237,12 +269,6 @@ export const globalCss = css`
     background-color: var(--dv-separator-border);
     height: 1px;
     width: 100%;
-  }
-
-  input,
-  textarea {
-    border-style: solid;
-    background-color: var(--chakra-colors-subsurface);
   }
 
   background-color: var(--chakra-colors-subsurface);

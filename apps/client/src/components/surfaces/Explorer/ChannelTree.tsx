@@ -36,7 +36,7 @@ const NodeBase = chakra('a', {
     cursor: 'pointer',
     userSelect: 'none',
     _hover: {
-      backgroundColor: 'gray.650',
+      backgroundColor: 'gray.700',
     },
   },
 });

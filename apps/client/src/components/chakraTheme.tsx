@@ -18,6 +18,41 @@ export const chakraTheme = defineConfig({
     },
   },
   theme: {
+    recipes: {
+      input: {
+        variants: {
+          variant: {
+            outline: {
+              bg: 'gray.700',
+              borderStyle: 'solid',
+              borderColor: 'gray.600',
+              focusVisibleRing: 'none',
+              _focusVisible: {
+                borderColor: 'gray.550',
+              },
+            },
+          },
+        },
+      },
+      textarea: {
+        base: {
+          fontFamily: 'body',
+        },
+        variants: {
+          variant: {
+            outline: {
+              bg: 'gray.700',
+              borderStyle: 'solid',
+              borderColor: 'gray.600',
+              focusVisibleRing: 'none',
+              _focusVisible: {
+                borderColor: 'gray.550',
+              },
+            },
+          },
+        },
+      },
+    },
     tokens: {
       colors: {
         gray: {
@@ -121,10 +156,27 @@ export const chakraTheme = defineConfig({
     },
     semanticTokens: {
       colors: {
-        primary: { value: '{colors.blue.500}' },
+        primary: {
+          solid: { value: '{colors.blue.600}' },
+          contrast: { value: 'white' },
+          fg: { value: '{colors.blue.500}' },
+          muted: { value: '{colors.blue.200}' },
+          subtle: { value: '{colors.blue.900}' },
+          emphasized: { value: '{colors.blue.800}' },
+          focusRing: { value: '{colors.blue.500}' },
+        },
+        danger: {
+          solid: { value: '{colors.red.600}' },
+          contrast: { value: 'white' },
+          fg: { value: '{colors.red.500}' },
+          muted: { value: '{colors.red.200}' },
+          subtle: { value: '{colors.red.900}' },
+          emphasized: { value: '{colors.red.800}' },
+          focusRing: { value: '{colors.red.500}' },
+        },
         text: { value: '{colors.gray.50}' },
-        surface: { value: '{colors.gray.700}' },
-        subsurface: { value: '{colors.gray.750}' },
+        surface: { value: '{colors.gray.750}' },
+        subsurface: { value: '{colors.gray.800}' },
       },
     },
   },
@@ -239,12 +291,6 @@ export const globalCss = css`
     width: 100%;
   }
 
-  input,
-  textarea {
-    border-style: solid;
-    background-color: var(--chakra-colors-subsurface);
-  }
-
   background-color: var(--chakra-colors-subsurface);
   color: var(--chakra-colors-text);
 
@@ -275,10 +321,6 @@ export const globalCss = css`
     font-family: var(--font-heading);
   }
 
-  button {
-    border: none;
-  }
-
   body {
     overscroll-behavior-x: none;
     overscroll-behavior-y: none;
@@ -293,6 +335,10 @@ export const globalCss = css`
   code {
     font-family: var(--chakra-fonts-code);
   }
+
+  /* button {
+    border: none;
+  } */
 
   ::-webkit-scrollbar {
     width: 6px;

@@ -142,6 +142,8 @@ function RolePermissionEditor({
 
 const StyledRoleEditor = styled(Form)`
   overflow-y: scroll;
+  padding: 0 40px;
+  max-width: 640px;
 `;
 
 function RoleEditor({ role, space }: { space: MikotoSpace; role: Role }) {

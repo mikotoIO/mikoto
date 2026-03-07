@@ -143,6 +143,10 @@ const DockViewContainer = styled.div`
     border-right: 1px solid var(--chakra-colors-gray-700);
   }
 
+  .dv-tabs-and-actions-container {
+    border-bottom: 1px solid var(--chakra-colors-gray-700);
+  }
+
   .dv-tab {
     font-size: 14px;
   }

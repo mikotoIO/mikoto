@@ -41,7 +41,9 @@ function General({ channel }: { channel: MikotoChannel }) {
           />
         </Field>
 
-        <Button type="submit">Save</Button>
+        <Button colorPalette="primary" type="submit">
+          Save
+        </Button>
       </Form>
     </SettingSurface>
   );

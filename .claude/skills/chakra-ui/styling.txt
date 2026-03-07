@@ -1,0 +1,4398 @@
+<SYSTEM>Documentation for the styling system in Chakra UI v3.</SYSTEM>
+
+# Animation Styles
+
+## Overview
+
+Animation styles allow you to define reusable animation properties. The goal is
+to reduce the amount of code needed to animate components.
+
+The supported animation styles are:
+
+- **Animation**: animation composition, delay, direction, duration, fill mode,
+  iteration count, name, play state, timing function
+
+- **Animation range**: animation range, start, end, timeline
+
+- **Transform origin**: transform origin
+
+## Defining animation styles
+
+Animation styles are defined using the `defineAnimationStyles` function.
+
+Here's an example of an animation style:
+
+```js
+import { defineAnimationStyles } from "@chakra-ui/react"
+
+const animationStyles = defineAnimationStyles({
+  bounceFadeIn: {
+    value: {
+      animationName: "bounce, fade-in",
+      animationDuration: "1s",
+      animationTimingFunction: "ease-in-out",
+      animationIterationCount: "infinite",
+    },
+  },
+})
+```
+
+## Built-in animation styles
+
+Chakra UI provides a set of built-in animation styles that you can use.
+
+<ExamplePreview name="tokens/animation-style" />
+
+## Update the theme
+
+To use the animation styles, update the `theme` object with the
+`animationStyles` property.
+
+```js filename="theme.ts"
+import { createSystem, defineConfig } from "@chakra-ui/react"
+import { animationStyles } from "./animation-styles"
+
+const config = defineConfig({
+  theme: {
+    animationStyles,
+  },
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+After updating the theme, run the `typegen` command to generate the animation
+types. See the [CLI docs](/docs/get-started/cli#chakra-typegen) for how to run
+typegen in postinstall, CI, and monorepos.
+
+```bash
+npx @chakra-ui/cli typegen ./theme.ts
+```
+
+These animation styles can be composed with other styles like `_open` and
+`_closed` which map to the `data-state=open|closed` attribute.
+
+```jsx
+<Box
+  data-state="open"
+  animationDuration="slow"
+  animationStyle={{ _open: "slide-fade-in", _closed: "slide-fade-out" }}
+>
+  This content will fade in
+</Box>
+```
+
+# Cascade Layers
+
+Chakra UI relies on CSS cascade layers to provide a predictable, performant way
+to override components. The layers are defined to match that of
+[Panda CSS](https://panda-css.com).
+
+> **Good to know**: This plays a major role in the faster reconciliation times
+> in v3.x
+
+## Layer Types
+
+Chakra supports these cascade layer types:
+
+- `@layer reset`: Where the preflight or css resets styles are defined.
+
+- `@layer base`: Where global styles are placed when defined in `globalCss`
+  config property.
+
+- `@layer recipes`: Where styles for recipes are placed when defined in
+  `theme.recipes` or `theme.slotRecipes`
+
+- `@layer tokens`: Where styles for design tokens are placed when defined in
+  `theme.tokens` or `theme.semanticTokens`
+
+## Layer Order
+
+Chakra appends the following layers to the top of the generated emotion
+stylesheet:
+
+```css
+@layer reset, base, tokens, recipes;
+```
+
+This structure allows for smoother experience when combining Chakra and Panda
+CSS in the same project.
+
+## Disabling Layers
+
+Cascade layers are enabled by default. If you want to disable them, you can do
+so by setting the `disableLayers` option to `true`
+
+```js title="theme.ts"
+export const system = createSystem(defaultConfig, {
+  disableLayers: true,
+})
+```
+
+Next, edit the `components/ui/provider` file to use the new system
+
+```tsx title="provider.tsx" {3} /value={system}/
+import { ColorModeProvider } from "@/components/ui/color-mode"
+import { ChakraProvider } from "@chakra-ui/react"
+import { system } from "./theme"
+
+export function Provider(props: React.PropsWithChildren) {
+  return (
+    <ChakraProvider value={system}>
+      <ColorModeProvider>{props.children}</ColorModeProvider>
+    </ChakraProvider>
+  )
+}
+```
+
+# Chakra Factory
+
+## Overview
+
+Chakra factory serves as a way to create supercharged JSX component from any
+HTML element to enable them receive JSX style props.
+
+```js
+import { chakra } from "@chakra-ui/react"
+```
+
+The chakra factory can be used in two ways: as a JSX element or as a factory
+function.
+
+## JSX Element
+
+Style props are CSS properties that you can pass as props to your components.
+With the JSX factory, you can use `chakra.<element>` syntax to create JSX
+elements that support style props.
+
+```jsx
+import { chakra } from "@chakra-ui/react"
+
+const Button = ({ children }) => (
+  <chakra.button bg="blue.500" color="white" py="2" px="4" rounded="md">
+    {children}
+  </chakra.button>
+)
+```
+
+## Factory function
+
+Use the `chakra` function to convert native elements or custom components. The
+key requirement is that the component **must** accept `className` as props.
+
+```jsx
+const Link = chakra("a")
+
+function Example() {
+  return <Link bg="red.200" href="https://chakra-ui.com" />
+}
+```
+
+Another example with a custom component.
+
+```jsx
+import * as RadixScrollArea from "@radix-ui/react-scroll-area"
+
+const ScrollArea = chakra(RadixScrollArea.Root)
+
+function Example() {
+  return (
+    <ScrollArea>
+      <RadixScrollArea.Viewport>
+        <div>Hello</div>
+      </RadixScrollArea.Viewport>
+    </ScrollArea>
+  )
+}
+```
+
+### Attaching styles
+
+Use the `chakra` function to attach styles or recipes to components.
+
+```jsx
+const Link = chakra("a", {
+  base: {
+    bg: "papayawhip",
+    color: "red.500",
+  },
+})
+
+// usage: <Link href="https://chakra-ui.com" />
+```
+
+### Attaching recipes
+
+Here's an example of attaching a recipe to the component.
+
+```jsx
+const Card = chakra("div", {
+  base: {
+    shadow: "lg",
+    rounded: "lg",
+    bg: "white",
+  },
+  variants: {
+    variant: {
+      outline: {
+        border: "1px solid",
+        borderColor: "red.500",
+      },
+      solid: {
+        bg: "red.500",
+        color: "white",
+      },
+    },
+  },
+})
+
+// usage: <Card variant="outline" />
+```
+
+### Forwarding props
+
+By default, the `chakra` factory only filters chakra related style props from
+getting to the DOM. For more fine-grained control of how props are forwarded,
+pass the `shouldForwardProp` option.
+
+Here's an example that forwards all props that doesn't start with `$`
+
+```tsx
+function shouldForwardProp(prop: string) {
+  return !prop.startsWith("$")
+}
+
+const Component = chakra("div", {}, { shouldForwardProp })
+```
+
+To create custom forward props logic, combine the
+[@emotion/is-prop-valid](https://github.com/emotion-js/emotion/tree/master/packages/is-prop-valid)
+package and the `isValidProperty` from Chakra UI.
+
+```tsx
+import { chakra, defaultSystem } from "@chakra-ui/react"
+import shouldForwardProp from "@emotion/is-prop-valid"
+
+const { isValidProperty } = defaultSystem
+
+function shouldForwardProp(prop: string, variantKeys: string[]) {
+  const chakraSfp = !variantKeys?.includes(prop) && !isValidProperty(prop)
+  return shouldForwardProp(prop) || chakraSfp
+}
+
+const Component = chakra("div", {}, { shouldForwardProp })
+```
+
+## Default Props
+
+Use the `defaultProps` option to pass default props to the component.
+
+```jsx {9}
+const Button = chakra(
+  "button",
+  {
+    base: {
+      bg: "blue.500",
+      color: "white",
+    },
+  },
+  { defaultProps: { type: "button" } },
+)
+```
+
+## Polymorphism
+
+Every component created with the chakra factory can accept the `as` and
+`asChild` props to change the underlying DOM element.
+
+```tsx
+<Button as="a" href="https://chakra-ui.com">
+  Chakra UI
+</Button>
+```
+
+or
+
+```tsx
+<Button asChild>
+  <a href="https://chakra-ui.com">Chakra UI</a>
+</Button>
+```
+
+> Learn more about composition in Chakra UI
+> [here](/docs/components/concepts/composition)
+
+# Color opacity modifier
+
+Every color related style property can use the
+[`color-mix`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-mix)
+shortcut to apply opacity to a color.
+
+## Syntax
+
+The general syntax is `{color}/{opacity}`. For example: `bg="red.300/40"`.
+
+## Usage
+
+```tsx
+<Text bg="red.300/40" color="white">
+  Hello World
+</Text>
+```
+
+This will generate something like this:
+
+```css {2,3}
+.css-sxdf {
+  --mix-background: color-mix(in srgb, var(--colors-red-300) 40%, transparent);
+  background: var(--mix-background, var(--colors-red-300));
+  color: var(--colors-white);
+}
+```
+
+### CSS Variables
+
+This feature can be used in css variables as well. This is useful for creating
+one-off color token in a component.
+
+The token reference syntax `{}` is required for this to work.
+
+```tsx
+<Box css={{ "--bg": "{colors.red.400/40}" }}>
+  <Text>Hello World</Text>
+  <Box bg="var(--bg)" />
+</Box>
+```
+
+# Conditional Styles
+
+## Overview
+
+Chakra allows you to write styles for pseudo states, media queries, and custom
+data attributes with the conditional style props.
+
+:::note
+
+See the list of [built-in conditions](#reference) below.
+
+:::
+
+## Usage
+
+For example, here's how to change the background color of a button when it's
+hovered:
+
+```jsx
+<Box bg="red.500" _hover={{ bg: "red.700" }}>
+  Hover me
+</Box>
+```
+
+### Nested condition
+
+Conditional values can be nested to create complex selector rules.
+
+Here's how to change the background color of an element when in focus on hover:
+
+```jsx
+<Box bg={{ base: "red.500", _hover: { _focus: "red.700" } }}>
+  Hover & Focus me
+</Box>
+```
+
+### At Rules
+
+This also works with the supported at-rules (`@media`, `@layer`, `@container`,
+`@supports`, and `@page`):
+
+```tsx
+<Box
+  css={{
+    "@container (min-width: 10px)": {
+      color: "green.300",
+    },
+  }}
+>
+  Hello
+</Box>
+```
+
+## Pseudo Classes
+
+### Hover, Active, Focus, and Disabled
+
+Here's an example of how to style the hover, active, focus, and disabled states
+of an element
+
+```jsx
+<chakra.button
+  _hover={{ bg: "red.700" }}
+  _active={{ bg: "red.900" }}
+  _focus={{ bg: "red.800" }}
+  _disabled={{ opacity: "0.5" }}
+>
+  Hover me > Hover me
+</chakra.button>
+```
+
+### First, Last, Odd, Even
+
+Here's an example of how to style the first, last, odd, and even elements in a
+list
+
+```jsx
+<Box as="ul">
+  {items.map((item) => (
+    <Box
+      as="li"
+      key={item}
+      _first={{ color: "red.500" }}
+      _last={{ color: "red.800" }}
+    >
+      {item}
+    </Box>
+  ))}
+</Box>
+```
+
+You can also style even and odd elements using the `_even` and `_odd` modifier
+
+```jsx
+<table>
+  <tbody>
+    {items.map((item) => (
+      <chakra.tr key={item} _even={{ bg: "gray.100" }} _odd={{ bg: "white" }}>
+        <td>{item}</td>
+      </chakra.tr>
+    ))}
+  </tbody>
+</table>
+```
+
+## Pseudo Elements
+
+### Before and After
+
+To style the `::before` and `::after` pseudo elements of an element, use the
+`_before` and `_after` modifiers
+
+```jsx /_before/
+<Box _before={{ content: '"👋"' }} _after={{ content: '"🥂"' }}>
+  Hello
+</Box>
+```
+
+### Placeholder
+
+To style the placeholder text of any input or textarea, use the `_placeholder`
+modifier:
+
+```jsx {3}
+<chakra.input
+  placeholder="Enter your name"
+  _placeholder={{ color: "gray.500" }}
+/>
+```
+
+### File Inputs
+
+To style the file input button, use the `_file` modifier:
+
+```jsx {3}
+<chakra.input
+  type="file"
+  _file={{ bg: "gray.500", px: "4", py: "2", marginEnd: "3" }}
+/>
+```
+
+## Media Queries
+
+### Reduced Motion
+
+Use the `_motionReduce` and `_motionSafe` modifiers to style an element based on
+the user's motion preference:
+
+```jsx
+<Box _motionSafe={{ transition: "all 0.3s" }}>Hello</Box>
+```
+
+### Color Scheme
+
+The `prefers-color-scheme` media feature is used to detect if the user has
+requested the system to use a light or dark color theme.
+
+Use the `_osLight` and `_osDark` modifiers to style an element based on the
+user's color scheme preference:
+
+```jsx
+<chakra.div bg={{ base: "white", _osDark: "black" }}>Hello</chakra.div>
+```
+
+### Color Contrast
+
+The `prefers-contrast` media feature is used to detect if the user has requested
+the system use a high or low contrast theme.
+
+Use the `_highContrast` and `_lessContrast` modifiers to style an element based
+on the user's color contrast preference:
+
+```jsx
+<Box bg={{ base: "white", _highContrast: "black" }}>Hello</Box>
+```
+
+### Orientation
+
+The `orientation` media feature is used to detect if the user has a device in
+portrait or landscape mode.
+
+Use the `_portrait` and `_landscape` modifiers to style an element based on the
+user's device orientation:
+
+```jsx
+<Box pb="4" _portrait={{ pb: "8" }}>
+  Hello
+</Box>
+```
+
+## Selectors
+
+### Arbitrary selectors
+
+For arbitrary, use the `css` prop to write styles for one-off selectors:
+
+```tsx
+<Box css={{ "&[data-state=closed]": { color: "red.300" } }} />
+```
+
+Here's another example that targets the child elements of a parent element:
+
+```tsx
+<Box
+  css={{
+    "& > *": { margin: "2" },
+  }}
+/>
+```
+
+### Group Selectors
+
+To style an element based on its parent element's state or attribute, add the
+`group` class to the parent element, and use any of the `_group*` modifiers on
+the child element.
+
+```jsx
+<div className="group">
+  <Text _groupHover={{ bg: "red.500" }}>Hover me</Text>
+</div>
+```
+
+This modifier works for every pseudo class modifiers like `_groupHover`,
+`_groupActive`, `_groupFocus`, and `_groupDisabled`, etc.
+
+### Sibling Selectors
+
+To style an element based on its sibling element's state or attribute, add the
+`peer` class to the sibling element, and use any of the `_peer*` modifiers on
+the target element.
+
+```jsx /_peerHover={{ bg: "red.500" }}/
+<div>
+  <p className="peer">Hover me</p>
+  <Box _peerHover={{ bg: "red.500" }}>I'll change by bg</Box>
+</div>
+```
+
+> **Note:** This only works for when the element marked with `peer` is a
+> previous siblings, that is, it comes before the element you want to start.
+
+## Data Attribute
+
+### LTR and RTL
+
+To style an element based on the direction of the text, use the `_ltr` and
+`_rtl` modifiers
+
+```jsx {2}
+<div dir="ltr">
+  <Box _ltr={{ ml: "3" }} _rtl={{ mr: "3" }}>
+    Hello
+  </Box>
+</div>
+```
+
+### State
+
+To style an element based on its `data-{state}` attribute, use the corresponding
+`_{state}` modifier
+
+```jsx /_loading/
+<Box data-loading _loading={{ bg: "gray.500" }}>
+  Hello
+</Box>
+```
+
+This works for common states like `data-active`, `data-disabled`, `data-focus`,
+`data-hover`, `data-invalid`, `data-required`, and `data-valid`.
+
+```jsx /_active/
+<Box data-active _active={{ bg: "gray.500" }}>
+  Hello
+</Box>
+```
+
+### Orientation
+
+To style an element based on its `data-orientation` attribute, use the
+`_horizontal` and `_vertical` modifiers
+
+```jsx
+<Box
+  data-orientation="horizontal"
+  _horizontal={{ bg: "red.500" }}
+  _vertical={{ bg: "blue.500" }}
+>
+  Hello
+</Box>
+```
+
+## ARIA Attribute
+
+To style an element based on its `aria-{state}=true` attribute, use the
+corresponding `_{state}` prop
+
+```jsx
+<Box aria-expanded="true" _expanded={{ bg: "gray.500" }}>
+  Hello
+</Box>
+```
+
+## Reference
+
+Here's a list of all the condition props you can use in Chakra:
+
+<ConditionalStylesReferenceDoc />
+
+## Customization
+
+Chakra lets you create your own conditions, so you're not limited to the ones in
+the default preset. Learn more about customizing conditions
+[here](/docs/theming/customization/conditions).
+
+# CSS Variables
+
+## Overview
+
+CSS variables have become the defacto way to create shared values on the web.
+It's very useful to avoid prop interpolations, classname regeneration, and
+reduce runtime evaluation of token values.
+
+## Examples
+
+### Basic
+
+Use the `css` prop to create css variables
+
+```jsx
+<Box css={{ "--font-size": "18px" }}>
+  <h3 style={{ fontSize: "calc(var(--font-size) * 2)" }}>Hello</h3>
+  <p style={{ fontSize: "var(--font-size)" }}>Hello</p>
+</Box>
+```
+
+### Access tokens
+
+Use the full token path to access tokens
+
+```jsx
+<Box css={{ "--color": "colors.red.500" }}>
+  <p style={{ color: "var(--color)" }}>Hello</p>
+</Box>
+```
+
+Here's an example of how to access size tokens
+
+```jsx
+<Box css={{ "--size": "sizes.10" }}>
+  <p style={{ width: "var(--size)", height: "var(--size)" }}>Hello</p>
+</Box>
+```
+
+### Responsive Styles
+
+Use the responsive syntax to make css variables responsive
+
+```jsx
+<Box css={{ "--font-size": { base: "18px", lg: "24px" } }}>
+  <h3 style={{ fontSize: "calc(var(--font-size) * 2)" }}>Hello</h3>
+  <p style={{ fontSize: "var(--font-size)" }}>Hello</p>
+</Box>
+```
+
+### Color Opacity Modifier
+
+When accessing color tokens, you can use the opacity modifier to access the
+color with an opacity. The requirement is to use the `{}` syntax.
+
+```jsx
+<Box css={{ "--color": "{colors.red.500/40}" }}>
+  <p style={{ color: "var(--color)" }}>Hello</p>
+</Box>
+```
+
+### Virtual Color
+
+Variables can point to a virtual color via the `colors.colorPalette.*` value.
+This is useful for creating theme components.
+
+```jsx
+<Box colorPalette="blue" css={{ "--color": "colors.colorPalette.400" }}>
+  <p style={{ color: "var(--color)" }}>Hello</p>
+</Box>
+```
+
+# Dark Mode
+
+Chakra relies on the `next-themes` library to provide dark mode support. During
+the installation process, the snippets required to get started are added to your
+project via the CLI.
+
+To implement color mode in your components, you can use:
+
+- **Semantic tokens** (recommended): Use Chakra's built-in semantic tokens like
+  `bg.subtle` that automatically adapt to light/dark mode.
+- **`_dark` overrides**: Manually specify dark mode styles for each color
+  property.
+
+## Setup
+
+If you haven't already, you can add the `next-themes` library to your project
+via the CLI.
+
+```bash
+npx @chakra-ui/cli snippet add color-mode
+```
+
+The generated snippets consists of the following:
+
+- `ColorModeProvider`: composes the `next-themes` provider component
+- `useColorMode`: provides the current color mode and a function to toggle the
+  color mode
+- `useColorModeValue`: returns the correct value based on the current color mode
+- `ColorModeButton`: can be used to toggle the color mode
+
+## Usage
+
+Wrap your app with the `ColorModeProvider` and use the `useColorMode` hook to
+access and toggle the color mode.
+
+```tsx
+import { ColorModeProvider } from "@/components/ui/color-mode"
+import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <ChakraProvider value={defaultSystem}>
+      <ColorModeProvider>{children}</ColorModeProvider>
+    </ChakraProvider>
+  )
+}
+```
+
+### Adding the dark mode toggle
+
+Use the `ColorModeButton` component to toggle the color mode.
+
+```tsx
+import { ColorModeButton } from "@/components/ui/color-mode"
+
+export default function Page({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <ColorModeButton />
+      {children}
+    </>
+  )
+}
+```
+
+### Styling dark mode
+
+Use the `_dark` condition to style components for dark mode.
+
+```tsx
+<Box bg={{ base: "white", _dark: "black" }}>
+  <Text>Hello</Text>
+</Box>
+```
+
+or
+
+```tsx
+<Box bg="white" _dark={{ bg: "black" }}>
+  <Text>Hello</Text>
+</Box>
+```
+
+## Using semantic tokens
+
+To reduce the amount of code you need to write, use semantic tokens to style
+components for dark mode. This ensures the light and dark mode styles are
+applied automatically and consistently.
+
+Chakra provides a set of semantic tokens that you can use to style components
+for dark mode. Learn more about
+[semantic tokens](/docs/theming/semantic-tokens).
+
+```tsx
+<Box bg="bg.subtle">
+  <Text>Hello</Text>
+</Box>
+```
+
+## Forcing dark mode
+
+### Element specific dark mode
+
+To force dark mode, set the `dark` className on any parent element, or the root
+element of your application.
+
+```tsx /className="dark"/
+<Box bg="black" className="dark">
+  <Box bg="bg.subtle">
+    <Text>Hello</Text>
+  </Box>
+</Box>
+```
+
+The same applied to forcing light mode, use the `light` className.
+
+```tsx /className="light"/
+<Box bg="white" className="light">
+  <Box bg="bg.subtle">
+    <Text>Hello</Text>
+  </Box>
+</Box>
+```
+
+### Page specific dark mode
+
+Use the `ColorModeProvider` component to set the dark mode for a page.
+
+```tsx
+<ColorModeProvider forcedTheme="dark">
+  <Box bg="black" className="dark">
+    <Box bg="bg.subtle">
+      <Text>Hello</Text>
+    </Box>
+  </Box>
+</ColorModeProvider>
+```
+
+> Follow this `next-themes` guide to learn more about
+> [forcing color mode](https://github.com/pacocoursey/next-themes#force-page-to-a-theme).
+
+# Focus Ring
+
+The focus ring is used to identify the currently focused element on your page.
+While this is important for accessibility, styling every component to have a
+focus ring can be tedious.
+
+Chakra UI provides the `focusRing` and `focusVisibleRing` style props to style
+focus ring with ease. The value of the `focusRing` prop can be "outside",
+"inside", or "mixed".
+
+## Focus Ring
+
+This focus ring maps to the `&:is(:focus, [data-focus])` CSS selector.
+
+Here's how to style a button from scratch with a focus ring:
+
+```tsx
+<chakra.button px="4" py="2" focusRing="outside">
+  Click me
+</chakra.button>
+```
+
+## Focus Visible Ring
+
+This focus ring maps to the `&:is(:focus-visible, [data-focus-visible])` CSS
+selector.
+
+```tsx
+<chakra.button px="4" py="2" focusVisibleRing="outside">
+  Click me
+</chakra.button>
+```
+
+### Difference between Focus Ring and Focus Visible Ring
+
+The Focus Visible Ring functions similarly to the Focus Ring, but with a key
+difference: it only applies focus indicator styles when an element receives
+keyboard focus.
+
+This ensures that the focus ring is visible only when navigating via keyboard,
+improving accessibility without affecting mouse interactions.
+
+## Built-in Focus Ring
+
+Here's a preview of the supported focus ring.
+
+```tsx
+import { Center, For, Stack } from "@chakra-ui/react"
+
+export const TokensFocusRing = () => {
+  return (
+    <Stack gap="4">
+      <For each={["inside", "outside", "mixed"]}>
+        {(focusRing) => (
+          <Center
+            h="20"
+            bg="bg"
+            borderWidth="1px"
+            focusRing={focusRing}
+            data-focus
+          >
+            {focusRing}
+          </Center>
+        )}
+      </For>
+    </Stack>
+  )
+}
+
+```
+
+## Customization
+
+### Ring Color
+
+There are three ways to customize the focus ring color:
+
+**1. Per component** - Use the `focusRingColor` prop:
+
+```tsx
+<Button focusRingColor="red.500">Click me</Button>
+```
+
+**2. Globally** - Set it in global CSS:
+
+```tsx title="theme.ts"
+const config = defineConfig({
+  globalCss: {
+    "*": {
+      focusRingColor: "red.500 !important",
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, config)
+```
+
+**3. Per color palette** - Define semantic tokens for each palette:
+
+```tsx title="theme.ts"
+const config = defineConfig({
+  theme: {
+    semanticTokens: {
+      colors: {
+        gray: {
+          focusRing: { value: "blue.500" },
+        },
+        blue: {
+          focusRing: { value: "blue.400" },
+        },
+      },
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, config)
+```
+
+### Ring Width
+
+To change the focus ring width for a specific component, you can use the
+`focusRingWidth` prop.
+
+```tsx
+<Button focusRingWidth="2px">Click me</Button>
+```
+
+### Ring Style
+
+To change the focus ring style for a specific component, you can use the
+`focusRingStyle` prop.
+
+```tsx
+<Button focusRingStyle="dashed">Click me</Button>
+```
+
+# Layer Styles
+
+## Overview
+
+Layer styles allow you to define visual properties. The common properties are:
+
+- Color or text color
+- Background color
+- Border width and border color
+- Box shadow
+- Opacity
+
+## Defining layer styles
+
+Layer styles are defined using the `defineLayerStyles` function.
+
+```js title="layer-styles.ts"
+import { defineLayerStyles } from "@chakra-ui/react"
+
+const layerStyles = defineLayerStyles({
+  container: {
+    description: "container styles",
+    value: {
+      background: "gray.50",
+      border: "2px solid",
+      borderColor: "gray.500",
+    },
+  },
+})
+```
+
+## Built-in layer styles
+
+Chakra UI provides a set of built-in layer styles.
+
+<ExamplePreview name="tokens/layer-style" />
+
+## Updating the theme
+
+To use the layer styles, update the `theme` object with the `layerStyles`
+property.
+
+```js title="theme.ts"
+import { createSystem, defineConfig } from "@chakra-ui/react"
+import { layerStyles } from "./layer-styles"
+
+const config = defineConfig({
+  theme: {
+    layerStyles,
+  },
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+After updating the theme, run the `typegen` command to generate the typings. See
+the [CLI docs](/docs/get-started/cli#chakra-typegen) for how to run typegen in
+postinstall, CI, and monorepos.
+
+```bash
+npx @chakra-ui/cli typegen
+```
+
+## Using layer styles
+
+Now you can use `layerStyle` property in your components.
+
+```jsx
+<Box layerStyle="container">This is inside a container style</Box>
+```
+
+# Styling
+
+## Concepts
+
+After installing Chakra UI, follow these guidelines to learn the key concepts:
+
+- [Chakra Factory](/docs/styling/chakra-factory)
+- [Responsive Design](/docs/styling/responsive-design)
+- [CSS Variables](/docs/styling/css-variables)
+- [Dark Mode](/docs/styling/dark-mode)
+- [Color Opacity Modifier](/docs/styling/color-opacity-modifier)
+- [Conditional Styles](/docs/styling/conditional-styles)
+- [Virtual Color](/docs/styling/virtual-color)
+
+## Compositions
+
+After understanding the concepts, learn how to use these compositions to avoid
+repeating styles:
+
+- [Text Styles](/docs/styling/text-styles)
+- [Layer Styles](/docs/styling/layer-styles)
+- [Animation Styles](/docs/styling/animation-styles)
+- [Focus Ring](/docs/styling/focus-ring)
+
+## Style Props
+
+Style props are the most fundamental way to style your components in Chakra UI.
+They are basically css styles as props.
+[Learn more about style props](/docs/styling/style-props/background)
+
+# Responsive Design
+
+## Overview
+
+Chakra UI uses a mobile-first breakpoint system with min-width media queries:
+
+```ts
+const breakpoints = {
+  base: "0rem", // 0px
+  sm: "30rem", // ~480px
+  md: "48rem", // ~768px
+  lg: "62rem", // ~992px
+  xl: "80rem", // ~1280px
+  "2xl": "96rem", // ~1536px
+}
+```
+
+## Object syntax
+
+Here's an example of how to change the font weight of a text on large screens
+
+```jsx
+<Text fontWeight="medium" lg={{ fontWeight: "bold" }}>
+  Text
+</Text>
+```
+
+or use the prop based modifier
+
+```jsx
+<Text fontWeight={{ base: "medium", lg: "bold" }}>Text</Text>
+```
+
+## Array syntax
+
+Chakra also accepts arrays as values for responsive styles. Pass the
+corresponding value for each breakpoint in the array. Using our previous code as
+an example:
+
+```jsx
+<Text fontWeight={["medium", undefined, undefined, "bold"]}>Text</Text>
+```
+
+Notice the use of `undefined` for the breakpoints to skip the `md` and `lg`
+breakpoints.
+
+## Breakpoint targeting
+
+### Breakpoint range
+
+Chakra provides a way to target a range of breakpoints using the `To` notation.
+To apply styles between the `md` and `xl` breakpoints, use the `mdToXl`
+property:
+
+```jsx
+<Text fontWeight={{ mdToXl: "bold" }}>Text</Text>
+```
+
+> This text will only be bold from `md` to `xl` breakpoints.
+
+### Only breakpoint
+
+To target a single breakpoint, use the `Only` notation. Here's an example of how
+to apply styles only in the `lg` breakpoint, using the `lgOnly` property:
+
+```jsx
+<Text fontWeight={{ lgOnly: "bold" }}>Text</Text>
+```
+
+### Down breakpoint
+
+To target a breakpoint and below, use the `Down` notation. This creates clear
+boundaries for responsive variants. Here's an example of how to apply styles
+from the `sm` breakpoint and below:
+
+```jsx
+<Text fontWeight={{ smDown: "bold" }}>Text</Text>
+```
+
+> This text will be bold from `base` up to and including the `sm` breakpoint.
+
+## Hiding elements at breakpoint
+
+Chakra provides the `hideFrom` and `hideBelow` utilities to hide elements at
+specific breakpoints.
+
+To hide an element from the `md` breakpoint, use the `hideFrom` utility:
+
+```jsx
+<Stack hideFrom="md">
+  <Text>This text will be hidden from the `md` breakpoint</Text>
+</Stack>
+```
+
+To hide an element below the `md` breakpoint, use the `hideBelow` utility:
+
+```jsx
+<Stack hideBelow="md">
+  <Text>This text will be hidden below the `md` breakpoint</Text>
+</Stack>
+```
+
+## Customizing Breakpoints
+
+To learn how to customize breakpoints, please refer to the
+[customizing breakpoints](/docs/theming/customization/breakpoints) section.
+
+## Responsive Variants
+
+When applying breakpoints to component variants, we recommend using explicit
+breakpoints instead of using the `base` breakpoint.
+
+This way, you can avoid style leaking from one variant to another.
+
+```jsx
+// okay, but can lead to style leaking ⚠️
+<Button variant={{ base: "solid", md: "outline" }}>Button</Button>
+
+// good ✅
+<Button variant={{ smDown: "solid", md: "outline" }}>Button</Button>
+```
+
+This creates clear boundaries without style accumulation. :::
+
+## FAQs
+
+### Why are breakpoints converted to `rem`?
+
+The conversion to `rem` is intentional and beneficial for accessibility reasons:
+
+- User changed their browser's font setting
+- User zoomed in
+- Font size changed in HTML
+
+# Text Styles
+
+## Overview
+
+Text styles allows you to define textual css properties. The common properties
+are:
+
+- **Font**: font family, weight, size
+- **Line height**
+- **Letter spacing**
+- **Text decoration**
+- **Text transform**
+
+## Defining text styles
+
+Text styles are defined using the `defineTextStyles` function.
+
+```js filename="text-styles.ts"
+import { defineTextStyles } from "@chakra-ui/react"
+
+export const textStyles = defineTextStyles({
+  body: {
+    description: "The body text style - used in paragraphs",
+    value: {
+      fontFamily: "Inter",
+      fontWeight: "500",
+      fontSize: "16px",
+      lineHeight: "24",
+      letterSpacing: "0",
+      textDecoration: "None",
+      textTransform: "None",
+    },
+  },
+})
+```
+
+## Built-in text styles
+
+Chakra UI provides a set of built-in text styles.
+
+<ExamplePreview name="tokens/text-styles" />
+
+## Update the theme
+
+To use the text styles, update the `theme` object with the `textStyles`
+property.
+
+```js filename="theme.ts"
+import { createSystem, defineConfig } from "@chakra-ui/react"
+import { textStyles } from "./text-styles"
+
+const config = defineConfig({
+  theme: {
+    textStyles,
+  },
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+After updating the theme, run the typegen command to generate the typings. See
+the [CLI docs](/docs/get-started/cli#chakra-typegen) for how to run typegen in
+postinstall, CI, and monorepos.
+
+```bash
+npx @chakra-ui/cli typegen
+```
+
+## Using text styles
+
+Now you can use `textStyle` property in your components.
+
+```jsx
+<Box textStyle="body">This is the body text style</Box>
+```
+
+# Virtual Color
+
+## Overview
+
+Chakra allows you to create a virtual color or color placeholder in your
+project. The `colorPalette` property is how you create virtual color.
+
+```js
+<Box
+  colorPalette="blue"
+  bg={{ base: "colorPalette.100", _hover: "colorPalette.200" }}
+>
+  Hello World
+</Box>
+```
+
+This will translate to the `blue.100` background color and `blue.200` background
+color on hover.
+
+## Usage
+
+The fundamental requirement for virtual colors is that your colors must have a
+consistent naming convention. By default, Chakra use `50-950` color values for
+each color we provide.
+
+This makes it easier for you to create and use virtual colors. Let's say we need
+to create a themable outline button from scratch.
+
+```jsx
+<chakra.button
+  borderWidth="1px"
+  colorPalette="red"
+  borderColor="colorPalette.500"
+  _hover={{
+    borderColor: "colorPalette.600",
+  }}
+>
+  Click me
+</chakra.button>
+```
+
+### Recipes
+
+Virtual colors are most useful when used with recipes.
+
+```js
+const buttonRecipe = defineRecipe({
+  base: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    // set the color palette
+    colorPalette: "blue",
+  },
+  variants: {
+    variant: {
+      primary: {
+        bg: "colorPalette.500",
+        color: "white",
+      },
+      outline: {
+        borderWidth: "1px",
+        borderColor: "colorPalette.500",
+        _hover: {
+          borderColor: "colorPalette.600",
+        },
+      },
+    },
+  },
+})
+```
+
+### Components
+
+Most built-in components in Chakra support virtual colors.
+
+```jsx
+<Button colorPalette="blue">Click me</Button>
+<Button colorPalette="red" variant="outline">
+  Click me
+</Button>
+```
+
+### Dark mode
+
+Another amazing thing you can do with virtual colors is to use them with dark
+mode.
+
+```jsx
+<Box
+  colorPalette="blue"
+  bg={{ base: "colorPalette.600", _dark: "colorPalette.400" }}
+>
+  Hello World
+</Box>
+```
+
+> This element will have a `blue.600` background color in light mode and a
+> `blue.400` background color in dark mode.
+
+# Background
+
+## Background Attachment
+
+Use `bgAttachment` to control the attachment of a background image.
+
+```jsx
+<Box bgAttachment="fixed" bgImage="url(...)" />
+```
+
+| Prop                                   | CSS Property            | Token Category |
+| -------------------------------------- | ----------------------- | -------------- |
+| `bgAttachment`, `backgroundAttachment` | `background-attachment` | -              |
+
+## Background Blend Mode
+
+Use `bgBlendMode` prop to control how an element's background image should blend
+with the its background color.
+
+```jsx
+<Box bgBlendMode="multiply" bgColor="red.200" bgImage="url(...)" />
+```
+
+## Background Clip
+
+Use `bgClip` to control the clipping of a background image.
+
+```jsx
+<Box bgClip="border-box" bgImage="url(...)" />
+```
+
+| Prop                       | CSS Property      | Token Category |
+| -------------------------- | ----------------- | -------------- |
+| `bgClip`, `backgroundClip` | `background-clip` | -              |
+
+## Background Color
+
+Use `bg`, `bgColor`, or `backgroundColor` props to set the background color of
+an element.
+
+```jsx
+<Box bg="red.200" />
+<Box bgColor="red.200" />
+
+// with opacity modifier
+<Box bg="blue.200/30" />
+<Box bgColor="blue.200/30" />
+```
+
+| Prop                         | CSS Property       | Token Category |
+| ---------------------------- | ------------------ | -------------- |
+| `bg`, `background`           | `background`       | `colors`       |
+| `bgColor`, `backgroundColor` | `background-color` | `colors`       |
+
+## Background Origin
+
+Use `bgOrigin` or `backgroundOrigin` to control the origin of a background
+image.
+
+```jsx
+<Box bgOrigin="border-box" bgImage="url(...)" />
+```
+
+| Prop                           | CSS Property        | Token Category |
+| ------------------------------ | ------------------- | -------------- |
+| `bgOrigin`, `backgroundOrigin` | `background-origin` | -              |
+
+## Background Position
+
+Properties for controlling the src and position of a background image.
+
+```jsx
+<Box bgImage="url(...)" bgPosition="center" />
+```
+
+| Prop                                 | CSS Property       | Token Category |
+| ------------------------------------ | ------------------ | -------------- |
+| `bgPosition`, `backgroundPosition`   | `background-image` | -              |
+| `bgPositionX`, `backgroundPositionX` | `background-image` | -              |
+| `bgPositionY`, `backgroundPositionY` | `background-image` | -              |
+
+## Background Repeat
+
+Use `bgRepeat` or `backgroundRepeat` to control the repeat of a background
+image.
+
+```jsx
+<Box bgRepeat="no-repeat" bgImage="url(...)" />
+```
+
+| Prop                           | CSS Property        | Token Category |
+| ------------------------------ | ------------------- | -------------- |
+| `bgRepeat`, `backgroundRepeat` | `background-repeat` | -              |
+
+## Background Size
+
+Use `bgSize` or `backgroundSize` to control the size of a background image.
+
+```jsx
+<Box bgSize="cover" bgImage="url(...)" />
+```
+
+| Prop                       | CSS Property      | Token Category |
+| -------------------------- | ----------------- | -------------- |
+| `bgSize`, `backgroundSize` | `background-size` | -              |
+
+## Background Image
+
+Use `bgImage` or `backgroundImage` to set the background image of an element.
+
+```jsx
+<Box bgImage="url(...)" />
+<Box bgImage="radial-gradient(circle, #0000 45%, #000f 48%)" />
+<Box bgImage="linear-gradient(black, white)" />
+
+// with token reference
+<Box bgImage="linear-gradient({colors.red.200}, {colors.blue.200})" />
+```
+
+| Prop                         | CSS Property       | Token Category        |
+| ---------------------------- | ------------------ | --------------------- |
+| `bgImage`, `backgroundImage` | `background-image` | `assets`, `gradients` |
+
+## Background Gradient
+
+Properties to create a background gradient based on color stops.
+
+```jsx
+<Box bgGradient="to-r" gradientFrom="red.200" gradientTo="blue.200" />
+```
+
+| Prop           | CSS Property       | Token Category |
+| -------------- | ------------------ | -------------- |
+| `bgGradient`   | `background-image` | `gradients`    |
+| `textGradient` | `background-image` | `gradients`    |
+| `gradientFrom` | `--gradient-from`  | `colors`       |
+| `gradientTo`   | `--gradient-to`    | `colors`       |
+| `gradientVia`  | `--gradient-via`   | `colors`       |
+
+# Border
+
+## Border Radius
+
+### All sides
+
+Use the `rounded` or `borderRadius` props to apply border radius on all sides of
+an element.
+
+```jsx
+<Box borderRadius="md" />
+<Box rounded="md" /> // shorthand
+```
+
+| Prop                      | CSS Property    | Token Category |
+| ------------------------- | --------------- | -------------- |
+| `rounded`, `borderRadius` | `border-radius` | `radii`        |
+
+### Specific sides
+
+Use the `rounded{Left,Right,Top,Bottom}` or
+`border{Left,Right,Top,Bottom}Radius` prop, to apply border radius on a specific
+side of an element.
+
+```jsx
+<Box borderTopRadius="md" />
+<Box roundedTop="md" /> // shorthand
+
+<Box borderLeftRadius="md" />
+<Box roundedLeft="md" /> // shorthand
+```
+
+Use the logical equivalent to make the border radius adapt based on the text
+direction.
+
+```jsx
+<Box roundedStart="md" />
+<Box roundedEnd="md" />
+```
+
+| Prop                                  | CSS Property                                           | Token Category |
+| ------------------------------------- | ------------------------------------------------------ | -------------- |
+| `roundedLeft`, `borderLeftRadius`     | `border-left-radius`                                   | `radii`        |
+| `roundedRight`, `borderRightRadius`   | `border-right-radius`                                  | `radii`        |
+| `roundedTop`, `borderTopRadius`       | `border-top-radius`                                    | `radii`        |
+| `roundedBottom`, `borderBottomRadius` | `border-bottom-radius`                                 | `radii`        |
+| `roundedStart`, `borderStartRadius`   | `border-start-start-radius`, `border-end-start-radius` | `radii`        |
+| `roundedEnd`, `borderEndRadius`       | `border-start-end-radius`, `border-end-end-radius`     | `radii`        |
+
+### Specific corners
+
+Use the `border{Top,Bottom}{Left,Right}Radius` properties, or the shorthand
+equivalent to round a specific corner.
+
+```jsx
+<Box borderTopLeftRadius="md" />
+<Box roundedTopLeft="md" /> // shorthand
+```
+
+Use the logical properties to adapt based on the text direction.
+
+```jsx
+<Box borderStartStartRadius="md" />
+<Box roundedStartStart="md" /> // shorthand
+```
+
+| Prop                                     | CSS Property                 | Token Category |
+| ---------------------------------------- | ---------------------------- | -------------- |
+| `roundedTopLeft`,`borderTopLeftRadius`   | `border-top-left-radius`     | `radii`        |
+| `roundedTopRight`,`borderTopRight`       | `border-top-right-radius`    | `radii`        |
+| `roundedBottomRight`,`borderBottomRight` | `border-bottom-right-radius` | `radii`        |
+| `roundedBottomLeft`,`borderBottomLeft`   | `border-bottom-left-radius`  | `radii`        |
+
+## Border Width
+
+### All sides
+
+Use the `borderWidth` prop to apply border width on all sides of an element.
+
+> Chakra applies `borderStyle: solid` and a global border color by default.
+> Specifying a border width is sufficient to apply the border.
+
+```jsx
+<Box borderWidth="1px" />
+```
+
+| Prop          | CSS Property   | Token Category |
+| ------------- | -------------- | -------------- |
+| `borderWidth` | `border-width` | `borderWidths` |
+
+### Specific sides
+
+Use the `border{Left|Right|Top|Bottom}Width` prop to apply border width on a
+specific side of an element.
+
+```jsx
+<Box borderTopWidth="1px" />
+<Box borderLeftWidth="1px" />
+```
+
+Use the logical equivalent to make the border width adapt based on the text
+direction.
+
+```jsx
+<Box borderInlineStartWidth="1px" />
+<Box borderInlineWidth="1px" /> // shorthand
+```
+
+| Prop                                          | CSS Property                | Token Category |
+| --------------------------------------------- | --------------------------- | -------------- |
+| `borderTopWidth`                              | `border-top-width`          | `borderWidths` |
+| `borderLeftWidth`                             | `border-left-width`         | `borderWidths` |
+| `borderRightWidth`                            | `border-right-width`        | `borderWidths` |
+| `borderBottomWidth`                           | `border-bottom-width`       | `borderWidths` |
+| `borderStartWidth` , `borderInlineStartWidth` | `border-{start+end}-width`  |
+| `borderEndWidth` , `borderInlineEndWidth`     | `border-{start+end}-width`  |
+| `borderXWidth` , `borderInlineWidth`          | `border-{left,right}-width` | `borderWidths` |
+| `borderYWidth` , `borderBlockWidth`           | `border-{top,bottom}-width` | `borderWidths` |
+
+## Border Color
+
+### All sides
+
+Use the `borderColor` prop to apply border color on all sides of an element.
+
+```jsx
+<Box borderColor="red.400" />
+
+// with opacity modifier
+<Box borderColor="red.400/20" />
+```
+
+### Specific sides
+
+Use the `border{Left,Right,Top,Bottom}Color` prop to apply border color on a
+specific side of an element.
+
+```jsx
+<Box borderTopColor="red.400" />
+<Box borderLeftColor="red.400" />
+```
+
+Use the logical properties to adapt based on the text direction.
+
+```jsx
+<Box borderStartColor="red.400" />
+<Box borderEndColor="red.400" />
+```
+
+| Prop                                          | CSS Property               | Token Category |
+| --------------------------------------------- | -------------------------- | -------------- |
+| `borderColor`                                 | `border-color`             | `colors`       |
+| `borderTopColor`                              | `border-top-color`         | `colors`       |
+| `borderLeftColor`                             | `border-left-color`        | `colors`       |
+| `borderRightColor`                            | `border-right-color`       | `colors`       |
+| `borderBottomColor`                           | `border-bottom-color`      | `colors`       |
+| `borderStartColor` , `borderInlineStartColor` | `border-{start,end}-color` | `colors`       |
+| `borderEndColor` , `borderInlineEndColor`     | `border-{start,end}-color` | `colors`       |
+| `borderXColor`, `borderInlineColor`           | `border-inline-color`      | `colors`       |
+| `borderYColor`, `borderBlockColor`            | `border-block-color`       | `colors`       |
+
+## Divide Width
+
+Use the `divide{X,Y}Width` prop to apply border width between elements. It uses
+the CSS selector `> * + *` to apply the `border*` properties.
+
+```jsx
+<Box divideXWidth="1px">
+  <Box>1</Box>
+  <Box>2</Box>
+</Box>
+
+<Box divideYWidth="1px">
+  <Box>1</Box>
+  <Box>2</Box>
+</Box>
+```
+
+| Prop          | CSS Property                        | Token Category |
+| ------------- | ----------------------------------- | -------------- |
+| `divideWidth` | `border-{inline,block}-start-width` | `borderWidths` |
+
+## Divide Color
+
+Use the `divideColor` prop to apply border color between elements.
+
+```jsx
+<Box divideColor="red.400">
+  <Box>1</Box>
+  <Box>2</Box>
+</Box>
+```
+
+| Prop          | CSS Property     | Token Category |
+| ------------- | ---------------- | -------------- |
+| `divideColor` | `--divide-color` | `colors`       |
+
+## Divide Style
+
+Use the `divideStyle` prop to apply border style between elements.
+
+```jsx
+<Box divideX="2px" divideStyle="dashed">
+  <Box>1</Box>
+  <Box>2</Box>
+</Box>
+```
+
+| Prop          | CSS Property     | Token Category |
+| ------------- | ---------------- | -------------- |
+| `divideStyle` | `--divide-style` | `borderStyle`  |
+
+# Display
+
+## Display Property
+
+```jsx
+<Box display="flex" />
+
+// responsive
+<Box display={{ base: "none", md: "block" }} />
+```
+
+| Prop      | CSS Property | Token Category |
+| --------- | ------------ | -------------- |
+| `display` | `display`    | -              |
+
+## Hiding Elements
+
+### Hide From
+
+Use the `hideFrom` prop to hide an element from a specific breakpoint.
+
+```jsx
+<Box display="flex" hideFrom="md" />
+```
+
+| Prop       | CSS Property | Token Category |
+| ---------- | ------------ | -------------- |
+| `hideFrom` | `display`    | `breakpoints`  |
+
+### Hide Below
+
+Use the `hideBelow` prop to hide an element below a specific breakpoint.
+
+```jsx
+<Box display="flex" hideBelow="md" />
+```
+
+| Prop        | CSS Property | Token Category |
+| ----------- | ------------ | -------------- |
+| `hideBelow` | `display`    | `breakpoints`  |
+
+# Divide
+
+## Divide X
+
+Use the `divideX` prop to add a divider between elements horizontally.
+
+```jsx
+<Box divideX="2px">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+</Box>
+```
+
+| Prop      | CSS Property                | Token Category |
+| --------- | --------------------------- | -------------- |
+| `divideX` | `border-inline-start-width` | -              |
+
+## Divide Y
+
+Use the `divideY` prop to add a divider between elements vertically.
+
+```jsx
+<Box divideY="2px">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+</Box>
+```
+
+| Prop      | CSS Property       | Token Category |
+| --------- | ------------------ | -------------- |
+| `divideY` | `border-top-width` | -              |
+
+## Divide Color
+
+Use the `divideColor` prop to add a divider color.
+
+```jsx
+<Box divideY="2px" divideColor="red.200">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+</Box>
+```
+
+| Prop          | CSS Property       | Token Category |
+| ------------- | ------------------ | -------------- |
+| `divideColor` | `border-top-color` | -              |
+
+## Divide Style
+
+Use the `divideStyle` prop to add a divider style.
+
+```jsx
+<Box divideY="2px" divideStyle="dashed">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+</Box>
+```
+
+| Prop          | CSS Property   | Token Category |
+| ------------- | -------------- | -------------- |
+| `divideStyle` | `border-style` | -              |
+
+# Effects
+
+## Box Shadow
+
+Use the `shadow` or `boxShadow` prop to apply a box shadow to an element.
+
+```jsx
+// hardcoded values
+<Box shadow="12px 12px 2px 1px rgba(0, 0, 255, .2)" />
+
+// token values
+<Box shadow="lg" />
+```
+
+| Prop                   | CSS Property     | Token Category |
+| ---------------------- | ---------------- | -------------- |
+| `shadows`, `boxShadow` | `box-shadow`     | `shadows`      |
+| `shadowColor`          | `--shadow-color` | `colors`       |
+
+## Box Shadow Color
+
+Use the `shadowColor` prop to set the color of a box shadow. This prop maps to
+the `--shadow-color` CSS variable.
+
+```jsx
+<Box shadow="60px -16px var(--shadow-color)" shadowColor="red" />
+```
+
+| Prop          | CSS Property     | Token Category |
+| ------------- | ---------------- | -------------- |
+| `shadowColor` | `--shadow-color` | `colors`       |
+
+## Opacity
+
+Use the `opacity` prop to set the opacity of an element.
+
+```jsx
+<Box opacity="0.5" />
+```
+
+| Prop      | CSS Property | Token Category |
+| --------- | ------------ | -------------- |
+| `opacity` | `opacity`    | `opacity`      |
+
+## Mix Blend Mode
+
+Use the `mixBlendMode` prop to control how an element's content should be
+blended with the background.
+
+```jsx
+<Box bg="red.400">
+  <Image src="..." mixBlendMode="hard-light" />
+</Box>
+```
+
+| Prop           | CSS Property     | Token Category |
+| -------------- | ---------------- | -------------- |
+| `mixBlendMode` | `mix-blend-mode` | -              |
+
+# Filters
+
+## Filter
+
+Use the `filter` prop to apply visual effects like blur or color shift to an
+element.
+
+```jsx
+<Box filter="blur(5px)" />
+<Box filter="grayscale(80%)" />
+```
+
+| Prop     | CSS Property | Token Category |
+| -------- | ------------ | -------------- |
+| `filter` | `filter`     | -              |
+
+## Blur
+
+Use the `blur` prop to apply a blur effect to an element. The requirement for
+this prop is to set the `filter` prop to `auto`.
+
+```jsx
+// hardcoded value
+<Box filter="auto" blur="5px" />
+
+// token value
+<Box filter="auto" blur="sm" />
+```
+
+| Prop   | CSS Property | Token Category |
+| ------ | ------------ | -------------- |
+| `blur` | `--blur`     | `blurs`        |
+
+## Contrast
+
+Use the `contrast` prop to apply a contrast effect to an element. The
+requirement for this prop is to use the `filter` prop and set it to `auto`.
+
+```jsx
+<Box filter="auto" contrast="0.3" />
+```
+
+| Prop       | CSS Property | Token Category |
+| ---------- | ------------ | -------------- |
+| `contrast` | `--contrast` | -              |
+
+## Drop Shadow
+
+Use the `dropShadow` prop to apply a drop shadow effect to an element. The
+requirement for this prop is to use the `filter` prop and set it to `auto`.
+
+```jsx
+<Box filter="auto" dropShadow="0px 0px 10px rgba(0, 0, 0, 0.5)" />
+```
+
+| Prop         | CSS Property    | Token Category |
+| ------------ | --------------- | -------------- |
+| `dropShadow` | `--drop-shadow` | -              |
+
+## Grayscale
+
+Use the `grayscale` prop to apply a grayscale effect to an element. The
+requirement for this prop is to use the `filter` prop and set it to `auto`.
+
+```jsx
+<Box filter="auto" grayscale="64%" />
+```
+
+| Prop        | CSS Property  | Token Category |
+| ----------- | ------------- | -------------- |
+| `grayscale` | `--grayscale` | -              |
+
+## Hue Rotate
+
+Use the `hueRotate` prop to apply a hue rotate effect to an element. The
+requirement for this prop is to use the `filter` prop and set it to `auto`.
+
+```jsx
+<Box filter="auto" hueRotate="30deg" />
+```
+
+| Prop        | CSS Property   | Token Category |
+| ----------- | -------------- | -------------- |
+| `hueRotate` | `--hue-rotate` | -              |
+
+## Invert
+
+Use the `invert` prop to apply an invert effect to an element. The requirement
+for this prop is to use the `filter` prop and set it to `auto`.
+
+```jsx
+<Box filter="auto" invert="40%" />
+```
+
+| Prop     | CSS Property | Token Category |
+| -------- | ------------ | -------------- |
+| `invert` | `--invert`   | -              |
+
+## Saturate
+
+Use the `saturate` prop to apply a saturate effect to an element. The
+requirement for this prop is to use the `filter` prop and set it to `auto`.
+
+```jsx
+<Box filter="auto" saturate="0.4" />
+```
+
+| Prop       | CSS Property | Token Category |
+| ---------- | ------------ | -------------- |
+| `saturate` | `--saturate` | -              |
+
+## Sepia
+
+Use the `sepia` prop to apply a sepia effect to an element. The requirement for
+this prop is to use the `filter` prop and set it to `auto`.
+
+```jsx
+<Box filter="auto" sepia="0.4" />
+```
+
+| Prop    | CSS Property | Token Category |
+| ------- | ------------ | -------------- |
+| `sepia` | `--sepia`    | -              |
+
+## Backdrop Filter
+
+Use the `backdropFilter` prop to apply visual effects like blur or color shift
+to the area behind an element. This creates a translucent effect.
+
+```jsx
+<Box backdropFilter="blur(5px)" />
+<Box backdropFilter="grayscale(80%)" />
+```
+
+| Prop             | CSS Property      | Token Category |
+| ---------------- | ----------------- | -------------- |
+| `backdropFilter` | `backdrop-filter` | -              |
+
+## Backdrop Blur
+
+Use the `backdropBlur` prop to apply a blur effect to the area behind an
+element. The requirement for this prop is to set the `backdropFilter` prop to
+`auto`.
+
+```jsx
+// hardcoded value
+<Box backdropFilter="auto" backdropBlur="5px" />
+
+// token value
+<Box backdropFilter="auto" backdropBlur="sm" />
+```
+
+| Prop           | CSS Property      | Token Category |
+| -------------- | ----------------- | -------------- |
+| `backdropBlur` | `--backdrop-blur` | `blurs`        |
+
+## Backdrop Contrast
+
+Use the `backdropContrast` prop to apply a contrast effect to the area behind an
+element. The requirement for this prop is to use the `backdropFilter` prop and
+set it to `auto`.
+
+```jsx
+<Box backdropFilter="auto" backdropContrast="0.3" />
+```
+
+| Prop               | CSS Property          | Token Category |
+| ------------------ | --------------------- | -------------- |
+| `backdropContrast` | `--backdrop-contrast` | -              |
+
+## Backdrop Grayscale
+
+Use the `backdropGrayscale` prop to apply a grayscale effect to the area behind
+an element. The requirement for this prop is to use the `backdropFilter` prop
+and set it to `auto`.
+
+```jsx
+<Box backdropFilter="auto" backdropGrayscale="64%" />
+```
+
+| Prop                | CSS Property           | Token Category |
+| ------------------- | ---------------------- | -------------- |
+| `backdropGrayscale` | `--backdrop-grayscale` | -              |
+
+## Backdrop Hue Rotate
+
+Use the `backdropHueRotate` prop to apply a hue rotate effect to the area behind
+an element. The requirement for this prop is to use the `backdropFilter` prop
+and set it to `auto`.
+
+```jsx
+<Box backdropFilter="auto" backdropHueRotate="30deg" />
+```
+
+| Prop                | CSS Property            | Token Category |
+| ------------------- | ----------------------- | -------------- |
+| `backdropHueRotate` | `--backdrop-hue-rotate` | -              |
+
+## Backdrop Invert
+
+Use the `backdropInvert` prop to apply an invert effect to the area behind an
+element. The requirement for this prop is to use the `backdropFilter` prop and
+set it to `auto`.
+
+```jsx
+<Box backdropFilter="auto" backdropInvert="40%" />
+```
+
+| Prop             | CSS Property        | Token Category |
+| ---------------- | ------------------- | -------------- |
+| `backdropInvert` | `--backdrop-invert` | -              |
+
+## Backdrop Opacity
+
+Use the `backdropOpacity` prop to apply an opacity effect to the area behind an
+element. The requirement for this prop is to use the `backdropFilter` prop and
+set it to `auto`.
+
+```jsx
+<Box backdropFilter="auto" backdropOpacity="0.4" />
+```
+
+| Prop              | CSS Property         | Token Category |
+| ----------------- | -------------------- | -------------- |
+| `backdropOpacity` | `--backdrop-opacity` | -              |
+
+## Backdrop Saturate
+
+Use the `backdropSaturate` prop to apply a saturate effect to the area behind an
+element. The requirement for this prop is to use the `backdropFilter` prop and
+set it to `auto`.
+
+```jsx
+<Box backdropFilter="auto" backdropSaturate="0.4" />
+```
+
+| Prop               | CSS Property          | Token Category |
+| ------------------ | --------------------- | -------------- |
+| `backdropSaturate` | `--backdrop-saturate` | -              |
+
+## Backdrop Sepia
+
+Use the `backdropSepia` prop to apply a sepia effect to the area behind an
+element. The requirement for this prop is to use the `backdropFilter` prop and
+set it to `auto`.
+
+```jsx
+<Box backdropFilter="auto" backdropSepia="0.4" />
+```
+
+| Prop            | CSS Property       | Token Category |
+| --------------- | ------------------ | -------------- |
+| `backdropSepia` | `--backdrop-sepia` | -              |
+
+# Flex and Grid
+
+## Flex Basis
+
+Use the `flexBasis` prop to set the initial main size of a flex item.
+
+```jsx
+<Flex>
+  <Box flexBasis="25%" />
+  <Box flexBasis="25%" />
+  <Box flexBasis="50%" />
+</Flex>
+```
+
+| Prop        | CSS Property | Token Category |
+| ----------- | ------------ | -------------- |
+| `flexBasis` | `flex-basis` | -              |
+
+## Flex Direction
+
+Use the `flexDir` or `flexDirection` prop to set the direction of the main axis
+in a flex container.
+
+```jsx
+<Box display="flex" flexDirection="column">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+When using `Flex` component, the `direction` prop is aliased to `flexDirection`.
+
+```jsx
+<Flex direction="column">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Flex>
+```
+
+| Prop                       | CSS Property     | Token Category |
+| -------------------------- | ---------------- | -------------- |
+| `flexDir`, `flexDirection` | `flex-direction` | -              |
+
+## Flex Wrap
+
+Use the `flexWrap` prop to set whether flex items are forced onto one line or
+can wrap onto multiple lines.
+
+```jsx
+<Box display="flex" flexWrap="wrap">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+When using `Flex` component, the `wrap` prop is aliased to `flexWrap`.
+
+```jsx
+<Flex wrap="wrap">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Flex>
+```
+
+| Prop       | CSS Property | Token Category |
+| ---------- | ------------ | -------------- |
+| `flexWrap` | `flex-wrap`  | -              |
+
+## Flex
+
+Use the `flex` prop to define the flexibility of a flex container or item.
+
+```jsx
+<Flex>
+  <Box flex="1" />
+  <Box />
+</Flex>
+```
+
+| Prop   | CSS Property | Token Category |
+| ------ | ------------ | -------------- |
+| `flex` | `flex`       | -              |
+
+## Flex Grow
+
+Use the `flexGrow` prop to set the flex grow factor of a flex item.
+
+```jsx
+<Flex>
+  <Box flexGrow="0" />
+  <Box flexGrow="1" />
+</Flex>
+```
+
+| Prop       | CSS Property | Token Category |
+| ---------- | ------------ | -------------- |
+| `flexGrow` | `flex-grow`  | -              |
+
+## Flex Shrink
+
+Use the `flexShrink` prop to set the flex shrink factor of a flex item.
+
+```jsx
+<Flex>
+  <Box flexShrink="0" />
+  <Box flexShrink="1" />
+</Flex>
+```
+
+| Prop         | CSS Property  | Token Category |
+| ------------ | ------------- | -------------- |
+| `flexShrink` | `flex-shrink` | -              |
+
+## Order
+
+Use the `order` prop to set the order of a flex item.
+
+```jsx
+<Flex>
+  <Box order="0" />
+  <Box order="1" />
+</Flex>
+```
+
+| Prop    | CSS Property | Token Category |
+| ------- | ------------ | -------------- |
+| `order` | `order`      | -              |
+
+## Gap
+
+Use the `gap` prop to set the gap between items in a flex or grid container.
+
+```jsx
+<Flex gap="4">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Flex>
+```
+
+| Prop  | CSS Property | Token Category |
+| ----- | ------------ | -------------- |
+| `gap` | `gap`        | `spacing`      |
+
+## Grid Template Columns
+
+Use the `gridTemplateColumns` prop to define the columns of a grid container.
+
+```jsx
+<Box display="grid" gridTemplateColumns="repeat(3, minmax(0, 1fr))">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+When using `Grid` component, the `templateColumns` prop is aliased to
+`gridTemplateColumns`.
+
+```jsx
+<Grid templateColumns="repeat(3, minmax(0, 1fr))">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Grid>
+```
+
+## Grid Template Start/End
+
+Use the `gridTemplateStart` and `gridTemplateEnd` props to define the start and
+end of a grid container.
+
+```jsx
+<Box display="grid" gridTemplateColumns="repeat(3, minmax(0, 1fr))">
+  <Box>Item 1</Box>
+  <Box gridColumn="span 2 / span 2">Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+| Prop                | CSS Property          | Token Category |
+| ------------------- | --------------------- | -------------- |
+| `gridTemplateStart` | `grid-template-start` | -              |
+| `gridTemplateEnd`   | `grid-template-end`   | -              |
+
+## Grid Template Rows
+
+Use the `gridTemplateRows` prop to define the rows of a grid container.
+
+```jsx
+<Box display="grid" gap="4" gridTemplateRows="repeat(3, minmax(0, 1fr))">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+| Prop               | CSS Property         | Token Category |
+| ------------------ | -------------------- | -------------- |
+| `gridTemplateRows` | `grid-template-rows` | -              |
+
+## Grid Row Start/End
+
+Use the `gridRowStart` and `gridRowEnd` props to define the start and end of a
+grid item.
+
+```jsx
+<Box display="grid" gap="4" gridTemplateRows="repeat(3, minmax(0, 1fr))">
+  <Box gridRowStart="1" gridRowEnd="3">
+    Item 1
+  </Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+| Prop           | CSS Property     | Token Category |
+| -------------- | ---------------- | -------------- |
+| `gridRowStart` | `grid-row-start` | -              |
+| `gridRowEnd`   | `grid-row-end`   | -              |
+
+## Grid Autoflow
+
+Use the `gridAutoFlow` prop to define how auto-placed items get flowed into the
+grid.
+
+```jsx
+<Box display="grid" gridAutoFlow="row">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+| Prop           | CSS Property     | Token Category |
+| -------------- | ---------------- | -------------- |
+| `gridAutoFlow` | `grid-auto-flow` | -              |
+
+## Grid Auto Columns
+
+Use the `gridAutoColumns` prop to specify the size of the grid columns that were
+created without an explicit size.
+
+```jsx
+<Box display="grid" gridAutoColumns="120px">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+| Prop              | CSS Property        | Token Category |
+| ----------------- | ------------------- | -------------- |
+| `gridAutoColumns` | `grid-auto-columns` | -              |
+
+## Grid Auto Rows
+
+Use the `gridAutoRows` prop to specify the size of the grid rows that were
+created without an explicit size.
+
+```jsx
+<Box display="grid" gridTemplateRows="200px" gridAutoRows="120px">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+| Prop           | CSS Property     | Token Category |
+| -------------- | ---------------- | -------------- |
+| `gridAutoRows` | `grid-auto-rows` | -              |
+
+## Justify Content
+
+Use the `justifyContent` prop to align items along the main axis of a flex
+container.
+
+```jsx
+<Box display="flex" justifyContent="center">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+When using the `Flex` component, the `justify` prop is aliased to
+`justifyContent`.
+
+```jsx
+<Flex justify="center">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Flex>
+```
+
+| Prop             | CSS Property      | Token Category |
+| ---------------- | ----------------- | -------------- |
+| `justifyContent` | `justify-content` | -              |
+
+## Justify Items
+
+Use the `justifyItems` prop to control the alignment of grid items within their
+scope.
+
+```jsx
+<Box display="grid" justifyItems="center">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+| Prop           | CSS Property    | Token Category |
+| -------------- | --------------- | -------------- |
+| `justifyItems` | `justify-items` | -              |
+
+## Align Content
+
+Use the `alignContent` prop to align rows of content along the cross axis of a
+flex container when there's extra space.
+
+```jsx
+<Box display="flex" alignContent="center">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+When using the `Flex` component, the `align` prop is aliased to `alignContent`.
+
+```jsx
+<Flex align="center">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Flex>
+```
+
+| Prop           | CSS Property    | Token Category |
+| -------------- | --------------- | -------------- |
+| `alignContent` | `align-content` | -              |
+
+## Align Items
+
+Use the `alignItems` prop to control the alignment of grid items within their
+scope.
+
+```jsx
+<Box display="grid" alignItems="center">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+## Align Self
+
+Use the `alignSelf` prop to control the alignment of a grid item within its
+scope.
+
+```jsx
+<Box display="grid">
+  <Box alignSelf="center">Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+| Prop        | CSS Property | Token Category |
+| ----------- | ------------ | -------------- |
+| `alignSelf` | `align-self` | -              |
+
+## Place Content
+
+Use the `placeContent` prop to align content along both the block and inline
+directions at once. It works like `justifyContent` and `alignContent` combined,
+and can be used in flex and grid containers.
+
+```jsx
+<Flex placeContent="center">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Flex>
+```
+
+| Prop           | CSS Property    | Token Category |
+| -------------- | --------------- | -------------- |
+| `placeContent` | `place-content` | -              |
+
+## Place Items
+
+Use the `placeItems` prop to align items along both the block and inline
+directions at once. It works like `justifyItems` and `alignItems` combined, and
+can be used in flex and grid containers.
+
+```jsx
+<Box display="grid" placeItems="center">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+| Prop         | CSS Property  | Token Category |
+| ------------ | ------------- | -------------- |
+| `placeItems` | `place-items` | -              |
+
+## Place Self
+
+Use the `placeSelf` prop to align a grid item along both the block and inline
+directions at once.
+
+```jsx
+<Box display="grid">
+  <Box placeSelf="center">Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+| Prop        | CSS Property | Token Category |
+| ----------- | ------------ | -------------- |
+| `placeSelf` | `place-self` | -              |
+
+# Interactivity
+
+## Accent Color
+
+Use the `accentColor` prop to set the accent color for browser generated
+user-interface controls.
+
+```jsx
+// hardcoded
+<label>
+  <chakra.input type="checkbox" accentColor="#3b82f6" />
+</label>
+
+// token value
+<label>
+  <chakra.input type="checkbox" accentColor="blue.500" />
+</label>
+```
+
+| Prop          | CSS Property   | Token Category |
+| ------------- | -------------- | -------------- |
+| `accentColor` | `accent-color` | `colors`       |
+
+## Appearance
+
+Use the `appearance` prop to set the appearance of an element.
+
+```jsx
+<chakra.select appearance="none">
+  <option value="1">Option 1</option>
+  <option value="2">Option 2</option>
+  <option value="3">Option 3</option>
+</chakra.select>
+```
+
+| Prop         | CSS Property | Token Category |
+| ------------ | ------------ | -------------- |
+| `appearance` | `appearance` | -              |
+
+## Caret Color
+
+Use the `caretColor` prop to set the color of the text cursor (caret) in an
+input or textarea
+
+```jsx
+// hardcoded
+<chakra.input caretColor="#3b82f6" />
+
+// token value
+<chakra.input caretColor="blue.500" />
+```
+
+| Prop         | CSS Property  | Token Category |
+| ------------ | ------------- | -------------- |
+| `caretColor` | `caret-color` | `colors`       |
+
+## Cursor
+
+Use the `cursor` prop to set the mouse cursor image to show when the mouse
+pointer is over an element.
+
+```jsx
+<Box cursor="pointer" />
+```
+
+| Prop     | CSS Property | Token Category |
+| -------- | ------------ | -------------- |
+| `cursor` | `cursor`     | -              |
+
+## Pointer Events
+
+Use the `pointerEvents` prop to control how pointer events are handled on an
+element.
+
+```jsx
+<Box pointerEvents="none">Can't click me</Box>
+```
+
+| Prop            | CSS Property     | Token Category |
+| --------------- | ---------------- | -------------- |
+| `pointerEvents` | `pointer-events` | -              |
+
+## Resize
+
+Use the `resize` prop to control whether an element is resizable, and if so, in
+which directions.
+
+```jsx
+<chakra.textarea resize="both" />
+<chakra.textarea resize="horizontal" />
+<chakra.textarea resize="vertical" />
+```
+
+| Prop     | CSS Property | Token Category |
+| -------- | ------------ | -------------- |
+| `resize` | `resize`     | -              |
+
+## Scrollbar
+
+Use the `scrollbar` prop to customize the appearance of scrollbars.
+
+```jsx
+<Box scrollbar="hidden" maxH="100px" overflowY="auto">
+  Scrollbar hidden
+</Box>
+```
+
+## Scroll Behavior
+
+Use the `scrollBehavior` prop to set the behavior for a scrolling box when
+scrolling is triggered by the navigation or JavaScript code.
+
+```jsx
+<Box maxH="100px" overflowY="auto" scrollBehavior="smooth">
+  <div>Scroll me</div>
+</Box>
+```
+
+| Prop             | CSS Property      | Token Category |
+| ---------------- | ----------------- | -------------- |
+| `scrollBehavior` | `scroll-behavior` | -              |
+
+## Scroll Margin
+
+Use the `scrollMargin*` prop to set margins around scroll containers.
+
+```jsx
+<Box maxH="100px" overflowY="auto" scrollMarginY="2">
+  Scrollbar Container with block padding
+</Box>
+```
+
+| Prop                                  | CSS Property                 | Token Category |
+| ------------------------------------- | ---------------------------- | -------------- |
+| `scrollMarginX` ,`scrollMarginInline` | `scroll-margin-inline`       | `spacing`      |
+| `scrollMarginInlineStart`             | `scroll-margin-inline-start` | `spacing`      |
+| `scrollMarginInlineEnd`               | `scroll-margin-inline-end`   | `spacing`      |
+| `scrollMarginY` , `scrollMarginBlock` | `scroll-margin-block`        | `spacing`      |
+| `scrollMarginBlockStart`              | `scroll-margin-block-start`  | `spacing`      |
+| `scrollMarginBlockEnd`                | `scroll-margin-block-end`    | `spacing`      |
+| `scrollMarginLeft`                    | `scroll-margin-left`         | `spacing`      |
+| `scrollMarginRight`                   | `scroll-margin-right`        | `spacing`      |
+| `scrollMarginTop`                     | `scroll-margin-top`          | `spacing`      |
+| `scrollMarginBottom`                  | `scroll-margin-bottom`       | `spacing`      |
+
+## Scroll Padding
+
+Use the `scrollPadding*` prop to set padding inside scroll containers.
+
+```jsx
+<Box maxH="100px" overflowY="auto" scrollPaddingY="2">
+  Scrollbar Container with block padding
+</Box>
+```
+
+| Prop                                     | CSS Property                  | Token Category |
+| ---------------------------------------- | ----------------------------- | -------------- |
+| `scrollPaddingX` , `scrollPaddingInline` | `scroll-padding-inline`       | `spacing`      |
+| `scrollPaddingInlineStart`               | `scroll-padding-inline-start` | `spacing`      |
+| `scrollPaddingInlineEnd`                 | `scroll-padding-inline-end`   | `spacing`      |
+| `scrollPaddingY` , `scrollPaddingBlock`  | `scroll-padding-block`        | `spacing`      |
+| `scrollPaddingBlockStart`                | `scroll-padding-block-start`  | `spacing`      |
+| `scrollPaddingBlockEnd`                  | `scroll-padding-block-end`    | `spacing`      |
+| `scrollPaddingLeft`                      | `scroll-padding-left`         | `spacing`      |
+| `scrollPaddingRight`                     | `scroll-padding-right`        | `spacing`      |
+| `scrollPaddingTop`                       | `scroll-padding-top`          | `spacing`      |
+| `scrollPaddingBottom`                    | `scroll-padding-bottom`       | `spacing`      |
+
+## Scroll Snap Margin
+
+Use the `scrollSnapMargin*` prop to set margins around scroll containers.
+
+```jsx
+<Box maxH="100px" overflowY="auto" scrollSnapMarginY="2">
+  Scrollbar Container with block padding
+</Box>
+```
+
+| Prop                     | CSS Property           | Token Category |
+| ------------------------ | ---------------------- | -------------- |
+| `scrollSnapMargin`       | `scroll-margin`        | `spacing`      |
+| `scrollSnapMarginTop`    | `scroll-margin-top`    | `spacing`      |
+| `scrollSnapMarginBottom` | `scroll-margin-bottom` | `spacing`      |
+| `scrollSnapMarginLeft`   | `scroll-margin-left`   | `spacing`      |
+| `scrollSnapMarginRight`  | `scroll-margin-right`  | `spacing`      |
+
+## Scroll Snap Type
+
+Use the `scrollSnapType` prop to control how strictly snap points are enforced
+in a scroll container.
+
+```jsx
+<Box maxH="100px" overflowY="auto" scrollSnapType="x">
+  Scroll container with x snap type
+</Box>
+```
+
+| Value  |                                      |
+| ------ | ------------------------------------ |
+| `none` | `none`                               |
+| `x`    | `x var(--scroll-snap-strictness)`    |
+| `y`    | `y var(--scroll-snap-strictness)`    |
+| `both` | `both var(--scroll-snap-strictness)` |
+
+## Scroll Snap Strictness
+
+Use the `scrollSnapStrictness` prop to set the scroll snap strictness of an
+element. This requires `scrollSnapType` to be set to `x`,`y` or `both`.
+
+It's values can be `mandatory` or `proximity` values, and maps to
+`var(--scroll-snap-strictness)`.
+
+```jsx
+<Box maxH="100px" overflowY="auto" scrollSnapStrictness="proximity">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+</Box>
+```
+
+| Prop                   | CSS Property               | Token Category |
+| ---------------------- | -------------------------- | -------------- |
+| `scrollSnapStrictness` | `--scroll-snap-strictness` | -              |
+
+## Touch Action
+
+Use the `touchAction` prop to control how an element's region can be manipulated
+by a touchscreen user
+
+```jsx
+<Box touchAction="none" />
+```
+
+| Prop          | CSS Property   | Token Category |
+| ------------- | -------------- | -------------- |
+| `touchAction` | `touch-action` | -              |
+
+## User Select
+
+Use the `userSelect` prop to control whether the user can select text within an
+element.
+
+```jsx
+<Box userSelect="none">
+  <p>Can't Select me</p>
+</Box>
+```
+
+| Prop         | CSS Property  | Token Category |
+| ------------ | ------------- | -------------- |
+| `userSelect` | `user-select` | -              |
+
+## Will Change
+
+Use the `willChange` prop to hint browsers how an element's property is expected
+to change.
+
+```jsx
+<Box willChange="transform" />
+```
+
+| Prop         | CSS Property  | Token Category |
+| ------------ | ------------- | -------------- |
+| `willChange` | `will-change` | -              |
+
+# Layout
+
+## Aspect Ratio
+
+Use the `aspectRatio` prop to set the desired aspect ratio of an element.
+
+```jsx
+// raw value
+<Box aspectRatio="1.2" />
+
+// token
+<Box aspectRatio="square" />
+```
+
+| Prop          | CSS Property   | Token Category |
+| ------------- | -------------- | -------------- |
+| `aspectRatio` | `aspect-ratio` | `aspectRatios` |
+
+## Break
+
+### Break After
+
+Use the `breakAfter` prop to set how page, column, or region breaks should
+behave after an element.
+
+```jsx
+<Box columns="2">
+  <Box>Item 1</Box>
+  <Box breakAfter="page">Item 2</Box>
+</Box>
+```
+
+| Prop         | CSS Property  | Token Category |
+| ------------ | ------------- | -------------- |
+| `breakAfter` | `break-after` | -              |
+
+### Break Before
+
+Use the `breakBefore` prop to set how page, column, or region breaks should
+behave before an element.
+
+```jsx
+<Box columns="2">
+  <Box>Item 1</Box>
+  <Box breakBefore="page">Item 2</Box>
+</Box>
+```
+
+| Prop          | CSS Property   | Token Category |
+| ------------- | -------------- | -------------- |
+| `breakBefore` | `break-before` | -              |
+
+### Break Inside
+
+Use the `breakInside` prop to set how page, column, or region breaks should
+behave inside an element.
+
+```jsx
+<Box columns="2">
+  <Box>Item 1</Box>
+  <Box breakInside="avoid">Item 2</Box>
+</Box>
+```
+
+| Prop          | CSS Property   | Token Category |
+| ------------- | -------------- | -------------- |
+| `breakInside` | `break-inside` | -              |
+
+## Box Decoration Break
+
+Use the `boxDecorationBreak` prop to set how box decorations should behave when
+the box breaks across multiple lines, columns, or pages.
+
+```jsx /boxDecorationBreak/
+<Box bgImage="linear-gradient(red, blue)" boxDecorationBreak="clone">
+  Chakra is <br /> great!
+</Box>
+```
+
+| Prop                 | CSS Property           | Token Category |
+| -------------------- | ---------------------- | -------------- |
+| `boxDecorationBreak` | `box-decoration-break` | -              |
+
+## Box Sizing
+
+Use the `boxSizing` prop to set the box sizing of an element.
+
+```jsx /boxSizing/
+<Box boxSizing="border-box" padding="4" width="8" height="8" />
+```
+
+| Prop        | CSS Property | Token Category |
+| ----------- | ------------ | -------------- |
+| `boxSizing` | `box-sizing` | -              |
+
+## Columns
+
+Use the `columns` prop to set the number of columns for an element.
+
+```jsx
+<Box columns={2} />
+```
+
+| Prop      | CSS Property | Token Category |
+| --------- | ------------ | -------------- |
+| `columns` | `columns`    | -              |
+
+## Float
+
+Use the `float` prop to set the float of an element.
+
+```jsx /float/
+<Box>
+  <Text>As much mud in the streets...</Text>
+  <Box float="left">Float me</Box>
+</Box>
+```
+
+| Prop    | CSS Property | Token Category |
+| ------- | ------------ | -------------- |
+| `float` | `float`      | -              |
+
+## Clear
+
+Use the `clear` prop to set whether an element must be moved below (cleared)
+floating elements that precede it.
+
+```jsx
+<Box>
+  <Box float="left">Left</Box>
+  <Box float="right">Right</Box>
+  <Box clear="none">
+    As much mud in the streets as if the waters had but newly retired from the
+    face of the earth, and it would not be wonderful to meet a Megalosaurus,
+    forty feet long or so, waddling like an elephantine lizard up Holborn Hill.
+  </Box>
+</Box>
+```
+
+| Prop    | CSS Property | Token Category |
+| ------- | ------------ | -------------- |
+| `clear` | `clear`      | -              |
+
+## Isolation
+
+Use the `isolation` prop to set whether an element should explicitly create a
+new stacking context.
+
+```jsx
+<Box isolation="isolate">
+  <Box bg="red.500" width="10" height="10" />
+</Box>
+```
+
+| Prop        | CSS Property | Token Category |
+| ----------- | ------------ | -------------- |
+| `isolation` | `isolation`  | -              |
+
+## Object Fit
+
+Use the `objectFit` prop to set how an image or video should be resized to fit
+its container.
+
+```jsx
+<Image src="..." objectFit="cover" width="10" height="10" />
+```
+
+| Prop        | CSS Property | Token Category |
+| ----------- | ------------ | -------------- |
+| `objectFit` | `object-fit` | -              |
+
+## Object Position
+
+Use the `objectPosition` prop to set how an element should be positioned within
+its container.
+
+```jsx
+<Image src="..." objectPosition="center" width="10" height="10" />
+```
+
+| Prop             | CSS Property      | Token Category |
+| ---------------- | ----------------- | -------------- |
+| `objectPosition` | `object-position` | -              |
+
+## Overflow
+
+Use the `overflow` prop to control how content that exceeds an element's
+dimensions is handled. This property determines whether to clip the content, add
+scrollbars, or display the overflow content.
+
+```jsx
+<Box overflow="hidden" maxHeight="120px" />
+<Box overflow="auto" maxHeight="120px" />
+```
+
+| Prop       | CSS Property | Token Category |
+| ---------- | ------------ | -------------- |
+| `overflow` | `overflow`   | -              |
+
+## Overscroll Behavior
+
+Use the `overscrollBehavior` prop to control what the browser does when reaching
+the boundary of a scrolling area.
+
+```jsx
+<Box maxHeight="120px" overscrollBehavior="contain" />
+```
+
+| Prop                 | CSS Property          | Token Category |
+| -------------------- | --------------------- | -------------- |
+| `overscrollBehavior` | `overscroll-behavior` | -              |
+
+## Position
+
+Use the `position` utilities to set the position of an element.
+
+```jsx
+<Box position="absolute" />
+<Box pos="absolute" /> // shorthand
+```
+
+| Prop       | CSS Property | Token Category |
+| ---------- | ------------ | -------------- |
+| `position` | `position`   | -              |
+
+## Top / Right / Bottom / Left
+
+Use the `top`, `right`, `bottom` and `left` utilities to set the position of an
+element.
+
+```jsx
+<Box position="absolute" top="0" left="0" />
+
+// using spacing tokens
+<Box position="absolute" top="4" />
+
+// using hardcoded values
+<Box position="absolute" top="100px" />
+```
+
+Use the logical equivalents of `inset{Start|End}` utilities to set the position
+of an element based on the writing mode.
+
+```jsx
+<Box position="absolute" insetStart="0" />
+```
+
+| Prop                                      | CSS Property         | Token Category |
+| ----------------------------------------- | -------------------- | -------------- |
+| `top`                                     | `top`                | `spacing`      |
+| `right`                                   | `right`              | `spacing`      |
+| `bottom`                                  | `bottom`             | `spacing`      |
+| `left`                                    | `left`               | `spacing`      |
+| `start`, `insetStart`, `insetInlineStart` | `inset-inline-start` | `spacing`      |
+| `end` , `insetEnd`, `insetInlineEnd`      | `inset-inline-end`   | `spacing`      |
+| `insetX`, `insetInline`                   | `inset-inline`       | `spacing`      |
+| `insetY`, `insetBlock`                    | `inset-inline`       | `spacing`      |
+
+## Visibility
+
+Use the `visibility` prop to control the visibility of an element.
+
+```jsx
+<Box visibility="hidden" />
+```
+
+| Prop         | CSS Property | Token Category |
+| ------------ | ------------ | -------------- |
+| `visibility` | `visibility` | -              |
+
+## Z-Index
+
+Use the `zIndex` prop to set the z-index of an element.
+
+```jsx
+// using hardcoded values
+<Box zIndex="1" />
+
+// using token
+<Box zIndex="overlay" />
+```
+
+| Prop     | CSS Property | Token Category |
+| -------- | ------------ | -------------- |
+| `zIndex` | `z-index`    | `zIndices`     |
+
+# List
+
+## List Style Type
+
+Use the `listStyleType` property to set the type of the list marker.
+
+```jsx
+<Box as="ul" listStyleType="circle">
+  <li>Item 1</li>
+  <li>Item 2</li>
+  <li>Item 3</li>
+</Box>
+```
+
+| Prop            | CSS Property      | Token Category |
+| --------------- | ----------------- | -------------- |
+| `listStyleType` | `list-style-type` | -              |
+
+## List Style Position
+
+Use the `listStylePosition` property to set the position of the list marker.
+
+```jsx
+<Box as="ul" listStylePosition="inside">
+  <li>Item 1</li>
+  <li>Item 2</li>
+  <li>Item 3</li>
+</Box>
+```
+
+| Prop                | CSS Property          | Token Category |
+| ------------------- | --------------------- | -------------- |
+| `listStylePosition` | `list-style-position` | -              |
+
+## List Style Image
+
+Use the `listStyleImage` property to set the image of the list marker.
+
+```jsx
+<Box as="ul" listStyleImage="url(...)">
+  <li>Item 1</li>
+  <li>Item 2</li>
+  <li>Item 3</li>
+</Box>
+```
+
+| Prop             | CSS Property       | Token Category |
+| ---------------- | ------------------ | -------------- |
+| `listStyleImage` | `list-style-image` | `assets`       |
+
+## Markers
+
+Use the `_marker` property to set the marker of a list item.
+
+```jsx /_marker/
+<ul>
+  <Box as="li" _marker={{ color: "red" }}>
+    Item 1
+  </Box>
+  <Box as="li" _marker={{ color: "blue" }}>
+    Item 2
+  </Box>
+  <Box as="li" _marker={{ color: "green" }}>
+    Item 3
+  </Box>
+</ul>
+```
+
+# Sizing
+
+## Width
+
+Use the `width` or `w` property to set the width of an element.
+
+```jsx
+// hardcoded values
+<Box width="64px" />
+<Box w="4rem" />
+
+// token values
+<Box width="5" />
+<Box w="5" />
+```
+
+### Fractional width
+
+Use can set fractional widths using the `width` or `w` property.
+
+Values can be within the following ranges:
+
+- Thirds: `1/3` to `2/3`
+- Fourths: `1/4` to `3/4`
+- Fifths: `1/5` to `4/5`
+- Sixths: `1/6` to `5/6`
+- Twelfths: `1/12` to `11/12`
+
+```jsx
+// half width
+<Flex>
+  <Box width="1/2" />
+  <Box width="1/2" />
+</Flex>
+
+// thirds
+<Flex>
+  <Box width="1/3" />
+  <Box width="2/3" />
+</Flex>
+
+// fourths
+<Flex>
+  <Box width="1/4" />
+  <Box width="3/4" />
+</Flex>
+
+// fifths
+<Flex>
+  <Box width="1/5" />
+  <Box width="4/5" />
+</Flex>
+
+// sixths
+<Flex>
+  <Box width="1/6" />
+  <Box width="5/6" />
+</Flex>
+
+// twelfths
+<Flex>
+  <Box width="3/12" />
+  <Box width="9/12" />
+</Flex>
+```
+
+### Viewport width
+
+Use the modern viewport width values `dvw`, `svw`, `lvw`.
+
+> `dvw` maps to `100dvw`, `svw` maps to `100svw`, `lvw` maps to `100lvw`.
+
+```jsx
+<Box width="dvw" />
+<Box w="dvw" /> // shorthand
+```
+
+| Prop         | CSS Property | Token Category |
+| ------------ | ------------ | -------------- |
+| `w`, `width` | `width`      | `sizes`        |
+
+## Max width
+
+Use the `maxWidth` or `maxW` property to set the maximum width of an element.
+
+```jsx
+// hardcoded values
+<Box maxWidth="640px" />
+<Box maxW="4rem" /> // shorthand
+
+// token values
+<Box maxWidth="xl" />
+<Box maxW="2xl" /> // shorthand
+```
+
+| Prop               | CSS Property | Token Category |
+| ------------------ | ------------ | -------------- |
+| `maxW`, `maxWidth` | `max-width`  | `sizes`        |
+
+## Min width
+
+Use the `minWidth` or `minW` property to set the minimum width of an element.
+
+```jsx
+// hardcoded values
+<Box minWidth="64px" />
+<Box minW="4rem" /> // shorthand
+
+// token values
+<Box minWidth="8" />
+<Box minW="10" /> // shorthand
+```
+
+| Prop               | CSS Property | Token Category |
+| ------------------ | ------------ | -------------- |
+| `w`, `width`       | `width`      | `sizing`       |
+| `maxW`, `maxWidth` | `max-width`  | `sizing`       |
+| `minW`, `minWidth` | `min-width`  | `sizing`       |
+
+## Height
+
+Use the `height` or `h` property to set the height of an element.
+
+```jsx
+// hardcoded values
+<Box height="40px" />
+<Box h="0.4rem" /> // shorthand
+
+// token values
+<Box height="5" />
+<Box h="5" /> // shorthand
+```
+
+### Fractional height
+
+Use can set fractional heights using the `height` or `h` property.
+
+Values can be within the following ranges:
+
+- Thirds: `1/3` to `2/3`
+- Fourths: `1/4` to `3/4`
+- Fifths: `1/5` to `4/5`
+- Sixths: `1/6` to `5/6`
+
+```jsx
+<Box height="1/2" />
+<Box h="1/2" /> // shorthand
+```
+
+### Relative heights
+
+Use the modern relative height values `dvh`, `svh`, `lvh`.
+
+> `dvh` maps to `100dvh`, `svh` maps to `100svh`, `lvh` maps to `100lvh`.
+
+```jsx
+<Box height="dvh" />
+<Box h="dvh" /> // shorthand
+```
+
+## Max height
+
+Use the `maxHeight` or `maxH` property to set the maximum height of an element.
+
+```jsx
+// hardcoded values
+<Box maxHeight="40px" />
+<Box maxH="0.4rem" /> // shorthand
+
+// token values
+<Box maxHeight="8" />
+<Box maxH="10" /> // shorthand
+```
+
+## Min height
+
+Use the `minHeight` or `minH` property to set the minimum height of an element.
+
+```jsx
+// hardcoded values
+<Box minHeight="40px" />
+<Box minH="0.4rem" /> // shorthand
+
+// token values
+<Box minHeight="8" />
+<Box minH="10" /> // shorthand
+```
+
+| Prop                | CSS Property | Token Category |
+| ------------------- | ------------ | -------------- |
+| `h`, `height`       | `height`     | `sizes`        |
+| `maxH`, `maxHeight` | `max-height` | `sizes`        |
+| `minH`, `minHeight` | `min-height` | `sizes`        |
+
+# Spacing
+
+## Padding
+
+### All sides
+
+Use the `padding` prop to apply padding on all sides of an element
+
+```jsx
+// raw value
+<Box padding="40px" />
+<Box p="40px" /> // shorthand
+
+// token value
+<Box padding="4" />
+<Box p="4" /> // shorthand
+```
+
+| Prop          | CSS Property | Token Category |
+| ------------- | ------------ | -------------- |
+| `p`,`padding` | `padding`    | `spacing`      |
+
+### Specific side
+
+Use the `padding{Left,Right,Top,Bottom}` to apply padding on one side of an
+element
+
+```jsx
+<Box paddingLeft="3" />
+<Box pl="3" /> // shorthand
+
+<Box paddingTop="3" />
+<Box pt="3" /> // shorthand
+```
+
+Use the `padding{Start,End}` props to apply padding on the logical axis of an
+element based on the text direction.
+
+```jsx
+<div className={css({ paddingStart: '8' })} />
+<div className={css({ ps: '8' })} /> // shorthand
+
+<div className={css({ paddingEnd: '8' })} />
+<div className={css({ pe: '8' })} /> // shorthand
+```
+
+| Prop                  | CSS Property           | Token Category |
+| --------------------- | ---------------------- | -------------- |
+| `pl`, `paddingLeft`   | `padding-left`         | `spacing`      |
+| `pr`, `paddingRight`  | `padding-right`        | `spacing`      |
+| `pt`, `paddingTop`    | `padding-top`          | `spacing`      |
+| `pb`, `paddingBottom` | `padding-bottom`       | `spacing`      |
+| `ps`, `paddingStart`  | `padding-inline-start` | `spacing`      |
+| `pe`, `paddingEnd`    | `padding-inline-end`   | `spacing`      |
+
+### Horizontal and Vertical padding
+
+Use the `padding{X,Y}` props to apply padding on the horizontal and vertical
+axis of an element
+
+```jsx
+<Box paddingX="8" />
+<Box px="8" /> // shorthand
+
+<Box paddingY="8" />
+<Box py="8" /> // shorthand
+```
+
+| Prop                  | CSS Property           | Token Category |
+| --------------------- | ---------------------- | -------------- |
+| `p`,`padding`         | `padding`              | `spacing`      |
+| `pl`, `paddingLeft`   | `padding-left`         | `spacing`      |
+| `pr`, `paddingRight`  | `padding-right`        | `spacing`      |
+| `pt`, `paddingTop`    | `padding-top`          | `spacing`      |
+| `pb`, `paddingBottom` | `padding-bottom`       | `spacing`      |
+| `px`, `paddingX`      | `padding-inline`       | `spacing`      |
+| `py`, `paddingY`      | `padding-block`        | `spacing`      |
+| `ps`, `paddingStart`  | `padding-inline-start` | `spacing`      |
+| `pe`, `paddingEnd`    | `padding-inline-end`   | `spacing`      |
+
+## Margin
+
+### All sides
+
+Use the `margin` prop to apply margin on all sides of an element
+
+```jsx
+<Box margin="5" />
+<Box m="5" /> // shorthand
+```
+
+| Prop         | CSS Property | Token Category |
+| ------------ | ------------ | -------------- |
+| `m`,`margin` | `margin`     | `spacing`      |
+
+### Specific side
+
+Use the `margin{Left,Right,Top,Bottom}` to apply margin on one side of an
+element
+
+```jsx
+<Box marginLeft="3" />
+<Box ml="3" /> // shorthand
+
+<Box marginTop="3" />
+<Box mt="3" /> // shorthand
+```
+
+Use the `margin{Start,End}` properties to apply margin on the logical axis of an
+element based on the text direction.
+
+```jsx
+<Box marginStart="8" />
+<Box ms="8" /> // shorthand
+
+<Box marginEnd="8" />
+<Box me="8" /> // shorthand
+```
+
+| Prop                 | CSS Property          | Token Category |
+| -------------------- | --------------------- | -------------- |
+| `ml`, `marginLeft`   | `margin-left`         | `spacing`      |
+| `mr`, `marginRight`  | `margin-right`        | `spacing`      |
+| `mt`, `marginTop`    | `margin-top`          | `spacing`      |
+| `mb`, `marginBottom` | `margin-bottom`       | `spacing`      |
+| `ms`, `marginStart`  | `margin-inline-start` | `spacing`      |
+| `me`, `marginEnd`    | `margin-inline-end`   | `spacing`      |
+
+### Horizontal and Vertical margin
+
+Use the `margin{X,Y}` properties to apply margin on the horizontal and vertical
+axis of an element
+
+```jsx
+<Box marginX="8" />
+<Box mx="8" /> // shorthand
+
+<Box marginY="8" />
+<Box my="8" /> // shorthand
+```
+
+| Prop            | CSS Property    | Token Category |
+| --------------- | --------------- | -------------- |
+| `mx`, `marginX` | `margin-inline` | `spacing`      |
+| `my`, `marginY` | `margin-blolck` | `spacing`      |
+
+## Spacing Between
+
+Use the `space{X,Y}` props to apply spacing between elements. This approach uses
+the owl selector `> * + *` to apply the spacing between the elements using
+`margin*` properties.
+
+:::info
+
+It's recommended to use the `space` prop over the `gap` prop for spacing when
+you need negative spacing.
+
+:::
+
+```jsx
+<Box display="flex" spaceX="8">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+
+<Box display="flex" spaceY="8">
+  <Box>Item 1</Box>
+  <Box>Item 2</Box>
+  <Box>Item 3</Box>
+</Box>
+```
+
+| Prop     | CSS Property          | Token Category |
+| -------- | --------------------- | -------------- |
+| `spaceX` | `margin-inline-start` | `spacing`      |
+| `spaceY` | `margin-block-start`  | `spacing`      |
+
+# SVG
+
+## Fill
+
+Use the `fill` prop to set the fill color of an SVG element.
+
+```jsx
+<chakra.svg fill="blue.500">
+  <path d="..." />
+</chakra.svg>
+```
+
+| Prop   | CSS Property | Token Category |
+| ------ | ------------ | -------------- |
+| `fill` | `fill`       | `colors`       |
+
+## Stroke
+
+Use the `stroke` prop to set the stroke color of an SVG element.
+
+```jsx
+<chakra.svg stroke="blue.500">
+  <path d="..." />
+</chakra.svg>
+```
+
+| Prop     | CSS Property | Token Category |
+| -------- | ------------ | -------------- |
+| `stroke` | `stroke`     | `colors`       |
+
+## Stroke Width
+
+Use the `strokeWidth` prop to set the stroke width of an SVG element.
+
+```jsx
+<chakra.svg strokeWidth="1px">
+  <path d="..." />
+</chakra.svg>
+```
+
+| Prop          | CSS Property   | Token Category |
+| ------------- | -------------- | -------------- |
+| `strokeWidth` | `stroke-width` | `borderWidths` |
+
+# Tables
+
+## Border Spacing
+
+Control the border-spacing property of a table. This property applies only when
+`border-collapse` is set to `separate`.
+
+```jsx
+<chakra.table borderSpacing="2" borderCollapse="separate">
+  <tbody>
+    <tr>
+      <td>Cell 1</td>
+      <td>Cell 2</td>
+    </tr>
+  </tbody>
+</chakra.table>
+```
+
+| Prop            | CSS Property     | Token Category |
+| --------------- | ---------------- | -------------- |
+| `borderSpacing` | `border-spacing` | `spacing`      |
+
+## Border Spacing X
+
+Use the `borderSpacingX` prop to set the horizontal border-spacing property of a
+table. This requires the `borderSpacing` prop to be set to `auto`.
+
+```jsx
+<chakra.table borderSpacing="auto" borderSpacingX="2" borderCollapse="separate">
+  <tbody>
+    <tr>
+      <td>Cell 1</td>
+      <td>Cell 2</td>
+    </tr>
+  </tbody>
+</chakra.table>
+```
+
+| Prop             | CSS Property     | Token Category |
+| ---------------- | ---------------- | -------------- |
+| `borderSpacingX` | `border-spacing` | `spacing`      |
+
+## Border Spacing Y
+
+Use the `borderSpacingY` prop to set the vertical border-spacing property of a
+table. This requires the `borderSpacing` prop to be set to `auto`.
+
+```jsx
+<chakra.table borderSpacing="auto" borderSpacingY="2" borderCollapse="separate">
+  <tbody>
+    <tr>
+      <td>Cell 1</td>
+      <td>Cell 2</td>
+    </tr>
+  </tbody>
+</chakra.table>
+```
+
+| Prop             | CSS Property     | Token Category |
+| ---------------- | ---------------- | -------------- |
+| `borderSpacingY` | `border-spacing` | `spacing`      |
+
+## Caption Side
+
+Use the `captionSide` prop to set the side of the caption of a table.
+
+```jsx
+<table>
+  <chakra.caption captionSide="bottom">This is a caption</chakra.caption>
+  <tbody>
+    <tr>
+      <td>Cell 1</td>
+      <td>Cell 2</td>
+    </tr>
+  </tbody>
+</table>
+```
+
+| Prop          | CSS Property   | Token Category |
+| ------------- | -------------- | -------------- |
+| `captionSide` | `caption-side` | -              |
+
+# Transforms
+
+## Scale
+
+Use the `scale` prop to control the scale of an element.
+
+```jsx
+<Box scale="1.2" />
+```
+
+When the `scale` prop is set to `auto`, the `scaleX` and `scaleY` props are used
+to control the scale of the element.
+
+| Prop    | CSS Property | Token Category |
+| ------- | ------------ | -------------- |
+| `scale` | `scale`      | -              |
+
+## Scale X
+
+Use the `scaleX` prop to control the scaleX property of an element. This
+requires the `scale` prop to be set to `auto`.
+
+```jsx
+<Box scale="auto" scaleX="1.3" />
+```
+
+| Prop     | CSS Property | Token Category |
+| -------- | ------------ | -------------- |
+| `scaleX` | `--scale-x`  | -              |
+
+## Scale Y
+
+Use the `scaleY` prop to control the scaleY property of an element. This
+requires the `scale` prop to be set to `auto`.
+
+```jsx
+<Box scale="auto" scaleY="0.4" />
+```
+
+| Prop     | CSS Property | Token Category |
+| -------- | ------------ | -------------- |
+| `scaleY` | `--scale-y`  | -              |
+
+## Rotate
+
+Use the `rotate` prop to control the rotate property of an element.
+
+```jsx
+<Box rotate="45deg" />
+```
+
+When the `rotate` prop is set to `auto`, the `rotateX` and `rotateY` props are
+used to control the rotate of the element.
+
+| Prop     | CSS Property | Token Category |
+| -------- | ------------ | -------------- |
+| `rotate` | `rotate`     | -              |
+
+## Rotate X
+
+Use the `rotateX` prop to control the rotateX property of an element.
+
+```jsx
+<Box rotateX="45deg" />
+```
+
+| Prop      | CSS Property | Token Category |
+| --------- | ------------ | -------------- |
+| `rotateX` | `--rotate-x` | -              |
+
+## Rotate Y
+
+Use the `rotateY` prop to control the rotateY property of an element.
+
+```jsx
+<Box rotateY="45deg" />
+```
+
+| Prop      | CSS Property | Token Category |
+| --------- | ------------ | -------------- |
+| `rotateY` | `--rotate-y` | -              |
+
+## Translate
+
+Use the `translate` prop to control the translate property of an element.
+
+```jsx
+<Box translate="40px" />
+<Box translate="50% -40%" />
+```
+
+When the `translate` prop is set to `auto`, the `translateX` and `translateY`
+props are used to control the translate of the element.
+
+| Prop        | CSS Property | Token Category |
+| ----------- | ------------ | -------------- |
+| `translate` | `translate`  | -              |
+
+## Translate X
+
+Use the `translateX` prop to control the translateX property of an element. This
+requires the `translate` prop to be set to `auto`.
+
+```jsx
+// hardcoded values
+<Box translate="auto" translateX="50%" />
+<Box translate="auto" translateX="20px" />
+
+// token values
+<Box translate="auto" translateX="4" />
+<Box translate="auto" translateX="-10" />
+```
+
+| Prop         | CSS Property    | Token Category |
+| ------------ | --------------- | -------------- |
+| `translateX` | `--translate-x` | `spacing`      |
+
+## Translate Y
+
+Use the `translateY` prop to control the translateY property of an element. This
+requires the `translate` prop to be set to `auto`.
+
+```jsx
+// hardcoded values
+<Box translate="auto" translateY="-40%" />
+<Box translate="auto" translateY="4rem" />
+
+// token values
+<Box translate="auto" translateY="4" />
+<Box translate="auto" translateY="-10" />
+```
+
+| Prop         | CSS Property    | Token Category |
+| ------------ | --------------- | -------------- |
+| `translateY` | `--translate-y` | `spacing`      |
+
+# Transitions
+
+## Transition
+
+Use the `transition` prop to control the transition of an element.
+
+```jsx
+// hardcoded value
+<Box bg="red.400" _hover={{ bg: "red.500" }} transition="background 0.2s ease-in-out">
+  Hover me
+</Box>
+
+// shortcut value
+<Box bg="red.400" _hover={{ bg: "red.500" }} transition="backgrounds">
+  Hover me
+</Box>
+```
+
+| Prop         | CSS Property | Token Category |
+| ------------ | ------------ | -------------- |
+| `transition` | `transition` | -              |
+
+## Transition Timing Function
+
+Use the `transitionTimingFunction` prop to control the timing function of a
+transition.
+
+```jsx
+<Box
+  bg="red.400"
+  _hover={{ bg: "red.500" }}
+  transition="backgrounds"
+  transitionTimingFunction="ease-in-out"
+>
+  Hover me
+</Box>
+```
+
+| Prop                       | CSS Property                 | Token Category |
+| -------------------------- | ---------------------------- | -------------- |
+| `transitionTimingFunction` | `transition-timing-function` | `easings`      |
+
+## Transition Duration
+
+Use the `transitionDuration` prop to control the duration of a transition.
+
+```jsx
+<Box
+  bg="red.400"
+  _hover={{ bg: "red.500" }}
+  transition="backgrounds"
+  transitionDuration="fast"
+>
+  Hover me
+</Box>
+```
+
+| Prop                 | CSS Property          | Token Category |
+| -------------------- | --------------------- | -------------- |
+| `transitionDuration` | `transition-duration` | `durations`    |
+
+## Transition Delay
+
+Use the `transitionDelay` prop to control the delay of a transition.
+
+```jsx
+<Box
+  bg="red.400"
+  _hover={{ bg: "red.500" }}
+  transition="backgrounds"
+  transitionDelay="fast"
+>
+  Hover me
+</Box>
+```
+
+| Prop              | CSS Property       | Token Category |
+| ----------------- | ------------------ | -------------- |
+| `transitionDelay` | `transition-delay` | `durations`    |
+
+## Animation
+
+Use the `animation` prop to control the animation of an element.
+
+```jsx
+<Box animation="bounce" />
+```
+
+| Prop        | CSS Property     | Token Category |
+| ----------- | ---------------- | -------------- |
+| `animation` | `animation-name	` | `animations`   |
+
+## Animation Name
+
+Use the `animationName` prop to control the name of an animation. Compose
+multiple animation names to create complex animations.
+
+:::info
+
+The value of the `animation` prop points to a global keyframe animation. Use the
+`theme.keyframes` object to define the animation.
+
+:::
+
+```jsx
+<Box animationName="bounce, fade-in" animationDuration="fast" />
+```
+
+| Prop            | CSS Property     | Token Category |
+| --------------- | ---------------- | -------------- |
+| `animationName` | `animation-name` | `animations`   |
+
+## Animation Timing Function
+
+Use the `animationTimingFunction` prop to control the timing function of an
+animation.
+
+```jsx
+<Box animation="bounce" animationTimingFunction="ease-in-out" />
+```
+
+| Prop                      | CSS Property                | Token Category |
+| ------------------------- | --------------------------- | -------------- |
+| `animationTimingFunction` | `animation-timing-function` | `easings`      |
+
+## Animation Duration
+
+Use the `animationDuration` prop to control the duration of an animation.
+
+```jsx
+<Box animation="bounce" animationDuration="fast" />
+```
+
+| Prop                | CSS Property         | Token Category |
+| ------------------- | -------------------- | -------------- |
+| `animationDuration` | `animation-duration` | `durations`    |
+
+## Animation Delay
+
+Use the `animationDelay` prop to control the delay of an animation.
+
+```jsx
+<Box animation="bounce" animationDelay="fast" />
+```
+
+| Prop             | CSS Property      | Token Category |
+| ---------------- | ----------------- | -------------- |
+| `animationDelay` | `animation-delay` | `durations`    |
+
+# Typography
+
+## Font Family
+
+Use the `fontFamily` prop to set the font family of a text element.
+
+```jsx
+<Text fontFamily="mono">Hello World</Text>
+```
+
+| Prop         | CSS Property  | Token Category |
+| ------------ | ------------- | -------------- |
+| `fontFamily` | `font-family` | `fonts`        |
+
+## Font Size
+
+Use the `fontSize` prop to set the font size of a text element.
+
+```jsx
+// hardcoded values
+<Text fontSize="12px">Hello World</Text>
+<Text fontSize="10rem">Hello World</Text>
+
+// token values
+<Text fontSize="xs">Hello World</Text>
+<Text fontSize="4xl">Hello World</Text>
+<Text fontSize="5xl">Hello World</Text>
+```
+
+| Prop       | CSS Property | Token Category |
+| ---------- | ------------ | -------------- |
+| `fontSize` | `font-size`  | `fonts`        |
+
+## Text Styles
+
+Use the `textStyle` prop to apply both a font size, line height, and letter
+spacing composition at once.
+
+```jsx
+<Text textStyle="xs">Hello World</Text>
+<Text textStyle="sm">Hello World</Text>
+<Text textStyle="md">Hello World</Text>
+<Text textStyle="lg">Hello World</Text>
+<Text textStyle="xl">Hello World</Text>
+<Text textStyle="2xl">Hello World</Text>
+<Text textStyle="3xl">Hello World</Text>
+<Text textStyle="4xl">Hello World</Text>
+<Text textStyle="5xl">Hello World</Text>
+```
+
+| Prop        | Config             |
+| ----------- | ------------------ |
+| `textStyle` | `theme.textStyles` |
+
+## Font Style
+
+Use the `fontStyle` prop to set the font style of a text element.
+
+```jsx
+<Text fontStyle="italic">Hello World</Text>
+```
+
+| Prop        | CSS Property | Token Category |
+| ----------- | ------------ | -------------- |
+| `fontStyle` | `font-style` | none           |
+
+## Font Weight
+
+Use the `fontWeight` prop to set the font weight of a text element.
+
+```jsx
+// hardcoded values
+<Text fontWeight="600">Hello World</Text>
+
+// token values
+<Text fontWeight="semibold">Hello World</Text>
+```
+
+| Prop         | CSS Property  | Token Category |
+| ------------ | ------------- | -------------- |
+| `fontWeight` | `font-weight` | `fontWeights`  |
+
+## Font Variant Numeric
+
+Use the `fontVariantNumeric` prop to set the font variant numeric of a text
+element.
+
+```jsx
+<Text fontVariantNumeric="lining-nums">Hello World</Text>
+```
+
+| Prop                 | CSS Property           | Token Category |
+| -------------------- | ---------------------- | -------------- |
+| `fontVariantNumeric` | `font-variant-numeric` | none           |
+
+## Letter Spacing
+
+Use the `letterSpacing` prop to set the letter spacing of a text element.
+
+```jsx
+// hardcoded values
+<Text letterSpacing="0.1rem">Hello World</Text>
+
+// token values
+<Text letterSpacing="tight">Hello World</Text>
+<Text letterSpacing="wide">Hello World</Text>
+<Text letterSpacing="wider">Hello World</Text>
+<Text letterSpacing="widest">Hello World</Text>
+```
+
+| Prop            | CSS Property     | Token Category   |
+| --------------- | ---------------- | ---------------- |
+| `letterSpacing` | `letter-spacing` | `letterSpacings` |
+
+## Truncation
+
+Use the `truncate` prop to truncate text.
+
+```jsx
+<Text truncate>Lorem ipsum dolor sit amet...</Text>
+```
+
+| Prop       | CSS Property    | Token Category |
+| ---------- | --------------- | -------------- |
+| `truncate` | `text-overflow` | none           |
+
+## Line Clamp
+
+Use the `lineClamp` prop to truncate multi-line text. Set `lineClamp` to `none`
+to disable truncation.
+
+```jsx
+<Text lineClamp="2">Lorem ipsum dolor sit amet...</Text>
+
+// revert truncation
+<Text lineClamp="none">Lorem ipsum dolor sit amet...</Text>
+```
+
+| Prop        | CSS Property        | Token Category |
+| ----------- | ------------------- | -------------- |
+| `lineClamp` | `webkit-line-clamp` | none           |
+
+## Line Height
+
+Use the `lineHeight` prop to set the line height of a text element.
+
+```jsx
+// hardcoded values
+<Text lineHeight="1.5">Hello World</Text>
+
+// token values
+<Text lineHeight="tall">Hello World</Text>
+```
+
+| Prop         | CSS Property  | Token Category |
+| ------------ | ------------- | -------------- |
+| `lineHeight` | `line-height` | `lineHeights`  |
+
+## Text Align
+
+Use the `textAlign` prop to set the text alignment of a text element.
+
+```jsx
+<Text textAlign="left">Hello World</Text>
+<Text textAlign="center">Hello World</Text>
+<Text textAlign="right">Hello World</Text>
+<Text textAlign="justify">Hello World</Text>
+```
+
+| Prop        | CSS Property | Token Category |
+| ----------- | ------------ | -------------- |
+| `textAlign` | `text-align` | none           |
+
+## Text Color
+
+Use the `color` prop to set the color of a text element.
+
+```jsx
+<Text color="red">Hello World</Text>
+```
+
+| Prop    | CSS Property | Token Category |
+| ------- | ------------ | -------------- |
+| `color` | `color`      | `colors`       |
+
+## Text Decoration
+
+Use the `textDecoration` or `textDecor` prop to set the text decoration of a
+text element.
+
+```jsx
+<Text textDecoration="underline">Hello World</Text>
+```
+
+| Prop                          | CSS Property      | Token Category |
+| ----------------------------- | ----------------- | -------------- |
+| `textDecor`, `textDecoration` | `text-decoration` | none           |
+
+## Text Decoration Color
+
+Use the `textDecorationColor` prop to set the text decoration color of a text
+element.
+
+```jsx
+<Text textDecoration="underline" textDecorationColor="red">
+  Hello World
+</Text>
+```
+
+| Prop                  | CSS Property            | Token Category |
+| --------------------- | ----------------------- | -------------- |
+| `textDecorationColor` | `text-decoration-color` | `colors`       |
+
+## Text Decoration Style
+
+Use the `textDecorationStyle` prop to set the text decoration style of a text
+element.
+
+```jsx
+<Text textDecoration="underline" textDecorationStyle="dashed">
+  Hello World
+</Text>
+```
+
+| Prop                  | CSS Property            | Token Category |
+| --------------------- | ----------------------- | -------------- |
+| `textDecorationStyle` | `text-decoration-style` | none           |
+
+## Text Decoration Thickness
+
+Use the `textDecorationThickness` prop to set the text decoration thickness of a
+text element.
+
+```jsx
+<Text textDecoration="underline" textDecorationThickness="1px">
+  Hello World
+</Text>
+```
+
+| Prop                      | CSS Property                | Token Category |
+| ------------------------- | --------------------------- | -------------- |
+| `textDecorationThickness` | `text-decoration-thickness` | none           |
+
+## Text Underline Offset
+
+Use the `textUnderlineOffset` prop to set the text underline offset of a text
+element.
+
+```jsx
+<Text textDecoration="underline" textUnderlineOffset="1px">
+  Hello World
+</Text>
+```
+
+| Prop                  | CSS Property            | Token Category |
+| --------------------- | ----------------------- | -------------- |
+| `textUnderlineOffset` | `text-underline-offset` | none           |
+
+## Text Transform
+
+Use the `textTransform` prop to set the text transform of a text element.
+
+```jsx
+<Text textTransform="uppercase">Hello World</Text>
+```
+
+| Prop            | CSS Property     | Token Category |
+| --------------- | ---------------- | -------------- |
+| `textTransform` | `text-transform` | none           |
+
+## Text Overflow
+
+Use the `textOverflow` prop to set the text overflow of a text element.
+
+```jsx
+<Text textOverflow="ellipsis">Hello World</Text>
+```
+
+| Prop           | CSS Property    | Token Category |
+| -------------- | --------------- | -------------- |
+| `textOverflow` | `text-overflow` | none           |
+
+## Text Shadow
+
+Use the `textShadow` prop to set the text shadow of a text element.
+
+```jsx
+<Text textShadow="0 0 1px red">Hello World</Text>
+```
+
+| Prop         | CSS Property  | Token Category |
+| ------------ | ------------- | -------------- |
+| `textShadow` | `text-shadow` | `shadows`      |
+
+## Text Indent
+
+Use the `textIndent` prop to set the text indent of a text element.
+
+```jsx
+// hardcoded values
+<Text textIndent="1rem">Hello World</Text>
+
+// token values
+<Text textIndent="3">Hello World</Text>
+```
+
+| Prop         | CSS Property  | Token Category |
+| ------------ | ------------- | -------------- |
+| `textIndent` | `text-indent` | `spacing`      |
+
+## Vertical Align
+
+Use the `verticalAlign` prop to set the vertical alignment of a text element.
+
+```jsx
+<Text verticalAlign="top">Hello World</Text>
+```
+
+| Prop            | CSS Property     | Token Category |
+| --------------- | ---------------- | -------------- |
+| `verticalAlign` | `vertical-align` | none           |
+
+## White Space
+
+Use the `whiteSpace` prop to set the white space of a text element.
+
+```jsx
+<Text whiteSpace="nowrap">Hello World</Text>
+```
+
+| Prop         | CSS Property  | Token Category |
+| ------------ | ------------- | -------------- |
+| `whiteSpace` | `white-space` | none           |
+
+## Word Break
+
+Use the `wordBreak` prop to set whether line breaks appear wherever the text
+would otherwise overflow its content box.
+
+```jsx
+<Text wordBreak="break-all">Hello World</Text>
+```
+
+| Prop        | CSS Property | Token Category |
+| ----------- | ------------ | -------------- |
+| `wordBreak` | `word-break` | none           |
+
+## Hyphens
+
+Use the `hyphens` prop to set whether hyphens are used in the text.
+
+```jsx
+<Text hyphens="auto">Hello World</Text>
+```
+
+| Prop      | CSS Property | Token Category |
+| --------- | ------------ | -------------- |
+| `hyphens` | `hyphens`    | none           |
+

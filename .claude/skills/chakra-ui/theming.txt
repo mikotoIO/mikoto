@@ -1,0 +1,3347 @@
+<SYSTEM>Documentation for theming Chakra UI v3.</SYSTEM>
+
+# Animations
+
+## Keyframes
+
+Chakra UI supports the following keyframes out of the box.
+
+| Animation Key            | Example                                       |
+| ------------------------ | --------------------------------------------- |
+| `spin`                   | <Box animation="spin 1s" />                   |
+| `pulse`                  | <Box animation="pulse 1s" />                  |
+| `ping`                   | <Box animation="ping 1s" />                   |
+| `bounce`                 | <Box animation="bounce 1s" />                 |
+| `bg-position`            | <Box animation="bg-position 1s" />            |
+| `position`               | <Box animation="position 1s" />               |
+| `circular-progress`      | <Box animation="circular-progress 1s" />      |
+| `expand-height`          | <Box animation="expand-height 1s" />          |
+| `collapse-height`        | <Box animation="collapse-height 1s" />        |
+| `expand-width`           | <Box animation="expand-width 1s" />           |
+| `collapse-width`         | <Box animation="collapse-width 1s" />         |
+| `fade-in`                | <Box animation="fade-in 1s" />                |
+| `fade-out`               | <Box animation="fade-out 1s" />               |
+| `slide-from-left-full`   | <Box animation="slide-from-left-full 1s" />   |
+| `slide-from-right-full`  | <Box animation="slide-from-right-full 1s" />  |
+| `slide-from-top-full`    | <Box animation="slide-from-top-full 1s" />    |
+| `slide-from-bottom-full` | <Box animation="slide-from-bottom-full 1s" /> |
+| `slide-to-left-full`     | <Box animation="slide-to-left-full 1s" />     |
+| `slide-to-right-full`    | <Box animation="slide-to-right-full 1s" />    |
+| `slide-to-top-full`      | <Box animation="slide-to-top-full 1s" />      |
+| `slide-to-bottom-full`   | <Box animation="slide-to-bottom-full 1s" />   |
+| `slide-from-top`         | <Box animation="slide-from-top 1s" />         |
+| `slide-from-bottom`      | <Box animation="slide-from-bottom 1s" />      |
+| `slide-from-left`        | <Box animation="slide-from-left 1s" />        |
+| `slide-from-right`       | <Box animation="slide-from-right 1s" />       |
+| `slide-to-top`           | <Box animation="slide-to-top 1s" />           |
+| `slide-to-bottom`        | <Box animation="slide-to-bottom 1s" />        |
+| `slide-to-left`          | <Box animation="slide-to-left 1s" />          |
+| `slide-to-right`         | <Box animation="slide-to-right 1s" />         |
+| `scale-in`               | <Box animation="scale-in 1s" />               |
+| `scale-out`              | <Box animation="scale-out 1s" />              |
+| `marqueeX`               | <Box animation="marqueeX 1s" />               |
+| `marqueeY`               | <Box animation="marqueeY 1s" />               |
+
+## Durations
+
+Chakra UI supports the following durations out of the box.
+
+| Duration Token | Value   | Example                                                   |
+| -------------- | ------- | --------------------------------------------------------- |
+| `slowest`      | `500ms` | <Box animationName="spin" animationDuration="slowest" />  |
+| `slower`       | `400ms` | <Box animationName="spin" animationDuration="slower" />   |
+| `slow`         | `300ms` | <Box animationName="spin" animationDuration="slow" />     |
+| `moderate`     | `200ms` | <Box animationName="spin" animationDuration="moderate" /> |
+| `fast`         | `150ms` | <Box animationName="spin" animationDuration="fast" />     |
+| `faster`       | `100ms` | <Box animationName="spin" animationDuration="faster" />   |
+| `fastest`      | `50ms`  | <Box animationName="spin" animationDuration="fastest" />  |
+
+# Aspect Ratios
+
+## Tokens
+
+Chakra UI supports the following aspect ratios out of the box.
+
+| Aspect Ratio Token | Value       | Example                         |
+| ------------------ | ----------- | ------------------------------- |
+| `square`           | `1 / 1`     | <Box aspectRatio="square" />    |
+| `landscape`        | `4 / 3`     | <Box aspectRatio="landscape" /> |
+| `portrait`         | `3 / 4`     | <Box aspectRatio="portrait" />  |
+| `wide`             | `16 / 9`    | <Box aspectRatio="wide" />      |
+| `ultrawide`        | `18 / 5`    | <Box aspectRatio="ultrawide" /> |
+| `golden`           | `1.618 / 1` | <Box aspectRatio="golden" />    |
+
+# Breakpoints
+
+Chakra UI supports the following breakpoints out of the box.
+
+| Breakpoint Token | Example                           |
+| ---------------- | --------------------------------- |
+| `sm`             | <Box sm={{ display: "none" }} />  |
+| `md`             | <Box md={{ display: "none" }} />  |
+| `lg`             | <Box lg={{ display: "none" }} />  |
+| `xl`             | <Box xl={{ display: "none" }} />  |
+| `2xl`            | <Box 2xl={{ display: "none" }} /> |
+
+# Colors
+
+## Semantic Tokens
+
+Chakra UI supports these semantic tokens out of the box.
+
+:::info
+
+We recommend using semantic tokens as they automatically adapt to color modes
+and provide consistent styling across your application.
+
+:::
+
+### Background
+
+| Background Token | Example                    |
+| ---------------- | -------------------------- |
+| `bg`             | <Box bg="bg" />            |
+| `bg.subtle`      | <Box bg="bg.subtle" />     |
+| `bg.muted`       | <Box bg="bg.muted" />      |
+| `bg.emphasized`  | <Box bg="bg.emphasized" /> |
+| `bg.inverted`    | <Box bg="bg.inverted" />   |
+| `bg.panel`       | <Box bg="bg.panel" />      |
+| `bg.error`       | <Box bg="bg.error" />      |
+| `bg.warning`     | <Box bg="bg.warning" />    |
+| `bg.success`     | <Box bg="bg.success" />    |
+| `bg.info`        | <Box bg="bg.info" />       |
+
+### Text
+
+| Text Token    | Example                     |
+| ------------- | --------------------------- |
+| `fg`          | <Box color="fg" />          |
+| `fg.muted`    | <Box color="fg.muted" />    |
+| `fg.subtle`   | <Box color="fg.subtle" />   |
+| `fg.inverted` | <Box color="fg.inverted" /> |
+| `fg.error`    | <Box color="fg.error" />    |
+| `fg.warning`  | <Box color="fg.warning" />  |
+| `fg.success`  | <Box color="fg.success" />  |
+| `fg.info`     | <Box color="fg.info" />     |
+
+### Border
+
+| Border Token        | Example                                 |
+| ------------------- | --------------------------------------- |
+| `border`            | <Box borderColor="border" />            |
+| `border.muted`      | <Box borderColor="border.muted" />      |
+| `border.subtle`     | <Box borderColor="border.subtle" />     |
+| `border.emphasized` | <Box borderColor="border.emphasized" /> |
+| `border.inverted`   | <Box borderColor="border.inverted" />   |
+| `border.error`      | <Box borderColor="border.error" />      |
+| `border.warning`    | <Box borderColor="border.warning" />    |
+| `border.success`    | <Box borderColor="border.success" />    |
+| `border.info`       | <Box borderColor="border.info" />       |
+
+## Tokens
+
+Chakra UI supports the following color tokens out of the box.
+
+| Color Token  | Value     | Example                                    |
+| ------------ | --------- | ------------------------------------------ |
+| `gray.50`    | `#fafafa` | <Box color="gray.50" bg="gray.50" />       |
+| `gray.100`   | `#f4f4f5` | <Box color="gray.100" bg="gray.100" />     |
+| `gray.200`   | `#e4e4e7` | <Box color="gray.200" bg="gray.200" />     |
+| `gray.300`   | `#d4d4d8` | <Box color="gray.300" bg="gray.300" />     |
+| `gray.400`   | `#a1a1aa` | <Box color="gray.400" bg="gray.400" />     |
+| `gray.500`   | `#71717a` | <Box color="gray.500" bg="gray.500" />     |
+| `gray.600`   | `#52525b` | <Box color="gray.600" bg="gray.600" />     |
+| `gray.700`   | `#3f3f46` | <Box color="gray.700" bg="gray.700" />     |
+| `gray.800`   | `#27272a` | <Box color="gray.800" bg="gray.800" />     |
+| `gray.900`   | `#18181b` | <Box color="gray.900" bg="gray.900" />     |
+| `gray.950`   | `#111111` | <Box color="gray.950" bg="gray.950" />     |
+| `red.50`     | `#fef2f2` | <Box color="red.50" bg="red.50" />         |
+| `red.100`    | `#fee2e2` | <Box color="red.100" bg="red.100" />       |
+| `red.200`    | `#fecaca` | <Box color="red.200" bg="red.200" />       |
+| `red.300`    | `#fca5a5` | <Box color="red.300" bg="red.300" />       |
+| `red.400`    | `#f87171` | <Box color="red.400" bg="red.400" />       |
+| `red.500`    | `#ef4444` | <Box color="red.500" bg="red.500" />       |
+| `red.600`    | `#dc2626` | <Box color="red.600" bg="red.600" />       |
+| `red.700`    | `#991919` | <Box color="red.700" bg="red.700" />       |
+| `red.800`    | `#511111` | <Box color="red.800" bg="red.800" />       |
+| `red.900`    | `#300c0c` | <Box color="red.900" bg="red.900" />       |
+| `red.950`    | `#1f0808` | <Box color="red.950" bg="red.950" />       |
+| `orange.50`  | `#fff7ed` | <Box color="orange.50" bg="orange.50" />   |
+| `orange.100` | `#ffedd5` | <Box color="orange.100" bg="orange.100" /> |
+| `orange.200` | `#fed7aa` | <Box color="orange.200" bg="orange.200" /> |
+| `orange.300` | `#fdba74` | <Box color="orange.300" bg="orange.300" /> |
+| `orange.400` | `#fb923c` | <Box color="orange.400" bg="orange.400" /> |
+| `orange.500` | `#f97316` | <Box color="orange.500" bg="orange.500" /> |
+| `orange.600` | `#ea580c` | <Box color="orange.600" bg="orange.600" /> |
+| `orange.700` | `#92310a` | <Box color="orange.700" bg="orange.700" /> |
+| `orange.800` | `#6c2710` | <Box color="orange.800" bg="orange.800" /> |
+| `orange.900` | `#3b1106` | <Box color="orange.900" bg="orange.900" /> |
+| `orange.950` | `#220a04` | <Box color="orange.950" bg="orange.950" /> |
+| `yellow.50`  | `#fefce8` | <Box color="yellow.50" bg="yellow.50" />   |
+| `yellow.100` | `#fef9c3` | <Box color="yellow.100" bg="yellow.100" /> |
+| `yellow.200` | `#fef08a` | <Box color="yellow.200" bg="yellow.200" /> |
+| `yellow.300` | `#fde047` | <Box color="yellow.300" bg="yellow.300" /> |
+| `yellow.400` | `#facc15` | <Box color="yellow.400" bg="yellow.400" /> |
+| `yellow.500` | `#eab308` | <Box color="yellow.500" bg="yellow.500" /> |
+| `yellow.600` | `#ca8a04` | <Box color="yellow.600" bg="yellow.600" /> |
+| `yellow.700` | `#845209` | <Box color="yellow.700" bg="yellow.700" /> |
+| `yellow.800` | `#713f12` | <Box color="yellow.800" bg="yellow.800" /> |
+| `yellow.900` | `#422006` | <Box color="yellow.900" bg="yellow.900" /> |
+| `yellow.950` | `#281304` | <Box color="yellow.950" bg="yellow.950" /> |
+| `green.50`   | `#f0fdf4` | <Box color="green.50" bg="green.50" />     |
+| `green.100`  | `#dcfce7` | <Box color="green.100" bg="green.100" />   |
+| `green.200`  | `#bbf7d0` | <Box color="green.200" bg="green.200" />   |
+| `green.300`  | `#86efac` | <Box color="green.300" bg="green.300" />   |
+| `green.400`  | `#4ade80` | <Box color="green.400" bg="green.400" />   |
+| `green.500`  | `#22c55e` | <Box color="green.500" bg="green.500" />   |
+| `green.600`  | `#16a34a` | <Box color="green.600" bg="green.600" />   |
+| `green.700`  | `#116932` | <Box color="green.700" bg="green.700" />   |
+| `green.800`  | `#124a28` | <Box color="green.800" bg="green.800" />   |
+| `green.900`  | `#042713` | <Box color="green.900" bg="green.900" />   |
+| `green.950`  | `#03190c` | <Box color="green.950" bg="green.950" />   |
+| `teal.50`    | `#f0fdfa` | <Box color="teal.50" bg="teal.50" />       |
+| `teal.100`   | `#ccfbf1` | <Box color="teal.100" bg="teal.100" />     |
+| `teal.200`   | `#99f6e4` | <Box color="teal.200" bg="teal.200" />     |
+| `teal.300`   | `#5eead4` | <Box color="teal.300" bg="teal.300" />     |
+| `teal.400`   | `#2dd4bf` | <Box color="teal.400" bg="teal.400" />     |
+| `teal.500`   | `#14b8a6` | <Box color="teal.500" bg="teal.500" />     |
+| `teal.600`   | `#0d9488` | <Box color="teal.600" bg="teal.600" />     |
+| `teal.700`   | `#0c5d56` | <Box color="teal.700" bg="teal.700" />     |
+| `teal.800`   | `#114240` | <Box color="teal.800" bg="teal.800" />     |
+| `teal.900`   | `#032726` | <Box color="teal.900" bg="teal.900" />     |
+| `teal.950`   | `#021716` | <Box color="teal.950" bg="teal.950" />     |
+| `blue.50`    | `#eff6ff` | <Box color="blue.50" bg="blue.50" />       |
+| `blue.100`   | `#dbeafe` | <Box color="blue.100" bg="blue.100" />     |
+| `blue.200`   | `#bfdbfe` | <Box color="blue.200" bg="blue.200" />     |
+| `blue.300`   | `#a3cfff` | <Box color="blue.300" bg="blue.300" />     |
+| `blue.400`   | `#60a5fa` | <Box color="blue.400" bg="blue.400" />     |
+| `blue.500`   | `#3b82f6` | <Box color="blue.500" bg="blue.500" />     |
+| `blue.600`   | `#2563eb` | <Box color="blue.600" bg="blue.600" />     |
+| `blue.700`   | `#173da6` | <Box color="blue.700" bg="blue.700" />     |
+| `blue.800`   | `#1a3478` | <Box color="blue.800" bg="blue.800" />     |
+| `blue.900`   | `#14204a` | <Box color="blue.900" bg="blue.900" />     |
+| `blue.950`   | `#0c142e` | <Box color="blue.950" bg="blue.950" />     |
+| `cyan.50`    | `#ecfeff` | <Box color="cyan.50" bg="cyan.50" />       |
+| `cyan.100`   | `#cffafe` | <Box color="cyan.100" bg="cyan.100" />     |
+| `cyan.200`   | `#a5f3fc` | <Box color="cyan.200" bg="cyan.200" />     |
+| `cyan.300`   | `#67e8f9` | <Box color="cyan.300" bg="cyan.300" />     |
+| `cyan.400`   | `#22d3ee` | <Box color="cyan.400" bg="cyan.400" />     |
+| `cyan.500`   | `#06b6d4` | <Box color="cyan.500" bg="cyan.500" />     |
+| `cyan.600`   | `#0891b2` | <Box color="cyan.600" bg="cyan.600" />     |
+| `cyan.700`   | `#0c5c72` | <Box color="cyan.700" bg="cyan.700" />     |
+| `cyan.800`   | `#134152` | <Box color="cyan.800" bg="cyan.800" />     |
+| `cyan.900`   | `#072a38` | <Box color="cyan.900" bg="cyan.900" />     |
+| `cyan.950`   | `#051b24` | <Box color="cyan.950" bg="cyan.950" />     |
+| `purple.50`  | `#faf5ff` | <Box color="purple.50" bg="purple.50" />   |
+| `purple.100` | `#f3e8ff` | <Box color="purple.100" bg="purple.100" /> |
+| `purple.200` | `#e9d5ff` | <Box color="purple.200" bg="purple.200" /> |
+| `purple.300` | `#d8b4fe` | <Box color="purple.300" bg="purple.300" /> |
+| `purple.400` | `#c084fc` | <Box color="purple.400" bg="purple.400" /> |
+| `purple.500` | `#a855f7` | <Box color="purple.500" bg="purple.500" /> |
+| `purple.600` | `#9333ea` | <Box color="purple.600" bg="purple.600" /> |
+| `purple.700` | `#641ba3` | <Box color="purple.700" bg="purple.700" /> |
+| `purple.800` | `#4a1772` | <Box color="purple.800" bg="purple.800" /> |
+| `purple.900` | `#2f0553` | <Box color="purple.900" bg="purple.900" /> |
+| `purple.950` | `#1a032e` | <Box color="purple.950" bg="purple.950" /> |
+| `pink.50`    | `#fdf2f8` | <Box color="pink.50" bg="pink.50" />       |
+| `pink.100`   | `#fce7f3` | <Box color="pink.100" bg="pink.100" />     |
+| `pink.200`   | `#fbcfe8` | <Box color="pink.200" bg="pink.200" />     |
+| `pink.300`   | `#f9a8d4` | <Box color="pink.300" bg="pink.300" />     |
+| `pink.400`   | `#f472b6` | <Box color="pink.400" bg="pink.400" />     |
+| `pink.500`   | `#ec4899` | <Box color="pink.500" bg="pink.500" />     |
+| `pink.600`   | `#db2777` | <Box color="pink.600" bg="pink.600" />     |
+| `pink.700`   | `#a41752` | <Box color="pink.700" bg="pink.700" />     |
+| `pink.800`   | `#6d0e34` | <Box color="pink.800" bg="pink.800" />     |
+| `pink.900`   | `#45061f` | <Box color="pink.900" bg="pink.900" />     |
+| `pink.950`   | `#2c0514` | <Box color="pink.950" bg="pink.950" />     |
+
+# Cursors
+
+## Overview
+
+Chakra UI uses the `cursor` token to define the cursor for interactive elements.
+
+| Cursor Token | Value         | Example                   |
+| ------------ | ------------- | ------------------------- |
+| `button`     | `pointer`     | <Box cursor="button" />   |
+| `checkbox`   | `default`     | <Box cursor="checkbox" /> |
+| `disabled`   | `not-allowed` | <Box cursor="disabled" /> |
+| `menuitem`   | `default`     | <Box cursor="menuitem" /> |
+| `option`     | `default`     | <Box cursor="option" />   |
+| `radio`      | `default`     | <Box cursor="radio" />    |
+| `slider`     | `default`     | <Box cursor="slider" />   |
+| `switch`     | `pointer`     | <Box cursor="switch" />   |
+
+## Cursor Tokens
+
+To customize the cursor for interactive elements in Chakra, set the desired
+`cursor` token values.
+
+Here's a list of the available cursor tokens:
+
+- **button**: Cursors for buttons
+- **checkbox**: Cursors for checkbox and checkbox card
+- **disabled**: Cursors for disabled elements
+- **menuitem**: Cursors for menu item and menu option items.
+- **option**: Cursors for select, combobox and listbox options
+- **radio**: Cursors for radio and radio cards
+- **slider**: Cursors for slider track and thumb interaction
+- **switch**: Cursors for switch
+
+## Customizing Cursors
+
+Here's an example of how to change the cursor for a button, you can set the
+`button` token to `default`.
+
+```tsx
+import { createSystem, defaultConfig } from "@chakra-ui/react"
+
+export const system = createSystem(defaultConfig, {
+  theme: {
+    tokens: {
+      cursor: {
+        button: { value: "pointer" },
+      },
+    },
+  },
+})
+```
+
+# Layer Styles
+
+Chakra UI provides these text styles out of the box.
+
+<br />
+
+<ExamplePreview name="tokens/layer-style" />
+
+# Overview
+
+## Architecture
+
+The Chakra UI theming system is built around the API of
+[Panda CSS](https://panda-css.com/).
+
+Here's a quick overview of how the system is structured to provide a performant
+and extensible styling system:
+
+- Define the styling system configuration using the `defineConfig` function
+- Create the styling engine using the `createSystem` function
+- Pass the styling engine to the `ChakraProvider` component
+
+```tsx
+import {
+  ChakraProvider,
+  createSystem,
+  defaultConfig,
+  defineConfig,
+} from "@chakra-ui/react"
+
+const config = defineConfig({
+  theme: {
+    tokens: {
+      colors: {},
+    },
+  },
+})
+
+const system = createSystem(defaultConfig, config)
+
+export default function App() {
+  return (
+    <ChakraProvider value={system}>
+      <Box>Hello World</Box>
+    </ChakraProvider>
+  )
+}
+```
+
+## Config
+
+The Chakra UI system is configured using the `defineConfig` function. This
+function accepts a configuration object that allows you to customize the styling
+system's behavior.
+
+After a config is defined, it is passed to the `createSystem` function to create
+the styling engine.
+
+### cssVarsRoot
+
+`cssVarsRoot` is the root element where the token CSS variables will be applied.
+
+```tsx title="theme.ts"
+const config = defineConfig({
+  cssVarsRoot: ":where(:root, :host)",
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+### cssVarsPrefix
+
+`cssVarsPrefix` is the prefix used for the token CSS variables.
+
+```tsx title="theme.ts"
+const config = defineConfig({
+  cssVarsPrefix: "ck",
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+### globalCss
+
+`globalCss` is used to apply global styles to the system.
+
+```tsx title="theme.ts"
+const config = defineConfig({
+  globalCss: {
+    "html, body": {
+      margin: 0,
+      padding: 0,
+    },
+  },
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+### preflight
+
+`preflight` is used to apply css reset styles to the system.
+
+```tsx title="theme.ts"
+const config = defineConfig({
+  preflight: false,
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+Alternatively, you can use the `preflight` config property to apply css reset
+styles to the system. This is useful if you want to apply css reset styles to a
+specific element.
+
+```tsx title="theme.ts"
+const config = defineConfig({
+  preflight: {
+    scope: ".chakra-reset",
+  },
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+### theme
+
+Use the `theme` config property to define the system theme. This property
+accepts the following properties:
+
+- `breakpoints`: for defining breakpoints
+- `keyframes`: for defining css keyframes animations
+- `tokens`: for defining tokens
+- `semanticTokens`: for defining semantic tokens
+- `textStyles`: for defining typography styles
+- `layerStyles`: for defining layer styles
+- `animationStyles`: for defining animation styles
+- `recipes`: for defining component recipes
+- `slotRecipes`: for defining component slot recipes
+
+```tsx title="theme.ts"
+const config = defineConfig({
+  theme: {
+    breakpoints: {
+      sm: "320px",
+      md: "768px",
+      lg: "960px",
+      xl: "1200px",
+    },
+    tokens: {
+      colors: {
+        red: "#EE0F0F",
+      },
+    },
+    semanticTokens: {
+      colors: {
+        danger: { value: "{colors.red}" },
+      },
+    },
+    keyframes: {
+      spin: {
+        from: { transform: "rotate(0deg)" },
+        to: { transform: "rotate(360deg)" },
+      },
+    },
+  },
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+### conditions
+
+Use the `conditions` config property to define custom selectors and media query
+conditions for use in the system.
+
+```tsx title="theme.ts"
+const config = defineConfig({
+  conditions: {
+    cqSm: "@container(min-width: 320px)",
+    child: "& > *",
+  },
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+Sample usage:
+
+```tsx
+<Box mt="40px" _cqSm={{ mt: "0px" }}>
+  <Text>Hello World</Text>
+</Box>
+```
+
+### strictTokens
+
+Use the `strictTokens` config property to enforce the usage of only design
+tokens. This will throw a TS error if you try to use a token that is not defined
+in the theme.
+
+```tsx title="theme.ts"
+const config = defineConfig({
+  strictTokens: true,
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+```tsx
+// ❌ This will throw a TS error
+<Box color="#4f343e">Hello World</Box>
+
+// ✅ This will work
+<Box color="red.400">Hello World</Box>
+```
+
+If you use TypeScript with `strictTokens`, run the
+[CLI `typegen` command](/docs/get-started/cli#chakra-typegen) in local
+development and CI/CD so token typings stay in sync with your theme.
+
+## TypeScript
+
+When you configure the system (colors, space, fonts, etc.), the CLI generates
+type definitions to keep your theme in sync with `@chakra-ui/react`. This
+provides a type-safe API and autocompletion.
+
+See the [CLI docs](/docs/get-started/cli#chakra-typegen) for how to run typegen
+in postinstall, CI, and monorepos.
+
+```bash
+npx @chakra-ui/cli typegen ./theme.ts
+```
+
+## System
+
+After a config is defined, it is passed to the `createSystem` function to create
+the styling engine. The returned `system` is framework-agnostic JavaScript
+styling engine that can be used to style components.
+
+```tsx
+const system = createSystem(defaultConfig, config)
+```
+
+The system includes the following properties:
+
+### token
+
+The token function is used to get a raw token value, or css variable.
+
+```tsx
+const system = createSystem(defaultConfig, config)
+
+// raw token
+system.token("colors.red.200")
+// => "#EE0F0F"
+
+// token with fallback
+system.token("colors.pink.240", "#000")
+// => "#000"
+```
+
+Use the `token.var` function to get the css variable:
+
+```tsx
+// css variable
+system.token.var("colors.red.200")
+// => "var(--chakra-colors-red-200)"
+
+// token with fallback
+system.token.var("colors.pink.240", "colors.red.200")
+// => "var(--chakra-colors-red-200)"
+```
+
+It's important to note that `semanticTokens` always return a css variable,
+regardless of whether you use `token` or `token.var`. This is because semantic
+tokens change based on the theme.
+
+```tsx
+// semantic token
+system.token("colors.danger")
+// => "var(--chakra-colors-danger)"
+
+system.token.var("colors.danger")
+// => "var(--chakra-colors-danger)"
+```
+
+### tokens
+
+```tsx
+const system = createSystem(defaultConfig, config)
+
+system.tokens.getVar("colors.red.200")
+// => "var(--chakra-colors-red-200)"
+
+system.tokens.expandReferenceInValue("3px solid {colors.red.200}")
+// => "3px solid var(--chakra-colors-red-200)"
+
+system.tokens.cssVarMap
+// => Map { "colors": Map { "red.200": "var(--chakra-colors-red-200)" } }
+
+system.tokens.flatMap
+// => Map { "colors.red.200": "var(--chakra-colors-red-200)" }
+```
+
+### css
+
+The `css` function is used to convert chakra style objects to CSS style object
+that can be passed to `emotion` or `styled-components` or any other styling
+library.
+
+```tsx
+const system = createSystem(defaultConfig, config)
+
+system.css({
+  color: "red.200",
+  bg: "blue.200",
+})
+
+// => { color: "var(--chakra-colors-red-200)", background: "var(--chakra-colors-blue-200)" }
+```
+
+### cva
+
+The `cva` function is used to create component recipes. It returns a function
+that, when called with a set of props, returns a style object.
+
+```tsx
+const system = createSystem(defaultConfig, config)
+
+const button = system.cva({
+  base: {
+    color: "white",
+    bg: "blue.500",
+  },
+  variants: {
+    outline: {
+      color: "blue.500",
+      bg: "transparent",
+      border: "1px solid",
+    },
+  },
+})
+
+button({ variant: "outline" })
+// => { color: "blue.500", bg: "transparent", border: "1px solid" }
+```
+
+### sva
+
+The `sva` function is used to create component slot recipes. It returns a
+function that, when called with a set of props, returns a style object for each
+slot.
+
+```tsx
+const system = createSystem(defaultConfig, config)
+
+const alert = system.sva({
+  slots: ["title", "description", "icon"],
+  base: {
+    title: { color: "white" },
+    description: { color: "white" },
+    icon: { color: "white" },
+  },
+  variants: {
+    status: {
+      info: {
+        title: { color: "blue.500" },
+        description: { color: "blue.500" },
+        icon: { color: "blue.500" },
+      },
+    },
+  },
+})
+
+alert({ status: "info" })
+// => { title: { color: "blue.500" }, description: { color: "blue.500" }, icon: { color: "blue.500" } }
+```
+
+### isValidProperty
+
+The `isValidProperty` function is used to check if a property is valid.
+
+```tsx
+const system = createSystem(defaultConfig, config)
+
+system.isValidProperty("color")
+// => true
+
+system.isValidProperty("background")
+// => true
+
+system.isValidProperty("invalid")
+// => false
+```
+
+### splitCssProps
+
+The `splitCssProps` function is used to split the props into css props and
+non-css props.
+
+```tsx
+const system = createSystem(defaultConfig, config)
+
+system.splitCssProps({
+  color: "red.200",
+  bg: "blue.200",
+  "aria-label": "Hello World",
+})
+// => [{ color: "red.200", bg: "blue.200" }, { "aria-label": "Hello World" }]
+```
+
+### breakpoints
+
+The `breakpoints` property is used to query breakpoints.
+
+```tsx
+const system = createSystem(defaultConfig, config)
+
+system.breakpoints.up("sm")
+// => "@media (min-width: 320px)"
+
+system.breakpoints.down("sm")
+// => "@media (max-width: 319px)"
+
+system.breakpoints.only("md")
+// => "@media (min-width: 320px) and (max-width: 768px)"
+
+system.breakpoints.keys()
+// => ["sm", "md", "lg", "xl"]
+```
+
+## Tokens
+
+To learn more about tokens, please refer to the [tokens](/docs/theming/tokens)
+section.
+
+## Recipes
+
+To learn more about recipes, please refer to the
+[recipes](/docs/theming/recipes) section.
+
+# Radii
+
+## Tokens
+
+Chakra UI supports the following border radius tokens out of the box.
+
+| Border Radius Token | Value        | Example                     |
+| ------------------- | ------------ | --------------------------- |
+| `none`              | `0`          | <Box borderRadius="none" /> |
+| `2xs`               | `0.0625rem`  | <Box borderRadius="2xs" />  |
+| `xs`                | `0.125rem`   | <Box borderRadius="xs" />   |
+| `sm`                | `0.25rem`    | <Box borderRadius="sm" />   |
+| `md`                | `0.375rem`   | <Box borderRadius="md" />   |
+| `lg`                | `0.5rem`     | <Box borderRadius="lg" />   |
+| `xl`                | `0.75rem`    | <Box borderRadius="xl" />   |
+| `2xl`               | `1rem`       | <Box borderRadius="2xl" />  |
+| `3xl`               | `1.5rem`     | <Box borderRadius="3xl" />  |
+| `4xl`               | `2rem`       | <Box borderRadius="4xl" />  |
+| `full`              | `9999px`     | <Box borderRadius="full" /> |
+| `l1`                | `{radii.xs}` | <Box borderRadius="l1" />   |
+| `l2`                | `{radii.sm}` | <Box borderRadius="l2" />   |
+| `l3`                | `{radii.md}` | <Box borderRadius="l3" />   |
+
+Here’s the conversion of the given rem values to px, assuming the root font size is 16px (which is the default in most browsers)
+
+| Size  | rem Value  | px Equivalent  |
+|-------|-----------|---------------|
+| none  | 0         | 0px           |
+| 2xs   | 0.0625rem | 1px           |
+| xs    | 0.125rem  | 2px           |
+| sm    | 0.25rem   | 4px           |
+| md    | 0.375rem  | 6px           |
+| lg    | 0.5rem    | 8px           |
+| xl    | 0.75rem   | 12px          |
+| 2xl   | 1rem      | 16px          |
+| 3xl   | 1.5rem    | 24px          |
+| 4xl   | 2rem      | 32px          |
+| full  | 9999px    | 9999px        |
+
+# Recipes
+
+## Overview
+
+Chakra provides a way to write CSS-in-JS with better performance, developer
+experience, and composability. One of its key features is the ability to create
+multi-variant styles with a type-safe runtime API.
+
+A recipe consists of these properties:
+
+- `className`: The className to attach to the component
+- `base`: The base styles for the component
+- `variants`: The different style variations for the component
+- `compoundVariants`: The different combinations of variants for the component
+- `defaultVariants`: The default variant values for the component
+
+## Defining the recipe
+
+Use the `defineRecipe` identity function to create a recipe.
+
+```tsx title="button.recipe.ts"
+import { defineRecipe } from "@chakra-ui/react"
+
+export const buttonRecipe = defineRecipe({
+  base: {
+    display: "flex",
+  },
+  variants: {
+    variant: {
+      solid: { bg: "red.200", color: "white" },
+      outline: { borderWidth: "1px", borderColor: "red.200" },
+    },
+    size: {
+      sm: { padding: "4", fontSize: "12px" },
+      lg: { padding: "8", fontSize: "24px" },
+    },
+  },
+})
+```
+
+## Using the recipe
+
+There are two ways to use the recipe in a component:
+
+- Directly in the component with `useRecipe`
+- Creating a component (recommended) with the `chakra` factory
+
+:::info
+
+**RSC Tip:** Adding the `"use client"` directive is required since it relies on
+react hooks like `useContext` and `useInsertionEffect` under the hood.
+
+:::
+
+### Directly in component
+
+Use the `useRecipe` hook to get the recipe for a component. Then, call the
+recipe with its variant props to get the styles.
+
+```tsx title="button.tsx" {9}
+"use client"
+
+import { chakra, useRecipe } from "@chakra-ui/react"
+import { buttonRecipe } from "./button.recipe"
+
+export const Button = (props) => {
+  const { variant, size, ...restProps } = props
+
+  const recipe = useRecipe({ recipe: buttonRecipe })
+  const styles = recipe({ variant, size })
+
+  return <chakra.button css={styles} {...restProps} />
+}
+```
+
+#### splitVariantProps
+
+Notice how the `variant` and `size` props were destructured from the props to be
+passed to the recipe. A smarter approach would be to automatically split the
+recipe props from the component props.
+
+To do that, use the `recipe.splitVariantProps` function to split the recipe
+props from the component props.
+
+```tsx title="button.tsx" {8}
+"use client"
+
+import { chakra, useRecipe } from "@chakra-ui/react"
+import { buttonRecipe } from "./button.recipe"
+
+export const Button = (props) => {
+  const recipe = useRecipe({ recipe: buttonRecipe })
+  const [recipeProps, restProps] = recipe.splitVariantProps(props)
+  const styles = recipe(recipeProps)
+
+  // ...
+}
+```
+
+#### TypeScript
+
+To infer the recipe variant prop types, use the `RecipeVariantProps` type
+helper.
+
+```tsx title="button.tsx"
+import type { RecipeVariantProps } from "@chakra-ui/react"
+import { buttonRecipe } from "./button.recipe"
+
+type ButtonVariantProps = RecipeVariantProps<typeof buttonRecipe>
+
+export interface ButtonProps extends React.PropsWithChildren<ButtonVariantProps> {}
+```
+
+### Creating a component
+
+Use the `chakra` function to create a component from a recipe.
+
+> **Note:** The recipe can also be inlined into the `chakra` function.
+
+```tsx title="button.tsx"
+"use client"
+
+import { chakra } from "@chakra-ui/react"
+import { buttonRecipe } from "./button.recipe"
+
+export const Button = chakra("button", buttonRecipe)
+```
+
+Next, use the component and pass recipe properties to it.
+
+```tsx title="app.tsx"
+import { Button } from "./button"
+
+const App = () => {
+  return (
+    <Button variant="solid" size="lg">
+      Click Me
+    </Button>
+  )
+}
+```
+
+## Default Variants
+
+The `defaultVariants` property is used to set the default variant values for the
+recipe. This is useful when you want to apply a variant by default.
+
+```tsx title="button.tsx" {19-22}
+"use client"
+
+import { chakra } from "@chakra-ui/react"
+
+const Button = chakra("button", {
+  base: {
+    display: "flex",
+  },
+  variants: {
+    variant: {
+      solid: { bg: "red.200", color: "white" },
+      outline: { borderWidth: "1px", borderColor: "red.200" },
+    },
+    size: {
+      sm: { padding: "4", fontSize: "12px" },
+      lg: { padding: "8", fontSize: "24px" },
+    },
+  },
+  defaultVariants: {
+    variant: "solid",
+    size: "lg",
+  },
+})
+```
+
+## Compound Variants
+
+Use the `compoundVariants` property to define a set of variants that are applied
+based on a combination of other variants.
+
+```tsx title="button.tsx" /compoundVariants/
+"use client"
+
+import { chakra } from "@chakra-ui/react"
+
+const button = cva({
+  base: {
+    display: "flex",
+  },
+  variants: {
+    variant: {
+      solid: { bg: "red.200", color: "white" },
+      outline: { borderWidth: "1px", borderColor: "red.200" },
+    },
+    size: {
+      sm: { padding: "4", fontSize: "12px" },
+      lg: { padding: "8", fontSize: "24px" },
+    },
+  },
+  compoundVariants: [
+    {
+      size: "small",
+      variant: "outline",
+      css: {
+        borderWidth: "2px",
+      },
+    },
+  ],
+})
+```
+
+When you use the `size="small"` and `variant="outline"` variants together, the
+`compoundVariants` will apply the `css` property to the component.
+
+```tsx title="app.tsx"
+<Button size="small" variant="outline">
+  Click Me
+</Button>
+```
+
+### Caveat
+
+Due to the design constraints, using `compoundVariants` with responsive values
+doesn't work.
+
+This means a code like this will not work:
+
+```tsx
+<Button size={{ base: "sm", md: "lg" }} variant="outline">
+  Click Me
+</Button>
+```
+
+For this cases, we recommend rendering multiple versions of the component with
+different breakpoints, then hide/show as needed.
+
+## Using Semantic Tokens
+
+Semantic tokens from your theme are available in recipes. Reference them by
+name.
+
+```tsx title="button.recipe.ts"
+import { defineRecipe } from "@chakra-ui/react"
+
+export const buttonRecipe = defineRecipe({
+  base: {
+    bg: "bg.muted", // semantic token
+    color: "fg", // semantic token
+    borderRadius: "l2", // semantic radius
+  },
+  variants: {
+    variant: {
+      primary: {
+        bg: "colorPalette.solid", // virtual color
+        color: "colorPalette.contrast",
+      },
+    },
+  },
+})
+```
+
+Common tokens: `bg`, `fg`, `border`, `colorPalette.*`
+
+## Theme Usage
+
+To use the recipe in a reusable manner, move it to the system theme and add it
+to `theme.recipes` property.
+
+```tsx title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+import { buttonRecipe } from "./button.recipe"
+
+const config = defineConfig({
+  theme: {
+    recipes: {
+      button: buttonRecipe,
+    },
+  },
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+### TypeScript
+
+Use the CLI to generate types for the recipe, then import them in your
+component. See the [CLI docs](/docs/get-started/cli#chakra-typegen) for how to
+run `typegen` in postinstall, CI, and monorepos.
+
+```bash
+npx @chakra-ui/cli typegen ./theme.ts
+```
+
+Then, import the generated types in your component.
+
+```tsx title="button.tsx"
+import type { RecipeVariantProps } from "@chakra-ui/react"
+import { buttonRecipe } from "./button.recipe"
+
+type ButtonVariantProps = RecipeVariantProps<typeof buttonRecipe>
+
+export interface ButtonProps extends React.PropsWithChildren<ButtonVariantProps> {}
+```
+
+### Update code
+
+If you use the recipe directly in your component, update the `useRecipe` to use
+the `key` property to get the recipe from the theme.
+
+```diff title="button.tsx"
+const Button = () => {
+-  const recipe = useRecipe({ recipe: buttonRecipe })
++  const recipe = useRecipe({ key: "button" })
+  // ...
+}
+```
+
+# Semantic Tokens
+
+## Overview
+
+Semantic tokens are tokens that are designed to be used in a specific context. A
+semantic token consists of the following properties:
+
+- `value`: The value of the token or a reference to an existing token.
+- `description`: An optional description of what the token can be used for.
+
+## Defining Semantic Tokens
+
+In most cases, the value of a semantic token references to an existing token.
+
+> To reference a value in a semantic token, use the token reference `{}` syntax.
+
+```js title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const config = defineConfig({
+  theme: {
+    tokens: {
+      colors: {
+        red: { value: "#EE0F0F" },
+      },
+    },
+    semanticTokens: {
+      colors: {
+        danger: { value: "{colors.red}" },
+      },
+    },
+  },
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+## Using Semantic Tokens
+
+After defining semantic tokens, run the Chakra CLI to generate theme typings.
+See the [CLI docs](/docs/get-started/cli#chakra-typegen) for how to run typegen
+in postinstall, CI, and monorepos.
+
+```bash
+npx @chakra-ui/cli typegen ./src/theme.ts
+```
+
+This provides autocompletion for your tokens in the editor
+
+```tsx
+<Box color="danger">Hello World</Box>
+```
+
+## Conditional Token
+
+Semantic tokens can also be changed based on the conditions like light and dark
+modes.
+
+For example, if you want a color to change automatically based on light or dark
+mode.
+
+```js title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const config = defineConfig({
+  theme: {
+    semanticTokens: {
+      colors: {
+        danger: {
+          value: { base: "{colors.red}", _dark: "{colors.darkred}" },
+        },
+        success: {
+          value: { base: "{colors.green}", _dark: "{colors.darkgreen}" },
+        },
+      },
+    },
+  },
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+:::info
+
+The conditions used in semantic tokens must be an at-rule or parent selector
+[condition](/docs/styling/conditional-styles#reference).
+
+:::
+
+## Semantic Token Nesting
+
+Semantic tokens can be nested to create a hierarchy of tokens. This is useful
+when you want to group tokens together.
+
+:::info
+
+Use the `DEFAULT` key to define the default value of a nested token.
+
+:::
+
+```js title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const config = defineConfig({
+  theme: {
+    semanticTokens: {
+      colors: {
+        bg: {
+          DEFAULT: { value: "{colors.gray.100}" },
+          primary: { value: "{colors.teal.100}" },
+          secondary: { value: "{colors.gray.100}" },
+        },
+      },
+    },
+  },
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+This allows the use of the `bg` token in the following ways:
+
+```tsx
+<Box bg="bg">
+  <Box bg="bg.primary">Hello World</Box>
+  <Box bg="bg.secondary">Hello World</Box>
+</Box>
+```
+
+## Using in Recipes
+
+Semantic tokens are available in recipe definitions. Reference them by name.
+
+```tsx
+import { defineRecipe } from "@chakra-ui/react"
+
+const cardRecipe = defineRecipe({
+  base: {
+    bg: "bg.subtle", // semantic token
+    color: "fg", // semantic token
+    borderColor: "border",
+  },
+})
+```
+
+# Shadows
+
+## Semantic Tokens
+
+Chakra UI supports these semantic tokens out of the box.
+
+| Shadow Token | Example                |
+| ------------ | ---------------------- |
+| `xs`         | <Box shadow="xs" />    |
+| `sm`         | <Box shadow="sm" />    |
+| `md`         | <Box shadow="md" />    |
+| `lg`         | <Box shadow="lg" />    |
+| `xl`         | <Box shadow="xl" />    |
+| `2xl`        | <Box shadow="2xl" />   |
+| `inner`      | <Box shadow="inner" /> |
+| `inset`      | <Box shadow="inset" /> |
+
+Here’s an example of how to add new shadows.
+
+```javascript
+export const system = createSystem(defaultConfig, {
+    theme: {
+        semanticTokens: {
+            shadows: {
+                custom: {
+                    value: {
+                        _light: "0 32px 56px 0 rgba(0, 0, 0, 0.25)",
+                        _dark: "0 32px 56px 0 rgba(0, 0, 0, 0.25)",
+                    },
+                },
+            },
+        },
+    },
+});
+```
+
+# Sizes
+
+## Tokens
+
+Chakra UI supports the following size tokens out of the box.
+
+<SizesTokenDoc />
+
+# Slot Recipes
+
+## Overview
+
+Slot Recipes come in handy when you need to apply style variations to multiple
+parts of a component.
+
+A slot recipe consists of these properties:
+
+- `className`: The className prefix to attach to the component slot
+- `slots`: An array of component parts to style
+- `base`: The base styles per slot
+- `variants`: The different visual styles for each slot
+- `defaultVariants`: The default variant for the component
+- `compoundVariants`: The compound variant combination and style overrides for
+  each slot.
+
+## Defining the recipe
+
+Use the `defineSlotRecipe` identity function to create a slot recipe.
+
+```tsx title="checkbox.recipe.ts"
+import { defineSlotRecipe } from "@chakra-ui/react"
+
+export const checkboxSlotRecipe = defineSlotRecipe({
+  slots: ["root", "control", "label"],
+  base: {
+    root: { display: "flex", alignItems: "center", gap: "2" },
+    control: { borderWidth: "1px", borderRadius: "sm" },
+    label: { marginStart: "2" },
+  },
+  variants: {
+    size: {
+      sm: {
+        control: { width: "8", height: "8" },
+        label: { fontSize: "sm" },
+      },
+      md: {
+        control: { width: "10", height: "10" },
+        label: { fontSize: "md" },
+      },
+    },
+  },
+})
+```
+
+## Using the recipe
+
+There are two ways to use the recipe in a component:
+
+- Directly in the component with `useSlotRecipe`
+- As a compound component (recommended) with `createSlotRecipeContext`
+
+:::info
+
+Adding the `"use client"` directive is required to use the `useSlotRecipe` hook
+or `createSlotRecipeContext` function. This is because they rely on react hooks
+like `useContext` and `useInsertionEffect` under the hood.
+
+:::
+
+### Directly in component
+
+Use the `useSlotRecipe` hook to get the recipe for a component. Then, call the
+recipe with its variant props to get the styles.
+
+```tsx title="checkbox.tsx"
+"use client"
+
+import { chakra, useSlotRecipe } from "@chakra-ui/react"
+import { checkboxSlotRecipe } from "./checkbox.recipe"
+
+export const Checkbox = (props) => {
+  const { size, ...restProps } = props
+
+  const recipe = useSlotRecipe({ recipe: checkboxSlotRecipe })
+  const styles = recipe({ size })
+
+  return (
+    <chakra.label css={styles.root}>
+      <chakra.input type="checkbox" css={styles.control} {...restProps} />
+      <chakra.span css={styles.label}>Checkbox Label</chakra.span>
+    </chakra.label>
+  )
+}
+```
+
+#### splitVariantProps
+
+Notice how the `size` prop was destructured from the props to be passed to the
+recipe. A smarter approach would be to automatically split the recipe props from
+the component props.
+
+To do that, use the `recipe.splitVariantProps` function to split the recipe
+props from the component props.
+
+```tsx title="checkbox.tsx" {8}
+"use client"
+
+import { chakra, useSlotRecipe } from "@chakra-ui/react"
+import { checkboxSlotRecipe } from "./checkbox.recipe"
+
+export const Checkbox = (props) => {
+  const recipe = useSlotRecipe({ recipe: checkboxSlotRecipe })
+  const [recipeProps, restProps] = recipe.splitVariantProps(props)
+  const styles = recipe(recipeProps)
+
+  //...
+}
+```
+
+#### TypeScript
+
+To infer the recipe variant prop types, use the `RecipeVariantProps` type
+helper.
+
+```tsx title="checkbox.tsx"
+import type { RecipeVariantProps } from "@chakra-ui/react"
+import { checkboxSlotRecipe } from "./checkbox.recipe"
+
+type CheckboxVariantProps = RecipeVariantProps<typeof checkboxSlotRecipe>
+
+export interface CheckboxProps extends React.PropsWithChildren<CheckboxVariantProps> {}
+```
+
+### Create compound components
+
+Pass the recipe to the `createSlotRecipeContext` function to create a slot
+recipe context.
+
+Then, use the `withProvider` and `withContext` functions to create the compound
+components that share the same context.
+
+:::info
+
+You will need to manually type the generics for `withProvider` and
+`withContext`. This approach is designed to optimize TypeScript performance.
+Auto-inference, while convenient, would slow down TypeScript compilation due to
+the complexity of the types involved.
+
+:::
+
+```tsx title="checkbox.tsx"
+"use client"
+
+import { createSlotRecipeContext } from "@chakra-ui/react"
+import { checkboxSlotRecipe } from "./checkbox.recipe"
+
+const { withProvider, withContext } = createSlotRecipeContext({
+  recipe: checkboxSlotRecipe,
+})
+
+interface CheckboxRootProps extends HTMLChakraProps<
+  "label",
+  RecipeVariantProps<typeof checkboxSlotRecipe>
+> {}
+export const CheckboxRoot = withProvider<HTMLLabelElement, CheckboxRootProps>(
+  "label",
+  "root",
+)
+
+interface CheckboxControlProps extends HTMLChakraProps<"input"> {}
+export const CheckboxControl = withContext<
+  HTMLInputElement,
+  CheckboxControlProps
+>("input", "control")
+
+interface CheckboxLabelProps extends HTMLChakraProps<"span"> {}
+export const CheckboxLabel = withContext<HTMLSpanElement, CheckboxLabelProps>(
+  "span",
+  "label",
+)
+```
+
+Pass the variant props to the "root" component that to apply the styles.
+
+> **Note:** The root component is the one that used the `withProvider` function.
+
+```tsx title="app.tsx"
+const App = () => {
+  return (
+    <CheckboxRoot size="md">
+      <CheckboxControl />
+      <CheckboxLabel />
+    </CheckboxRoot>
+  )
+}
+```
+
+#### unstyled prop
+
+This approach supports the use of the `unstyled` prop to remove the styles
+applied by the recipe.
+
+```tsx title="checkbox.tsx" /unstyled/
+<CheckboxRoot unstyled>
+  <CheckboxControl />
+  <CheckboxLabel />
+</CheckboxRoot>
+```
+
+#### TypeScript
+
+To infer the recipe variant prop types, use the `RecipeVariantProps` type
+helper.
+
+```ts
+import type { RecipeVariantProps, UnstyledProp } from "@chakra-ui/react"
+import { checkboxSlotRecipe } from "./checkbox.recipe"
+
+type CheckboxVariantProps = RecipeVariantProps<typeof checkboxSlotRecipe>
+
+export interface CheckboxProps
+  extends React.PropsWithChildren<CheckboxVariantProps>, UnstyledProp {}
+```
+
+## Compound Variants
+
+Use the `compoundVariants` property to define a set of variants that are applied
+based on a combination of other variants.
+
+```tsx title="checkbox.recipe.ts" /compoundVariants/
+import { defineSlotRecipe } from "@chakra-ui/react"
+
+export const checkboxRecipe = defineSlotRecipe({
+  slots: ["root", "control", "label"],
+  base: {},
+  variants: {
+    size: {
+      sm: {},
+      md: {},
+    },
+    visual: {
+      contained: {},
+      outline: {},
+    },
+  },
+  compoundVariants: [
+    {
+      size: "sm",
+      visual: "outline",
+      css: {
+        control: { borderWidth: "1px" },
+        label: { color: "green.500" },
+      },
+    },
+  ],
+})
+```
+
+## Targeting a slot
+
+In some cases, targeting a slot by className might be needed.
+
+- Set the `className` property in the config
+- The naming convention is `${className}__${slot}`
+
+```tsx title="checkbox.recipe.ts" /& .checkbox__label/
+import { defineSlotRecipe } from "@chakra-ui/react"
+
+export const checkboxRecipe = defineSlotRecipe({
+  className: "checkbox",
+  slots: ["root", "control", "label"],
+  base: {
+    root: {
+      bg: "blue.500",
+      _hover: {
+        "& .checkbox__label": { color: "white" },
+      },
+    },
+  },
+})
+```
+
+## Theme Usage
+
+To use the recipe in a reusable manner, move it to the system theme and add it
+to `theme.slotRecipes` property.
+
+> No need to add the `"use client"` directive when using the recipe in the
+> theme.
+
+```tsx title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+import { checkboxSlotRecipe } from "./checkbox.recipe"
+
+const config = defineConfig({
+  theme: {
+    slotRecipes: {
+      checkbox: checkboxSlotRecipe,
+    },
+  },
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+### TypeScript
+
+Use the CLI to generate types for the recipe, then import them in your
+component. See the [CLI docs](/docs/get-started/cli#chakra-typegen) for how to
+run `typegen` in postinstall, CI, and monorepos.
+
+```bash
+npx @chakra-ui/cli typegen ./theme.ts
+```
+
+Then, import the generated types in your component.
+
+```tsx title="checkbox.tsx"
+import type { SlotRecipeProps, UnstyledProp } from "@chakra-ui/react"
+
+export interface CheckboxProps
+  extends SlotRecipeProps<"checkbox">, UnstyledProp {}
+```
+
+### Update code
+
+If you use the recipe directly in your component, update the `useRecipe` to use
+the `key` property to get the recipe from the theme.
+
+```diff title="checkbox.tsx"
+const Checkbox = () => {
+-  const recipe = useRecipe({ recipe: checkboxRecipe })
++  const recipe = useRecipe({ key: "checkbox" })
+  // ...
+}
+```
+
+If you create a compound component, update the `createSlotRecipeContext` to use
+the `key` property.
+
+```diff title="checkbox.tsx"
+const { withProvider, withContext } = createSlotRecipeContext({
+-  recipe: checkboxRecipe,
++  key: "checkbox",
+})
+```
+
+# Spacing
+
+## Tokens
+
+Chakra UI supports the following spacing tokens out of the box.
+
+| Spacing Token | Value      | Example               |
+| ------------- | ---------- | --------------------- |
+| `0.5`         | `0.125rem` | <Box spacing="0.5" /> |
+| `1`           | `0.25rem`  | <Box spacing="1" />   |
+| `1.5`         | `0.375rem` | <Box spacing="1.5" /> |
+| `2`           | `0.5rem`   | <Box spacing="2" />   |
+| `2.5`         | `0.625rem` | <Box spacing="2.5" /> |
+| `3`           | `0.75rem`  | <Box spacing="3" />   |
+| `3.5`         | `0.875rem` | <Box spacing="3.5" /> |
+| `4`           | `1rem`     | <Box spacing="4" />   |
+| `4.5`         | `1.125rem` | <Box spacing="4.5" /> |
+| `5`           | `1.25rem`  | <Box spacing="5" />   |
+| `6`           | `1.5rem`   | <Box spacing="6" />   |
+| `7`           | `1.75rem`  | <Box spacing="7" />   |
+| `8`           | `2rem`     | <Box spacing="8" />   |
+| `9`           | `2.25rem`  | <Box spacing="9" />   |
+| `10`          | `2.5rem`   | <Box spacing="10" />  |
+| `11`          | `2.75rem`  | <Box spacing="11" />  |
+| `12`          | `3rem`     | <Box spacing="12" />  |
+| `14`          | `3.5rem`   | <Box spacing="14" />  |
+| `16`          | `4rem`     | <Box spacing="16" />  |
+| `20`          | `5rem`     | <Box spacing="20" />  |
+| `24`          | `6rem`     | <Box spacing="24" />  |
+| `28`          | `7rem`     | <Box spacing="28" />  |
+| `32`          | `8rem`     | <Box spacing="32" />  |
+| `36`          | `9rem`     | <Box spacing="36" />  |
+| `40`          | `10rem`    | <Box spacing="40" />  |
+| `44`          | `11rem`    | <Box spacing="44" />  |
+| `48`          | `12rem`    | <Box spacing="48" />  |
+| `52`          | `13rem`    | <Box spacing="52" />  |
+| `56`          | `14rem`    | <Box spacing="56" />  |
+| `60`          | `15rem`    | <Box spacing="60" />  |
+| `64`          | `16rem`    | <Box spacing="64" />  |
+| `72`          | `18rem`    | <Box spacing="72" />  |
+| `80`          | `20rem`    | <Box spacing="80" />  |
+| `96`          | `24rem`    | <Box spacing="96" />  |
+
+# Text Styles
+
+Chakra UI provides these text styles out of the box.
+
+<br />
+
+<ExamplePreview name="tokens/text-styles" />
+
+# Tokens
+
+## Overview
+
+Design tokens are the platform-agnostic way to manage design decisions in your
+application or website. It is a collection of attributes that describe any
+fundamental/atomic visual style. Each attribute is a key-value pair.
+
+> Design tokens in Chakra are largely influenced by the
+> [W3C Token Format](https://tr.designtokens.org/format/).
+
+A design token consists of the following properties:
+
+- `value`: The value of the token. This can be any valid CSS value.
+- `description`: An optional description of what the token can be used for.
+
+## Defining Tokens
+
+Tokens are defined in the under the `theme` key in your system config.
+
+```ts title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const config = defineConfig({
+  theme: {
+    tokens: {
+      colors: {
+        primary: { value: "#0FEE0F" },
+        secondary: { value: "#EE0F0F" },
+      },
+      fonts: {
+        body: { value: "system-ui, sans-serif" },
+      },
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, config)
+```
+
+:::warning
+
+> Token values need to be nested in an object with a `value` key. This is to
+> allow for additional properties like `description` and more in the future.
+
+:::
+
+## Using Tokens
+
+After defining tokens, run the Chakra CLI to generate theme typings. This
+provides autocompletion for your tokens in the editor. See the
+[CLI docs](/docs/get-started/cli#chakra-typegen) for how to run typegen in
+postinstall, CI, and monorepos.
+
+```bash
+npx @chakra-ui/cli typegen ./src/theme.ts
+```
+
+Here's an example of using the tokens in a component.
+
+```tsx
+<Box color="primary" fontFamily="body">
+  Hello World
+</Box>
+```
+
+### Token reference syntax
+
+Chakra UI enables you to reference design tokens within composite values for CSS
+properties like `border`, `padding`, and `box-shadow`.  
+This is achieved through the token reference syntax: `{path.to.token}`.
+
+:::note
+
+It is important to use the complete token path; for example, instead of using
+`red.300`, you must reference it as `colors.red.300`.
+
+:::
+
+Here’s an example where token reference syntax is applied to both the border and
+p (padding) props:
+
+```tsx
+<Box
+  border="1px solid {colors.red.300}"
+  p="{spacing.4} {spacing.6} {spacing.8} {spacing.10}"
+  boxShadow="{spacing.4} {spacing.2} {spacing.2} {colors.red.300}"
+/>
+```
+
+## Token Nesting
+
+Tokens can be nested to create a hierarchy of tokens. This is useful when you
+want to group related tokens together.
+
+:::info
+
+Use the `DEFAULT` key to define the default value of a nested token.
+
+:::
+
+```ts title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const config = defineConfig({
+  theme: {
+    tokens: {
+      colors: {
+        red: {
+          DEFAULT: { value: "#EE0F0F" },
+          100: { value: "#EE0F0F" },
+        },
+      },
+    },
+  },
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+```tsx
+<Box
+  // 👇🏻 This will use the `DEFAULT` value
+  bg="red"
+  color="red.100"
+>
+  Hello World
+</Box>
+```
+
+## Token Types
+
+### Colors
+
+Colors have meaning and support the purpose of the content, communicating things
+like hierarchy of information, and states. It is mostly defined as a string
+value or reference to other tokens.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  colors: {
+    red: {
+      100: { value: "#fff1f0" },
+    },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+### Gradients
+
+Gradient tokens represent a smooth transition between two or more colors. Its
+value can be defined as a string or a composite value.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  gradients: {
+    // string value
+    simple: { value: "linear-gradient(to right, red, blue)" },
+
+    // composite value
+    primary: {
+      value: { type: "linear", placement: "to right", stops: ["red", "blue"] },
+    },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+### Sizes
+
+Size tokens represent the width and height of an element. Its value is defined
+as a string.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  sizes: {
+    sm: { value: "12px" },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+> Size tokens are typically used in `width`, `height`, `minWidth`, `maxWidth`,
+> `minHeight`, `maxHeight` properties.
+
+### Spacing
+
+Spacing tokens represent the margin and padding of an element. Its value is
+defined as a string.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  spacing: {
+    gutter: { value: "12px" },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+> Spacing tokens are typically used in `margin`, `padding`, `gap`, and
+> `{top,right,bottom,left}` properties.
+
+### Fonts
+
+Font tokens represent the font family of a text element. Its value is defined as
+a string or an array of strings.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  fonts: {
+    body: { value: "Inter, sans-serif" },
+    heading: { value: ["Roboto Mono", "sans-serif"] },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+> Font tokens are typically used in `font-family` property.
+
+### Font Sizes
+
+Font size tokens represent the size of a text element. Its value is defined as a
+string.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  fontSizes: {
+    sm: { value: "12px" },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+> Font size tokens are typically used in `font-size` property.
+
+### Font Weights
+
+Font weight tokens represent the weight of a text element. Its value is defined
+as a string.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  fontWeights: {
+    bold: { value: "700" },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+> Font weight tokens are typically used in `font-weight` property.
+
+### Letter Spacings
+
+Letter spacing tokens represent the spacing between letters in a text element.
+Its value is defined as a string.
+
+```tsx
+const tokens = defineTokens({
+  letterSpacings: {
+    wide: { value: "0.1em" },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+> Letter spacing tokens are typically used in `letter-spacing` property.
+
+### Line Heights
+
+Line height tokens represent the height of a line of text. Its value is defined
+as a string.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  lineHeights: {
+    normal: { value: "1.5" },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+> Line height tokens are typically used in `line-height` property.
+
+### Radii
+
+Radii tokens represent the radius of a border. Its value is defined as a string.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  radii: {
+    sm: { value: "4px" },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+> Radii tokens are typically used in `border-radius` property.
+
+### Borders
+
+A border is a line surrounding a UI element. You can define them as string
+values or as a composite value
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  borders: {
+    // string value
+    subtle: { value: "1px solid red" },
+    // string value with reference to color token
+    danger: { value: "1px solid {colors.red.400}" },
+    // composite value
+    accent: { value: { width: "1px", color: "red", style: "solid" } },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+> Border tokens are typically used in `border`, `border-top`, `border-right`,
+> `border-bottom`, `border-left`, `outline` properties.
+
+### Border Widths
+
+Border width tokens represent the width of a border. Its value is defined as a
+string.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  borderWidths: {
+    thin: { value: "1px" },
+    thick: { value: "2px" },
+    medium: { value: "1.5px" },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+### Shadows
+
+Shadow tokens represent the shadow of an element. Its value is defined as single
+or multiple values containing a string or a composite value.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  shadows: {
+    // string value
+    subtle: { value: "0 1px 2px 0 rgba(0, 0, 0, 0.05)" },
+    // composite value
+    accent: {
+      value: {
+        offsetX: 0,
+        offsetY: 4,
+        blur: 4,
+        spread: 0,
+        color: "rgba(0, 0, 0, 0.1)",
+      },
+    },
+    // multiple string values
+    realistic: {
+      value: [
+        "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+        "0 1px 4px 0 rgba(0, 0, 0, 0.1)",
+      ],
+    },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+> Shadow tokens are typically used in `box-shadow` property.
+
+### Easings
+
+Easing tokens represent the easing function of an animation or transition. Its
+value is defined as a string or an array of values representing the cubic
+bezier.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  easings: {
+    // string value
+    easeIn: { value: "cubic-bezier(0.4, 0, 0.2, 1)" },
+    // array value
+    easeOut: { value: [0.4, 0, 0.2, 1] },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+> Ease tokens are typically used in `transition-timing-function` property.
+
+### Opacity
+
+Opacity tokens help you set the opacity of an element.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  opacity: {
+    50: { value: 0.5 },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+> Opacity tokens are typically used in `opacity` property.
+
+### Z-Index
+
+This token type represents the depth of an element's position on the z-axis.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  zIndex: {
+    modal: { value: 1000 },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+> Z-index tokens are typically used in `z-index` property.
+
+### Assets
+
+Asset tokens represent a url or svg string. Its value is defined as a string or
+a composite value.
+
+```ts
+type CompositeAsset = { type: "url" | "svg"; value: string }
+type Asset = string | CompositeAsset
+```
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  tokens: {
+    assets: {
+      logo: {
+        value: { type: "url", value: "/static/logo.png" },
+      },
+      checkmark: {
+        value: { type: "svg", value: "<svg>...</svg>" },
+      },
+    },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+> Asset tokens are typically used in `background-image` property.
+
+### Durations
+
+Duration tokens represent the length of time in milliseconds an animation or
+animation cycle takes to complete. Its value is defined as a string.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  durations: {
+    fast: { value: "100ms" },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+> Duration tokens are typically used in `transition-duration` and
+> `animation-duration` properties.
+
+### Animations
+
+Animation tokens represent a keyframe animation. Its value is defined as a
+string value.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  animations: {
+    spin: {
+      value: "spin 1s linear infinite",
+    },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+> Animation tokens are typically used in `animation` property.
+
+### Aspect Ratios
+
+Aspect ratio tokens represent the aspect ratio of an element. Its value is
+defined as a string.
+
+```tsx title="theme.ts"
+import { defineTokens } from "@chakra-ui/react"
+
+const tokens = defineTokens({
+  aspectRatios: {
+    "1:1": { value: "1 / 1" },
+    "16:9": { value: "16 / 9" },
+  },
+})
+
+export default createSystem({
+  theme: { tokens },
+})
+```
+
+# Typography
+
+## Fonts
+
+Here's the list of available fonts.
+
+| Font Token | Example                       |
+| ---------- | ----------------------------- |
+| `heading`  | <Text fontFamily="heading" /> |
+| `body`     | <Text fontFamily="body" />    |
+| `mono`     | <Text fontFamily="mono" />    |
+
+## Font Sizes
+
+Here's the list of available font sizes.
+
+| Font Size Token | Value      | Example                 |
+| --------------- | ---------- | ----------------------- |
+| `2xs`           | `0.625rem` | <Text fontSize="2xs" /> |
+| `xs`            | `0.75rem`  | <Text fontSize="xs" />  |
+| `sm`            | `0.875rem` | <Text fontSize="sm" />  |
+| `md`            | `1rem`     | <Text fontSize="md" />  |
+| `lg`            | `1.125rem` | <Text fontSize="lg" />  |
+| `xl`            | `1.25rem`  | <Text fontSize="xl" />  |
+| `2xl`           | `1.5rem`   | <Text fontSize="2xl" /> |
+| `3xl`           | `1.875rem` | <Text fontSize="3xl" /> |
+| `4xl`           | `2.25rem`  | <Text fontSize="4xl" /> |
+| `5xl`           | `3rem`     | <Text fontSize="5xl" /> |
+| `6xl`           | `3.75rem`  | <Text fontSize="6xl" /> |
+| `7xl`           | `4.5rem`   | <Text fontSize="7xl" /> |
+| `8xl`           | `6rem`     | <Text fontSize="8xl" /> |
+| `9xl`           | `8rem`     | <Text fontSize="9xl" /> |
+
+## Font Weights
+
+Here's the list of available font weights.
+
+| Font Weight Token | Value | Example                          |
+| ----------------- | ----- | -------------------------------- |
+| `thin`            | `100` | <Text fontWeight="thin" />       |
+| `extralight`      | `200` | <Text fontWeight="extralight" /> |
+| `light`           | `300` | <Text fontWeight="light" />      |
+| `normal`          | `400` | <Text fontWeight="normal" />     |
+| `medium`          | `500` | <Text fontWeight="medium" />     |
+| `semibold`        | `600` | <Text fontWeight="semibold" />   |
+| `bold`            | `700` | <Text fontWeight="bold" />       |
+| `extrabold`       | `800` | <Text fontWeight="extrabold" />  |
+| `black`           | `900` | <Text fontWeight="black" />      |
+
+## Line Heights
+
+Here's the list of available line heights.
+
+| Line Height Token | Value   | Example                        |
+| ----------------- | ------- | ------------------------------ |
+| `shorter`         | `1.25`  | <Text lineHeight="shorter" />  |
+| `short`           | `1.375` | <Text lineHeight="short" />    |
+| `moderate`        | `1.5`   | <Text lineHeight="moderate" /> |
+| `tall`            | `1.625` | <Text lineHeight="tall" />     |
+| `taller`          | `2`     | <Text lineHeight="taller" />   |
+
+## Letter Spacings
+
+Here's the list of available letter spacing.
+
+| Letter Spacing Token | Value      | Example                          |
+| -------------------- | ---------- | -------------------------------- |
+| `tighter`            | `-0.05em`  | <Text letterSpacing="tighter" /> |
+| `tight`              | `-0.025em` | <Text letterSpacing="tight" />   |
+| `wide`               | `0.025em`  | <Text letterSpacing="wide" />    |
+| `wider`              | `0.05em`   | <Text letterSpacing="wider" />   |
+| `widest`             | `0.1em`    | <Text letterSpacing="widest" />  |
+
+# Z-Index
+
+## Tokens
+
+Chakra UI supports the following z-index tokens out of the box.
+
+| Z Index Token | Value        | Example                   |
+| ------------- | ------------ | ------------------------- |
+| `hide`        | `-1`         | <Box zIndex="hide" />     |
+| `base`        | `0`          | <Box zIndex="base" />     |
+| `docked`      | `10`         | <Box zIndex="docked" />   |
+| `dropdown`    | `1000`       | <Box zIndex="dropdown" /> |
+| `sticky`      | `1100`       | <Box zIndex="sticky" />   |
+| `banner`      | `1200`       | <Box zIndex="banner" />   |
+| `overlay`     | `1300`       | <Box zIndex="overlay" />  |
+| `modal`       | `1400`       | <Box zIndex="modal" />    |
+| `popover`     | `1500`       | <Box zIndex="popover" />  |
+| `skipNav`     | `1600`       | <Box zIndex="skipNav" />  |
+| `toast`       | `1700`       | <Box zIndex="toast" />    |
+| `tooltip`     | `1800`       | <Box zIndex="tooltip" />  |
+| `max`         | `2147483647` | <Box zIndex="max" />      |
+
+# Animations
+
+:::info
+
+Please read the [overview](/docs/theming/customization/overview) first to learn
+how to properly customize the styling engine, and get type safety.
+
+:::
+
+## Keyframes
+
+Keyframes are used to define the animation sequence. Here's how to define custom
+keyframes:
+
+```tsx title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const config = defineConfig({
+  theme: {
+    keyframes: {
+      shakeX: {
+        "0%, 100%": { transform: "translateX(-100%)" },
+        "50%": { transform: "translateX(100%)" },
+      },
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, config)
+```
+
+## Animation Tokens
+
+After defining keyframes, you can create animation tokens that reference them.
+Animation tokens can include the keyframe name, duration, timing function, and
+other animation properties.
+
+```tsx title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const config = defineConfig({
+  theme: {
+    keyframes: {
+      // ... keyframes from above
+    },
+    tokens: {
+      animations: {
+        shakeX: { value: "shakeX 1s ease-in-out infinite" },
+      },
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, config)
+```
+
+## Usage
+
+You can use the animation token directly in your component style props.
+
+```tsx
+<Box animation="shakeX" />
+```
+
+or as individual animation properties
+
+```tsx
+<Box
+  animationName="shakeX"
+  animationDuration="1s"
+  animationTimingFunction="ease-in-out"
+  animationIterationCount="infinite"
+/>
+```
+
+# Breakpoints
+
+:::info
+
+Please read the [overview](/docs/theming/customization/overview) first to learn
+how to properly customize the styling engine, and get type safety.
+
+:::
+
+## Example
+
+Here's an example of how to customize breakpoints in Chakra UI.
+
+```tsx title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const config = defineConfig({
+  theme: {
+    breakpoints: {
+      tablet: "992px",
+      desktop: "1200px",
+      wide: "1400px",
+    },
+  },
+})
+
+export default createSystem(defaultConfig, config)
+```
+
+## Usage
+
+When using responsive properties, reference the new breakpoints.
+
+```tsx title="App.tsx"
+<Box fontSize={{ base: "16px", tablet: "18px", desktop: "20px" }}>Hello</Box>
+```
+
+# Colors
+
+:::info
+
+Please read the [overview](/docs/theming/customization/overview) first to learn
+how to properly customize the styling engine, and get type safety.
+
+:::
+
+## Tokens
+
+To create new colors, we recommend providing `50` - `950` color values. Here's
+an example of how to customize colors in Chakra UI.
+
+```tsx title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const customConfig = defineConfig({
+  theme: {
+    tokens: {
+      colors: {
+        brand: {
+          50: { value: "#e6f2ff" },
+          100: { value: "#e6f2ff" },
+          200: { value: "#bfdeff" },
+          300: { value: "#99caff" },
+          // ...
+          950: { value: "#001a33" },
+        },
+      },
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, customConfig)
+```
+
+To use the `brand` color, you can set the value of any color related properties,
+like `bg`, `borderColor`, `color`, etc. to the `brand` token.
+
+```tsx
+<Box bg="brand.100" />
+```
+
+## Semantic Tokens
+
+### Color Palette
+
+For new colors defined in the theme, we recommend creating these matching
+semantic tokens to ensure consistency.
+
+- `solid`: The bold fill color of the color.
+- `contrast`: The text color that goes on solid color.
+- `fg`: The foreground color used for text, icons, etc.
+- `muted`: The muted color of the color.
+- `subtle`: The subtle color of the color.
+- `emphasized`: The emphasized version of the subtle color.
+- `focusRing`: The focus ring color when interactive element is focused.
+
+:::note
+
+This is required if you intend to use the color in `colorPalette` property.
+
+:::
+
+```tsx title="theme.ts"
+const customConfig = defineConfig({
+  theme: {
+    tokens: {
+      colors: {
+        brand: {
+          // ...
+        },
+      },
+    },
+    semanticTokens: {
+      colors: {
+        brand: {
+          solid: { value: "{colors.brand.500}" },
+          contrast: { value: "{colors.brand.100}" },
+          fg: { value: "{colors.brand.700}" },
+          muted: { value: "{colors.brand.100}" },
+          subtle: { value: "{colors.brand.200}" },
+          emphasized: { value: "{colors.brand.300}" },
+          focusRing: { value: "{colors.brand.500}" },
+        },
+      },
+    },
+  },
+})
+```
+
+To use the color palette in components, you can use the `colorPalette` property.
+
+```tsx
+<Button colorPalette="brand">Click me</Button>
+```
+
+Alternative, you can also use the semantic token directly.
+
+```tsx
+<Box color="brand.contrast" bg="brand.solid">
+  Hello world
+</Box>
+```
+
+### Custom Tokens
+
+Here's an example of how to create custom semantic tokens.
+
+```tsx title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const customConfig = defineConfig({
+  theme: {
+    semanticTokens: {
+      colors: {
+        "checkbox-border": {
+          value: { _light: "gray.200", _dark: "gray.800" },
+        },
+      },
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, customConfig)
+```
+
+Then, you can apply the `checkbox-border` token to any component.
+
+```tsx
+<Square size="4" borderColor="checkbox-border">
+  <LuCheck />
+</Square>
+```
+
+# Conditions
+
+:::info
+
+Please read the [overview](/docs/theming/customization/overview) first to learn
+how to properly customize the styling engine, and get type safety.
+
+:::
+
+## Example
+
+Here's an example of how to customize conditions in Chakra UI.
+
+```tsx title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const customConfig = defineConfig({
+  conditions: {
+    off: "&:is([data-state=off])",
+    on: "&:is([data-state=on])",
+  },
+})
+
+export const system = createSystem(defaultConfig, customConfig)
+```
+
+## Usage
+
+Use `_off` and `_on` conditions to style elements based on the `data-state`
+attribute.
+
+```tsx title="app.tsx"
+import { Box } from "@chakra-ui/react"
+
+<Box data-state="off" _off={{ bg: "red.500" }} />
+<Box data-state="on" _on={{ bg: "green.500" }} />
+```
+
+# CSS Variables
+
+:::info
+
+Please read the [overview](/docs/theming/customization/overview) first to learn
+how to properly customize the styling engine, and get type safety.
+
+:::
+
+## Variable Root
+
+Here's an example of how to customize the selector that token CSS variables are
+applied to.
+
+```tsx title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const customConfig = defineConfig({
+  cssVarsRoot: ":where(html)",
+})
+
+export const system = createSystem(defaultConfig, customConfig)
+```
+
+The emitted CSS variables will now be applied to the `html` element.
+
+```css
+:where(html) {
+  --chakra-colors-gray-100: #e6f2ff;
+  --chakra-colors-gray-200: #bfdeff;
+  --chakra-colors-gray-300: #99caff;
+}
+```
+
+## Variable Prefix
+
+Here's an example of how to customize the prefix of the emitted CSS variables.
+
+```tsx title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const customConfig = defineConfig({
+  cssVarsPrefix: "sui",
+})
+
+export const system = createSystem(defaultConfig, customConfig)
+```
+
+The emitted CSS variables will now use the `sui` prefix.
+
+```css
+:where(html) {
+  --sui-colors-gray-100: #e6f2ff;
+  --sui-colors-gray-200: #bfdeff;
+  --sui-colors-gray-300: #99caff;
+}
+```
+
+# Global CSS
+
+:::info
+
+Please read the [overview](/docs/theming/customization/overview) first to learn
+how to properly customize the styling engine, and get type safety.
+
+:::
+
+## Customize
+
+### Add global styles
+
+Here's an example of how to customize the global CSS in Chakra UI.
+
+```tsx title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const customConfig = defineConfig({
+  globalCss: {
+    "*::placeholder": {
+      opacity: 1,
+      color: "fg.subtle",
+    },
+    "*::selection": {
+      bg: "green.200",
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, customConfig)
+```
+
+### Change global font family
+
+To change the font family globally, set it on the `html` element in globalCss:
+
+```tsx title="theme.ts"
+const customConfig = defineConfig({
+  globalCss: {
+    html: {
+      fontFamily: "Roboto, sans-serif",
+    },
+  },
+})
+```
+
+Alternatively, define custom font tokens:
+
+```tsx title="theme.ts"
+const customConfig = defineConfig({
+  theme: {
+    tokens: {
+      fonts: {
+        body: { value: "Roboto, sans-serif" },
+        heading: { value: "Poppins, sans-serif" },
+        mono: { value: "Fira Code, monospace" },
+      },
+    },
+  },
+})
+```
+
+### Remove global CSS
+
+If you don't need global CSS, you can remove it by destructuring the `globalCss`
+property from the default config.
+
+```tsx title="theme.ts"
+import { createSystem, defaultConfig } from "@chakra-ui/react"
+
+const { globalCss: _, ...restConfig } = defaultConfig
+export const system = createSystem(restConfig)
+```
+
+## Update provider
+
+After customizing the global CSS, make sure to update your provider component to
+use the new system.
+
+```tsx title="components/ui/provider.tsx" /value={system}/
+"use client"
+
+import { system } from "@/components/theme"
+import {
+  ColorModeProvider,
+  type ColorModeProviderProps,
+} from "@/components/ui/color-mode"
+import { ChakraProvider } from "@chakra-ui/react"
+
+export function Provider(props: ColorModeProviderProps) {
+  return (
+    <ChakraProvider value={system}>
+      <ColorModeProvider {...props} />
+    </ChakraProvider>
+  )
+}
+```
+
+# Customization
+
+## Overview
+
+Chakra UI uses a system of configs to define the default styling system.
+
+- `defaultBaseConfig`: contains the conditions and style properties (without
+  tokens and recipes).
+- `defaultConfig`: everything from `defaultBaseConfig` plus the built-in tokens
+  and recipes.
+
+The `defaultSystem` exported from Chakra UI uses the `defaultConfig` by default.
+
+When customizing the theme, it's important to decide if you want to merge your
+config with `defaultConfig` or start from scratch with `defaultBaseConfig`.
+
+## Customization
+
+These are the key functions needed to customize the Chakra UI theme.
+
+- `defineConfig`: used to define the system config
+- `createSystem`: used to create a styling engine from the config
+
+```tsx title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const config = defineConfig({
+  theme: {
+    tokens: {
+      colors: {
+        brand: {
+          "500": { value: "tomato" },
+        },
+      },
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, config)
+```
+
+Next, update the `ChakraProvider` to use the custom system.
+
+```tsx title="provider.tsx"
+import { ChakraProvider } from "@chakra-ui/react"
+import { ThemeProvider } from "next-themes"
+import { system } from "./theme"
+
+export function Provider(props: { children: React.ReactNode }) {
+  return (
+    <ChakraProvider value={system}>
+      <ThemeProvider attribute="class">{props.children}</ThemeProvider>
+    </ChakraProvider>
+  )
+}
+```
+
+## Complete Customization
+
+In most cases, we recommend starting with the default configuration and only
+specify the things you want to customize.
+
+However, if you prefer to start from scratch, scaffold the default tokens and
+recipes using the CLI.
+
+```bash
+npx @chakra-ui/cli eject --outdir ./theme
+```
+
+This will generate a file that includes all the tokens and recipes in Chakra.
+
+## TypeScript
+
+After customizing the default config, you may need to update the types. Run the
+`typegen` command to generate the typings. See the
+[CLI docs](/docs/get-started/cli#chakra-typegen) for how to run typegen in
+postinstall, CI, and monorepos.
+
+```bash
+npx @chakra-ui/cli typegen ./theme.ts
+```
+
+# Recipes
+
+:::info
+
+Please read the [overview](/docs/theming/customization/overview) first to learn
+how to properly customize the styling engine, and get type safety.
+
+:::
+
+## Recipes
+
+### Extending variants
+
+Use the `defineRecipe` function to define a recipe override.
+
+Here's an example of extending the `Button` to add a new `xl` size
+
+```tsx title="theme.ts"
+const buttonRecipe = defineRecipe({
+  variants: {
+    size: {
+      xl: {
+        fontSize: "lg",
+        px: 6,
+        py: 3,
+      },
+    },
+  },
+})
+
+const customConfig = defineConfig({
+  theme: {
+    recipes: {
+      button: buttonRecipe,
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, customConfig)
+```
+
+Then you can use the new size variant in your components.
+
+```tsx
+<Button size="xl">Click me</Button>
+```
+
+### Adding new variant
+
+Use the `defineRecipe` function to define a new recipe variant.
+
+Here's an example of defining a boolean variant called `raised`.
+
+```tsx title="theme.ts"
+const buttonRecipe = defineRecipe({
+  variants: {
+    raised: {
+      true: {
+        boxShadow: "md",
+      },
+    },
+  },
+})
+
+const customConfig = defineConfig({
+  theme: {
+    recipes: {
+      button: buttonRecipe,
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, customConfig)
+```
+
+Then you can use the new variant in your components.
+
+```tsx
+<Button raised>Click me</Button>
+```
+
+### Custom recipe
+
+Use the `defineRecipe` function to define a custom recipe all together.
+
+Here's an example of defining a custom recipe called `Title`
+
+```tsx title="theme.ts"
+const titleRecipe = defineRecipe({
+  baseStyle: {
+    fontWeight: "bold",
+    letterSpacing: "tight",
+  },
+  variants: {
+    size: {
+      md: { fontSize: "xl" },
+      lg: { fontSize: "2xl" },
+    },
+  },
+})
+
+const customConfig = defineConfig({
+  theme: {
+    recipes: {
+      title: titleRecipe,
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, customConfig)
+```
+
+Then, use the new recipe to create a components
+
+```tsx
+const Title = (props) => {
+  const recipe = useRecipe({ key: "title" })
+  const styles = recipe({ size: "lg" })
+  return <Box as="h1" css={styles} {...props} />
+}
+```
+
+## Slot Recipes
+
+To effectively override an existing slot recipe, we recommend connecting to its
+anatomy. Slot recipes are added to the `theme.slotRecipes` object.
+
+### Extending variants
+
+Here's an example of how to extend the `Alert` slot recipe to create an `xl`
+size.
+
+```tsx title="theme.ts"
+import { alertAnatomy } from "@chakra-ui/react/anatomy"
+
+const alertSlotRecipe = defineSlotRecipe({
+  slots: alertAnatomy.keys(),
+  variants: {
+    size: {
+      xl: {
+        root: {
+          fontSize: "lg",
+          px: 6,
+          py: 3,
+        },
+      },
+    },
+  },
+})
+
+const customConfig = defineConfig({
+  theme: {
+    slotRecipes: {
+      alert: alertSlotRecipe,
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, customConfig)
+```
+
+Then you can use the new size variant in your components.
+
+```tsx /size="xl"/
+<Alert size="xl" title="..." />
+```
+
+### Adding new variant
+
+Here's an example of how to extend the `Alert` slot recipe to add a new variant
+called `shape`.
+
+```tsx title="theme.ts"
+import { alertAnatomy } from "@chakra-ui/react/anatomy"
+
+const alertSlotRecipe = defineSlotRecipe({
+  slots: alertAnatomy.keys(),
+  variants: {
+    shape: {
+      rounded: {
+        root: { borderRadius: "full" },
+      },
+    },
+  },
+})
+
+const customConfig = defineConfig({
+  theme: {
+    slotRecipes: {
+      alert: alertSlotRecipe,
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, customConfig)
+```
+
+Then you can use the new variant in your components.
+
+```tsx /shape="rounded"/
+<Alert shape="rounded" title="..." />
+```
+
+### Custom recipe
+
+Here's an example of how to define a custom slot recipe called `Navbar`.
+
+```tsx title="theme.ts"
+const navbarSlotRecipe = defineSlotRecipe({
+  slots: ["root", "badge", "icon"],
+  base: {
+    root: {
+      bg: "blue.500",
+      color: "white",
+      px: 4,
+      py: 2,
+    },
+    badge: {
+      borderRadius: "full",
+      px: 2,
+      py: 1,
+    },
+  },
+})
+
+const customConfig = defineConfig({
+  theme: {
+    slotRecipes: {
+      navbar: navbarSlotRecipe,
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, customConfig)
+```
+
+Then you can use the new recipe to create a components
+
+```tsx
+const Navbar = (props) => {
+  const recipe = useSlotRecipe({ key: "navbar" })
+  const styles = recipe()
+  return (
+    <Box css={styles.root}>
+      {props.children}
+      <Box css={styles.badge} />
+      <Box css={styles.icon} />
+    </Box>
+  )
+}
+```
+
+# Sizes
+
+:::info
+
+Please read the [overview](/docs/theming/customization/overview) first to learn
+how to properly customize the styling engine, and get type safety.
+
+:::
+
+## Example
+
+Here's an example of how to customize sizes in Chakra UI.
+
+```tsx title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const customConfig = defineConfig({
+  theme: {
+    tokens: {
+      sizes: {
+        "1/7": { value: "14.285%" },
+        "2/7": { value: "28.571%" },
+        "3/7": { value: "42.857%" },
+      },
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, customConfig)
+```
+
+## Usage
+
+Set the value of any size related properties, like `width`, `height`,
+`minWidth`, `minHeight`, `maxWidth`, `maxHeight`, etc. to the `sizes` token.
+
+```tsx
+<Box width="1/7" height="2/7" />
+```
+
+# Spacing
+
+:::info
+
+Please read the [overview](/docs/theming/customization/overview) first to learn
+how to properly customize the styling engine, and get type safety.
+
+:::
+
+## Example
+
+Here's an example of how to customize spacing in Chakra UI.
+
+```tsx title="theme.ts"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const customConfig = defineConfig({
+  theme: {
+    tokens: {
+      spacing: {
+        "128": { value: "32rem" },
+        "144": { value: "36rem" },
+      },
+    },
+  },
+})
+
+export const system = createSystem(defaultConfig, customConfig)
+```
+
+## Usage
+
+Here's how to use the custom spacing in Chakra UI.
+
+```tsx
+<Box margin="128" />
+```
+
+# Utilities
+
+Here are the properties you need to define or customize a utility:
+
+- `shorthand`: The shorthand or alias version of the property
+- `values`: The possible values the property can have. Could be a token
+  category, or an enum of values, string, number, or boolean.
+- `transform`: A function that converts the value to a valid css object
+
+## Creating a custom utility
+
+Let's say you want to create new property `br` that applies a border radius to
+an element.
+
+```tsx title="components/ui/provider.tsx"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const customConfig = defineConfig({
+  utilities: {
+    extend: {
+      br: {
+        values: "radii",
+        transform(value) {
+          return { borderRadius: value }
+        },
+      },
+    },
+  },
+})
+
+const system = createSystem(defaultConfig, customConfig)
+```
+
+Now, you can use the `br` property in components.
+
+```tsx title="app.tsx"
+import { Box } from "@chakra-ui/react"
+
+function App() {
+  return <Box br="sm" />
+}
+```
+
+### Using enum values
+
+Let's say we want to create a new property `borderX` that applies a limited set
+of inline border to an element and automatically applies the border color.
+
+```tsx title="components/ui/provider.tsx"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const customConfig = defineConfig({
+  utilities: {
+    extend: {
+      borderX: {
+        values: ["1px", "2px", "4px"],
+        shorthand: "bx",
+        transform(value, { token }) {
+          return {
+            borderInlineWidth: value,
+            borderColor: token("colors.red.200"),
+          }
+        },
+      },
+    },
+  },
+})
+
+const system = createSystem(defaultConfig, customConfig)
+```
+
+Now, you can use the `borderX` or `bx` property in components.
+
+```tsx title="app.tsx"
+import { Box } from "@chakra-ui/react"
+
+function App() {
+  return <Box borderX="sm" />
+}
+```
+
+### Using mapped values
+
+```tsx title="components/ui/provider.tsx"
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
+
+const customConfig = defineConfig({
+  utilities: {
+    extend: {
+      borderX: {
+        values: { small: "2px", medium: "5px" },
+        shorthand: "bx",
+        transform(value, { token }) {
+          return {
+            borderTopWidth: value,
+            borderTopColor: token("colors.gray.400"),
+          }
+        },
+      },
+    },
+  },
+})
+
+const system = createSystem(defaultConfig, customConfig)
+```
+
+Now, you can use the `borderX` or `bx` property in components.
+
+```tsx title="app.tsx"
+import { Box } from "@chakra-ui/react"
+
+function App() {
+  return <Box borderX="sm" />
+}
+```
+

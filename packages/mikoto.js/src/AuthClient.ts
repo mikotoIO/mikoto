@@ -50,7 +50,7 @@ export class AuthClient {
     },
   );
 
-  private accessToken?: string;
+  protected accessToken?: string;
 
   constructor(options: AuthClientOptions) {
     this.api = createApiClient(options.url, {});
@@ -131,6 +131,7 @@ export class BotAuthClient extends AuthClient {
       botId: this.botId,
       token: this.botToken,
     });
+    this.accessToken = res.accessToken;
     return res.accessToken;
   }
 }

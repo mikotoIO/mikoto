@@ -1,7 +1,7 @@
 language: 'rust'
 tasks:
   generate:
-    command: cargo run --bin mikoto-codegen -- apps/superego/api.json crates/mikoto-client/src/generated.rs
+    command: cargo run --bin openapi-codegen -- apps/superego/api.json crates/mikoto-client/src/generated.rs
     deps:
       - 'superego:generate'
     options:

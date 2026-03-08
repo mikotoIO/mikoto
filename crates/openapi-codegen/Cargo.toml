@@ -1,5 +1,5 @@
 [package]
-name = "mikoto-codegen"
+name = "openapi-codegen"
 version = "0.1.0"
 edition = "2021"
 

@@ -289,3 +289,114 @@ fn find_param_in_path(path: &str, snake_name: &str) -> String {
     }
     snake_name.to_string()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_extract_path_params_empty() {
+        assert!(extract_path_params("/api/spaces").is_empty());
+    }
+
+    #[test]
+    fn test_extract_path_params_single() {
+        let params = extract_path_params("/api/spaces/{spaceId}");
+        assert_eq!(params, vec!["spaceId"]);
+    }
+
+    #[test]
+    fn test_extract_path_params_multiple() {
+        let params = extract_path_params("/api/spaces/{spaceId}/channels/{channelId}");
+        assert_eq!(params, vec!["spaceId", "channelId"]);
+    }
+
+    #[test]
+    fn test_extract_path_params_deduplicates() {
+        let params = extract_path_params("/api/{id}/sub/{id}");
+        assert_eq!(params, vec!["id"]);
+    }
+
+    #[test]
+    fn test_guess_path_param_type_uuid() {
+        assert!(matches!(guess_path_param_type("spaceId"), RustType::Uuid));
+        assert!(matches!(guess_path_param_type("channelId"), RustType::Uuid));
+        assert!(matches!(guess_path_param_type("messageId"), RustType::Uuid));
+    }
+
+    #[test]
+    fn test_guess_path_param_type_string() {
+        assert!(matches!(guess_path_param_type("slug"), RustType::String));
+        assert!(matches!(guess_path_param_type("name"), RustType::String));
+    }
+
+    #[test]
+    fn test_build_path_expr_no_params() {
+        let result = build_path_expr("/api/spaces", &[]);
+        assert_eq!(result, r#""/api/spaces".to_string()"#);
+    }
+
+    #[test]
+    fn test_build_path_expr_with_params() {
+        let params = vec![PathParam {
+            name: "space_id".into(),
+            rust_type: RustType::Uuid,
+        }];
+        let result = build_path_expr("/api/spaces/{spaceId}", &params);
+        assert_eq!(result, r#"format!("/api/spaces/{}", space_id)"#);
+    }
+
+    #[test]
+    fn test_build_path_expr_multiple_params() {
+        let params = vec![
+            PathParam {
+                name: "space_id".into(),
+                rust_type: RustType::Uuid,
+            },
+            PathParam {
+                name: "channel_id".into(),
+                rust_type: RustType::Uuid,
+            },
+        ];
+        let result = build_path_expr("/api/spaces/{spaceId}/channels/{channelId}", &params);
+        assert_eq!(
+            result,
+            r#"format!("/api/spaces/{}/channels/{}", space_id, channel_id)"#
+        );
+    }
+
+    #[test]
+    fn test_find_param_in_path() {
+        assert_eq!(
+            find_param_in_path("/api/spaces/{spaceId}", "space_id"),
+            "spaceId"
+        );
+    }
+
+    #[test]
+    fn test_find_param_in_path_fallback() {
+        assert_eq!(
+            find_param_in_path("/api/items/{id}", "missing"),
+            "missing"
+        );
+    }
+
+    #[test]
+    fn test_generate_http_simple_endpoint() {
+        let json = r#"{
+            "paths": {
+                "/api/spaces": {
+                    "get": {
+                        "operationId": "spaces.list",
+                        "responses": {}
+                    }
+                }
+            },
+            "components": { "schemas": {} }
+        }"#;
+        let api: crate::parse::OpenApi = serde_json::from_str(json).unwrap();
+        let output = generate_http(&api);
+        assert!(output.contains("pub async fn spaces_list(&self) -> Result<(), ClientError>"));
+        assert!(output.contains("self.client.get(self.url(&path))"));
+    }
+}

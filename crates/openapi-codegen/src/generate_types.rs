@@ -221,3 +221,245 @@ fn generate_struct(name: &str, schema: &Schema) -> String {
 
     out
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::parse::SchemaType;
+
+    fn empty_schema() -> Schema {
+        Schema {
+            schema_type: None,
+            format: None,
+            properties: None,
+            required: vec![],
+            items: None,
+            ref_path: None,
+            enum_values: None,
+            one_of: None,
+            any_of: None,
+            default: None,
+            description: None,
+            minimum: None,
+        }
+    }
+
+    #[test]
+    fn test_type_alias() {
+        let schema = Schema {
+            schema_type: Some(SchemaType::Single("string".into())),
+            format: Some("date-time".into()),
+            ..empty_schema()
+        };
+        let output = generate_schema("Timestamp", &schema);
+        assert_eq!(output, "pub type Timestamp = DateTime<Utc>;\n");
+    }
+
+    #[test]
+    fn test_string_enum() {
+        let schema = Schema {
+            schema_type: Some(SchemaType::Single("string".into())),
+            enum_values: Some(vec!["Text".into(), "Voice".into(), "Document".into()]),
+            ..empty_schema()
+        };
+        let output = generate_schema("ChannelType", &schema);
+        assert!(output.contains("pub enum ChannelType {"));
+        assert!(output.contains("Text,"));
+        assert!(output.contains("Voice,"));
+        assert!(output.contains("Document,"));
+    }
+
+    #[test]
+    fn test_empty_struct() {
+        let schema = Schema {
+            schema_type: Some(SchemaType::Single("object".into())),
+            properties: Some(IndexMap::new()),
+            ..empty_schema()
+        };
+        let output = generate_schema("EmptyPayload", &schema);
+        assert!(output.contains("pub struct EmptyPayload {}"));
+    }
+
+    #[test]
+    fn test_struct_with_properties() {
+        let mut props = IndexMap::new();
+        props.insert(
+            "id".into(),
+            Schema {
+                schema_type: Some(SchemaType::Single("string".into())),
+                format: Some("uuid".into()),
+                ..empty_schema()
+            },
+        );
+        props.insert(
+            "name".into(),
+            Schema {
+                schema_type: Some(SchemaType::Single("string".into())),
+                ..empty_schema()
+            },
+        );
+        let schema = Schema {
+            schema_type: Some(SchemaType::Single("object".into())),
+            properties: Some(props),
+            required: vec!["id".into(), "name".into()],
+            ..empty_schema()
+        };
+        let output = generate_schema("Space", &schema);
+        assert!(output.contains("pub struct Space {"));
+        assert!(output.contains("pub id: Uuid,"));
+        assert!(output.contains("pub name: String,"));
+        // snake_case fields = no rename_all needed
+        assert!(!output.contains("rename_all"));
+    }
+
+    #[test]
+    fn test_struct_with_camel_case_adds_rename_all() {
+        let mut props = IndexMap::new();
+        props.insert(
+            "channelId".into(),
+            Schema {
+                schema_type: Some(SchemaType::Single("string".into())),
+                format: Some("uuid".into()),
+                ..empty_schema()
+            },
+        );
+        let schema = Schema {
+            schema_type: Some(SchemaType::Single("object".into())),
+            properties: Some(props),
+            required: vec!["channelId".into()],
+            ..empty_schema()
+        };
+        let output = generate_schema("Msg", &schema);
+        assert!(output.contains("rename_all = \"camelCase\""));
+        assert!(output.contains("pub channel_id: Uuid,"));
+    }
+
+    #[test]
+    fn test_optional_field() {
+        let mut props = IndexMap::new();
+        props.insert(
+            "bio".into(),
+            Schema {
+                schema_type: Some(SchemaType::Single("string".into())),
+                ..empty_schema()
+            },
+        );
+        let schema = Schema {
+            schema_type: Some(SchemaType::Single("object".into())),
+            properties: Some(props),
+            required: vec![], // bio is not required
+            ..empty_schema()
+        };
+        let output = generate_schema("Profile", &schema);
+        assert!(output.contains("pub bio: Option<String>,"));
+        assert!(output.contains("skip_serializing_if"));
+    }
+
+    #[test]
+    fn test_no_properties_generates_empty_struct() {
+        let schema = Schema {
+            schema_type: Some(SchemaType::Single("object".into())),
+            ..empty_schema()
+        };
+        let output = generate_schema("Empty", &schema);
+        assert!(output.contains("pub struct Empty {}"));
+    }
+
+    #[test]
+    fn test_generate_types_multiple_schemas() {
+        let mut schemas = IndexMap::new();
+        schemas.insert(
+            "Timestamp".into(),
+            Schema {
+                schema_type: Some(SchemaType::Single("string".into())),
+                format: Some("date-time".into()),
+                ..empty_schema()
+            },
+        );
+        schemas.insert(
+            "ChannelType".into(),
+            Schema {
+                schema_type: Some(SchemaType::Single("string".into())),
+                enum_values: Some(vec!["Text".into(), "Voice".into()]),
+                ..empty_schema()
+            },
+        );
+        let output = generate_types(&schemas);
+        assert!(output.contains("pub type Timestamp"));
+        assert!(output.contains("pub enum ChannelType"));
+    }
+
+    #[test]
+    fn test_one_of_untagged_enum() {
+        let variants = vec![
+            Schema {
+                ref_path: Some("#/components/schemas/User".into()),
+                ..empty_schema()
+            },
+            Schema {
+                ref_path: Some("#/components/schemas/Bot".into()),
+                ..empty_schema()
+            },
+        ];
+        let schema = Schema {
+            one_of: Some(variants),
+            ..empty_schema()
+        };
+        let output = generate_schema("Owner", &schema);
+        assert!(output.contains("#[serde(untagged)]"));
+        assert!(output.contains("pub enum Owner {"));
+        assert!(output.contains("Variant0(User)"));
+        assert!(output.contains("Variant1(Bot)"));
+    }
+
+    #[test]
+    fn test_one_of_internally_tagged_enum() {
+        let mut props0 = IndexMap::new();
+        props0.insert(
+            "type".into(),
+            Schema {
+                enum_values: Some(vec!["text".into()]),
+                ..empty_schema()
+            },
+        );
+        props0.insert(
+            "content".into(),
+            Schema {
+                schema_type: Some(SchemaType::Single("string".into())),
+                ..empty_schema()
+            },
+        );
+
+        let mut props1 = IndexMap::new();
+        props1.insert(
+            "type".into(),
+            Schema {
+                enum_values: Some(vec!["image".into()]),
+                ..empty_schema()
+            },
+        );
+
+        let variants = vec![
+            Schema {
+                properties: Some(props0),
+                required: vec!["type".into(), "content".into()],
+                ..empty_schema()
+            },
+            Schema {
+                properties: Some(props1),
+                required: vec!["type".into()],
+                ..empty_schema()
+            },
+        ];
+        let schema = Schema {
+            one_of: Some(variants),
+            ..empty_schema()
+        };
+        let output = generate_schema("Block", &schema);
+        assert!(output.contains("#[serde(tag = \"type\")]"));
+        assert!(output.contains("pub enum Block {"));
+        assert!(output.contains("Text {"));
+        assert!(output.contains("content: String,"));
+        assert!(output.contains("Image,"));
+    }
+}

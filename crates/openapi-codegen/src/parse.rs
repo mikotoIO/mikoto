@@ -70,6 +70,156 @@ impl Schema {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_ref_type_name() {
+        let r = Ref {
+            ref_path: "#/components/schemas/User".into(),
+        };
+        assert_eq!(r.type_name(), "User");
+    }
+
+    #[test]
+    fn test_ref_type_name_no_slash() {
+        let r = Ref {
+            ref_path: "User".into(),
+        };
+        assert_eq!(r.type_name(), "User");
+    }
+
+    #[test]
+    fn test_schema_ref_type_name() {
+        let s = Schema {
+            ref_path: Some("#/components/schemas/Message".into()),
+            schema_type: None,
+            format: None,
+            properties: None,
+            required: vec![],
+            items: None,
+            enum_values: None,
+            one_of: None,
+            any_of: None,
+            default: None,
+            description: None,
+            minimum: None,
+        };
+        assert_eq!(s.ref_type_name(), Some("Message"));
+    }
+
+    #[test]
+    fn test_schema_ref_type_name_none() {
+        let s = Schema {
+            ref_path: None,
+            schema_type: None,
+            format: None,
+            properties: None,
+            required: vec![],
+            items: None,
+            enum_values: None,
+            one_of: None,
+            any_of: None,
+            default: None,
+            description: None,
+            minimum: None,
+        };
+        assert_eq!(s.ref_type_name(), None);
+    }
+
+    #[test]
+    fn test_schema_type_deserialization_single() {
+        let json = r#"{"type": "string"}"#;
+        let schema: Schema = serde_json::from_str(json).unwrap();
+        assert!(matches!(schema.schema_type, Some(SchemaType::Single(t)) if t == "string"));
+    }
+
+    #[test]
+    fn test_schema_type_deserialization_array() {
+        let json = r#"{"type": ["string", "null"]}"#;
+        let schema: Schema = serde_json::from_str(json).unwrap();
+        match schema.schema_type {
+            Some(SchemaType::Array(types)) => {
+                assert_eq!(types, vec!["string", "null"]);
+            }
+            other => panic!("expected Array, got {:?}", other),
+        }
+    }
+
+    #[test]
+    fn test_schema_deserialization_with_ref() {
+        let json = r##"{"$ref": "#/components/schemas/User"}"##;
+        let schema: Schema = serde_json::from_str(json).unwrap();
+        assert_eq!(schema.ref_type_name(), Some("User"));
+    }
+
+    #[test]
+    fn test_schema_deserialization_enum() {
+        let json = r#"{"type": "string", "enum": ["Text", "Voice", "Document"]}"#;
+        let schema: Schema = serde_json::from_str(json).unwrap();
+        assert_eq!(
+            schema.enum_values,
+            Some(vec![
+                "Text".to_string(),
+                "Voice".to_string(),
+                "Document".to_string()
+            ])
+        );
+    }
+
+    #[test]
+    fn test_operation_deserialization() {
+        let json = r##"{
+            "operationId": "spaces.list",
+            "parameters": [],
+            "responses": {
+                "200": {
+                    "content": {
+                        "application/json": {
+                            "schema": {"type": "array", "items": {"$ref": "#/components/schemas/Space"}}
+                        }
+                    }
+                }
+            }
+        }"##;
+        let op: Operation = serde_json::from_str(json).unwrap();
+        assert_eq!(op.operation_id, Some("spaces.list".into()));
+        assert!(op.parameters.is_empty());
+        assert!(op.responses.is_some());
+    }
+
+    #[test]
+    fn test_openapi_deserialization_minimal() {
+        let json = r##"{
+            "paths": {
+                "/api/spaces": {
+                    "get": {
+                        "operationId": "spaces.list",
+                        "responses": {}
+                    }
+                }
+            },
+            "components": {
+                "schemas": {
+                    "Space": {
+                        "type": "object",
+                        "properties": {
+                            "id": {"type": "string", "format": "uuid"},
+                            "name": {"type": "string"}
+                        },
+                        "required": ["id", "name"]
+                    }
+                }
+            }
+        }"##;
+        let api: OpenApi = serde_json::from_str(json).unwrap();
+        assert_eq!(api.paths.len(), 1);
+        assert_eq!(api.components.schemas.len(), 1);
+        assert!(api.websocket.is_none());
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct Operation {
     #[serde(rename = "operationId")]

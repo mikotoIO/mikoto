@@ -8,19 +8,23 @@ mod schema;
 
 use std::path::PathBuf;
 
+use clap::Parser;
+
+/// Generate Rust API client code from an OpenAPI spec.
+#[derive(Parser)]
+struct Args {
+    /// Path to the input OpenAPI JSON file
+    input: PathBuf,
+    /// Path to the output Rust file
+    output: PathBuf,
+}
+
 fn main() {
-    let args: Vec<String> = std::env::args().collect();
-    if args.len() != 3 {
-        eprintln!("Usage: {} <input_api.json> <output.rs>", args[0]);
-        std::process::exit(1);
-    }
+    let args = Args::parse();
 
-    let api_path = PathBuf::from(&args[1]);
-    let output_path = PathBuf::from(&args[2]);
-
-    println!("Reading API spec from: {}", api_path.display());
-    let api_json = std::fs::read_to_string(&api_path)
-        .unwrap_or_else(|e| panic!("Failed to read {}: {}", api_path.display(), e));
+    println!("Reading API spec from: {}", args.input.display());
+    let api_json = std::fs::read_to_string(&args.input)
+        .unwrap_or_else(|e| panic!("Failed to read {}: {}", args.input.display(), e));
 
     let api: parse::OpenApi = serde_json::from_str(&api_json)
         .unwrap_or_else(|e| panic!("Failed to parse API spec: {}", e));
@@ -33,12 +37,12 @@ fn main() {
 
     let output = codegen::generate(&api);
 
-    if let Some(parent) = output_path.parent() {
+    if let Some(parent) = args.output.parent() {
         std::fs::create_dir_all(parent).ok();
     }
 
-    std::fs::write(&output_path, &output)
-        .unwrap_or_else(|e| panic!("Failed to write {}: {}", output_path.display(), e));
+    std::fs::write(&args.output, &output)
+        .unwrap_or_else(|e| panic!("Failed to write {}: {}", args.output.display(), e));
 
-    println!("Generated: {}", output_path.display());
+    println!("Generated: {}", args.output.display());
 }

@@ -1,5 +1,6 @@
 import {
   Box,
+  Checkbox,
   Code,
   Group,
   HStack,
@@ -13,10 +14,9 @@ import { faCopy, faRobot, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { BotInfo, BotSpaceInfo } from '@mikoto-io/mikoto.js';
 import { useSetAtom } from 'jotai';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
 
 import { modalState } from '@/components/ContextMenu';
 import { Surface } from '@/components/Surface';
@@ -24,6 +24,7 @@ import { Avatar } from '@/components/atoms/Avatar';
 import { AvatarEditor } from '@/components/molecules/AvatarEditor';
 import { TabName } from '@/components/tabs';
 import { Button, DialogContent, Field } from '@/components/ui';
+import { toaster } from '@/components/ui/toaster';
 import { uploadFile } from '@/functions/fileUpload';
 import { useAuthClient } from '@/hooks';
 import { useTabkit } from '@/store/surface';
@@ -35,8 +36,6 @@ const Section = styled.div`
 `;
 
 const DangerZone = styled.div`
-  border: 1px solid var(--chakra-colors-red-600);
-  padding: 16px;
   margin-top: 16px;
   max-width: 640px;
 `;
@@ -69,7 +68,7 @@ function TokenDisplay({ token }: { token: string }) {
           size="sm"
           onClick={() => {
             navigator.clipboard.writeText(token);
-            toast.success('Token copied to clipboard!');
+            toaster.success({ title: 'Token copied to clipboard!' });
           }}
         >
           <FontAwesomeIcon icon={faCopy} /> Copy
@@ -96,7 +95,7 @@ function DeleteBotModal({
       <Form
         onSubmit={handleSubmit(async () => {
           await authClient.deleteBot(bot.id);
-          toast.success('Bot deleted');
+          toaster.success({ title: 'Bot deleted' });
           setModal(null);
           onDeleted();
         })}
@@ -125,12 +124,16 @@ function DeleteBotModal({
   );
 }
 
-function GeneralSection({ bot, onUpdate }: { bot: BotInfo; onUpdate: () => void }) {
+function GeneralSection({
+  bot,
+  onUpdate,
+}: {
+  bot: BotInfo;
+  onUpdate: () => void;
+}) {
   const authClient = useAuthClient();
   const [name, setName] = useState(bot.user?.name ?? bot.name);
-  const [description, setDescription] = useState(
-    bot.user?.description ?? '',
-  );
+  const [description, setDescription] = useState(bot.user?.description ?? '');
 
   return (
     <Section>
@@ -166,7 +169,7 @@ function GeneralSection({ bot, onUpdate }: { bot: BotInfo; onUpdate: () => void 
               size="sm"
               onClick={() => {
                 navigator.clipboard.writeText(bot.id);
-                toast.success('Copied bot ID');
+                toaster.success({ title: 'Copied bot ID' });
               }}
             >
               <FontAwesomeIcon icon={faCopy} />
@@ -178,7 +181,7 @@ function GeneralSection({ bot, onUpdate }: { bot: BotInfo; onUpdate: () => void 
           type="button"
           onClick={async () => {
             await authClient.updateBot(bot.id, { name, description });
-            toast.success('Bot updated');
+            toaster.success({ title: 'Bot updated' });
             onUpdate();
           }}
         >
@@ -209,7 +212,12 @@ function AuthSection({ bot }: { bot: BotInfo }) {
         <Button
           colorPalette="primary"
           onClick={async () => {
-            if (!window.confirm('Regenerate token? The old token will stop working.')) return;
+            if (
+              !window.confirm(
+                'Regenerate token? The old token will stop working.',
+              )
+            )
+              return;
             const res = await authClient.regenerateBotToken(bot.id);
             setNewToken(res.token);
           }}
@@ -230,7 +238,7 @@ function AuthSection({ bot }: { bot: BotInfo }) {
               size="sm"
               onClick={() => {
                 navigator.clipboard.writeText(bot.user!.handle!);
-                toast.success('Copied handle');
+                toaster.success({ title: 'Copied handle' });
               }}
             >
               <FontAwesomeIcon icon={faCopy} />
@@ -301,14 +309,15 @@ function PermissionsSection({
           Permission Scopes
         </Text>
         {PERMISSION_SCOPES.map((scope) => (
-          <label key={scope.key} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-            <input
-              type="checkbox"
-              checked={perms.has(scope.key)}
-              onChange={() => togglePerm(scope.key)}
-            />
-            <Text fontSize="sm">{scope.label}</Text>
-          </label>
+          <Checkbox.Root
+            key={scope.key}
+            checked={perms.has(scope.key)}
+            onCheckedChange={() => togglePerm(scope.key)}
+          >
+            <Checkbox.HiddenInput />
+            <Checkbox.Control />
+            <Checkbox.Label fontSize="sm">{scope.label}</Checkbox.Label>
+          </Checkbox.Root>
         ))}
         <Button
           colorPalette="primary"
@@ -319,7 +328,7 @@ function PermissionsSection({
               visibility,
               permissions: [...perms],
             });
-            toast.success('Permissions updated');
+            toaster.success({ title: 'Permissions updated' });
             onUpdate();
           }}
         >
@@ -354,7 +363,7 @@ function SpacesSection({ bot }: { bot: BotInfo }) {
             colorPalette="danger"
             onClick={async () => {
               await authClient.removeBotFromSpace(bot.id, s.spaceId);
-              toast.success('Bot removed from space');
+              toaster.success({ title: 'Bot removed from space' });
               refresh();
             }}
           >
@@ -370,10 +379,10 @@ export function BotSettingSurface({ botId }: { botId: string }) {
   const authClient = useAuthClient();
   const tabkit = useTabkit();
 
-  const {
-    result: bot,
-    execute: refresh,
-  } = useAsync(() => authClient.getBot(botId), [botId]);
+  const { result: bot, execute: refresh } = useAsync(
+    () => authClient.getBot(botId),
+    [botId],
+  );
   const setModal = useSetAtom(modalState);
 
   if (!bot) {

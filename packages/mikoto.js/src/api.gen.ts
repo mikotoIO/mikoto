@@ -50,10 +50,30 @@ export const ResetPasswordConfirmData = z.object({
 });
 export type ResetPasswordConfirmData = z.infer<typeof ResetPasswordConfirmData>;
 
-export const BotInfo = z.object({
+export const UserCategory = z.enum(["BOT", "UNVERIFIED"]);
+export type UserCategory = z.infer<typeof UserCategory>;
+
+export const UserExt = z.object({
+  avatar: z.union([z.string(), z.null()]).optional(),
+  category: z.union([UserCategory, z.null()]).optional(),
+  description: z.union([z.string(), z.null()]).optional(),
+  handle: z.union([z.string(), z.null()]).optional(),
   id: z.string().uuid(),
   name: z.string(),
+});
+export type UserExt = z.infer<typeof UserExt>;
+
+export const BotVisibility = z.enum(["PUBLIC", "PRIVATE"]);
+export type BotVisibility = z.infer<typeof BotVisibility>;
+
+export const BotInfo = z.object({
+  id: z.string().uuid(),
+  lastTokenRegeneratedAt: z.union([z.string(), z.null()]).optional(),
+  name: z.string(),
   ownerId: z.string().uuid(),
+  permissions: z.array(z.string()),
+  user: z.union([UserExt, z.null()]).optional(),
+  visibility: BotVisibility,
 });
 export type BotInfo = z.infer<typeof BotInfo>;
 
@@ -73,6 +93,27 @@ export const BotLoginPayload = z.object({
   token: z.string(),
 });
 export type BotLoginPayload = z.infer<typeof BotLoginPayload>;
+
+export const UpdateBotPayload = z
+  .object({
+    avatar: z.union([z.string(), z.null()]),
+    description: z.union([z.string(), z.null()]),
+    name: z.union([z.string(), z.null()]),
+    permissions: z.union([z.array(z.string()), z.null()]),
+    visibility: z.union([BotVisibility, z.null()]),
+  })
+  .partial();
+export type UpdateBotPayload = z.infer<typeof UpdateBotPayload>;
+
+export const BotSpaceInfo = z.object({
+  spaceIcon: z.union([z.string(), z.null()]).optional(),
+  spaceId: z.string().uuid(),
+  spaceName: z.string(),
+});
+export type BotSpaceInfo = z.infer<typeof BotSpaceInfo>;
+
+export const InstallBotPayload = z.object({ spaceId: z.string().uuid() });
+export type InstallBotPayload = z.infer<typeof InstallBotPayload>;
 
 export const HandleOwner = z.union([
   z.object({ id: z.string().uuid(), type: z.literal("user") }),
@@ -95,19 +136,6 @@ export const InstanceInfo = z.object({
   publicKey: z.union([z.string(), z.null()]).optional(),
 });
 export type InstanceInfo = z.infer<typeof InstanceInfo>;
-
-export const UserCategory = z.enum(["BOT", "UNVERIFIED"]);
-export type UserCategory = z.infer<typeof UserCategory>;
-
-export const UserExt = z.object({
-  avatar: z.union([z.string(), z.null()]).optional(),
-  category: z.union([UserCategory, z.null()]).optional(),
-  description: z.union([z.string(), z.null()]).optional(),
-  handle: z.union([z.string(), z.null()]).optional(),
-  id: z.string().uuid(),
-  name: z.string(),
-});
-export type UserExt = z.infer<typeof UserExt>;
 
 export const UserPatch = z
   .object({
@@ -394,15 +422,19 @@ export const schemas = {
   ChangePasswordPayload,
   ResetPasswordPayload,
   ResetPasswordConfirmData,
+  UserCategory,
+  UserExt,
+  BotVisibility,
   BotInfo,
   CreateBotPayload,
   BotCreatedResponse,
   BotLoginPayload,
+  UpdateBotPayload,
+  BotSpaceInfo,
+  InstallBotPayload,
   HandleOwner,
   HandleResolution,
   InstanceInfo,
-  UserCategory,
-  UserExt,
   UserPatch,
   HandlePayload,
   VerifyHandleRequest,
@@ -566,6 +598,69 @@ const endpoints = makeApi([
       },
     ],
     response: BotCreatedResponse,
+  },
+  {
+    method: "get",
+    path: "/bots/:botId",
+    alias: "bots.get",
+    requestFormat: "json",
+    response: BotInfo,
+  },
+  {
+    method: "delete",
+    path: "/bots/:botId",
+    alias: "bots.delete",
+    requestFormat: "json",
+    response: z.null(),
+  },
+  {
+    method: "patch",
+    path: "/bots/:botId",
+    alias: "bots.update",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: UpdateBotPayload,
+      },
+    ],
+    response: BotInfo,
+  },
+  {
+    method: "post",
+    path: "/bots/:botId/install",
+    alias: "bots.install",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: z.object({ spaceId: z.string().uuid() }),
+      },
+    ],
+    response: z.null(),
+  },
+  {
+    method: "post",
+    path: "/bots/:botId/regenerate-token",
+    alias: "bots.regenerateToken",
+    requestFormat: "json",
+    response: BotCreatedResponse,
+  },
+  {
+    method: "get",
+    path: "/bots/:botId/spaces",
+    alias: "bots.listSpaces",
+    requestFormat: "json",
+    response: z.array(BotSpaceInfo),
+  },
+  {
+    method: "delete",
+    path: "/bots/:botId/spaces/:spaceId",
+    alias: "bots.removeFromSpace",
+    requestFormat: "json",
+    response: z.null(),
   },
   {
     method: "post",

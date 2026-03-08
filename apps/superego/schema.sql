@@ -17,6 +17,18 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: BotVisibility; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public."BotVisibility" AS ENUM (
+    'PUBLIC',
+    'PRIVATE'
+);
+
+
+ALTER TYPE public."BotVisibility" OWNER TO postgres;
+
+--
 -- Name: ChannelType; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -126,7 +138,10 @@ CREATE TABLE public."Bot" (
     id uuid NOT NULL,
     name character varying(64) NOT NULL,
     "ownerId" uuid NOT NULL,
-    secret text NOT NULL
+    secret text NOT NULL,
+    visibility public."BotVisibility" DEFAULT 'PRIVATE'::public."BotVisibility" NOT NULL,
+    permissions jsonb DEFAULT '[]'::jsonb NOT NULL,
+    "lastTokenRegeneratedAt" timestamp with time zone
 );
 
 

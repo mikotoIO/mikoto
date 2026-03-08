@@ -294,6 +294,172 @@
         }
       }
     },
+    "/bots/{botId}": {
+      "get": {
+        "tags": [
+          "Bots"
+        ],
+        "summary": "Get Bot Details",
+        "operationId": "bots.get",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BotInfo"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Bots"
+        ],
+        "summary": "Delete Bot",
+        "operationId": "bots.delete",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Bots"
+        ],
+        "summary": "Update Bot",
+        "operationId": "bots.update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBotPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BotInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bots/{botId}/regenerate-token": {
+      "post": {
+        "tags": [
+          "Bots"
+        ],
+        "summary": "Regenerate Bot Token",
+        "operationId": "bots.regenerateToken",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BotCreatedResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bots/{botId}/spaces": {
+      "get": {
+        "tags": [
+          "Bots"
+        ],
+        "summary": "List Spaces Bot Is In",
+        "operationId": "bots.listSpaces",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BotSpaceInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bots/{botId}/install": {
+      "post": {
+        "tags": [
+          "Bots"
+        ],
+        "summary": "Install Bot Into Space",
+        "operationId": "bots.install",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstallBotPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bots/{botId}/spaces/{spaceId}": {
+      "delete": {
+        "tags": [
+          "Bots"
+        ],
+        "summary": "Remove Bot From Space",
+        "operationId": "bots.removeFromSpace",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/handles/{handle}": {
       "get": {
         "tags": [
@@ -1554,12 +1720,21 @@
         "required": [
           "id",
           "name",
-          "ownerId"
+          "ownerId",
+          "permissions",
+          "visibility"
         ],
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "lastTokenRegeneratedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
           },
           "name": {
             "type": "string"
@@ -1567,6 +1742,25 @@
           "ownerId": {
             "type": "string",
             "format": "uuid"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "user": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserExt"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/BotVisibility"
           }
         }
       },
@@ -1585,6 +1779,35 @@
             "type": "string"
           }
         }
+      },
+      "BotSpaceInfo": {
+        "type": "object",
+        "required": [
+          "spaceId",
+          "spaceName"
+        ],
+        "properties": {
+          "spaceIcon": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "spaceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "spaceName": {
+            "type": "string"
+          }
+        }
+      },
+      "BotVisibility": {
+        "type": "string",
+        "enum": [
+          "PUBLIC",
+          "PRIVATE"
+        ]
       },
       "ChangePasswordPayload": {
         "type": "object",
@@ -1856,6 +2079,18 @@
           },
           "version": {
             "type": "string"
+          }
+        }
+      },
+      "InstallBotPayload": {
+        "type": "object",
+        "required": [
+          "spaceId"
+        ],
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },
@@ -2543,6 +2778,48 @@
             "type": [
               "string",
               "null"
+            ]
+          }
+        }
+      },
+      "UpdateBotPayload": {
+        "type": "object",
+        "properties": {
+          "avatar": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "permissions": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "visibility": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BotVisibility"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         }

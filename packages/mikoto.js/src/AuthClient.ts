@@ -6,10 +6,12 @@ import {
   BotLoginPayload,
   ChangePasswordPayload,
   CreateBotPayload,
+  InstallBotPayload,
   LoginPayload,
   RegisterPayload,
   ResetPasswordConfirmData,
   ResetPasswordPayload,
+  UpdateBotPayload,
   createApiClient,
 } from './api.gen';
 
@@ -108,6 +110,49 @@ export class AuthClient {
 
   async botLogin(payload: BotLoginPayload) {
     const res = await this.api['bots.login'](payload);
+    return res;
+  }
+
+  async getBot(botId: string) {
+    const res = await this.api['bots.get']({ params: { botId } });
+    return res;
+  }
+
+  async updateBot(botId: string, payload: UpdateBotPayload) {
+    const res = await this.api['bots.update'](payload, { params: { botId } });
+    return res;
+  }
+
+  async deleteBot(botId: string) {
+    const res = await this.api['bots.delete'](undefined, {
+      params: { botId },
+    });
+    return res;
+  }
+
+  async regenerateBotToken(botId: string) {
+    const res = await this.api['bots.regenerateToken'](undefined, {
+      params: { botId },
+    });
+    return res;
+  }
+
+  async listBotSpaces(botId: string) {
+    const res = await this.api['bots.listSpaces']({ params: { botId } });
+    return res;
+  }
+
+  async installBot(botId: string, payload: InstallBotPayload) {
+    const res = await this.api['bots.install'](payload, {
+      params: { botId },
+    });
+    return res;
+  }
+
+  async removeBotFromSpace(botId: string, spaceId: string) {
+    const res = await this.api['bots.removeFromSpace'](undefined, {
+      params: { botId, spaceId },
+    });
     return res;
   }
 }

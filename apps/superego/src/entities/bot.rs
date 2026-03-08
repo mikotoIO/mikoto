@@ -1,6 +1,17 @@
+use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
-use crate::{db_find_by_id, entity, error::Error, model};
+use crate::{db_enum, db_find_by_id, entity, error::Error, model};
+
+use super::UserExt;
+
+db_enum!(
+    #[sqlx(type_name = "\"BotVisibility\"")]
+    pub enum BotVisibility {
+        Public,
+        Private,
+    }
+);
 
 entity!(
     pub struct Bot {
@@ -10,19 +21,31 @@ entity!(
 
         #[serde(skip_serializing)]
         pub secret: String,
+
+        pub visibility: BotVisibility,
+
+        #[schemars(with = "Vec<String>")]
+        pub permissions: serde_json::Value,
+
+        pub last_token_regenerated_at: Option<DateTime<Utc>>,
     }
 );
 
-// Public bot info returned by list endpoint (no secret)
+// Public bot info returned by list/detail endpoints (no secret)
 model!(
     pub struct BotInfo {
         pub id: Uuid,
         pub name: String,
         pub owner_id: Uuid,
+        pub visibility: BotVisibility,
+        pub permissions: Vec<String>,
+        pub last_token_regenerated_at: Option<DateTime<Utc>>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub user: Option<UserExt>,
     }
 );
 
-// Response returned only when creating a bot, containing the plaintext token.
+// Response returned only when creating a bot or regenerating a token.
 // This is the only time the token is visible.
 model!(
     pub struct BotCreatedResponse {
@@ -30,6 +53,15 @@ model!(
         pub name: String,
         pub owner_id: Uuid,
         pub token: String,
+    }
+);
+
+// Info about a space a bot is in
+entity!(
+    pub struct BotSpaceInfo {
+        pub space_id: Uuid,
+        pub space_name: String,
+        pub space_icon: Option<String>,
     }
 );
 
@@ -95,5 +127,93 @@ impl Bot {
             .execute(db)
             .await?;
         Ok(())
+    }
+
+    pub async fn update_settings<'c, X: sqlx::PgExecutor<'c>>(
+        id: Uuid,
+        visibility: BotVisibility,
+        permissions: &[String],
+        db: X,
+    ) -> Result<Self, Error> {
+        sqlx::query_as(
+            r##"
+            UPDATE "Bot"
+            SET "visibility" = $2, "permissions" = $3
+            WHERE "id" = $1
+            RETURNING *
+            "##,
+        )
+        .bind(id)
+        .bind(visibility)
+        .bind(serde_json::to_value(permissions).unwrap_or_default())
+        .fetch_optional(db)
+        .await?
+        .ok_or(Error::NotFound)
+    }
+
+    pub async fn regenerate_secret<'c, X: sqlx::PgExecutor<'c>>(
+        id: Uuid,
+        hashed_secret: &str,
+        db: X,
+    ) -> Result<Self, Error> {
+        sqlx::query_as(
+            r##"
+            UPDATE "Bot"
+            SET "secret" = $2, "lastTokenRegeneratedAt" = NOW()
+            WHERE "id" = $1
+            RETURNING *
+            "##,
+        )
+        .bind(id)
+        .bind(hashed_secret)
+        .fetch_optional(db)
+        .await?
+        .ok_or(Error::NotFound)
+    }
+
+    pub fn to_info(&self) -> BotInfo {
+        let permissions: Vec<String> =
+            serde_json::from_value(self.permissions.clone()).unwrap_or_default();
+        BotInfo {
+            id: self.id,
+            name: self.name.clone(),
+            owner_id: self.owner_id,
+            visibility: self.visibility,
+            permissions,
+            last_token_regenerated_at: self.last_token_regenerated_at,
+            user: None,
+        }
+    }
+
+    pub async fn to_info_with_user<'c, X: sqlx::PgExecutor<'c> + Copy>(
+        &self,
+        db: X,
+    ) -> Result<BotInfo, Error> {
+        let user = super::User::find_by_id(self.id, db).await.ok();
+        let user = match user {
+            Some(u) => Some(UserExt::from_user(u, db).await?),
+            None => None,
+        };
+        let mut info = self.to_info();
+        info.user = user;
+        Ok(info)
+    }
+
+    pub async fn list_spaces<'c, X: sqlx::PgExecutor<'c>>(
+        bot_id: Uuid,
+        db: X,
+    ) -> Result<Vec<BotSpaceInfo>, Error> {
+        let spaces: Vec<BotSpaceInfo> = sqlx::query_as(
+            r##"
+            SELECT s."id" AS "spaceId", s."name" AS "spaceName", s."icon" AS "spaceIcon"
+            FROM "SpaceUser" su
+            JOIN "Space" s ON s."id" = su."spaceId"
+            WHERE su."userId" = $1
+            "##,
+        )
+        .bind(bot_id)
+        .fetch_all(db)
+        .await?;
+        Ok(spaces)
     }
 }

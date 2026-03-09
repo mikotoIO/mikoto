@@ -1,6 +1,6 @@
 import { Box } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { faCrown } from '@fortawesome/free-solid-svg-icons';
+import { faCrown, faGlasses } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoMember, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useSetAtom } from 'jotai';
@@ -71,10 +71,10 @@ function MemberElement({ member }: { member: MikotoMember }) {
           px={1}
           minH="18px"
           variant="solid"
-          bg="primary"
+          bg="blue.500"
           color="white"
         >
-          BOT
+          <FontAwesomeIcon icon={faGlasses} />
         </Tag>
       )}
     </StyledMember>

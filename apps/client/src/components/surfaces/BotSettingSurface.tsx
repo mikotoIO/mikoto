@@ -5,16 +5,18 @@ import {
   Group,
   HStack,
   Input,
+  NativeSelect,
   Stack,
   Text,
   Textarea,
 } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { faCopy, faRobot, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faCopy, faPlus, faRobot, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { BotInfo, BotSpaceInfo } from '@mikoto-io/mikoto.js';
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
+import { useSnapshot } from 'valtio/react';
 import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
 
@@ -26,7 +28,7 @@ import { TabName } from '@/components/tabs';
 import { Button, DialogContent, Field } from '@/components/ui';
 import { toaster } from '@/components/ui/toaster';
 import { uploadFile } from '@/functions/fileUpload';
-import { useAuthClient } from '@/hooks';
+import { useAuthClient, useMikoto } from '@/hooks';
 import { useTabkit } from '@/store/surface';
 import { Form } from '@/ui';
 
@@ -341,9 +343,19 @@ function PermissionsSection({
 
 function SpacesSection({ bot }: { bot: BotInfo }) {
   const authClient = useAuthClient();
+  const mikoto = useMikoto();
+  useSnapshot(mikoto.spaces);
+
   const { result: spaces, execute: refresh } = useAsync(
     () => authClient.listBotSpaces(bot.id),
     [bot.id],
+  );
+
+  const [selectedSpaceId, setSelectedSpaceId] = useState('');
+
+  const installedSpaceIds = new Set(spaces?.map((s) => s.spaceId) ?? []);
+  const availableSpaces = Array.from(mikoto.spaces.cache.values()).filter(
+    (s) => !installedSpaceIds.has(s.id),
   );
 
   return (
@@ -371,6 +383,37 @@ function SpacesSection({ bot }: { bot: BotInfo }) {
           </Button>
         </SpaceRow>
       ))}
+      {availableSpaces.length > 0 && (
+        <HStack mt={3}>
+          <NativeSelect.Root size="sm" flex="1">
+            <NativeSelect.Field
+              value={selectedSpaceId}
+              onChange={(e) => setSelectedSpaceId(e.target.value)}
+            >
+              <option value="">Select a space...</option>
+              {availableSpaces.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </NativeSelect.Field>
+            <NativeSelect.Indicator />
+          </NativeSelect.Root>
+          <Button
+            size="sm"
+            colorPalette="primary"
+            disabled={!selectedSpaceId}
+            onClick={async () => {
+              await authClient.installBot(bot.id, { spaceId: selectedSpaceId });
+              toaster.success({ title: 'Bot added to space' });
+              setSelectedSpaceId('');
+              refresh();
+            }}
+          >
+            <FontAwesomeIcon icon={faPlus} /> Add
+          </Button>
+        </HStack>
+      )}
     </Section>
   );
 }

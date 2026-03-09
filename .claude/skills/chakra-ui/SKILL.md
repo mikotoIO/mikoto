@@ -36,13 +36,15 @@ The docs are located at: `/home/hayley/Projects/mikoto/.claude/skills/chakra-ui/
 
 ```tsx
 // System setup
-import { createSystem, defineConfig, defaultConfig } from "@chakra-ui/react"
+import { createSystem, defaultConfig, defineConfig } from '@chakra-ui/react';
 
 const config = defineConfig({
-  theme: { /* tokens, semanticTokens, recipes, slotRecipes */ },
-})
+  theme: {
+    /* tokens, semanticTokens, recipes, slotRecipes */
+  },
+});
 
-export const system = createSystem(defaultConfig, config)
+export const system = createSystem(defaultConfig, config);
 ```
 
 ```tsx
@@ -86,33 +88,33 @@ const StyledCustom = chakra(MyComponent)
 ### Recipes & Slot Recipes
 
 ```tsx
-import { defineRecipe, defineSlotRecipe } from "@chakra-ui/react"
+import { defineRecipe, defineSlotRecipe } from '@chakra-ui/react';
 
 // Single-part recipe
 const buttonRecipe = defineRecipe({
-  base: { fontWeight: "bold" },
+  base: { fontWeight: 'bold' },
   variants: {
     visual: {
-      solid: { bg: "blue.500", color: "white" },
-      outline: { border: "1px solid", borderColor: "blue.500" },
+      solid: { bg: 'blue.500', color: 'white' },
+      outline: { border: '1px solid', borderColor: 'blue.500' },
     },
     size: {
-      sm: { px: "2", py: "1", fontSize: "sm" },
-      lg: { px: "4", py: "2", fontSize: "lg" },
+      sm: { px: '2', py: '1', fontSize: 'sm' },
+      lg: { px: '4', py: '2', fontSize: 'lg' },
     },
   },
-  defaultVariants: { visual: "solid", size: "sm" },
-})
+  defaultVariants: { visual: 'solid', size: 'sm' },
+});
 
 // Multi-part slot recipe
 const cardRecipe = defineSlotRecipe({
-  slots: ["root", "header", "body", "footer"],
+  slots: ['root', 'header', 'body', 'footer'],
   base: {
-    root: { shadow: "md", borderRadius: "md" },
-    header: { fontWeight: "bold", p: "4" },
-    body: { p: "4" },
+    root: { shadow: 'md', borderRadius: 'md' },
+    header: { fontWeight: 'bold', p: '4' },
+    body: { p: '4' },
   },
-})
+});
 ```
 
 ### Composition with asChild
@@ -126,11 +128,11 @@ const cardRecipe = defineSlotRecipe({
 
 ### Key Semantic Tokens
 
-| Category | Tokens |
-|----------|--------|
+| Category   | Tokens                                                                                                                       |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | Background | `bg`, `bg.subtle`, `bg.muted`, `bg.emphasized`, `bg.inverted`, `bg.panel`, `bg.error`, `bg.warning`, `bg.success`, `bg.info` |
-| Text | `fg`, `fg.muted`, `fg.subtle`, `fg.inverted`, `fg.error`, `fg.warning`, `fg.success`, `fg.info` |
-| Border | `border`, `border.muted`, `border.subtle`, `border.emphasized`, `border.inverted`, `border.error` |
+| Text       | `fg`, `fg.muted`, `fg.subtle`, `fg.inverted`, `fg.error`, `fg.warning`, `fg.success`, `fg.info`                              |
+| Border     | `border`, `border.muted`, `border.subtle`, `border.emphasized`, `border.inverted`, `border.error`                            |
 
 ### CSS Cascade Layers
 

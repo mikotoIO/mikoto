@@ -64,9 +64,7 @@ pub struct Schema {
 
 impl Schema {
     pub fn ref_type_name(&self) -> Option<&str> {
-        self.ref_path
-            .as_deref()
-            .and_then(|p| p.rsplit('/').next())
+        self.ref_path.as_deref().and_then(|p| p.rsplit('/').next())
     }
 }
 

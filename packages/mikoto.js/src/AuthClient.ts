@@ -1,5 +1,5 @@
-import { debounce } from 'lodash-es';
 import { pluginToken } from '@zodios/plugins';
+import { debounce } from 'lodash-es';
 
 import {
   Api,

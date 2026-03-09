@@ -31,10 +31,7 @@ pub async fn index() -> Json<&'static IndexResponse> {
     .into()
 }
 
-async fn security_headers(
-    request: Request,
-    next: middleware::Next,
-) -> axum::response::Response {
+async fn security_headers(request: Request, next: middleware::Next) -> axum::response::Response {
     let mut response = next.run(request).await;
     let headers = response.headers_mut();
     headers.insert("X-Content-Type-Options", "nosniff".parse().unwrap());
@@ -61,9 +58,7 @@ pub fn router() -> Router {
             .expect("CORS_ORIGIN must be a valid header value");
         cors.allow_origin(origin)
     } else {
-        log::warn!(
-            "CORS_ORIGIN not set — allowing all origins. Set CORS_ORIGIN in production!"
-        );
+        log::warn!("CORS_ORIGIN not set — allowing all origins. Set CORS_ORIGIN in production!");
         cors.allow_origin(tower_http::cors::Any)
     };
 

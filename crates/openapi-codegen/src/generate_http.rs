@@ -269,11 +269,7 @@ fn build_path_expr(path: &str, params: &[PathParam]) -> String {
         format_args.push(pp.name.clone());
     }
 
-    format!(
-        "format!(\"{}\", {})",
-        format_str,
-        format_args.join(", ")
-    )
+    format!("format!(\"{}\", {})", format_str, format_args.join(", "))
 }
 
 fn find_param_in_path(path: &str, snake_name: &str) -> String {
@@ -375,10 +371,7 @@ mod tests {
 
     #[test]
     fn test_find_param_in_path_fallback() {
-        assert_eq!(
-            find_param_in_path("/api/items/{id}", "missing"),
-            "missing"
-        );
+        assert_eq!(find_param_in_path("/api/items/{id}", "missing"), "missing");
     }
 
     #[test]

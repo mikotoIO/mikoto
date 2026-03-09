@@ -29,7 +29,10 @@ impl RateLimiter {
     }
 
     pub fn check(&self, key: &str) -> Result<(), Error> {
-        let mut state = self.state.lock().unwrap();
+        let mut state = self
+            .state
+            .lock()
+            .map_err(|_| Error::internal("Rate limiter lock poisoned"))?;
         let now = Instant::now();
 
         // Periodic cleanup: remove expired entries when map grows large

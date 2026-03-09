@@ -5,7 +5,10 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Ban, Bot, MemberExt, MemberKey, Role, RoleToSpaceUser, SpaceExt, SpaceUser, User, UserCategory},
+    entities::{
+        Ban, Bot, MemberExt, MemberKey, Role, RoleToSpaceUser, SpaceExt, SpaceUser, User,
+        UserCategory,
+    },
     error::Error,
     functions::{
         jwt::Claims,
@@ -61,12 +64,16 @@ async fn create(
     // Verify the target user is a bot owned by the requesting user
     let user = User::find_by_id(body.user_id, db()).await?;
     if user.category != Some(UserCategory::Bot) {
-        return Err(Error::forbidden("Only bot users can be added as members via this endpoint"));
+        return Err(Error::forbidden(
+            "Only bot users can be added as members via this endpoint",
+        ));
     }
     let bot = Bot::find_by_id(body.user_id, db()).await?;
     let owner_id: Uuid = claim.sub.parse()?;
     if bot.owner_id != owner_id {
-        return Err(Error::forbidden("You can only add your own bots to a space"));
+        return Err(Error::forbidden(
+            "You can only add your own bots to a space",
+        ));
     }
 
     // Check ban
@@ -81,12 +88,7 @@ async fn create(
     member.create(db()).await?;
     let member = MemberExt::dataload_one(member, db()).await?;
 
-    emit_event(
-        "members.onCreate",
-        &member,
-        &format!("space:{space_id}"),
-    )
-    .await?;
+    emit_event("members.onCreate", &member, &format!("space:{space_id}")).await?;
 
     Ok(member.into())
 }

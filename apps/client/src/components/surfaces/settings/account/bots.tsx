@@ -1,4 +1,13 @@
-import { Box, Code, Group, HStack, Input, Stack, Text, Textarea } from '@chakra-ui/react';
+import {
+  Box,
+  Code,
+  Group,
+  HStack,
+  Input,
+  Stack,
+  Text,
+  Textarea,
+} from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faCopy, faRobot } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -41,7 +50,9 @@ const StatusPill = styled.span<{ online?: boolean }>`
   font-size: 12px;
   font-weight: 600;
   background-color: ${(p) =>
-    p.online ? 'var(--chakra-colors-green-600)' : 'var(--chakra-colors-gray-600)'};
+    p.online
+      ? 'var(--chakra-colors-green-600)'
+      : 'var(--chakra-colors-gray-600)'};
   color: white;
 `;
 
@@ -73,7 +84,9 @@ function BotCard({ id, name, visibility, user }: BotProps) {
           <Text fontWeight="bold" fontSize="lg">
             {name}
           </Text>
-          <StatusPill>{visibility === 'PUBLIC' ? 'Public' : 'Private'}</StatusPill>
+          <StatusPill>
+            {visibility === 'PUBLIC' ? 'Public' : 'Private'}
+          </StatusPill>
         </HStack>
         <Text fontSize="sm" color="gray.400">
           Bot ID: {id}
@@ -87,12 +100,7 @@ function TokenDisplay({ token }: { token: string }) {
   const [visible, setVisible] = useState(false);
   return (
     <Stack gap={2}>
-      <Box
-        bg="yellow.900"
-        p={3}
-        borderWidth="1px"
-        borderColor="yellow.600"
-      >
+      <Box bg="yellow.900" p={3} borderWidth="1px" borderColor="yellow.600">
         <Text fontWeight="bold" color="yellow.200" fontSize="sm">
           This token will only be shown once. Store it securely.
         </Text>
@@ -194,7 +202,8 @@ export function BotsSurface() {
     <SettingSurface>
       <h1>{t('accountSettings.bots.title')}</h1>
       <Text color="gray.400" mb={4}>
-        Create and manage bots that can interact with your spaces via the Mikoto API.
+        Create and manage bots that can interact with your spaces via the Mikoto
+        API.
       </Text>
       <Button
         colorPalette="primary"

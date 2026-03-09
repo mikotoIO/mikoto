@@ -4,7 +4,6 @@ import { QueryClientProvider } from '@tanstack/react-query';
 // Import styles
 import 'dockview-react/dist/styles/dockview.css';
 import React from 'react';
-
 import ReactDOM from 'react-dom/client';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -45,16 +44,16 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <HelmetProvider>
       <ChakraProvider forcedTheme="dark">
         <QueryClientProvider client={queryClient}>
-            <>
-              <Helmet>
-                {env.DEV && (
-                  <link rel="icon" type="image/png" href="/favicon-dev.ico" />
-                )}
-              </Helmet>
-              <Global styles={globalCss} />
-              <App />
-              <ToastContainer theme="dark" limit={3} />
-            </>
+          <>
+            <Helmet>
+              {env.DEV && (
+                <link rel="icon" type="image/png" href="/favicon-dev.ico" />
+              )}
+            </Helmet>
+            <Global styles={globalCss} />
+            <App />
+            <ToastContainer theme="dark" limit={3} />
+          </>
         </QueryClientProvider>
       </ChakraProvider>
     </HelmetProvider>

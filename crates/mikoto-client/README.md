@@ -31,10 +31,10 @@ moon mikoto-client:generate
 
 ## Modules
 
-| Module | Description |
-|---|---|
-| `client` | `MikotoClient` — main entry point with token-based auth |
-| `http` | `HttpClient` — lower-level HTTP client with mutable token |
-| `ws` | `WsConnection` — WebSocket connection for real-time events |
-| `error` | `ClientError` — unified error type (HTTP, WebSocket, JSON) |
+| Module      | Description                                                         |
+| ----------- | ------------------------------------------------------------------- |
+| `client`    | `MikotoClient` — main entry point with token-based auth             |
+| `http`      | `HttpClient` — lower-level HTTP client with mutable token           |
+| `ws`        | `WsConnection` — WebSocket connection for real-time events          |
+| `error`     | `ClientError` — unified error type (HTTP, WebSocket, JSON)          |
 | `generated` | Auto-generated types, HTTP API methods, and WebSocket message types |

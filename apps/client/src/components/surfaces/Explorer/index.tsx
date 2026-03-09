@@ -175,10 +175,7 @@ function ExplorerInner({ space }: { space: MikotoSpace }) {
     onDragStart(ev) {
       const tab = channelToTab(channel);
       ev.dataTransfer.effectAllowed = 'move';
-      ev.dataTransfer.setData(
-        'application/mikoto-tab',
-        JSON.stringify(tab),
-      );
+      ev.dataTransfer.setData('application/mikoto-tab', JSON.stringify(tab));
       ev.dataTransfer.setData('text/plain', channel.name);
     },
   }));

@@ -54,10 +54,7 @@ mod tests {
     #[test]
     fn test_ws_event_to_variant() {
         assert_eq!(ws_event_to_variant("channels.onCreate"), "ChannelsOnCreate");
-        assert_eq!(
-            ws_event_to_variant("messages.onDelete"),
-            "MessagesOnDelete"
-        );
+        assert_eq!(ws_event_to_variant("messages.onDelete"), "MessagesOnDelete");
         assert_eq!(ws_event_to_variant("typing.start"), "TypingStart");
     }
 }

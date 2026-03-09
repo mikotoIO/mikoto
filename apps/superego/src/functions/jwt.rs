@@ -11,7 +11,7 @@ use crate::{entities::Account, env::env, error::Error};
 // This can be used as an Axum extractor as well.
 #[derive(Debug, Clone, Serialize, Deserialize, OperationIo)]
 pub struct Claims {
-    pub exp: usize, // expiry
+    pub exp: usize,  // expiry
     pub sub: String, // user ID
     pub iss: String, // issuer
     pub aud: String, // audience

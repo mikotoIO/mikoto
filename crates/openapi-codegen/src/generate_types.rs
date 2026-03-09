@@ -108,10 +108,7 @@ fn generate_internally_tagged_enum(name: &str, variants: &[Schema]) -> String {
         let variant_name = enum_variant_name(tag_value);
 
         // Collect non-type fields
-        let other_fields: Vec<_> = props
-            .iter()
-            .filter(|(k, _)| k.as_str() != "type")
-            .collect();
+        let other_fields: Vec<_> = props.iter().filter(|(k, _)| k.as_str() != "type").collect();
 
         out.push_str(&format!("    #[serde(rename = \"{}\")]\n", tag_value));
         if other_fields.is_empty() {
@@ -193,15 +190,10 @@ fn generate_struct(name: &str, schema: &Schema) -> String {
             };
 
             // Handle default values and Option fields
-            let has_default = field_schema
-                .default
-                .as_ref()
-                .is_some_and(|d| d.is_array());
+            let has_default = field_schema.default.as_ref().is_some_and(|d| d.is_array());
 
             if matches!(&rust_type, RustType::Option(_)) && !is_required {
-                out.push_str(
-                    "    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n",
-                );
+                out.push_str("    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n");
             } else if has_default {
                 out.push_str("    #[serde(default)]\n");
             }

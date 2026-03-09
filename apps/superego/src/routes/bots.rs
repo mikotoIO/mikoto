@@ -9,7 +9,10 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Bot, BotCreatedResponse, BotInfo, BotSpaceInfo, BotVisibility, MemberKey, SpaceUser, TokenPair, User, UserPatch},
+    entities::{
+        Bot, BotCreatedResponse, BotInfo, BotSpaceInfo, BotVisibility, MemberKey, SpaceUser,
+        TokenPair, User, UserPatch,
+    },
     error::Error,
     functions::jwt::{jwt_key, Claims},
 };
@@ -175,10 +178,7 @@ async fn list_bots(account: Claims) -> Result<Json<Vec<BotInfo>>, Error> {
     Ok(Json(infos))
 }
 
-async fn get_bot(
-    account: Claims,
-    Path(bot_id): Path<Uuid>,
-) -> Result<Json<BotInfo>, Error> {
+async fn get_bot(account: Claims, Path(bot_id): Path<Uuid>) -> Result<Json<BotInfo>, Error> {
     let bot = Bot::find_by_id(bot_id, db()).await?;
     let owner_id = Uuid::parse_str(&account.sub)?;
     if bot.owner_id != owner_id {
@@ -227,10 +227,7 @@ async fn update_bot(
     Ok(Json(updated.to_info_with_user(db()).await?))
 }
 
-async fn delete_bot(
-    account: Claims,
-    Path(bot_id): Path<Uuid>,
-) -> Result<Json<()>, Error> {
+async fn delete_bot(account: Claims, Path(bot_id): Path<Uuid>) -> Result<Json<()>, Error> {
     let bot = Bot::find_by_id(bot_id, db()).await?;
     let owner_id = Uuid::parse_str(&account.sub)?;
     if bot.owner_id != owner_id {
@@ -287,11 +284,7 @@ async fn install_bot(
     }
 
     // Check if bot is already in the space
-    let existing = SpaceUser::get_by_key(
-        &MemberKey::new(body.space_id, bot_id),
-        db(),
-    )
-    .await;
+    let existing = SpaceUser::get_by_key(&MemberKey::new(body.space_id, bot_id), db()).await;
     if existing.is_ok() {
         return Err(Error::BadRequest);
     }

@@ -141,9 +141,13 @@ pub struct DocumentPatch {
 #[serde(tag = "type")]
 pub enum HandleOwner {
     #[serde(rename = "user")]
-    User { id: Uuid },
+    User {
+        id: Uuid,
+    },
     #[serde(rename = "space")]
-    Space { id: Uuid },
+    Space {
+        id: Uuid,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -532,6 +536,7 @@ pub struct VoiceToken {
     pub url: String,
 }
 
+
 // ===== HTTP API =====
 
 pub struct HttpApi<'a> {
@@ -547,14 +552,16 @@ impl<'a> HttpApi<'a> {
 
     pub async fn index(&self) -> Result<IndexResponse, ClientError> {
         let path = "/".to_string();
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
     pub async fn account_register(&self, body: &RegisterPayload) -> Result<TokenPair, ClientError> {
         let path = "/account/register".to_string();
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
@@ -562,7 +569,8 @@ impl<'a> HttpApi<'a> {
 
     pub async fn account_login(&self, body: &LoginPayload) -> Result<TokenPair, ClientError> {
         let path = "/account/login".to_string();
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
@@ -570,41 +578,36 @@ impl<'a> HttpApi<'a> {
 
     pub async fn account_refresh(&self, body: &RefreshPayload) -> Result<TokenPair, ClientError> {
         let path = "/account/refresh".to_string();
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn account_change_password(
-        &self,
-        body: &ChangePasswordPayload,
-    ) -> Result<TokenPair, ClientError> {
+    pub async fn account_change_password(&self, body: &ChangePasswordPayload) -> Result<TokenPair, ClientError> {
         let path = "/account/change_password".to_string();
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn account_reset_password(
-        &self,
-        body: &ResetPasswordPayload,
-    ) -> Result<(), ClientError> {
+    pub async fn account_reset_password(&self, body: &ResetPasswordPayload) -> Result<(), ClientError> {
         let path = "/account/reset_password".to_string();
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         let _ = resp.text().await?;
         Ok(())
     }
 
-    pub async fn account_reset_password_confirm(
-        &self,
-        body: &ResetPasswordConfirmData,
-    ) -> Result<(), ClientError> {
+    pub async fn account_reset_password_confirm(&self, body: &ResetPasswordConfirmData) -> Result<(), ClientError> {
         let path = "/account/reset_password/submit".to_string();
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         let _ = resp.text().await?;
@@ -613,17 +616,16 @@ impl<'a> HttpApi<'a> {
 
     pub async fn bots_list(&self) -> Result<Vec<BotInfo>, ClientError> {
         let path = "/bots/".to_string();
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn bots_create(
-        &self,
-        body: &CreateBotPayload,
-    ) -> Result<BotCreatedResponse, ClientError> {
+    pub async fn bots_create(&self, body: &CreateBotPayload) -> Result<BotCreatedResponse, ClientError> {
         let path = "/bots/".to_string();
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
@@ -631,7 +633,8 @@ impl<'a> HttpApi<'a> {
 
     pub async fn bots_login(&self, body: &BotLoginPayload) -> Result<TokenPair, ClientError> {
         let path = "/bots/login".to_string();
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
@@ -639,68 +642,60 @@ impl<'a> HttpApi<'a> {
 
     pub async fn bots_get(&self, bot_id: Uuid) -> Result<BotInfo, ClientError> {
         let path = format!("/bots/{}", bot_id);
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
     pub async fn bots_delete(&self, bot_id: Uuid) -> Result<(), ClientError> {
         let path = format!("/bots/{}", bot_id);
-        let mut req = self.client.delete(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         let _ = resp.text().await?;
         Ok(())
     }
 
-    pub async fn bots_update(
-        &self,
-        bot_id: Uuid,
-        body: &UpdateBotPayload,
-    ) -> Result<BotInfo, ClientError> {
+    pub async fn bots_update(&self, bot_id: Uuid, body: &UpdateBotPayload) -> Result<BotInfo, ClientError> {
         let path = format!("/bots/{}", bot_id);
-        let mut req = self.client.patch(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.patch(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn bots_regenerate_token(
-        &self,
-        bot_id: Uuid,
-    ) -> Result<BotCreatedResponse, ClientError> {
+    pub async fn bots_regenerate_token(&self, bot_id: Uuid) -> Result<BotCreatedResponse, ClientError> {
         let path = format!("/bots/{}/regenerate-token", bot_id);
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
     pub async fn bots_list_spaces(&self, bot_id: Uuid) -> Result<Vec<BotSpaceInfo>, ClientError> {
         let path = format!("/bots/{}/spaces", bot_id);
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn bots_install(
-        &self,
-        bot_id: Uuid,
-        body: &InstallBotPayload,
-    ) -> Result<(), ClientError> {
+    pub async fn bots_install(&self, bot_id: Uuid, body: &InstallBotPayload) -> Result<(), ClientError> {
         let path = format!("/bots/{}/install", bot_id);
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         let _ = resp.text().await?;
         Ok(())
     }
 
-    pub async fn bots_remove_from_space(
-        &self,
-        bot_id: Uuid,
-        space_id: Uuid,
-    ) -> Result<(), ClientError> {
+    pub async fn bots_remove_from_space(&self, bot_id: Uuid, space_id: Uuid) -> Result<(), ClientError> {
         let path = format!("/bots/{}/spaces/{}", bot_id, space_id);
-        let mut req = self.client.delete(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         let _ = resp.text().await?;
         Ok(())
@@ -708,28 +703,32 @@ impl<'a> HttpApi<'a> {
 
     pub async fn handles_resolve(&self, handle: String) -> Result<HandleResolution, ClientError> {
         let path = format!("/handles/{}", handle);
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
     pub async fn instance_info(&self) -> Result<InstanceInfo, ClientError> {
         let path = "/.well-known/mikoto/instance.json".to_string();
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
     pub async fn user_get(&self) -> Result<UserExt, ClientError> {
         let path = "/users/me".to_string();
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
     pub async fn user_update(&self, body: &UserPatch) -> Result<UserExt, ClientError> {
         let path = "/users/me".to_string();
-        let mut req = self.client.patch(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.patch(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
@@ -737,7 +736,8 @@ impl<'a> HttpApi<'a> {
 
     pub async fn user_set_handle(&self, body: &HandlePayload) -> Result<UserExt, ClientError> {
         let path = "/users/me/handle".to_string();
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
@@ -745,28 +745,25 @@ impl<'a> HttpApi<'a> {
 
     pub async fn user_delete_handle(&self) -> Result<UserExt, ClientError> {
         let path = "/users/me/handle".to_string();
-        let mut req = self.client.delete(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn user_start_handle_verification(
-        &self,
-        body: &VerifyHandleRequest,
-    ) -> Result<VerificationChallenge, ClientError> {
+    pub async fn user_start_handle_verification(&self, body: &VerifyHandleRequest) -> Result<VerificationChallenge, ClientError> {
         let path = "/users/me/handle/verify".to_string();
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn user_complete_handle_verification(
-        &self,
-        body: &VerifyHandleRequest,
-    ) -> Result<VerificationResult, ClientError> {
+    pub async fn user_complete_handle_verification(&self, body: &VerifyHandleRequest) -> Result<VerificationResult, ClientError> {
         let path = "/users/me/handle/verify/complete".to_string();
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
@@ -774,35 +771,40 @@ impl<'a> HttpApi<'a> {
 
     pub async fn relations_list(&self) -> Result<Vec<Relationship>, ClientError> {
         let path = "/relations/".to_string();
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
     pub async fn relations_get(&self, relation_id: Uuid) -> Result<Relationship, ClientError> {
         let path = format!("/relations/{}", relation_id);
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
     pub async fn relations_open_dm(&self, relation_id: Uuid) -> Result<User, ClientError> {
         let path = format!("/relations/{}/dm", relation_id);
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
     pub async fn spaces_list(&self) -> Result<Vec<SpaceExt>, ClientError> {
         let path = "/spaces/".to_string();
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
     pub async fn spaces_create(&self, body: &SpaceCreatePayload) -> Result<SpaceExt, ClientError> {
         let path = "/spaces/".to_string();
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
@@ -810,26 +812,25 @@ impl<'a> HttpApi<'a> {
 
     pub async fn spaces_get(&self, space_id: Uuid) -> Result<SpaceExt, ClientError> {
         let path = format!("/spaces/{}", space_id);
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
     pub async fn spaces_delete(&self, space_id: Uuid) -> Result<(), ClientError> {
         let path = format!("/spaces/{}", space_id);
-        let mut req = self.client.delete(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         let _ = resp.text().await?;
         Ok(())
     }
 
-    pub async fn spaces_update(
-        &self,
-        space_id: Uuid,
-        body: &SpaceUpdatePayload,
-    ) -> Result<SpaceExt, ClientError> {
+    pub async fn spaces_update(&self, space_id: Uuid, body: &SpaceUpdatePayload) -> Result<SpaceExt, ClientError> {
         let path = format!("/spaces/{}", space_id);
-        let mut req = self.client.patch(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.patch(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
@@ -837,45 +838,42 @@ impl<'a> HttpApi<'a> {
 
     pub async fn spaces_preview(&self, invite: String) -> Result<SpaceExt, ClientError> {
         let path = format!("/spaces/join/{}", invite);
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
     pub async fn spaces_join(&self, invite: String) -> Result<SpaceExt, ClientError> {
         let path = format!("/spaces/join/{}", invite);
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
     pub async fn spaces_leave(&self, space_id: Uuid) -> Result<(), ClientError> {
         let path = format!("/spaces/{}/leave", space_id);
-        let mut req = self.client.delete(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         let _ = resp.text().await?;
         Ok(())
     }
 
-    pub async fn spaces_start_handle_verification(
-        &self,
-        space_id: Uuid,
-        body: &VerifyHandleRequest,
-    ) -> Result<VerificationChallenge, ClientError> {
+    pub async fn spaces_start_handle_verification(&self, space_id: Uuid, body: &VerifyHandleRequest) -> Result<VerificationChallenge, ClientError> {
         let path = format!("/spaces/{}/handle/verify", space_id);
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn spaces_complete_handle_verification(
-        &self,
-        space_id: Uuid,
-        body: &VerifyHandleRequest,
-    ) -> Result<VerificationResult, ClientError> {
+    pub async fn spaces_complete_handle_verification(&self, space_id: Uuid, body: &VerifyHandleRequest) -> Result<VerificationResult, ClientError> {
         let path = format!("/spaces/{}/handle/verify/complete", space_id);
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
@@ -883,191 +881,129 @@ impl<'a> HttpApi<'a> {
 
     pub async fn channels_list(&self, space_id: Uuid) -> Result<Vec<Channel>, ClientError> {
         let path = format!("/spaces/{}/channels/", space_id);
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn channels_create(
-        &self,
-        space_id: Uuid,
-        body: &ChannelCreatePayload,
-    ) -> Result<Channel, ClientError> {
+    pub async fn channels_create(&self, space_id: Uuid, body: &ChannelCreatePayload) -> Result<Channel, ClientError> {
         let path = format!("/spaces/{}/channels/", space_id);
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn channels_get(
-        &self,
-        space_id: Uuid,
-        channel_id: Uuid,
-    ) -> Result<Channel, ClientError> {
+    pub async fn channels_get(&self, space_id: Uuid, channel_id: Uuid) -> Result<Channel, ClientError> {
         let path = format!("/spaces/{}/channels/{}", space_id, channel_id);
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn channels_delete(
-        &self,
-        space_id: Uuid,
-        channel_id: Uuid,
-    ) -> Result<(), ClientError> {
+    pub async fn channels_delete(&self, space_id: Uuid, channel_id: Uuid) -> Result<(), ClientError> {
         let path = format!("/spaces/{}/channels/{}", space_id, channel_id);
-        let mut req = self.client.delete(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         let _ = resp.text().await?;
         Ok(())
     }
 
-    pub async fn channels_update(
-        &self,
-        space_id: Uuid,
-        channel_id: Uuid,
-        body: &ChannelPatch,
-    ) -> Result<Channel, ClientError> {
+    pub async fn channels_update(&self, space_id: Uuid, channel_id: Uuid, body: &ChannelPatch) -> Result<Channel, ClientError> {
         let path = format!("/spaces/{}/channels/{}", space_id, channel_id);
-        let mut req = self.client.patch(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.patch(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn channels_unreads(
-        &self,
-        space_id: Uuid,
-    ) -> Result<Vec<ChannelUnread>, ClientError> {
+    pub async fn channels_unreads(&self, space_id: Uuid) -> Result<Vec<ChannelUnread>, ClientError> {
         let path = format!("/spaces/{}/channels/unreads", space_id);
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn channels_acknowledge(
-        &self,
-        space_id: Uuid,
-        channel_id: Uuid,
-    ) -> Result<(), ClientError> {
+    pub async fn channels_acknowledge(&self, space_id: Uuid, channel_id: Uuid) -> Result<(), ClientError> {
         let path = format!("/spaces/{}/channels/{}/ack", space_id, channel_id);
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         let _ = resp.text().await?;
         Ok(())
     }
 
-    pub async fn messages_list(
-        &self,
-        space_id: Uuid,
-        channel_id: Uuid,
-        cursor: Option<Uuid>,
-        limit: Option<i32>,
-    ) -> Result<Vec<MessageExt>, ClientError> {
+    pub async fn messages_list(&self, space_id: Uuid, channel_id: Uuid, cursor: Option<Uuid>, limit: Option<i32>) -> Result<Vec<MessageExt>, ClientError> {
         let path = format!("/spaces/{}/channels/{}/messages/", space_id, channel_id);
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
-        if let Some(v) = &cursor {
-            req = req.query(&[("cursor", v.to_string())]);
-        }
-        if let Some(v) = &limit {
-            req = req.query(&[("limit", v.to_string())]);
-        }
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
+        if let Some(v) = &cursor { req = req.query(&[("cursor", v.to_string())]); }
+        if let Some(v) = &limit { req = req.query(&[("limit", v.to_string())]); }
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn messages_create(
-        &self,
-        space_id: Uuid,
-        channel_id: Uuid,
-        body: &MessageSendPayload,
-    ) -> Result<MessageExt, ClientError> {
+    pub async fn messages_create(&self, space_id: Uuid, channel_id: Uuid, body: &MessageSendPayload) -> Result<MessageExt, ClientError> {
         let path = format!("/spaces/{}/channels/{}/messages/", space_id, channel_id);
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn messages_get(
-        &self,
-        space_id: Uuid,
-        channel_id: Uuid,
-        message_id: Uuid,
-    ) -> Result<MessageExt, ClientError> {
-        let path = format!(
-            "/spaces/{}/channels/{}/messages/{}",
-            space_id, channel_id, message_id
-        );
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+    pub async fn messages_get(&self, space_id: Uuid, channel_id: Uuid, message_id: Uuid) -> Result<MessageExt, ClientError> {
+        let path = format!("/spaces/{}/channels/{}/messages/{}", space_id, channel_id, message_id);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn messages_delete(
-        &self,
-        space_id: Uuid,
-        channel_id: Uuid,
-        message_id: Uuid,
-    ) -> Result<(), ClientError> {
-        let path = format!(
-            "/spaces/{}/channels/{}/messages/{}",
-            space_id, channel_id, message_id
-        );
-        let mut req = self.client.delete(self.url(&path)).bearer_auth(self.token);
+    pub async fn messages_delete(&self, space_id: Uuid, channel_id: Uuid, message_id: Uuid) -> Result<(), ClientError> {
+        let path = format!("/spaces/{}/channels/{}/messages/{}", space_id, channel_id, message_id);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         let _ = resp.text().await?;
         Ok(())
     }
 
-    pub async fn messages_update(
-        &self,
-        space_id: Uuid,
-        channel_id: Uuid,
-        message_id: Uuid,
-        body: &MessageEditPayload,
-    ) -> Result<MessageExt, ClientError> {
-        let path = format!(
-            "/spaces/{}/channels/{}/messages/{}",
-            space_id, channel_id, message_id
-        );
-        let mut req = self.client.patch(self.url(&path)).bearer_auth(self.token);
+    pub async fn messages_update(&self, space_id: Uuid, channel_id: Uuid, message_id: Uuid, body: &MessageEditPayload) -> Result<MessageExt, ClientError> {
+        let path = format!("/spaces/{}/channels/{}/messages/{}", space_id, channel_id, message_id);
+        let mut req = self.client.patch(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn voice_join(
-        &self,
-        space_id: Uuid,
-        channel_id: Uuid,
-    ) -> Result<VoiceToken, ClientError> {
+    pub async fn voice_join(&self, space_id: Uuid, channel_id: Uuid) -> Result<VoiceToken, ClientError> {
         let path = format!("/spaces/{}/channels/{}/voice/", space_id, channel_id);
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn documents_get(
-        &self,
-        space_id: Uuid,
-        channel_id: Uuid,
-    ) -> Result<Document, ClientError> {
+    pub async fn documents_get(&self, space_id: Uuid, channel_id: Uuid) -> Result<Document, ClientError> {
         let path = format!("/spaces/{}/channels/{}/documents/", space_id, channel_id);
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn documents_update(
-        &self,
-        space_id: Uuid,
-        channel_id: Uuid,
-        body: &DocumentPatch,
-    ) -> Result<Document, ClientError> {
+    pub async fn documents_update(&self, space_id: Uuid, channel_id: Uuid, body: &DocumentPatch) -> Result<Document, ClientError> {
         let path = format!("/spaces/{}/channels/{}/documents/", space_id, channel_id);
-        let mut req = self.client.patch(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.patch(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
@@ -1075,86 +1011,67 @@ impl<'a> HttpApi<'a> {
 
     pub async fn members_list(&self, space_id: Uuid) -> Result<Vec<MemberExt>, ClientError> {
         let path = format!("/spaces/{}/members/", space_id);
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn members_create(
-        &self,
-        space_id: Uuid,
-        body: &MemberCreatePayload,
-    ) -> Result<MemberExt, ClientError> {
+    pub async fn members_create(&self, space_id: Uuid, body: &MemberCreatePayload) -> Result<MemberExt, ClientError> {
         let path = format!("/spaces/{}/members/", space_id);
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn members_get(
-        &self,
-        space_id: Uuid,
-        user_id: Uuid,
-    ) -> Result<MemberExt, ClientError> {
+    pub async fn members_get(&self, space_id: Uuid, user_id: Uuid) -> Result<MemberExt, ClientError> {
         let path = format!("/spaces/{}/members/{}", space_id, user_id);
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
     pub async fn members_delete(&self, space_id: Uuid, user_id: Uuid) -> Result<(), ClientError> {
         let path = format!("/spaces/{}/members/{}", space_id, user_id);
-        let mut req = self.client.delete(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         let _ = resp.text().await?;
         Ok(())
     }
 
-    pub async fn members_update(
-        &self,
-        space_id: Uuid,
-        user_id: Uuid,
-        body: &MemberUpdatePayload,
-    ) -> Result<MemberExt, ClientError> {
+    pub async fn members_update(&self, space_id: Uuid, user_id: Uuid, body: &MemberUpdatePayload) -> Result<MemberExt, ClientError> {
         let path = format!("/spaces/{}/members/{}", space_id, user_id);
-        let mut req = self.client.patch(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.patch(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn members_add_role(
-        &self,
-        space_id: Uuid,
-        user_id: Uuid,
-        role_id: Uuid,
-    ) -> Result<MemberExt, ClientError> {
+    pub async fn members_add_role(&self, space_id: Uuid, user_id: Uuid, role_id: Uuid) -> Result<MemberExt, ClientError> {
         let path = format!("/spaces/{}/members/{}/roles/{}", space_id, user_id, role_id);
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn members_remove_role(
-        &self,
-        space_id: Uuid,
-        user_id: Uuid,
-        role_id: Uuid,
-    ) -> Result<MemberExt, ClientError> {
+    pub async fn members_remove_role(&self, space_id: Uuid, user_id: Uuid, role_id: Uuid) -> Result<MemberExt, ClientError> {
         let path = format!("/spaces/{}/members/{}/roles/{}", space_id, user_id, role_id);
-        let mut req = self.client.delete(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn roles_create(
-        &self,
-        space_id: Uuid,
-        body: &RoleCreatePayload,
-    ) -> Result<Role, ClientError> {
+    pub async fn roles_create(&self, space_id: Uuid, body: &RoleCreatePayload) -> Result<Role, ClientError> {
         let path = format!("/spaces/{}/roles/", space_id);
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
@@ -1162,20 +1079,17 @@ impl<'a> HttpApi<'a> {
 
     pub async fn roles_delete(&self, space_id: Uuid, role_id: Uuid) -> Result<(), ClientError> {
         let path = format!("/spaces/{}/roles/{}", space_id, role_id);
-        let mut req = self.client.delete(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         let _ = resp.text().await?;
         Ok(())
     }
 
-    pub async fn roles_update(
-        &self,
-        space_id: Uuid,
-        role_id: Uuid,
-        body: &RolePatch,
-    ) -> Result<Role, ClientError> {
+    pub async fn roles_update(&self, space_id: Uuid, role_id: Uuid, body: &RolePatch) -> Result<Role, ClientError> {
         let path = format!("/spaces/{}/roles/{}", space_id, role_id);
-        let mut req = self.client.patch(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.patch(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
@@ -1183,18 +1097,16 @@ impl<'a> HttpApi<'a> {
 
     pub async fn invites_list(&self, space_id: Uuid) -> Result<Vec<Invite>, ClientError> {
         let path = format!("/spaces/{}/invites/", space_id);
-        let mut req = self.client.get(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
 
-    pub async fn invites_create(
-        &self,
-        space_id: Uuid,
-        body: &InviteCreatePayload,
-    ) -> Result<Invite, ClientError> {
+    pub async fn invites_create(&self, space_id: Uuid, body: &InviteCreatePayload) -> Result<Invite, ClientError> {
         let path = format!("/spaces/{}/invites/", space_id);
-        let mut req = self.client.post(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
@@ -1202,11 +1114,13 @@ impl<'a> HttpApi<'a> {
 
     pub async fn invites_delete(&self, space_id: Uuid, invite_id: Uuid) -> Result<(), ClientError> {
         let path = format!("/spaces/{}/invites/{}", space_id, invite_id);
-        let mut req = self.client.delete(self.url(&path)).bearer_auth(self.token);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         let _ = resp.text().await?;
         Ok(())
     }
+
 }
 
 // ===== WebSocket =====

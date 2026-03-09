@@ -145,6 +145,9 @@ async fn delete(
     Load(acting_member): Load<MemberExt>,
     Path((space_id, user_id)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<()>, Error> {
+    if acting_member.user.base.id == user_id {
+        return Err(Error::forbidden("You cannot ban yourself"));
+    }
     permissions_or_admin(&space, &acting_member, Permission::BAN)?;
 
     // ban user

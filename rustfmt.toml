@@ -1,3 +1,0 @@
-ignore = [
-    "crates/mikoto-client/src/generated.rs",
-]

@@ -24,7 +24,9 @@ export function UserContextMenu({ user, member }: UserContextMenuProps) {
       >
         Profile
       </ContextMenu.Link>
-      {member && member.checkPermission(permissions.ban) && (
+      {member &&
+        member.space?.member?.userId !== member.userId &&
+        member.space?.member?.checkPermission(permissions.ban) && (
         <ContextMenu.Link
           onClick={async () => {
             await member.kick();

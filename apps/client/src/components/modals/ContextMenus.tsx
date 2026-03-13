@@ -27,13 +27,22 @@ export function UserContextMenu({ user, member }: UserContextMenuProps) {
       {member &&
         member.space?.member?.userId !== member.userId &&
         member.space?.member?.checkPermission(permissions.ban) && (
-        <ContextMenu.Link
-          onClick={async () => {
-            await member.kick();
-          }}
-        >
-          Kick {user.name}
-        </ContextMenu.Link>
+        <>
+          <ContextMenu.Link
+            onClick={async () => {
+              await member.kick();
+            }}
+          >
+            Kick {user.name}
+          </ContextMenu.Link>
+          <ContextMenu.Link
+            onClick={async () => {
+              await member.ban();
+            }}
+          >
+            Ban {user.name}
+          </ContextMenu.Link>
+        </>
       )}
     </ContextMenu>
   );

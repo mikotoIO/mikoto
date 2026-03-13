@@ -13,6 +13,26 @@ use crate::error::ClientError;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct BanCreatePayload {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
+    pub user_id: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BanInfo {
+    pub id: Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
+    pub space_id: Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user: Option<User>,
+    pub user_id: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct BotCreatedResponse {
     pub id: Uuid,
     pub name: String,
@@ -1094,6 +1114,32 @@ impl<'a> HttpApi<'a> {
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
+    }
+
+    pub async fn bans_list(&self, space_id: Uuid) -> Result<Vec<BanInfo>, ClientError> {
+        let path = format!("/spaces/{}/bans/", space_id);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn bans_create(&self, space_id: Uuid, body: &BanCreatePayload) -> Result<BanInfo, ClientError> {
+        let path = format!("/spaces/{}/bans/", space_id);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        req = req.json(body);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn bans_delete(&self, space_id: Uuid, user_id: Uuid) -> Result<(), ClientError> {
+        let path = format!("/spaces/{}/bans/{}", space_id, user_id);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
     }
 
     pub async fn invites_list(&self, space_id: Uuid) -> Result<Vec<Invite>, ClientError> {

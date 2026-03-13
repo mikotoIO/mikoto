@@ -374,6 +374,21 @@ export const RolePatch = z.object({
 });
 export type RolePatch = z.infer<typeof RolePatch>;
 
+export const BanInfo = z.object({
+  id: z.string().uuid(),
+  reason: z.union([z.string(), z.null()]).optional(),
+  spaceId: z.string().uuid(),
+  user: z.union([User, z.null()]).optional(),
+  userId: z.string().uuid(),
+});
+export type BanInfo = z.infer<typeof BanInfo>;
+
+export const BanCreatePayload = z.object({
+  reason: z.union([z.string(), z.null()]).optional(),
+  userId: z.string().uuid(),
+});
+export type BanCreatePayload = z.infer<typeof BanCreatePayload>;
+
 export const Invite = z.object({
   createdAt: Timestamp.datetime({ offset: true }),
   creatorId: z.string().uuid(),
@@ -469,6 +484,8 @@ export const schemas = {
   MemberUpdatePayload,
   RoleCreatePayload,
   RolePatch,
+  BanInfo,
+  BanCreatePayload,
   Invite,
   InviteCreatePayload,
   ListQuery,
@@ -753,6 +770,34 @@ const endpoints = makeApi([
       },
     ],
     response: SpaceExt,
+  },
+  {
+    method: "get",
+    path: "/spaces/:spaceId/bans/",
+    alias: "bans.list",
+    requestFormat: "json",
+    response: z.array(BanInfo),
+  },
+  {
+    method: "post",
+    path: "/spaces/:spaceId/bans/",
+    alias: "bans.create",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: BanCreatePayload,
+      },
+    ],
+    response: BanInfo,
+  },
+  {
+    method: "delete",
+    path: "/spaces/:spaceId/bans/:userId",
+    alias: "bans.delete",
+    requestFormat: "json",
+    response: z.null(),
   },
   {
     method: "get",

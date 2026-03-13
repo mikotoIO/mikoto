@@ -1447,7 +1447,7 @@
         "tags": [
           "Members"
         ],
-        "summary": "Ban Member",
+        "summary": "Kick Member",
         "operationId": "members.delete",
         "responses": {
           "200": {
@@ -1613,6 +1613,80 @@
         }
       }
     },
+    "/spaces/{spaceId}/bans/": {
+      "get": {
+        "tags": [
+          "Bans"
+        ],
+        "summary": "List Bans",
+        "operationId": "bans.list",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BanInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Bans"
+        ],
+        "summary": "Ban User",
+        "operationId": "bans.create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BanCreatePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BanInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/bans/{userId}": {
+      "delete": {
+        "tags": [
+          "Bans"
+        ],
+        "summary": "Unban User",
+        "operationId": "bans.delete",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/spaces/{spaceId}/invites/": {
       "get": {
         "tags": [
@@ -1690,6 +1764,62 @@
   },
   "components": {
     "schemas": {
+      "BanCreatePayload": {
+        "type": "object",
+        "required": [
+          "userId"
+        ],
+        "properties": {
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "BanInfo": {
+        "type": "object",
+        "required": [
+          "id",
+          "spaceId",
+          "userId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "spaceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/User"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "BotCreatedResponse": {
         "type": "object",
         "required": [

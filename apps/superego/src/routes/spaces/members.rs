@@ -146,18 +146,9 @@ async fn delete(
     Path((space_id, user_id)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<()>, Error> {
     if acting_member.user.base.id == user_id {
-        return Err(Error::forbidden("You cannot ban yourself"));
+        return Err(Error::forbidden("You cannot kick yourself"));
     }
     permissions_or_admin(&space, &acting_member, Permission::BAN)?;
-
-    // ban user
-    let ban = Ban {
-        id: Uuid::new_v4(),
-        user_id,
-        space_id,
-        reason: None,
-    };
-    ban.create(db()).await?;
 
     let key = MemberKey::new(space_id, user_id);
     let member = SpaceUser::get_by_key(&key, db()).await?;
@@ -202,7 +193,7 @@ pub fn router() -> AppRouter<State> {
         .route(
             "/:userId",
             delete_with(delete, |o| {
-                o.tag(TAG).id("members.delete").summary("Ban Member")
+                o.tag(TAG).id("members.delete").summary("Kick Member")
             }),
         )
         .route(

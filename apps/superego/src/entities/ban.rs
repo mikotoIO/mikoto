@@ -45,9 +45,37 @@ impl Ban {
         Ok(ban)
     }
 
+    pub async fn list_by_space<'c, X: sqlx::PgExecutor<'c>>(
+        space_id: Uuid,
+        db: X,
+    ) -> Result<Vec<Self>, Error> {
+        let bans = sqlx::query_as(
+            r#"
+            SELECT * FROM "Ban" WHERE "spaceId" = $1
+            "#,
+        )
+        .bind(space_id)
+        .fetch_all(db)
+        .await?;
+        Ok(bans)
+    }
+
     pub async fn delete<'c, X: sqlx::PgExecutor<'c>>(id: Uuid, db: X) -> Result<(), Error> {
         sqlx::query(r#"DELETE FROM "Ban" WHERE "id" = $1"#)
             .bind(id)
+            .execute(db)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn delete_by_space_and_user<'c, X: sqlx::PgExecutor<'c>>(
+        space_id: Uuid,
+        user_id: Uuid,
+        db: X,
+    ) -> Result<(), Error> {
+        sqlx::query(r#"DELETE FROM "Ban" WHERE "spaceId" = $1 AND "userId" = $2"#)
+            .bind(space_id)
+            .bind(user_id)
             .execute(db)
             .await?;
         Ok(())

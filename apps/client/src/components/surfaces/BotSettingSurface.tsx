@@ -11,14 +11,19 @@ import {
   Textarea,
 } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { faCopy, faPlus, faRobot, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCopy,
+  faPlus,
+  faRobot,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { BotInfo, BotSpaceInfo } from '@mikoto-io/mikoto.js';
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
-import { useSnapshot } from 'valtio/react';
 import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
+import { useSnapshot } from 'valtio/react';
 
 import { modalState } from '@/components/ContextMenu';
 import { Surface } from '@/components/Surface';

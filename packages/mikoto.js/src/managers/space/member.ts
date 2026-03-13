@@ -60,6 +60,13 @@ export class MikotoMember extends ZSchema(MemberExt) {
     });
   }
 
+  async ban(reason?: string) {
+    await this.client.rest['bans.create'](
+      { userId: this.userId, reason: reason ?? null },
+      { params: { spaceId: this.spaceId } },
+    );
+  }
+
   checkPermission(action: string | bigint) {
     if (!this.space) return false;
     if (this.isOwner) return true;

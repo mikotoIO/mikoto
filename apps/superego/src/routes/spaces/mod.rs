@@ -28,6 +28,7 @@ use super::{
     ws::{state::State, SocketAction},
 };
 
+pub mod bans;
 pub mod invites;
 pub mod members;
 pub mod roles;

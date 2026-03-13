@@ -9,6 +9,8 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+// Register PWA service worker
+import { registerSW } from 'virtual:pwa-register';
 
 import App from '@/App';
 import { globalCss } from '@/components/chakraTheme';
@@ -64,9 +66,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
-
-// Register PWA service worker
-import { registerSW } from 'virtual:pwa-register';
 
 registerSW({
   onNeedRefresh() {

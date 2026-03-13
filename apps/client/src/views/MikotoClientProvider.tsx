@@ -36,10 +36,7 @@ export function MikotoClientProvider({
   const [mikoto, setMikoto] = useState<MikotoConnectionState>('connecting');
   const [err, setErr] = useState<AxiosError | null>(null);
 
-  const setupMikotoClient = async (
-    mi: MikotoClient,
-    signal: AbortSignal,
-  ) => {
+  const setupMikotoClient = async (mi: MikotoClient, signal: AbortSignal) => {
     for (let attempt = 0; ; attempt++) {
       if (signal.aborted) return;
 

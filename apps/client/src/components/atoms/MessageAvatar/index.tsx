@@ -5,13 +5,13 @@ import { permissions } from '@mikoto-io/permcheck';
 import { useSetAtom } from 'jotai';
 import { useRef, useState } from 'react';
 
+import { useTabkit } from '@/store/surface';
+
 import {
   contextMenuState,
-  modalState,
   useContextMenu,
 } from '@/components/ContextMenu';
 import { UserContextMenu } from '@/components/modals/ContextMenus';
-import { ProfileModal } from '@/components/modals/Profile';
 import { Checkbox } from '@/components/ui';
 import { useMaybeSnapshot } from '@/hooks';
 import { checkNonNull } from '@/utils/assertNonNull';
@@ -108,7 +108,7 @@ export function MemberContextMenu({
   member?: MikotoMember;
 }) {
   const memberSnap = useMaybeSnapshot(member);
-  const setModal = useSetAtom(modalState);
+  const tabkit = useTabkit();
 
   const [roleEditorOpen, setRoleEditorOpen] = useState(false);
   const setContextMenu = useSetAtom(contextMenuState);
@@ -125,8 +125,10 @@ export function MemberContextMenu({
               userId={user.id}
               size={80}
               onClick={() => {
-                setModal({
-                  elem: <ProfileModal user={user} />,
+                tabkit.openTab({
+                  kind: 'profile',
+                  key: user.id,
+                  user,
                 });
                 setContextMenu(null);
               }}

@@ -1,9 +1,8 @@
 import { MikotoMember, User } from '@mikoto-io/mikoto.js';
 import { permissions } from '@mikoto-io/permcheck';
-import { useSetAtom } from 'jotai';
 
-import { ContextMenu, modalState } from '@/components/ContextMenu';
-import { ProfileModal } from '@/components/modals/Profile';
+import { ContextMenu } from '@/components/ContextMenu';
+import { useTabkit } from '@/store/surface';
 
 interface UserContextMenuProps {
   user: User;
@@ -11,14 +10,16 @@ interface UserContextMenuProps {
 }
 
 export function UserContextMenu({ user, member }: UserContextMenuProps) {
-  const setModal = useSetAtom(modalState);
+  const tabkit = useTabkit();
 
   return (
     <ContextMenu>
       <ContextMenu.Link
         onClick={() => {
-          setModal({
-            elem: <ProfileModal user={user} />,
+          tabkit.openTab({
+            kind: 'profile',
+            key: user.id,
+            user,
           });
         }}
       >

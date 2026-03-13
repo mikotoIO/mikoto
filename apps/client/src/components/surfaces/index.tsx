@@ -7,6 +7,7 @@ import { BotSettingSurface } from './BotSettingSurface';
 import { DiscoverySurface } from './DiscoverySurface';
 import { DMExplorerSurface, ExplorerSurface } from './Explorer';
 import { FriendsSurface } from './FriendsSurface';
+import { ProfileSurface } from './ProfileSurface';
 import { MessageSurface } from './Messages';
 import { SearchSurface } from './SearchSurface';
 import { SpaceExplorerSurface } from './SpaceExplorerSurface';
@@ -26,6 +27,7 @@ export const surfaceMap = {
   channelSettings: ChannelSettingsSurface,
   botSettings: BotSettingSurface,
   friends: FriendsSurface,
+  profile: ProfileSurface,
   discovery: DiscoverySurface,
   palette: DesignStory,
   welcome: WelcomeSurface,

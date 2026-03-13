@@ -9,6 +9,8 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+// Register PWA service worker
+import { registerSW } from 'virtual:pwa-register';
 
 import App from '@/App';
 import { globalCss } from '@/components/chakraTheme';
@@ -64,3 +66,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+
+registerSW({
+  onNeedRefresh() {
+    // TODO: show a toast/prompt to the user to refresh
+    console.log('New content available, refresh to update.');
+  },
+  onOfflineReady() {
+    console.log('App ready to work offline.');
+  },
+});

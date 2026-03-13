@@ -66,4 +66,21 @@ impl WsConnection {
         }
         Ok(None)
     }
+
+    /// Receive the next raw text message from the WebSocket.
+    ///
+    /// Returns `Ok(None)` when the connection is closed. Unlike [`recv`],
+    /// this does not attempt to deserialize the message, which is useful
+    /// for frameworks that need to handle unknown event types gracefully.
+    pub async fn recv_text(&mut self) -> Result<Option<String>, ClientError> {
+        while let Some(msg) = self.read.next().await {
+            let msg = msg?;
+            match msg {
+                Message::Text(text) => return Ok(Some(text.to_string())),
+                Message::Close(_) => return Ok(None),
+                _ => continue,
+            }
+        }
+        Ok(None)
+    }
 }

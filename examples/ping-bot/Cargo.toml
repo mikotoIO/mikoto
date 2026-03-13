@@ -1,0 +1,12 @@
+[package]
+name = "ping-bot"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+mikoto-client = { path = "../../crates/mikoto-client" }
+tokio = { version = "1", features = ["full"] }
+uuid = { version = "1", features = ["serde"] }
+dotenvy = "0.15"
+async-trait = "0.1"
+tracing-subscriber = "0.3"

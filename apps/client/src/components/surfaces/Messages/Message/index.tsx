@@ -1,5 +1,11 @@
 import { Box, Flex, Link } from '@chakra-ui/react';
 import styled from '@emotion/styled';
+import {
+  faGears,
+  faGlasses,
+  faSprayCanSparkles,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoMessage } from '@mikoto-io/mikoto.js';
 import { atom, useSetAtom } from 'jotai';
 import { useSnapshot } from 'valtio/react';
@@ -144,10 +150,10 @@ export const MessageItem = ({ message, isSimple }: MessageProps) => {
                 px={1}
                 minH="18px"
                 variant="solid"
-                bg="primary"
+                bg="blue.500"
                 color="white"
               >
-                BOT
+                <FontAwesomeIcon icon={faGlasses} />
               </Tag>
             )}
             <Timestamp time={new Date(messageSnap.timestamp)} />

@@ -64,3 +64,16 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+
+// Register PWA service worker
+import { registerSW } from 'virtual:pwa-register';
+
+registerSW({
+  onNeedRefresh() {
+    // TODO: show a toast/prompt to the user to refresh
+    console.log('New content available, refresh to update.');
+  },
+  onOfflineReady() {
+    console.log('App ready to work offline.');
+  },
+});

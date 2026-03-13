@@ -7,6 +7,9 @@ import { env } from '@/env';
 import { AuthContext, MikotoContext } from '@/hooks';
 import { authClient } from '@/store/authClient';
 
+const BASE_DELAY_MS = 1000;
+const MAX_DELAY_MS = 16000;
+
 function registerNotifications(_mikoto: MikotoClient) {
   // mikoto.client.messages.onCreate((msg) => {
   //   notifyFromMessage(mikoto, msg);
@@ -33,16 +36,49 @@ export function MikotoClientProvider({
   const [mikoto, setMikoto] = useState<MikotoConnectionState>('connecting');
   const [err, setErr] = useState<AxiosError | null>(null);
 
-  const setupMikotoClient = async (mi: MikotoClient) => {
-    try {
-      await Promise.all([mi.spaces.list(), mi.user.load()]);
-      registerNotifications(mi);
-      setMikoto(mi);
-    } catch (e) {
-      console.error('Failed to connect to Mikoto API');
-      console.error(e);
-      setMikoto('disconnected');
-      setErr(e as AxiosError);
+  const setupMikotoClient = async (
+    mi: MikotoClient,
+    signal: AbortSignal,
+  ) => {
+    for (let attempt = 0; ; attempt++) {
+      if (signal.aborted) return;
+
+      try {
+        await Promise.all([mi.spaces.list(), mi.user.load()]);
+        registerNotifications(mi);
+        setMikoto(mi);
+        return;
+      } catch (e) {
+        const axiosErr = e as AxiosError;
+        const status = axiosErr.response?.status;
+
+        // Don't retry auth errors
+        if (status === 401 || status === 403) {
+          setMikoto('disconnected');
+          setErr(axiosErr);
+          return;
+        }
+
+        const delay = Math.min(
+          BASE_DELAY_MS * 2 ** attempt + Math.random() * 500,
+          MAX_DELAY_MS,
+        );
+        console.warn(
+          `Connection attempt ${attempt + 1} failed, retrying in ${Math.round(delay)}ms...`,
+        );
+        setMikoto('reconnecting');
+        await new Promise<void>((resolve) => {
+          const timer = setTimeout(resolve, delay);
+          signal.addEventListener(
+            'abort',
+            () => {
+              clearTimeout(timer);
+              resolve();
+            },
+            { once: true },
+          );
+        });
+      }
     }
   };
 
@@ -51,14 +87,16 @@ export function MikotoClientProvider({
   useEffect(() => {
     if (!initialized.current) {
       initialized.current = true;
+      const abortController = new AbortController();
 
       const mi = new MikotoClient({
         url: env.PUBLIC_SERVER_URL,
         auth: authClient,
       });
-      setupMikotoClient(mi);
+      setupMikotoClient(mi, abortController.signal);
 
       return () => {
+        abortController.abort();
         mi.disconnect();
         setMikoto('disconnected');
       };
@@ -66,23 +104,6 @@ export function MikotoClientProvider({
 
     return () => {};
   }, []);
-
-  // FIXME: Rework the heartbeat system
-  // useInterval(() => {
-  //   if (!(mikoto instanceof MikotoClient)) {
-  //     console.log(`current client state: ${mikoto}: reconnecting`);
-  //     buildMikotoClient().then();
-  //     return;
-  //   }
-
-  //   Promise.race([wait(PING_TIMEOUT), mikoto.client.ping({})]).catch(() => {
-  //     console.warn('Ping failed, websocket timeout');
-  //     // clean up the old client to avoid memory leaks, before reconnecting
-  //     mikoto.disconnect();
-  //     setMikoto('reconnecting');
-  //     buildMikotoClient().then();
-  //   });
-  // }, PING_INTERVAL);
 
   if (err !== null) {
     const status = err.response?.status;

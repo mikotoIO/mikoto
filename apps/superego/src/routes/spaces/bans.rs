@@ -125,15 +125,11 @@ pub fn router() -> AppRouter<State> {
     AppRouter::new()
         .route(
             "/",
-            get_with(list, |o| {
-                o.tag(TAG).id("bans.list").summary("List Bans")
-            }),
+            get_with(list, |o| o.tag(TAG).id("bans.list").summary("List Bans")),
         )
         .route(
             "/",
-            post_with(create, |o| {
-                o.tag(TAG).id("bans.create").summary("Ban User")
-            }),
+            post_with(create, |o| o.tag(TAG).id("bans.create").summary("Ban User")),
         )
         .route(
             "/:userId",

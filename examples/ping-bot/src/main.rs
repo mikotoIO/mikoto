@@ -42,7 +42,10 @@ impl EventHandler for PingBot {
     }
 
     async fn channel_create(&self, _ctx: Context, channel: Channel) {
-        println!("New channel '{}' in space {}", channel.name, channel.space_id);
+        println!(
+            "New channel '{}' in space {}",
+            channel.name, channel.space_id
+        );
     }
 }
 

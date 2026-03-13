@@ -51,7 +51,11 @@ impl Cache {
         self.roles.get(&id)
     }
 
-    pub fn member(&self, space_id: Uuid, user_id: Uuid) -> Option<Ref<'_, (Uuid, Uuid), MemberExt>> {
+    pub fn member(
+        &self,
+        space_id: Uuid,
+        user_id: Uuid,
+    ) -> Option<Ref<'_, (Uuid, Uuid), MemberExt>> {
         self.members.get(&(space_id, user_id))
     }
 

@@ -14,7 +14,10 @@ use crate::{
         SpaceExt, SpaceUser, TokenPair, User, UserPatch,
     },
     error::Error,
-    functions::{jwt::{jwt_key, Claims}, pubsub::emit_event},
+    functions::{
+        jwt::{jwt_key, Claims},
+        pubsub::emit_event,
+    },
 };
 
 pub fn router() -> ApiRouter {
@@ -327,12 +330,7 @@ async fn remove_bot_from_space(
 
     SpaceUser::delete_by_key(&key, db()).await?;
 
-    emit_event(
-        "members.onDelete",
-        &member,
-        &format!("space:{space_id}"),
-    )
-    .await?;
+    emit_event("members.onDelete", &member, &format!("space:{space_id}")).await?;
     emit_event("spaces.onDelete", &space, &format!("user:{bot_id}")).await?;
 
     Ok(Json(()))

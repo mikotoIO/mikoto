@@ -61,6 +61,7 @@ export default ({ mode }: { mode: string }) =>
           ],
         },
         workbox: {
+          maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
           globPatterns: ['**/*.{js,css,html,ico,svg,woff,woff2,ttf}'],
           navigateFallback: 'index.html',
           runtimeCaching: [

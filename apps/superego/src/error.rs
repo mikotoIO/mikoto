@@ -27,7 +27,7 @@ pub enum Error {
     FileTooLarge,
 
     // errors relating to services
-    #[error("Database error")]
+    #[error("{0}")]
     DatabaseError(#[from] sqlx::Error),
     #[error("Cache error")]
     RedisError(#[from] fred::error::Error),

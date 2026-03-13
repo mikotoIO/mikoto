@@ -10,11 +10,11 @@ use uuid::Uuid;
 use crate::{
     db::db,
     entities::{
-        Bot, BotCreatedResponse, BotInfo, BotSpaceInfo, BotVisibility, MemberKey, SpaceUser,
-        TokenPair, User, UserPatch,
+        Bot, BotCreatedResponse, BotInfo, BotSpaceInfo, BotVisibility, MemberExt, MemberKey, Space,
+        SpaceExt, SpaceUser, TokenPair, User, UserPatch,
     },
     error::Error,
-    functions::jwt::{jwt_key, Claims},
+    functions::{jwt::{jwt_key, Claims}, pubsub::emit_event},
 };
 
 pub fn router() -> ApiRouter {
@@ -291,6 +291,21 @@ async fn install_bot(
 
     let space_user = SpaceUser::new(body.space_id, bot_id);
     space_user.create(db()).await?;
+
+    // Emit the same events as join_space so the bot's WS connection
+    // auto-subscribes to the new space and all clients see the new member.
+    let member = MemberExt::dataload_one(space_user, db()).await?;
+    let space = Space::find_by_id(body.space_id, db()).await?;
+    let space = SpaceExt::dataload_one(space, db()).await?;
+
+    emit_event(
+        "members.onCreate",
+        &member,
+        &format!("space:{}", body.space_id),
+    )
+    .await?;
+    emit_event("spaces.onCreate", &space, &format!("user:{bot_id}")).await?;
+
     Ok(Json(()))
 }
 
@@ -304,6 +319,21 @@ async fn remove_bot_from_space(
         return Err(Error::forbidden("You do not own this bot"));
     }
 
-    SpaceUser::delete_by_key(&MemberKey::new(space_id, bot_id), db()).await?;
+    let key = MemberKey::new(space_id, bot_id);
+    let space_user = SpaceUser::get_by_key(&key, db()).await?;
+    let member = MemberExt::dataload_one(space_user, db()).await?;
+    let space = Space::find_by_id(space_id, db()).await?;
+    let space = SpaceExt::dataload_one(space, db()).await?;
+
+    SpaceUser::delete_by_key(&key, db()).await?;
+
+    emit_event(
+        "members.onDelete",
+        &member,
+        &format!("space:{space_id}"),
+    )
+    .await?;
+    emit_event("spaces.onDelete", &space, &format!("user:{bot_id}")).await?;
+
     Ok(Json(()))
 }

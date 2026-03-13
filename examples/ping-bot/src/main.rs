@@ -1,7 +1,7 @@
 use std::env;
 
 use async_trait::async_trait;
-use mikoto_client::{BotClient, Context, EventHandler, MessageExt};
+use mikoto_client::{BotClient, Channel, Context, EventHandler, MessageExt, SpaceExt};
 use uuid::Uuid;
 
 struct PingBot;
@@ -12,7 +12,10 @@ impl EventHandler for PingBot {
         let user = ctx.cache().current_user().unwrap();
         let spaces = ctx.cache().spaces().len();
         let channels = ctx.cache().channels().len();
-        println!("{} is ready! watching {} channels across {} spaces", user.name, channels, spaces);
+        println!(
+            "{} is ready! watching {} channels across {} spaces",
+            user.name, channels, spaces
+        );
     }
 
     async fn message_create(&self, ctx: Context, message: MessageExt) {
@@ -22,6 +25,24 @@ impl EventHandler for PingBot {
                 Err(e) => eprintln!("Failed to send message: {e}"),
             }
         }
+    }
+
+    async fn space_create(&self, ctx: Context, space: SpaceExt) {
+        println!(
+            "Joined space '{}' with {} channels",
+            space.name,
+            space.channels.len()
+        );
+        // Cache is already updated — new channels are immediately usable.
+        println!(
+            "Now watching {} channels across {} spaces",
+            ctx.cache().channels().len(),
+            ctx.cache().spaces().len()
+        );
+    }
+
+    async fn channel_create(&self, _ctx: Context, channel: Channel) {
+        println!("New channel '{}' in space {}", channel.name, channel.space_id);
     }
 }
 

@@ -1,6 +1,10 @@
 import { Box, Button, Flex, Group, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { faEnvelope, faUser } from '@fortawesome/free-solid-svg-icons';
+import {
+  faEnvelope,
+  faUser,
+  faUserPlus,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UserExt } from '@mikoto-io/mikoto.js';
 
@@ -54,9 +58,11 @@ export function ProfileSurface({ user }: { user: UserExt }) {
             <div>
               {mikoto.user.me?.id !== user.id && (
                 <Group>
-                  <Button colorPalette="success">Send Friend Request</Button>
+                  <Button colorPalette="primary">
+                    <FontAwesomeIcon icon={faUserPlus} />
+                  </Button>
                   <Button
-                    colorPalette="secondary"
+                    variant="outline"
                     onClick={async () => {
                       await mikoto.rest['relations.openDm'](undefined, {
                         params: { relationId: user.id },

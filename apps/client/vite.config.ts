@@ -60,6 +60,23 @@ export default ({ mode }: { mode: string }) =>
               src: 'logo/mikoto.svg',
               sizes: 'any',
               type: 'image/svg+xml',
+              purpose: 'any',
+            },
+          ],
+          screenshots: [
+            {
+              src: 'logo/screenshot-desktop.png',
+              sizes: '1280x720',
+              type: 'image/png',
+              form_factor: 'wide',
+              label: 'Mikoto Desktop',
+            },
+            {
+              src: 'logo/screenshot-mobile.png',
+              sizes: '390x844',
+              type: 'image/png',
+              form_factor: 'narrow',
+              label: 'Mikoto Mobile',
             },
           ],
         },

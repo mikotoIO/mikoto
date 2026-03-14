@@ -45,7 +45,7 @@ export function SpaceInviteViewInner() {
   }, [inviteCode]);
 
   return (
-    <Grid templateColumns="400px 1fr" h="100vh">
+    <Grid templateColumns="400px 1fr" h="100dvh">
       <InvitationBox>
         {space ? (
           <Flex direction="column" alignItems="center" gap={4}>

@@ -90,7 +90,7 @@ const EditorWrapper = styled.div`
 
   .editor-input {
     outline: none;
-    min-height: calc(100vh - 200px);
+    min-height: calc(100dvh - 200px);
   }
 
   blockquote {

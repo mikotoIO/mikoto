@@ -13,8 +13,8 @@ import { NotFound } from '@/views/NotFoundPage';
 import { SpaceInviteView } from '@/views/SpaceInviteView';
 
 const AppShell = styled.div`
-  height: 100vh;
-  width: 100vw;
+  height: 100dvh;
+  width: 100dvw;
   display: flex;
   flex-direction: column;
 `;

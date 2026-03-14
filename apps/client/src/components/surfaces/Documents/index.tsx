@@ -39,7 +39,9 @@ import { useMikoto } from '@/hooks';
 import { createTooltip } from '@/ui';
 
 import { EDITOR_NODES } from './editorNodes';
+import { CodeBlockPlugin } from './plugins/CodeBlockPlugin';
 import { EmptyParagraphPlugin } from './plugins/EmptyParagraphPlugin';
+import { FloatingToolbarPlugin } from './plugins/FloatingToolbarPlugin';
 import { HotkeyPlugin } from './plugins/HotkeyPlugin';
 import { ListBehaviorPlugin } from './plugins/ListBehaviorPlugin';
 import { MarkdownPastePlugin } from './plugins/MarkdownPastePlugin';
@@ -102,6 +104,26 @@ const EditorWrapper = styled.div`
 
   a {
     color: #00aff4;
+  }
+
+  .editor-code {
+    display: block;
+    background-color: var(--chakra-colors-gray-800);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9em;
+    line-height: 1.5;
+    padding: 12px 16px;
+    margin: 8px 0;
+    overflow-x: auto;
+    tab-size: 2;
+    white-space: pre;
+  }
+
+  .editor-text-code {
+    background-color: var(--chakra-colors-gray-800);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9em;
+    padding: 1px 4px;
   }
 `;
 
@@ -260,7 +282,9 @@ function DocumentEditor({
       <AutoLinkPlugin matchers={LINK_MATCHERS} />
       <HotkeyPlugin channel={channel} />
       <ListBehaviorPlugin />
+      <CodeBlockPlugin />
       <EmptyParagraphPlugin />
+      <FloatingToolbarPlugin />
       <OnChangePlugin ignoreSelectionChange onChange={onChange} />
       <HistoryPlugin />
     </LexicalComposer>

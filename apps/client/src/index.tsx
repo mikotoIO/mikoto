@@ -68,10 +68,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 reportWebVitals();
 
 registerSW({
-  onNeedRefresh() {
-    // TODO: show a toast/prompt to the user to refresh
-    console.log('New content available, refresh to update.');
-  },
   onOfflineReady() {
     console.log('App ready to work offline.');
   },

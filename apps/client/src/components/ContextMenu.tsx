@@ -26,6 +26,7 @@ const StyledContextMenuOverlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
+  z-index: 200;
 `;
 
 const ContextMenuBase = styled.div`
@@ -68,6 +69,12 @@ export function ContextMenuKit() {
   }, [context ? 'something' : '']);
 
   useEventListener('mousedown', (ev) => {
+    if (ref.current && !ref.current.contains(ev.target as any)) {
+      setContext(null);
+    }
+  });
+
+  useEventListener('touchstart', (ev) => {
     if (ref.current && !ref.current.contains(ev.target as any)) {
       setContext(null);
     }

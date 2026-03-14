@@ -18,14 +18,17 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { useSnapshot } from 'valtio/react';
 
 import { CommandMenuKit } from '@/components/CommandMenu';
-import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
+import { ContextMenuKit, ModalKit, useContextMenu } from '@/components/ContextMenu';
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import { faMikoto } from '@/components/icons';
 import { ErrorSurface, LoadingSurface, surfaceMap } from '@/components/surfaces';
+import { ChannelContextMenu } from '@/components/surfaces/Explorer/ChannelContextMenu';
+import { TreebarContextMenu } from '@/components/surfaces/Explorer';
 import {
   channelToTab,
   getIconFromChannelType,
 } from '@/components/surfaces/Explorer/channelToTab';
+import { SpaceContextMenu } from '@/components/sidebars/SpaceSidebar/SpaceContextMenu';
 import { useMikoto } from '@/hooks';
 import { TabContext, Tabable } from '@/store/surface';
 
@@ -287,6 +290,57 @@ function useSwipeDrawer() {
 
 // --- Sidebar Content ---
 
+function MobileSpaceIcon({
+  space,
+  active,
+  onSelectSpace,
+}: {
+  space: MikotoSpace;
+  active: boolean;
+  onSelectSpace: (id: string) => void;
+}) {
+  const contextMenu = useContextMenu(() => <SpaceContextMenu space={space} />);
+
+  return (
+    <SpaceStripIcon
+      active={active}
+      icon={space.icon ? normalizeMediaUrl(space.icon) : undefined}
+      onClick={() => onSelectSpace(space.id)}
+      onContextMenu={contextMenu}
+    >
+      {!space.icon && space.name[0]}
+    </SpaceStripIcon>
+  );
+}
+
+function MobileChannelPanel({
+  space,
+  onSelectChannel,
+}: {
+  space: MikotoSpace;
+  onSelectChannel: (tab: Tabable, title: string) => void;
+}) {
+  const contextMenu = useContextMenu(() => (
+    <TreebarContextMenu space={space} />
+  ));
+
+  return (
+    <>
+      <ChannelPanelHeader>
+        <Heading fontSize="15px" fontWeight="700" truncate>
+          {space.name}
+        </Heading>
+      </ChannelPanelHeader>
+      <ChannelPanelList onContextMenu={contextMenu}>
+        <MobileChannelList
+          space={space}
+          onSelectChannel={onSelectChannel}
+        />
+      </ChannelPanelList>
+    </>
+  );
+}
+
 function SidebarContent({
   selectedSpaceId,
   onSelectSpace,
@@ -310,31 +364,20 @@ function SidebarContent({
     <>
       <SpaceStrip>
         {spaces.map((space) => (
-          <SpaceStripIcon
+          <MobileSpaceIcon
             key={space.id}
+            space={space}
             active={space.id === selectedSpaceId}
-            icon={space.icon ? normalizeMediaUrl(space.icon) : undefined}
-            onClick={() => onSelectSpace(space.id)}
-          >
-            {!space.icon && space.name[0]}
-          </SpaceStripIcon>
+            onSelectSpace={onSelectSpace}
+          />
         ))}
       </SpaceStrip>
       <ChannelPanel>
         {selectedSpace ? (
-          <>
-            <ChannelPanelHeader>
-              <Heading fontSize="15px" fontWeight="700" truncate>
-                {selectedSpace.name}
-              </Heading>
-            </ChannelPanelHeader>
-            <ChannelPanelList>
-              <MobileChannelList
-                space={selectedSpace}
-                onSelectChannel={onSelectChannel}
-              />
-            </ChannelPanelList>
-          </>
+          <MobileChannelPanel
+            space={selectedSpace}
+            onSelectChannel={onSelectChannel}
+          />
         ) : (
           <Flex align="center" justify="center" flex="1" color="gray.500">
             <Text fontSize="14px">Select a space</Text>
@@ -387,13 +430,20 @@ function MobileChannelNode({
   const [open, setOpen] = useState(depth === 0);
   const children = allChannels.filter((c) => c.parentId === channel.id);
   const isGroup = children.length > 0;
+  const contextMenu = useContextMenu(() => (
+    <ChannelContextMenu channel={channel} />
+  ));
 
   const icon = getIconFromChannelType(channel.type) ?? faHashtag;
 
   if (isGroup) {
     return (
       <div>
-        <MobileChannelItem depth={depth} onClick={() => setOpen(!open)}>
+        <MobileChannelItem
+          depth={depth}
+          onClick={() => setOpen(!open)}
+          onContextMenu={contextMenu}
+        >
           <FontAwesomeIcon icon={icon} />
           <span>{channel.name}</span>
         </MobileChannelItem>
@@ -414,6 +464,7 @@ function MobileChannelNode({
   return (
     <MobileChannelItem
       depth={depth}
+      onContextMenu={contextMenu}
       onClick={() => {
         try {
           const tab = channelToTab(channel);

@@ -23,8 +23,18 @@ pub mod relations;
 
 async fn me(claim: Claims) -> Result<Json<UserExt>, Error> {
     let user = User::find_by_id(claim.sub.parse()?, db()).await?;
-    let user = UserExt::from_user(user, db()).await?;
-    Ok(user.into())
+    let mut user_ext = UserExt::from_user(user, db()).await?;
+
+    // Backfill: auto-assign a handle for users who don't have one yet
+    if user_ext.handle.is_none() {
+        if let Ok(h) =
+            Handle::auto_assign_for_user(user_ext.base.id, &user_ext.base.name, db()).await
+        {
+            user_ext.handle = Some(h.handle);
+        }
+    }
+
+    Ok(user_ext.into())
 }
 
 async fn update(claim: Claims, Json(patch): Json<UserPatch>) -> Result<Json<UserExt>, Error> {

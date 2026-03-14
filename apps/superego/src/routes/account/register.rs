@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Account, RefreshToken, TokenPair},
+    entities::{Account, Handle, RefreshToken, TokenPair},
     error::Error,
     functions::{
         captcha::captcha,
@@ -50,6 +50,9 @@ pub async fn route(
     };
 
     account.create_with_user(&body.name, db()).await?;
+
+    // Auto-assign a unique default handle for the new user
+    let _ = Handle::auto_assign_for_user(account.id, &body.name, db()).await;
 
     let (refresh, token) = RefreshToken::new(account.id);
     refresh.create(db()).await?;

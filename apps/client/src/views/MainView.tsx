@@ -7,7 +7,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAtom, useSetAtom } from 'jotai';
-import { useEffect, useRef } from 'react';
+import { lazy, Suspense, useEffect, useRef } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import { CommandMenuKit, commandMenuOpenAtom } from '@/components/CommandMenu';
@@ -22,10 +22,13 @@ import { surfaceMap } from '@/components/surfaces';
 import { channelToTab } from '@/components/surfaces/Explorer/channelToTab';
 import { TabBarButton } from '@/components/tabs';
 import { useMikoto } from '@/hooks';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { treebarSpaceState, workspaceState } from '@/store';
 import { Tabable, useTabkit } from '@/store/surface';
 
 import { MikotoClientProvider } from './MikotoClientProvider';
+
+const MobileMainView = lazy(() => import('./MobileView'));
 
 const AppContainer = styled.div`
   background-color: var(--chakra-colors-subsurface);
@@ -358,6 +361,16 @@ function Fallback() {
 }
 
 export default function MainView() {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <Suspense fallback={<Fallback />}>
+        <MobileMainView />
+      </Suspense>
+    );
+  }
+
   return (
     <MikotoClientProvider fallback={<Fallback />}>
       <AppView />

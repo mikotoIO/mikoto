@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import {
   faFaceSmileWink,
   faFileArrowUp,
+  faPaperPlane,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import useResizeObserver from '@react-hook/resize-observer';
@@ -14,6 +15,7 @@ import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 
 import { contextMenuState } from '@/components/ContextMenu';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 import { messageEditState } from './Message';
 
@@ -46,6 +48,11 @@ const EditableContainer = styled.div`
   padding-right: 80px;
   position: relative;
   display: flex;
+  align-items: flex-end;
+
+  @media (max-width: 767px) {
+    padding-right: 16px;
+  }
 `;
 
 const initialEditorValue = [{ children: [{ text: '' }] }];
@@ -194,6 +201,26 @@ type FileUpload = {
   id: string;
 };
 
+const SendButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--chakra-colors-blue-600);
+  color: white;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 16px;
+  margin-left: 8px;
+
+  &:active {
+    background-color: var(--chakra-colors-blue-700);
+  }
+`;
+
 export function MessageEditor({
   placeholder,
   onSubmit,
@@ -202,6 +229,7 @@ export function MessageEditor({
 }: MessageEditorProps) {
   const currentEditState = useAtomValue(messageEditState);
   const setEditState = useSetAtom(messageEditState);
+  const isMobile = useIsMobile();
   const [editorValue, setEditorValue] = useState<Node[]>(() => [
     { children: [{ text: currentEditState?.content ?? '' }] },
   ]);
@@ -232,13 +260,25 @@ export function MessageEditor({
     onResize?.();
   });
 
+  const handleSubmit = () => {
+    const text = serialize(editorValue).trim();
+    if (text === '' && files.length === 0) return;
+    onSubmit(text, files);
+    setEditorValue(initialEditorValue);
+    resetEditor(editor);
+    setFiles([]);
+  };
+
   useEffect(() => {
-    ReactEditor.focus(editor);
+    if (!isMobile) {
+      ReactEditor.focus(editor);
+    }
     const fn = (ev: KeyboardEvent) => {
       if (ev.key === 'Escape' && currentEditState) {
         setEditState(null);
         setEditorValue(initialEditorValue);
       }
+      if (isMobile) return;
       if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
       if (ev.key.length !== 1) return;
       if (isInputLike()) return;
@@ -249,7 +289,7 @@ export function MessageEditor({
     document.addEventListener('keydown', fn);
 
     return () => document.removeEventListener('keydown', fn);
-  }, []);
+  }, [isMobile]);
 
   // upload logic
   const dropzone = useDropzone({
@@ -290,64 +330,63 @@ export function MessageEditor({
           <StyledEditable
             placeholder={placeholder}
             onKeyDown={(ev) => {
-              // submission
+              if (isMobile) {
+                onTyping?.();
+                return;
+              }
+              // submission via Enter on desktop
               if (ev.key !== 'Enter' || ev.shiftKey) {
                 onTyping?.();
                 return;
               }
 
               ev.preventDefault();
-
-              const text = serialize(editorValue).trim();
-              // no empty message - require either text content or file attachments
-              if (text === '' && files.length === 0) {
-                return;
-              }
-
-              // audio.play();
-              onSubmit(text, files);
-              setEditorValue(initialEditorValue);
-              resetEditor(editor);
-              setFiles([]);
+              handleSubmit();
             }}
           />
         </Slate>
-        <EditorButtons>
-          {currentEditState === null && (
+        {isMobile ? (
+          <SendButton onClick={handleSubmit}>
+            <FontAwesomeIcon icon={faPaperPlane} />
+          </SendButton>
+        ) : (
+          <EditorButtons>
+            {currentEditState === null && (
+              <EditorButton
+                onClick={() => {
+                  dropzone.open();
+                }}
+              >
+                <FontAwesomeIcon icon={faFileArrowUp} />
+              </EditorButton>
+            )}
             <EditorButton
-              onClick={() => {
-                dropzone.open();
+              onClick={(ev) => {
+                if (!ref.current) return;
+                const bounds = ref.current.getBoundingClientRect();
+                ev.preventDefault();
+                ev.stopPropagation();
+                setContextMenu({
+                  elem: (
+                    <Suspense>
+                      <EmojiPicker
+                        onEmojiSelect={(x) => {
+                          editor.insertText(x);
+                        }}
+                      />
+                    </Suspense>
+                  ),
+                  position: {
+                    right: window.innerWidth - bounds.right,
+                    bottom: window.innerHeight - bounds.top + 16,
+                  },
+                });
               }}
             >
-              <FontAwesomeIcon icon={faFileArrowUp} />
+              <FontAwesomeIcon icon={faFaceSmileWink} />
             </EditorButton>
-          )}
-          <EditorButton
-            onClick={(ev) => {
-              if (!ref.current) return;
-              const bounds = ref.current.getBoundingClientRect();
-              ev.preventDefault();
-              ev.stopPropagation();
-              setContextMenu({
-                elem: (
-                  <Suspense>
-                    <EmojiPicker
-                      onEmojiSelect={(x) => {
-                        editor.insertText(x);
-                      }}
-                    />
-                  </Suspense>
-                ),
-                position: {
-                  right: window.innerWidth - bounds.right,
-                  bottom: window.innerHeight - bounds.top + 16,
-                },
-              });
-            }}
-          >
-            <FontAwesomeIcon icon={faFaceSmileWink} />
-          </EditorButton>
-        </EditorButtons>
+          </EditorButtons>
+        )}
       </EditableContainer>
     </TopContainer>
   );

@@ -49,10 +49,6 @@ const EditableContainer = styled.div`
   position: relative;
   display: flex;
   align-items: flex-end;
-
-  @media (max-width: 767px) {
-    padding-right: 16px;
-  }
 `;
 
 const initialEditorValue = [{ children: [{ text: '' }] }];
@@ -89,7 +85,7 @@ const EditorButtons = styled.div`
   position: absolute;
   gap: 16px;
   right: 16px;
-  transform: translateY(-8px);
+  transform: translateY(8px);
   font-size: 24px;
 `;
 
@@ -112,10 +108,18 @@ const EditMode = styled.div`
   padding-left: 16px;
 `;
 
-const TopContainer = styled.div`
+const EditorRow = styled.div`
+  display: flex;
+  align-items: center;
   margin: 16px 16px 4px;
+  gap: 8px;
+`;
+
+const TopContainer = styled.div`
   border: 1px solid var(--chakra-colors-gray-600);
   border-radius: 8px;
+  flex: 1;
+  min-width: 0;
 
   & > *:first-of-type {
     border-top-left-radius: 8px;
@@ -205,17 +209,15 @@ const SendButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
   border: none;
-  border-radius: 50%;
+  border-radius: 4px;
   background-color: var(--chakra-colors-blue-600);
   color: white;
   cursor: pointer;
   flex-shrink: 0;
   font-size: 16px;
-  margin-left: 8px;
-
   &:active {
     background-color: var(--chakra-colors-blue-700);
   }
@@ -305,89 +307,92 @@ export function MessageEditor({
   });
 
   return (
-    <TopContainer>
-      <input {...dropzone.getInputProps()} />
-      {currentEditState && <EditMode>Editing Message</EditMode>}
-      {files.length !== 0 && (
-        <UploadSection>
-          {files.map((fileUpload) => (
-            <FilePreview
-              file={fileUpload.file}
-              key={fileUpload.id}
-              onRemove={() => {
-                setFiles((xs) => xs.filter((x) => x.id !== fileUpload.id));
+    <EditorRow>
+      <TopContainer>
+        <input {...dropzone.getInputProps()} />
+        {currentEditState && <EditMode>Editing Message</EditMode>}
+        {files.length !== 0 && (
+          <UploadSection>
+            {files.map((fileUpload) => (
+              <FilePreview
+                file={fileUpload.file}
+                key={fileUpload.id}
+                onRemove={() => {
+                  setFiles((xs) => xs.filter((x) => x.id !== fileUpload.id));
+                }}
+              />
+            ))}
+          </UploadSection>
+        )}
+        <EditableContainer ref={ref}>
+          <Slate
+            editor={editor}
+            initialValue={editorValue}
+            onChange={(x) => setEditorValue(x)}
+          >
+            <StyledEditable
+              placeholder={placeholder}
+              onKeyDown={(ev) => {
+                if (isMobile) {
+                  onTyping?.();
+                  return;
+                }
+                // submission via Enter on desktop
+                if (ev.key !== 'Enter' || ev.shiftKey) {
+                  onTyping?.();
+                  return;
+                }
+
+                ev.preventDefault();
+                handleSubmit();
               }}
             />
-          ))}
-        </UploadSection>
-      )}
-      <EditableContainer ref={ref}>
-        <Slate
-          editor={editor}
-          initialValue={editorValue}
-          onChange={(x) => setEditorValue(x)}
-        >
-          <StyledEditable
-            placeholder={placeholder}
-            onKeyDown={(ev) => {
-              if (isMobile) {
-                onTyping?.();
-                return;
-              }
-              // submission via Enter on desktop
-              if (ev.key !== 'Enter' || ev.shiftKey) {
-                onTyping?.();
-                return;
-              }
-
-              ev.preventDefault();
-              handleSubmit();
-            }}
-          />
-        </Slate>
-        {isMobile ? (
-          <SendButton onClick={handleSubmit}>
-            <FontAwesomeIcon icon={faPaperPlane} />
-          </SendButton>
-        ) : (
-          <EditorButtons>
-            {currentEditState === null && (
+          </Slate>
+          {!isMobile && (
+            <EditorButtons>
+              {currentEditState === null && (
+                <EditorButton
+                  onClick={() => {
+                    dropzone.open();
+                  }}
+                >
+                  <FontAwesomeIcon icon={faFileArrowUp} />
+                </EditorButton>
+              )}
               <EditorButton
-                onClick={() => {
-                  dropzone.open();
+                onClick={(ev) => {
+                  if (!ref.current) return;
+                  const bounds = ref.current.getBoundingClientRect();
+                  ev.preventDefault();
+                  ev.stopPropagation();
+                  setContextMenu({
+                    elem: (
+                      <Suspense>
+                        <EmojiPicker
+                          onEmojiSelect={(x) => {
+                            editor.insertText(x);
+                          }}
+                        />
+                      </Suspense>
+                    ),
+                    position: {
+                      right: window.innerWidth - bounds.right,
+                      bottom: window.innerHeight - bounds.top + 16,
+                    },
+                  });
                 }}
               >
-                <FontAwesomeIcon icon={faFileArrowUp} />
+                <FontAwesomeIcon icon={faFaceSmileWink} />
               </EditorButton>
-            )}
-            <EditorButton
-              onClick={(ev) => {
-                if (!ref.current) return;
-                const bounds = ref.current.getBoundingClientRect();
-                ev.preventDefault();
-                ev.stopPropagation();
-                setContextMenu({
-                  elem: (
-                    <Suspense>
-                      <EmojiPicker
-                        onEmojiSelect={(x) => {
-                          editor.insertText(x);
-                        }}
-                      />
-                    </Suspense>
-                  ),
-                  position: {
-                    right: window.innerWidth - bounds.right,
-                    bottom: window.innerHeight - bounds.top + 16,
-                  },
-                });
-              }}
-            >
-              <FontAwesomeIcon icon={faFaceSmileWink} />
-            </EditorButton>
-          </EditorButtons>
-        )}
-      </EditableContainer>
-    </TopContainer>
+            </EditorButtons>
+          )}
+        </EditableContainer>
+      </TopContainer>
+      {isMobile && (
+        <SendButton onClick={handleSubmit}>
+          <FontAwesomeIcon icon={faPaperPlane} />
+        </SendButton>
+      )}
+    </EditorRow>
   );
 }

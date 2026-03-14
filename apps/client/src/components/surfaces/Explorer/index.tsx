@@ -75,7 +75,7 @@ const PanelContent = styled.div`
   min-height: 0;
 `;
 
-function TreebarContextMenu({ space }: { space: MikotoSpace }) {
+export function TreebarContextMenu({ space }: { space: MikotoSpace }) {
   const setModal = useSetAtom(modalState);
   const tabkit = useTabkit();
   return (

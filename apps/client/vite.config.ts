@@ -35,7 +35,7 @@ export default ({ mode }: { mode: string }) =>
       // tsconfigPaths(),
       visualizer() as any,
       VitePWA({
-        registerType: 'prompt',
+        registerType: 'autoUpdate',
         includeAssets: ['favicon.ico', 'logo/mikoto.svg'],
         manifest: {
           name: 'Mikoto',

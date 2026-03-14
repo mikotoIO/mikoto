@@ -316,6 +316,65 @@ impl Handle {
         Ok(result)
     }
 
+    /// Sanitize a display name into a valid username for a default handle.
+    /// Lowercases, replaces invalid chars with hyphens, trims, and falls back to "user".
+    pub fn sanitize_username(name: &str) -> String {
+        let sanitized: String = name
+            .to_lowercase()
+            .chars()
+            .map(|c| {
+                if c.is_ascii_alphanumeric() || c == '-' || c == '_' {
+                    c
+                } else {
+                    '-'
+                }
+            })
+            .collect();
+        let trimmed = sanitized.trim_matches('-').trim_matches('_');
+        if trimmed.is_empty() || trimmed.len() < 2 {
+            "user".to_string()
+        } else if trimmed.len() > 60 {
+            // Leave room for discriminator suffix
+            trimmed[..60].trim_end_matches('-').trim_end_matches('_').to_string()
+        } else {
+            trimmed.to_string()
+        }
+    }
+
+    /// Auto-generate a unique default handle for a user based on their display name.
+    /// Tries the sanitized name first, then appends short discriminators on conflict.
+    pub async fn auto_assign_for_user(
+        user_id: Uuid,
+        name: &str,
+        db: &sqlx::PgPool,
+    ) -> Result<Self, Error> {
+        let base = Self::sanitize_username(name);
+
+        // Try the base username first
+        let handle = Self::make_default_handle(&base);
+        match Self::claim_for_user(handle, user_id, db).await {
+            Ok(h) => return Ok(h),
+            Err(Error::Miscallaneous { ref code, .. }) if code == "HandleTaken" => {}
+            Err(e) => return Err(e),
+        }
+
+        // Try with short discriminators derived from the user's UUID
+        let id_hex = user_id.as_simple().to_string();
+        for len in [3, 4, 6, 8] {
+            let discriminator = &id_hex[..len];
+            let handle = Self::make_default_handle(&format!("{}-{}", base, discriminator));
+            match Self::claim_for_user(handle, user_id, db).await {
+                Ok(h) => return Ok(h),
+                Err(Error::Miscallaneous { ref code, .. }) if code == "HandleTaken" => {}
+                Err(e) => return Err(e),
+            }
+        }
+
+        // Final fallback: full UUID prefix (very unlikely to reach here)
+        let handle = Self::make_default_handle(&format!("{}-{}", base, &id_hex[..12]));
+        Self::claim_for_user(handle, user_id, db).await
+    }
+
     /// Resolve a handle to its owner
     pub async fn resolve<'c, X: sqlx::PgExecutor<'c>>(
         handle: &str,

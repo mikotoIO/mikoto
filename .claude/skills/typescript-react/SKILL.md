@@ -26,8 +26,7 @@ apps/client/src/
 ├── views/              # Top-level views (MainView, AuthView)
 ├── hooks/              # Custom React hooks
 ├── store/              # Jotai atoms, LocalDB
-├── functions/          # Utility functions (fileUpload, notify)
-└── utils/              # Helpers (assertNonNull)
+└── functions/          # Utility functions (fileUpload, notify)
 
 packages/
 ├── mikoto.js/          # Core API client library

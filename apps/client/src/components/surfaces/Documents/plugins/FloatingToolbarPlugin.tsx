@@ -1,5 +1,4 @@
-import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import styled from '@emotion/styled';
 import {
   faBold,
   faCode,
@@ -9,7 +8,10 @@ import {
   faUnderline,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import styled from '@emotion/styled';
+import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { $isAtNodeEnd } from '@lexical/selection';
+import { mergeRegister } from '@lexical/utils';
 import {
   $getSelection,
   $isRangeSelection,
@@ -19,8 +21,6 @@ import {
 } from 'lexical';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { $isAtNodeEnd } from '@lexical/selection';
-import { mergeRegister } from '@lexical/utils';
 
 function getSelectedNode(selection: ReturnType<typeof $getSelection>) {
   if (!$isRangeSelection(selection)) return null;
@@ -66,7 +66,9 @@ const ToolbarButton = styled.button<{ active?: boolean }>`
   background: ${(p) =>
     p.active ? 'var(--chakra-colors-gray-600)' : 'transparent'};
   color: ${(p) =>
-    p.active ? 'var(--chakra-colors-gray-50)' : 'var(--chakra-colors-gray-300)'};
+    p.active
+      ? 'var(--chakra-colors-gray-50)'
+      : 'var(--chakra-colors-gray-300)'};
   cursor: pointer;
   font-size: 13px;
 
@@ -185,10 +187,7 @@ function FloatingToolbar({
   }, [editor, isLink]);
 
   return createPortal(
-    <ToolbarContainer
-      ref={toolbarRef}
-      className={isVisible ? 'visible' : ''}
-    >
+    <ToolbarContainer ref={toolbarRef} className={isVisible ? 'visible' : ''}>
       <ToolbarButton
         active={isBold}
         onMouseDown={(e) => {

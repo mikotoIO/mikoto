@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TabName } from '@/components/tabs';
-import { checkNonNull } from '@/utils/assertNonNull';
+import { checkNonNull } from '@/functions/assertNonNull';
 import { SettingSurface } from '@/views';
 
 interface BaseSettingsSurfaceProps {

@@ -7,7 +7,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAtom, useSetAtom } from 'jotai';
-import { lazy, Suspense, useEffect, useRef } from 'react';
+import { Suspense, lazy, useEffect, useRef } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import { CommandMenuKit, commandMenuOpenAtom } from '@/components/CommandMenu';

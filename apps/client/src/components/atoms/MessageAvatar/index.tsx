@@ -13,8 +13,8 @@ import {
 import { UserContextMenu } from '@/components/modals/ContextMenus';
 import { ProfileModal } from '@/components/modals/Profile';
 import { Checkbox } from '@/components/ui';
+import { checkNonNull } from '@/functions/assertNonNull';
 import { useMaybeSnapshot } from '@/hooks';
-import { checkNonNull } from '@/utils/assertNonNull';
 
 import { Avatar } from '../Avatar';
 import { BaseRoleBadge, RoleBadge } from './RoleBadge';

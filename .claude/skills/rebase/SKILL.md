@@ -24,5 +24,3 @@ Steps:
    - **Abort rebase** — run `git rebase --abort` and stop
 5. After resolving all files in the current step: `git add <files>` and `git rebase --continue`.
 6. Repeat until the rebase completes or the user aborts.
-
-Always use `dev` as the base branch, not `main` or `master`.

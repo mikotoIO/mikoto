@@ -140,10 +140,7 @@ impl UserExt {
             .into_iter()
             .map(|user| {
                 let handle = handles.get(&user.id).cloned();
-                Self {
-                    handle,
-                    base: user,
-                }
+                Self { handle, base: user }
             })
             .collect())
     }

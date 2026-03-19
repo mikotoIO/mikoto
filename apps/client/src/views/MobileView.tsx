@@ -7,28 +7,30 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoChannel, MikotoSpace } from '@mikoto-io/mikoto.js';
-import {
-  Suspense,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useSnapshot } from 'valtio/react';
 
 import { CommandMenuKit } from '@/components/CommandMenu';
-import { ContextMenuKit, ModalKit, useContextMenu } from '@/components/ContextMenu';
+import {
+  ContextMenuKit,
+  ModalKit,
+  useContextMenu,
+} from '@/components/ContextMenu';
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import { faMikoto } from '@/components/icons';
-import { ErrorSurface, LoadingSurface, surfaceMap } from '@/components/surfaces';
-import { ChannelContextMenu } from '@/components/surfaces/Explorer/ChannelContextMenu';
+import { SpaceContextMenu } from '@/components/sidebars/SpaceSidebar/SpaceContextMenu';
+import {
+  ErrorSurface,
+  LoadingSurface,
+  surfaceMap,
+} from '@/components/surfaces';
 import { TreebarContextMenu } from '@/components/surfaces/Explorer';
+import { ChannelContextMenu } from '@/components/surfaces/Explorer/ChannelContextMenu';
 import {
   channelToTab,
   getIconFromChannelType,
 } from '@/components/surfaces/Explorer/channelToTab';
-import { SpaceContextMenu } from '@/components/sidebars/SpaceSidebar/SpaceContextMenu';
 import { useMikoto } from '@/hooks';
 import { TabContext, Tabable } from '@/store/surface';
 
@@ -133,8 +135,7 @@ const SpaceStripIcon = styled.button<{ active?: boolean; icon?: string }>`
   height: 40px;
   border-radius: 4px;
   border: 2px solid
-    ${(p) =>
-      p.active ? 'var(--chakra-colors-gray-150)' : 'transparent'};
+    ${(p) => (p.active ? 'var(--chakra-colors-gray-150)' : 'transparent')};
   background-color: var(--chakra-colors-surface);
   background-image: ${(p) => (p.icon ? `url(${p.icon})` : 'none')};
   background-size: cover;
@@ -332,10 +333,7 @@ function MobileChannelPanel({
         </Heading>
       </ChannelPanelHeader>
       <ChannelPanelList onContextMenu={contextMenu}>
-        <MobileChannelList
-          space={space}
-          onSelectChannel={onSelectChannel}
-        />
+        <MobileChannelList space={space} onSelectChannel={onSelectChannel} />
       </ChannelPanelList>
     </>
   );
@@ -587,10 +585,7 @@ function MobileAppView() {
         visible={drawer.offset > -SIDEBAR_WIDTH}
         onClick={drawer.close}
         style={{
-          opacity: Math.max(
-            0,
-            (drawer.offset + SIDEBAR_WIDTH) / SIDEBAR_WIDTH,
-          ),
+          opacity: Math.max(0, (drawer.offset + SIDEBAR_WIDTH) / SIDEBAR_WIDTH),
         }}
       />
 

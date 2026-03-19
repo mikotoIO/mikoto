@@ -335,7 +335,10 @@ impl Handle {
             "user".to_string()
         } else if trimmed.len() > 60 {
             // Leave room for discriminator suffix
-            trimmed[..60].trim_end_matches('-').trim_end_matches('_').to_string()
+            trimmed[..60]
+                .trim_end_matches('-')
+                .trim_end_matches('_')
+                .to_string()
         } else {
             trimmed.to_string()
         }

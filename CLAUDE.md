@@ -60,9 +60,32 @@ Check `ARCHITECTURE.md`.
 - **Server**: Cargo test for Rust unit tests
 - **E2E**: Not currently configured
 
+## Port Configuration
+
+All Mikoto services use ports in the `351X` or `351XX` range to avoid conflicts with other common services:
+
+### Application Services (351X)
+
+| Service     | Port | Description            |
+| ----------- | ---- | ---------------------- |
+| Client      | 3510 | Web client             |
+| Superego    | 3511 | API server             |
+| Collab      | 3512 | Collaboration service  |
+| MediaServer | 3513 | Media handling service |
+
+### Infrastructure Services (351XX)
+
+| Service     | Ports               | Description             |
+| ----------- | ------------------- | ----------------------- |
+| PostgreSQL  | 35101               | Database                |
+| Redis       | 35102               | Cache & pub/sub         |
+| MinIO (S3)  | 35103, 35104        | Object storage          |
+| LiveKit     | 35105, 35106, 35107 | Real-time audio/video   |
+| MailHog     | 35108, 35109        | Development mail server |
+| Meilisearch | 35110               | Search engine           |
+
 ## Important Tips
 
-- Use the rustdoc MCP, if available, to get up-to-date information about Rust crate documentations, instead of web searching by default.
 - Before adding any new package, use the rustdoc crate search to check for the version.
 - Instead of reading the migrations, you can read schema.sql for the up-to-date dump of the database schema.
 - at the end of your task, run moon :typecheck to check both Rust and TypeScript parts of the codebase.

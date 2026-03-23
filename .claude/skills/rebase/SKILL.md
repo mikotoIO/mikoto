@@ -1,12 +1,12 @@
 ---
 name: rebase
-description: Rebases the current branch onto the latest dev branch.
+description: Rebases the current branch onto the latest main branch.
 ---
 
 Steps:
 
 1. Fetch the latest changes from origin.
-2. Rebase the current branch onto `origin/dev`.
+2. Rebase the current branch onto `origin/main`.
 3. If there are conflicts, resolve conflicts automatically, trying to preserve features from both branches.
 
 ## Conflict resolution
@@ -24,5 +24,3 @@ Steps:
    - **Abort rebase** — run `git rebase --abort` and stop
 5. After resolving all files in the current step: `git add <files>` and `git rebase --continue`.
 6. Repeat until the rebase completes or the user aborts.
-
-Always use `dev` as the base branch, not `main` or `master`.

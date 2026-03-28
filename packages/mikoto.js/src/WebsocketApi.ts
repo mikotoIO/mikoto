@@ -1,5 +1,4 @@
 import EventEmitter from 'events';
-import WebSocket from 'isomorphic-ws';
 import type { z } from 'zod';
 
 import type { WebsocketEventEmitter, websocketCommands } from './api.gen';

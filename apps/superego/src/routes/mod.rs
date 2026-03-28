@@ -141,7 +141,21 @@ fn build_app_router() -> AppRouter<State> {
 }
 
 async fn security_headers(request: Request, next: middleware::Next) -> axum::response::Response {
+    // Skip security headers for WebSocket upgrade requests — CSP and other
+    // document-level headers are meaningless on 101 responses and can cause
+    // Firefox to reject the connection.
+    let is_websocket_upgrade = request
+        .headers()
+        .get(http::header::UPGRADE)
+        .and_then(|v| v.to_str().ok())
+        .is_some_and(|v| v.eq_ignore_ascii_case("websocket"));
+
     let mut response = next.run(request).await;
+
+    if is_websocket_upgrade {
+        return response;
+    }
+
     let headers = response.headers_mut();
     headers.insert("X-Content-Type-Options", "nosniff".parse().unwrap());
     headers.insert("X-Frame-Options", "DENY".parse().unwrap());

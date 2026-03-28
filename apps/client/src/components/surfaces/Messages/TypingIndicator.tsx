@@ -3,7 +3,6 @@ import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useState } from 'react';
 
 import { useInterval, useMikoto } from '@/hooks';
-import { TypingDots } from '@/ui';
 
 export interface Typer {
   timestamp: number;
@@ -57,14 +56,13 @@ export function TypingIndicator({ typers, channel }: TypingIndicatorProps) {
   const botPart = formatTyperGroup(botNames, 'thinking...');
 
   return (
-    <Box px={4} fontSize="12px">
+    <Box px={4} ml={1} fontSize="12px">
       {typers.length > 0 && (
-        <div>
-          <TypingDots />
+        <>
           {humanPart}
           {humanPart && botPart && ' '}
           {botPart}
-        </div>
+        </>
       )}
     </Box>
   );

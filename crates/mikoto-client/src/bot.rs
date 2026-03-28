@@ -125,11 +125,7 @@ impl BotClient {
         let mut ws = self.http.connect_ws().await?;
         let (ws_tx, mut ws_rx) = mpsc::unbounded_channel::<WsCommand>();
 
-        let ctx = Context::new(
-            Arc::clone(&self.http),
-            Arc::clone(&self.cache),
-            ws_tx,
-        );
+        let ctx = Context::new(Arc::clone(&self.http), Arc::clone(&self.cache), ws_tx);
         self.handler.ready(ctx.clone()).await;
 
         tracing::info!("connected to websocket, dispatching events");

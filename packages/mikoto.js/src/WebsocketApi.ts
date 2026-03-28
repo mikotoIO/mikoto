@@ -39,7 +39,10 @@ export class WebsocketApi extends (EventEmitter as new () => WebsocketEventEmitt
     };
   }
 
-  send<K extends keyof WebsocketCommands>(op: K, data: z.infer<WebsocketCommands[K]>) {
+  send<K extends keyof WebsocketCommands>(
+    op: K,
+    data: z.infer<WebsocketCommands[K]>,
+  ) {
     this.ws.send(
       JSON.stringify({
         op,

@@ -2,11 +2,13 @@ use std::sync::Arc;
 
 use uuid::Uuid;
 
+use tokio::sync::mpsc;
+
 use crate::cache::Cache;
 use crate::client::MikotoClient;
 use crate::context::Context;
 use crate::error::ClientError;
-use crate::generated::{BotLoginPayload, WsEvent};
+use crate::generated::{BotLoginPayload, WsCommand, WsEvent};
 use crate::handler::EventHandler;
 
 /// High-level bot client with automatic caching and event dispatch.
@@ -116,52 +118,55 @@ impl BotClient {
         }
     }
 
-    /// Get a [`Context`] handle (useful outside of event handlers).
-    pub fn context(&self) -> Context {
-        Context::new(Arc::clone(&self.http), Arc::clone(&self.cache))
-    }
-
     /// Connect to the WebSocket and run the event loop until disconnected.
     ///
     /// This method blocks until the WebSocket connection is closed.
     pub async fn start(&self) -> Result<(), ClientError> {
         let mut ws = self.http.connect_ws().await?;
+        let (ws_tx, mut ws_rx) = mpsc::unbounded_channel::<WsCommand>();
 
-        let ctx = self.context();
+        let ctx = Context::new(
+            Arc::clone(&self.http),
+            Arc::clone(&self.cache),
+            ws_tx,
+        );
         self.handler.ready(ctx.clone()).await;
 
         tracing::info!("connected to websocket, dispatching events");
 
         loop {
-            let text = match ws.recv_text().await? {
-                Some(t) => t,
-                None => {
-                    tracing::info!("websocket closed");
-                    break;
+            tokio::select! {
+                text = ws.recv_text() => {
+                    let text = match text? {
+                        Some(t) => t,
+                        None => {
+                            tracing::info!("websocket closed");
+                            break;
+                        }
+                    };
+
+                    let event: WsEvent = match serde_json::from_str(&text) {
+                        Ok(ev) => ev,
+                        Err(e) => {
+                            tracing::trace!(error = %e, "skipping unknown ws event");
+                            continue;
+                        }
+                    };
+
+                    // Update cache before dispatching to handler
+                    self.cache.update(&event);
+
+                    let ctx = ctx.clone();
+                    let handler = Arc::clone(&self.handler);
+
+                    tokio::spawn(async move {
+                        dispatch_event(handler.as_ref(), ctx, event).await;
+                    });
                 }
-            };
-
-            let event: WsEvent = match serde_json::from_str(&text) {
-                Ok(ev) => ev,
-                Err(e) => {
-                    // Unknown event ops (e.g. "ready") cause deserialization
-                    // errors — silently skip them.
-                    tracing::trace!(error = %e, "skipping unknown ws event");
-                    continue;
+                Some(cmd) = ws_rx.recv() => {
+                    ws.send(&cmd).await?;
                 }
-            };
-
-            // Update cache before dispatching to handler
-            self.cache.update(&event);
-
-            let ctx = ctx.clone();
-            let handler = Arc::clone(&self.handler);
-
-            // Dispatch to handler in a spawned task so one slow handler
-            // doesn't block the event loop.
-            tokio::spawn(async move {
-                dispatch_event(handler.as_ref(), ctx, event).await;
-            });
+            }
         }
 
         Ok(())
@@ -193,6 +198,8 @@ async fn dispatch_event(handler: &dyn EventHandler, ctx: Context, event: WsEvent
         WsEvent::UsersOnCreate(u) => handler.user_create(ctx, u).await,
         WsEvent::UsersOnUpdate(u) => handler.user_update(ctx, u).await,
         WsEvent::UsersOnDelete(obj) => handler.user_delete(ctx, obj.id).await,
+
+        WsEvent::TypingOnUpdate(u) => handler.typing_update(ctx, u).await,
 
         WsEvent::Pong(_) => {}
     }

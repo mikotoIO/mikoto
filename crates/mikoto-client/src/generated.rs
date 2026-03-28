@@ -457,6 +457,19 @@ pub type Timestamp = DateTime<Utc>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct TypingStart {
+    pub channel_id: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TypingUpdate {
+    pub channel_id: String,
+    pub user_id: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct TokenPair {
     pub access_token: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1177,6 +1190,8 @@ impl<'a> HttpApi<'a> {
 pub enum WsCommand {
     #[serde(rename = "ping")]
     Ping(Ping),
+    #[serde(rename = "typing.start")]
+    TypingStart(TypingStart),
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -1214,6 +1229,8 @@ pub enum WsEvent {
     SpacesOnDelete(SpaceExt),
     #[serde(rename = "spaces.onUpdate")]
     SpacesOnUpdate(SpaceExt),
+    #[serde(rename = "typing.onUpdate")]
+    TypingOnUpdate(TypingUpdate),
     #[serde(rename = "users.onCreate")]
     UsersOnCreate(UserExt),
     #[serde(rename = "users.onDelete")]

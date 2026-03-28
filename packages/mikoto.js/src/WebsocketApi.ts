@@ -10,7 +10,7 @@ export interface WebsocketApiOptions {
 
 type WebsocketCommands = typeof websocketCommands;
 
-export class WebsocketApi extends (EventEmitter as new () => WebsocketEventEmitter) {
+export class WebsocketApi extends (EventEmitter as unknown as new () => WebsocketEventEmitter) {
   ws: WebSocket;
   constructor(options: WebsocketApiOptions) {
     super();

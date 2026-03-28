@@ -1,5 +1,4 @@
 import { Box, Flex, Grid, Heading } from '@chakra-ui/react';
-import styled from '@emotion/styled';
 import { faHashtag } from '@fortawesome/free-solid-svg-icons';
 import {
   Channel,
@@ -15,30 +14,49 @@ import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
+import {
+  Skeleton,
+  SkeletonCircle,
+} from '@/components/ui/skeleton';
 import { uploadFile } from '@/functions/fileUpload';
 import { useFetchMember, useMikoto } from '@/hooks';
 import { CurrentSpaceContext } from '@/store';
-import { Spinner } from '@/ui/Spinner';
 
 import { DateSeparator, showDateSeparator } from './DateSeparator';
 import { MessageItem, messageEditState } from './Message';
 import { MessageEditor } from './MessageEditor';
 import { TypingIndicator, useTyping } from './TypingIndicator';
 
-const StyledMessagesLoading = styled.div`
-  padding: 40px;
-  overflow-y: auto;
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
+function MessageSkeleton({ isSimple }: { isSimple?: boolean }) {
+  return (
+    <Flex gap="16px" px="20px" py={isSimple ? '2px' : '8px'} align="start">
+      {isSimple ? (
+        <Box w="40px" flexShrink={0} />
+      ) : (
+        <SkeletonCircle size="40px" />
+      )}
+      <Box flex={1}>
+        {!isSimple && (
+          <Flex gap="8px" mb="6px" align="center">
+            <Skeleton height="14px" width="120px" />
+            <Skeleton height="10px" width="60px" />
+          </Flex>
+        )}
+        <Skeleton height="14px" width={`${50 + Math.random() * 40}%`} />
+      </Box>
+    </Flex>
+  );
+}
 
 function MessagesLoading() {
   return (
-    <StyledMessagesLoading>
-      <Spinner />
-    </StyledMessagesLoading>
+    <Box flexGrow={1} overflow="hidden" py="16px">
+      {[false, true, true, false, true, false, true, true].map(
+        (isSimple, i) => (
+          <MessageSkeleton key={i} isSimple={isSimple} />
+        ),
+      )}
+    </Box>
   );
 }
 

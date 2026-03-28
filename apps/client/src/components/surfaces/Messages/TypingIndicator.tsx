@@ -1,6 +1,6 @@
-import { Box } from '@chakra-ui/react';
+import { Box, Presence } from '@chakra-ui/react';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
-import { useState } from 'react';
+import { type ReactNode, useRef, useState } from 'react';
 
 import { useInterval, useMikoto } from '@/hooks';
 
@@ -55,15 +55,29 @@ export function TypingIndicator({ typers, channel }: TypingIndicatorProps) {
   const humanPart = formatTyperGroup(humanNames, 'typing...');
   const botPart = formatTyperGroup(botNames, 'thinking...');
 
+  const lastContent = useRef<ReactNode>(null);
+  if (typers.length > 0) {
+    lastContent.current = (
+      <>
+        {humanPart}
+        {humanPart && botPart && ' '}
+        {botPart}
+      </>
+    );
+  }
+
   return (
     <Box px={4} ml={1} fontSize="12px">
-      {typers.length > 0 && (
-        <>
-          {humanPart}
-          {humanPart && botPart && ' '}
-          {botPart}
-        </>
-      )}
+      <Presence
+        present={typers.length > 0}
+        animationName={{
+          _open: 'slide-from-bottom, fade-in',
+          _closed: 'slide-to-bottom, fade-out',
+        }}
+        animationDuration="fast"
+      >
+        {lastContent.current}
+      </Presence>
     </Box>
   );
 }

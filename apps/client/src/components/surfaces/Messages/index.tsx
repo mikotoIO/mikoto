@@ -262,6 +262,7 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
               }
             }}
             onSubmit={async (msg, files) => {
+              typing.cancel();
               if (currentEditState) {
                 const m = currentEditState;
                 setEditState(null);

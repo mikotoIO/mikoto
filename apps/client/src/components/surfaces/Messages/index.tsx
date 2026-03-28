@@ -84,45 +84,40 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
   const currentEditState = useAtomValue(messageEditState);
   const setEditState = useSetAtom(messageEditState);
 
-  // TODO: When I wrote this code, only God and I understood what I was doing
-  // At this point, I don't think God understands it either
-  // useEffect(
-  //   () =>
-  //     mikoto.client.messages.onTypingStart((ev) => {
-  //       if (ev.channelId !== channel.id) return;
-  //       if (ev.userId === mikoto.me.id) return;
+  useEffect(() => {
+    const handler = (ev: { channelId: string; userId: string }) => {
+      if (ev.channelId !== channel.id) return;
+      if (ev.userId === mikoto.user.me?.id) return;
 
-  //       setCurrentTypers((cts) => {
-  //         const ct = [...cts];
-  //         let exists = false;
-  //         ct.forEach((x) => {
-  //           if (x.userId === ev.userId) {
-  //             exists = true;
-  //             x.timestamp = Date.now() + 5000;
-  //           }
-  //         });
-  //         if (!exists) {
-  //           ct.push({
-  //             timestamp: Date.now() + 5000,
-  //             userId: ev.userId,
-  //           });
-  //         }
-  //         return ct;
-  //       });
-  //     }),
-  //   [channel.id],
-  // );
+      setCurrentTypers((cts) => {
+        const ct = [...cts];
+        let exists = false;
+        ct.forEach((x) => {
+          if (x.userId === ev.userId) {
+            exists = true;
+            x.timestamp = Date.now() + 5000;
+          }
+        });
+        if (!exists) {
+          ct.push({
+            timestamp: Date.now() + 5000,
+            userId: ev.userId,
+          });
+        }
+        return ct;
+      });
+    };
+    mikoto.ws.on('typing.onUpdate', handler);
+    return () => {
+      mikoto.ws.off('typing.onUpdate', handler);
+    };
+  }, [channel.id]);
 
   const typing = useCallback(
     throttle(() => {
-      // TODO: reimplement typing
-      // mikoto.client.messages
-      //   .startTyping({
-      //     channelId: channel.id,
-      //   })
-      //   .then();
+      mikoto.ws.send('typing.start', { channelId: channel.id });
     }, 3000),
-    [],
+    [channel.id],
   );
 
   const [msgs, setMsgs] = useState<MikotoMessage[] | null>(null);
@@ -267,6 +262,7 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
               }
             }}
             onSubmit={async (msg, files) => {
+              typing.cancel();
               if (currentEditState) {
                 const m = currentEditState;
                 setEditState(null);

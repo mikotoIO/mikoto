@@ -15,6 +15,8 @@ use tower_http::cors::CorsLayer;
 use ws::state::State;
 
 use crate::{
+    db::db,
+    entities::Channel,
     env::{env, MikotoMode},
     functions::pubsub::emit_event,
 };
@@ -52,6 +54,19 @@ pub async fn index() -> Json<&'static IndexResponse> {
 #[derive(Serialize, Deserialize, JsonSchema)]
 pub struct Ping {
     pub message: String,
+}
+
+#[derive(Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct TypingStart {
+    pub channel_id: String,
+}
+
+#[derive(Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct TypingUpdate {
+    pub channel_id: String,
+    pub user_id: String,
 }
 
 fn build_app_router() -> AppRouter<State> {
@@ -102,6 +117,27 @@ fn build_app_router() -> AppRouter<State> {
             Ok(())
         })
         .ws_event("pong", |ping: Ping, _| async move { Some(ping) })
+        .ws_command(
+            "typing.start",
+            |payload: TypingStart, state: Arc<RwLock<State>>| async move {
+                let channel_id: uuid::Uuid = payload.channel_id.parse()?;
+                let channel = Channel::find_by_id(channel_id, db()).await?;
+                let user_id = state.read().await.user.id;
+                emit_event(
+                    "typing.onUpdate",
+                    TypingUpdate {
+                        channel_id: payload.channel_id,
+                        user_id: user_id.to_string(),
+                    },
+                    &format!("space:{}", channel.space_id),
+                )
+                .await?;
+                Ok(())
+            },
+        )
+        .ws_event("typing.onUpdate", |update: TypingUpdate, _| async move {
+            Some(update)
+        })
 }
 
 async fn security_headers(request: Request, next: middleware::Next) -> axum::response::Response {

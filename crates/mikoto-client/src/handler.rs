@@ -51,6 +51,8 @@ pub trait EventHandler: Send + Sync {
     async fn space_update(&self, _ctx: Context, _space: SpaceExt) {}
     async fn space_delete(&self, _ctx: Context, _space: SpaceExt) {}
 
+    async fn typing_update(&self, _ctx: Context, _update: TypingUpdate) {}
+
     async fn user_create(&self, _ctx: Context, _user: UserExt) {}
     async fn user_update(&self, _ctx: Context, _user: UserExt) {}
     async fn user_delete(&self, _ctx: Context, _id: Uuid) {}

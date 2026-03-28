@@ -197,10 +197,11 @@ impl Cache {
                 self.users.remove(&obj.id);
             }
 
-            // Messages and pong don't affect the cache
+            // Messages, typing, and pong don't affect the cache
             WsEvent::MessagesOnCreate(_)
             | WsEvent::MessagesOnDelete(_)
             | WsEvent::MessagesOnUpdate(_)
+            | WsEvent::TypingOnUpdate(_)
             | WsEvent::Pong(_) => {}
         }
     }

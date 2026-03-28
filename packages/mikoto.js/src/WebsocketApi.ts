@@ -1,5 +1,6 @@
 import EventEmitter from 'events';
 import WebSocket from 'isomorphic-ws';
+import type { z } from 'zod';
 
 import type { WebsocketEventEmitter, websocketCommands } from './api.gen';
 
@@ -38,7 +39,10 @@ export class WebsocketApi extends (EventEmitter as new () => WebsocketEventEmitt
     };
   }
 
-  send<K extends keyof WebsocketCommands>(op: K, data: WebsocketCommands[K]) {
+  send<K extends keyof WebsocketCommands>(
+    op: K,
+    data: z.infer<WebsocketCommands[K]>,
+  ) {
     this.ws.send(
       JSON.stringify({
         op,

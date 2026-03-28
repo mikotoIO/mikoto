@@ -420,6 +420,15 @@ export type ObjectWithId = z.infer<typeof ObjectWithId>;
 export const Ping = z.object({ message: z.string() });
 export type Ping = z.infer<typeof Ping>;
 
+export const TypingStart = z.object({ channelId: z.string() });
+export type TypingStart = z.infer<typeof TypingStart>;
+
+export const TypingUpdate = z.object({
+  channelId: z.string(),
+  userId: z.string(),
+});
+export type TypingUpdate = z.infer<typeof TypingUpdate>;
+
 export const ServeParams = z
   .object({
     h: z.union([z.number(), z.null()]),
@@ -493,6 +502,8 @@ export const schemas = {
   ObjectWithId,
   Ping,
   ServeParams,
+  TypingStart,
+  TypingUpdate,
 };
 
 const endpoints = makeApi([
@@ -1214,6 +1225,7 @@ export function createApiClient(baseUrl: string, options?: ZodiosOptions) {
 
 export const websocketCommands = {
   ping: Ping,
+  "typing.start": TypingStart,
 };
 
 export const websocketEvents = {
@@ -1233,6 +1245,7 @@ export const websocketEvents = {
   "spaces.onCreate": SpaceExt,
   "spaces.onDelete": SpaceExt,
   "spaces.onUpdate": SpaceExt,
+  "typing.onUpdate": TypingUpdate,
   "users.onCreate": UserExt,
   "users.onDelete": ObjectWithId,
   "users.onUpdate": UserExt,

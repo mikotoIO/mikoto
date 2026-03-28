@@ -2912,6 +2912,32 @@
           }
         }
       },
+      "TypingStart": {
+        "type": "object",
+        "required": [
+          "channelId"
+        ],
+        "properties": {
+          "channelId": {
+            "type": "string"
+          }
+        }
+      },
+      "TypingUpdate": {
+        "type": "object",
+        "required": [
+          "channelId",
+          "userId"
+        ],
+        "properties": {
+          "channelId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        }
+      },
       "UpdateBotPayload": {
         "type": "object",
         "properties": {
@@ -3186,6 +3212,9 @@
     "commands": {
       "ping": {
         "$ref": "#/components/schemas/Ping"
+      },
+      "typing.start": {
+        "$ref": "#/components/schemas/TypingStart"
       }
     },
     "events": {
@@ -3236,6 +3265,9 @@
       },
       "spaces.onUpdate": {
         "$ref": "#/components/schemas/SpaceExt"
+      },
+      "typing.onUpdate": {
+        "$ref": "#/components/schemas/TypingUpdate"
       },
       "users.onCreate": {
         "$ref": "#/components/schemas/UserExt"

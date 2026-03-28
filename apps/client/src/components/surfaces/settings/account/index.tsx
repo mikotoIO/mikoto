@@ -390,7 +390,6 @@ function Overview() {
           </Button>
           {user?.handle && (
             <Button
-              variant="outline"
               colorPalette="red"
               type="button"
               onClick={async () => {

@@ -312,7 +312,6 @@ function Overview({ space }: { space: MikotoSpace }) {
           </Button>
           {space.handle && (
             <Button
-              variant="outline"
               colorPalette="red"
               type="button"
               onClick={async () => {

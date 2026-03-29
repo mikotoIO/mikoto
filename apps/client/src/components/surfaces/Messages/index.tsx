@@ -27,7 +27,17 @@ import { MessageItem, messageEditState } from './Message';
 import { MessageEditor } from './MessageEditor';
 import { TypingIndicator, useTyping } from './TypingIndicator';
 
-function MessageSkeleton({ isSimple }: { isSimple?: boolean }) {
+// Simple hash to get a deterministic pseudo-random number from an index
+function seededRandom(index: number) {
+  const x = Math.sin(index * 9301 + 49297) * 49297;
+  return x - Math.floor(x);
+}
+
+function MessageSkeleton({ index }: { index: number }) {
+  // Determine if "simple" (continuation) based on a pattern seeded by index
+  const isSimple = index > 0 && seededRandom(index) > 0.4;
+  const width = `${50 + seededRandom(index * 7 + 3) * 40}%`;
+
   return (
     <Flex gap="16px" px="20px" py={isSimple ? '2px' : '8px'} align="start">
       {isSimple ? (
@@ -42,7 +52,7 @@ function MessageSkeleton({ isSimple }: { isSimple?: boolean }) {
             <Skeleton height="10px" width="60px" />
           </Flex>
         )}
-        <Skeleton height="14px" width={`${50 + Math.random() * 40}%`} />
+        <Skeleton height="14px" width={width} />
       </Box>
     </Flex>
   );
@@ -50,13 +60,12 @@ function MessageSkeleton({ isSimple }: { isSimple?: boolean }) {
 
 function MessagesLoading() {
   return (
-    <Box flexGrow={1} overflow="hidden" py="16px">
-      {[false, true, true, false, true, false, true, true].map(
-        (isSimple, i) => (
-          <MessageSkeleton key={i} isSimple={isSimple} />
-        ),
-      )}
-    </Box>
+    <Virtuoso
+      totalCount={1000}
+      defaultItemHeight={48}
+      style={{ flexGrow: 1, overflowX: 'hidden' }}
+      itemContent={(index) => <MessageSkeleton index={index} />}
+    />
   );
 }
 
@@ -215,7 +224,13 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
     () => ({
       Header: topLoaded
         ? () => <ChannelHead channel={channel} />
-        : () => <MessagesLoading />,
+        : () => (
+            <Box py="16px">
+              {Array.from({ length: 8 }, (_, i) => (
+                <MessageSkeleton key={i} index={i} />
+              ))}
+            </Box>
+          ),
     }),
     [topLoaded, channel],
   );

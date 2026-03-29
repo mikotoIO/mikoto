@@ -110,7 +110,13 @@ export default ({ mode }: { mode: string }) =>
     define: {
       'process.env.NODE_ENV': `"${mode}"`,
       __COMMIT_HASH__: JSON.stringify(
-        execSync('git rev-parse --short HEAD').toString().trim(),
+        (() => {
+          try {
+            return execSync('git rev-parse --short HEAD').toString().trim();
+          } catch {
+            return process.env.COMMIT_HASH || 'unknown';
+          }
+        })(),
       ),
     },
     envPrefix: ['MIKOTO_', 'PUBLIC_'],

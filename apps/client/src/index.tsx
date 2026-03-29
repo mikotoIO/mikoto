@@ -71,4 +71,10 @@ registerSW({
   onOfflineReady() {
     console.log('App ready to work offline.');
   },
+  onRegisteredSW(_swUrl, registration) {
+    if (registration) {
+      // Check for new version every 15 minutes
+      setInterval(() => registration.update(), 15 * 60 * 1000);
+    }
+  },
 });

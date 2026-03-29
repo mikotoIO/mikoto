@@ -458,6 +458,9 @@ function Overview() {
         </Button>
       </Flex>
       <h2>Debug</h2>
+      <Text color="gray.400" fontSize="sm" mb={2} fontFamily="mono">
+        Commit: {__COMMIT_HASH__}
+      </Text>
       <Button size="md" variant="subtle">
         Open Design Palette
       </Button>

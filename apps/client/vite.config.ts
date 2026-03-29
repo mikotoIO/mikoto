@@ -1,5 +1,6 @@
 /// <reference types="vitest" />
 import react from '@vitejs/plugin-react';
+import { execSync } from 'node:child_process';
 import * as dotenv from 'dotenv';
 import path from 'node:path';
 import { visualizer } from 'rollup-plugin-visualizer';
@@ -83,6 +84,9 @@ export default ({ mode }: { mode: string }) =>
         workbox: {
           maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
           globPatterns: ['**/*.{js,css,html,ico,svg,woff,woff2,ttf}'],
+          cleanupOutdatedCaches: true,
+          clientsClaim: true,
+          skipWaiting: true,
           navigateFallback: 'index.html',
           runtimeCaching: [
             {
@@ -105,6 +109,9 @@ export default ({ mode }: { mode: string }) =>
     ],
     define: {
       'process.env.NODE_ENV': `"${mode}"`,
+      __COMMIT_HASH__: JSON.stringify(
+        execSync('git rev-parse --short HEAD').toString().trim(),
+      ),
     },
     envPrefix: ['MIKOTO_', 'PUBLIC_'],
   });

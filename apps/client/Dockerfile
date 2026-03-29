@@ -8,6 +8,7 @@ ARG PUBLIC_MEDIASERVER_URL
 
 WORKDIR /app
 
+RUN apk add --no-cache git
 RUN corepack enable
 COPY . .
 RUN pnpm install --frozen-lockfile

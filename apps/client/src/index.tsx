@@ -9,8 +9,8 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// Register PWA service worker
-import { registerSW } from 'virtual:pwa-register';
+// PWA disabled due to caching issues
+// import { registerSW } from 'virtual:pwa-register';
 
 import App from '@/App';
 import { globalCss } from '@/components/chakraTheme';
@@ -67,14 +67,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 
-registerSW({
-  onOfflineReady() {
-    console.log('App ready to work offline.');
-  },
-  onRegisteredSW(_swUrl, registration) {
-    if (registration) {
-      // Check for new version every 15 minutes
-      setInterval(() => registration.update(), 15 * 60 * 1000);
-    }
-  },
-});
+// PWA disabled due to caching issues
+// registerSW({ ... });

@@ -9,7 +9,7 @@ import {
 } from '@mikoto-io/mikoto.js';
 import { useAtomValue, useSetAtom } from 'jotai';
 import throttle from 'lodash/throttle';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 import { Surface } from '@/components/Surface';
@@ -27,7 +27,17 @@ import { MessageItem, messageEditState } from './Message';
 import { MessageEditor } from './MessageEditor';
 import { TypingIndicator, useTyping } from './TypingIndicator';
 
-function MessageSkeleton({ isSimple }: { isSimple?: boolean }) {
+// Simple hash to get a deterministic pseudo-random number from an index
+function seededRandom(index: number) {
+  const x = Math.sin(index * 9301 + 49297) * 49297;
+  return x - Math.floor(x);
+}
+
+function MessageSkeleton({ index }: { index: number }) {
+  // Determine if "simple" (continuation) based on a pattern seeded by index
+  const isSimple = index > 0 && seededRandom(index) > 0.4;
+  const width = `${50 + seededRandom(index * 7 + 3) * 40}%`;
+
   return (
     <Flex gap="16px" px="20px" py={isSimple ? '2px' : '8px'} align="start">
       {isSimple ? (
@@ -42,7 +52,7 @@ function MessageSkeleton({ isSimple }: { isSimple?: boolean }) {
             <Skeleton height="10px" width="60px" />
           </Flex>
         )}
-        <Skeleton height="14px" width={`${50 + Math.random() * 40}%`} />
+        <Skeleton height="14px" width={width} />
       </Box>
     </Flex>
   );
@@ -50,13 +60,12 @@ function MessageSkeleton({ isSimple }: { isSimple?: boolean }) {
 
 function MessagesLoading() {
   return (
-    <Box flexGrow={1} overflow="hidden" py="16px">
-      {[false, true, true, false, true, false, true, true].map(
-        (isSimple, i) => (
-          <MessageSkeleton key={i} isSimple={isSimple} />
-        ),
-      )}
-    </Box>
+    <Virtuoso
+      totalCount={1000}
+      defaultItemHeight={48}
+      style={{ flexGrow: 1, overflowX: 'hidden' }}
+      itemContent={(index) => <MessageSkeleton index={index} />}
+    />
   );
 }
 
@@ -96,6 +105,7 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
   // you will probably run out of memory before this number
   const [firstItemIndex, setFirstItemIndex] = useState(FUNNY_NUMBER);
   const [topLoaded, setTopLoaded] = useState(false);
+  const loadingOlder = useRef(false);
 
   const [currentTypers, setCurrentTypers] = useTyping();
   const [bottomState, setBottomState] = useState(false);
@@ -210,6 +220,21 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
     };
   }, [channel.id]);
 
+  const virtuosoComponents = useMemo(
+    () => ({
+      Header: topLoaded
+        ? () => <ChannelHead channel={channel} />
+        : () => (
+            <Box py="16px">
+              {Array.from({ length: 8 }, (_, i) => (
+                <MessageSkeleton key={i} index={i} />
+              ))}
+            </Box>
+          ),
+    }),
+    [topLoaded, channel],
+  );
+
   return (
     <Surface key={channel.id}>
       <TabName name={channel.name} icon={channel.space?.icon ?? faHashtag} />
@@ -221,31 +246,33 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
             <Virtuoso
               ref={virtuosoRef}
               followOutput="auto"
-              defaultItemHeight={28}
+              defaultItemHeight={64}
               style={{ flexGrow: 1, overflowX: 'hidden' }}
               initialTopMostItemIndex={msgs.length - 1}
               data={msgs}
+              computeItemKey={(index, msg) => msg.id}
               atBottomStateChange={(atBottom) => {
                 setBottomState(atBottom);
               }}
               overscan={1000}
-              components={{
-                Header() {
-                  if (topLoaded) return <ChannelHead channel={channel} />;
-                  return <MessagesLoading />;
-                },
-              }}
+              components={virtuosoComponents}
               firstItemIndex={firstItemIndex}
               startReached={async () => {
                 if (!msgs) return;
                 if (msgs.length === 0) return;
-                const m = await channel.listMessages(50, msgs[0].id);
-                if (m.length === 0) {
-                  setTopLoaded(true);
-                  return;
+                if (loadingOlder.current) return;
+                loadingOlder.current = true;
+                try {
+                  const m = await channel.listMessages(50, msgs[0].id);
+                  if (m.length === 0) {
+                    setTopLoaded(true);
+                    return;
+                  }
+                  setFirstItemIndex((x) => x - m.length);
+                  setMsgs((xs) => (xs ? [...m, ...xs] : null));
+                } finally {
+                  loadingOlder.current = false;
                 }
-                setMsgs((xs) => (xs ? [...m, ...xs] : null));
-                setFirstItemIndex((x) => x - m.length);
               }}
               itemContent={(index, msg) => (
                 <>
@@ -254,7 +281,6 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
                   )}
                   <MessageItem
                     message={msg}
-                    // message={new ClientMessage(mikoto, msg)}
                     isSimple={isMessageSimple(
                       msg,
                       msgs[index - firstItemIndex - 1],

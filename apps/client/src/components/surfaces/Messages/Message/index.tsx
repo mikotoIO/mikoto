@@ -41,8 +41,11 @@ const MessageContainer = styled.div<{ isSimple?: boolean }>`
 
 const MessageInner = styled.div`
   flex: 1;
+  min-width: 0;
   margin: 0;
   font-size: 14px;
+  overflow-wrap: break-word;
+  word-break: break-word;
 
   a {
     color: #00aff4;

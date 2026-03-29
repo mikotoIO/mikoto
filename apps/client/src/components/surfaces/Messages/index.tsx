@@ -9,7 +9,7 @@ import {
 } from '@mikoto-io/mikoto.js';
 import { useAtomValue, useSetAtom } from 'jotai';
 import throttle from 'lodash/throttle';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 import { Surface } from '@/components/Surface';
@@ -96,6 +96,7 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
   // you will probably run out of memory before this number
   const [firstItemIndex, setFirstItemIndex] = useState(FUNNY_NUMBER);
   const [topLoaded, setTopLoaded] = useState(false);
+  const loadingOlder = useRef(false);
 
   const [currentTypers, setCurrentTypers] = useTyping();
   const [bottomState, setBottomState] = useState(false);
@@ -210,6 +211,15 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
     };
   }, [channel.id]);
 
+  const virtuosoComponents = useMemo(
+    () => ({
+      Header: topLoaded
+        ? () => <ChannelHead channel={channel} />
+        : () => <MessagesLoading />,
+    }),
+    [topLoaded, channel],
+  );
+
   return (
     <Surface key={channel.id}>
       <TabName name={channel.name} icon={channel.space?.icon ?? faHashtag} />
@@ -221,31 +231,33 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
             <Virtuoso
               ref={virtuosoRef}
               followOutput="auto"
-              defaultItemHeight={28}
+              defaultItemHeight={64}
               style={{ flexGrow: 1, overflowX: 'hidden' }}
               initialTopMostItemIndex={msgs.length - 1}
               data={msgs}
+              computeItemKey={(index, msg) => msg.id}
               atBottomStateChange={(atBottom) => {
                 setBottomState(atBottom);
               }}
               overscan={1000}
-              components={{
-                Header() {
-                  if (topLoaded) return <ChannelHead channel={channel} />;
-                  return <MessagesLoading />;
-                },
-              }}
+              components={virtuosoComponents}
               firstItemIndex={firstItemIndex}
               startReached={async () => {
                 if (!msgs) return;
                 if (msgs.length === 0) return;
-                const m = await channel.listMessages(50, msgs[0].id);
-                if (m.length === 0) {
-                  setTopLoaded(true);
-                  return;
+                if (loadingOlder.current) return;
+                loadingOlder.current = true;
+                try {
+                  const m = await channel.listMessages(50, msgs[0].id);
+                  if (m.length === 0) {
+                    setTopLoaded(true);
+                    return;
+                  }
+                  setFirstItemIndex((x) => x - m.length);
+                  setMsgs((xs) => (xs ? [...m, ...xs] : null));
+                } finally {
+                  loadingOlder.current = false;
                 }
-                setMsgs((xs) => (xs ? [...m, ...xs] : null));
-                setFirstItemIndex((x) => x - m.length);
               }}
               itemContent={(index, msg) => (
                 <>
@@ -254,7 +266,6 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
                   )}
                   <MessageItem
                     message={msg}
-                    // message={new ClientMessage(mikoto, msg)}
                     isSimple={isMessageSimple(
                       msg,
                       msgs[index - firstItemIndex - 1],

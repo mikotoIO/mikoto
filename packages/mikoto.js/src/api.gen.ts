@@ -236,6 +236,9 @@ export type Role = z.infer<typeof Role>;
 export const SpaceType = z.enum(["NONE", "DM", "GROUP"]);
 export type SpaceType = z.infer<typeof SpaceType>;
 
+export const SpaceVisibility = z.enum(["PRIVATE", "PUBLIC"]);
+export type SpaceVisibility = z.infer<typeof SpaceVisibility>;
+
 export const SpaceExt = z.object({
   channels: z.array(Channel),
   handle: z.union([z.string(), z.null()]).optional(),
@@ -246,6 +249,7 @@ export const SpaceExt = z.object({
   ownerId: z.union([z.string(), z.null()]).optional(),
   roles: z.array(Role),
   type: SpaceType,
+  visibility: z.union([SpaceVisibility, z.null()]).optional(),
 });
 export type SpaceExt = z.infer<typeof SpaceExt>;
 
@@ -257,6 +261,7 @@ export const SpaceUpdatePayload = z
     handle: z.union([z.string(), z.null()]),
     icon: z.union([z.string(), z.null()]),
     name: z.union([z.string(), z.null()]),
+    visibility: z.union([SpaceVisibility, z.null()]),
   })
   .partial();
 export type SpaceUpdatePayload = z.infer<typeof SpaceUpdatePayload>;
@@ -420,6 +425,14 @@ export type ObjectWithId = z.infer<typeof ObjectWithId>;
 export const Ping = z.object({ message: z.string() });
 export type Ping = z.infer<typeof Ping>;
 
+export const ServeParams = z
+  .object({
+    h: z.union([z.number(), z.null()]),
+    w: z.union([z.number(), z.null()]),
+  })
+  .partial();
+export type ServeParams = z.infer<typeof ServeParams>;
+
 export const TypingStart = z.object({ channelId: z.string() });
 export type TypingStart = z.infer<typeof TypingStart>;
 
@@ -428,14 +441,6 @@ export const TypingUpdate = z.object({
   userId: z.string(),
 });
 export type TypingUpdate = z.infer<typeof TypingUpdate>;
-
-export const ServeParams = z
-  .object({
-    h: z.union([z.number(), z.null()]),
-    w: z.union([z.number(), z.null()]),
-  })
-  .partial();
-export type ServeParams = z.infer<typeof ServeParams>;
 
 export const schemas = {
   IndexResponse,
@@ -472,6 +477,7 @@ export const schemas = {
   Channel,
   Role,
   SpaceType,
+  SpaceVisibility,
   SpaceExt,
   SpaceCreatePayload,
   SpaceUpdatePayload,

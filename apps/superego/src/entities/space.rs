@@ -14,6 +14,14 @@ db_enum!(
     }
 );
 
+db_enum!(
+    #[sqlx(type_name = "\"SpaceVisibility\"")]
+    pub enum SpaceVisibility {
+        Private,
+        Public,
+    }
+);
+
 entity!(
     /// # SpaceDataModel
     pub struct Space {
@@ -25,6 +33,8 @@ entity!(
         #[serde(rename = "type")]
         #[sqlx(rename = "type")]
         pub space_type: SpaceType,
+
+        pub visibility: Option<SpaceVisibility>,
     }
 );
 
@@ -47,6 +57,7 @@ pub struct SpacePatch {
     pub name: Option<String>,
     pub icon: Option<String>,
     pub owner_id: Option<Uuid>,
+    pub visibility: Option<SpaceVisibility>,
 }
 
 impl Space {
@@ -57,6 +68,7 @@ impl Space {
             icon: None,
             owner_id: Some(owner_id),
             space_type: SpaceType::None,
+            visibility: None,
         }
     }
 
@@ -92,8 +104,8 @@ impl Space {
                 VALUES (gen_random_uuid(), $1, '@everyone', -1, '0')
                 RETURNING "id"
             )
-            INSERT INTO "Space" ("id", "name", "icon", "ownerId", "type")
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO "Space" ("id", "name", "icon", "ownerId", "type", "visibility")
+            VALUES ($1, $2, $3, $4, $5, $6)
             "##,
         )
         .bind(self.id)
@@ -101,6 +113,7 @@ impl Space {
         .bind(&self.icon)
         .bind(self.owner_id)
         .bind(self.space_type)
+        .bind(self.visibility)
         .execute(db)
         .await?;
         Ok(())
@@ -116,7 +129,8 @@ impl Space {
             UPDATE "Space" SET
             "name" = COALESCE($2, "name"),
             "icon" = COALESCE($3, "icon"),
-            "ownerId" = COALESCE($4, "ownerId")
+            "ownerId" = COALESCE($4, "ownerId"),
+            "visibility" = COALESCE($5, "visibility")
             WHERE "id" = $1
             RETURNING *
             "##,
@@ -125,6 +139,7 @@ impl Space {
         .bind(&patch.name)
         .bind(&patch.icon)
         .bind(patch.owner_id)
+        .bind(patch.visibility)
         .fetch_optional(db)
         .await?
         .ok_or(Error::NotFound)?;

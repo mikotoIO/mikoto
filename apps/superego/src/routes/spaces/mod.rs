@@ -9,7 +9,10 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{Ban, Handle, Invite, MemberExt, MemberKey, Space, SpaceExt, SpacePatch, SpaceUser},
+    entities::{
+        Ban, Handle, Invite, MemberExt, MemberKey, Space, SpaceExt, SpacePatch, SpaceUser,
+        SpaceVisibility,
+    },
     error::Error,
     functions::{
         handle_verification::{
@@ -45,6 +48,7 @@ pub struct SpaceUpdatePayload {
     pub name: Option<String>,
     pub icon: Option<String>,
     pub handle: Option<String>,
+    pub visibility: Option<SpaceVisibility>,
 }
 
 impl SpaceUpdatePayload {
@@ -52,6 +56,7 @@ impl SpaceUpdatePayload {
         SpacePatch {
             name: self.name.clone(),
             icon: self.icon.clone(),
+            visibility: self.visibility,
             ..Default::default()
         }
     }
@@ -179,18 +184,33 @@ async fn delete(Load(space): Load<SpaceExt>, claims: Claims) -> Result<Json<()>,
     Ok(().into())
 }
 
-async fn invite_preview(Path(invite): Path<String>) -> Result<Json<SpaceExt>, Error> {
-    let invite = Invite::find_by_id(&invite, db()).await?;
+/// Resolve an invite string to a space. If the invite starts with `@`, treat it
+/// as a handle lookup for a public space; otherwise look up a traditional invite code.
+async fn resolve_invite(invite: &str) -> Result<Space, Error> {
+    if let Some(handle_str) = invite.strip_prefix('@') {
+        let handle = Handle::resolve(handle_str, db())
+            .await?
+            .ok_or(Error::NotFound)?;
+        let space_id = handle.space_id.ok_or(Error::NotFound)?;
+        let space = Space::find_by_id(space_id, db()).await?;
+        if space.visibility != Some(SpaceVisibility::Public) {
+            return Err(Error::forbidden("This space is not public"));
+        }
+        Ok(space)
+    } else {
+        let invite = Invite::find_by_id(invite, db()).await?;
+        Ok(Space::find_by_id(invite.space_id, db()).await?)
+    }
+}
 
-    let space = Space::find_by_id(invite.space_id, db()).await?;
+async fn invite_preview(Path(invite): Path<String>) -> Result<Json<SpaceExt>, Error> {
+    let space = resolve_invite(&invite).await?;
     let space = SpaceExt::dataload_one(space, db()).await?;
     Ok(space.into())
 }
 
 async fn join(Path(invite): Path<String>, claims: Claims) -> Result<Json<SpaceExt>, Error> {
-    let invite = Invite::find_by_id(&invite, db()).await?;
-
-    let space = Space::find_by_id(invite.space_id, db()).await?;
+    let space = resolve_invite(&invite).await?;
     let space = SpaceExt::dataload_one(space, db()).await?;
     join_space(&space, claims.sub.parse()?).await?;
     Ok(space.into())

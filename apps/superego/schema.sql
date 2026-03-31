@@ -73,6 +73,18 @@ CREATE TYPE public."SpaceType" AS ENUM (
 ALTER TYPE public."SpaceType" OWNER TO postgres;
 
 --
+-- Name: SpaceVisibility; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public."SpaceVisibility" AS ENUM (
+    'PRIVATE',
+    'PUBLIC'
+);
+
+
+ALTER TYPE public."SpaceVisibility" OWNER TO postgres;
+
+--
 -- Name: UserCategory; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -321,7 +333,8 @@ CREATE TABLE public."Space" (
     name character varying(64) NOT NULL,
     icon character varying(256),
     "ownerId" uuid,
-    type public."SpaceType" DEFAULT 'NONE'::public."SpaceType" NOT NULL
+    type public."SpaceType" DEFAULT 'NONE'::public."SpaceType" NOT NULL,
+    visibility public."SpaceVisibility"
 );
 
 

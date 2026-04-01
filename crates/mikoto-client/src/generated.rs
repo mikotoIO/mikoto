@@ -431,6 +431,8 @@ pub struct SpaceExt {
     pub owner_id: Option<Uuid>,
     pub roles: Vec<Role>,
     pub r#type: SpaceType,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub visibility: Option<SpaceVisibility>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -451,9 +453,27 @@ pub struct SpaceUpdatePayload {
     pub icon: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub visibility: Option<SpaceVisibility>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum SpaceVisibility {
+    #[serde(rename = "PRIVATE")]
+    Private,
+    #[serde(rename = "PUBLIC")]
+    Public,
 }
 
 pub type Timestamp = DateTime<Utc>;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TokenPair {
+    pub access_token: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub refresh_token: Option<String>,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -466,14 +486,6 @@ pub struct TypingStart {
 pub struct TypingUpdate {
     pub channel_id: String,
     pub user_id: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct TokenPair {
-    pub access_token: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub refresh_token: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

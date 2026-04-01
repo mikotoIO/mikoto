@@ -2856,6 +2856,16 @@
           },
           "type": {
             "$ref": "#/components/schemas/SpaceType"
+          },
+          "visibility": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SpaceVisibility"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       },
@@ -2887,8 +2897,25 @@
               "string",
               "null"
             ]
+          },
+          "visibility": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SpaceVisibility"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
+      },
+      "SpaceVisibility": {
+        "type": "string",
+        "enum": [
+          "PRIVATE",
+          "PUBLIC"
+        ]
       },
       "Timestamp": {
         "type": "string",

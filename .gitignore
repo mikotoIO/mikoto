@@ -73,3 +73,6 @@ target/
 .moon/docker
 
 .brainstorm/
+
+# WASM build output
+packages/mikoto-crypto/wasm/

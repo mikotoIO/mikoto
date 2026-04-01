@@ -73,6 +73,7 @@ impl Context {
                 &MessageSendPayload {
                     content: content.into(),
                     attachments: None,
+                    ciphertext: None,
                 },
             )
             .await

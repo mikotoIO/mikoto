@@ -198,5 +198,12 @@ async fn dispatch_event(handler: &dyn EventHandler, ctx: Context, event: WsEvent
         WsEvent::TypingOnUpdate(u) => handler.typing_update(ctx, u).await,
 
         WsEvent::Pong(_) => {}
+
+        // MLS and relation events are handled by the client, not bots
+        WsEvent::MlsMessagesOnHandshake(_)
+        | WsEvent::MlsMessagesOnWelcome(_)
+        | WsEvent::RelationsOnAccept(_)
+        | WsEvent::RelationsOnRemove(_)
+        | WsEvent::RelationsOnRequest(_) => {}
     }
 }

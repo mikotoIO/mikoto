@@ -249,6 +249,7 @@ async fn create_messages(pool: &PgPool) -> Result<(), sqlx::Error> {
             timestamp: base_time + TimeDelta::minutes(i as i64 * 2),
             edited_timestamp: None,
             content: content.to_string(),
+            ciphertext: None,
         };
         message.create(pool).await.map_err(|e| match e {
             SuperegoError::DatabaseError(e) => e,

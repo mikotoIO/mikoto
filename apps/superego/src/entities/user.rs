@@ -38,14 +38,159 @@ db_enum!(
 
 entity!(
     pub struct Relationship {
-        id: Uuid,
-        user_id: Uuid,
-        relation_id: Uuid,
+        pub id: Uuid,
+        pub user_id: Uuid,
+        pub relation_id: Uuid,
 
-        state: RelationState,
-        space_id: Option<Uuid>,
+        pub state: RelationState,
+        pub space_id: Option<Uuid>,
     }
 );
+
+impl Relationship {
+    pub async fn list_for_user<'c, X: sqlx::PgExecutor<'c>>(
+        user_id: Uuid,
+        db: X,
+    ) -> Result<Vec<Self>, Error> {
+        let res = sqlx::query_as(
+            r#"
+            SELECT * FROM "Relationship" WHERE "userId" = $1
+            "#,
+        )
+        .bind(user_id)
+        .fetch_all(db)
+        .await?;
+        Ok(res)
+    }
+
+    pub async fn find_pair<'c, X: sqlx::PgExecutor<'c>>(
+        user_id: Uuid,
+        relation_id: Uuid,
+        db: X,
+    ) -> Result<Option<Self>, Error> {
+        let res = sqlx::query_as(
+            r#"
+            SELECT * FROM "Relationship"
+            WHERE "userId" = $1 AND "relationId" = $2
+            "#,
+        )
+        .bind(user_id)
+        .bind(relation_id)
+        .fetch_optional(db)
+        .await?;
+        Ok(res)
+    }
+
+    /// Create a symmetric pair of relationships.
+    pub async fn create_pair<'c, X: sqlx::PgExecutor<'c>>(
+        user_id: Uuid,
+        relation_id: Uuid,
+        user_state: RelationState,
+        relation_state: RelationState,
+        db: X,
+    ) -> Result<(Self, Self), Error> {
+        let id_a = Uuid::new_v4();
+        let id_b = Uuid::new_v4();
+
+        sqlx::query(
+            r#"
+            INSERT INTO "Relationship" (id, "userId", "relationId", state)
+            VALUES ($1, $2, $3, $4), ($5, $6, $7, $8)
+            "#,
+        )
+        .bind(id_a)
+        .bind(user_id)
+        .bind(relation_id)
+        .bind(user_state)
+        .bind(id_b)
+        .bind(relation_id)
+        .bind(user_id)
+        .bind(relation_state)
+        .execute(db)
+        .await?;
+
+        Ok((
+            Self {
+                id: id_a,
+                user_id,
+                relation_id,
+                state: user_state,
+                space_id: None,
+            },
+            Self {
+                id: id_b,
+                user_id: relation_id,
+                relation_id: user_id,
+                state: relation_state,
+                space_id: None,
+            },
+        ))
+    }
+
+    pub async fn update_state<'c, X: sqlx::PgExecutor<'c>>(
+        user_id: Uuid,
+        relation_id: Uuid,
+        new_state: RelationState,
+        db: X,
+    ) -> Result<Self, Error> {
+        let res = sqlx::query_as(
+            r#"
+            UPDATE "Relationship"
+            SET state = $3
+            WHERE "userId" = $1 AND "relationId" = $2
+            RETURNING *
+            "#,
+        )
+        .bind(user_id)
+        .bind(relation_id)
+        .bind(new_state)
+        .fetch_optional(db)
+        .await?
+        .ok_or(Error::NotFound)?;
+        Ok(res)
+    }
+
+    pub async fn set_space_id<'c, X: sqlx::PgExecutor<'c>>(
+        user_id: Uuid,
+        relation_id: Uuid,
+        space_id: Uuid,
+        db: X,
+    ) -> Result<(), Error> {
+        sqlx::query(
+            r#"
+            UPDATE "Relationship"
+            SET "spaceId" = $3
+            WHERE ("userId" = $1 AND "relationId" = $2)
+               OR ("userId" = $2 AND "relationId" = $1)
+            "#,
+        )
+        .bind(user_id)
+        .bind(relation_id)
+        .bind(space_id)
+        .execute(db)
+        .await?;
+        Ok(())
+    }
+
+    pub async fn delete_pair<'c, X: sqlx::PgExecutor<'c>>(
+        user_id: Uuid,
+        relation_id: Uuid,
+        db: X,
+    ) -> Result<(), Error> {
+        sqlx::query(
+            r#"
+            DELETE FROM "Relationship"
+            WHERE ("userId" = $1 AND "relationId" = $2)
+               OR ("userId" = $2 AND "relationId" = $1)
+            "#,
+        )
+        .bind(user_id)
+        .bind(relation_id)
+        .execute(db)
+        .await?;
+        Ok(())
+    }
+}
 
 /// User with extended data including handle
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]

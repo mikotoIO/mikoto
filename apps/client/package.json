@@ -32,6 +32,7 @@
     "@livekit/components-react": "^1.1.8",
     "@livekit/components-styles": "^1.0.6",
     "@marsidev/react-turnstile": "^0.2.2",
+    "@mikoto-io/mikoto-crypto": "workspace:*",
     "@mikoto-io/mikoto.js": "workspace:*",
     "@mikoto-io/permcheck": "workspace:*",
     "@react-hook/resize-observer": "^1.2.6",

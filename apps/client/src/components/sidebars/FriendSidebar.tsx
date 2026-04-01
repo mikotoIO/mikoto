@@ -5,11 +5,14 @@ import {
   faUserGroup,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { MikotoRelationship } from '@mikoto-io/mikoto.js';
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
+import { useSnapshot } from 'valtio/react';
 
 import { Avatar } from '@/components/atoms/Avatar';
 import { hoverableButtonLike } from '@/components/design';
+import { useMikoto } from '@/hooks';
 import { treebarSpaceState } from '@/store';
 import { useTabkit } from '@/store/surface';
 
@@ -28,16 +31,37 @@ const StyledButtonBase = styled.div`
   }
 `;
 
+const RequestBadge = styled.span`
+  margin-left: auto;
+  margin-right: 8px;
+  background: var(--chakra-colors-red-500);
+  color: white;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  min-width: 18px;
+  text-align: center;
+`;
+
 export function FriendSidebar() {
+  const mikoto = useMikoto();
   const tabkit = useTabkit();
   const [, setLeftSidebar] = useAtom(treebarSpaceState);
 
   useEffect(() => {
-    // mikoto.relations.list(true);
+    mikoto.relationships.list();
   }, []);
 
-  // FIXME: rework relations
-  const friends: any[] = []; // Array.from(mikoto.relations.values());
+  useSnapshot(mikoto.relationships.cache);
+
+  const allRelations = mikoto.relationships.values();
+  const friends = allRelations.filter(
+    (r: MikotoRelationship) => r.state === 'FRIEND',
+  );
+  const incomingRequests = allRelations.filter(
+    (r: MikotoRelationship) => r.state === 'INCOMING_REQUEST',
+  );
 
   return (
     <Box p={2}>
@@ -54,6 +78,9 @@ export function FriendSidebar() {
       >
         <FontAwesomeIcon icon={faUserGroup} fixedWidth />
         <span>Friends</span>
+        {incomingRequests.length > 0 && (
+          <RequestBadge>{incomingRequests.length}</RequestBadge>
+        )}
       </StyledButtonBase>
       <StyledButtonBase
         onClick={() => {
@@ -72,35 +99,35 @@ export function FriendSidebar() {
       <Heading fontSize="14px" p={2} color="gray.200">
         Direct Messages
       </Heading>
-      {friends.length === 0 && (
+      {friends.filter((f: MikotoRelationship) => f.spaceId).length === 0 && (
         <Box px={4} color="gray.500">
           <Box>No DMs yet. Maybe add some friends?</Box>
         </Box>
       )}
-      {friends.map((friend) => (
-        <StyledButtonBase
-          key={friend.id}
-          onClick={() => {
-            const friendSpaceId = friend?.space?.id;
-            if (friendSpaceId) {
-              setLeftSidebar({
-                kind: 'dmExplorer',
-                key: `dmExplorer/${friendSpaceId}`,
-                spaceId: friendSpaceId,
-                relationId: friend.id,
-              });
-            }
-          }}
-        >
-          <Avatar
-            className="avatar"
-            size={32}
-            src={friend?.relation?.avatar ?? undefined}
-            userId={friend?.relation?.id}
-          />
-          <div>{friend?.relation?.name ?? 'Deleted User'}</div>
-        </StyledButtonBase>
-      ))}
+      {friends
+        .filter((f: MikotoRelationship) => f.spaceId)
+        .map((friend: MikotoRelationship) => (
+          <StyledButtonBase
+            key={friend.id}
+            onClick={() => {
+              if (friend.spaceId) {
+                setLeftSidebar({
+                  kind: 'dmExplorer',
+                  key: `dmExplorer/${friend.spaceId}`,
+                  spaceId: friend.spaceId,
+                  relationId: friend.relationId,
+                });
+              }
+            }}
+          >
+            <Avatar
+              className="avatar"
+              size={32}
+              userId={friend.relationId}
+            />
+            <div>{friend.relationId}</div>
+          </StyledButtonBase>
+        ))}
     </Box>
   );
 }

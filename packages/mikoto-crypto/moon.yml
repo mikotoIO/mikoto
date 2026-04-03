@@ -1,0 +1,5 @@
+language: 'typescript'
+
+tasks:
+  typecheck:
+    command: 'tsc --noEmit'

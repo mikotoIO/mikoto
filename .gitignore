@@ -73,3 +73,7 @@ target/
 .moon/docker
 
 .brainstorm/
+
+# WASM build output (keep .d.ts type stubs)
+packages/mikoto-crypto/wasm/*
+!packages/mikoto-crypto/wasm/*.d.ts

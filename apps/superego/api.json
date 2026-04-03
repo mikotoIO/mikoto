@@ -714,6 +714,90 @@
         }
       }
     },
+    "/relations/{userId}/request": {
+      "post": {
+        "tags": [
+          "Relations"
+        ],
+        "summary": "Send Friend Request",
+        "operationId": "relations.request",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Relationship"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relations/{userId}/accept": {
+      "post": {
+        "tags": [
+          "Relations"
+        ],
+        "summary": "Accept Friend Request",
+        "operationId": "relations.accept",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Relationship"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relations/{userId}/block": {
+      "post": {
+        "tags": [
+          "Relations"
+        ],
+        "summary": "Block User",
+        "operationId": "relations.block",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Relationship"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relations/{userId}/remove": {
+      "post": {
+        "tags": [
+          "Relations"
+        ],
+        "summary": "Remove Relationship",
+        "operationId": "relations.remove",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/relations/{relationId}/dm": {
       "post": {
         "tags": [
@@ -727,7 +811,178 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/OpenDmResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/key-packages/": {
+      "post": {
+        "tags": [
+          "KeyPackages"
+        ],
+        "summary": "Upload KeyPackages",
+        "operationId": "keyPackages.upload",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KeyPackageUploadPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/key-packages/count": {
+      "get": {
+        "tags": [
+          "KeyPackages"
+        ],
+        "summary": "Get KeyPackage Count",
+        "operationId": "keyPackages.count",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KeyPackageCountResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/key-packages/{userId}": {
+      "get": {
+        "tags": [
+          "KeyPackages"
+        ],
+        "summary": "Fetch KeyPackage for User",
+        "operationId": "keyPackages.fetch",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KeyPackageExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/key-packages/{userId}/devices": {
+      "get": {
+        "tags": [
+          "KeyPackages"
+        ],
+        "summary": "Fetch KeyPackages for All Devices",
+        "operationId": "keyPackages.fetchAll",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/KeyPackageExt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/key-packages/device/{deviceId}": {
+      "delete": {
+        "tags": [
+          "KeyPackages"
+        ],
+        "summary": "Revoke KeyPackages for Device",
+        "operationId": "keyPackages.revoke",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mls-messages/": {
+      "get": {
+        "tags": [
+          "MLS"
+        ],
+        "summary": "List Pending MLS Messages",
+        "operationId": "mlsMessages.list",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MlsMessageExt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "MLS"
+        ],
+        "summary": "Send MLS Messages",
+        "operationId": "mlsMessages.send",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MlsMessageSendPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
                 }
               }
             }
@@ -2277,6 +2532,82 @@
       "InviteCreatePayload": {
         "type": "object"
       },
+      "KeyPackageCountResponse": {
+        "type": "object",
+        "required": [
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "KeyPackageExt": {
+        "type": "object",
+        "required": [
+          "ciphersuite",
+          "data",
+          "deviceId",
+          "id",
+          "userId"
+        ],
+        "properties": {
+          "ciphersuite": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          },
+          "deviceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "KeyPackageUploadItem": {
+        "type": "object",
+        "required": [
+          "ciphersuite",
+          "data",
+          "deviceId"
+        ],
+        "properties": {
+          "ciphersuite": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          },
+          "deviceId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "KeyPackageUploadPayload": {
+        "type": "object",
+        "required": [
+          "packages"
+        ],
+        "properties": {
+          "packages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeyPackageUploadItem"
+            }
+          }
+        }
+      },
       "ListQuery": {
         "type": "object",
         "properties": {
@@ -2495,6 +2826,17 @@
             "type": "string",
             "format": "uuid"
           },
+          "ciphertext": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "integer",
+              "format": "uint8",
+              "minimum": 0.0
+            }
+          },
           "content": {
             "type": "string"
           },
@@ -2547,8 +2889,106 @@
               "$ref": "#/components/schemas/MessageAttachmentInput"
             }
           },
+          "ciphertext": {
+            "description": "Base64-encoded MLS ciphertext for E2EE messages",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "content": {
             "type": "string"
+          }
+        }
+      },
+      "MlsGroupExt": {
+        "description": "Serialized MlsGroup info returned to the client",
+        "type": "object",
+        "required": [
+          "epoch",
+          "groupId",
+          "id",
+          "spaceId"
+        ],
+        "properties": {
+          "epoch": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "groupId": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "spaceId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "MlsMessageExt": {
+        "type": "object",
+        "required": [
+          "data",
+          "id",
+          "messageType",
+          "mlsGroupId"
+        ],
+        "properties": {
+          "data": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "messageType": {
+            "type": "string"
+          },
+          "mlsGroupId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "MlsMessageSendItem": {
+        "type": "object",
+        "required": [
+          "data",
+          "messageType",
+          "mlsGroupId",
+          "recipientUserId"
+        ],
+        "properties": {
+          "data": {
+            "type": "string"
+          },
+          "messageType": {
+            "type": "string"
+          },
+          "mlsGroupId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recipientUserId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "MlsMessageSendPayload": {
+        "type": "object",
+        "required": [
+          "messages"
+        ],
+        "properties": {
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MlsMessageSendItem"
+            }
           }
         }
       },
@@ -2561,6 +3001,33 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "OpenDmResponse": {
+        "type": "object",
+        "required": [
+          "created",
+          "keyPackages",
+          "mlsGroup",
+          "space"
+        ],
+        "properties": {
+          "created": {
+            "description": "True if this DM space was newly created (client must send Welcome messages)",
+            "type": "boolean"
+          },
+          "keyPackages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeyPackageExt"
+            }
+          },
+          "mlsGroup": {
+            "$ref": "#/components/schemas/MlsGroupExt"
+          },
+          "space": {
+            "$ref": "#/components/schemas/SpaceExt"
           }
         }
       },
@@ -3272,8 +3739,23 @@
       "messages.onUpdate": {
         "$ref": "#/components/schemas/MessageExt"
       },
+      "mlsMessages.onHandshake": {
+        "$ref": "#/components/schemas/MlsMessageExt"
+      },
+      "mlsMessages.onWelcome": {
+        "$ref": "#/components/schemas/MlsMessageExt"
+      },
       "pong": {
         "$ref": "#/components/schemas/Ping"
+      },
+      "relations.onAccept": {
+        "$ref": "#/components/schemas/Relationship"
+      },
+      "relations.onRemove": {
+        "$ref": "#/components/schemas/ObjectWithId"
+      },
+      "relations.onRequest": {
+        "$ref": "#/components/schemas/Relationship"
       },
       "roles.onCreate": {
         "$ref": "#/components/schemas/Role"

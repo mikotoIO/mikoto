@@ -275,20 +275,14 @@ export const DMExplorer = ({
   space: MikotoSpace;
   relation: Relationship;
 }) => {
-  const nodeContextMenu = useContextMenuX();
-
-  // TODO: return loading indicator
   if (space === null) return null;
-  // FIXME: reimplement this
+
   return (
-    <StyledTree
-      onContextMenu={nodeContextMenu(<TreebarContextMenu space={space} />)}
-    >
-      <Flex p="16px" align="center">
-        {/* <Avatar src={relation.relation?.avatar ?? undefined} size={32} />
-        <Heading fontSize="16px" ml={2}>
-          {relation.relation?.name ?? 'Unknown User'}
-        </Heading> */}
+    <StyledTree>
+      <Flex p="16px" align="center" gap={2}>
+        <Heading fontSize="16px">
+          {space.name}
+        </Heading>
       </Flex>
       <ExplorerInner space={space} />
     </StyledTree>

@@ -202,7 +202,12 @@ impl Cache {
             | WsEvent::MessagesOnDelete(_)
             | WsEvent::MessagesOnUpdate(_)
             | WsEvent::TypingOnUpdate(_)
-            | WsEvent::Pong(_) => {}
+            | WsEvent::Pong(_)
+            | WsEvent::MlsMessagesOnHandshake(_)
+            | WsEvent::MlsMessagesOnWelcome(_)
+            | WsEvent::RelationsOnAccept(_)
+            | WsEvent::RelationsOnRemove(_)
+            | WsEvent::RelationsOnRequest(_) => {}
         }
     }
 }

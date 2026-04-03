@@ -16,6 +16,7 @@ entity!(
         pub timestamp: Timestamp,
         pub edited_timestamp: Option<Timestamp>,
         pub content: String,
+        pub ciphertext: Option<Vec<u8>>,
     }
 );
 
@@ -32,6 +33,14 @@ pub struct MessageExt {
     pub base: Message,
     pub author: Option<User>,
     pub attachments: Vec<MessageAttachment>,
+    /// Base64-encoded MLS ciphertext, present only for E2EE messages
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        with = "crate::entities::key_package::optional_base64_bytes",
+        default
+    )]
+    #[schemars(with = "Option<String>")]
+    pub ciphertext: Option<Vec<u8>>,
 }
 
 model!(
@@ -42,7 +51,7 @@ model!(
 );
 
 impl Message {
-    pub fn new(channel: &Channel, author_id: Uuid, content: String) -> Self {
+    pub fn new(channel: &Channel, author_id: Uuid, content: String, ciphertext: Option<Vec<u8>>) -> Self {
         Self {
             id: Uuid::new_v4(),
             channel_id: channel.id,
@@ -50,6 +59,7 @@ impl Message {
             timestamp: Timestamp::now(),
             edited_timestamp: None,
             content,
+            ciphertext,
         }
     }
 
@@ -87,8 +97,8 @@ impl Message {
     pub async fn create<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
         sqlx::query(
             r#"
-            INSERT INTO "Message" ("id", "channelId", "authorId", "timestamp", "editedTimestamp", "content")
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO "Message" ("id", "channelId", "authorId", "timestamp", "editedTimestamp", "content", "ciphertext")
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             "#,
         )
         .bind(self.id)
@@ -97,6 +107,7 @@ impl Message {
         .bind(self.timestamp)
         .bind(self.edited_timestamp)
         .bind(&self.content)
+        .bind(&self.ciphertext)
         .execute(db)
         .await?;
         Ok(())
@@ -148,10 +159,12 @@ impl MessageExt {
             None
         };
         let attachments = MessageAttachment::list_by_message(message.id, db).await?;
+        let ciphertext = message.ciphertext.clone();
         Ok(MessageExt {
             base: message,
             author,
             attachments,
+            ciphertext,
         })
     }
 
@@ -194,10 +207,12 @@ impl MessageExt {
                     .get(&message.id)
                     .cloned()
                     .unwrap_or_default();
+                let ciphertext = message.ciphertext.clone();
                 MessageExt {
                     base: message,
                     author,
                     attachments,
+                    ciphertext,
                 }
             })
             .collect();

@@ -6,6 +6,7 @@ import { type Api, createApiClient } from './api.gen';
 import { RelationshipManager, UserManager } from './managers';
 import { ChannelManager } from './managers/channel';
 import { MemberManager, RoleManager, SpaceManager } from './managers/space';
+export type { MikotoRelationship } from './managers/relationship';
 
 export interface MikotoClientOptions {
   auth: AuthClient;
@@ -63,6 +64,7 @@ export class MikotoClient {
     ChannelManager._subscribe(this);
     MemberManager._subscribe(this);
     RoleManager._subscribe(this);
+    RelationshipManager._subscribe(this);
   }
 
   disconnect() {

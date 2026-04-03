@@ -2,13 +2,15 @@ import { Box, Button, Flex, Group, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { UserExt } from '@mikoto-io/mikoto.js';
+import { MikotoSpace, UserExt } from '@mikoto-io/mikoto.js';
 import { useSetAtom } from 'jotai';
 
 import { modalState } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';
 import { DialogContent } from '@/components/ui';
 import { useMikoto } from '@/hooks';
+import { useCrypto } from '@/hooks/useCrypto';
+import { treebarSpaceState } from '@/store';
 
 const ProfileContainer = styled.div`
   width: 640px;
@@ -40,7 +42,9 @@ const MikotoId = styled.h2`
 
 export function ProfileModal({ user }: { user: UserExt }) {
   const mikoto = useMikoto();
+  const crypto = useCrypto();
   const setModal = useSetAtom(modalState);
+  const setLeftSidebar = useSetAtom(treebarSpaceState);
 
   return (
     <DialogContent rounded="lg" p={0} maxWidth="640px">
@@ -67,11 +71,7 @@ export function ProfileModal({ user }: { user: UserExt }) {
                   <Button
                     colorPalette="success"
                     onClick={async () => {
-                      // FIXME: the fuck is this
-                      // await mikoto.client.relations.openDm({
-                      //   relationId: '2a36685a-6236-4fbe-92bf-b3025fd92cfb',
-                      // });
-
+                      await mikoto.relationships.request(user.id);
                       setModal(null);
                     }}
                   >
@@ -80,22 +80,38 @@ export function ProfileModal({ user }: { user: UserExt }) {
                   <Button
                     colorPalette="secondary"
                     onClick={async () => {
-                      // const dm = await mikoto.client.relations.openDm({
-                      //   relationId: user.id,
-                      // });
-                      await mikoto.rest['relations.openDm'](undefined, {
-                        params: { relationId: user.id },
+                      const dm = await mikoto.relationships.openDm(user.id);
+
+                      // If this is a new DM, create the MLS group and send Welcome
+                      if (dm.created && crypto && dm.keyPackages.length > 0) {
+                        const { welcome } = await crypto.createDmGroup(
+                          dm.space.id,
+                          dm.keyPackages.map((kp) => kp.data),
+                        );
+
+                        // Send Welcome messages via the MLS relay
+                        await mikoto.rest['mlsMessages.send']({
+                          messages: [
+                            {
+                              recipientUserId: user.id,
+                              mlsGroupId: dm.mlsGroup.id,
+                              messageType: 'welcome',
+                              data: welcome,
+                            },
+                          ],
+                        });
+                      }
+
+                      // Ensure the space is in our cache
+                      const space = new MikotoSpace(dm.space, mikoto);
+
+                      setLeftSidebar({
+                        kind: 'dmExplorer',
+                        key: `dmExplorer/${space.id}`,
+                        spaceId: space.id,
+                        relationId: user.id,
                       });
-                      // TODO: Rework DMs
-                      // const spaceId = dm.space?.id;
-                      // if (spaceId) {
-                      //   setSpace({
-                      //     kind: 'explorer',
-                      //     key: `explorer/${spaceId}`,
-                      //     spaceId,
-                      //   });
-                      // }
-                      // setModal(null);
+                      setModal(null);
                     }}
                   >
                     <FontAwesomeIcon icon={faEnvelope} />

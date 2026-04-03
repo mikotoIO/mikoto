@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "lib": ["ES2023", "DOM"]
+  },
+  "include": ["src", "wasm/*.d.ts"],
+  "exclude": ["node_modules"]
+}

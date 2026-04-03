@@ -28,6 +28,14 @@ pub struct MessageSendPayload {
     pub content: String,
     #[serde(default)]
     pub attachments: Vec<MessageAttachmentInput>,
+    /// Base64-encoded MLS ciphertext for E2EE messages
+    #[serde(
+        default,
+        with = "crate::entities::key_package::optional_base64_bytes",
+        skip_serializing_if = "Option::is_none"
+    )]
+    #[schemars(with = "Option<String>")]
+    pub ciphertext: Option<Vec<u8>>,
 }
 
 #[derive(Deserialize, JsonSchema)]
@@ -94,7 +102,7 @@ async fn send(
     if channel.space_id != space.base.id {
         return Err(Error::NotFound);
     }
-    let message = Message::new(&channel, claim.sub.parse()?, body.content);
+    let message = Message::new(&channel, claim.sub.parse()?, body.content, body.ciphertext);
     message.create(db()).await?;
 
     // Create attachments if any

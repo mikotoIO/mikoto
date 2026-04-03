@@ -91,11 +91,13 @@ export class MikotoChannel extends ZSchema(Channel) {
       contentType: string;
       size: number;
     }> = [],
+    ciphertext?: string,
   ) {
     await this.client.rest['messages.create'](
       {
         content,
         attachments,
+        ciphertext,
       },
       {
         params: {

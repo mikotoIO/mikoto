@@ -19,6 +19,8 @@ use crate::{
 
 use super::{router::AppRouter, ws::state::State};
 
+pub mod key_packages;
+pub mod mls_messages;
 pub mod relations;
 
 async fn me(claim: Claims) -> Result<Json<UserExt>, Error> {

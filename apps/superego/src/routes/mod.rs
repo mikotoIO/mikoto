@@ -82,6 +82,8 @@ fn build_app_router() -> AppRouter<State> {
         })
         .nest("users", "/users", users::router())
         .nest("relations", "/relations", users::relations::router())
+        .nest("keyPackages", "/key-packages", users::key_packages::router())
+        .nest("mlsMessages", "/mls-messages", users::mls_messages::router())
         .nest("spaces", "/spaces", spaces::router())
         .nest("channels", "/spaces/:spaceId/channels", channels::router())
         .nest(

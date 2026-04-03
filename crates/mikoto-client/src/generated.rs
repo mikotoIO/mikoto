@@ -221,6 +221,34 @@ pub struct Invite {
 pub struct InviteCreatePayload {}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct KeyPackageCountResponse {
+    pub count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct KeyPackageExt {
+    pub ciphersuite: String,
+    pub data: String,
+    pub device_id: Uuid,
+    pub id: Uuid,
+    pub user_id: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct KeyPackageUploadItem {
+    pub ciphersuite: String,
+    pub data: String,
+    pub device_id: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct KeyPackageUploadPayload {
+    pub packages: Vec<KeyPackageUploadItem>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ListQuery {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cursor: Option<Uuid>,
@@ -293,6 +321,8 @@ pub struct MessageExt {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub author_id: Option<Uuid>,
     pub channel_id: Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ciphertext: Option<Vec<i32>>,
     pub content: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub edited_timestamp: Option<DateTime<Utc>>,
@@ -311,12 +341,55 @@ pub struct MessageKey {
 pub struct MessageSendPayload {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub attachments: Option<Vec<MessageAttachmentInput>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ciphertext: Option<String>,
     pub content: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MlsGroupExt {
+    pub epoch: i64,
+    pub group_id: String,
+    pub id: Uuid,
+    pub space_id: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MlsMessageExt {
+    pub data: String,
+    pub id: Uuid,
+    pub message_type: String,
+    pub mls_group_id: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MlsMessageSendItem {
+    pub data: String,
+    pub message_type: String,
+    pub mls_group_id: Uuid,
+    pub recipient_user_id: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MlsMessageSendPayload {
+    pub messages: Vec<MlsMessageSendItem>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ObjectWithId {
     pub id: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OpenDmResponse {
+    pub created: bool,
+    pub key_packages: Vec<KeyPackageExt>,
+    pub mls_group: MlsGroupExt,
+    pub space: SpaceExt,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -831,12 +904,106 @@ impl<'a> HttpApi<'a> {
         Ok(resp.json().await?)
     }
 
-    pub async fn relations_open_dm(&self, relation_id: Uuid) -> Result<User, ClientError> {
+    pub async fn relations_request(&self, user_id: Uuid) -> Result<Relationship, ClientError> {
+        let path = format!("/relations/{}/request", user_id);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn relations_accept(&self, user_id: Uuid) -> Result<Relationship, ClientError> {
+        let path = format!("/relations/{}/accept", user_id);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn relations_block(&self, user_id: Uuid) -> Result<Relationship, ClientError> {
+        let path = format!("/relations/{}/block", user_id);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn relations_remove(&self, user_id: Uuid) -> Result<(), ClientError> {
+        let path = format!("/relations/{}/remove", user_id);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
+    }
+
+    pub async fn relations_open_dm(&self, relation_id: Uuid) -> Result<OpenDmResponse, ClientError> {
         let path = format!("/relations/{}/dm", relation_id);
         let mut req = self.client.post(self.url(&path))
             .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
+    }
+
+    pub async fn key_packages_upload(&self, body: &KeyPackageUploadPayload) -> Result<(), ClientError> {
+        let path = "/key-packages/".to_string();
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        req = req.json(body);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
+    }
+
+    pub async fn key_packages_count(&self) -> Result<KeyPackageCountResponse, ClientError> {
+        let path = "/key-packages/count".to_string();
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn key_packages_fetch(&self, user_id: Uuid) -> Result<KeyPackageExt, ClientError> {
+        let path = format!("/key-packages/{}", user_id);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn key_packages_fetch_all(&self, user_id: Uuid) -> Result<Vec<KeyPackageExt>, ClientError> {
+        let path = format!("/key-packages/{}/devices", user_id);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn key_packages_revoke(&self, device_id: Uuid) -> Result<(), ClientError> {
+        let path = format!("/key-packages/device/{}", device_id);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
+    }
+
+    pub async fn mls_messages_list(&self) -> Result<Vec<MlsMessageExt>, ClientError> {
+        let path = "/mls-messages/".to_string();
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn mls_messages_send(&self, body: &MlsMessageSendPayload) -> Result<(), ClientError> {
+        let path = "/mls-messages/".to_string();
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        req = req.json(body);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
     }
 
     pub async fn spaces_list(&self) -> Result<Vec<SpaceExt>, ClientError> {
@@ -1227,8 +1394,18 @@ pub enum WsEvent {
     MessagesOnDelete(MessageKey),
     #[serde(rename = "messages.onUpdate")]
     MessagesOnUpdate(MessageExt),
+    #[serde(rename = "mlsMessages.onHandshake")]
+    MlsMessagesOnHandshake(MlsMessageExt),
+    #[serde(rename = "mlsMessages.onWelcome")]
+    MlsMessagesOnWelcome(MlsMessageExt),
     #[serde(rename = "pong")]
     Pong(Ping),
+    #[serde(rename = "relations.onAccept")]
+    RelationsOnAccept(Relationship),
+    #[serde(rename = "relations.onRemove")]
+    RelationsOnRemove(ObjectWithId),
+    #[serde(rename = "relations.onRequest")]
+    RelationsOnRequest(Relationship),
     #[serde(rename = "roles.onCreate")]
     RolesOnCreate(Role),
     #[serde(rename = "roles.onDelete")]

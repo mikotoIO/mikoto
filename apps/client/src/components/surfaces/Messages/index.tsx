@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/skeleton';
 import { uploadFile } from '@/functions/fileUpload';
 import { useFetchMember, useMikoto } from '@/hooks';
+import { useCrypto } from '@/hooks/useCrypto';
 import { CurrentSpaceContext } from '@/store';
 
 import { DateSeparator, showDateSeparator } from './DateSeparator';
@@ -102,6 +103,8 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
 
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const mikoto = useMikoto();
+  const crypto = useCrypto();
+  const isDm = channel.space?.type === 'DM';
   // you will probably run out of memory before this number
   const [firstItemIndex, setFirstItemIndex] = useState(FUNNY_NUMBER);
   const [topLoaded, setTopLoaded] = useState(false);
@@ -171,24 +174,43 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
   const createFn = (x: MessageExt) => {
     if (x.channelId !== channel.id) return;
 
-    setMsgs((xs) => {
-      if (xs === null) return null;
-      setCurrentTypers((ts) => ts.filter((y) => y.userId !== x.author?.id));
-      // mikoto.client.messages
-      //   .ack({
-      //     channelId: channel.id,
-      //     timestamp: x.timestamp,
-      //   })
-      //   .then(() => {});
-      mikoto.rest['channels.acknowledge'](undefined, {
-        params: {
-          spaceId: channel.spaceId,
-          channelId: channel.id,
-        },
-      }).then(() => {});
-      setScrollToBottom(true);
-      return [...xs, new MikotoMessage(x, mikoto)];
-    });
+    // Decrypt if this is an encrypted DM message
+    if (isDm && crypto && x.ciphertext && x.ciphertext.length > 0) {
+      const ciphertextBase64 = btoa(
+        String.fromCharCode(...x.ciphertext),
+      );
+      crypto
+        .decrypt(channel.spaceId, ciphertextBase64)
+        .then((plaintext) => {
+          const decrypted = { ...x, content: plaintext };
+          setMsgs((xs) => {
+            if (xs === null) return null;
+            return [...xs, new MikotoMessage(decrypted, mikoto)];
+          });
+        })
+        .catch(() => {
+          // Decryption failed — show encrypted indicator
+          const failed = { ...x, content: '[Encrypted message — unable to decrypt]' };
+          setMsgs((xs) => {
+            if (xs === null) return null;
+            return [...xs, new MikotoMessage(failed, mikoto)];
+          });
+        });
+    } else {
+      setMsgs((xs) => {
+        if (xs === null) return null;
+        return [...xs, new MikotoMessage(x, mikoto)];
+      });
+    }
+
+    setCurrentTypers((ts) => ts.filter((y) => y.userId !== x.author?.id));
+    mikoto.rest['channels.acknowledge'](undefined, {
+      params: {
+        spaceId: channel.spaceId,
+        channelId: channel.id,
+      },
+    }).then(() => {});
+    setScrollToBottom(true);
   };
 
   const updateFn = (x: MessageExt) => {
@@ -325,7 +347,21 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
                   }),
                 );
 
-                await channel.sendMessage(msg, attachments);
+                // Encrypt for DM spaces
+                let ciphertext: string | undefined;
+                if (isDm && crypto) {
+                  const spaceId = channel.spaceId;
+                  const hasState = await crypto.hasGroupState(spaceId);
+                  if (hasState) {
+                    ciphertext = await crypto.encrypt(spaceId, msg);
+                  }
+                }
+
+                await channel.sendMessage(
+                  ciphertext ? '' : msg,
+                  attachments,
+                  ciphertext,
+                );
               }
             }}
           />

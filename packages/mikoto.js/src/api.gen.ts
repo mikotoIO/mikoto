@@ -190,14 +190,22 @@ export const Relationship = z.object({
 });
 export type Relationship = z.infer<typeof Relationship>;
 
-export const User = z.object({
-  avatar: z.union([z.string(), z.null()]).optional(),
-  category: z.union([UserCategory, z.null()]).optional(),
-  description: z.union([z.string(), z.null()]).optional(),
+export const KeyPackageExt = z.object({
+  ciphersuite: z.string(),
+  data: z.string(),
+  deviceId: z.string().uuid(),
   id: z.string().uuid(),
-  name: z.string(),
+  userId: z.string().uuid(),
 });
-export type User = z.infer<typeof User>;
+export type KeyPackageExt = z.infer<typeof KeyPackageExt>;
+
+export const MlsGroupExt = z.object({
+  epoch: z.number().int(),
+  groupId: z.string(),
+  id: z.string().uuid(),
+  spaceId: z.string().uuid(),
+});
+export type MlsGroupExt = z.infer<typeof MlsGroupExt>;
 
 export const Timestamp = z.string();
 export type Timestamp = z.infer<typeof Timestamp>;
@@ -253,6 +261,50 @@ export const SpaceExt = z.object({
 });
 export type SpaceExt = z.infer<typeof SpaceExt>;
 
+export const OpenDmResponse = z.object({
+  created: z.boolean(),
+  keyPackages: z.array(KeyPackageExt),
+  mlsGroup: MlsGroupExt,
+  space: SpaceExt,
+});
+export type OpenDmResponse = z.infer<typeof OpenDmResponse>;
+
+export const KeyPackageUploadItem = z.object({
+  ciphersuite: z.string(),
+  data: z.string(),
+  deviceId: z.string().uuid(),
+});
+export type KeyPackageUploadItem = z.infer<typeof KeyPackageUploadItem>;
+
+export const KeyPackageUploadPayload = z.object({
+  packages: z.array(KeyPackageUploadItem),
+});
+export type KeyPackageUploadPayload = z.infer<typeof KeyPackageUploadPayload>;
+
+export const KeyPackageCountResponse = z.object({ count: z.number().int() });
+export type KeyPackageCountResponse = z.infer<typeof KeyPackageCountResponse>;
+
+export const MlsMessageExt = z.object({
+  data: z.string(),
+  id: z.string().uuid(),
+  messageType: z.string(),
+  mlsGroupId: z.string().uuid(),
+});
+export type MlsMessageExt = z.infer<typeof MlsMessageExt>;
+
+export const MlsMessageSendItem = z.object({
+  data: z.string(),
+  messageType: z.string(),
+  mlsGroupId: z.string().uuid(),
+  recipientUserId: z.string().uuid(),
+});
+export type MlsMessageSendItem = z.infer<typeof MlsMessageSendItem>;
+
+export const MlsMessageSendPayload = z.object({
+  messages: z.array(MlsMessageSendItem),
+});
+export type MlsMessageSendPayload = z.infer<typeof MlsMessageSendPayload>;
+
 export const SpaceCreatePayload = z.object({ name: z.string() });
 export type SpaceCreatePayload = z.infer<typeof SpaceCreatePayload>;
 
@@ -302,11 +354,21 @@ export const MessageAttachment = z.object({
 });
 export type MessageAttachment = z.infer<typeof MessageAttachment>;
 
+export const User = z.object({
+  avatar: z.union([z.string(), z.null()]).optional(),
+  category: z.union([UserCategory, z.null()]).optional(),
+  description: z.union([z.string(), z.null()]).optional(),
+  id: z.string().uuid(),
+  name: z.string(),
+});
+export type User = z.infer<typeof User>;
+
 export const MessageExt = z.object({
   attachments: z.array(MessageAttachment),
   author: z.union([User, z.null()]).optional(),
   authorId: z.union([z.string(), z.null()]).optional(),
   channelId: z.string().uuid(),
+  ciphertext: z.union([z.array(z.number().int().gte(0)), z.null()]).optional(),
   content: z.string(),
   editedTimestamp: z.union([Timestamp, z.null()]).optional(),
   id: z.string().uuid(),
@@ -324,6 +386,7 @@ export type MessageAttachmentInput = z.infer<typeof MessageAttachmentInput>;
 
 export const MessageSendPayload = z.object({
   attachments: z.array(MessageAttachmentInput).optional().default([]),
+  ciphertext: z.union([z.string(), z.null()]).optional(),
   content: z.string(),
 });
 export type MessageSendPayload = z.infer<typeof MessageSendPayload>;
@@ -471,7 +534,8 @@ export const schemas = {
   VerificationResult,
   RelationState,
   Relationship,
-  User,
+  KeyPackageExt,
+  MlsGroupExt,
   Timestamp,
   ChannelType,
   Channel,
@@ -479,6 +543,13 @@ export const schemas = {
   SpaceType,
   SpaceVisibility,
   SpaceExt,
+  OpenDmResponse,
+  KeyPackageUploadItem,
+  KeyPackageUploadPayload,
+  KeyPackageCountResponse,
+  MlsMessageExt,
+  MlsMessageSendItem,
+  MlsMessageSendPayload,
   SpaceCreatePayload,
   SpaceUpdatePayload,
   ChannelCreatePayload,
@@ -487,6 +558,7 @@ export const schemas = {
   cursor,
   limit,
   MessageAttachment,
+  User,
   MessageExt,
   MessageAttachmentInput,
   MessageSendPayload,
@@ -719,6 +791,69 @@ const endpoints = makeApi([
     response: HandleResolution,
   },
   {
+    method: "post",
+    path: "/key-packages/",
+    alias: "keyPackages.upload",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: KeyPackageUploadPayload,
+      },
+    ],
+    response: z.null(),
+  },
+  {
+    method: "get",
+    path: "/key-packages/:userId",
+    alias: "keyPackages.fetch",
+    requestFormat: "json",
+    response: KeyPackageExt,
+  },
+  {
+    method: "get",
+    path: "/key-packages/:userId/devices",
+    alias: "keyPackages.fetchAll",
+    requestFormat: "json",
+    response: z.array(KeyPackageExt),
+  },
+  {
+    method: "get",
+    path: "/key-packages/count",
+    alias: "keyPackages.count",
+    requestFormat: "json",
+    response: z.object({ count: z.number().int() }),
+  },
+  {
+    method: "delete",
+    path: "/key-packages/device/:deviceId",
+    alias: "keyPackages.revoke",
+    requestFormat: "json",
+    response: z.null(),
+  },
+  {
+    method: "get",
+    path: "/mls-messages/",
+    alias: "mlsMessages.list",
+    requestFormat: "json",
+    response: z.array(MlsMessageExt),
+  },
+  {
+    method: "post",
+    path: "/mls-messages/",
+    alias: "mlsMessages.send",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: MlsMessageSendPayload,
+      },
+    ],
+    response: z.null(),
+  },
+  {
     method: "get",
     path: "/relations/",
     alias: "relations.list",
@@ -737,7 +872,35 @@ const endpoints = makeApi([
     path: "/relations/:relationId/dm",
     alias: "relations.openDm",
     requestFormat: "json",
-    response: User,
+    response: OpenDmResponse,
+  },
+  {
+    method: "post",
+    path: "/relations/:userId/accept",
+    alias: "relations.accept",
+    requestFormat: "json",
+    response: Relationship,
+  },
+  {
+    method: "post",
+    path: "/relations/:userId/block",
+    alias: "relations.block",
+    requestFormat: "json",
+    response: Relationship,
+  },
+  {
+    method: "post",
+    path: "/relations/:userId/remove",
+    alias: "relations.remove",
+    requestFormat: "json",
+    response: z.null(),
+  },
+  {
+    method: "post",
+    path: "/relations/:userId/request",
+    alias: "relations.request",
+    requestFormat: "json",
+    response: Relationship,
   },
   {
     method: "get",
@@ -1244,7 +1407,12 @@ export const websocketEvents = {
   "messages.onCreate": MessageExt,
   "messages.onDelete": MessageKey,
   "messages.onUpdate": MessageExt,
+  "mlsMessages.onHandshake": MlsMessageExt,
+  "mlsMessages.onWelcome": MlsMessageExt,
   pong: Ping,
+  "relations.onAccept": Relationship,
+  "relations.onRemove": ObjectWithId,
+  "relations.onRequest": Relationship,
   "roles.onCreate": Role,
   "roles.onDelete": Role,
   "roles.onUpdate": Role,

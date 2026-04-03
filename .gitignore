@@ -74,5 +74,6 @@ target/
 
 .brainstorm/
 
-# WASM build output
-packages/mikoto-crypto/wasm/
+# WASM build output (keep .d.ts type stubs)
+packages/mikoto-crypto/wasm/*
+!packages/mikoto-crypto/wasm/*.d.ts

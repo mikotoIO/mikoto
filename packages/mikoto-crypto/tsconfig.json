@@ -14,6 +14,6 @@
     "noEmit": true,
     "lib": ["ES2023", "DOM"]
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "wasm"]
+  "include": ["src", "wasm/*.d.ts"],
+  "exclude": ["node_modules"]
 }

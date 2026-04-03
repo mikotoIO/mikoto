@@ -234,6 +234,23 @@ CREATE TABLE public."Invite" (
 ALTER TABLE public."Invite" OWNER TO postgres;
 
 --
+-- Name: KeyPackage; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."KeyPackage" (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    "userId" uuid NOT NULL,
+    "deviceId" uuid NOT NULL,
+    data bytea NOT NULL,
+    ciphersuite text NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    consumed boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE public."KeyPackage" OWNER TO postgres;
+
+--
 -- Name: Message; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -243,7 +260,8 @@ CREATE TABLE public."Message" (
     "timestamp" timestamp(3) without time zone NOT NULL,
     "editedTimestamp" timestamp(3) without time zone,
     "authorId" uuid,
-    "channelId" uuid NOT NULL
+    "channelId" uuid NOT NULL,
+    ciphertext bytea
 );
 
 
@@ -267,6 +285,38 @@ CREATE TABLE public."MessageAttachment" (
 ALTER TABLE public."MessageAttachment" OWNER TO postgres;
 
 --
+-- Name: MlsGroup; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."MlsGroup" (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    "spaceId" uuid NOT NULL,
+    "groupId" bytea NOT NULL,
+    epoch bigint DEFAULT 0 NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public."MlsGroup" OWNER TO postgres;
+
+--
+-- Name: MlsMessage; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."MlsMessage" (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    "recipientUserId" uuid NOT NULL,
+    "mlsGroupId" uuid NOT NULL,
+    "messageType" text NOT NULL,
+    data bytea NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    delivered boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE public."MlsMessage" OWNER TO postgres;
+
+--
 -- Name: RefreshToken; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -288,7 +338,7 @@ CREATE TABLE public."Relationship" (
     id uuid NOT NULL,
     "userId" uuid NOT NULL,
     "relationId" uuid NOT NULL,
-    "spaceId" uuid NOT NULL,
+    "spaceId" uuid,
     state public."RelationState" NOT NULL
 );
 
@@ -484,6 +534,14 @@ ALTER TABLE ONLY public."Invite"
 
 
 --
+-- Name: KeyPackage KeyPackage_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."KeyPackage"
+    ADD CONSTRAINT "KeyPackage_pkey" PRIMARY KEY (id);
+
+
+--
 -- Name: MessageAttachment MessageAttachment_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -497,6 +555,38 @@ ALTER TABLE ONLY public."MessageAttachment"
 
 ALTER TABLE ONLY public."Message"
     ADD CONSTRAINT "Message_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: MlsGroup MlsGroup_groupId_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."MlsGroup"
+    ADD CONSTRAINT "MlsGroup_groupId_key" UNIQUE ("groupId");
+
+
+--
+-- Name: MlsGroup MlsGroup_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."MlsGroup"
+    ADD CONSTRAINT "MlsGroup_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: MlsGroup MlsGroup_spaceId_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."MlsGroup"
+    ADD CONSTRAINT "MlsGroup_spaceId_key" UNIQUE ("spaceId");
+
+
+--
+-- Name: MlsMessage MlsMessage_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."MlsMessage"
+    ADD CONSTRAINT "MlsMessage_pkey" PRIMARY KEY (id);
 
 
 --
@@ -621,6 +711,13 @@ CREATE INDEX "Handle_userId_idx" ON public."Handle" USING btree ("userId");
 
 
 --
+-- Name: KeyPackage_userId_unconsumed_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "KeyPackage_userId_unconsumed_idx" ON public."KeyPackage" USING btree ("userId") WHERE (consumed = false);
+
+
+--
 -- Name: MessageAttachment_messageId_idx; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -632,6 +729,13 @@ CREATE INDEX "MessageAttachment_messageId_idx" ON public."MessageAttachment" USI
 --
 
 CREATE INDEX "Message_channelId_timestamp_idx" ON public."Message" USING btree ("channelId", "timestamp");
+
+
+--
+-- Name: MlsMessage_recipient_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "MlsMessage_recipient_idx" ON public."MlsMessage" USING btree ("recipientUserId", delivered);
 
 
 --
@@ -825,6 +929,14 @@ ALTER TABLE ONLY public."Invite"
 
 
 --
+-- Name: KeyPackage KeyPackage_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."KeyPackage"
+    ADD CONSTRAINT "KeyPackage_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."User"(id) ON DELETE CASCADE;
+
+
+--
 -- Name: MessageAttachment MessageAttachment_messageId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -846,6 +958,30 @@ ALTER TABLE ONLY public."Message"
 
 ALTER TABLE ONLY public."Message"
     ADD CONSTRAINT "Message_channelId_fkey" FOREIGN KEY ("channelId") REFERENCES public."Channel"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: MlsGroup MlsGroup_spaceId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."MlsGroup"
+    ADD CONSTRAINT "MlsGroup_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES public."Space"(id) ON DELETE CASCADE;
+
+
+--
+-- Name: MlsMessage MlsMessage_mlsGroupId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."MlsMessage"
+    ADD CONSTRAINT "MlsMessage_mlsGroupId_fkey" FOREIGN KEY ("mlsGroupId") REFERENCES public."MlsGroup"(id) ON DELETE CASCADE;
+
+
+--
+-- Name: MlsMessage MlsMessage_recipientUserId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."MlsMessage"
+    ADD CONSTRAINT "MlsMessage_recipientUserId_fkey" FOREIGN KEY ("recipientUserId") REFERENCES public."User"(id) ON DELETE CASCADE;
 
 
 --

@@ -355,12 +355,13 @@ pub enum RelationState {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Relationship {
+pub struct RelationshipExt {
     pub id: Uuid,
     pub relation_id: Uuid,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub space_id: Option<Uuid>,
     pub state: RelationState,
+    pub user: UserExt,
     pub user_id: Uuid,
 }
 
@@ -815,7 +816,7 @@ impl<'a> HttpApi<'a> {
         Ok(resp.json().await?)
     }
 
-    pub async fn relations_list(&self) -> Result<Vec<Relationship>, ClientError> {
+    pub async fn relations_list(&self) -> Result<Vec<RelationshipExt>, ClientError> {
         let path = "/relations/".to_string();
         let mut req = self.client.get(self.url(&path))
             .bearer_auth(self.token);
@@ -823,7 +824,7 @@ impl<'a> HttpApi<'a> {
         Ok(resp.json().await?)
     }
 
-    pub async fn relations_get(&self, relation_id: Uuid) -> Result<Relationship, ClientError> {
+    pub async fn relations_get(&self, relation_id: Uuid) -> Result<RelationshipExt, ClientError> {
         let path = format!("/relations/{}", relation_id);
         let mut req = self.client.get(self.url(&path))
             .bearer_auth(self.token);
@@ -831,7 +832,58 @@ impl<'a> HttpApi<'a> {
         Ok(resp.json().await?)
     }
 
-    pub async fn relations_open_dm(&self, relation_id: Uuid) -> Result<User, ClientError> {
+    pub async fn relations_remove(&self, relation_id: Uuid) -> Result<(), ClientError> {
+        let path = format!("/relations/{}", relation_id);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
+    }
+
+    pub async fn relations_send_request(&self, relation_id: Uuid) -> Result<RelationshipExt, ClientError> {
+        let path = format!("/relations/{}/request", relation_id);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn relations_accept(&self, relation_id: Uuid) -> Result<RelationshipExt, ClientError> {
+        let path = format!("/relations/{}/accept", relation_id);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn relations_decline(&self, relation_id: Uuid) -> Result<(), ClientError> {
+        let path = format!("/relations/{}/decline", relation_id);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
+    }
+
+    pub async fn relations_block(&self, relation_id: Uuid) -> Result<RelationshipExt, ClientError> {
+        let path = format!("/relations/{}/block", relation_id);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn relations_unblock(&self, relation_id: Uuid) -> Result<(), ClientError> {
+        let path = format!("/relations/{}/block", relation_id);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
+    }
+
+    pub async fn relations_open_dm(&self, relation_id: Uuid) -> Result<SpaceExt, ClientError> {
         let path = format!("/relations/{}/dm", relation_id);
         let mut req = self.client.post(self.url(&path))
             .bearer_auth(self.token);
@@ -1229,6 +1281,12 @@ pub enum WsEvent {
     MessagesOnUpdate(MessageExt),
     #[serde(rename = "pong")]
     Pong(Ping),
+    #[serde(rename = "relations.onCreate")]
+    RelationsOnCreate(RelationshipExt),
+    #[serde(rename = "relations.onDelete")]
+    RelationsOnDelete(ObjectWithId),
+    #[serde(rename = "relations.onUpdate")]
+    RelationsOnUpdate(RelationshipExt),
     #[serde(rename = "roles.onCreate")]
     RolesOnCreate(Role),
     #[serde(rename = "roles.onDelete")]

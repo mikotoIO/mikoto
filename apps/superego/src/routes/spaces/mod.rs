@@ -62,7 +62,7 @@ impl SpaceUpdatePayload {
     }
 }
 
-async fn join_space(space: &SpaceExt, user_id: Uuid) -> Result<(), Error> {
+pub async fn join_space(space: &SpaceExt, user_id: Uuid) -> Result<(), Error> {
     if Ban::find_by_space_and_user(space.base.id, user_id, db())
         .await?
         .is_some()

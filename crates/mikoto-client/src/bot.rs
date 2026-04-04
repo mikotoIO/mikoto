@@ -198,5 +198,10 @@ async fn dispatch_event(handler: &dyn EventHandler, ctx: Context, event: WsEvent
         WsEvent::TypingOnUpdate(u) => handler.typing_update(ctx, u).await,
 
         WsEvent::Pong(_) => {}
+
+        // Relation events are handled client-side only
+        WsEvent::RelationsOnCreate(_)
+        | WsEvent::RelationsOnUpdate(_)
+        | WsEvent::RelationsOnDelete(_) => {}
     }
 }

@@ -181,23 +181,15 @@ export const RelationState = z.enum([
 ]);
 export type RelationState = z.infer<typeof RelationState>;
 
-export const Relationship = z.object({
+export const RelationshipExt = z.object({
   id: z.string().uuid(),
   relationId: z.string().uuid(),
   spaceId: z.union([z.string(), z.null()]).optional(),
   state: RelationState,
+  user: UserExt,
   userId: z.string().uuid(),
 });
-export type Relationship = z.infer<typeof Relationship>;
-
-export const User = z.object({
-  avatar: z.union([z.string(), z.null()]).optional(),
-  category: z.union([UserCategory, z.null()]).optional(),
-  description: z.union([z.string(), z.null()]).optional(),
-  id: z.string().uuid(),
-  name: z.string(),
-});
-export type User = z.infer<typeof User>;
+export type RelationshipExt = z.infer<typeof RelationshipExt>;
 
 export const Timestamp = z.string();
 export type Timestamp = z.infer<typeof Timestamp>;
@@ -301,6 +293,15 @@ export const MessageAttachment = z.object({
   url: z.string(),
 });
 export type MessageAttachment = z.infer<typeof MessageAttachment>;
+
+export const User = z.object({
+  avatar: z.union([z.string(), z.null()]).optional(),
+  category: z.union([UserCategory, z.null()]).optional(),
+  description: z.union([z.string(), z.null()]).optional(),
+  id: z.string().uuid(),
+  name: z.string(),
+});
+export type User = z.infer<typeof User>;
 
 export const MessageExt = z.object({
   attachments: z.array(MessageAttachment),
@@ -470,8 +471,7 @@ export const schemas = {
   VerificationChallenge,
   VerificationResult,
   RelationState,
-  Relationship,
-  User,
+  RelationshipExt,
   Timestamp,
   ChannelType,
   Channel,
@@ -487,6 +487,7 @@ export const schemas = {
   cursor,
   limit,
   MessageAttachment,
+  User,
   MessageExt,
   MessageAttachmentInput,
   MessageSendPayload,
@@ -723,21 +724,63 @@ const endpoints = makeApi([
     path: "/relations/",
     alias: "relations.list",
     requestFormat: "json",
-    response: z.array(Relationship),
+    response: z.array(RelationshipExt),
   },
   {
     method: "get",
     path: "/relations/:relationId",
     alias: "relations.get",
     requestFormat: "json",
-    response: Relationship,
+    response: RelationshipExt,
+  },
+  {
+    method: "delete",
+    path: "/relations/:relationId",
+    alias: "relations.remove",
+    requestFormat: "json",
+    response: z.null(),
+  },
+  {
+    method: "post",
+    path: "/relations/:relationId/accept",
+    alias: "relations.accept",
+    requestFormat: "json",
+    response: RelationshipExt,
+  },
+  {
+    method: "post",
+    path: "/relations/:relationId/block",
+    alias: "relations.block",
+    requestFormat: "json",
+    response: RelationshipExt,
+  },
+  {
+    method: "delete",
+    path: "/relations/:relationId/block",
+    alias: "relations.unblock",
+    requestFormat: "json",
+    response: z.null(),
+  },
+  {
+    method: "post",
+    path: "/relations/:relationId/decline",
+    alias: "relations.decline",
+    requestFormat: "json",
+    response: z.null(),
   },
   {
     method: "post",
     path: "/relations/:relationId/dm",
     alias: "relations.openDm",
     requestFormat: "json",
-    response: User,
+    response: SpaceExt,
+  },
+  {
+    method: "post",
+    path: "/relations/:relationId/request",
+    alias: "relations.sendRequest",
+    requestFormat: "json",
+    response: RelationshipExt,
   },
   {
     method: "get",
@@ -1245,6 +1288,9 @@ export const websocketEvents = {
   "messages.onDelete": MessageKey,
   "messages.onUpdate": MessageExt,
   pong: Ping,
+  "relations.onCreate": RelationshipExt,
+  "relations.onDelete": ObjectWithId,
+  "relations.onUpdate": RelationshipExt,
   "roles.onCreate": Role,
   "roles.onDelete": Role,
   "roles.onUpdate": Role,

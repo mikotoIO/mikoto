@@ -63,6 +63,10 @@ export class MikotoClient {
     ChannelManager._subscribe(this);
     MemberManager._subscribe(this);
     RoleManager._subscribe(this);
+    RelationshipManager._subscribe(this);
+
+    // Prefetch relationships after connection
+    this.relationships.list();
   }
 
   disconnect() {

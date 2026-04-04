@@ -5,7 +5,7 @@ import {
   faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { MikotoChannel, MikotoSpace, Relationship } from '@mikoto-io/mikoto.js';
+import { MikotoChannel, MikotoRelationship, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useAtom, useSetAtom } from 'jotai';
 import { NumberSize, Resizable } from 're-resizable';
 import { useEffect, useState } from 'react';
@@ -273,7 +273,7 @@ export const DMExplorer = ({
   space,
 }: {
   space: MikotoSpace;
-  relation: Relationship;
+  relation: MikotoRelationship;
 }) => {
   const nodeContextMenu = useContextMenuX();
 

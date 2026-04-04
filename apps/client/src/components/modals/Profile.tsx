@@ -2,13 +2,16 @@ import { Box, Button, Flex, Group, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { UserExt } from '@mikoto-io/mikoto.js';
+import { MikotoRelationship, UserExt } from '@mikoto-io/mikoto.js';
 import { useSetAtom } from 'jotai';
+import { useSnapshot } from 'valtio/react';
 
 import { modalState } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';
 import { DialogContent } from '@/components/ui';
+import { toaster } from '@/components/ui/toaster';
 import { useMikoto } from '@/hooks';
+import { treebarSpaceState } from '@/store';
 
 const ProfileContainer = styled.div`
   width: 640px;
@@ -38,9 +41,121 @@ const MikotoId = styled.h2`
   color: var(--chakra-colors-gray-500);
 `;
 
-export function ProfileModal({ user }: { user: UserExt }) {
+function useRelationshipFor(userId: string): MikotoRelationship | undefined {
+  const mikoto = useMikoto();
+  useSnapshot(mikoto.relationships.cache);
+  return mikoto.relationships
+    .values()
+    .find((r) => r.relationId === userId);
+}
+
+function RelationshipButtons({
+  user,
+  relation,
+}: {
+  user: UserExt;
+  relation: MikotoRelationship | undefined;
+}) {
   const mikoto = useMikoto();
   const setModal = useSetAtom(modalState);
+  const setLeftSidebar = useSetAtom(treebarSpaceState);
+
+  const handleSendRequest = async () => {
+    try {
+      await mikoto.relationships.sendRequest(user.id);
+      toaster.success({ title: 'Friend request sent!' });
+    } catch {
+      toaster.error({ title: 'Failed to send friend request' });
+    }
+  };
+
+  const handleOpenDm = async () => {
+    try {
+      const space = await mikoto.rest['relations.openDm'](undefined, {
+        params: { relationId: user.id },
+      });
+      setLeftSidebar({
+        kind: 'dmExplorer',
+        key: `dmExplorer/${space.id}`,
+        spaceId: space.id,
+        relationId: relation!.id,
+      });
+      setModal(null);
+    } catch {
+      toaster.error({ title: 'Failed to open DM' });
+    }
+  };
+
+  if (!relation) {
+    return (
+      <Button colorPalette="success" onClick={handleSendRequest}>
+        Send Friend Request
+      </Button>
+    );
+  }
+
+  switch (relation.state) {
+    case 'FRIEND':
+      return (
+        <Group>
+          <Button
+            variant="ghost"
+            colorPalette="red"
+            onClick={() => relation.remove()}
+          >
+            Remove Friend
+          </Button>
+          <Button colorPalette="secondary" onClick={handleOpenDm}>
+            <FontAwesomeIcon icon={faEnvelope} />
+          </Button>
+        </Group>
+      );
+    case 'OUTGOING_REQUEST':
+      return (
+        <Button disabled colorPalette="gray">
+          Request Pending
+        </Button>
+      );
+    case 'INCOMING_REQUEST':
+      return (
+        <Group>
+          <Button
+            colorPalette="success"
+            onClick={() => relation.accept()}
+          >
+            Accept Request
+          </Button>
+          <Button
+            variant="ghost"
+            colorPalette="red"
+            onClick={() => relation.decline()}
+          >
+            Decline
+          </Button>
+        </Group>
+      );
+    case 'BLOCKED':
+      return (
+        <Button
+          variant="ghost"
+          colorPalette="red"
+          onClick={() => relation.unblock()}
+        >
+          Unblock
+        </Button>
+      );
+    default:
+      return (
+        <Button colorPalette="success" onClick={handleSendRequest}>
+          Send Friend Request
+        </Button>
+      );
+  }
+}
+
+export function ProfileModal({ user }: { user: UserExt }) {
+  const mikoto = useMikoto();
+  const relation = useRelationshipFor(user.id);
 
   return (
     <DialogContent rounded="lg" p={0} maxWidth="640px">
@@ -63,44 +178,7 @@ export function ProfileModal({ user }: { user: UserExt }) {
             </div>
             <div>
               {mikoto.user.me?.id !== user.id && (
-                <Group>
-                  <Button
-                    colorPalette="success"
-                    onClick={async () => {
-                      // FIXME: the fuck is this
-                      // await mikoto.client.relations.openDm({
-                      //   relationId: '2a36685a-6236-4fbe-92bf-b3025fd92cfb',
-                      // });
-
-                      setModal(null);
-                    }}
-                  >
-                    Send Friend Request
-                  </Button>
-                  <Button
-                    colorPalette="secondary"
-                    onClick={async () => {
-                      // const dm = await mikoto.client.relations.openDm({
-                      //   relationId: user.id,
-                      // });
-                      await mikoto.rest['relations.openDm'](undefined, {
-                        params: { relationId: user.id },
-                      });
-                      // TODO: Rework DMs
-                      // const spaceId = dm.space?.id;
-                      // if (spaceId) {
-                      //   setSpace({
-                      //     kind: 'explorer',
-                      //     key: `explorer/${spaceId}`,
-                      //     spaceId,
-                      //   });
-                      // }
-                      // setModal(null);
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faEnvelope} />
-                  </Button>
-                </Group>
+                <RelationshipButtons user={user} relation={relation} />
               )}
             </div>
           </Flex>

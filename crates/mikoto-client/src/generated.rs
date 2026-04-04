@@ -95,7 +95,8 @@ pub struct Channel {
     pub order: i32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<Uuid>,
-    pub space_id: Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub space_id: Option<Uuid>,
     pub r#type: ChannelType,
 }
 
@@ -229,6 +230,14 @@ pub struct ListQuery {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ListQuery2 {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<Uuid>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i32>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LoginPayload {
     pub email: String,
     pub password: String,
@@ -315,6 +324,13 @@ pub struct MessageSendPayload {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MessageSendPayload2 {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attachments: Option<Vec<MessageAttachmentInput>>,
+    pub content: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ObjectWithId {
     pub id: Uuid,
 }
@@ -356,10 +372,10 @@ pub enum RelationState {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RelationshipExt {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub channel_id: Option<Uuid>,
     pub id: Uuid,
     pub relation_id: Uuid,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub space_id: Option<Uuid>,
     pub state: RelationState,
     pub user: UserExt,
     pub user_id: Uuid,
@@ -883,10 +899,29 @@ impl<'a> HttpApi<'a> {
         Ok(())
     }
 
-    pub async fn relations_open_dm(&self, relation_id: Uuid) -> Result<SpaceExt, ClientError> {
+    pub async fn relations_open_dm(&self, relation_id: Uuid) -> Result<Channel, ClientError> {
         let path = format!("/relations/{}/dm", relation_id);
         let mut req = self.client.post(self.url(&path))
             .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn dm_messages_list(&self, channel_id: Uuid, cursor: Option<Uuid>, limit: Option<i32>) -> Result<Vec<MessageExt>, ClientError> {
+        let path = format!("/dm/{}/messages/", channel_id);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
+        if let Some(v) = &cursor { req = req.query(&[("cursor", v.to_string())]); }
+        if let Some(v) = &limit { req = req.query(&[("limit", v.to_string())]); }
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn dm_messages_create(&self, channel_id: Uuid, body: &MessageSendPayload) -> Result<MessageExt, ClientError> {
+        let path = format!("/dm/{}/messages/", channel_id);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }
@@ -1047,7 +1082,7 @@ impl<'a> HttpApi<'a> {
         Ok(resp.json().await?)
     }
 
-    pub async fn messages_create(&self, space_id: Uuid, channel_id: Uuid, body: &MessageSendPayload) -> Result<MessageExt, ClientError> {
+    pub async fn messages_create(&self, space_id: Uuid, channel_id: Uuid, body: &MessageSendPayload2) -> Result<MessageExt, ClientError> {
         let path = format!("/spaces/{}/channels/{}/messages/", space_id, channel_id);
         let mut req = self.client.post(self.url(&path))
             .bearer_auth(self.token);

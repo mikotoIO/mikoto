@@ -8,16 +8,11 @@ use uuid::Uuid;
 use crate::{
     db::db,
     entities::{
-        ObjectWithId, Relationship, RelationshipExt, RelationState, Space, SpaceExt, SpaceType,
-        User,
+        Channel, ChannelType, ObjectWithId, Relationship, RelationshipExt, RelationState, User,
     },
     error::Error,
-    functions::{jwt::Claims, pubsub::emit_event},
-    routes::{
-        router::AppRouter,
-        spaces::join_space,
-        ws::state::State,
-    },
+    functions::{jwt::Claims, pubsub::emit_event, time::Timestamp},
+    routes::{router::AppRouter, ws::state::State},
 };
 
 async fn list(claim: Claims) -> Result<Json<Vec<RelationshipExt>>, Error> {
@@ -310,7 +305,7 @@ async fn unblock(
 async fn open_dm(
     claim: Claims,
     Path(relation_id): Path<Uuid>,
-) -> Result<Json<SpaceExt>, Error> {
+) -> Result<Json<Channel>, Error> {
     let user_id: Uuid = claim.sub.parse()?;
 
     let my_rel = Relationship::find_by_pair(user_id, relation_id, db())
@@ -321,34 +316,29 @@ async fn open_dm(
         return Err(Error::forbidden("You must be friends to open a DM"));
     }
 
-    // If DM space already exists, return it
-    if let Some(space_id) = my_rel.space_id {
-        let space = Space::find_by_id(space_id, db()).await?;
-        let space = SpaceExt::dataload_one(space, db()).await?;
-        return Ok(space.into());
+    // If DM channel already exists, return it
+    if let Some(channel_id) = my_rel.channel_id {
+        let channel = Channel::find_by_id(channel_id, db()).await?;
+        return Ok(channel.into());
     }
 
-    // Create a new DM space
+    // Create a standalone DM channel (no space)
     let other_user = User::find_by_id(relation_id, db()).await?;
-    let space = Space {
+    let channel = Channel {
         id: Uuid::new_v4(),
+        space_id: None,
+        parent_id: None,
+        order: 0,
         name: other_user.name.clone(),
-        icon: None,
-        owner_id: None,
-        space_type: SpaceType::Dm,
-        visibility: None,
+        category: ChannelType::Text,
+        last_updated: Some(Timestamp::now()),
     };
-    space.create(db()).await?;
-    let space = SpaceExt::dataload_one(space, db()).await?;
+    channel.create(db()).await?;
 
-    // Join both users to the space
-    join_space(&space, user_id).await?;
-    join_space(&space, relation_id).await?;
+    // Update channelId on both relationship rows
+    Relationship::set_channel_id(user_id, relation_id, channel.id, db()).await?;
 
-    // Update spaceId on both relationship rows
-    Relationship::set_space_id(user_id, relation_id, space.base.id, db()).await?;
-
-    // Emit relationship updates so clients know about the new spaceId
+    // Emit relationship updates so clients know about the new channelId
     let my_rel = Relationship::find_by_pair(user_id, relation_id, db())
         .await?
         .ok_or(Error::NotFound)?;
@@ -367,7 +357,7 @@ async fn open_dm(
     )
     .await?;
 
-    Ok(space.into())
+    Ok(channel.into())
 }
 
 static TAG: &str = "Relations";

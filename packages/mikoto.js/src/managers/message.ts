@@ -31,6 +31,10 @@ export class MikotoMessage extends ZSchema(MessageExt) {
   }
 
   async edit(content: string) {
+    if (!this.channel.spaceId) {
+      // DM channels don't support edit via space routes yet
+      return;
+    }
     const message = await this.client.rest['messages.update'](
       { content },
       {
@@ -45,6 +49,10 @@ export class MikotoMessage extends ZSchema(MessageExt) {
   }
 
   async delete() {
+    if (!this.channel.spaceId) {
+      // DM channels don't support delete via space routes yet
+      return;
+    }
     await this.client.rest['messages.delete'](undefined, {
       params: {
         spaceId: this.channel.spaceId,
@@ -67,11 +75,17 @@ export class MessageManager extends Manager {
   }
 
   async list({ limit, cursor }: MessageListParams) {
-    return this.client.rest['messages.list']({
-      params: {
-        spaceId: this.channel.spaceId,
-        channelId: this.channel.id,
-      },
+    if (this.channel.spaceId) {
+      return this.client.rest['messages.list']({
+        params: {
+          spaceId: this.channel.spaceId,
+          channelId: this.channel.id,
+        },
+        queries: { limit, cursor },
+      });
+    }
+    return this.client.rest['dm.messages.list']({
+      params: { channelId: this.channel.id },
       queries: { limit, cursor },
     });
   }

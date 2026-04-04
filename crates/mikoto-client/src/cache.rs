@@ -87,7 +87,7 @@ impl Cache {
     pub fn channels_in_space(&self, space_id: Uuid) -> Vec<Channel> {
         self.channels
             .iter()
-            .filter(|entry| entry.value().space_id == space_id)
+            .filter(|entry| entry.value().space_id == Some(space_id))
             .map(|entry| entry.value().clone())
             .collect()
     }

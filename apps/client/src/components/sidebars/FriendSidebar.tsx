@@ -5,14 +5,12 @@ import {
   faUserGroup,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAtom } from 'jotai';
 import { useEffect } from 'react';
 import { useSnapshot } from 'valtio/react';
 
 import { Avatar } from '@/components/atoms/Avatar';
 import { hoverableButtonLike } from '@/components/design';
 import { useMikoto } from '@/hooks';
-import { treebarSpaceState } from '@/store';
 import { useTabkit } from '@/store/surface';
 
 const StyledButtonBase = styled.div`
@@ -33,7 +31,6 @@ const StyledButtonBase = styled.div`
 export function FriendSidebar() {
   const tabkit = useTabkit();
   const mikoto = useMikoto();
-  const [, setLeftSidebar] = useAtom(treebarSpaceState);
 
   useSnapshot(mikoto.relationships.cache);
 
@@ -42,7 +39,7 @@ export function FriendSidebar() {
   }, []);
 
   const friends = mikoto.relationships.friends;
-  const dmFriends = friends.filter((f) => f.spaceId);
+  const dmFriends = friends.filter((f) => f.channelId);
 
   return (
     <Box p={2}>
@@ -85,16 +82,16 @@ export function FriendSidebar() {
       {dmFriends.map((friend) => (
         <StyledButtonBase
           key={friend.id}
-          onClick={() => {
-            const friendSpaceId = friend.spaceId;
-            if (friendSpaceId) {
-              setLeftSidebar({
-                kind: 'dmExplorer',
-                key: `dmExplorer/${friendSpaceId}`,
-                spaceId: friendSpaceId,
-                relationId: friend.id,
-              });
-            }
+          onClick={async () => {
+            const channel = await friend.openDm();
+            tabkit.openTab(
+              {
+                kind: 'textChannel',
+                key: channel.id,
+                channelId: channel.id,
+              },
+              false,
+            );
           }}
         >
           <Avatar

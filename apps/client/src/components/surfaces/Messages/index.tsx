@@ -98,7 +98,7 @@ function ChannelHead({ channel }: { channel: Channel }) {
 const FUNNY_NUMBER = 69_420_000;
 
 function RealMessageView({ channel }: { channel: MikotoChannel }) {
-  useFetchMember(channel.space!);
+  useFetchMember(channel.space);
 
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const mikoto = useMikoto();
@@ -180,12 +180,14 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
       //     timestamp: x.timestamp,
       //   })
       //   .then(() => {});
-      mikoto.rest['channels.acknowledge'](undefined, {
-        params: {
-          spaceId: channel.spaceId,
-          channelId: channel.id,
-        },
-      }).then(() => {});
+      if (channel.spaceId) {
+        mikoto.rest['channels.acknowledge'](undefined, {
+          params: {
+            spaceId: channel.spaceId,
+            channelId: channel.id,
+          },
+        }).then(() => {});
+      }
       setScrollToBottom(true);
       return [...xs, new MikotoMessage(x, mikoto)];
     });
@@ -341,7 +343,7 @@ export function MessageSurface({ channelId }: { channelId: string }) {
   const channel = mikoto.channels._get(channelId)!;
 
   return (
-    <CurrentSpaceContext.Provider value={channel.space!}>
+    <CurrentSpaceContext.Provider value={channel.space}>
       <RealMessageView channel={channel} />
     </CurrentSpaceContext.Provider>
   );

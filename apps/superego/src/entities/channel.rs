@@ -32,7 +32,7 @@ model!(
 entity!(
     pub struct Channel {
         pub id: Uuid,
-        pub space_id: Uuid,
+        pub space_id: Option<Uuid>,
 
         pub parent_id: Option<Uuid>,
         pub order: i32,
@@ -76,7 +76,10 @@ impl Channel {
         .bind(&space_ids)
         .fetch_all(db)
         .await?;
-        Ok(group_by_key(channels, |x| x.space_id))
+        Ok(group_by_key(
+            channels.into_iter().filter(|x| x.space_id.is_some()).collect(),
+            |x| x.space_id.unwrap(),
+        ))
     }
 
     pub async fn create<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {

@@ -18,7 +18,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoRelationship } from '@mikoto-io/mikoto.js';
-import { useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSnapshot } from 'valtio/react';
@@ -28,7 +27,7 @@ import { TabName } from '@/components/tabs';
 import { Field } from '@/components/ui';
 import { toaster } from '@/components/ui/toaster';
 import { useMikoto } from '@/hooks';
-import { treebarSpaceState } from '@/store';
+import { useTabkit } from '@/store/surface';
 import { Form } from '@/ui';
 
 import { Avatar } from '../atoms/Avatar';
@@ -188,7 +187,7 @@ function BlockedItem({ relation }: { relation: MikotoRelationship }) {
 export function FriendsSurface() {
   const [activeTab, setActiveTab] = useState<FriendsTab>('all');
   const mikoto = useMikoto();
-  const setLeftSidebar = useSetAtom(treebarSpaceState);
+  const tabkit = useTabkit();
 
   const form = useForm({
     defaultValues: { userId: '' },
@@ -205,13 +204,15 @@ export function FriendsSurface() {
   const blocked = mikoto.relationships.blocked;
 
   const handleOpenDm = async (relation: MikotoRelationship) => {
-    const space = await relation.openDm();
-    setLeftSidebar({
-      kind: 'dmExplorer',
-      key: `dmExplorer/${space.id}`,
-      spaceId: space.id,
-      relationId: relation.id,
-    });
+    const channel = await relation.openDm();
+    tabkit.openTab(
+      {
+        kind: 'textChannel',
+        key: channel.id,
+        channelId: channel.id,
+      },
+      false,
+    );
   };
 
   return (

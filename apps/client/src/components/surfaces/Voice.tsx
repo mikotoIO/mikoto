@@ -53,7 +53,7 @@ export default function VoiceSurface({ channelId }: { channelId: string }) {
   useEffect(() => {
     mikoto.rest['voice.join'](undefined, {
       params: {
-        spaceId: channel.spaceId,
+        spaceId: channel.spaceId!,
         channelId: channel.id,
       },
     }).then((x) => {

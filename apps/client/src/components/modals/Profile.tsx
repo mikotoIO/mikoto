@@ -2,7 +2,7 @@ import { Box, Button, Flex, Group, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { MikotoRelationship, UserExt } from '@mikoto-io/mikoto.js';
+import { MikotoChannel, MikotoRelationship, UserExt } from '@mikoto-io/mikoto.js';
 import { useSetAtom } from 'jotai';
 import { useSnapshot } from 'valtio/react';
 
@@ -11,7 +11,7 @@ import { Avatar } from '@/components/atoms/Avatar';
 import { DialogContent } from '@/components/ui';
 import { toaster } from '@/components/ui/toaster';
 import { useMikoto } from '@/hooks';
-import { treebarSpaceState } from '@/store';
+import { useTabkit } from '@/store/surface';
 
 const ProfileContainer = styled.div`
   width: 640px;
@@ -58,7 +58,7 @@ function RelationshipButtons({
 }) {
   const mikoto = useMikoto();
   const setModal = useSetAtom(modalState);
-  const setLeftSidebar = useSetAtom(treebarSpaceState);
+  const tabkit = useTabkit();
 
   const handleSendRequest = async () => {
     try {
@@ -72,15 +72,18 @@ function RelationshipButtons({
 
   const handleOpenDm = async () => {
     try {
-      const space = await mikoto.rest['relations.openDm'](undefined, {
+      const channelData = await mikoto.rest['relations.openDm'](undefined, {
         params: { relationId: user.id },
       });
-      setLeftSidebar({
-        kind: 'dmExplorer',
-        key: `dmExplorer/${space.id}`,
-        spaceId: space.id,
-        relationId: relation!.id,
-      });
+      const channel = new MikotoChannel(channelData, mikoto);
+      tabkit.openTab(
+        {
+          kind: 'textChannel',
+          key: channel.id,
+          channelId: channel.id,
+        },
+        false,
+      );
       setModal(null);
     } catch {
       toaster.error({ title: 'Failed to open DM' });

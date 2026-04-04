@@ -182,9 +182,9 @@ export const RelationState = z.enum([
 export type RelationState = z.infer<typeof RelationState>;
 
 export const RelationshipExt = z.object({
+  channelId: z.union([z.string(), z.null()]).optional(),
   id: z.string().uuid(),
   relationId: z.string().uuid(),
-  spaceId: z.union([z.string(), z.null()]).optional(),
   state: RelationState,
   user: UserExt,
   userId: z.string().uuid(),
@@ -210,10 +210,62 @@ export const Channel = z.object({
   name: z.string(),
   order: z.number().int(),
   parentId: z.union([z.string(), z.null()]).optional(),
-  spaceId: z.string().uuid(),
+  spaceId: z.union([z.string(), z.null()]).optional(),
   type: ChannelType,
 });
 export type Channel = z.infer<typeof Channel>;
+
+export const cursor = z.union([z.string(), z.null()]).optional();
+export type cursor = z.infer<typeof cursor>;
+
+export const limit = z.union([z.number(), z.null()]).optional();
+export type limit = z.infer<typeof limit>;
+
+export const MessageAttachment = z.object({
+  contentType: z.string(),
+  filename: z.string(),
+  id: z.string().uuid(),
+  messageId: z.string().uuid(),
+  order: z.number().int(),
+  size: z.number().int(),
+  url: z.string(),
+});
+export type MessageAttachment = z.infer<typeof MessageAttachment>;
+
+export const User = z.object({
+  avatar: z.union([z.string(), z.null()]).optional(),
+  category: z.union([UserCategory, z.null()]).optional(),
+  description: z.union([z.string(), z.null()]).optional(),
+  id: z.string().uuid(),
+  name: z.string(),
+});
+export type User = z.infer<typeof User>;
+
+export const MessageExt = z.object({
+  attachments: z.array(MessageAttachment),
+  author: z.union([User, z.null()]).optional(),
+  authorId: z.union([z.string(), z.null()]).optional(),
+  channelId: z.string().uuid(),
+  content: z.string(),
+  editedTimestamp: z.union([Timestamp, z.null()]).optional(),
+  id: z.string().uuid(),
+  timestamp: Timestamp.datetime({ offset: true }),
+});
+export type MessageExt = z.infer<typeof MessageExt>;
+
+export const MessageAttachmentInput = z.object({
+  contentType: z.string(),
+  filename: z.string(),
+  size: z.number().int(),
+  url: z.string(),
+});
+export type MessageAttachmentInput = z.infer<typeof MessageAttachmentInput>;
+
+export const MessageSendPayload = z.object({
+  attachments: z.array(MessageAttachmentInput).optional().default([]),
+  content: z.string(),
+});
+export type MessageSendPayload = z.infer<typeof MessageSendPayload>;
 
 export const Role = z.object({
   color: z.union([z.string(), z.null()]).optional(),
@@ -277,57 +329,11 @@ export const ChannelUnread = z.object({
 });
 export type ChannelUnread = z.infer<typeof ChannelUnread>;
 
-export const cursor = z.union([z.string(), z.null()]).optional();
-export type cursor = z.infer<typeof cursor>;
-
-export const limit = z.union([z.number(), z.null()]).optional();
-export type limit = z.infer<typeof limit>;
-
-export const MessageAttachment = z.object({
-  contentType: z.string(),
-  filename: z.string(),
-  id: z.string().uuid(),
-  messageId: z.string().uuid(),
-  order: z.number().int(),
-  size: z.number().int(),
-  url: z.string(),
-});
-export type MessageAttachment = z.infer<typeof MessageAttachment>;
-
-export const User = z.object({
-  avatar: z.union([z.string(), z.null()]).optional(),
-  category: z.union([UserCategory, z.null()]).optional(),
-  description: z.union([z.string(), z.null()]).optional(),
-  id: z.string().uuid(),
-  name: z.string(),
-});
-export type User = z.infer<typeof User>;
-
-export const MessageExt = z.object({
-  attachments: z.array(MessageAttachment),
-  author: z.union([User, z.null()]).optional(),
-  authorId: z.union([z.string(), z.null()]).optional(),
-  channelId: z.string().uuid(),
-  content: z.string(),
-  editedTimestamp: z.union([Timestamp, z.null()]).optional(),
-  id: z.string().uuid(),
-  timestamp: Timestamp.datetime({ offset: true }),
-});
-export type MessageExt = z.infer<typeof MessageExt>;
-
-export const MessageAttachmentInput = z.object({
-  contentType: z.string(),
-  filename: z.string(),
-  size: z.number().int(),
-  url: z.string(),
-});
-export type MessageAttachmentInput = z.infer<typeof MessageAttachmentInput>;
-
-export const MessageSendPayload = z.object({
+export const MessageSendPayload2 = z.object({
   attachments: z.array(MessageAttachmentInput).optional().default([]),
   content: z.string(),
 });
-export type MessageSendPayload = z.infer<typeof MessageSendPayload>;
+export type MessageSendPayload2 = z.infer<typeof MessageSendPayload2>;
 
 export const MessageEditPayload = z.object({ content: z.string() });
 export type MessageEditPayload = z.infer<typeof MessageEditPayload>;
@@ -414,6 +420,14 @@ export const ListQuery = z
   .partial();
 export type ListQuery = z.infer<typeof ListQuery>;
 
+export const ListQuery2 = z
+  .object({
+    cursor: z.union([z.string(), z.null()]),
+    limit: z.union([z.number(), z.null()]),
+  })
+  .partial();
+export type ListQuery2 = z.infer<typeof ListQuery2>;
+
 export const MessageKey = z.object({
   channelId: z.string().uuid(),
   messageId: z.string().uuid(),
@@ -475,6 +489,13 @@ export const schemas = {
   Timestamp,
   ChannelType,
   Channel,
+  cursor,
+  limit,
+  MessageAttachment,
+  User,
+  MessageExt,
+  MessageAttachmentInput,
+  MessageSendPayload,
   Role,
   SpaceType,
   SpaceVisibility,
@@ -484,13 +505,7 @@ export const schemas = {
   ChannelCreatePayload,
   ChannelPatch,
   ChannelUnread,
-  cursor,
-  limit,
-  MessageAttachment,
-  User,
-  MessageExt,
-  MessageAttachmentInput,
-  MessageSendPayload,
+  MessageSendPayload2,
   MessageEditPayload,
   VoiceToken,
   Document,
@@ -505,6 +520,7 @@ export const schemas = {
   Invite,
   InviteCreatePayload,
   ListQuery,
+  ListQuery2,
   MessageKey,
   ObjectWithId,
   Ping,
@@ -714,6 +730,39 @@ const endpoints = makeApi([
   },
   {
     method: "get",
+    path: "/dm/:channelId/messages/",
+    alias: "dm.messages.list",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "cursor",
+        type: "Query",
+        schema: cursor,
+      },
+      {
+        name: "limit",
+        type: "Query",
+        schema: limit,
+      },
+    ],
+    response: z.array(MessageExt),
+  },
+  {
+    method: "post",
+    path: "/dm/:channelId/messages/",
+    alias: "dm.messages.create",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: MessageSendPayload,
+      },
+    ],
+    response: MessageExt,
+  },
+  {
+    method: "get",
     path: "/handles/:handle",
     alias: "handles.resolve",
     requestFormat: "json",
@@ -773,7 +822,7 @@ const endpoints = makeApi([
     path: "/relations/:relationId/dm",
     alias: "relations.openDm",
     requestFormat: "json",
-    response: SpaceExt,
+    response: Channel,
   },
   {
     method: "post",
@@ -964,7 +1013,7 @@ const endpoints = makeApi([
       {
         name: "body",
         type: "Body",
-        schema: MessageSendPayload,
+        schema: MessageSendPayload2,
       },
     ],
     response: MessageExt,

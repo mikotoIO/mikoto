@@ -43,7 +43,7 @@ entity!(
         pub relation_id: Uuid,
 
         pub state: RelationState,
-        pub space_id: Option<Uuid>,
+        pub channel_id: Option<Uuid>,
     }
 );
 
@@ -65,7 +65,7 @@ impl Relationship {
             user_id,
             relation_id,
             state,
-            space_id: None,
+            channel_id: None,
         }
     }
 
@@ -106,7 +106,7 @@ impl Relationship {
     pub async fn create<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
         sqlx::query(
             r##"
-            INSERT INTO "Relationship" ("id", "userId", "relationId", "state", "spaceId")
+            INSERT INTO "Relationship" ("id", "userId", "relationId", "state", "channelId")
             VALUES ($1, $2, $3, $4, $5)
             "##,
         )
@@ -114,7 +114,7 @@ impl Relationship {
         .bind(self.user_id)
         .bind(self.relation_id)
         .bind(self.state)
-        .bind(self.space_id)
+        .bind(self.channel_id)
         .execute(db)
         .await?;
         Ok(())
@@ -141,27 +141,46 @@ impl Relationship {
         Ok(res)
     }
 
-    /// Set spaceId on both rows of a relationship pair
-    pub async fn set_space_id<'c, X: sqlx::PgExecutor<'c>>(
+    /// Set channelId on both rows of a relationship pair
+    pub async fn set_channel_id<'c, X: sqlx::PgExecutor<'c>>(
         user_id: Uuid,
         relation_id: Uuid,
-        space_id: Uuid,
+        channel_id: Uuid,
         db: X,
     ) -> Result<(), Error> {
         sqlx::query(
             r##"
             UPDATE "Relationship"
-            SET "spaceId" = $3
+            SET "channelId" = $3
             WHERE ("userId" = $1 AND "relationId" = $2)
                OR ("userId" = $2 AND "relationId" = $1)
             "##,
         )
         .bind(user_id)
         .bind(relation_id)
-        .bind(space_id)
+        .bind(channel_id)
         .execute(db)
         .await?;
         Ok(())
+    }
+
+    /// Find a relationship by channel ID and user ID (for DM auth)
+    pub async fn find_by_channel<'c, X: sqlx::PgExecutor<'c>>(
+        channel_id: Uuid,
+        user_id: Uuid,
+        db: X,
+    ) -> Result<Option<Self>, Error> {
+        let res = sqlx::query_as(
+            r##"
+            SELECT * FROM "Relationship"
+            WHERE "channelId" = $1 AND "userId" = $2
+            "##,
+        )
+        .bind(channel_id)
+        .bind(user_id)
+        .fetch_optional(db)
+        .await?;
+        Ok(res)
     }
 
     /// Delete both rows of a relationship pair

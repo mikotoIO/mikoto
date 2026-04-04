@@ -1,11 +1,11 @@
-import { Box, Flex, Heading } from '@chakra-ui/react';
+import { Box, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import {
   faChevronDown,
   faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { MikotoChannel, MikotoRelationship, MikotoSpace } from '@mikoto-io/mikoto.js';
+import { MikotoChannel, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useAtom, useSetAtom } from 'jotai';
 import { NumberSize, Resizable } from 're-resizable';
 import { useEffect, useState } from 'react';
@@ -269,50 +269,9 @@ export function Explorer({ space }: { space: MikotoSpace }) {
   );
 }
 
-export const DMExplorer = ({
-  space,
-}: {
-  space: MikotoSpace;
-  relation: MikotoRelationship;
-}) => {
-  const nodeContextMenu = useContextMenuX();
-
-  // TODO: return loading indicator
-  if (space === null) return null;
-  // FIXME: reimplement this
-  return (
-    <StyledTree
-      onContextMenu={nodeContextMenu(<TreebarContextMenu space={space} />)}
-    >
-      <Flex p="16px" align="center">
-        {/* <Avatar src={relation.relation?.avatar ?? undefined} size={32} />
-        <Heading fontSize="16px" ml={2}>
-          {relation.relation?.name ?? 'Unknown User'}
-        </Heading> */}
-      </Flex>
-      <ExplorerInner space={space} />
-    </StyledTree>
-  );
-};
-
 export function ExplorerSurface({ spaceId }: { spaceId: string }) {
   const mikoto = useMikoto();
   const space = mikoto.spaces._get(spaceId);
   if (space === undefined) return null;
   return <Explorer space={space} />;
-}
-
-export function DMExplorerSurface({
-  spaceId,
-  relationId,
-}: {
-  spaceId: string;
-  relationId: string;
-}) {
-  const mikoto = useMikoto();
-  const space = mikoto.spaces._get(spaceId);
-  const relation = mikoto.relationships._get(relationId);
-
-  if (space === undefined || relation === undefined) return null;
-  return <DMExplorer space={space} relation={relation} />;
 }

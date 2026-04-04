@@ -22,7 +22,7 @@ export function SaveLoadPlugin({ channel }: { channel: MikotoChannel }) {
             },
             {
               params: {
-                spaceId: channel.spaceId,
+                spaceId: channel.spaceId!,
                 channelId: channel.id,
               },
             },

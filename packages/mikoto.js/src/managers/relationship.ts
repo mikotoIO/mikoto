@@ -4,6 +4,7 @@ import { MikotoClient } from '../MikotoClient';
 import { RelationshipExt } from '../api.gen';
 import { ZSchema } from '../helpers/ZSchema';
 import { CachedManager } from './base';
+import { MikotoChannel } from './channel';
 
 export class MikotoRelationship extends ZSchema(RelationshipExt) {
   client!: MikotoClient;
@@ -58,9 +59,10 @@ export class MikotoRelationship extends ZSchema(RelationshipExt) {
   }
 
   async openDm() {
-    return this.client.rest['relations.openDm'](undefined, {
+    const channelData = await this.client.rest['relations.openDm'](undefined, {
       params: { relationId: this.relationId },
     });
+    return new MikotoChannel(channelData, this.client);
   }
 }
 

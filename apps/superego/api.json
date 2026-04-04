@@ -849,7 +849,86 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SpaceExt"
+                  "$ref": "#/components/schemas/Channel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dm/{channelId}/messages/": {
+      "get": {
+        "tags": [
+          "DM"
+        ],
+        "summary": "List DM Messages",
+        "operationId": "dm.messages.list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int32"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageExt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "DM"
+        ],
+        "summary": "Send DM Message",
+        "operationId": "dm.messages.create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageSendPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageExt"
                 }
               }
             }
@@ -1332,7 +1411,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/MessageSendPayload"
+                "$ref": "#/components/schemas/MessageSendPayload2"
               }
             }
           },
@@ -2082,7 +2161,6 @@
           "id",
           "name",
           "order",
-          "spaceId",
           "type"
         ],
         "properties": {
@@ -2115,7 +2193,10 @@
             "format": "uuid"
           },
           "spaceId": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "format": "uuid"
           },
           "type": {
@@ -2418,6 +2499,25 @@
           }
         }
       },
+      "ListQuery2": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          }
+        }
+      },
       "LoginPayload": {
         "examples": [
           {
@@ -2674,6 +2774,24 @@
           }
         }
       },
+      "MessageSendPayload2": {
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "properties": {
+          "attachments": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageAttachmentInput"
+            }
+          },
+          "content": {
+            "type": "string"
+          }
+        }
+      },
       "ObjectWithId": {
         "type": "object",
         "required": [
@@ -2761,19 +2879,19 @@
           "userId"
         ],
         "properties": {
+          "channelId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
           },
           "relationId": {
             "type": "string",
-            "format": "uuid"
-          },
-          "spaceId": {
-            "type": [
-              "string",
-              "null"
-            ],
             "format": "uuid"
           },
           "state": {

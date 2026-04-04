@@ -29,7 +29,7 @@ async fn join(
 ) -> Result<Json<VoiceToken>, Error> {
     // Verify channel belongs to the space
     let channel = Channel::find_by_id(channel_id, db()).await?;
-    if channel.space_id != _space_id {
+    if channel.space_id != Some(_space_id) {
         return Err(Error::NotFound);
     }
 

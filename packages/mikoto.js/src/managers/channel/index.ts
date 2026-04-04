@@ -31,6 +31,7 @@ export class MikotoChannel extends ZSchema(Channel) {
   }
 
   get space(): MikotoSpace | undefined {
+    if (!this.spaceId) return undefined;
     return this.client.spaces.cache.get(this.spaceId);
   }
 
@@ -44,6 +45,7 @@ export class MikotoChannel extends ZSchema(Channel) {
   }
 
   async edit(data: ChannelPatch) {
+    if (!this.spaceId) return this;
     await this.client.rest['channels.update'](data, {
       params: {
         spaceId: this.spaceId,
@@ -54,6 +56,7 @@ export class MikotoChannel extends ZSchema(Channel) {
   }
 
   async delete() {
+    if (!this.spaceId) return;
     await this.client.rest['channels.delete'](undefined, {
       params: {
         spaceId: this.spaceId,
@@ -64,6 +67,7 @@ export class MikotoChannel extends ZSchema(Channel) {
   }
 
   async ack() {
+    if (!this.spaceId) return;
     await this.client.rest['channels.acknowledge'](undefined, {
       params: {
         spaceId: this.spaceId,
@@ -73,11 +77,19 @@ export class MikotoChannel extends ZSchema(Channel) {
   }
 
   async listMessages(limit: number, cursor: string | null) {
-    const msgs = await this.client.rest['messages.list']({
-      params: {
-        spaceId: this.spaceId,
-        channelId: this.id,
-      },
+    if (this.spaceId) {
+      const msgs = await this.client.rest['messages.list']({
+        params: {
+          spaceId: this.spaceId,
+          channelId: this.id,
+        },
+        queries: { limit, cursor },
+      });
+      return msgs.map((x) => new MikotoMessage(x, this.client));
+    }
+    // DM channel
+    const msgs = await this.client.rest['dm.messages.list']({
+      params: { channelId: this.id },
       queries: { limit, cursor },
     });
     return msgs.map((x) => new MikotoMessage(x, this.client));
@@ -92,21 +104,27 @@ export class MikotoChannel extends ZSchema(Channel) {
       size: number;
     }> = [],
   ) {
-    await this.client.rest['messages.create'](
-      {
-        content,
-        attachments,
-      },
-      {
-        params: {
-          spaceId: this.spaceId,
-          channelId: this.id,
+    if (this.spaceId) {
+      await this.client.rest['messages.create'](
+        { content, attachments },
+        {
+          params: {
+            spaceId: this.spaceId,
+            channelId: this.id,
+          },
         },
-      },
-    );
+      );
+    } else {
+      // DM channel
+      await this.client.rest['dm.messages.create'](
+        { content, attachments },
+        { params: { channelId: this.id } },
+      );
+    }
   }
 
   async getDocument(): Promise<Document> {
+    if (!this.spaceId) throw new Error('DM channels do not support documents');
     return await this.client.rest['documents.get']({
       params: {
         spaceId: this.spaceId,
@@ -116,6 +134,7 @@ export class MikotoChannel extends ZSchema(Channel) {
   }
 
   async updateDocument(patch: DocumentPatch): Promise<Document> {
+    if (!this.spaceId) throw new Error('DM channels do not support documents');
     return await this.client.rest['documents.update'](patch, {
       params: {
         spaceId: this.spaceId,
@@ -133,10 +152,11 @@ export class ChannelManager extends CachedManager<MikotoChannel> {
 
   static _subscribe(client: MikotoClient) {
     client.ws.on('channels.onCreate', (data) => {
-      const space = client.spaces.cache.get(data.spaceId);
-      if (!space) return;
       client.channels._insert(new MikotoChannel(data, client));
-      space.channelIds.push(data.id);
+      if (data.spaceId) {
+        const space = client.spaces.cache.get(data.spaceId);
+        if (space) space.channelIds.push(data.id);
+      }
     });
 
     client.ws.on('channels.onUpdate', (data) => {
@@ -146,9 +166,13 @@ export class ChannelManager extends CachedManager<MikotoChannel> {
     });
 
     client.ws.on('channels.onDelete', (data) => {
-      const space = client.spaces.cache.get(data.spaceId);
-      if (!space) return;
-      space.channelIds = space.channelIds.filter((x) => x !== data.id);
+      client.channels.cache.delete(data.id);
+      if (data.spaceId) {
+        const space = client.spaces.cache.get(data.spaceId);
+        if (space) {
+          space.channelIds = space.channelIds.filter((x) => x !== data.id);
+        }
+      }
     });
   }
 }

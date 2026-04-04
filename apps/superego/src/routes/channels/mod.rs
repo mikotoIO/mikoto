@@ -39,7 +39,7 @@ async fn get(
     Path((_, channel_id)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<Channel>, Error> {
     let channel = Channel::find_by_id(channel_id, db()).await?;
-    if channel.space_id != space.base.id {
+    if channel.space_id != Some(space.base.id) {
         return Err(Error::NotFound);
     }
     Ok(channel.into())
@@ -64,7 +64,7 @@ async fn create(
 
     let channel = Channel {
         id: Uuid::new_v4(),
-        space_id,
+        space_id: Some(space_id),
         name: body.name,
         parent_id: body.parent_id,
         category: body.kind.unwrap_or(ChannelType::Text),
@@ -96,14 +96,14 @@ async fn update(
     permissions_or_admin(&space, &member, Permission::MANAGE_CHANNELS)?;
 
     let channel = Channel::find_by_id(channel_id, db()).await?;
-    if channel.space_id != space.base.id {
+    if channel.space_id != Some(space.base.id) {
         return Err(Error::NotFound);
     }
     let channel = channel.update(patch, db()).await?;
     emit_event(
         "channels.onUpdate",
         &channel,
-        &format!("space:{}", channel.space_id),
+        &format!("space:{}", space.base.id),
     )
     .await?;
     Ok(channel.into())
@@ -117,14 +117,14 @@ async fn delete(
     permissions_or_admin(&space, &member, Permission::MANAGE_CHANNELS)?;
 
     let channel = Channel::find_by_id(channel_id, db()).await?;
-    if channel.space_id != space.base.id {
+    if channel.space_id != Some(space.base.id) {
         return Err(Error::NotFound);
     }
     channel.delete(db()).await?;
     emit_event(
         "channels.onDelete",
         &channel,
-        &format!("space:{}", channel.space_id),
+        &format!("space:{}", space.base.id),
     )
     .await?;
     Ok(().into())

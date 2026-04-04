@@ -5,12 +5,12 @@ import {
   faUserGroup,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAtom } from 'jotai';
 import { useEffect } from 'react';
+import { useSnapshot } from 'valtio/react';
 
 import { Avatar } from '@/components/atoms/Avatar';
 import { hoverableButtonLike } from '@/components/design';
-import { treebarSpaceState } from '@/store';
+import { useMikoto } from '@/hooks';
 import { useTabkit } from '@/store/surface';
 
 const StyledButtonBase = styled.div`
@@ -30,14 +30,16 @@ const StyledButtonBase = styled.div`
 
 export function FriendSidebar() {
   const tabkit = useTabkit();
-  const [, setLeftSidebar] = useAtom(treebarSpaceState);
+  const mikoto = useMikoto();
+
+  useSnapshot(mikoto.relationships.cache);
 
   useEffect(() => {
-    // mikoto.relations.list(true);
+    mikoto.relationships.list();
   }, []);
 
-  // FIXME: rework relations
-  const friends: any[] = []; // Array.from(mikoto.relations.values());
+  const friends = mikoto.relationships.friends;
+  const dmFriends = friends.filter((f) => f.channelId);
 
   return (
     <Box p={2}>
@@ -72,33 +74,33 @@ export function FriendSidebar() {
       <Heading fontSize="14px" p={2} color="gray.200">
         Direct Messages
       </Heading>
-      {friends.length === 0 && (
+      {dmFriends.length === 0 && (
         <Box px={4} color="gray.500">
           <Box>No DMs yet. Maybe add some friends?</Box>
         </Box>
       )}
-      {friends.map((friend) => (
+      {dmFriends.map((friend) => (
         <StyledButtonBase
           key={friend.id}
-          onClick={() => {
-            const friendSpaceId = friend?.space?.id;
-            if (friendSpaceId) {
-              setLeftSidebar({
-                kind: 'dmExplorer',
-                key: `dmExplorer/${friendSpaceId}`,
-                spaceId: friendSpaceId,
-                relationId: friend.id,
-              });
-            }
+          onClick={async () => {
+            const channel = await friend.openDm();
+            tabkit.openTab(
+              {
+                kind: 'textChannel',
+                key: channel.id,
+                channelId: channel.id,
+              },
+              false,
+            );
           }}
         >
           <Avatar
             className="avatar"
             size={32}
-            src={friend?.relation?.avatar ?? undefined}
-            userId={friend?.relation?.id}
+            src={friend.user.avatar ?? undefined}
+            userId={friend.user.id}
           />
-          <div>{friend?.relation?.name ?? 'Deleted User'}</div>
+          <div>{friend.user.name}</div>
         </StyledButtonBase>
       ))}
     </Box>

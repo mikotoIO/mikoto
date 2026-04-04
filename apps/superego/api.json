@@ -684,7 +684,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Relationship"
+                    "$ref": "#/components/schemas/RelationshipExt"
                   }
                 }
               }
@@ -706,7 +706,129 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Relationship"
+                  "$ref": "#/components/schemas/RelationshipExt"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Relations"
+        ],
+        "summary": "Remove Friend",
+        "operationId": "relations.remove",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relations/{relationId}/request": {
+      "post": {
+        "tags": [
+          "Relations"
+        ],
+        "summary": "Send Friend Request",
+        "operationId": "relations.sendRequest",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationshipExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relations/{relationId}/accept": {
+      "post": {
+        "tags": [
+          "Relations"
+        ],
+        "summary": "Accept Friend Request",
+        "operationId": "relations.accept",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationshipExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relations/{relationId}/decline": {
+      "post": {
+        "tags": [
+          "Relations"
+        ],
+        "summary": "Decline Friend Request",
+        "operationId": "relations.decline",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relations/{relationId}/block": {
+      "post": {
+        "tags": [
+          "Relations"
+        ],
+        "summary": "Block User",
+        "operationId": "relations.block",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationshipExt"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Relations"
+        ],
+        "summary": "Unblock User",
+        "operationId": "relations.unblock",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
                 }
               }
             }
@@ -727,7 +849,86 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/Channel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dm/{channelId}/messages/": {
+      "get": {
+        "tags": [
+          "DM"
+        ],
+        "summary": "List DM Messages",
+        "operationId": "dm.messages.list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int32"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageExt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "DM"
+        ],
+        "summary": "Send DM Message",
+        "operationId": "dm.messages.create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageSendPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageExt"
                 }
               }
             }
@@ -1210,7 +1411,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/MessageSendPayload"
+                "$ref": "#/components/schemas/MessageSendPayload2"
               }
             }
           },
@@ -1960,7 +2161,6 @@
           "id",
           "name",
           "order",
-          "spaceId",
           "type"
         ],
         "properties": {
@@ -1993,7 +2193,10 @@
             "format": "uuid"
           },
           "spaceId": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "format": "uuid"
           },
           "type": {
@@ -2296,6 +2499,25 @@
           }
         }
       },
+      "ListQuery2": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          }
+        }
+      },
       "LoginPayload": {
         "examples": [
           {
@@ -2552,6 +2774,24 @@
           }
         }
       },
+      "MessageSendPayload2": {
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "properties": {
+          "attachments": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageAttachmentInput"
+            }
+          },
+          "content": {
+            "type": "string"
+          }
+        }
+      },
       "ObjectWithId": {
         "type": "object",
         "required": [
@@ -2628,15 +2868,24 @@
           "OUTGOING_REQUEST"
         ]
       },
-      "Relationship": {
+      "RelationshipExt": {
+        "description": "Relationship with extended data including the related user",
         "type": "object",
         "required": [
           "id",
           "relationId",
           "state",
+          "user",
           "userId"
         ],
         "properties": {
+          "channelId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -2645,15 +2894,11 @@
             "type": "string",
             "format": "uuid"
           },
-          "spaceId": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "uuid"
-          },
           "state": {
             "$ref": "#/components/schemas/RelationState"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserExt"
           },
           "userId": {
             "type": "string",
@@ -3274,6 +3519,15 @@
       },
       "pong": {
         "$ref": "#/components/schemas/Ping"
+      },
+      "relations.onCreate": {
+        "$ref": "#/components/schemas/RelationshipExt"
+      },
+      "relations.onDelete": {
+        "$ref": "#/components/schemas/ObjectWithId"
+      },
+      "relations.onUpdate": {
+        "$ref": "#/components/schemas/RelationshipExt"
       },
       "roles.onCreate": {
         "$ref": "#/components/schemas/Role"

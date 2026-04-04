@@ -10,7 +10,7 @@ export function saveWithToast(channel: MikotoChannel, content: string) {
     { content },
     {
       params: {
-        spaceId: channel.spaceId,
+        spaceId: channel.spaceId!,
         channelId: channel.id,
       },
     },

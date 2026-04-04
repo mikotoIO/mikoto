@@ -10,6 +10,7 @@ export function notifyFromMessage(mikoto: MikotoClient, message: MessageExt) {
   if (message.authorId === mikoto.user.me!.id) return;
   const channel = mikoto.channels._get(message.channelId);
   if (!channel) return;
+  if (!channel.spaceId) return;
   const space = mikoto.spaces._get(channel.spaceId);
   if (!space) return;
 

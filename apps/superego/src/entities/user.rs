@@ -38,14 +38,214 @@ db_enum!(
 
 entity!(
     pub struct Relationship {
-        id: Uuid,
-        user_id: Uuid,
-        relation_id: Uuid,
+        pub id: Uuid,
+        pub user_id: Uuid,
+        pub relation_id: Uuid,
 
-        state: RelationState,
-        space_id: Option<Uuid>,
+        pub state: RelationState,
+        pub channel_id: Option<Uuid>,
     }
 );
+
+/// Relationship with extended data including the related user
+#[derive(Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct RelationshipExt {
+    #[serde(flatten)]
+    pub base: Relationship,
+    pub user: UserExt,
+}
+
+impl Relationship {
+    db_find_by_id!("Relationship");
+
+    pub fn new(user_id: Uuid, relation_id: Uuid, state: RelationState) -> Self {
+        Self {
+            id: Uuid::new_v4(),
+            user_id,
+            relation_id,
+            state,
+            channel_id: None,
+        }
+    }
+
+    pub async fn find_by_pair<'c, X: sqlx::PgExecutor<'c>>(
+        user_id: Uuid,
+        relation_id: Uuid,
+        db: X,
+    ) -> Result<Option<Self>, Error> {
+        let res = sqlx::query_as(
+            r##"
+            SELECT * FROM "Relationship"
+            WHERE "userId" = $1 AND "relationId" = $2
+            "##,
+        )
+        .bind(user_id)
+        .bind(relation_id)
+        .fetch_optional(db)
+        .await?;
+        Ok(res)
+    }
+
+    pub async fn list_by_user<'c, X: sqlx::PgExecutor<'c>>(
+        user_id: Uuid,
+        db: X,
+    ) -> Result<Vec<Self>, Error> {
+        let res = sqlx::query_as(
+            r##"
+            SELECT * FROM "Relationship"
+            WHERE "userId" = $1
+            "##,
+        )
+        .bind(user_id)
+        .fetch_all(db)
+        .await?;
+        Ok(res)
+    }
+
+    pub async fn create<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
+        sqlx::query(
+            r##"
+            INSERT INTO "Relationship" ("id", "userId", "relationId", "state", "channelId")
+            VALUES ($1, $2, $3, $4, $5)
+            "##,
+        )
+        .bind(self.id)
+        .bind(self.user_id)
+        .bind(self.relation_id)
+        .bind(self.state)
+        .bind(self.channel_id)
+        .execute(db)
+        .await?;
+        Ok(())
+    }
+
+    pub async fn update_state<'c, X: sqlx::PgExecutor<'c>>(
+        &self,
+        new_state: RelationState,
+        db: X,
+    ) -> Result<Self, Error> {
+        let res = sqlx::query_as(
+            r##"
+            UPDATE "Relationship"
+            SET "state" = $2
+            WHERE "id" = $1
+            RETURNING *
+            "##,
+        )
+        .bind(self.id)
+        .bind(new_state)
+        .fetch_optional(db)
+        .await?
+        .ok_or(Error::NotFound)?;
+        Ok(res)
+    }
+
+    /// Set channelId on both rows of a relationship pair
+    pub async fn set_channel_id<'c, X: sqlx::PgExecutor<'c>>(
+        user_id: Uuid,
+        relation_id: Uuid,
+        channel_id: Uuid,
+        db: X,
+    ) -> Result<(), Error> {
+        sqlx::query(
+            r##"
+            UPDATE "Relationship"
+            SET "channelId" = $3
+            WHERE ("userId" = $1 AND "relationId" = $2)
+               OR ("userId" = $2 AND "relationId" = $1)
+            "##,
+        )
+        .bind(user_id)
+        .bind(relation_id)
+        .bind(channel_id)
+        .execute(db)
+        .await?;
+        Ok(())
+    }
+
+    /// Find a relationship by channel ID and user ID (for DM auth)
+    pub async fn find_by_channel<'c, X: sqlx::PgExecutor<'c>>(
+        channel_id: Uuid,
+        user_id: Uuid,
+        db: X,
+    ) -> Result<Option<Self>, Error> {
+        let res = sqlx::query_as(
+            r##"
+            SELECT * FROM "Relationship"
+            WHERE "channelId" = $1 AND "userId" = $2
+            "##,
+        )
+        .bind(channel_id)
+        .bind(user_id)
+        .fetch_optional(db)
+        .await?;
+        Ok(res)
+    }
+
+    /// Delete both rows of a relationship pair
+    pub async fn delete_pair<'c, X: sqlx::PgExecutor<'c>>(
+        user_id: Uuid,
+        relation_id: Uuid,
+        db: X,
+    ) -> Result<(), Error> {
+        sqlx::query(
+            r##"
+            DELETE FROM "Relationship"
+            WHERE ("userId" = $1 AND "relationId" = $2)
+               OR ("userId" = $2 AND "relationId" = $1)
+            "##,
+        )
+        .bind(user_id)
+        .bind(relation_id)
+        .execute(db)
+        .await?;
+        Ok(())
+    }
+}
+
+impl RelationshipExt {
+    pub async fn from_relationship<'c, X: sqlx::PgExecutor<'c> + Copy>(
+        rel: Relationship,
+        db: X,
+    ) -> Result<Self, Error> {
+        let user = User::find_by_id(rel.relation_id, db).await?;
+        let user_ext = UserExt::from_user(user, db).await?;
+        Ok(Self {
+            base: rel,
+            user: user_ext,
+        })
+    }
+
+    pub async fn dataload<'c, X: sqlx::PgExecutor<'c> + Copy>(
+        rels: Vec<Relationship>,
+        db: X,
+    ) -> Result<Vec<Self>, Error> {
+        let relation_ids: Vec<Uuid> = rels.iter().map(|r| r.relation_id).collect();
+        let users = User::dataload(relation_ids, db).await?;
+        let plain_users: Vec<User> = rels
+            .iter()
+            .map(|r| users.get(&r.relation_id).cloned().unwrap_or_else(User::ghost))
+            .collect();
+        let user_exts = UserExt::dataload(plain_users, db).await?;
+        let user_ext_map: HashMap<Uuid, UserExt> =
+            user_exts.into_iter().map(|u| (u.base.id, u)).collect();
+
+        Ok(rels
+            .into_iter()
+            .map(|rel| {
+                let user = user_ext_map
+                    .get(&rel.relation_id)
+                    .cloned()
+                    .unwrap_or_else(|| UserExt {
+                        base: User::ghost(),
+                        handle: None,
+                    });
+                Self { base: rel, user }
+            })
+            .collect())
+    }
+}
 
 /// User with extended data including handle
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]

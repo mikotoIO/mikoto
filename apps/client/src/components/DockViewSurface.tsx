@@ -289,7 +289,7 @@ export const DockViewSurface = () => {
           const channelId = (tab as any).channelId;
           if (!channelId) return '/';
           const channel = mikoto.channels._get(channelId);
-          if (!channel) return '/';
+          if (!channel || !channel.spaceId) return '/';
           return `/space/${getSpaceUrlSegment(channel.spaceId)}/channel/${channel.id}`;
         }
 
@@ -298,7 +298,7 @@ export const DockViewSurface = () => {
           const channelId = (tab as any).channelId;
           if (!channelId) return '/';
           const channel = mikoto.channels._get(channelId);
-          if (!channel) return '/';
+          if (!channel || !channel.spaceId) return '/';
           return `/space/${getSpaceUrlSegment(channel.spaceId)}/channel/${channel.id}/settings`;
         }
 

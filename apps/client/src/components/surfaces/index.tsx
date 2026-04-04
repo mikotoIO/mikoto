@@ -5,7 +5,7 @@ import { DesignStory } from '@/views/Palette';
 
 import { BotSettingSurface } from './BotSettingSurface';
 import { DiscoverySurface } from './DiscoverySurface';
-import { DMExplorerSurface, ExplorerSurface } from './Explorer';
+import { ExplorerSurface } from './Explorer';
 import { FriendsSurface } from './FriendsSurface';
 import { MessageSurface } from './Messages';
 import { SearchSurface } from './SearchSurface';
@@ -30,7 +30,6 @@ export const surfaceMap = {
   palette: DesignStory,
   welcome: WelcomeSurface,
   explorer: ExplorerSurface,
-  dmExplorer: DMExplorerSurface,
   spaceInvite: SpaceInviteSurface,
   spaceExplorer: SpaceExplorerSurface,
 };

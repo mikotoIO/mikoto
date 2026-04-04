@@ -288,7 +288,7 @@ CREATE TABLE public."Relationship" (
     id uuid NOT NULL,
     "userId" uuid NOT NULL,
     "relationId" uuid NOT NULL,
-    "spaceId" uuid NOT NULL,
+    "spaceId" uuid,
     state public."RelationState" NOT NULL
 );
 

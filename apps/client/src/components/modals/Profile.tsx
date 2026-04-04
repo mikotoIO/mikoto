@@ -64,7 +64,8 @@ function RelationshipButtons({
     try {
       await mikoto.relationships.sendRequest(user.id);
       toaster.success({ title: 'Friend request sent!' });
-    } catch {
+    } catch (err) {
+      console.error('Failed to send friend request:', err);
       toaster.error({ title: 'Failed to send friend request' });
     }
   };

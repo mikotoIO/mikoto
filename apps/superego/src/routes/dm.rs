@@ -93,18 +93,8 @@ async fn send(
     let message = MessageExt::dataload_one(message, db()).await?;
 
     // Emit to both DM participants
-    emit_event(
-        "messages.onCreate",
-        &message,
-        &format!("user:{user_id}"),
-    )
-    .await?;
-    emit_event(
-        "messages.onCreate",
-        &message,
-        &format!("user:{partner_id}"),
-    )
-    .await?;
+    emit_event("messages.onCreate", &message, &format!("user:{user_id}")).await?;
+    emit_event("messages.onCreate", &message, &format!("user:{partner_id}")).await?;
 
     Ok(message.into())
 }
@@ -178,7 +168,9 @@ pub fn router() -> AppRouter<State> {
         .route(
             "/",
             get_with(list, |o| {
-                o.tag(TAG).id("dm.messages.list").summary("List DM Messages")
+                o.tag(TAG)
+                    .id("dm.messages.list")
+                    .summary("List DM Messages")
             }),
         )
         .route(

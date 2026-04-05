@@ -130,12 +130,10 @@ fn build_app_router() -> AppRouter<State> {
                     user_id: user_id.to_string(),
                 };
                 if let Some(space_id) = channel.space_id {
-                    emit_event("typing.onUpdate", &update, &format!("space:{space_id}"))
-                        .await?;
+                    emit_event("typing.onUpdate", &update, &format!("space:{space_id}")).await?;
                 } else {
                     // DM channel — emit to both participants
-                    emit_event("typing.onUpdate", &update, &format!("user:{user_id}"))
-                        .await?;
+                    emit_event("typing.onUpdate", &update, &format!("user:{user_id}")).await?;
                     if let Some(rel) =
                         entities::Relationship::find_by_channel(channel_id, user_id, db()).await?
                     {

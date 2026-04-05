@@ -225,7 +225,12 @@ impl RelationshipExt {
         let users = User::dataload(relation_ids, db).await?;
         let plain_users: Vec<User> = rels
             .iter()
-            .map(|r| users.get(&r.relation_id).cloned().unwrap_or_else(User::ghost))
+            .map(|r| {
+                users
+                    .get(&r.relation_id)
+                    .cloned()
+                    .unwrap_or_else(User::ghost)
+            })
             .collect();
         let user_exts = UserExt::dataload(plain_users, db).await?;
         let user_ext_map: HashMap<Uuid, UserExt> =

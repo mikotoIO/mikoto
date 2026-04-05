@@ -174,7 +174,12 @@ interface MessageAvatarProps extends AvatarProps {
 /**
  * An avatar that when clicked, shows a user profile menu.
  */
-export function MessageAvatar({ src, member, size, user: userProp }: MessageAvatarProps) {
+export function MessageAvatar({
+  src,
+  member,
+  size,
+  user: userProp,
+}: MessageAvatarProps) {
   const setContextMenu = useSetAtom(contextMenuState);
   const avatarRef = useRef<HTMLDivElement>(null);
   useMaybeSnapshot(member);

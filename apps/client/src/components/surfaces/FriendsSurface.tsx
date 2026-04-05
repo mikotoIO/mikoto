@@ -215,7 +215,9 @@ export function FriendsSurface() {
     <Surface padded scroll>
       <TabName name="Friends" icon={faUserGroup} />
       <Flex align="center" gap={4} mb={4}>
-        <Heading fontSize="xl" mb={0}>Friends</Heading>
+        <Heading fontSize="xl" mb={0}>
+          Friends
+        </Heading>
         <Flex gap={1}>
           <TabButton
             active={activeTab === 'all'}

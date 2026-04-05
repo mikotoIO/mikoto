@@ -13,10 +13,7 @@ import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
-import {
-  Skeleton,
-  SkeletonCircle,
-} from '@/components/ui/skeleton';
+import { Skeleton, SkeletonCircle } from '@/components/ui/skeleton';
 import { uploadFile } from '@/functions/fileUpload';
 import { useFetchMember, useMikoto } from '@/hooks';
 import { CurrentSpaceContext } from '@/store';
@@ -88,7 +85,11 @@ function ChannelHead({
   return (
     <Box py={4} px={16}>
       <Heading fontSize="24px" mb={2}>
-        {isDm ? <>Conversation with {displayName}</> : <>Welcome to #{displayName}!</>}
+        {isDm ? (
+          <>Conversation with {displayName}</>
+        ) : (
+          <>Welcome to #{displayName}!</>
+        )}
       </Heading>
       <Box as="p" color="gray.250" m={0}>
         {isDm
@@ -112,9 +113,7 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
 
   // For DM channels, resolve the display name from the relationship
   const dmRelation = !channel.spaceId
-    ? mikoto.relationships
-        .values()
-        .find((r) => r.channelId === channel.id)
+    ? mikoto.relationships.values().find((r) => r.channelId === channel.id)
     : undefined;
   const displayName = dmRelation?.user.name ?? channel.name;
   // you will probably run out of memory before this number
@@ -240,7 +239,9 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
   const virtuosoComponents = useMemo(
     () => ({
       Header: topLoaded
-        ? () => <ChannelHead displayName={displayName} isDm={!channel.spaceId} />
+        ? () => (
+            <ChannelHead displayName={displayName} isDm={!channel.spaceId} />
+          )
         : () => (
             <Box py="16px">
               {Array.from({ length: 8 }, (_, i) => (

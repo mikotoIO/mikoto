@@ -118,7 +118,9 @@ async fn ws_handler(
         // DM channel — verify user has a relationship with this channel
         Relationship::find_by_channel(channel_id, user_id, db())
             .await?
-            .ok_or(Error::unauthorized("You do not have access to this channel"))?;
+            .ok_or(Error::unauthorized(
+                "You do not have access to this channel",
+            ))?;
     }
 
     Ok(ws.on_upgrade(move |socket| peer(room, socket, bcast)))

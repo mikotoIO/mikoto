@@ -59,12 +59,9 @@ impl Context {
         channel_id: Uuid,
         content: impl Into<String>,
     ) -> Result<MessageExt, ClientError> {
-        let channel = self
-            .cache
-            .channel(channel_id)
-            .ok_or_else(|| {
-                ClientError::Other(format!("Channel {channel_id} not found in cache"))
-            })?;
+        let channel = self.cache.channel(channel_id).ok_or_else(|| {
+            ClientError::Other(format!("Channel {channel_id} not found in cache"))
+        })?;
 
         if let Some(space_id) = channel.space_id {
             self.http

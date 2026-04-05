@@ -39,7 +39,9 @@ function formatTyperGroup(names: string[], verb: string) {
 export function TypingIndicator({ typers, channel }: TypingIndicatorProps) {
   const mikoto = useMikoto();
 
-  const space = channel.spaceId ? mikoto.spaces._get(channel.spaceId) : undefined;
+  const space = channel.spaceId
+    ? mikoto.spaces._get(channel.spaceId)
+    : undefined;
   const humanNames: string[] = [];
   const botNames: string[] = [];
 

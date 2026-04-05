@@ -77,7 +77,10 @@ impl Channel {
         .fetch_all(db)
         .await?;
         Ok(group_by_key(
-            channels.into_iter().filter(|x| x.space_id.is_some()).collect(),
+            channels
+                .into_iter()
+                .filter(|x| x.space_id.is_some())
+                .collect(),
             |x| x.space_id.unwrap(),
         ))
     }

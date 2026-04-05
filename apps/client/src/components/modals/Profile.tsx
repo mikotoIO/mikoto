@@ -44,9 +44,7 @@ const MikotoId = styled.h2`
 function useRelationshipFor(userId: string): MikotoRelationship | undefined {
   const mikoto = useMikoto();
   useSnapshot(mikoto.relationships.cache);
-  return mikoto.relationships
-    .values()
-    .find((r) => r.relationId === userId);
+  return mikoto.relationships.values().find((r) => r.relationId === userId);
 }
 
 function RelationshipButtons({
@@ -121,10 +119,7 @@ function RelationshipButtons({
     case 'INCOMING_REQUEST':
       return (
         <Group>
-          <Button
-            colorPalette="success"
-            onClick={() => relation.accept()}
-          >
+          <Button colorPalette="success" onClick={() => relation.accept()}>
             Accept Request
           </Button>
           <Button

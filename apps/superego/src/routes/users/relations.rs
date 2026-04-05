@@ -8,7 +8,7 @@ use uuid::Uuid;
 use crate::{
     db::db,
     entities::{
-        Channel, ChannelType, ObjectWithId, Relationship, RelationshipExt, RelationState, User,
+        Channel, ChannelType, ObjectWithId, RelationState, Relationship, RelationshipExt, User,
     },
     error::Error,
     functions::{jwt::Claims, pubsub::emit_event, time::Timestamp},
@@ -100,10 +100,7 @@ async fn send_request(
 }
 
 /// Shared accept logic, used by both accept endpoint and auto-accept in send_request
-async fn accept_inner(
-    user_id: Uuid,
-    relation_id: Uuid,
-) -> Result<Json<RelationshipExt>, Error> {
+async fn accept_inner(user_id: Uuid, relation_id: Uuid) -> Result<Json<RelationshipExt>, Error> {
     let my_rel = Relationship::find_by_pair(user_id, relation_id, db())
         .await?
         .ok_or(Error::NotFound)?;
@@ -117,12 +114,7 @@ async fn accept_inner(
     let my_ext = RelationshipExt::from_relationship(my_rel, db()).await?;
     let their_ext = RelationshipExt::from_relationship(their_rel, db()).await?;
 
-    emit_event(
-        "relations.onUpdate",
-        &my_ext,
-        &format!("user:{user_id}"),
-    )
-    .await?;
+    emit_event("relations.onUpdate", &my_ext, &format!("user:{user_id}")).await?;
     emit_event(
         "relations.onUpdate",
         &their_ext,
@@ -154,10 +146,7 @@ async fn accept(
     accept_inner(user_id, relation_id).await
 }
 
-async fn decline(
-    claim: Claims,
-    Path(relation_id): Path<Uuid>,
-) -> Result<Json<()>, Error> {
+async fn decline(claim: Claims, Path(relation_id): Path<Uuid>) -> Result<Json<()>, Error> {
     let user_id: Uuid = claim.sub.parse()?;
 
     let my_rel = Relationship::find_by_pair(user_id, relation_id, db())
@@ -195,10 +184,7 @@ async fn decline(
     Ok(().into())
 }
 
-async fn remove(
-    claim: Claims,
-    Path(relation_id): Path<Uuid>,
-) -> Result<Json<()>, Error> {
+async fn remove(claim: Claims, Path(relation_id): Path<Uuid>) -> Result<Json<()>, Error> {
     let user_id: Uuid = claim.sub.parse()?;
 
     let my_rel = Relationship::find_by_pair(user_id, relation_id, db())
@@ -280,20 +266,12 @@ async fn block(
 
     let my_ext = RelationshipExt::from_relationship(my_rel, db()).await?;
 
-    emit_event(
-        "relations.onCreate",
-        &my_ext,
-        &format!("user:{user_id}"),
-    )
-    .await?;
+    emit_event("relations.onCreate", &my_ext, &format!("user:{user_id}")).await?;
 
     Ok(my_ext.into())
 }
 
-async fn unblock(
-    claim: Claims,
-    Path(relation_id): Path<Uuid>,
-) -> Result<Json<()>, Error> {
+async fn unblock(claim: Claims, Path(relation_id): Path<Uuid>) -> Result<Json<()>, Error> {
     let user_id: Uuid = claim.sub.parse()?;
 
     let my_rel = Relationship::find_by_pair(user_id, relation_id, db())
@@ -320,10 +298,7 @@ async fn unblock(
     Ok(().into())
 }
 
-async fn open_dm(
-    claim: Claims,
-    Path(relation_id): Path<Uuid>,
-) -> Result<Json<Channel>, Error> {
+async fn open_dm(claim: Claims, Path(relation_id): Path<Uuid>) -> Result<Json<Channel>, Error> {
     let user_id: Uuid = claim.sub.parse()?;
 
     // Use a transaction with FOR UPDATE to prevent race conditions
@@ -439,25 +414,19 @@ pub fn router() -> AppRouter<State> {
         .route(
             "/:relationId",
             delete_with(remove, |o| {
-                o.tag(TAG)
-                    .id("relations.remove")
-                    .summary("Remove Friend")
+                o.tag(TAG).id("relations.remove").summary("Remove Friend")
             }),
         )
         .route(
             "/:relationId/block",
             post_with(block, |o| {
-                o.tag(TAG)
-                    .id("relations.block")
-                    .summary("Block User")
+                o.tag(TAG).id("relations.block").summary("Block User")
             }),
         )
         .route(
             "/:relationId/block",
             delete_with(unblock, |o| {
-                o.tag(TAG)
-                    .id("relations.unblock")
-                    .summary("Unblock User")
+                o.tag(TAG).id("relations.unblock").summary("Unblock User")
             }),
         )
         .route(

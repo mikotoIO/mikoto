@@ -77,11 +77,13 @@ async fn send_request(
         }
     }
 
-    // Create paired rows
+    // Create paired rows in a transaction
+    let mut tx = db().begin().await?;
     let my_rel = Relationship::new(user_id, relation_id, RelationState::OutgoingRequest);
     let their_rel = Relationship::new(relation_id, user_id, RelationState::IncomingRequest);
-    my_rel.create(db()).await?;
-    their_rel.create(db()).await?;
+    my_rel.create(&mut *tx).await?;
+    their_rel.create(&mut *tx).await?;
+    tx.commit().await?;
 
     let my_ext = RelationshipExt::from_relationship(my_rel, db()).await?;
     let their_ext = RelationshipExt::from_relationship(their_rel, db()).await?;
@@ -218,7 +220,15 @@ async fn remove(
         .await?
         .ok_or(Error::NotFound)?;
 
+    // Clean up orphaned DM channel before deleting relationships
+    let dm_channel_id = my_rel.channel_id;
+
     Relationship::delete_pair(user_id, relation_id, db()).await?;
+
+    if let Some(channel_id) = dm_channel_id {
+        let channel = Channel::find_by_id(channel_id, db()).await?;
+        channel.delete(db()).await?;
+    }
 
     emit_event(
         "relations.onDelete",
@@ -253,8 +263,16 @@ async fn block(
     // Verify target user exists
     User::find_by_id(relation_id, db()).await?;
 
-    // Remove any existing relationship first
+    // Remove any existing relationship first, cleaning up DM channel
+    let existing_rel = Relationship::find_by_pair(user_id, relation_id, db()).await?;
+    let dm_channel_id = existing_rel.and_then(|r| r.channel_id);
+
     Relationship::delete_pair(user_id, relation_id, db()).await?;
+
+    if let Some(channel_id) = dm_channel_id {
+        let channel = Channel::find_by_id(channel_id, db()).await?;
+        channel.delete(db()).await?;
+    }
 
     // Create block row (only one direction — the blocker's row)
     let my_rel = Relationship::new(user_id, relation_id, RelationState::Blocked);
@@ -308,9 +326,22 @@ async fn open_dm(
 ) -> Result<Json<Channel>, Error> {
     let user_id: Uuid = claim.sub.parse()?;
 
-    let my_rel = Relationship::find_by_pair(user_id, relation_id, db())
-        .await?
-        .ok_or(Error::NotFound)?;
+    // Use a transaction with FOR UPDATE to prevent race conditions
+    let mut tx = db().begin().await?;
+
+    let my_rel: Option<Relationship> = sqlx::query_as(
+        r##"
+        SELECT * FROM "Relationship"
+        WHERE "userId" = $1 AND "relationId" = $2
+        FOR UPDATE
+        "##,
+    )
+    .bind(user_id)
+    .bind(relation_id)
+    .fetch_optional(&mut *tx)
+    .await?;
+
+    let my_rel = my_rel.ok_or(Error::NotFound)?;
 
     if my_rel.state != RelationState::Friend {
         return Err(Error::forbidden("You must be friends to open a DM"));
@@ -318,12 +349,13 @@ async fn open_dm(
 
     // If DM channel already exists, return it
     if let Some(channel_id) = my_rel.channel_id {
-        let channel = Channel::find_by_id(channel_id, db()).await?;
+        let channel = Channel::find_by_id(channel_id, &mut *tx).await?;
+        tx.commit().await?;
         return Ok(channel.into());
     }
 
     // Create a standalone DM channel (no space)
-    let other_user = User::find_by_id(relation_id, db()).await?;
+    let other_user = User::find_by_id(relation_id, &mut *tx).await?;
     let channel = Channel {
         id: Uuid::new_v4(),
         space_id: None,
@@ -333,18 +365,20 @@ async fn open_dm(
         category: ChannelType::Text,
         last_updated: Some(Timestamp::now()),
     };
-    channel.create(db()).await?;
+    channel.create(&mut *tx).await?;
 
     // Update channelId on both relationship rows
-    Relationship::set_channel_id(user_id, relation_id, channel.id, db()).await?;
+    Relationship::set_channel_id(user_id, relation_id, channel.id, &mut *tx).await?;
 
-    // Emit relationship updates so clients know about the new channelId
-    let my_rel = Relationship::find_by_pair(user_id, relation_id, db())
+    // Re-read within transaction for the event payloads
+    let my_rel = Relationship::find_by_pair(user_id, relation_id, &mut *tx)
         .await?
         .ok_or(Error::NotFound)?;
-    let their_rel = Relationship::find_by_pair(relation_id, user_id, db())
+    let their_rel = Relationship::find_by_pair(relation_id, user_id, &mut *tx)
         .await?
         .ok_or(Error::NotFound)?;
+
+    tx.commit().await?;
 
     let my_ext = RelationshipExt::from_relationship(my_rel, db()).await?;
     let their_ext = RelationshipExt::from_relationship(their_rel, db()).await?;

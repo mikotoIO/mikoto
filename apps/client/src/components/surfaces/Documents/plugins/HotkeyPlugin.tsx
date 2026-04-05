@@ -6,11 +6,12 @@ import { useEffect } from 'react';
 import { toast } from 'react-toastify';
 
 export function saveWithToast(channel: MikotoChannel, content: string) {
+  if (!channel.spaceId) return;
   const promise = channel.client.rest['documents.update'](
     { content },
     {
       params: {
-        spaceId: channel.spaceId!,
+        spaceId: channel.spaceId,
         channelId: channel.id,
       },
     },

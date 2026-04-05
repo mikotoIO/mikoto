@@ -31,35 +31,49 @@ export class MikotoMessage extends ZSchema(MessageExt) {
   }
 
   async edit(content: string) {
-    if (!this.channel.spaceId) {
-      // DM channels don't support edit via space routes yet
-      return;
+    if (this.channel.spaceId) {
+      const message = await this.client.rest['messages.update'](
+        { content },
+        {
+          params: {
+            spaceId: this.channel.spaceId,
+            channelId: this.channelId,
+            messageId: this.id,
+          },
+        },
+      );
+      this._patch(message);
+    } else {
+      const message = await this.client.rest['dm.messages.update'](
+        { content },
+        {
+          params: {
+            channelId: this.channelId,
+            messageId: this.id,
+          },
+        },
+      );
+      this._patch(message);
     }
-    const message = await this.client.rest['messages.update'](
-      { content },
-      {
+  }
+
+  async delete() {
+    if (this.channel.spaceId) {
+      await this.client.rest['messages.delete'](undefined, {
         params: {
           spaceId: this.channel.spaceId,
           channelId: this.channelId,
           messageId: this.id,
         },
-      },
-    );
-    this._patch(message);
-  }
-
-  async delete() {
-    if (!this.channel.spaceId) {
-      // DM channels don't support delete via space routes yet
-      return;
+      });
+    } else {
+      await this.client.rest['dm.messages.delete'](undefined, {
+        params: {
+          channelId: this.channelId,
+          messageId: this.id,
+        },
+      });
     }
-    await this.client.rest['messages.delete'](undefined, {
-      params: {
-        spaceId: this.channel.spaceId,
-        channelId: this.channelId,
-        messageId: this.id,
-      },
-    });
   }
 }
 

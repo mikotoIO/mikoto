@@ -1,4 +1,4 @@
-use aide::axum::routing::{get_with, post_with};
+use aide::axum::routing::{delete_with, get_with, patch_with, post_with};
 use axum::{
     extract::{Path, Query},
     Json,
@@ -9,7 +9,8 @@ use uuid::Uuid;
 use crate::{
     db::db,
     entities::{
-        Channel, Message, MessageAttachment, MessageAttachmentInput, MessageExt, Relationship,
+        Channel, Message, MessageAttachment, MessageAttachmentInput, MessageExt, MessageKey,
+        MessagePatch, Relationship,
     },
     error::Error,
     functions::{jwt::Claims, pubsub::emit_event},
@@ -108,6 +109,68 @@ async fn send(
     Ok(message.into())
 }
 
+#[derive(Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct MessageEditPayload {
+    pub content: String,
+}
+
+async fn edit(
+    claim: Claims,
+    Path((channel_id, message_id)): Path<(Uuid, Uuid)>,
+    Json(body): Json<MessageEditPayload>,
+) -> Result<Json<MessageExt>, Error> {
+    let user_id: Uuid = claim.sub.parse()?;
+    verify_dm_access(channel_id, user_id).await?;
+    let partner_id = get_dm_partner(channel_id, user_id).await?;
+
+    let message = Message::find_by_id(message_id, db()).await?;
+    if message.channel_id != channel_id {
+        return Err(Error::NotFound);
+    }
+    if message.author_id != Some(user_id) {
+        return Err(Error::forbidden("You can only edit your own messages"));
+    }
+
+    let message = message
+        .update(MessagePatch::edit(body.content), db())
+        .await?;
+    let message = MessageExt::dataload_one(message, db()).await?;
+
+    emit_event("messages.onUpdate", &message, &format!("user:{user_id}")).await?;
+    emit_event("messages.onUpdate", &message, &format!("user:{partner_id}")).await?;
+
+    Ok(message.into())
+}
+
+async fn delete(
+    claim: Claims,
+    Path((channel_id, message_id)): Path<(Uuid, Uuid)>,
+) -> Result<Json<()>, Error> {
+    let user_id: Uuid = claim.sub.parse()?;
+    verify_dm_access(channel_id, user_id).await?;
+    let partner_id = get_dm_partner(channel_id, user_id).await?;
+
+    let message = Message::find_by_id(message_id, db()).await?;
+    if message.channel_id != channel_id {
+        return Err(Error::NotFound);
+    }
+    if message.author_id != Some(user_id) {
+        return Err(Error::forbidden("You can only delete your own messages"));
+    }
+
+    message.delete(db()).await?;
+
+    let key = MessageKey {
+        message_id: message.id,
+        channel_id: message.channel_id,
+    };
+    emit_event("messages.onDelete", &key, &format!("user:{user_id}")).await?;
+    emit_event("messages.onDelete", &key, &format!("user:{partner_id}")).await?;
+
+    Ok(().into())
+}
+
 static TAG: &str = "DM";
 
 pub fn router() -> AppRouter<State> {
@@ -124,6 +187,22 @@ pub fn router() -> AppRouter<State> {
                 o.tag(TAG)
                     .id("dm.messages.create")
                     .summary("Send DM Message")
+            }),
+        )
+        .route(
+            "/:messageId",
+            patch_with(edit, |o| {
+                o.tag(TAG)
+                    .id("dm.messages.update")
+                    .summary("Edit DM Message")
+            }),
+        )
+        .route(
+            "/:messageId",
+            delete_with(delete, |o| {
+                o.tag(TAG)
+                    .id("dm.messages.delete")
+                    .summary("Delete DM Message")
             }),
         )
 }

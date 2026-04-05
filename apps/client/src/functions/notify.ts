@@ -10,18 +10,21 @@ export function notifyFromMessage(mikoto: MikotoClient, message: MessageExt) {
   if (message.authorId === mikoto.user.me!.id) return;
   const channel = mikoto.channels._get(message.channelId);
   if (!channel) return;
-  if (!channel.spaceId) return;
-  const space = mikoto.spaces._get(channel.spaceId);
-  if (!space) return;
 
-  const notification = new Notification(
-    `${message.author?.name} (#${channel.name}, ${space.name})`,
-    {
-      body: message.content,
-      icon: normalizeMediaUrl(message.author?.avatar),
-      silent: true,
-    },
-  );
+  let title: string;
+  if (channel.spaceId) {
+    const space = mikoto.spaces._get(channel.spaceId);
+    if (!space) return;
+    title = `${message.author?.name} (#${channel.name}, ${space.name})`;
+  } else {
+    title = `${message.author?.name} (DM)`;
+  }
+
+  const notification = new Notification(title, {
+    body: message.content,
+    icon: normalizeMediaUrl(message.author?.avatar),
+    silent: true,
+  });
   notification.onshow = () => {
     audio.play();
 

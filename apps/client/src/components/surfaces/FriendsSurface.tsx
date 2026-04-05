@@ -18,7 +18,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoRelationship } from '@mikoto-io/mikoto.js';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSnapshot } from 'valtio/react';
 
@@ -194,10 +194,6 @@ export function FriendsSurface() {
   });
 
   useSnapshot(mikoto.relationships.cache);
-
-  useEffect(() => {
-    mikoto.relationships.list();
-  }, []);
 
   const friends = mikoto.relationships.friends;
   const pending = mikoto.relationships.pending;

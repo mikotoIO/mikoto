@@ -5,7 +5,6 @@ import {
   faUserGroup,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect } from 'react';
 import { useSnapshot } from 'valtio/react';
 
 import { Avatar } from '@/components/atoms/Avatar';
@@ -33,10 +32,6 @@ export function FriendSidebar() {
   const mikoto = useMikoto();
 
   useSnapshot(mikoto.relationships.cache);
-
-  useEffect(() => {
-    mikoto.relationships.list();
-  }, []);
 
   const friends = mikoto.relationships.friends;
   const dmFriends = friends.filter((f) => f.channelId);

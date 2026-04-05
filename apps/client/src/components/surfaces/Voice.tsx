@@ -51,9 +51,10 @@ export default function VoiceSurface({ channelId }: { channelId: string }) {
 
   const [voiceConfig, setVoiceConfig] = useState<VoiceToken | null>(null);
   useEffect(() => {
+    if (!channel.spaceId) return;
     mikoto.rest['voice.join'](undefined, {
       params: {
-        spaceId: channel.spaceId!,
+        spaceId: channel.spaceId,
         channelId: channel.id,
       },
     }).then((x) => {

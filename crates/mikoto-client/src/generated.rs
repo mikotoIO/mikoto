@@ -294,6 +294,11 @@ pub struct MessageEditPayload {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MessageEditPayload2 {
+    pub content: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MessageExt {
     pub attachments: Vec<MessageAttachment>,
@@ -926,6 +931,24 @@ impl<'a> HttpApi<'a> {
         Ok(resp.json().await?)
     }
 
+    pub async fn dm_messages_delete(&self, channel_id: Uuid, message_id: Uuid) -> Result<(), ClientError> {
+        let path = format!("/dm/{}/messages/{}", channel_id, message_id);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
+    }
+
+    pub async fn dm_messages_update(&self, channel_id: Uuid, message_id: Uuid, body: &MessageEditPayload) -> Result<MessageExt, ClientError> {
+        let path = format!("/dm/{}/messages/{}", channel_id, message_id);
+        let mut req = self.client.patch(self.url(&path))
+            .bearer_auth(self.token);
+        req = req.json(body);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
     pub async fn spaces_list(&self) -> Result<Vec<SpaceExt>, ClientError> {
         let path = "/spaces/".to_string();
         let mut req = self.client.get(self.url(&path))
@@ -1108,7 +1131,7 @@ impl<'a> HttpApi<'a> {
         Ok(())
     }
 
-    pub async fn messages_update(&self, space_id: Uuid, channel_id: Uuid, message_id: Uuid, body: &MessageEditPayload) -> Result<MessageExt, ClientError> {
+    pub async fn messages_update(&self, space_id: Uuid, channel_id: Uuid, message_id: Uuid, body: &MessageEditPayload2) -> Result<MessageExt, ClientError> {
         let path = format!("/spaces/{}/channels/{}/messages/{}", space_id, channel_id, message_id);
         let mut req = self.client.patch(self.url(&path))
             .bearer_auth(self.token);

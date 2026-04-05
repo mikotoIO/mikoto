@@ -2,7 +2,7 @@ import { Box, Button, Flex, Group, Heading } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { MikotoChannel, MikotoRelationship, UserExt } from '@mikoto-io/mikoto.js';
+import { MikotoRelationship, UserExt } from '@mikoto-io/mikoto.js';
 import { useSetAtom } from 'jotai';
 import { useSnapshot } from 'valtio/react';
 
@@ -71,11 +71,9 @@ function RelationshipButtons({
   };
 
   const handleOpenDm = async () => {
+    if (!relation) return;
     try {
-      const channelData = await mikoto.rest['relations.openDm'](undefined, {
-        params: { relationId: user.id },
-      });
-      const channel = new MikotoChannel(channelData, mikoto);
+      const channel = await relation.openDm();
       tabkit.openTab(
         {
           kind: 'textChannel',

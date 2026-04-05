@@ -267,6 +267,9 @@ export const MessageSendPayload = z.object({
 });
 export type MessageSendPayload = z.infer<typeof MessageSendPayload>;
 
+export const MessageEditPayload = z.object({ content: z.string() });
+export type MessageEditPayload = z.infer<typeof MessageEditPayload>;
+
 export const Role = z.object({
   color: z.union([z.string(), z.null()]).optional(),
   id: z.string().uuid(),
@@ -335,8 +338,8 @@ export const MessageSendPayload2 = z.object({
 });
 export type MessageSendPayload2 = z.infer<typeof MessageSendPayload2>;
 
-export const MessageEditPayload = z.object({ content: z.string() });
-export type MessageEditPayload = z.infer<typeof MessageEditPayload>;
+export const MessageEditPayload2 = z.object({ content: z.string() });
+export type MessageEditPayload2 = z.infer<typeof MessageEditPayload2>;
 
 export const VoiceToken = z.object({
   channelId: z.string().uuid(),
@@ -496,6 +499,7 @@ export const schemas = {
   MessageExt,
   MessageAttachmentInput,
   MessageSendPayload,
+  MessageEditPayload,
   Role,
   SpaceType,
   SpaceVisibility,
@@ -506,7 +510,7 @@ export const schemas = {
   ChannelPatch,
   ChannelUnread,
   MessageSendPayload2,
-  MessageEditPayload,
+  MessageEditPayload2,
   VoiceToken,
   Document,
   DocumentPatch,
@@ -757,6 +761,27 @@ const endpoints = makeApi([
         name: "body",
         type: "Body",
         schema: MessageSendPayload,
+      },
+    ],
+    response: MessageExt,
+  },
+  {
+    method: "delete",
+    path: "/dm/:channelId/messages/:messageId",
+    alias: "dm.messages.delete",
+    requestFormat: "json",
+    response: z.null(),
+  },
+  {
+    method: "patch",
+    path: "/dm/:channelId/messages/:messageId",
+    alias: "dm.messages.update",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: z.object({ content: z.string() }),
       },
     ],
     response: MessageExt,

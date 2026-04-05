@@ -936,6 +936,56 @@
         }
       }
     },
+    "/dm/{channelId}/messages/{messageId}": {
+      "delete": {
+        "tags": [
+          "DM"
+        ],
+        "summary": "Delete DM Message",
+        "operationId": "dm.messages.delete",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "DM"
+        ],
+        "summary": "Edit DM Message",
+        "operationId": "dm.messages.update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageEditPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/spaces/": {
       "get": {
         "tags": [
@@ -1480,7 +1530,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/MessageEditPayload"
+                "$ref": "#/components/schemas/MessageEditPayload2"
               }
             }
           },
@@ -2670,6 +2720,17 @@
         }
       },
       "MessageEditPayload": {
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "properties": {
+          "content": {
+            "type": "string"
+          }
+        }
+      },
+      "MessageEditPayload2": {
         "type": "object",
         "required": [
           "content"

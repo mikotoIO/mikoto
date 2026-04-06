@@ -4,7 +4,7 @@ use log::info;
 use tower_http::normalize_path::NormalizePathLayer;
 use tower_layer::Layer;
 
-use superego::{db, dump::dump, env, error::Error, routes};
+use superego::{db, dump::dump, entities::Handle, env, error::Error, routes};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -14,7 +14,10 @@ async fn main() -> Result<(), Error> {
     println!("{}", include_str!("./ascii2.txt"));
     env.print_env_info();
 
-    let (_db, _redis) = try_join!(db::init(), db::init_redis())?;
+    let (db_pool, _redis) = try_join!(db::init(), db::init_redis())?;
+
+    // Backfill handles for any users/spaces that don't have one yet
+    Handle::backfill_all(db_pool).await?;
 
     dump().await?;
 

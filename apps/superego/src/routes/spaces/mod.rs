@@ -119,8 +119,12 @@ async fn create(
     claims: Claims,
     Json(body): Json<SpaceCreatePayload>,
 ) -> Result<Json<SpaceExt>, Error> {
-    let space = Space::new(body.name, claims.sub.parse()?);
+    let space = Space::new(body.name.clone(), claims.sub.parse()?);
     space.create(db()).await?;
+
+    // Auto-assign a unique default handle for the new space
+    let _ = Handle::auto_assign_for_space(space.id, &body.name, db()).await;
+
     let space = SpaceExt::dataload_one(space, db()).await?;
     join_space(&space, claims.sub.parse()?).await?;
     Ok(space.into())

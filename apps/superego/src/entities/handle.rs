@@ -378,6 +378,104 @@ impl Handle {
         Self::claim_for_user(handle, user_id, db).await
     }
 
+    /// Auto-generate a unique default handle for a space based on its name.
+    /// Tries the sanitized name first, then appends short discriminators on conflict.
+    pub async fn auto_assign_for_space(
+        space_id: Uuid,
+        name: &str,
+        db: &sqlx::PgPool,
+    ) -> Result<Self, Error> {
+        let base = Self::sanitize_username(name);
+
+        // Try the base name first
+        let handle = Self::make_default_handle(&base);
+        match Self::claim_for_space(handle, space_id, db).await {
+            Ok(h) => return Ok(h),
+            Err(Error::Miscallaneous { ref code, .. }) if code == "HandleTaken" => {}
+            Err(e) => return Err(e),
+        }
+
+        // Try with short discriminators derived from the space's UUID
+        let id_hex = space_id.as_simple().to_string();
+        for len in [3, 4, 6, 8] {
+            let discriminator = &id_hex[..len];
+            let handle = Self::make_default_handle(&format!("{}-{}", base, discriminator));
+            match Self::claim_for_space(handle, space_id, db).await {
+                Ok(h) => return Ok(h),
+                Err(Error::Miscallaneous { ref code, .. }) if code == "HandleTaken" => {}
+                Err(e) => return Err(e),
+            }
+        }
+
+        // Final fallback: full UUID prefix (very unlikely to reach here)
+        let handle = Self::make_default_handle(&format!("{}-{}", base, &id_hex[..12]));
+        Self::claim_for_space(handle, space_id, db).await
+    }
+
+    /// Backfill handles for all users and spaces that don't have one yet.
+    /// This is intended to run at startup to ensure every user and space has a handle.
+    pub async fn backfill_all(db: &sqlx::PgPool) -> Result<(), Error> {
+        // Find all users without a handle
+        let users_without_handles: Vec<(Uuid, String)> = sqlx::query_as(
+            r#"
+            SELECT u.id, u.name
+            FROM "User" u
+            LEFT JOIN "Handle" h ON h."userId" = u.id
+            WHERE h.handle IS NULL
+            "#,
+        )
+        .fetch_all(db)
+        .await?;
+
+        if !users_without_handles.is_empty() {
+            info!(
+                "Backfilling handles for {} users without handles",
+                users_without_handles.len()
+            );
+            for (user_id, name) in &users_without_handles {
+                match Self::auto_assign_for_user(*user_id, name, db).await {
+                    Ok(h) => {
+                        info!("Assigned handle '{}' to user {}", h.handle, user_id);
+                    }
+                    Err(e) => {
+                        warn!("Failed to assign handle to user {}: {}", user_id, e);
+                    }
+                }
+            }
+        }
+
+        // Find all spaces without a handle
+        let spaces_without_handles: Vec<(Uuid, String)> = sqlx::query_as(
+            r#"
+            SELECT s.id, s.name
+            FROM "Space" s
+            LEFT JOIN "Handle" h ON h."spaceId" = s.id
+            WHERE h.handle IS NULL
+            "#,
+        )
+        .fetch_all(db)
+        .await?;
+
+        if !spaces_without_handles.is_empty() {
+            info!(
+                "Backfilling handles for {} spaces without handles",
+                spaces_without_handles.len()
+            );
+            for (space_id, name) in &spaces_without_handles {
+                match Self::auto_assign_for_space(*space_id, name, db).await {
+                    Ok(h) => {
+                        info!("Assigned handle '{}' to space {}", h.handle, space_id);
+                    }
+                    Err(e) => {
+                        warn!("Failed to assign handle to space {}: {}", space_id, e);
+                    }
+                }
+            }
+        }
+
+        Ok(())
+    }
+
     /// Resolve a handle to its owner
     pub async fn resolve<'c, X: sqlx::PgExecutor<'c>>(
         handle: &str,

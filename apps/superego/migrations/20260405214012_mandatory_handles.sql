@@ -64,7 +64,7 @@ BEGIN
 
         IF NOT done THEN
             INSERT INTO "Handle" (handle, "userId")
-            VALUES (base_handle || '-' || LEFT(id_hex, 12) || '.platform.mikoto.io', r.id);
+            VALUES (base_handle || '-' || id_hex || '.platform.mikoto.io', r.id);
         END IF;
     END LOOP;
 END $$;
@@ -132,7 +132,7 @@ BEGIN
 
         IF NOT done THEN
             INSERT INTO "Handle" (handle, "spaceId")
-            VALUES (base_handle || '-' || LEFT(id_hex, 12) || '.platform.mikoto.io', r.id);
+            VALUES (base_handle || '-' || id_hex || '.platform.mikoto.io', r.id);
         END IF;
     END LOOP;
 END $$;

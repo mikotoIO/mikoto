@@ -349,7 +349,7 @@ impl UserExt {
                 let handle = handles
                     .get(&user.id)
                     .cloned()
-                    .unwrap_or_else(|| "unknown".to_string());
+                    .unwrap_or_else(|| "ghost".to_string());
                 Self { handle, base: user }
             })
             .collect())

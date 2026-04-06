@@ -349,13 +349,13 @@ impl Handle {
     pub async fn auto_assign_for_user(
         user_id: Uuid,
         name: &str,
-        db: &sqlx::PgPool,
+        db: &mut sqlx::PgConnection,
     ) -> Result<Self, Error> {
         let base = Self::sanitize_username(name);
 
         // Try the base username first
         let handle = Self::make_default_handle(&base);
-        match Self::claim_for_user(handle, user_id, db).await {
+        match Self::claim_for_user(handle, user_id, &mut *db).await {
             Ok(h) => return Ok(h),
             Err(Error::Miscallaneous { ref code, .. }) if code == "HandleTaken" => {}
             Err(e) => return Err(e),
@@ -366,7 +366,7 @@ impl Handle {
         for len in [3, 4, 6, 8] {
             let discriminator = &id_hex[..len];
             let handle = Self::make_default_handle(&format!("{}-{}", base, discriminator));
-            match Self::claim_for_user(handle, user_id, db).await {
+            match Self::claim_for_user(handle, user_id, &mut *db).await {
                 Ok(h) => return Ok(h),
                 Err(Error::Miscallaneous { ref code, .. }) if code == "HandleTaken" => {}
                 Err(e) => return Err(e),
@@ -375,7 +375,7 @@ impl Handle {
 
         // Final fallback: full UUID prefix (very unlikely to reach here)
         let handle = Self::make_default_handle(&format!("{}-{}", base, &id_hex[..12]));
-        Self::claim_for_user(handle, user_id, db).await
+        Self::claim_for_user(handle, user_id, &mut *db).await
     }
 
     /// Auto-generate a unique default handle for a space based on its name.
@@ -383,13 +383,13 @@ impl Handle {
     pub async fn auto_assign_for_space(
         space_id: Uuid,
         name: &str,
-        db: &sqlx::PgPool,
+        db: &mut sqlx::PgConnection,
     ) -> Result<Self, Error> {
         let base = Self::sanitize_username(name);
 
         // Try the base username first
         let handle = Self::make_default_handle(&base);
-        match Self::claim_for_space(handle, space_id, db).await {
+        match Self::claim_for_space(handle, space_id, &mut *db).await {
             Ok(h) => return Ok(h),
             Err(Error::Miscallaneous { ref code, .. }) if code == "HandleTaken" => {}
             Err(e) => return Err(e),
@@ -400,7 +400,7 @@ impl Handle {
         for len in [3, 4, 6, 8] {
             let discriminator = &id_hex[..len];
             let handle = Self::make_default_handle(&format!("{}-{}", base, discriminator));
-            match Self::claim_for_space(handle, space_id, db).await {
+            match Self::claim_for_space(handle, space_id, &mut *db).await {
                 Ok(h) => return Ok(h),
                 Err(Error::Miscallaneous { ref code, .. }) if code == "HandleTaken" => {}
                 Err(e) => return Err(e),
@@ -409,7 +409,7 @@ impl Handle {
 
         // Final fallback: full UUID prefix (very unlikely to reach here)
         let handle = Self::make_default_handle(&format!("{}-{}", base, &id_hex[..12]));
-        Self::claim_for_space(handle, space_id, db).await
+        Self::claim_for_space(handle, space_id, &mut *db).await
     }
 
     /// Resolve a handle to its owner

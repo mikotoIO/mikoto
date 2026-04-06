@@ -3,7 +3,7 @@ use serde_json::json;
 use sqlx::FromRow;
 use uuid::Uuid;
 
-use crate::error::Error;
+use crate::{entities::Handle, error::Error};
 
 pub mod refresh_token;
 pub mod verification;
@@ -50,11 +50,14 @@ impl Account {
         name: &str,
         db: X,
     ) -> Result<(), Error> {
+        let base = Handle::sanitize_username(name);
+        let initial_handle = Handle::make_default_handle(&base);
+
         sqlx::query(
             r##"
             WITH u AS (
-                INSERT INTO "User" ("id", "name")
-                VALUES ($1, $2)
+                INSERT INTO "User" ("id", "name", "handle")
+                VALUES ($1, $2, $5)
                 RETURNING "id"
             )
             INSERT INTO "Account" ("id", "email", "passhash")
@@ -65,6 +68,7 @@ impl Account {
         .bind(name)
         .bind(self.email.trim().to_lowercase())
         .bind(&self.passhash)
+        .bind(&initial_handle)
         .execute(db)
         .await?;
         Ok(())

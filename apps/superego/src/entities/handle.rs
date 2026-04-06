@@ -186,7 +186,7 @@ impl Handle {
         self.verified_at.is_some()
     }
 
-    /// Claim a handle for a user
+    /// Claim a handle for a user. Also updates the User table's handle column.
     pub async fn claim_for_user<'c, X: sqlx::PgExecutor<'c>>(
         handle: String,
         user_id: Uuid,
@@ -196,9 +196,15 @@ impl Handle {
 
         let result: Self = sqlx::query_as(
             r#"
-            INSERT INTO "Handle" (handle, "userId")
-            VALUES ($1, $2)
-            RETURNING *
+            WITH inserted AS (
+                INSERT INTO "Handle" (handle, "userId")
+                VALUES ($1, $2)
+                RETURNING *
+            ),
+            user_update AS (
+                UPDATE "User" SET handle = $1 WHERE id = $2
+            )
+            SELECT * FROM inserted
             "#,
         )
         .bind(&handle)
@@ -217,7 +223,7 @@ impl Handle {
         Ok(result)
     }
 
-    /// Claim a handle for a space
+    /// Claim a handle for a space. Also updates the Space table's handle column.
     pub async fn claim_for_space<'c, X: sqlx::PgExecutor<'c>>(
         handle: String,
         space_id: Uuid,
@@ -227,9 +233,15 @@ impl Handle {
 
         let result: Self = sqlx::query_as(
             r#"
-            INSERT INTO "Handle" (handle, "spaceId")
-            VALUES ($1, $2)
-            RETURNING *
+            WITH inserted AS (
+                INSERT INTO "Handle" (handle, "spaceId")
+                VALUES ($1, $2)
+                RETURNING *
+            ),
+            space_update AS (
+                UPDATE "Space" SET handle = $1 WHERE id = $2
+            )
+            SELECT * FROM inserted
             "#,
         )
         .bind(&handle)
@@ -248,7 +260,8 @@ impl Handle {
         Ok(result)
     }
 
-    /// Release a user's handle and claim a new one (atomic operation)
+    /// Release a user's handle and claim a new one (atomic operation).
+    /// Also updates the User table's handle column to keep them in sync.
     pub async fn change_user_handle<'c, X: sqlx::PgExecutor<'c>>(
         user_id: Uuid,
         new_handle: String,
@@ -260,10 +273,16 @@ impl Handle {
             r#"
             WITH deleted AS (
                 DELETE FROM "Handle" WHERE "userId" = $1
+            ),
+            inserted AS (
+                INSERT INTO "Handle" (handle, "userId")
+                VALUES ($2, $1)
+                RETURNING *
+            ),
+            user_update AS (
+                UPDATE "User" SET handle = $2 WHERE id = $1
             )
-            INSERT INTO "Handle" (handle, "userId")
-            VALUES ($2, $1)
-            RETURNING *
+            SELECT * FROM inserted
             "#,
         )
         .bind(user_id)
@@ -282,7 +301,8 @@ impl Handle {
         Ok(result)
     }
 
-    /// Release a space's handle and claim a new one (atomic operation)
+    /// Release a space's handle and claim a new one (atomic operation).
+    /// Also updates the Space table's handle column to keep them in sync.
     pub async fn change_space_handle<'c, X: sqlx::PgExecutor<'c>>(
         space_id: Uuid,
         new_handle: String,
@@ -294,10 +314,16 @@ impl Handle {
             r#"
             WITH deleted AS (
                 DELETE FROM "Handle" WHERE "spaceId" = $1
+            ),
+            inserted AS (
+                INSERT INTO "Handle" (handle, "spaceId")
+                VALUES ($2, $1)
+                RETURNING *
+            ),
+            space_update AS (
+                UPDATE "Space" SET handle = $2 WHERE id = $1
             )
-            INSERT INTO "Handle" (handle, "spaceId")
-            VALUES ($2, $1)
-            RETURNING *
+            SELECT * FROM inserted
             "#,
         )
         .bind(space_id)

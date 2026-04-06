@@ -130,7 +130,7 @@ impl MemberExt {
             RoleToSpaceUser::get_role_ids_by_member(base.id, db),
             User::find_by_id(base.user_id, db)
         )?;
-        let user = UserExt::from_user(user, db).await?;
+        let user = UserExt::from_user(user);
 
         Ok(Self {
             base,
@@ -152,7 +152,7 @@ impl MemberExt {
             .iter()
             .map(|member| users.get(&member.user_id).unwrap_or(&User::ghost()).clone())
             .collect();
-        let user_exts = UserExt::dataload(plain_users, db).await?;
+        let user_exts = UserExt::dataload(plain_users);
         let user_ext_map: HashMap<Uuid, UserExt> =
             user_exts.into_iter().map(|u| (u.base.id, u)).collect();
 
@@ -168,7 +168,6 @@ impl MemberExt {
                         .cloned()
                         .unwrap_or_else(|| UserExt {
                             base: User::ghost(),
-                            handle: None,
                         }),
                     role_ids: role_ids
                         .get(&member_id)

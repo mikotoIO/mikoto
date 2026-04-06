@@ -119,12 +119,19 @@ async fn create(
     claims: Claims,
     Json(body): Json<SpaceCreatePayload>,
 ) -> Result<Json<SpaceExt>, Error> {
-    let space = Space::new(body.name.clone(), claims.sub.parse()?);
+    let mut space = Space::new(body.name.clone(), claims.sub.parse()?);
+
+    // Pre-generate a handle string for the initial Space insert.
+    // auto_assign_for_space will then create the Handle row and keep it in sync.
+    let base = Handle::sanitize_username(&body.name);
+    space.handle = Handle::make_default_handle(&base);
     space.create(db()).await?;
 
-    // Auto-assign a unique default handle for the new space
+    // Auto-assign a unique default handle (creates Handle row + updates Space.handle)
     let _ = Handle::auto_assign_for_space(space.id, &body.name, db()).await;
 
+    // Re-fetch to get the final handle value
+    let space = Space::find_by_id(space.id, db()).await?;
     let space = SpaceExt::dataload_one(space, db()).await?;
     join_space(&space, claims.sub.parse()?).await?;
     Ok(space.into())
@@ -141,8 +148,8 @@ async fn update(
     // Update handle if provided
     if let Some(ref new_handle) = body.handle {
         if new_handle.is_empty() {
-            // Empty string means release the handle
-            Handle::release_for_space(space_id, db()).await?;
+            // Handles are mandatory — reassign a default handle based on space name
+            Handle::auto_assign_for_space(space_id, &space.base.name, db()).await?;
         } else {
             // Determine the full handle
             let full_handle = if !new_handle.contains('.') {
@@ -275,9 +282,13 @@ async fn complete_handle_verification(
             r#"
             WITH deleted AS (
                 DELETE FROM "Handle" WHERE "spaceId" = $1
+            ),
+            inserted AS (
+                INSERT INTO "Handle" (handle, "spaceId", "verifiedAt", attestation)
+                VALUES ($2, $1, $3, $4)
+                RETURNING handle
             )
-            INSERT INTO "Handle" (handle, "spaceId", "verifiedAt", attestation)
-            VALUES ($2, $1, $3, $4)
+            UPDATE "Space" SET handle = $2 WHERE id = $1
             "#,
         )
         .bind(space_id)

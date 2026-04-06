@@ -23,24 +23,14 @@ pub mod relations;
 
 async fn me(claim: Claims) -> Result<Json<UserExt>, Error> {
     let user = User::find_by_id(claim.sub.parse()?, db()).await?;
-    let mut user_ext = UserExt::from_user(user, db()).await?;
-
-    // Backfill: auto-assign a handle for users who don't have one yet
-    if user_ext.handle.is_none() {
-        if let Ok(h) =
-            Handle::auto_assign_for_user(user_ext.base.id, &user_ext.base.name, db()).await
-        {
-            user_ext.handle = Some(h.handle);
-        }
-    }
-
+    let user_ext = UserExt::from_user(user);
     Ok(user_ext.into())
 }
 
 async fn update(claim: Claims, Json(patch): Json<UserPatch>) -> Result<Json<UserExt>, Error> {
     let user = User::find_by_id(claim.sub.parse()?, db()).await?;
     let user = user.update(patch, db()).await?;
-    let user_ext = UserExt::from_user(user.clone(), db()).await?;
+    let user_ext = UserExt::from_user(user.clone());
     emit_event("users.onUpdate", &user_ext, &format!("user:{}", claim.sub)).await?;
     Ok(user_ext.into())
 }
@@ -78,17 +68,19 @@ async fn set_handle(
     Handle::change_user_handle(user_id, full_handle, db()).await?;
 
     let user = User::find_by_id(user_id, db()).await?;
-    let user_ext = UserExt::from_user(user, db()).await?;
+    let user_ext = UserExt::from_user(user);
     emit_event("users.onUpdate", &user_ext, &format!("user:{}", claim.sub)).await?;
     Ok(user_ext.into())
 }
 
 async fn delete_handle(claim: Claims) -> Result<Json<UserExt>, Error> {
+    // Handles are mandatory — reassign a default handle based on the user's name
     let user_id = claim.sub.parse()?;
-    Handle::release_for_user(user_id, db()).await?;
+    let user = User::find_by_id(user_id, db()).await?;
+    Handle::auto_assign_for_user(user_id, &user.name, db()).await?;
 
     let user = User::find_by_id(user_id, db()).await?;
-    let user_ext = UserExt::from_user(user, db()).await?;
+    let user_ext = UserExt::from_user(user);
     emit_event("users.onUpdate", &user_ext, &format!("user:{}", claim.sub)).await?;
     Ok(user_ext.into())
 }
@@ -132,9 +124,13 @@ async fn complete_handle_verification(
             r#"
             WITH deleted AS (
                 DELETE FROM "Handle" WHERE "userId" = $1
+            ),
+            inserted AS (
+                INSERT INTO "Handle" (handle, "userId", "verifiedAt", attestation)
+                VALUES ($2, $1, $3, $4)
+                RETURNING handle
             )
-            INSERT INTO "Handle" (handle, "userId", "verifiedAt", attestation)
-            VALUES ($2, $1, $3, $4)
+            UPDATE "User" SET handle = $2 WHERE id = $1
             "#,
         )
         .bind(user_id)
@@ -153,7 +149,7 @@ async fn complete_handle_verification(
         })?;
 
         let user = User::find_by_id(user_id, db()).await?;
-        let user_ext = UserExt::from_user(user, db()).await?;
+        let user_ext = UserExt::from_user(user);
         emit_event("users.onUpdate", &user_ext, &format!("user:{}", claim.sub)).await?;
     }
 

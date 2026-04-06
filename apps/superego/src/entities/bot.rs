@@ -3,7 +3,7 @@ use uuid::Uuid;
 
 use crate::{db_enum, db_find_by_id, entity, error::Error, model};
 
-use super::UserExt;
+use super::{Handle, UserExt};
 
 db_enum!(
     #[sqlx(type_name = "\"BotVisibility\"")]
@@ -100,11 +100,14 @@ impl Bot {
         name: &str,
         db: X,
     ) -> Result<(), Error> {
+        let base = Handle::sanitize_username(name);
+        let initial_handle = Handle::make_default_handle(&base);
+
         sqlx::query(
             r##"
             WITH u AS (
-                INSERT INTO "User" ("id", "name", "category")
-                VALUES ($1, $2, 'BOT')
+                INSERT INTO "User" ("id", "name", "category", "handle")
+                VALUES ($1, $2, 'BOT', $6)
                 RETURNING "id"
             )
             INSERT INTO "Bot" ("id", "name", "ownerId", "secret")
@@ -116,6 +119,7 @@ impl Bot {
         .bind(&self.name)
         .bind(self.owner_id)
         .bind(&self.secret)
+        .bind(&initial_handle)
         .execute(db)
         .await?;
         Ok(())
@@ -191,7 +195,7 @@ impl Bot {
     ) -> Result<BotInfo, Error> {
         let user = super::User::find_by_id(self.id, db).await.ok();
         let user = match user {
-            Some(u) => Some(UserExt::from_user(u, db).await?),
+            Some(u) => Some(UserExt::from_user(u)),
             None => None,
         };
         let mut info = self.to_info();

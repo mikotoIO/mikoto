@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::{db_enum, db_find_by_id, entity, error::Error};
 
-use super::{hashmap_by_key, Handle};
+use super::hashmap_by_key;
 
 db_enum!(
     #[sqlx(type_name = "\"UserCategory\"")]
@@ -22,6 +22,7 @@ entity!(
         pub avatar: Option<String>,
         pub description: Option<String>,
         pub category: Option<UserCategory>,
+        pub handle: String,
     }
 );
 
@@ -53,8 +54,6 @@ entity!(
 pub struct UserExt {
     #[serde(flatten)]
     pub base: User,
-    /// The user's handle (if claimed)
-    pub handle: Option<String>,
 }
 
 #[derive(Deserialize, JsonSchema)]
@@ -73,6 +72,7 @@ impl User {
             avatar: None,
             description: None,
             category: None,
+            handle: String::new(),
         }
     }
 
@@ -121,27 +121,11 @@ impl User {
 }
 
 impl UserExt {
-    pub async fn from_user<'c, X: sqlx::PgExecutor<'c>>(user: User, db: X) -> Result<Self, Error> {
-        let handle = Handle::for_user(user.id, db).await?;
-        Ok(Self {
-            handle: handle.map(|h| h.handle),
-            base: user,
-        })
+    pub fn from_user(user: User) -> Self {
+        Self { base: user }
     }
 
-    pub async fn dataload<'c, X: sqlx::PgExecutor<'c>>(
-        users: Vec<User>,
-        db: X,
-    ) -> Result<Vec<Self>, Error> {
-        let user_ids: Vec<Uuid> = users.iter().map(|u| u.id).collect();
-        let handles = Handle::for_users(&user_ids, db).await?;
-
-        Ok(users
-            .into_iter()
-            .map(|user| {
-                let handle = handles.get(&user.id).cloned();
-                Self { handle, base: user }
-            })
-            .collect())
+    pub fn dataload(users: Vec<User>) -> Vec<Self> {
+        users.into_iter().map(|user| Self { base: user }).collect()
     }
 }

@@ -3,7 +3,7 @@ use uuid::Uuid;
 
 use crate::{db_entity_delete, db_enum, db_find_by_id, entities::Role, entity, error::Error};
 
-use super::{Channel, Handle};
+use super::Channel;
 
 db_enum!(
     #[sqlx(type_name = "\"SpaceType\"")]
@@ -35,6 +35,7 @@ entity!(
         pub space_type: SpaceType,
 
         pub visibility: Option<SpaceVisibility>,
+        pub handle: String,
     }
 );
 
@@ -45,8 +46,6 @@ entity!(
 pub struct SpaceExt {
     #[serde(flatten)]
     pub base: Space,
-    /// The space's handle (if claimed)
-    pub handle: Option<String>,
     pub roles: Vec<Role>,
     pub channels: Vec<Channel>,
     pub member_count: i64,
@@ -69,6 +68,7 @@ impl Space {
             owner_id: Some(owner_id),
             space_type: SpaceType::None,
             visibility: None,
+            handle: String::new(),
         }
     }
 
@@ -104,8 +104,8 @@ impl Space {
                 VALUES (gen_random_uuid(), $1, '@everyone', -1, '0')
                 RETURNING "id"
             )
-            INSERT INTO "Space" ("id", "name", "icon", "ownerId", "type", "visibility")
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO "Space" ("id", "name", "icon", "ownerId", "type", "visibility", "handle")
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             "##,
         )
         .bind(self.id)
@@ -114,6 +114,7 @@ impl Space {
         .bind(self.owner_id)
         .bind(self.space_type)
         .bind(self.visibility)
+        .bind(&self.handle)
         .execute(db)
         .await?;
         Ok(())
@@ -154,10 +155,9 @@ impl SpaceExt {
         space: Space,
         db: X,
     ) -> Result<Self, Error> {
-        let (channels, roles, handle, member_count) = tokio::try_join!(
+        let (channels, roles, member_count) = tokio::try_join!(
             Channel::list(space.id, db),
             Role::list(space.id, db),
-            Handle::for_space(space.id, db),
             async {
                 let row: (i64,) =
                     sqlx::query_as(r#"SELECT COUNT(*) FROM "SpaceUser" WHERE "spaceId" = $1"#)
@@ -170,7 +170,6 @@ impl SpaceExt {
 
         Ok(SpaceExt {
             base: space,
-            handle: handle.map(|h| h.handle),
             channels,
             roles,
             member_count,
@@ -183,10 +182,9 @@ impl SpaceExt {
     ) -> Result<Vec<Self>, Error> {
         let space_ids: Vec<Uuid> = spaces.iter().map(|s| s.id).collect();
 
-        let (mut channels, mut roles, handles, member_counts) = tokio::try_join!(
+        let (mut channels, mut roles, member_counts) = tokio::try_join!(
             Channel::dataload_space(space_ids.clone(), db),
             Role::dataload_space(space_ids.clone(), db),
-            Handle::for_spaces(&space_ids, db),
             async {
                 let rows: Vec<(Uuid, i64)> = sqlx::query_as(
                     r#"SELECT "spaceId", COUNT(*) FROM "SpaceUser" WHERE "spaceId" = ANY($1) GROUP BY "spaceId""#,
@@ -204,12 +202,10 @@ impl SpaceExt {
             .map(|space| {
                 let channels = channels.remove(&space.id).unwrap_or_default();
                 let roles = roles.remove(&space.id).unwrap_or_default();
-                let handle = handles.get(&space.id).cloned();
                 let member_count = member_counts.get(&space.id).copied().unwrap_or(0);
 
                 SpaceExt {
                     base: space,
-                    handle,
                     channels,
                     roles,
                     member_count,

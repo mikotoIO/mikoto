@@ -7,7 +7,9 @@ use tokio::sync::mpsc;
 use crate::cache::Cache;
 use crate::client::MikotoClient;
 use crate::error::ClientError;
-use crate::generated::{HttpApi, MessageExt, MessageSendPayload, TypingStart, WsCommand};
+use crate::generated::{
+    HttpApi, MessageExt, MessageSendPayload, MessageSendPayload2, TypingStart, WsCommand,
+};
 
 /// A cheaply cloneable handle that provides access to the HTTP API and cache.
 ///
@@ -57,24 +59,33 @@ impl Context {
         channel_id: Uuid,
         content: impl Into<String>,
     ) -> Result<MessageExt, ClientError> {
-        let space_id = self
-            .cache
-            .channel(channel_id)
-            .map(|c| c.space_id)
-            .ok_or_else(|| {
-                ClientError::Other(format!("Channel {channel_id} not found in cache"))
-            })?;
+        let channel = self.cache.channel(channel_id).ok_or_else(|| {
+            ClientError::Other(format!("Channel {channel_id} not found in cache"))
+        })?;
 
-        self.http
-            .api()
-            .messages_create(
-                space_id,
-                channel_id,
-                &MessageSendPayload {
-                    content: content.into(),
-                    attachments: None,
-                },
-            )
-            .await
+        if let Some(space_id) = channel.space_id {
+            self.http
+                .api()
+                .messages_create(
+                    space_id,
+                    channel_id,
+                    &MessageSendPayload2 {
+                        content: content.into(),
+                        attachments: None,
+                    },
+                )
+                .await
+        } else {
+            self.http
+                .api()
+                .dm_messages_create(
+                    channel_id,
+                    &MessageSendPayload {
+                        content: content.into(),
+                        attachments: None,
+                    },
+                )
+                .await
+        }
     }
 }

@@ -22,7 +22,9 @@ use yrs_axum::{
 
 use crate::{
     db::db,
-    entities::{Channel, Document, DocumentPatch, MemberExt, MemberKey, SpaceExt, SpaceUser},
+    entities::{
+        Channel, Document, DocumentPatch, MemberExt, MemberKey, Relationship, SpaceExt, SpaceUser,
+    },
     error::Error,
     functions::jwt::{jwt_key, Claims},
     middlewares::load::Load,
@@ -36,7 +38,7 @@ async fn get(
     Path((_, channel_id)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<Document>, Error> {
     let channel = Channel::find_by_id(channel_id, db()).await?;
-    if channel.space_id != space.base.id {
+    if channel.space_id != Some(space.base.id) {
         return Err(Error::NotFound);
     }
     let document = Document::get_by_channel_id(channel_id, db()).await?;
@@ -51,7 +53,7 @@ async fn update(
     Json(patch): Json<DocumentPatch>,
 ) -> Result<Json<Document>, Error> {
     let channel = Channel::find_by_id(channel_id, db()).await?;
-    if channel.space_id != space.base.id {
+    if channel.space_id != Some(space.base.id) {
         return Err(Error::NotFound);
     }
     let document = Document::get_by_channel_id(channel_id, db()).await?;
@@ -108,9 +110,18 @@ async fn ws_handler(
     // The room format is the channel ID; verify the user is a member of the channel's space
     let channel_id: Uuid = room.parse().map_err(|_| Error::NotFound)?;
     let channel = Channel::find_by_id(channel_id, db()).await?;
-    SpaceUser::get_by_key(&MemberKey::new(channel.space_id, user_id), db())
-        .await
-        .map_err(|_| Error::unauthorized("You are not a member of this space"))?;
+    if let Some(space_id) = channel.space_id {
+        SpaceUser::get_by_key(&MemberKey::new(space_id, user_id), db())
+            .await
+            .map_err(|_| Error::unauthorized("You are not a member of this space"))?;
+    } else {
+        // DM channel — verify user has a relationship with this channel
+        Relationship::find_by_channel(channel_id, user_id, db())
+            .await?
+            .ok_or(Error::unauthorized(
+                "You do not have access to this channel",
+            ))?;
+    }
 
     Ok(ws.on_upgrade(move |socket| peer(room, socket, bcast)))
 }

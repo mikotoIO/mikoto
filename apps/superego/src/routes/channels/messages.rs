@@ -45,7 +45,7 @@ async fn get(
     let message = Message::find_by_id(message_id, db()).await?;
     // Verify message's channel belongs to this space
     let channel = Channel::find_by_id(message.channel_id, db()).await?;
-    if channel.space_id != space.base.id {
+    if channel.space_id != Some(space.base.id) {
         return Err(Error::NotFound);
     }
     let message = MessageExt::dataload_one(message, db()).await?;
@@ -69,7 +69,7 @@ async fn list(
 ) -> Result<Json<Vec<MessageExt>>, Error> {
     // Verify channel belongs to this space
     let channel = Channel::find_by_id(channel_id, db()).await?;
-    if channel.space_id != space.base.id {
+    if channel.space_id != Some(space.base.id) {
         return Err(Error::NotFound);
     }
     let messages = Message::paginate(
@@ -91,7 +91,7 @@ async fn send(
     Json(body): Json<MessageSendPayload>,
 ) -> Result<Json<MessageExt>, Error> {
     let channel = Channel::find_by_id(channel_id, db()).await?;
-    if channel.space_id != space.base.id {
+    if channel.space_id != Some(space.base.id) {
         return Err(Error::NotFound);
     }
     let message = Message::new(&channel, claim.sub.parse()?, body.content);
@@ -108,7 +108,7 @@ async fn send(
     emit_event(
         "messages.onCreate",
         &message,
-        &format!("space:{}", channel.space_id),
+        &format!("space:{}", space.base.id),
     )
     .await?;
     Ok(message.into())
@@ -122,7 +122,7 @@ async fn edit(
     Json(body): Json<MessageEditPayload>,
 ) -> Result<Json<MessageExt>, Error> {
     let channel = Channel::find_by_id(channel_id, db()).await?;
-    if channel.space_id != space.base.id {
+    if channel.space_id != Some(space.base.id) {
         return Err(Error::NotFound);
     }
     let message = Message::find_by_id(message_id, db()).await?;
@@ -144,7 +144,7 @@ async fn edit(
     emit_event(
         "messages.onUpdate",
         &message,
-        &format!("space:{}", channel.space_id),
+        &format!("space:{}", space.base.id),
     )
     .await?;
     Ok(message.into())
@@ -157,7 +157,7 @@ async fn delete(
     Path((_, channel_id, message_id)): Path<(Uuid, Uuid, Uuid)>,
 ) -> Result<Json<()>, Error> {
     let channel = Channel::find_by_id(channel_id, db()).await?;
-    if channel.space_id != space.base.id {
+    if channel.space_id != Some(space.base.id) {
         return Err(Error::NotFound);
     }
     let message = Message::find_by_id(message_id, db()).await?;
@@ -179,7 +179,7 @@ async fn delete(
             message_id: message.id,
             channel_id: message.channel_id,
         },
-        &format!("space:{}", channel.space_id),
+        &format!("space:{}", space.base.id),
     )
     .await?;
     Ok(().into())

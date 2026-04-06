@@ -1,10 +1,11 @@
 /// <reference types="vitest" />
 import react from '@vitejs/plugin-react';
-import { execSync } from 'node:child_process';
 import * as dotenv from 'dotenv';
+import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
+
 // import { VitePWA } from 'vite-plugin-pwa';
 
 dotenv.config();

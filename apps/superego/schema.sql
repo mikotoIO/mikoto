@@ -169,7 +169,7 @@ CREATE TABLE public."Channel" (
     "parentId" uuid,
     "order" integer DEFAULT 0 NOT NULL,
     name character varying(64) NOT NULL,
-    "spaceId" uuid NOT NULL,
+    "spaceId" uuid,
     "lastUpdated" timestamp(3) without time zone
 );
 
@@ -288,7 +288,7 @@ CREATE TABLE public."Relationship" (
     id uuid NOT NULL,
     "userId" uuid NOT NULL,
     "relationId" uuid NOT NULL,
-    "spaceId" uuid NOT NULL,
+    "channelId" uuid,
     state public."RelationState" NOT NULL
 );
 
@@ -857,19 +857,19 @@ ALTER TABLE ONLY public."RefreshToken"
 
 
 --
+-- Name: Relationship Relationship_channelId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Relationship"
+    ADD CONSTRAINT "Relationship_channelId_fkey" FOREIGN KEY ("channelId") REFERENCES public."Channel"(id) ON DELETE SET NULL;
+
+
+--
 -- Name: Relationship Relationship_relationId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public."Relationship"
     ADD CONSTRAINT "Relationship_relationId_fkey" FOREIGN KEY ("relationId") REFERENCES public."User"(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: Relationship Relationship_spaceId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public."Relationship"
-    ADD CONSTRAINT "Relationship_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES public."Space"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

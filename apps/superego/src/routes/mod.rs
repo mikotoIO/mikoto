@@ -16,7 +16,7 @@ use ws::state::State;
 
 use crate::{
     db::db,
-    entities::Channel,
+    entities::{self, Channel},
     env::{env, MikotoMode},
     functions::pubsub::emit_event,
 };
@@ -25,6 +25,7 @@ pub mod account;
 pub mod bots;
 pub mod cdn;
 pub mod channels;
+pub mod dm;
 pub mod handles;
 pub mod router;
 pub mod spaces;
@@ -82,6 +83,7 @@ fn build_app_router() -> AppRouter<State> {
         })
         .nest("users", "/users", users::router())
         .nest("relations", "/relations", users::relations::router())
+        .nest("dm_messages", "/dm/:channelId/messages", dm::router())
         .nest("spaces", "/spaces", spaces::router())
         .nest("channels", "/spaces/:spaceId/channels", channels::router())
         .nest(
@@ -123,15 +125,26 @@ fn build_app_router() -> AppRouter<State> {
                 let channel_id: uuid::Uuid = payload.channel_id.parse()?;
                 let channel = Channel::find_by_id(channel_id, db()).await?;
                 let user_id = state.read().await.user.id;
-                emit_event(
-                    "typing.onUpdate",
-                    TypingUpdate {
-                        channel_id: payload.channel_id,
-                        user_id: user_id.to_string(),
-                    },
-                    &format!("space:{}", channel.space_id),
-                )
-                .await?;
+                let update = TypingUpdate {
+                    channel_id: payload.channel_id,
+                    user_id: user_id.to_string(),
+                };
+                if let Some(space_id) = channel.space_id {
+                    emit_event("typing.onUpdate", &update, &format!("space:{space_id}")).await?;
+                } else {
+                    // DM channel — emit to both participants
+                    emit_event("typing.onUpdate", &update, &format!("user:{user_id}")).await?;
+                    if let Some(rel) =
+                        entities::Relationship::find_by_channel(channel_id, user_id, db()).await?
+                    {
+                        emit_event(
+                            "typing.onUpdate",
+                            &update,
+                            &format!("user:{}", rel.relation_id),
+                        )
+                        .await?;
+                    }
+                }
                 Ok(())
             },
         )

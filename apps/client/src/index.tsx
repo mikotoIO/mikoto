@@ -9,9 +9,9 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 // PWA disabled due to caching issues
 // import { registerSW } from 'virtual:pwa-register';
-
 import App from '@/App';
 import { globalCss } from '@/components/chakraTheme';
 import { Provider as ChakraProvider } from '@/components/ui/provider';

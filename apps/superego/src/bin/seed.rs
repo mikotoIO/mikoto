@@ -185,7 +185,7 @@ async fn create_channels(pool: &PgPool) -> Result<(), sqlx::Error> {
     for (id, name, channel_type, order) in channels {
         let channel = Channel {
             id,
-            space_id: TEST_SPACE_ID,
+            space_id: Some(TEST_SPACE_ID),
             parent_id: None,
             order,
             name: name.to_string(),

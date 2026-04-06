@@ -1,7 +1,6 @@
 import { Box, Flex, Grid, Heading } from '@chakra-ui/react';
 import { faHashtag } from '@fortawesome/free-solid-svg-icons';
 import {
-  Channel,
   MessageExt,
   MessageKey,
   MikotoChannel,
@@ -14,10 +13,7 @@ import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
-import {
-  Skeleton,
-  SkeletonCircle,
-} from '@/components/ui/skeleton';
+import { Skeleton, SkeletonCircle } from '@/components/ui/skeleton';
 import { uploadFile } from '@/functions/fileUpload';
 import { useFetchMember, useMikoto } from '@/hooks';
 import { CurrentSpaceContext } from '@/store';
@@ -79,14 +75,26 @@ function isMessageSimple(message: MessageExt, prevMessage?: MessageExt) {
   );
 }
 
-function ChannelHead({ channel }: { channel: Channel }) {
+function ChannelHead({
+  displayName,
+  isDm,
+}: {
+  displayName: string;
+  isDm: boolean;
+}) {
   return (
     <Box py={4} px={16}>
       <Heading fontSize="24px" mb={2}>
-        Welcome to #{channel.name}!
+        {isDm ? (
+          <>Conversation with {displayName}</>
+        ) : (
+          <>Welcome to #{displayName}!</>
+        )}
       </Heading>
       <Box as="p" color="gray.250" m={0}>
-        This is the start of the channel.
+        {isDm
+          ? 'This is the start of your direct message history.'
+          : 'This is the start of the channel.'}
       </Box>
     </Box>
   );
@@ -98,10 +106,16 @@ function ChannelHead({ channel }: { channel: Channel }) {
 const FUNNY_NUMBER = 69_420_000;
 
 function RealMessageView({ channel }: { channel: MikotoChannel }) {
-  useFetchMember(channel.space!);
+  useFetchMember(channel.space);
 
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const mikoto = useMikoto();
+
+  // For DM channels, resolve the display name from the relationship
+  const dmRelation = !channel.spaceId
+    ? mikoto.relationships.values().find((r) => r.channelId === channel.id)
+    : undefined;
+  const displayName = dmRelation?.user.name ?? channel.name;
   // you will probably run out of memory before this number
   const [firstItemIndex, setFirstItemIndex] = useState(FUNNY_NUMBER);
   const [topLoaded, setTopLoaded] = useState(false);
@@ -180,12 +194,14 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
       //     timestamp: x.timestamp,
       //   })
       //   .then(() => {});
-      mikoto.rest['channels.acknowledge'](undefined, {
-        params: {
-          spaceId: channel.spaceId,
-          channelId: channel.id,
-        },
-      }).then(() => {});
+      if (channel.spaceId) {
+        mikoto.rest['channels.acknowledge'](undefined, {
+          params: {
+            spaceId: channel.spaceId,
+            channelId: channel.id,
+          },
+        }).then(() => {});
+      }
       setScrollToBottom(true);
       return [...xs, new MikotoMessage(x, mikoto)];
     });
@@ -223,7 +239,9 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
   const virtuosoComponents = useMemo(
     () => ({
       Header: topLoaded
-        ? () => <ChannelHead channel={channel} />
+        ? () => (
+            <ChannelHead displayName={displayName} isDm={!channel.spaceId} />
+          )
         : () => (
             <Box py="16px">
               {Array.from({ length: 8 }, (_, i) => (
@@ -237,7 +255,7 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
 
   return (
     <Surface key={channel.id}>
-      <TabName name={channel.name} icon={channel.space?.icon ?? faHashtag} />
+      <TabName name={displayName} icon={channel.space?.icon ?? faHashtag} />
       <Grid templateRows="auto 24px" h="100%">
         <Flex direction="column">
           {msgs === null ? (
@@ -341,7 +359,7 @@ export function MessageSurface({ channelId }: { channelId: string }) {
   const channel = mikoto.channels._get(channelId)!;
 
   return (
-    <CurrentSpaceContext.Provider value={channel.space!}>
+    <CurrentSpaceContext.Provider value={channel.space}>
       <RealMessageView channel={channel} />
     </CurrentSpaceContext.Provider>
   );

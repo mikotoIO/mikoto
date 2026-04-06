@@ -31,27 +31,49 @@ export class MikotoMessage extends ZSchema(MessageExt) {
   }
 
   async edit(content: string) {
-    const message = await this.client.rest['messages.update'](
-      { content },
-      {
+    if (this.channel.spaceId) {
+      const message = await this.client.rest['messages.update'](
+        { content },
+        {
+          params: {
+            spaceId: this.channel.spaceId,
+            channelId: this.channelId,
+            messageId: this.id,
+          },
+        },
+      );
+      this._patch(message);
+    } else {
+      const message = await this.client.rest['dm.messages.update'](
+        { content },
+        {
+          params: {
+            channelId: this.channelId,
+            messageId: this.id,
+          },
+        },
+      );
+      this._patch(message);
+    }
+  }
+
+  async delete() {
+    if (this.channel.spaceId) {
+      await this.client.rest['messages.delete'](undefined, {
         params: {
           spaceId: this.channel.spaceId,
           channelId: this.channelId,
           messageId: this.id,
         },
-      },
-    );
-    this._patch(message);
-  }
-
-  async delete() {
-    await this.client.rest['messages.delete'](undefined, {
-      params: {
-        spaceId: this.channel.spaceId,
-        channelId: this.channelId,
-        messageId: this.id,
-      },
-    });
+      });
+    } else {
+      await this.client.rest['dm.messages.delete'](undefined, {
+        params: {
+          channelId: this.channelId,
+          messageId: this.id,
+        },
+      });
+    }
   }
 }
 
@@ -67,11 +89,17 @@ export class MessageManager extends Manager {
   }
 
   async list({ limit, cursor }: MessageListParams) {
-    return this.client.rest['messages.list']({
-      params: {
-        spaceId: this.channel.spaceId,
-        channelId: this.channel.id,
-      },
+    if (this.channel.spaceId) {
+      return this.client.rest['messages.list']({
+        params: {
+          spaceId: this.channel.spaceId,
+          channelId: this.channel.id,
+        },
+        queries: { limit, cursor },
+      });
+    }
+    return this.client.rest['dm.messages.list']({
+      params: { channelId: this.channel.id },
       queries: { limit, cursor },
     });
   }

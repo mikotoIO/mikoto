@@ -15,6 +15,7 @@ export function SaveLoadPlugin({ channel }: { channel: MikotoChannel }) {
       (event) => {
         // check if key is ctrl + s
         if (event && event.ctrlKey && event.key === 's') {
+          if (!channel.spaceId) return false;
           const content = $convertToMarkdownString(TRANSFORMERS);
           mikoto.rest['documents.update'](
             {

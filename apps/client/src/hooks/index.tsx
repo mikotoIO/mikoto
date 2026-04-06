@@ -20,7 +20,7 @@ export function useAuthClient() {
 
 export function useEvent() {}
 
-export const useFetchMember = (space: MikotoSpace) => {
+export const useFetchMember = (space: MikotoSpace | undefined) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 

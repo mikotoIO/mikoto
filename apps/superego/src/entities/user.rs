@@ -244,7 +244,7 @@ impl RelationshipExt {
                     .cloned()
                     .unwrap_or_else(|| UserExt {
                         base: User::ghost(),
-                        handle: None,
+                        handle: "ghost".to_string(),
                     });
                 Self { base: rel, user }
             })
@@ -258,8 +258,8 @@ impl RelationshipExt {
 pub struct UserExt {
     #[serde(flatten)]
     pub base: User,
-    /// The user's handle (if claimed)
-    pub handle: Option<String>,
+    /// The user's handle
+    pub handle: String,
 }
 
 #[derive(Deserialize, JsonSchema)]
@@ -327,9 +327,11 @@ impl User {
 
 impl UserExt {
     pub async fn from_user<'c, X: sqlx::PgExecutor<'c>>(user: User, db: X) -> Result<Self, Error> {
-        let handle = Handle::for_user(user.id, db).await?;
+        let handle = Handle::for_user(user.id, db)
+            .await?
+            .ok_or_else(|| Error::internal("User has no handle"))?;
         Ok(Self {
-            handle: handle.map(|h| h.handle),
+            handle: handle.handle,
             base: user,
         })
     }
@@ -344,7 +346,10 @@ impl UserExt {
         Ok(users
             .into_iter()
             .map(|user| {
-                let handle = handles.get(&user.id).cloned();
+                let handle = handles
+                    .get(&user.id)
+                    .cloned()
+                    .unwrap_or_else(|| "unknown".to_string());
                 Self { handle, base: user }
             })
             .collect())

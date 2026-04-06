@@ -378,6 +378,40 @@ impl Handle {
         Self::claim_for_user(handle, user_id, db).await
     }
 
+    /// Auto-generate a unique default handle for a space based on its name.
+    /// Tries the sanitized name first, then appends short discriminators on conflict.
+    pub async fn auto_assign_for_space(
+        space_id: Uuid,
+        name: &str,
+        db: &sqlx::PgPool,
+    ) -> Result<Self, Error> {
+        let base = Self::sanitize_username(name);
+
+        // Try the base username first
+        let handle = Self::make_default_handle(&base);
+        match Self::claim_for_space(handle, space_id, db).await {
+            Ok(h) => return Ok(h),
+            Err(Error::Miscallaneous { ref code, .. }) if code == "HandleTaken" => {}
+            Err(e) => return Err(e),
+        }
+
+        // Try with short discriminators derived from the space's UUID
+        let id_hex = space_id.as_simple().to_string();
+        for len in [3, 4, 6, 8] {
+            let discriminator = &id_hex[..len];
+            let handle = Self::make_default_handle(&format!("{}-{}", base, discriminator));
+            match Self::claim_for_space(handle, space_id, db).await {
+                Ok(h) => return Ok(h),
+                Err(Error::Miscallaneous { ref code, .. }) if code == "HandleTaken" => {}
+                Err(e) => return Err(e),
+            }
+        }
+
+        // Final fallback: full UUID prefix (very unlikely to reach here)
+        let handle = Self::make_default_handle(&format!("{}-{}", base, &id_hex[..12]));
+        Self::claim_for_space(handle, space_id, db).await
+    }
+
     /// Resolve a handle to its owner
     pub async fn resolve<'c, X: sqlx::PgExecutor<'c>>(
         handle: &str,
@@ -427,40 +461,6 @@ impl Handle {
         .await?;
 
         Ok(result)
-    }
-
-    /// Release a user's handle
-    pub async fn release_for_user<'c, X: sqlx::PgExecutor<'c>>(
-        user_id: Uuid,
-        db: X,
-    ) -> Result<bool, Error> {
-        let result = sqlx::query(
-            r#"
-            DELETE FROM "Handle" WHERE "userId" = $1
-            "#,
-        )
-        .bind(user_id)
-        .execute(db)
-        .await?;
-
-        Ok(result.rows_affected() > 0)
-    }
-
-    /// Release a space's handle
-    pub async fn release_for_space<'c, X: sqlx::PgExecutor<'c>>(
-        space_id: Uuid,
-        db: X,
-    ) -> Result<bool, Error> {
-        let result = sqlx::query(
-            r#"
-            DELETE FROM "Handle" WHERE "spaceId" = $1
-            "#,
-        )
-        .bind(space_id)
-        .execute(db)
-        .await?;
-
-        Ok(result.rows_affected() > 0)
     }
 
     /// Batch load handles for multiple users

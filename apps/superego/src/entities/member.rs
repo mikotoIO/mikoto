@@ -168,7 +168,7 @@ impl MemberExt {
                         .cloned()
                         .unwrap_or_else(|| UserExt {
                             base: User::ghost(),
-                            handle: None,
+                            handle: "ghost".to_string(),
                         }),
                     role_ids: role_ids
                         .get(&member_id)

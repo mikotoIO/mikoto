@@ -194,7 +194,7 @@ export function SpaceSidebar() {
               background:
                 spaceId === null
                   ? 'linear-gradient(133deg, #2298ff 0%, rgba(59,108,255,1) 100%)'
-                  : undefined,
+                  : 'var(--chakra-colors-gray-700)',
             }}
             onClick={() => {
               setSpaceId(null);
@@ -203,7 +203,7 @@ export function SpaceSidebar() {
             <FontAwesomeIcon icon={faMikoto} fontSize="24px" />
           </SpaceIconLike>
         </StyledIconWrapper>
-        <Separator w={8} />
+        <Separator borderColor="gray.600" ml={3} width={9} borderWidth="1px" my={2}/>
 
         {spaceArray
           .filter((x) => x.type === 'NONE') // TODO: filter this on the server

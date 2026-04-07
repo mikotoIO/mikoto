@@ -1,6 +1,6 @@
 import { Box } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import { faHashtag } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faHashtag } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { Command } from 'cmdk';
@@ -97,14 +97,18 @@ export function CommandMenuKit() {
   const setLeftSidebar = useSetAtom(treebarSpaceState);
   const tabkit = useTabkit();
 
-  // Subscribe to spaces for reactivity
+  // Subscribe to spaces and relationships for reactivity
   useSnapshot(mikoto.spaces);
+  useSnapshot(mikoto.relationships.cache);
 
   // Get all spaces
   const spaces = useMemo(() => {
     const spaceList = Array.from(mikoto.spaces.cache.values());
     return spaceList.filter((space) => space.type === 'NONE');
   }, [mikoto.spaces.cache.size]);
+
+  // Get DM friends
+  const dmFriends = mikoto.relationships.friends.filter((f) => f.channelId);
 
   // Toggle the menu when ⌘K is pressed
   useEffect(() => {
@@ -141,6 +145,16 @@ export function CommandMenuKit() {
     setOpen(false);
   };
 
+  const openDm = async (friend: (typeof dmFriends)[number]) => {
+    const channel = await friend.openDm();
+    setLeftSidebar({ kind: 'friends', key: 'friends' });
+    tabkit.openTab(
+      { kind: 'textChannel', key: channel.id, channelId: channel.id },
+      tabkit.getTabs().length > 0,
+    );
+    setOpen(false);
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen} label="Global Command Menu">
       <Box bg="surface" rounded="md" maxW="60%" w="600px" maxH="400px">
@@ -148,6 +162,24 @@ export function CommandMenuKit() {
         <Box p={2}>
           <StyledList>
             <Command.Empty>No matching results</Command.Empty>
+
+            {dmFriends.length > 0 && (
+              <StyledGroup heading="Direct Messages">
+                {dmFriends.map((friend) => (
+                  <StyledItem
+                    key={friend.id}
+                    value={`dm ${friend.user.name}`}
+                    onSelect={() => openDm(friend)}
+                  >
+                    <FontAwesomeIcon
+                      icon={faEnvelope}
+                      style={{ opacity: 0.6, marginLeft: 4 }}
+                    />
+                    {friend.user.name}
+                  </StyledItem>
+                ))}
+              </StyledGroup>
+            )}
 
             <StyledGroup heading="Spaces">
               {spaces.map((space) => (

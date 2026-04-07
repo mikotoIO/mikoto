@@ -129,6 +129,6 @@ pub async fn route(
     bucket().put_object(&store_path, &buf).await?;
 
     Ok(Json(UploadResponse {
-        url: format!("{}/{}", env().public_mediaserver_url, &store_path),
+        url: store_path,
     }))
 }

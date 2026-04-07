@@ -1,5 +1,6 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import {
   DockviewApi,
   DockviewDidDropEvent,
@@ -174,7 +175,7 @@ function CustomTabComponent(props: IDockviewPanelHeaderProps) {
               />
             ) : (
               <img
-                src={tabName.icon}
+                src={normalizeMediaUrl(tabName.icon as string)}
                 alt=""
                 style={{
                   width: '24px',

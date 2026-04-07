@@ -29,7 +29,7 @@ export function remarkMention() {
         (_: string, username: string) =>
           hNode('mention', { username }, `@${username}`),
       ],
-    ]);
+    ], { ignore: ['link', 'linkReference'] });
   };
 }
 
@@ -41,7 +41,7 @@ export function remarkEmoji() {
         (_: string, emoji: string) =>
           hNode('emoji-shortcode', { emoji }, `:${emoji}:`),
       ],
-    ]);
+    ], { ignore: ['link', 'linkReference'] });
   };
 }
 
@@ -52,7 +52,7 @@ export function remarkSpoiler() {
         /\|\|([\s\S]+?)\|\|(?!\|)/g,
         (_: string, content: string) => hNode('spoiler', { content }, content),
       ],
-    ]);
+    ], { ignore: ['link', 'linkReference'] });
   };
 }
 

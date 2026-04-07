@@ -1,5 +1,4 @@
 import { pluginToken } from '@zodios/plugins';
-import { debounce } from 'lodash-es';
 
 import {
   Api,
@@ -30,32 +29,15 @@ export interface BotAuthClientOptions {
 export class AuthClient {
   api: Api;
   refreshToken?: string;
+  private getRefreshToken?: () => string;
   private setRefreshToken?: (token: string) => void;
-
-  // this prevents multiple refresh calls from happening at the same time
-  // when multiple requests are made in the same tick
-  debouncedRefresh = debounce(
-    async () => {
-      const res = await this.api['account.refresh']({
-        refreshToken: this.refreshToken ?? '',
-      });
-      if (res.refreshToken) {
-        this.refreshToken = res.refreshToken;
-        this.setRefreshToken?.(res.refreshToken);
-      }
-      return res.accessToken;
-    },
-    1000,
-    {
-      leading: true,
-      trailing: false,
-    },
-  );
+  private inflightRefresh?: Promise<string>;
 
   protected accessToken?: string;
 
   constructor(options: AuthClientOptions) {
     this.api = createApiClient(options.url, {});
+    this.getRefreshToken = options.refreshToken;
     this.refreshToken = options.refreshToken?.();
     this.setRefreshToken = options.setRefreshToken;
 
@@ -67,9 +49,53 @@ export class AuthClient {
   }
 
   async refresh(): Promise<string> {
-    const token = await this.debouncedRefresh();
-    this.accessToken = token;
-    return token;
+    // Deduplicate concurrent refresh calls by reusing the in-flight promise
+    if (this.inflightRefresh) {
+      return this.inflightRefresh;
+    }
+
+    this.inflightRefresh = this._doRefresh();
+    try {
+      const token = await this.inflightRefresh;
+      return token;
+    } finally {
+      this.inflightRefresh = undefined;
+    }
+  }
+
+  private async _doRefresh(): Promise<string> {
+    // Read the latest refresh token (e.g. from localStorage) in case
+    // another tab rotated it since we last cached it in memory
+    const currentToken =
+      this.getRefreshToken?.() ?? this.refreshToken ?? '';
+
+    try {
+      const res = await this.api['account.refresh']({
+        refreshToken: currentToken,
+      });
+      if (res.refreshToken) {
+        this.refreshToken = res.refreshToken;
+        this.setRefreshToken?.(res.refreshToken);
+      }
+      this.accessToken = res.accessToken;
+      return res.accessToken;
+    } catch (e) {
+      // If the token we used was already rotated by another tab,
+      // localStorage may now hold the newer token — retry once
+      const latestToken = this.getRefreshToken?.() ?? '';
+      if (latestToken && latestToken !== currentToken) {
+        const res = await this.api['account.refresh']({
+          refreshToken: latestToken,
+        });
+        if (res.refreshToken) {
+          this.refreshToken = res.refreshToken;
+          this.setRefreshToken?.(res.refreshToken);
+        }
+        this.accessToken = res.accessToken;
+        return res.accessToken;
+      }
+      throw e;
+    }
   }
 
   async register(payload: RegisterPayload) {

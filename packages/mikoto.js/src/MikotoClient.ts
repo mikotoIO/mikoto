@@ -52,6 +52,7 @@ export class MikotoClient {
 
   async connect() {
     this.token = await this.auth.refresh();
+    this.timeOfLastRefresh = new Date();
     const websocketUrl = new URL(this.options.url);
     websocketUrl.protocol = websocketUrl.protocol.replace('http', 'ws');
     this.ws = new WebsocketApi({

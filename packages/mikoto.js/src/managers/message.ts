@@ -8,10 +8,12 @@ import type { MikotoChannel } from './channel';
 
 export class MikotoMessage extends ZSchema(MessageExt) {
   client!: MikotoClient;
+  pending?: boolean;
 
-  constructor(base: MessageExt, client: MikotoClient) {
+  constructor(base: MessageExt, client: MikotoClient, pending?: boolean) {
     super(base);
     this.client = ref(client);
+    if (pending) this.pending = true;
     return proxy(this);
   }
 

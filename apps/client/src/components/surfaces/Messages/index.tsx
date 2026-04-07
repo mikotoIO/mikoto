@@ -188,12 +188,6 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
     setMsgs((xs) => {
       if (xs === null) return null;
       setCurrentTypers((ts) => ts.filter((y) => y.userId !== x.author?.id));
-      // mikoto.client.messages
-      //   .ack({
-      //     channelId: channel.id,
-      //     timestamp: x.timestamp,
-      //   })
-      //   .then(() => {});
       if (channel.spaceId) {
         mikoto.rest['channels.acknowledge'](undefined, {
           params: {
@@ -203,6 +197,15 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
         }).then(() => {});
       }
       setScrollToBottom(true);
+      // Replace optimistic message if one exists for this user
+      const optimisticIndex = xs.findIndex(
+        (m) => m.pending && m.authorId === x.authorId,
+      );
+      if (optimisticIndex !== -1) {
+        const updated = [...xs];
+        updated[optimisticIndex] = new MikotoMessage(x, mikoto);
+        return updated;
+      }
       return [...xs, new MikotoMessage(x, mikoto)];
     });
   };
@@ -330,6 +333,24 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
                 setEditState(null);
                 await m.edit(msg);
               } else {
+                // Insert optimistic message immediately
+                const optimisticMsg = new MikotoMessage(
+                  {
+                    id: crypto.randomUUID(),
+                    channelId: channel.id,
+                    content: msg,
+                    authorId: mikoto.user.me?.id ?? null,
+                    author: mikoto.user.me ?? null,
+                    timestamp: new Date().toISOString(),
+                    editedTimestamp: null,
+                    attachments: [],
+                  },
+                  mikoto,
+                  true,
+                );
+                setMsgs((xs) => (xs ? [...xs, optimisticMsg] : null));
+                setScrollToBottom(true);
+
                 // Upload all files first
                 const attachments = await Promise.all(
                   files.map(async ({ file }) => {
@@ -343,7 +364,12 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
                   }),
                 );
 
-                await channel.sendMessage(msg, attachments);
+                await channel.sendMessage(msg, attachments).catch(() => {
+                  // Remove optimistic message on failure
+                  setMsgs((xs) =>
+                    xs ? xs.filter((m) => m.id !== optimisticMsg.id) : null,
+                  );
+                });
               }
             }}
           />

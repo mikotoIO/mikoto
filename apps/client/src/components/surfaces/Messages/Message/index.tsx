@@ -19,13 +19,14 @@ import { TypingDots } from '@/ui';
 
 import { Timestamp } from './Timestamp';
 
-const MessageContainer = styled.div<{ isSimple?: boolean }>`
+const MessageContainer = styled.div<{ isSimple?: boolean; pending?: boolean }>`
   margin: 0;
   display: flex;
   min-height: 20px;
   gap: 16px;
   padding: 2px 20px 6px;
   padding-top: ${(p) => (p.isSimple ? '2px' : '8px')};
+  opacity: ${(p) => (p.pending ? 0.5 : 1)};
   &:hover {
     background-color: rgba(0, 0, 0, 0.06);
   }
@@ -129,7 +130,7 @@ export const MessageItem = ({ message, isSimple }: MessageProps) => {
   ));
 
   return (
-    <MessageContainer isSimple={isSimple} onContextMenu={menu}>
+    <MessageContainer isSimple={isSimple} pending={message.pending} onContextMenu={menu}>
       {isSimple ? (
         <Box m={0} w={10} />
       ) : (

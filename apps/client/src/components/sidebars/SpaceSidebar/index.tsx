@@ -186,7 +186,9 @@ export function SpaceSidebar() {
       }}
     >
       <StyledSpaceSidebar onContextMenu={contextMenu}>
-        <StyledIconWrapper>
+        <StyledIconWrapper style={{
+          marginTop: '8px',
+        }}>
           <SpaceIconLike
             style={{
               background:

@@ -2,7 +2,6 @@ import { Box, Center } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import {
   faBarsStaggered,
-  faGlobe,
   faMagnifyingGlass,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -290,13 +289,13 @@ const AppView = () => {
       <TopBar>
         <TopBarLeft>
           <UserAreaAvatar />
-          <TabBarButton
+          {/* <TabBarButton
             onClick={() => {
               tabkit.openTab({ kind: 'spaceExplorer', key: 'spaceExplorer' });
             }}
           >
             <FontAwesomeIcon icon={faGlobe} />
-          </TabBarButton>
+          </TabBarButton> */}
           <TabBarButton
             onClick={() => {
               setWorkspace((ws) => ({

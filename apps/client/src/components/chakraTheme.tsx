@@ -321,6 +321,10 @@ export const globalCss = css`
     font-family: var(--font-heading);
   }
 
+  p {
+    margin: 0;
+  }
+
   body {
     overscroll-behavior-x: none;
     overscroll-behavior-y: none;

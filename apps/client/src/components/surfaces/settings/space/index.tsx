@@ -1,4 +1,4 @@
-import { Box, Code, Group, Input, Text } from '@chakra-ui/react';
+import { Box, Code, Group, Input, NativeSelect, Text } from '@chakra-ui/react';
 import { MikotoSpace, VerificationChallenge } from '@mikoto-io/mikoto.js';
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
@@ -185,6 +185,7 @@ function Overview({ space }: { space: MikotoSpace }) {
   const [spaceName, setSpaceName] = useState(space.name);
   const [spaceHandle, setSpaceHandle] = useState(space.handle ?? '');
   const [handleLoading, setHandleLoading] = useState(false);
+  const [visibility, setVisibility] = useState(space.visibility ?? 'PRIVATE');
   const handleError = useErrorElement();
   const setModal = useSetAtom(modalState);
   const spaceSnap = useSnapshot(space);
@@ -324,6 +325,36 @@ function Overview({ space }: { space: MikotoSpace }) {
             </Button>
           )}
         </Group>
+      </Form>
+
+      <h2>Visibility</h2>
+      <Text color="gray.400" fontSize="sm" mb={2}>
+        Public spaces can be discovered and joined by anyone. Private spaces
+        require an invite to join.
+      </Text>
+      <Form mb={4} maxW="480px">
+        <Field label="Space Visibility">
+          <NativeSelect.Root size="sm">
+            <NativeSelect.Field
+              value={visibility}
+              onChange={(e) => setVisibility(e.target.value as 'PRIVATE' | 'PUBLIC')}
+            >
+              <option value="PRIVATE">Private</option>
+              <option value="PUBLIC">Public</option>
+            </NativeSelect.Field>
+            <NativeSelect.Indicator />
+          </NativeSelect.Root>
+        </Field>
+        <Button
+          colorPalette="primary"
+          type="button"
+          mt={2}
+          onClick={async () => {
+            await space.edit({ visibility });
+          }}
+        >
+          Save Visibility
+        </Button>
       </Form>
 
       <h2>Bots</h2>

@@ -53,10 +53,8 @@ async fn get(
 }
 
 #[derive(Deserialize, JsonSchema)]
-struct ListQuery {
-    #[serde(skip_serializing_if = "Option::is_none")]
+struct MessageListQuery {
     limit: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     cursor: Option<Uuid>,
 }
 
@@ -65,7 +63,7 @@ async fn list(
     _member: Load<MemberExt>,
     Load(space): Load<SpaceExt>,
     Path((_, channel_id)): Path<(Uuid, Uuid)>,
-    Query(query): Query<ListQuery>,
+    Query(query): Query<MessageListQuery>,
 ) -> Result<Json<Vec<MessageExt>>, Error> {
     // Verify channel belongs to this space
     let channel = Channel::find_by_id(channel_id, db()).await?;

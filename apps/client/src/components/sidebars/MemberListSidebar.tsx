@@ -159,15 +159,23 @@ export function MemberListSidebar({ space }: { space: MikotoSpace }) {
 
   // Use a snapshot of the members cache to ensure reactivity
   const members = useSnapshot(space.members.cache);
+  const { hasMore } = useSnapshot(space.members);
   const spaceMembers = Array.from(members.values() ?? []).toSorted((a, b) =>
     a.user.name.localeCompare(b.user.name),
   );
+
+  const loadMore = useCallback(() => {
+    if (hasMore) {
+      space.members.list();
+    }
+  }, [space, hasMore]);
 
   return (
     <StyledMemberListSidebar>
       <Virtuoso
         style={{ height: '100%', overflowX: 'hidden' }}
         data={spaceMembers}
+        endReached={loadMore}
         itemContent={(_idx, member) => (
           <MemberElement
             member={member}

@@ -82,7 +82,13 @@ export class MikotoMember extends ZSchema(MemberExt) {
   }
 }
 
+const PAGE_SIZE = 100;
+
 export class MemberManager extends CachedManager<MikotoMember> {
+  hasMore = true;
+  private nextCursor?: string;
+  private fetching = false;
+
   constructor(public space: MikotoSpace) {
     super(space.client);
     return proxy(this);
@@ -92,14 +98,31 @@ export class MemberManager extends CachedManager<MikotoMember> {
     this.cache.set(data.userId, data);
   }
 
+  reset() {
+    this.cache.clear();
+    this.hasMore = true;
+    this.nextCursor = undefined;
+    this.fetching = false;
+  }
+
   async list() {
-    const res = await this.client.rest['members.list']({
-      params: { spaceId: this.space.id },
-    });
-    res.forEach((member) =>
-      this._insert(new MikotoMember(member, this.client)),
-    );
-    return res;
+    if (!this.hasMore || this.fetching) return;
+    this.fetching = true;
+    try {
+      const page = await this.client.rest['members.list']({
+        params: { spaceId: this.space.id },
+        queries: { limit: PAGE_SIZE, cursor: this.nextCursor },
+      });
+      page.forEach((member) =>
+        this._insert(new MikotoMember(member, this.client)),
+      );
+      this.hasMore = page.length >= PAGE_SIZE;
+      if (page.length > 0) {
+        this.nextCursor = page[page.length - 1].id;
+      }
+    } finally {
+      this.fetching = false;
+    }
   }
 
   static _subscribe(client: MikotoClient) {

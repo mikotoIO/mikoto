@@ -230,14 +230,6 @@ pub struct ListQuery {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ListQuery2 {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cursor: Option<Uuid>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub limit: Option<i32>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LoginPayload {
     pub email: String,
     pub password: String,
@@ -259,6 +251,14 @@ pub struct MemberExt {
     pub space_id: Uuid,
     pub user: UserExt,
     pub user_id: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MemberListQuery {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<Uuid>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -319,6 +319,14 @@ pub struct MessageExt {
 pub struct MessageKey {
     pub channel_id: Uuid,
     pub message_id: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MessageListQuery {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<Uuid>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i32>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1165,10 +1173,12 @@ impl<'a> HttpApi<'a> {
         Ok(resp.json().await?)
     }
 
-    pub async fn members_list(&self, space_id: Uuid) -> Result<Vec<MemberExt>, ClientError> {
+    pub async fn members_list(&self, space_id: Uuid, cursor: Option<Uuid>, limit: Option<i64>) -> Result<Vec<MemberExt>, ClientError> {
         let path = format!("/spaces/{}/members/", space_id);
         let mut req = self.client.get(self.url(&path))
             .bearer_auth(self.token);
+        if let Some(v) = &cursor { req = req.query(&[("cursor", v.to_string())]); }
+        if let Some(v) = &limit { req = req.query(&[("limit", v.to_string())]); }
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }

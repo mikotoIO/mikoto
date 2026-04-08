@@ -2556,6 +2556,25 @@
       "InviteCreatePayload": {
         "type": "object"
       },
+      "ListQuery": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          }
+        }
+      },
       "LoginPayload": {
         "examples": [
           {

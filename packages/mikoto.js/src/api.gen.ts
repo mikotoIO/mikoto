@@ -415,6 +415,14 @@ export type Invite = z.infer<typeof Invite>;
 export const InviteCreatePayload = z.object({}).partial();
 export type InviteCreatePayload = z.infer<typeof InviteCreatePayload>;
 
+export const ListQuery = z
+  .object({
+    cursor: z.union([z.string(), z.null()]),
+    limit: z.union([z.number(), z.null()]),
+  })
+  .partial();
+export type ListQuery = z.infer<typeof ListQuery>;
+
 export const MemberListQuery = z
   .object({
     cursor: z.union([z.string(), z.null()]),
@@ -523,6 +531,7 @@ export const schemas = {
   BanCreatePayload,
   Invite,
   InviteCreatePayload,
+  ListQuery,
   MemberListQuery,
   MessageKey,
   MessageListQuery,

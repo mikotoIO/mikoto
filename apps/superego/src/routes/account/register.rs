@@ -49,10 +49,10 @@ pub async fn route(
         passhash: bcrypt::hash(body.password.clone(), bcrypt::DEFAULT_COST)?,
     };
 
-    account.create_with_user(&body.name, db()).await?;
-
-    // Auto-assign a unique default handle for the new user
-    let _ = Handle::auto_assign_for_user(account.id, &body.name, db()).await;
+    let mut tx = db().begin().await?;
+    account.create_with_user(&body.name, &mut *tx).await?;
+    Handle::auto_assign_for_user(account.id, &body.name, &mut *tx).await?;
+    tx.commit().await?;
 
     let (refresh, token) = RefreshToken::new(account.id);
     refresh.create(db()).await?;

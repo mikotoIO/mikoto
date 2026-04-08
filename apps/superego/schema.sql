@@ -96,6 +96,97 @@ CREATE TYPE public."UserCategory" AS ENUM (
 
 ALTER TYPE public."UserCategory" OWNER TO postgres;
 
+--
+-- Name: check_space_has_handle(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.check_space_has_handle() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    IF NEW.type != 'NONE' THEN
+        RETURN NEW;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM "Handle" WHERE "spaceId" = NEW.id) THEN
+        RAISE EXCEPTION 'Space % must have a handle', NEW.id;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.check_space_has_handle() OWNER TO postgres;
+
+--
+-- Name: check_user_has_handle(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.check_user_has_handle() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM "Handle" WHERE "userId" = NEW.id) THEN
+        RAISE EXCEPTION 'User % must have a handle', NEW.id;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.check_user_has_handle() OWNER TO postgres;
+
+--
+-- Name: prevent_handle_orphan_space(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.prevent_handle_orphan_space() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    IF OLD."spaceId" IS NOT NULL THEN
+        IF NOT EXISTS (
+            SELECT 1 FROM "Handle"
+            WHERE "spaceId" = OLD."spaceId" AND handle != OLD.handle
+        ) THEN
+            -- Allow if the space is being deleted (CASCADE) or is DM/GROUP
+            IF EXISTS (SELECT 1 FROM "Space" WHERE id = OLD."spaceId" AND type = 'NONE') THEN
+                RAISE EXCEPTION 'Cannot remove the last handle for space %', OLD."spaceId";
+            END IF;
+        END IF;
+    END IF;
+    RETURN OLD;
+END;
+$$;
+
+
+ALTER FUNCTION public.prevent_handle_orphan_space() OWNER TO postgres;
+
+--
+-- Name: prevent_handle_orphan_user(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.prevent_handle_orphan_user() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    IF OLD."userId" IS NOT NULL THEN
+        IF NOT EXISTS (
+            SELECT 1 FROM "Handle"
+            WHERE "userId" = OLD."userId" AND handle != OLD.handle
+        ) THEN
+            -- Allow if the user is being deleted (CASCADE)
+            IF EXISTS (SELECT 1 FROM "User" WHERE id = OLD."userId") THEN
+                RAISE EXCEPTION 'Cannot remove the last handle for user %', OLD."userId";
+            END IF;
+        END IF;
+    END IF;
+    RETURN OLD;
+END;
+$$;
+
+
+ALTER FUNCTION public.prevent_handle_orphan_user() OWNER TO postgres;
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -614,10 +705,24 @@ CREATE INDEX "Handle_spaceId_idx" ON public."Handle" USING btree ("spaceId");
 
 
 --
+-- Name: Handle_spaceId_unique; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX "Handle_spaceId_unique" ON public."Handle" USING btree ("spaceId") WHERE ("spaceId" IS NOT NULL);
+
+
+--
 -- Name: Handle_userId_idx; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX "Handle_userId_idx" ON public."Handle" USING btree ("userId");
+
+
+--
+-- Name: Handle_userId_unique; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX "Handle_userId_unique" ON public."Handle" USING btree ("userId") WHERE ("userId" IS NOT NULL);
 
 
 --
@@ -702,6 +807,34 @@ CREATE UNIQUE INDEX "_RoleToSpaceUser_AB_unique" ON public."_RoleToSpaceUser" US
 --
 
 CREATE INDEX "_RoleToSpaceUser_B_index" ON public."_RoleToSpaceUser" USING btree ("B");
+
+
+--
+-- Name: Handle prevent_handle_orphan_space; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER prevent_handle_orphan_space BEFORE DELETE ON public."Handle" FOR EACH ROW EXECUTE FUNCTION public.prevent_handle_orphan_space();
+
+
+--
+-- Name: Handle prevent_handle_orphan_user; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER prevent_handle_orphan_user BEFORE DELETE ON public."Handle" FOR EACH ROW EXECUTE FUNCTION public.prevent_handle_orphan_user();
+
+
+--
+-- Name: Space space_must_have_handle; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE CONSTRAINT TRIGGER space_must_have_handle AFTER INSERT ON public."Space" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION public.check_space_has_handle();
+
+
+--
+-- Name: User user_must_have_handle; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE CONSTRAINT TRIGGER user_must_have_handle AFTER INSERT ON public."User" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION public.check_user_has_handle();
 
 
 --

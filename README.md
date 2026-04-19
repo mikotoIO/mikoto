@@ -48,7 +48,7 @@ and upcoming features:
 Prerequisites:
 
 - Docker
-- Rust 1.93+
+- [Rustup](https://rustup.rs/)
 - [Proto](https://moonrepo.dev/proto) (tool manager, used to install moonrepo)
 - Just (task runner)
 

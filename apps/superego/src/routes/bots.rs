@@ -174,10 +174,7 @@ async fn create_bot(
 
 async fn list_bots(account: Claims) -> Result<Json<Vec<BotInfo>>, Error> {
     let bots = Bot::list(Uuid::parse_str(&account.sub)?, db()).await?;
-    let mut infos = Vec::with_capacity(bots.len());
-    for bot in &bots {
-        infos.push(bot.to_info_with_user(db()).await?);
-    }
+    let infos = Bot::to_infos_with_users(&bots, db()).await?;
     Ok(Json(infos))
 }
 

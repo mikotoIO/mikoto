@@ -1,9 +1,11 @@
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
+use std::collections::HashMap;
+
 use crate::{db_enum, db_find_by_id, entity, error::Error, model};
 
-use super::UserExt;
+use super::{hashmap_by_key, User, UserExt};
 
 db_enum!(
     #[sqlx(type_name = "\"BotVisibility\"")]
@@ -197,6 +199,26 @@ impl Bot {
         let mut info = self.to_info();
         info.user = user;
         Ok(info)
+    }
+
+    pub async fn to_infos_with_users<'c, X: sqlx::PgExecutor<'c> + Copy>(
+        bots: &[Self],
+        db: X,
+    ) -> Result<Vec<BotInfo>, Error> {
+        let bot_ids: Vec<Uuid> = bots.iter().map(|b| b.id).collect();
+        let users = User::dataload(bot_ids, db).await?;
+
+        let user_exts = UserExt::dataload(users.into_values().collect(), db).await?;
+        let user_ext_map: HashMap<Uuid, UserExt> = hashmap_by_key(user_exts, |u| u.base.id);
+
+        Ok(bots
+            .iter()
+            .map(|bot| {
+                let mut info = bot.to_info();
+                info.user = user_ext_map.get(&bot.id).cloned();
+                info
+            })
+            .collect())
     }
 
     pub async fn list_spaces<'c, X: sqlx::PgExecutor<'c>>(

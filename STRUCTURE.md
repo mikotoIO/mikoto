@@ -14,7 +14,6 @@ mikoto/
 │   │       └── views/        # Page components
 │   ├── content-proxy/        # Content proxy service (Rust)
 │   ├── desktop/              # Desktop application (Electron)
-│   ├── mobile/               # Mobile application (React Native)
 │   └── superego/             # API server (Rust)
 │       ├── migrations/       # Database migrations
 │       └── src/              # Server source code

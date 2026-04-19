@@ -96,10 +96,13 @@ async fn send(
     message.create(db()).await?;
 
     // Create attachments if any
-    for (i, attachment_input) in body.attachments.into_iter().enumerate() {
-        let attachment = MessageAttachment::new(message.id, attachment_input, i as i32);
-        attachment.create(db()).await?;
-    }
+    let attachments: Vec<MessageAttachment> = body
+        .attachments
+        .into_iter()
+        .enumerate()
+        .map(|(i, input)| MessageAttachment::new(message.id, input, i as i32))
+        .collect();
+    MessageAttachment::create_many(&attachments, db()).await?;
 
     let message = MessageExt::dataload_one(message, db()).await?;
 

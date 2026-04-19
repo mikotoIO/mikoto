@@ -3,45 +3,36 @@
 </p>
 
 <h1 align="center">
-  Mikoto
+  <a href='https://mikoto.io'>mikoto.io</a> 
 </h1>
 
 <p align="center">The Most Overkill Messaging App in the World.</p>
-<p align="center">
-  <a href='https://mikoto.io'>Website</a> · 
-  <a href='https://platform.mikoto.io'>App</a> ·
-  <a href='https://docs.mikoto.io'>Docs</a> ·
-  <a href='https://blog.mikoto.io'>Blog</a>
-</p>
 <br>
-
-Mikoto is an messaging platform designed for building online communities. It uses a thread-based structure for text messaging, voice/video chat, and real-time collaborative wiki editing.
 
 <p align="center">
   <img src="./screenshots/img3.png" width="800px">
 </p>
 
-## Features
+## features
 
-> Note: Mikoto is still in early development. Some of these features are not fully implemented.
+- 📑 tabs
+- 🀄 tiling window manager
+- 🧵 threaded messages
+- 📡 voice, video, and screen share
+- 📝 real-time wiki channels using Y.js
+- zen mode
+- 🅱️ keyboard shortcuts
+- 📨 direct messages
 
-- ✨ Open Source (with proprietary extensions for enterprise support)
-- ⚡️ Superuser friendly features, like tab view, zen mode and, keyboard shortcuts and more
-- 📡 Voice, video, and screen sharing
-- 📝 Real-time collaborative wiki channels
-- 🧵 Next-generation thread management
-- 🏡 Threaded DMs and group DMs
-- 🎨 Customizable themes and appearances
+and upcoming:
 
-and upcoming features:
-
+- 🌎 built-in community finder
+- 🔍 search channels
 - 🪐 [DID-based](https://www.w3.org/TR/did-core/) usernames
-- 🔒 E2E encrypted DMs and Group DMs
-- 🔍 Semantic search across all channels
-- 🔌 Pluggable architecture for custom extensions
-- 🛒 A marketplace for extensions and integrations
-- 🌎 Built-in community finder
-- 🥸 A system to handle multiple personas and identities
+  - 🥸 subdomains for multiple personas and identities
+- 🔒 encryption
+- 🎨 custom themes
+- 🛒 marketplace for extensions and integrations
 
 ## Setup
 
@@ -106,6 +97,13 @@ All Mikoto services use ports in the `351X` or `351XX` range to avoid conflicts 
 | MailHog     | 35108, 35109        | Development mail server |
 | Meilisearch | 35110               | Search engine           |
 
+## Docs
+
+[docs.mikoto.io](https://docs.mikoto.io)
+
 ## License
 
-While we're still an early-stage project and the licensing may change in the future, Mikoto is currently dual licensed under AGPL core and a proprietary license. Please email cactus (at) mikoto.io if you are interested in enterprise uses for Mikoto.
+Dual licensed under AGPL core and a proprietary license.
+
+See [LICENSE](./LICENSE)
+

@@ -9,7 +9,7 @@
 <p align="center">The Most Overkill Messaging App in the World.</p>
 <p align="center">
   <a href='https://mikoto.io'>Website</a> · 
-  <a href='https://alpha.mikoto.io'>Alpha</a> ·
+  <a href='https://platform.mikoto.io'>App</a> ·
   <a href='https://docs.mikoto.io'>Docs</a> ·
   <a href='https://blog.mikoto.io'>Blog</a>
 </p>
@@ -48,26 +48,19 @@ and upcoming features:
 Prerequisites:
 
 - Docker
-- Rust 1.81+
-- Node.js 22+
-- sqlx CLI (`cargo install sqlx-cli --no-default-features --features rustls,postgres`)
-- Moonrepo
+- Rust 1.93+
+- [Proto](https://moonrepo.dev/proto) (tool manager, used to install moonrepo)
+- Just (task runner)
 
 ```sh
-# use corepack
-corepack enable
-
-# install dependencies
+proto install
 pnpm install
 
 # Copy .env.example to .env and set the variables
-cp ./apps/superego/.env.example ./apps/superego/.env
+cp ./.env.example ./.env
 
-# migrate database (run in superego directory)
-sqlx database create && sqlx migrate run
-
-# start services (PostgreSQL, Redis, MinIO, etc.)
-docker-compose up
+# Reset and seed the environment
+just reset-dev-env
 ```
 
 ### Development
@@ -78,7 +71,7 @@ To develop apps and packages, run the following command:
 
 ```sh
 docker compose up -d # Run auxiliary services
-moon :start --query "tag~core-app" # superego, content-proxy and client
+just start-dev # runs the base scripts
 ```
 
 ### Build
@@ -86,7 +79,7 @@ moon :start --query "tag~core-app" # superego, content-proxy and client
 To build all apps and packages, run the following command:
 
 ```sh
-pnpm build
+moon :build
 ```
 
 ## Port Configuration

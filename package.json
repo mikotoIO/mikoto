@@ -22,8 +22,8 @@
     ]
   },
   "engines": {
-    "npm": ">=7.0.0",
-    "node": ">=22.0.0"
+    "node": ">=24.0.0",
+    "pnpm": ">=8.0.0"
   },
   "scripts": {
     "compose": "docker compose up -d",

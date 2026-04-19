@@ -7,6 +7,7 @@ projects:
   - '.'
   - 'apps/*'
   - 'crates/*'
+  - 'examples/*'
   - 'packages/*'
 vcs:
   manager: 'git'

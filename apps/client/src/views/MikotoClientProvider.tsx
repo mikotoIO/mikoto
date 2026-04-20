@@ -20,8 +20,10 @@ function registerNotifications(
   preferences: Map<string, NotificationLevel>,
 ) {
   mikoto.ws.on('messages.onCreate', (msg) => {
-    if (msg.authorId === mikoto.user.me?.id) return;
     const channel = mikoto.channels._get(msg.channelId);
+    if (channel) channel.lastUpdated = msg.timestamp;
+
+    if (msg.authorId === mikoto.user.me?.id) return;
     if (!channel) return;
 
     if (channel.spaceId) {

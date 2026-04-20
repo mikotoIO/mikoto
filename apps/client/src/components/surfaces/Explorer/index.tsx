@@ -135,7 +135,6 @@ function useAcks(space: MikotoSpace) {
       const ch = mikoto.channels._get(msg.channelId);
       if (ch?.spaceId !== space.id) return;
       if (msg.authorId === mikoto.user.me?.id) return;
-      if (ch) ch.lastUpdated = msg.timestamp;
 
       // Auto-ack if this channel tab is active
       if (getActiveChannelId() === msg.channelId) {

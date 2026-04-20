@@ -95,6 +95,8 @@ async fn send(
     let message = Message::new(&channel, claim.sub.parse()?, body.content);
     message.create(db()).await?;
 
+    Channel::update_last_updated(channel_id, message.timestamp, db()).await?;
+
     // Create attachments if any
     let attachments: Vec<MessageAttachment> = body
         .attachments

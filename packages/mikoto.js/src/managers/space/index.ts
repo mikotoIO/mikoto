@@ -3,6 +3,8 @@ import { proxy, ref } from 'valtio/vanilla';
 import type { MikotoClient } from '../../MikotoClient';
 import {
   type ChannelCreatePayload,
+  type NotificationLevel,
+  type NotificationPreference,
   SpaceExt,
   type SpaceUpdatePayload,
 } from '../../api.gen';
@@ -90,6 +92,21 @@ export class MikotoSpace extends ZSchema(SimpleSpaceExt) {
     return unread;
   }
 
+  async getNotificationPreference(): Promise<NotificationPreference> {
+    return await this.client.rest['spaces.getNotificationPreference']({
+      params: { spaceId: this.id },
+    });
+  }
+
+  async setNotificationPreference(
+    level: NotificationLevel,
+  ): Promise<NotificationPreference> {
+    return await this.client.rest['spaces.setNotificationPreference'](
+      { level },
+      { params: { spaceId: this.id } },
+    );
+  }
+
   async createChannel(data: ChannelCreatePayload) {
     const channel = await this.client.rest['channels.create'](data, {
       params: { spaceId: this.id },
@@ -126,6 +143,10 @@ export class SpaceManager extends CachedManager<MikotoSpace> {
   async list() {
     const spaces = await this.client.rest['spaces.list']();
     return spaces.map((space) => new MikotoSpace(space, this.client));
+  }
+
+  async listNotificationPreferences(): Promise<NotificationPreference[]> {
+    return await this.client.rest['spaces.listNotificationPreferences']();
   }
 
   async join(invite: string) {

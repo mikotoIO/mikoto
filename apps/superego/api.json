@@ -1169,6 +1169,80 @@
         }
       }
     },
+    "/spaces/notification-preferences": {
+      "get": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "List Notification Preferences",
+        "operationId": "spaces.listNotificationPreferences",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationPreference"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/notification-preference": {
+      "get": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Get Notification Preference",
+        "operationId": "spaces.getNotificationPreference",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreference"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "Set Notification Preference",
+        "operationId": "spaces.setNotificationPreference",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationPreferencePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreference"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/spaces/{spaceId}/handle/verify": {
       "post": {
         "tags": [
@@ -2895,6 +2969,46 @@
           },
           "content": {
             "type": "string"
+          }
+        }
+      },
+      "NotificationLevel": {
+        "type": "string",
+        "enum": [
+          "ALL",
+          "MENTIONS",
+          "NOTHING"
+        ]
+      },
+      "NotificationPreference": {
+        "type": "object",
+        "required": [
+          "level",
+          "spaceId",
+          "userId"
+        ],
+        "properties": {
+          "level": {
+            "$ref": "#/components/schemas/NotificationLevel"
+          },
+          "spaceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "NotificationPreferencePayload": {
+        "type": "object",
+        "required": [
+          "level"
+        ],
+        "properties": {
+          "level": {
+            "$ref": "#/components/schemas/NotificationLevel"
           }
         }
       },

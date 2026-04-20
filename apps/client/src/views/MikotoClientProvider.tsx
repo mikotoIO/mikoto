@@ -1,19 +1,44 @@
-import { MikotoClient } from '@mikoto-io/mikoto.js';
+import {
+  MikotoClient,
+  NotificationLevel,
+  NotificationPreference,
+} from '@mikoto-io/mikoto.js';
 import { AxiosError } from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { env } from '@/env';
+import { notifyFromMessage } from '@/functions/notify';
 import { AuthContext, MikotoContext } from '@/hooks';
 import { authClient } from '@/store/authClient';
 
 const BASE_DELAY_MS = 1000;
 const MAX_DELAY_MS = 16000;
 
-function registerNotifications(_mikoto: MikotoClient) {
-  // mikoto.client.messages.onCreate((msg) => {
-  //   notifyFromMessage(mikoto, msg);
-  // });
+function registerNotifications(
+  mikoto: MikotoClient,
+  preferences: Map<string, NotificationLevel>,
+) {
+  mikoto.ws.on('messages.onCreate', (msg) => {
+    if (msg.authorId === mikoto.user.me?.id) return;
+    const channel = mikoto.channels._get(msg.channelId);
+    if (!channel) return;
+
+    if (channel.spaceId) {
+      const pref = preferences.get(channel.spaceId) ?? 'ALL';
+      if (pref === 'NOTHING') return;
+      if (pref === 'MENTIONS') return;
+    }
+
+    notifyFromMessage(mikoto, msg);
+  });
+}
+
+async function loadNotificationPreferences(
+  mikoto: MikotoClient,
+): Promise<Map<string, NotificationLevel>> {
+  const prefs = await mikoto.spaces.listNotificationPreferences();
+  return new Map(prefs.map((p: NotificationPreference) => [p.spaceId, p.level]));
 }
 
 interface MikotoClientProviderProps {
@@ -42,7 +67,8 @@ export function MikotoClientProvider({
 
       try {
         await Promise.all([mi.spaces.list(), mi.user.load()]);
-        registerNotifications(mi);
+        const preferences = await loadNotificationPreferences(mi);
+        registerNotifications(mi, preferences);
         setMikoto(mi);
         return;
       } catch (e) {

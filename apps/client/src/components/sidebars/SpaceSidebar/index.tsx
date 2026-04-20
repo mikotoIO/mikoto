@@ -4,9 +4,9 @@ import { useSortable } from '@dnd-kit/react/sortable';
 import styled from '@emotion/styled';
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
+import { MessageExt, MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useAtom, useSetAtom } from 'jotai';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSnapshot } from 'valtio/react';
 
 import { modalState, useContextMenu } from '@/components/ContextMenu';
@@ -18,6 +18,7 @@ import { reorder } from '@/functions/reorder';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState, workspaceState } from '@/store';
 
+import { Pill } from './Pill';
 import { SpaceBackContextMenu, SpaceContextMenu } from './SpaceContextMenu';
 import { SpaceIconTooltip } from './Tooltip';
 
@@ -43,13 +44,51 @@ const StyledIconWrapper = styled.div`
   padding-right: 8px;
 `;
 
+function useSpaceUnreadState(mikoto: MikotoClient) {
+  const [unreadSpaces, setUnreadSpaces] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const handler = (msg: MessageExt) => {
+      if (msg.authorId === mikoto.user.me?.id) return;
+      const channel = mikoto.channels._get(msg.channelId);
+      if (!channel?.spaceId) return;
+      setUnreadSpaces((prev) => {
+        if (prev.has(channel.spaceId!)) return prev;
+        const next = new Set(prev);
+        next.add(channel.spaceId!);
+        return next;
+      });
+    };
+    mikoto.ws.on('messages.onCreate', handler);
+    return () => {
+      mikoto.ws.off('messages.onCreate', handler);
+    };
+  }, []);
+
+  return {
+    isUnread: (spaceId: string) => unreadSpaces.has(spaceId),
+    clearUnread: (spaceId: string) => {
+      setUnreadSpaces((prev) => {
+        if (!prev.has(spaceId)) return prev;
+        const next = new Set(prev);
+        next.delete(spaceId);
+        return next;
+      });
+    },
+  };
+}
+
 interface SidebarSpaceIconProps {
   space: MikotoSpace;
+  unread?: boolean;
+  onClearUnread?: () => void;
 }
 
 function SortableSpaceIcon({
   space,
   index,
+  unread,
+  onClearUnread,
 }: SidebarSpaceIconProps & { index: number }) {
   const { ref } = useSortable({
     id: space.id,
@@ -58,13 +97,20 @@ function SortableSpaceIcon({
 
   return (
     <div ref={ref}>
-      <SidebarSpaceIcon space={space} />
+      <SidebarSpaceIcon
+        space={space}
+        unread={unread}
+        onClearUnread={onClearUnread}
+      />
     </div>
   );
 }
 
-function SidebarSpaceIcon({ space }: SidebarSpaceIconProps) {
-  // TODO: TF is this name?
+function SidebarSpaceIcon({
+  space,
+  unread,
+  onClearUnread,
+}: SidebarSpaceIconProps) {
   const [leftSidebar, setLeftSidebar] = useAtom(treebarSpaceState);
   const isActive =
     leftSidebar &&
@@ -77,6 +123,7 @@ function SidebarSpaceIcon({ space }: SidebarSpaceIconProps) {
   return (
     <SpaceIconTooltip tooltip={space.name}>
       <StyledIconWrapper>
+        {unread && !isActive && <Pill h={8} />}
         <StyledSpaceIcon
           active={isActive}
           size={ICON_SIZE}
@@ -92,8 +139,7 @@ function SidebarSpaceIcon({ space }: SidebarSpaceIconProps) {
               key: `explorer/${space.id}`,
               spaceId: space.id,
             });
-            // FIXME: correctly fetch members
-            // space.fetchMembers().then();
+            onClearUnread?.();
           }}
         >
           {space.icon === null ? space.name[0] : ''}
@@ -155,6 +201,7 @@ const ICON_SIZE = '40px';
 export function SpaceSidebar() {
   const mikoto = useMikoto();
   const [spaceId, setSpaceId] = useAtom(treebarSpaceState);
+  const { isUnread, clearUnread } = useSpaceUnreadState(mikoto);
 
   useSnapshot(mikoto.spaces);
   const contextMenu = useContextMenu(() => <SpaceBackContextMenu />);
@@ -209,7 +256,13 @@ export function SpaceSidebar() {
         {spaceArray
           .filter((x) => x.type === 'NONE') // TODO: filter this on the server
           .map((space, index) => (
-            <SortableSpaceIcon key={space.id} space={space} index={index} />
+            <SortableSpaceIcon
+              key={space.id}
+              space={space}
+              index={index}
+              unread={isUnread(space.id)}
+              onClearUnread={() => clearUnread(space.id)}
+            />
           ))}
         <JoinSpaceButon />
       </StyledSpaceSidebar>

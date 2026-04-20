@@ -59,9 +59,69 @@ pub struct ChannelPatch {
     pub name: Option<String>,
 }
 
+impl ChannelUnread {
+    pub async fn upsert<'c, X: sqlx::PgExecutor<'c>>(
+        channel_id: Uuid,
+        user_id: Uuid,
+        timestamp: Timestamp,
+        db: X,
+    ) -> Result<(), Error> {
+        sqlx::query(
+            r##"
+            INSERT INTO "ChannelUnread" ("channelId", "userId", "timestamp")
+            VALUES ($1, $2, $3)
+            ON CONFLICT ("channelId", "userId")
+            DO UPDATE SET "timestamp" = $3
+            "##,
+        )
+        .bind(channel_id)
+        .bind(user_id)
+        .bind(timestamp)
+        .execute(db)
+        .await?;
+        Ok(())
+    }
+
+    pub async fn list_by_user_in_space<'c, X: sqlx::PgExecutor<'c>>(
+        user_id: Uuid,
+        space_id: Uuid,
+        db: X,
+    ) -> Result<Vec<Self>, Error> {
+        let unreads = sqlx::query_as(
+            r##"
+            SELECT cu.* FROM "ChannelUnread" cu
+            JOIN "Channel" c ON cu."channelId" = c."id"
+            WHERE cu."userId" = $1 AND c."spaceId" = $2
+            "##,
+        )
+        .bind(user_id)
+        .bind(space_id)
+        .fetch_all(db)
+        .await?;
+        Ok(unreads)
+    }
+}
+
 impl Channel {
     db_find_by_id!("Channel");
     db_list_where!("Channel", list, "spaceId", space_id, Uuid);
+
+    pub async fn update_last_updated<'c, X: sqlx::PgExecutor<'c>>(
+        channel_id: Uuid,
+        timestamp: Timestamp,
+        db: X,
+    ) -> Result<(), Error> {
+        sqlx::query(
+            r##"
+            UPDATE "Channel" SET "lastUpdated" = $1 WHERE "id" = $2
+            "##,
+        )
+        .bind(timestamp)
+        .bind(channel_id)
+        .execute(db)
+        .await?;
+        Ok(())
+    }
 
     pub async fn dataload_space<'c, X: sqlx::PgExecutor<'c>>(
         space_ids: Vec<Uuid>,

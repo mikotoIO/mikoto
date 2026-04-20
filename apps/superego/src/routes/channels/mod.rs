@@ -130,14 +130,21 @@ async fn delete(
     Ok(().into())
 }
 
-async fn list_unread(Path(_space_id): Path<Uuid>) -> Result<Json<Vec<ChannelUnread>>, Error> {
-    // no-op for now
-    Ok(vec![].into())
+async fn list_unread(
+    claim: Claims,
+    Path(space_id): Path<Uuid>,
+) -> Result<Json<Vec<ChannelUnread>>, Error> {
+    let user_id: Uuid = claim.sub.parse()?;
+    let unreads = ChannelUnread::list_by_user_in_space(user_id, space_id, db()).await?;
+    Ok(unreads.into())
 }
 
-async fn acknowledge(Path((_, _channel_id)): Path<(Uuid, Uuid)>) -> Result<Json<()>, Error> {
-    // no-op for now
-    // TODO: Implement
+async fn acknowledge(
+    claim: Claims,
+    Path((_, channel_id)): Path<(Uuid, Uuid)>,
+) -> Result<Json<()>, Error> {
+    let user_id: Uuid = claim.sub.parse()?;
+    ChannelUnread::upsert(channel_id, user_id, Timestamp::now(), db()).await?;
     Ok(().into())
 }
 

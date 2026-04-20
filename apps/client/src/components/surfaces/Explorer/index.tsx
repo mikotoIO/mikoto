@@ -6,7 +6,11 @@ import {
   faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { MikotoChannel, MikotoSpace } from '@mikoto-io/mikoto.js';
+import {
+  MessageExt,
+  MikotoChannel,
+  MikotoSpace,
+} from '@mikoto-io/mikoto.js';
 import { useAtom, useSetAtom } from 'jotai';
 import { NumberSize, Resizable } from 're-resizable';
 import { useEffect, useState } from 'react';
@@ -108,11 +112,13 @@ export function TreebarContextMenu({ space }: { space: MikotoSpace }) {
 }
 
 function isUnread(lastUpdate: Date | undefined, ack: Date | null) {
-  if (lastUpdate === undefined || ack === null) return false;
+  if (lastUpdate === undefined) return false;
+  if (ack === null) return true;
   return lastUpdate.getTime() > ack.getTime();
 }
 
 function useAcks(space: MikotoSpace) {
+  const mikoto = useMikoto();
   const [acks, setAcks] = useState<Record<string, Date>>({});
 
   useEffect(() => {
@@ -124,16 +130,16 @@ function useAcks(space: MikotoSpace) {
   }, [space.id]);
 
   useEffect(() => {
-    // FIXME: what the hell is this
-    // const destroy = mikoto.client.messages.onCreate((msg) => {
-    //   const ch = mikoto.channels.get(msg.channelId);
-    //   if (ch?.spaceId !== space.id) return;
-    //   if (msg.author?.id === mikoto.me.id) return;
-    //   ch.lastUpdated = msg.timestamp;
-    // });
-    // return () => {
-    //   destroy();
-    // };
+    const handler = (msg: MessageExt) => {
+      const ch = mikoto.channels._get(msg.channelId);
+      if (ch?.spaceId !== space.id) return;
+      if (msg.authorId === mikoto.user.me?.id) return;
+      if (ch) ch.lastUpdated = msg.timestamp;
+    };
+    mikoto.ws.on('messages.onCreate', handler);
+    return () => {
+      mikoto.ws.off('messages.onCreate', handler);
+    };
   }, [space.id]);
 
   return {

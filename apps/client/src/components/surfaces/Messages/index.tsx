@@ -264,7 +264,12 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
 
   return (
     <Surface key={channel.id}>
-      <TabName name={displayName} icon={channel.space?.icon ?? faHashtag} />
+      <TabName
+        name={displayName}
+        icon={channel.space?.icon ?? faHashtag}
+        spaceId={channel.space?.id}
+        spaceName={channel.space?.name}
+      />
       <Grid templateRows="auto 24px" h="100%">
         <Flex direction="column">
           {msgs === null ? (

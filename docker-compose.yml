@@ -29,7 +29,7 @@ services:
       - '35104:9001'
     restart: always
   livekit:
-    image: 'livekit/livekit-server:v1.8.3'
+    image: 'livekit/livekit-server:v1.11.0'
     command: '--keys "devkey: secret1234567890abcdefghijklmnopqrtsuvwxyz"'
     ports:
       - '35105:7880'

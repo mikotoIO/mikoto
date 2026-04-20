@@ -1,6 +1,23 @@
 import { MessageExt, MikotoClient } from '@mikoto-io/mikoto.js';
 
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
+import { toaster } from '@/components/ui/toaster';
+
+export type NotificationMode = 'none' | 'native' | 'toast';
+
+const NOTIFICATION_MODE_KEY = 'notificationMode';
+
+export function getNotificationMode(): NotificationMode {
+  const stored = localStorage.getItem(NOTIFICATION_MODE_KEY);
+  if (stored === 'none' || stored === 'native' || stored === 'toast') {
+    return stored;
+  }
+  return 'native';
+}
+
+export function setNotificationMode(mode: NotificationMode) {
+  localStorage.setItem(NOTIFICATION_MODE_KEY, mode);
+}
 
 const audio = new Audio('audio/notification/ping.ogg');
 audio.volume = 0.3;
@@ -28,16 +45,36 @@ function isSoundEnabled() {
   return localStorage.getItem('notificationSound') !== 'false';
 }
 
+function playSound() {
+  if (isSoundEnabled()) {
+    audio.play();
+  }
+}
+
 function showNotification(title: string, body: string, icon?: string) {
+  const mode = getNotificationMode();
+  if (mode === 'none') return;
+
+  if (mode === 'toast') {
+    toaster.create({
+      title,
+      description: body,
+      type: 'info',
+      duration: 3000,
+    });
+    playSound();
+    return;
+  }
+
+  if (Notification.permission !== 'granted') return;
+
   const notification = new Notification(title, {
     body,
     icon,
     silent: true,
   });
   notification.onshow = () => {
-    if (isSoundEnabled()) {
-      audio.play();
-    }
+    playSound();
     setTimeout(() => {
       notification.close();
     }, 3000);

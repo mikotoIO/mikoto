@@ -24,7 +24,10 @@ function registerNotifications(
     const channel = mikoto.channels._get(msg.channelId);
     if (channel) channel.lastUpdated = msg.timestamp;
 
-    if (msg.authorId === mikoto.user.me?.id) return;
+    if (msg.authorId === mikoto.user.me?.id) {
+      ackChannel(msg.channelId, msg.timestamp);
+      return;
+    }
     if (!channel) return;
 
     if (channel.spaceId) {

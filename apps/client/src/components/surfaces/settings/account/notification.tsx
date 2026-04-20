@@ -8,6 +8,11 @@ import { useTranslation } from 'react-i18next';
 import { useSnapshot } from 'valtio/react';
 
 import { Switch } from '@/components/ui';
+import {
+  NotificationMode,
+  getNotificationMode,
+  setNotificationMode,
+} from '@/functions/notify';
 import { useMikoto } from '@/hooks';
 import { SettingSurface } from '@/views';
 
@@ -21,6 +26,18 @@ const LEVEL_DESCRIPTIONS: Record<NotificationLevel, string> = {
   ALL: 'You will be notified for every new message.',
   MENTIONS: 'You will only be notified when mentioned.',
   NOTHING: 'You will not receive any notifications.',
+};
+
+const MODE_LABELS: Record<NotificationMode, string> = {
+  none: 'Off',
+  native: 'Native',
+  toast: 'In-App',
+};
+
+const MODE_DESCRIPTIONS: Record<NotificationMode, string> = {
+  none: 'Do not show push notifications.',
+  native: 'Show notifications using your browser or OS notification system.',
+  toast: 'Show notifications as toasts in the bottom right corner.',
 };
 
 function NotificationPermissionBanner() {
@@ -114,6 +131,7 @@ export function NotificationSurface() {
   const mikoto = useMikoto();
   useSnapshot(mikoto.spaces);
 
+  const [mode, setMode] = useState<NotificationMode>(getNotificationMode);
   const [preferences, setPreferences] = useState<
     Map<string, NotificationLevel>
   >(new Map());
@@ -140,7 +158,39 @@ export function NotificationSurface() {
     <SettingSurface>
       <h1>{t('accountSettings.notifications.title')}</h1>
 
-      <NotificationPermissionBanner />
+      <Box mb={6}>
+        <Text fontSize="14px" fontWeight="600" mb={3}>
+          Notification Style
+        </Text>
+        <Flex gap={3}>
+          {(['none', 'native', 'toast'] as NotificationMode[]).map((m) => (
+            <Box
+              key={m}
+              flex="1"
+              p={4}
+              borderWidth="2px"
+              borderColor={mode === m ? 'blue.500' : 'gray.700'}
+              borderRadius="8px"
+              cursor="pointer"
+              bg={mode === m ? 'blue.500/10' : undefined}
+              _hover={{ borderColor: mode === m ? 'blue.500' : 'gray.500' }}
+              onClick={() => {
+                setMode(m);
+                setNotificationMode(m);
+              }}
+            >
+              <Text fontSize="14px" fontWeight="600" mb={1}>
+                {MODE_LABELS[m]}
+              </Text>
+              <Text fontSize="12px" color="gray.400">
+                {MODE_DESCRIPTIONS[m]}
+              </Text>
+            </Box>
+          ))}
+        </Flex>
+      </Box>
+
+      {mode === 'native' && <NotificationPermissionBanner />}
 
       <Box mb={6}>
         <Flex align="center" justify="space-between" mb={2}>

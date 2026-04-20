@@ -124,7 +124,7 @@ importers:
         version: 0.14.5
       '@livekit/components-react':
         specifier: ^2.9.20
-        version: 2.9.20(livekit-client@1.15.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tslib@2.7.0)
+        version: 2.9.20(livekit-client@2.18.3(@types/dom-mediacapture-record@1.0.22))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tslib@2.8.1)
       '@livekit/components-styles':
         specifier: ^1.2.0
         version: 1.2.0
@@ -201,8 +201,8 @@ importers:
         specifier: ^0.14.4
         version: 0.14.5
       livekit-client:
-        specifier: ^1.13.3
-        version: 1.15.13
+        specifier: ^2.18.3
+        version: 2.18.3(@types/dom-mediacapture-record@1.0.22)
       localforage:
         specifier: ^1.10.0
         version: 1.10.0
@@ -2233,7 +2233,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.17.13':
     resolution: {integrity: sha512-n13yxOmI3I0JidzMdFCH68tYKGDtK4XlDFk1vysZX7AIRKeDVRsSbHhma5jCla2bDt25RKmJBHA9KtzielwzAA==}
@@ -2771,6 +2771,12 @@ packages:
   '@livekit/components-styles@1.2.0':
     resolution: {integrity: sha512-74/rt0lDh6aHmOPmWAeDE9C4OrNW9RIdmhX/YRbovQBVNGNVWojRjl3FgQZ5LPFXO6l1maKB4JhXcBFENVxVvw==}
     engines: {node: '>=18'}
+
+  '@livekit/mutex@1.1.1':
+    resolution: {integrity: sha512-EsshAucklmpuUAfkABPxJNhzj9v2sG7JuzFDL4ML1oJQSV14sqrpTYnsaOudMAw9yOaW53NU3QQTlUQoRs4czw==}
+
+  '@livekit/protocol@1.45.3':
+    resolution: {integrity: sha512-WmMxBTsy4dRBqcrswFwUUlgq3Z0nnhOqKR6tX749Rb/PcB1yBMUtrHxZvcsS6qi3/5+86zHeVG+exmu1sZqfJg==}
 
   '@malept/cross-spawn-promise@1.1.1':
     resolution: {integrity: sha512-RTBGWL5FWQcg9orDOCcp4LvItNzUPcyEU9bwaeJX0rJ1IQxzucC48Y0/sQLp/g6t99IQgAlGIaesJS+gTn7tVQ==}
@@ -3675,6 +3681,9 @@ packages:
 
   '@types/debug@4.1.12':
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
+
+  '@types/dom-mediacapture-record@1.0.22':
+    resolution: {integrity: sha512-mUMZLK3NvwRLcAAT9qmcK+9p7tpU2FHdDsntR3YI4+GY88XrgG4XiE7u1Q2LAN2/FZOz/tdMDC3GQCR4T8nFuw==}
 
   '@types/electron-squirrel-startup@1.0.2':
     resolution: {integrity: sha512-AzxnvBzNh8K/0SmxMmZtpJf1/IWoGXLP+pQDuUaVkPyotI8ryvAtBSqgxR/qOSvxWHYWrxkeNsJ+Ca5xOuUxJQ==}
@@ -7444,8 +7453,10 @@ packages:
     resolution: {integrity: sha512-rJysbR9GKIalhTbVL2tYbF2hVyDnrf7pFUZBwjPaMIdadYHmeT+EVi/Bu3qd7ETQPahTotg2WRCatXwRBW554g==}
     engines: {node: '>=16.0.0'}
 
-  livekit-client@1.15.13:
-    resolution: {integrity: sha512-0oPyZvQ8RK/Gi7Hhmg1hIHM5qpGbkpVtjGC2J1AZlNs41Bp45bU9sgCWRVZ+nd++vDSWEOR/lXiHE8sXPgcFTA==}
+  livekit-client@2.18.3:
+    resolution: {integrity: sha512-A8QDaVPo+Ye35bJFyKe6PjMOtY33dmdRXGKP/3+BG48ynEES3YwFzHbsPHJiScgI4OZouNef3Ew/BPazXKwo8Q==}
+    peerDependencies:
+      '@types/dom-mediacapture-record': ^1
 
   load-json-file@2.0.0:
     resolution: {integrity: sha512-3p6ZOGNbiX4CdvEd1VcE6yi78UrGNpjHO33noGwHCnT/o2fyllJDepsm8+mFFv/DvtwFHht5HIHSyOy5a+ChVQ==}
@@ -9368,8 +9379,8 @@ packages:
   scroll-into-view-if-needed@2.2.31:
     resolution: {integrity: sha512-dGCXy99wZQivjmjIqihaBQNjryrz5rueJY7eHfTdyWEiR4ttYpsajb14rn9s5d4DY4EcY6+4+U/maARBXJedkA==}
 
-  sdp-transform@2.14.2:
-    resolution: {integrity: sha512-icY6jVao7MfKCieyo1AyxFYm1baiM+fA00qW/KrNNVlkxHAd34riEKuEkUe4bBb3gJwLJZM+xT60Yj1QL8rHiA==}
+  sdp-transform@2.15.0:
+    resolution: {integrity: sha512-KrOH82c/W+GYQ0LHqtr3caRpM3ITglq3ljGUIb8LTki7ByacJZ9z+piSGiwZDsRyhQbYBOBJgr2k6X4BZXi3Kw==}
     hasBin: true
 
   sdp@3.2.0:
@@ -10076,9 +10087,6 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
-  ts-debounce@4.0.0:
-    resolution: {integrity: sha512-+1iDGY6NmOGidq7i7xZGA4cm8DAa6fqdYcvO5Z6yBevH++Bdo9Qt/mN0TzHUgcCcKv1gmh9+W5dHqz8pMWbCbg==}
-
   ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
 
@@ -10115,11 +10123,11 @@ packages:
   tslib@2.4.1:
     resolution: {integrity: sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==}
 
-  tslib@2.6.2:
-    resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
-
   tslib@2.7.0:
     resolution: {integrity: sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==}
+
+  tslib@2.8.1:
+    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
   tsup@8.5.1:
     resolution: {integrity: sha512-xtgkqwdhpKWr3tKPmCkvYmS9xnQK3m3XgxZHwSUjvfTjp7YfXe5tT3GgWi0F2N+ZSMsOeWeZFh7ZZFg5iPhing==}
@@ -10652,8 +10660,8 @@ packages:
     resolution: {integrity: sha512-VlZwKPCkYKxQgeSbH5EyngOmRp7Ww7I9rQLERETtf5ofd9pGeswWiOtogpEO850jziPRarreGxn5QIiTqpb2wA==}
     engines: {node: '>=8'}
 
-  webrtc-adapter@8.2.3:
-    resolution: {integrity: sha512-gnmRz++suzmvxtp3ehQts6s2JtAGPuDPjA1F3a9ckNpG1kYdYuHWYpazoAnL9FS5/B21tKlhkorbdCXat0+4xQ==}
+  webrtc-adapter@9.0.5:
+    resolution: {integrity: sha512-U9vjByy/sK2OMXu5mmfuZFKTMIUQe34c0JXRO+oDrxJTsntdYT2iIFwYMOV7HhMTuktcZLGf2W1N/OcSf9ssWg==}
     engines: {node: '>=6.0.0', npm: '>=3.10.0'}
 
   whatwg-fetch@3.6.20:
@@ -14071,27 +14079,33 @@ snapshots:
       '@types/fs-extra': 9.0.13
       fs-extra: 10.1.0
 
-  '@livekit/components-core@0.12.13(livekit-client@1.15.13)(tslib@2.7.0)':
+  '@livekit/components-core@0.12.13(livekit-client@2.18.3(@types/dom-mediacapture-record@1.0.22))(tslib@2.8.1)':
     dependencies:
       '@floating-ui/dom': 1.7.4
-      livekit-client: 1.15.13
+      livekit-client: 2.18.3(@types/dom-mediacapture-record@1.0.22)
       loglevel: 1.9.1
       rxjs: 7.8.2
-      tslib: 2.7.0
+      tslib: 2.8.1
 
-  '@livekit/components-react@2.9.20(livekit-client@1.15.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tslib@2.7.0)':
+  '@livekit/components-react@2.9.20(livekit-client@2.18.3(@types/dom-mediacapture-record@1.0.22))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tslib@2.8.1)':
     dependencies:
-      '@livekit/components-core': 0.12.13(livekit-client@1.15.13)(tslib@2.7.0)
+      '@livekit/components-core': 0.12.13(livekit-client@2.18.3(@types/dom-mediacapture-record@1.0.22))(tslib@2.8.1)
       clsx: 2.1.1
       events: 3.3.0
       jose: 6.2.2
-      livekit-client: 1.15.13
+      livekit-client: 2.18.3(@types/dom-mediacapture-record@1.0.22)
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
-      tslib: 2.7.0
+      tslib: 2.8.1
       usehooks-ts: 3.1.1(react@19.2.4)
 
   '@livekit/components-styles@1.2.0': {}
+
+  '@livekit/mutex@1.1.1': {}
+
+  '@livekit/protocol@1.45.3':
+    dependencies:
+      '@bufbuild/protobuf': 1.10.0
 
   '@malept/cross-spawn-promise@1.1.1':
     dependencies:
@@ -15286,6 +15300,8 @@ snapshots:
   '@types/debug@4.1.12':
     dependencies:
       '@types/ms': 0.7.34
+
+  '@types/dom-mediacapture-record@1.0.22': {}
 
   '@types/electron-squirrel-startup@1.0.2': {}
 
@@ -20163,16 +20179,18 @@ snapshots:
       rfdc: 1.4.1
       wrap-ansi: 8.1.0
 
-  livekit-client@1.15.13:
+  livekit-client@2.18.3(@types/dom-mediacapture-record@1.0.22):
     dependencies:
-      '@bufbuild/protobuf': 1.10.0
+      '@livekit/mutex': 1.1.1
+      '@livekit/protocol': 1.45.3
+      '@types/dom-mediacapture-record': 1.0.22
       events: 3.3.0
+      jose: 6.2.2
       loglevel: 1.9.2
-      sdp-transform: 2.14.2
-      ts-debounce: 4.0.0
-      tslib: 2.6.2
+      sdp-transform: 2.15.0
+      tslib: 2.8.1
       typed-emitter: 2.1.0
-      webrtc-adapter: 8.2.3
+      webrtc-adapter: 9.0.5
 
   load-json-file@2.0.0:
     dependencies:
@@ -22757,7 +22775,7 @@ snapshots:
     dependencies:
       compute-scroll-into-view: 1.0.20
 
-  sdp-transform@2.14.2: {}
+  sdp-transform@2.15.0: {}
 
   sdp@3.2.0: {}
 
@@ -23576,8 +23594,6 @@ snapshots:
     dependencies:
       typescript: 5.6.2
 
-  ts-debounce@4.0.0: {}
-
   ts-interface-checker@0.1.13: {}
 
   ts-node@10.9.2(@types/node@22.7.2)(typescript@5.6.2):
@@ -23608,9 +23624,9 @@ snapshots:
 
   tslib@2.4.1: {}
 
-  tslib@2.6.2: {}
-
   tslib@2.7.0: {}
+
+  tslib@2.8.1: {}
 
   tsup@8.5.1(jiti@2.5.1)(postcss@8.4.47)(tsx@4.19.1)(typescript@5.6.2)(yaml@2.8.2):
     dependencies:
@@ -24104,7 +24120,7 @@ snapshots:
 
   webidl-conversions@5.0.0: {}
 
-  webrtc-adapter@8.2.3:
+  webrtc-adapter@9.0.5:
     dependencies:
       sdp: 3.2.0
 

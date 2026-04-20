@@ -30,12 +30,12 @@ import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { EditorState } from 'lexical';
 import { debounce } from 'lodash';
-import { PropsWithChildren, useCallback, useRef } from 'react';
+import { PropsWithChildren, useCallback, useRef, useState } from 'react';
 import { proxy, useSnapshot } from 'valtio';
 
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
-import { useMikoto } from '@/hooks';
+import { useInterval, useMikoto } from '@/hooks';
 import { createTooltip } from '@/ui';
 
 import { EDITOR_NODES } from './editorNodes';
@@ -46,6 +46,33 @@ import { HotkeyPlugin } from './plugins/HotkeyPlugin';
 import { ListBehaviorPlugin } from './plugins/ListBehaviorPlugin';
 import { MarkdownPastePlugin } from './plugins/MarkdownPastePlugin';
 import { lexicalTheme } from './theme';
+
+const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+
+function formatRelativeTime(date: Date): string {
+  const now = Date.now();
+  const diffMs = date.getTime() - now;
+  const diffSec = Math.round(diffMs / 1000);
+  const diffMin = Math.round(diffMs / 60000);
+  const diffHr = Math.round(diffMs / 3600000);
+  const diffDay = Math.round(diffMs / 86400000);
+
+  if (Math.abs(diffSec) < 60) return rtf.format(diffSec, 'second');
+  if (Math.abs(diffMin) < 60) return rtf.format(diffMin, 'minute');
+  if (Math.abs(diffHr) < 24) return rtf.format(diffHr, 'hour');
+  return rtf.format(diffDay, 'day');
+}
+
+function useRelativeTime(date: Date | undefined): string | undefined {
+  const [, setTick] = useState(0);
+
+  useInterval(() => {
+    setTick((t) => t + 1);
+  }, 10000);
+
+  if (!date) return undefined;
+  return formatRelativeTime(date);
+}
 
 // Zero-width space used as placeholder for empty lines
 const ZERO_WIDTH_SPACE = '\u200B';
@@ -301,6 +328,7 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
     }),
   ).current;
   const documentSnap = useSnapshot(documentState);
+  const lastEdited = useRelativeTime(channel.lastUpdatedDate);
 
   return (
     <Surface scroll>
@@ -311,9 +339,16 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
         spaceName={channel.space?.name}
       />
       <DocumentActions>
-        <Box className="left" fontWeight="semibold" color="gray.400">
-          #{channel.name}
-        </Box>
+        <Flex className="left" direction="column">
+          <Box fontWeight="semibold" color="gray.200">
+            {channel.name}
+          </Box>
+          {lastEdited && (
+            <Box fontSize="xs" color="gray.500">
+              edited {lastEdited}
+            </Box>
+          )}
+        </Flex>
         <Flex className="right" fontSize="xl" gap={3}>
           <Group>
             <ActionTooltip tooltip="Edit">

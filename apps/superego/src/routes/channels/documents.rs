@@ -25,6 +25,7 @@ use crate::{
     entities::{
         Channel, Document, DocumentPatch, MemberExt, MemberKey, Relationship, SpaceExt, SpaceUser,
     },
+    functions::time::Timestamp,
     error::Error,
     functions::jwt::{jwt_key, Claims},
     middlewares::load::Load,
@@ -58,6 +59,7 @@ async fn update(
     }
     let document = Document::get_by_channel_id(channel_id, db()).await?;
     let document = document.update(patch, db()).await?;
+    Channel::update_last_updated(channel_id, Timestamp::now(), db()).await?;
     Ok(document.into())
 }
 

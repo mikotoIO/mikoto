@@ -25,7 +25,7 @@ export function remarkMention() {
   return (tree: TreeParam) => {
     findAndReplace(tree, [
       [
-        /@(\w+)/g,
+        /@([\w.]+)/g,
         (_: string, username: string) =>
           hNode('mention', { username }, `@${username}`),
       ],
@@ -61,7 +61,7 @@ const ESCAPE_PLACEHOLDER = '\u200C';
 
 // Matches code blocks/inline code (preserved as-is) or our custom escape sequences
 const ESCAPE_PREPROCESS_REGEX =
-  /(```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]+`)|(?<!\\)\\(\|\|)|(?<!\\)\\(@|:)/g;
+  /(```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]+`)|(?<!\\)\\(\|\|)|(?<!\\)\\(@[\w.]*|:)/g;
 
 /**
  * Pre-processes a markdown string so that \@, \:, and \|| escape sequences

@@ -10,6 +10,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import throttle from 'lodash/throttle';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
+import { useSnapshot } from 'valtio';
 
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
@@ -110,6 +111,11 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
 
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const mikoto = useMikoto();
+  const membersCache = useSnapshot(channel.space?.members.cache ?? new Map());
+  const spaceMembers = useMemo(
+    () => Array.from(membersCache.values()),
+    [membersCache],
+  );
 
   // For DM channels, resolve the display name from the relationship
   const dmRelation = !channel.spaceId
@@ -314,6 +320,7 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
           <MessageEditor
             placeholder={`Message #${channel.name}`}
             key={currentEditState?.id ?? 'base'}
+            members={spaceMembers}
             onTyping={() => {
               typing();
             }}

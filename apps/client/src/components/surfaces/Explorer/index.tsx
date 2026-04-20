@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import {
   faChevronDown,
   faChevronRight,
+  faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoChannel, MikotoSpace } from '@mikoto-io/mikoto.js';
@@ -187,6 +188,8 @@ export function Explorer({ space }: { space: MikotoSpace }) {
   const nodeContextMenu = useContextMenuX();
   const [panels, setPanels] = useAtom(explorerPanelsState);
 
+  const channelHeaderContextMenu = useContextMenuX();
+
   // TODO: return loading indicator
   if (space === null) return null;
 
@@ -203,12 +206,28 @@ export function Explorer({ space }: { space: MikotoSpace }) {
             channelsCollapsed: !p.channelsCollapsed,
           }))
         }
+        onContextMenu={channelHeaderContextMenu(
+          <TreebarContextMenu space={space} />,
+        )}
       >
         <FontAwesomeIcon
           className="chevron"
           icon={panels.channelsCollapsed ? faChevronRight : faChevronDown}
         />
         Channels
+        <FontAwesomeIcon
+          icon={faPlus}
+          style={{
+            marginLeft: 'auto',
+            marginRight: '8px',
+            fontSize: '12px',
+            opacity: 0.6,
+          }}
+          onClick={(ev) => {
+            ev.stopPropagation();
+            channelHeaderContextMenu(<TreebarContextMenu space={space} />)(ev);
+          }}
+        />
       </PanelHeader>
 
       {panels.channelsCollapsed ? null : (

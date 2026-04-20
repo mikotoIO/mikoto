@@ -1,5 +1,6 @@
 import { Box, Flex, Grid, Heading } from '@chakra-ui/react';
-import { faHashtag } from '@fortawesome/free-solid-svg-icons';
+import { faArrowDown, faHashtag } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   MessageExt,
   MessageKey,
@@ -272,56 +273,100 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
       />
       <Grid templateRows="auto 24px" h="100%">
         <Flex direction="column">
-          {msgs === null ? (
-            <MessagesLoading />
-          ) : (
-            <Virtuoso
-              ref={virtuosoRef}
-              followOutput="auto"
-              defaultItemHeight={64}
-              style={{ flexGrow: 1, overflowX: 'hidden' }}
-              initialTopMostItemIndex={msgs.length - 1}
-              data={msgs}
-              computeItemKey={(index, msg) => msg.id}
-              atBottomStateChange={(atBottom) => {
-                setBottomState(atBottom);
-              }}
-              overscan={1000}
-              components={virtuosoComponents}
-              firstItemIndex={firstItemIndex}
-              startReached={async () => {
-                if (!msgs) return;
-                if (msgs.length === 0) return;
-                if (loadingOlder.current) return;
-                loadingOlder.current = true;
-                try {
-                  const m = await channel.listMessages(50, msgs[0].id);
-                  if (m.length === 0) {
-                    setTopLoaded(true);
-                    return;
+          <Box position="relative" flex="1" overflow="hidden">
+            {msgs === null ? (
+              <MessagesLoading />
+            ) : (
+              <Virtuoso
+                ref={virtuosoRef}
+                followOutput="auto"
+                defaultItemHeight={64}
+                style={{ height: '100%', overflowX: 'hidden' }}
+                initialTopMostItemIndex={msgs.length - 1}
+                data={msgs}
+                computeItemKey={(index, msg) => msg.id}
+                atBottomStateChange={(atBottom) => {
+                  setBottomState(atBottom);
+                }}
+                atBottomThreshold={30}
+                overscan={1000}
+                components={virtuosoComponents}
+                firstItemIndex={firstItemIndex}
+                startReached={async () => {
+                  if (!msgs) return;
+                  if (msgs.length === 0) return;
+                  if (loadingOlder.current) return;
+                  loadingOlder.current = true;
+                  try {
+                    const m = await channel.listMessages(50, msgs[0].id);
+                    if (m.length === 0) {
+                      setTopLoaded(true);
+                      return;
+                    }
+                    setFirstItemIndex((x) => x - m.length);
+                    setMsgs((xs) => (xs ? [...m, ...xs] : null));
+                  } finally {
+                    loadingOlder.current = false;
                   }
-                  setFirstItemIndex((x) => x - m.length);
-                  setMsgs((xs) => (xs ? [...m, ...xs] : null));
-                } finally {
-                  loadingOlder.current = false;
-                }
-              }}
-              itemContent={(index, msg) => (
-                <>
-                  {showDateSeparator(msg, msgs[index - firstItemIndex - 1]) && (
-                    <DateSeparator date={new Date(msg.timestamp)} />
-                  )}
-                  <MessageItem
-                    message={msg}
-                    isSimple={isMessageSimple(
+                }}
+                itemContent={(index, msg) => (
+                  <>
+                    {showDateSeparator(
                       msg,
                       msgs[index - firstItemIndex - 1],
-                    )}
-                  />
-                </>
-              )}
-            />
-          )}
+                    ) && <DateSeparator date={new Date(msg.timestamp)} />}
+                    <MessageItem
+                      message={msg}
+                      isSimple={isMessageSimple(
+                        msg,
+                        msgs[index - firstItemIndex - 1],
+                      )}
+                    />
+                  </>
+                )}
+              />
+            )}
+            {!bottomState && msgs !== null && (
+              <Flex
+                justify="center"
+                position="absolute"
+                bottom="8px"
+                left="0"
+                right="0"
+                zIndex="1"
+                pointerEvents="none"
+              >
+                <Flex
+                  as="button"
+                  align="center"
+                  gap="6px"
+                  px="12px"
+                  py="6px"
+                  bg="gray.600"
+                  color="white"
+                  fontSize="13px"
+                  fontWeight="medium"
+                  cursor="pointer"
+                  borderRadius="full"
+                  outline="none"
+                  border="none"
+                  pointerEvents="auto"
+                  _hover={{ bg: 'gray.500' }}
+                  transition="background 0.15s"
+                  onClick={() => {
+                    virtuosoRef.current?.scrollToIndex({
+                      index: 'LAST',
+                      align: 'start',
+                      behavior: 'smooth',
+                    });
+                  }}
+                >
+                  <FontAwesomeIcon icon={faArrowDown} fontSize="11px" />
+                  Jump to latest
+                </Flex>
+              </Flex>
+            )}
+          </Box>
           <MessageEditor
             placeholder={`Message #${channel.name}`}
             key={currentEditState?.id ?? 'base'}

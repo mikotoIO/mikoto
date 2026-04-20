@@ -55,7 +55,7 @@
     "jotai-immer": "^0.4.1",
     "jwt-decode": "^3.1.2",
     "lexical": "^0.14.4",
-    "livekit-client": "^1.13.3",
+    "livekit-client": "^2.18.3",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
     "markdown-draft-js": "^2.4.0",

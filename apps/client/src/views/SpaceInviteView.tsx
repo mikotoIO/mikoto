@@ -49,7 +49,7 @@ export function SpaceInviteViewInner() {
       <InvitationBox>
         {space ? (
           <Flex direction="column" alignItems="center" gap={4}>
-            <StyledSpaceIcon size="100px" icon={normalizeMediaUrl(space.icon)}>
+            <StyledSpaceIcon size="100px" spaceId={space.id} icon={normalizeMediaUrl(space.icon)}>
               {space.icon === null ? space.name[0] : ''}
             </StyledSpaceIcon>
             <Heading fontSize="32px" my={0}>

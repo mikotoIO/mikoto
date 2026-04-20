@@ -7,6 +7,21 @@ interface SpaceIconProps {
   color?: string;
   fontSize?: string;
   active?: boolean | null;
+  spaceId?: string;
+}
+
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 31 + str.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
+function colorFromId(id: string): string {
+  const hash = hashString(id);
+  const hue = hash % 360;
+  return `oklch(0.55 0.25 ${hue})`;
 }
 
 // layout equivalent to a space icon
@@ -18,6 +33,7 @@ export const SpaceIconLike = styled.div`
   width: 40px;
   height: 40px;
 
+  font-family: var(--font-heading);
   font-size: 14px;
   cursor: pointer;
   border-radius: 4px;
@@ -28,6 +44,7 @@ const SpaceIcon = styled.div<{
   size?: string;
   fontSize?: string;
   active?: boolean | null;
+  bgColor?: string;
 }>`
   display: flex;
   align-items: center;
@@ -36,12 +53,18 @@ const SpaceIcon = styled.div<{
   width: ${(p) => p.size ?? '40px'};
   height: ${(p) => p.size ?? '40px'};
   background-color: ${(p) =>
-    p.active
-      ? 'var(--chakra-colors-gray-700)'
-      : 'var(--chakra-colors-surface)'};
+    p.icon
+      ? 'transparent'
+      : p.bgColor
+        ? p.bgColor
+        : p.active
+          ? 'var(--chakra-colors-gray-700)'
+          : 'var(--chakra-colors-surface)'};
   background-size: cover;
   background-image: ${(p) => (p.icon ? `url(${p.icon})` : 'none')};
-  font-size: 14px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 16px;
   cursor: pointer;
   border-radius: 4px;
 `;
@@ -61,6 +84,7 @@ export function StyledSpaceIcon({
   size,
   fontSize,
   active,
+  spaceId,
   ...rest
 }: SpaceIconProps & React.HTMLAttributes<HTMLDivElement>) {
   return (
@@ -70,6 +94,7 @@ export function StyledSpaceIcon({
         size={size}
         fontSize={fontSize}
         active={active}
+        bgColor={spaceId && !icon ? colorFromId(spaceId) : undefined}
         {...rest}
       />
     </SpaceIconOutline>

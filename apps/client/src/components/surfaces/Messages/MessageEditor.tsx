@@ -18,6 +18,7 @@ import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import { contextMenuState } from '@/components/ContextMenu';
 import { useIsMobile } from '@/hooks/useIsMobile';
 
+import { useEmojiAutocomplete } from './EmojiAutocomplete';
 import { messageEditState } from './Message';
 import { useMentionAutocomplete } from './MentionAutocomplete';
 
@@ -262,6 +263,8 @@ export function MessageEditor({
 
   const { overlay: mentionOverlay, onKeyDown: mentionKeyDown } =
     useMentionAutocomplete({ editor, members });
+  const { overlay: emojiOverlay, onKeyDown: emojiKeyDown } =
+    useEmojiAutocomplete({ editor });
 
   const setContextMenu = useSetAtom(contextMenuState);
   const ref = useRef<HTMLDivElement>(null);
@@ -333,6 +336,7 @@ export function MessageEditor({
         )}
         <EditableContainer ref={ref}>
           {mentionOverlay}
+          {emojiOverlay}
           <Slate
             editor={editor}
             initialValue={editorValue}
@@ -342,6 +346,7 @@ export function MessageEditor({
               placeholder={placeholder}
               onKeyDown={(ev) => {
                 if (mentionKeyDown(ev)) return;
+                if (emojiKeyDown(ev)) return;
 
                 if (isMobile) {
                   onTyping?.();

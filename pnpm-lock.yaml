@@ -123,11 +123,11 @@ importers:
         specifier: ^0.14.4
         version: 0.14.5
       '@livekit/components-react':
-        specifier: ^1.1.8
-        version: 1.5.3(livekit-client@1.15.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tslib@2.7.0)
+        specifier: ^2.9.20
+        version: 2.9.20(livekit-client@1.15.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tslib@2.7.0)
       '@livekit/components-styles':
-        specifier: ^1.0.6
-        version: 1.1.2
+        specifier: ^1.2.0
+        version: 1.2.0
       '@marsidev/react-turnstile':
         specifier: ^0.2.2
         version: 0.2.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -2452,8 +2452,8 @@ packages:
   '@floating-ui/core@1.7.5':
     resolution: {integrity: sha512-1Ih4WTWyw0+lKyFMcBHGbb5U5FtuHJuujoyyr5zTaWS5EYMeT6Jb2AuDeftsCsEuchO+mM2ij5+q9crhydzLhQ==}
 
-  '@floating-ui/dom@1.5.4':
-    resolution: {integrity: sha512-jByEsHIY+eEdCjnTVu+E3ephzTOzkQ8hgUfGwos+bg7NlH33Zc5uO+QHz1mrQUOgIKKDD1RtS201P9NvAfq3XQ==}
+  '@floating-ui/dom@1.7.4':
+    resolution: {integrity: sha512-OOchDgh4F2CchOX94cRVqhvy7b3AFb+/rQXyswmzmGakRfkMgoWVjfnLWkRirfLEfuD4ysVW16eXzwt3jHIzKA==}
 
   '@floating-ui/dom@1.7.6':
     resolution: {integrity: sha512-9gZSAI5XM36880PPMm//9dfiEngYoC6Am2izES1FF406YFsjvyBMmeJ2g4SAju3xWwtuynNRFL2s9hgxpLI5SQ==}
@@ -2748,24 +2748,28 @@ packages:
   '@liuli-util/fs-extra@0.1.0':
     resolution: {integrity: sha512-eaAyDyMGT23QuRGbITVY3SOJff3G9ekAAyGqB9joAnTBmqvFN+9a1FazOdO70G6IUqgpKV451eBHYSRcOJ/FNQ==}
 
-  '@livekit/components-core@0.8.3':
-    resolution: {integrity: sha512-xwHjE7B4oQmhL3Nme7HKR5X71D5SaG0PbM750VpFOkdMkD6fhiouiblDc4/Ys0yK1iLFUAM8lXq/jBzU+xf2ZA==}
-    engines: {node: '>=14'}
+  '@livekit/components-core@0.12.13':
+    resolution: {integrity: sha512-DQmi84afHoHjZ62wm8y+XPNIDHTwFHAltjd3lmyXj8UZHOY7wcza4vFt1xnghJOD5wLRY58L1dkAgAw59MgWvw==}
+    engines: {node: '>=18'}
     peerDependencies:
-      livekit-client: ^1.15.1
+      livekit-client: ^2.17.2
       tslib: ^2.6.2
 
-  '@livekit/components-react@1.5.3':
-    resolution: {integrity: sha512-OL2BhyltXz4GTEmTPZPMehBMoWWNILTqHClPpFLJyM3KLnk2lLvaH9QWwlbqIJVr6vkm39pvq39ckv6GKa7jJw==}
-    engines: {node: '>=14'}
+  '@livekit/components-react@2.9.20':
+    resolution: {integrity: sha512-hjkYOsJj9Jbghb7wM5cI8HoVisKeL6Zcy1VnRWTLm0sqVbto8GJp/17T4Udx85mCPY6Jgh8I1Cv0yVzgz7CQtg==}
+    engines: {node: '>=18'}
     peerDependencies:
-      livekit-client: ^1.15.1
+      '@livekit/krisp-noise-filter': ^0.2.12 || ^0.3.0
+      livekit-client: ^2.17.2
       react: '>=18'
       react-dom: '>=18'
       tslib: ^2.6.2
+    peerDependenciesMeta:
+      '@livekit/krisp-noise-filter':
+        optional: true
 
-  '@livekit/components-styles@1.1.2':
-    resolution: {integrity: sha512-6ghL+JQWPnD3AYK+Zfcd100Kvh5YrrG2z23REyXUjtHpQjPRgg7F/lmHNa7Jz55afCv0L0BQFYpfo5Z4Kdc+tw==}
+  '@livekit/components-styles@1.2.0':
+    resolution: {integrity: sha512-74/rt0lDh6aHmOPmWAeDE9C4OrNW9RIdmhX/YRbovQBVNGNVWojRjl3FgQZ5LPFXO6l1maKB4JhXcBFENVxVvw==}
     engines: {node: '>=18'}
 
   '@malept/cross-spawn-promise@1.1.1':
@@ -4956,10 +4960,6 @@ packages:
     resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
     engines: {node: '>=6'}
 
-  clsx@2.1.0:
-    resolution: {integrity: sha512-m3iNNWpd9rl3jvvcBnu70ylMdrXt8Vlq4HYadnU5fwcOtvkSQWPmj7amUcDT2qYI7risszBjI5AUIUox9D16pg==}
-    engines: {node: '>=6'}
-
   clsx@2.1.1:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
     engines: {node: '>=6'}
@@ -5531,10 +5531,6 @@ packages:
     resolution: {integrity: sha512-fz8ndj8cmmf441t4Yh2FDP3Rn0JhLkVGvtUf2YVMbJ5SdJPlc0JWll9jYkhh60jDKVVCr/tBAmfxqRnXMWJpzg==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
-
-  email-regex@5.0.0:
-    resolution: {integrity: sha512-he76Cm8JFxb6OGQHabLBPdsiStgPmJeAEhctmw0uhonUh1pCBsHpI6/rB62s2GNzjBb0YlhIcF/1l9Lp5AfH0Q==}
-    engines: {node: '>=12'}
 
   emoji-mart@5.6.0:
     resolution: {integrity: sha512-eJp3QRe79pjwa+duv+n7+5YsNhRcMl812EcFVwrnRvYKoNPoQb5qxU8DG6Bgwji0akHdp6D4Ln6tYLG58MFSow==}
@@ -7156,6 +7152,9 @@ packages:
   join-component@1.1.0:
     resolution: {integrity: sha512-bF7vcQxbODoGK1imE2P9GS9aw4zD0Sd+Hni68IMZLj7zRnquH7dXUmMw9hDI5S/Jzt7q+IyTXN0rSg2GI0IKhQ==}
 
+  jose@6.2.2:
+    resolution: {integrity: sha512-d7kPDd34KO/YnzaDOlikGpOurfF0ByC2sEV4cANCtdqLlTfBlw2p14O/5d/zv40gJPbIQxfES3nSx1/oYNyuZQ==}
+
   jotai-immer@0.4.1:
     resolution: {integrity: sha512-nQTt1HBKie/5OJDck1qLpV1PeBA6bjJLAczEYAx70PD8R4Mbu7gtexfBUCzJh6W6ecsOfwHksAYAesVth6SN9A==}
     peerDependencies:
@@ -7528,8 +7527,8 @@ packages:
     resolution: {integrity: sha512-/3ER20CTTbahrCrpYfPn7Xavv9diBROZpoXGVZDWMw4b/X4uuUwAC0ki85tgsdMRONURyIJbcOvS94QsUBYPbQ==}
     hasBin: true
 
-  loglevel@1.8.1:
-    resolution: {integrity: sha512-tCRIJM51SHjAayKwC+QAg8hT8vg6z7GSgLJKGvzuPb1Wc+hLzqtuVLxp6/HzSPOozuK+8ErAhy7U/sVzw8Dgfg==}
+  loglevel@1.9.1:
+    resolution: {integrity: sha512-hP3I3kCrDIMuRwAwHltphhDM1r8i55H33GgqjXbrisuJhF4kRhW1dNuxsRklp4bXl8DSdLaNLuiL4A/LWRfxvg==}
     engines: {node: '>= 0.6.0'}
 
   loglevel@1.9.2:
@@ -9330,8 +9329,8 @@ packages:
   run-parallel@1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
 
-  rxjs@7.8.1:
-    resolution: {integrity: sha512-AA3TVj+0A2iuIoQkWEK/tqFjBq2j+6PO6Y0zJcvzLAFhEFIO3HL0vls9hWLncZbAAbK0mar7oZ4V079I/qPMxg==}
+  rxjs@7.8.2:
+    resolution: {integrity: sha512-dhKf903U/PQZY6boNNtAGdWbG85WAbjT/1xYoZIC7FAY0yWapOBQVsVrDl58W86//e1VpMNBtRV4MaXfdMySFA==}
 
   safe-array-concat@1.1.3:
     resolution: {integrity: sha512-AURm5f0jYEOydBj7VQlVvDrjeFgthDdEF5H1dP+6mNpoXOMo1quQqJ4wvJDyRZ9+pO3kGWoOdmV08cSv2aJV6Q==}
@@ -10410,12 +10409,11 @@ packages:
     peerDependencies:
       react: ^16.8.0  || ^17 || ^18
 
-  usehooks-ts@2.9.1:
-    resolution: {integrity: sha512-2FAuSIGHlY+apM9FVlj8/oNhd+1y+Uwv5QNkMQz1oSfdHk4PXo1qoCw9I5M7j0vpH8CSWFJwXbVPeYDjLCx9PA==}
-    engines: {node: '>=16.15.0', npm: '>=8'}
+  usehooks-ts@3.1.1:
+    resolution: {integrity: sha512-I4diPp9Cq6ieSUH2wu+fDAVQO43xwtulo+fKEidHUwZPnYImbtkTjzIJYcDcJqxgmX31GVqNFURodvcgHcW0pA==}
+    engines: {node: '>=16.15.0'}
     peerDependencies:
-      react: ^16.8.0  || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0  || ^17.0.0 || ^18.0.0
+      react: ^16.8.0  || ^17 || ^18 || ^19 || ^19.0.0-rc
 
   username@5.1.0:
     resolution: {integrity: sha512-PCKbdWw85JsYMvmCv5GH3kXmM66rCd9m1hBEDutPNv94b/pqCMT4NtcKyeWYvLFiE8b+ha1Jdl8XAaUdPn5QTg==}
@@ -13637,7 +13635,7 @@ snapshots:
     dependencies:
       '@floating-ui/utils': 0.2.11
 
-  '@floating-ui/dom@1.5.4':
+  '@floating-ui/dom@1.7.4':
     dependencies:
       '@floating-ui/core': 1.7.5
       '@floating-ui/utils': 0.2.11
@@ -14073,27 +14071,27 @@ snapshots:
       '@types/fs-extra': 9.0.13
       fs-extra: 10.1.0
 
-  '@livekit/components-core@0.8.3(livekit-client@1.15.13)(tslib@2.7.0)':
+  '@livekit/components-core@0.12.13(livekit-client@1.15.13)(tslib@2.7.0)':
     dependencies:
-      '@floating-ui/dom': 1.5.4
-      email-regex: 5.0.0
+      '@floating-ui/dom': 1.7.4
       livekit-client: 1.15.13
-      loglevel: 1.8.1
-      rxjs: 7.8.1
+      loglevel: 1.9.1
+      rxjs: 7.8.2
       tslib: 2.7.0
 
-  '@livekit/components-react@1.5.3(livekit-client@1.15.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tslib@2.7.0)':
+  '@livekit/components-react@2.9.20(livekit-client@1.15.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tslib@2.7.0)':
     dependencies:
-      '@livekit/components-core': 0.8.3(livekit-client@1.15.13)(tslib@2.7.0)
-      '@react-hook/latest': 1.0.3(react@19.2.4)
-      clsx: 2.1.0
+      '@livekit/components-core': 0.12.13(livekit-client@1.15.13)(tslib@2.7.0)
+      clsx: 2.1.1
+      events: 3.3.0
+      jose: 6.2.2
       livekit-client: 1.15.13
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
       tslib: 2.7.0
-      usehooks-ts: 2.9.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      usehooks-ts: 3.1.1(react@19.2.4)
 
-  '@livekit/components-styles@1.1.2': {}
+  '@livekit/components-styles@1.2.0': {}
 
   '@malept/cross-spawn-promise@1.1.1':
     dependencies:
@@ -17185,8 +17183,6 @@ snapshots:
 
   clsx@1.2.1: {}
 
-  clsx@2.1.0: {}
-
   clsx@2.1.1: {}
 
   cmdk@1.1.1(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
@@ -17927,8 +17923,6 @@ snapshots:
       extract-zip: 2.0.1
     transitivePeerDependencies:
       - supports-color
-
-  email-regex@5.0.0: {}
 
   emoji-mart@5.6.0: {}
 
@@ -19878,6 +19872,8 @@ snapshots:
 
   join-component@1.1.0: {}
 
+  jose@6.2.2: {}
+
   jotai-immer@0.4.1(immer@10.1.1)(jotai@2.13.1(@babel/core@7.25.2)(@babel/template@7.27.2)(@types/react@19.2.14)(react@19.2.4)):
     dependencies:
       immer: 10.1.1
@@ -20152,7 +20148,7 @@ snapshots:
       log-update: 4.0.0
       p-map: 4.0.0
       rfdc: 1.4.1
-      rxjs: 7.8.1
+      rxjs: 7.8.2
       through: 2.3.8
       wrap-ansi: 7.0.0
     optionalDependencies:
@@ -20263,7 +20259,7 @@ snapshots:
       yargs: 15.4.1
     optional: true
 
-  loglevel@1.8.1: {}
+  loglevel@1.9.1: {}
 
   loglevel@1.9.2: {}
 
@@ -22717,7 +22713,7 @@ snapshots:
     dependencies:
       queue-microtask: 1.2.3
 
-  rxjs@7.8.1:
+  rxjs@7.8.2:
     dependencies:
       tslib: 2.7.0
 
@@ -23719,7 +23715,7 @@ snapshots:
 
   typed-emitter@2.1.0:
     optionalDependencies:
-      rxjs: 7.8.1
+      rxjs: 7.8.2
 
   typedarray.prototype.slice@1.0.3:
     dependencies:
@@ -23903,10 +23899,10 @@ snapshots:
       lodash.debounce: 4.0.8
       react: 19.2.4
 
-  usehooks-ts@2.9.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  usehooks-ts@3.1.1(react@19.2.4):
     dependencies:
+      lodash.debounce: 4.0.8
       react: 19.2.4
-      react-dom: 19.2.4(react@19.2.4)
 
   username@5.1.0:
     dependencies:

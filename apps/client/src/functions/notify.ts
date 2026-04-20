@@ -101,7 +101,7 @@ export function notifyFromMessage(
 
   if (existing) {
     existing.count += 1;
-    if (existing.count === BATCH_THRESHOLD) {
+    if (existing.count >= BATCH_THRESHOLD) {
       clearTimeout(existing.timer);
       const spaceName = channel.spaceId
         ? mikoto.spaces._get(channel.spaceId)?.name
@@ -111,10 +111,9 @@ export function notifyFromMessage(
         `in #${channel.name} (${spaceName})`,
         normalizeMediaUrl(message.author?.avatar),
       );
-      const timer = setTimeout(() => {
+      existing.timer = setTimeout(() => {
         recentByChannel.delete(channelId);
       }, BATCH_WINDOW_MS);
-      existing.timer = timer;
     }
     return false;
   }

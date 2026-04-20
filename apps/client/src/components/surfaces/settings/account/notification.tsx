@@ -1,9 +1,6 @@
 import { Box, Button, Flex, Text } from '@chakra-ui/react';
-import {
-  NotificationLevel,
-  NotificationPreference,
-} from '@mikoto-io/mikoto.js';
-import { useEffect, useState } from 'react';
+import { NotificationLevel } from '@mikoto-io/mikoto.js';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSnapshot } from 'valtio/react';
 
@@ -14,6 +11,10 @@ import {
   setNotificationMode,
 } from '@/functions/notify';
 import { useMikoto } from '@/hooks';
+import {
+  notificationPreferenceStore,
+  setSpaceNotificationLevel,
+} from '@/store/unreads';
 import { SettingSurface } from '@/views';
 
 const LEVEL_LABELS: Record<NotificationLevel, string> = {
@@ -130,25 +131,13 @@ export function NotificationSurface() {
   const { t } = useTranslation();
   const mikoto = useMikoto();
   useSnapshot(mikoto.spaces);
+  const { preferences } = useSnapshot(notificationPreferenceStore);
 
   const [mode, setMode] = useState<NotificationMode>(getNotificationMode);
-  const [preferences, setPreferences] = useState<
-    Map<string, NotificationLevel>
-  >(new Map());
   const [soundEnabled, setSoundEnabled] = useState<boolean>(() => {
     const stored = localStorage.getItem('notificationSound');
     return stored !== 'false';
   });
-
-  useEffect(() => {
-    mikoto.spaces.listNotificationPreferences().then((prefs) => {
-      setPreferences(
-        new Map(
-          prefs.map((p: NotificationPreference) => [p.spaceId, p.level]),
-        ),
-      );
-    });
-  }, []);
 
   const spaces = Array.from(mikoto.spaces.cache.values()).filter(
     (s) => s.type === 'NONE',
@@ -226,13 +215,9 @@ export function NotificationSurface() {
               key={space.id}
               spaceId={space.id}
               spaceName={space.name}
-              level={preferences.get(space.id) ?? 'ALL'}
+              level={preferences[space.id] ?? 'ALL'}
               onChangeLevel={async (level) => {
-                setPreferences((prev) => {
-                  const next = new Map(prev);
-                  next.set(space.id, level);
-                  return next;
-                });
+                setSpaceNotificationLevel(space.id, level);
                 await space.setNotificationPreference(level);
               }}
             />

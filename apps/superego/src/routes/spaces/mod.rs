@@ -315,6 +315,8 @@ async fn get_notification_preference(
     Path(space_id): Path<Uuid>,
 ) -> Result<Json<NotificationPreference>, Error> {
     let user_id: Uuid = claim.sub.parse()?;
+    // Verify user is a member of the space
+    SpaceUser::get_by_key(&MemberKey::new(space_id, user_id), db()).await?;
     let pref = NotificationPreference::get(user_id, space_id, db()).await?;
     Ok(pref.into())
 }
@@ -325,6 +327,8 @@ async fn set_notification_preference(
     Json(body): Json<NotificationPreferencePayload>,
 ) -> Result<Json<NotificationPreference>, Error> {
     let user_id: Uuid = claim.sub.parse()?;
+    // Verify user is a member of the space
+    SpaceUser::get_by_key(&MemberKey::new(space_id, user_id), db()).await?;
     let pref = NotificationPreference::upsert(user_id, space_id, body.level, db()).await?;
     Ok(pref.into())
 }

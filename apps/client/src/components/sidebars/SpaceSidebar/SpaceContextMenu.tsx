@@ -6,11 +6,15 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoSpace, NotificationLevel } from '@mikoto-io/mikoto.js';
 import { useSetAtom } from 'jotai';
-import { useEffect, useState } from 'react';
+import { useSnapshot } from 'valtio/react';
 
 import { ContextMenu, modalState } from '@/components/ContextMenu';
 import { InviteModal } from '@/components/modals/Invite';
 import { SpaceJoinModal } from '@/components/modals/SpaceJoin';
+import {
+  notificationPreferenceStore,
+  setSpaceNotificationLevel,
+} from '@/store/unreads';
 import { useTabkit } from '@/store/surface';
 
 const NOTIFICATION_OPTIONS: {
@@ -26,13 +30,8 @@ const NOTIFICATION_OPTIONS: {
 export function SpaceContextMenu({ space }: { space: MikotoSpace }) {
   const tabkit = useTabkit();
   const setModal = useSetAtom(modalState);
-  const [notifLevel, setNotifLevel] = useState<NotificationLevel>('ALL');
-
-  useEffect(() => {
-    space.getNotificationPreference().then((pref) => {
-      setNotifLevel(pref.level);
-    });
-  }, [space.id]);
+  const { preferences } = useSnapshot(notificationPreferenceStore);
+  const notifLevel: NotificationLevel = preferences[space.id] ?? 'ALL';
 
   return (
     <ContextMenu>
@@ -84,7 +83,7 @@ export function SpaceContextMenu({ space }: { space: MikotoSpace }) {
                 : undefined,
           }}
           onClick={async () => {
-            setNotifLevel(opt.level);
+            setSpaceNotificationLevel(space.id, opt.level);
             await space.setNotificationPreference(opt.level);
           }}
         >

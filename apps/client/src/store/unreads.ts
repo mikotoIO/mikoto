@@ -1,10 +1,35 @@
-import { MikotoClient } from '@mikoto-io/mikoto.js';
+import { MikotoClient, NotificationLevel } from '@mikoto-io/mikoto.js';
 import { proxy } from 'valtio/vanilla';
 
 // Global ack state: channelId -> ack timestamp
 export const ackStore = proxy<{ acks: Record<string, string> }>({
   acks: {},
 });
+
+// Global notification preference state: spaceId -> level
+export const notificationPreferenceStore = proxy<{
+  preferences: Record<string, NotificationLevel>;
+}>({
+  preferences: {},
+});
+
+export function getSpaceNotificationLevel(spaceId: string): NotificationLevel {
+  return notificationPreferenceStore.preferences[spaceId] ?? 'ALL';
+}
+
+export function setSpaceNotificationLevel(
+  spaceId: string,
+  level: NotificationLevel,
+) {
+  notificationPreferenceStore.preferences[spaceId] = level;
+}
+
+export async function loadNotificationPreferences(mikoto: MikotoClient) {
+  const prefs = await mikoto.spaces.listNotificationPreferences();
+  for (const p of prefs) {
+    notificationPreferenceStore.preferences[p.spaceId] = p.level;
+  }
+}
 
 export async function loadAcksForSpace(space: { listUnread: () => Promise<{ channelId: string; timestamp: string }[]> }) {
   const unreads = await space.listUnread();
@@ -13,10 +38,12 @@ export async function loadAcksForSpace(space: { listUnread: () => Promise<{ chan
   }
 }
 
-export function loadAcksForAllSpaces(mikoto: MikotoClient) {
-  for (const space of mikoto.spaces.cache.values()) {
-    loadAcksForSpace(space);
-  }
+export async function loadAcksForAllSpaces(mikoto: MikotoClient) {
+  await Promise.allSettled(
+    Array.from(mikoto.spaces.cache.values()).map((space) =>
+      loadAcksForSpace(space),
+    ),
+  );
 }
 
 export function ackChannel(channelId: string, timestamp: string) {

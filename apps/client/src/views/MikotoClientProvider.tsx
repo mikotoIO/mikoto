@@ -1,8 +1,4 @@
-import {
-  MikotoClient,
-  NotificationLevel,
-  NotificationPreference,
-} from '@mikoto-io/mikoto.js';
+import { MikotoClient } from '@mikoto-io/mikoto.js';
 import { AxiosError } from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
@@ -11,15 +7,17 @@ import { env } from '@/env';
 import { notifyFromMessage } from '@/functions/notify';
 import { AuthContext, MikotoContext } from '@/hooks';
 import { authClient } from '@/store/authClient';
-import { ackChannel, loadAcksForAllSpaces } from '@/store/unreads';
+import {
+  ackChannel,
+  getSpaceNotificationLevel,
+  loadAcksForAllSpaces,
+  loadNotificationPreferences,
+} from '@/store/unreads';
 
 const BASE_DELAY_MS = 1000;
 const MAX_DELAY_MS = 16000;
 
-function registerNotifications(
-  mikoto: MikotoClient,
-  preferences: Map<string, NotificationLevel>,
-) {
+function registerNotifications(mikoto: MikotoClient) {
   mikoto.ws.on('messages.onCreate', (msg) => {
     const channel = mikoto.channels._get(msg.channelId);
     if (channel) channel.lastUpdated = msg.timestamp;
@@ -31,7 +29,7 @@ function registerNotifications(
     if (!channel) return;
 
     if (channel.spaceId) {
-      const pref = preferences.get(channel.spaceId) ?? 'ALL';
+      const pref = getSpaceNotificationLevel(channel.spaceId);
       if (pref === 'NOTHING') return;
       if (pref === 'MENTIONS') return;
     }
@@ -42,13 +40,6 @@ function registerNotifications(
       ackChannel(msg.channelId, msg.timestamp);
     }
   });
-}
-
-async function loadNotificationPreferences(
-  mikoto: MikotoClient,
-): Promise<Map<string, NotificationLevel>> {
-  const prefs = await mikoto.spaces.listNotificationPreferences();
-  return new Map(prefs.map((p: NotificationPreference) => [p.spaceId, p.level]));
 }
 
 interface MikotoClientProviderProps {
@@ -77,8 +68,8 @@ export function MikotoClientProvider({
 
       try {
         await Promise.all([mi.spaces.list(), mi.user.load()]);
-        const preferences = await loadNotificationPreferences(mi);
-        registerNotifications(mi, preferences);
+        await loadNotificationPreferences(mi);
+        registerNotifications(mi);
         loadAcksForAllSpaces(mi);
         setMikoto(mi);
         return;

@@ -9,7 +9,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoChannel, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useAtom, useSetAtom } from 'jotai';
 import { NumberSize, Resizable } from 're-resizable';
-import { useEffect } from 'react';
 import { useSnapshot } from 'valtio/react';
 
 import {
@@ -26,7 +25,6 @@ import {
   ackChannel,
   ackStore,
   isChannelUnread,
-  loadAcksForSpace,
 } from '@/store/unreads';
 
 import { ChannelContextMenu, CreateChannelModal } from './ChannelContextMenu';
@@ -113,12 +111,8 @@ export function TreebarContextMenu({ space }: { space: MikotoSpace }) {
   );
 }
 
-function useAcks(space: MikotoSpace) {
+function useAcks() {
   useSnapshot(ackStore);
-
-  useEffect(() => {
-    loadAcksForSpace(space);
-  }, [space.id]);
 
   return {
     isChannelUnread(channel: MikotoChannel) {
@@ -136,7 +130,7 @@ function useAcks(space: MikotoSpace) {
 function ExplorerInner({ space }: { space: MikotoSpace }) {
   useFetchMember(space);
   const tabkit = useTabkit();
-  const { isChannelUnread: isUnread, ackChannel } = useAcks(space);
+  const { isChannelUnread: isUnread, ackChannel } = useAcks();
   const nodeContextMenu = useContextMenuX();
 
   useSnapshot(space);

@@ -70,7 +70,7 @@ export function MikotoClientProvider({
         await Promise.all([mi.spaces.list(), mi.user.load()]);
         await loadNotificationPreferences(mi);
         registerNotifications(mi);
-        loadAcksForAllSpaces(mi);
+        await loadAcksForAllSpaces(mi);
         setMikoto(mi);
         return;
       } catch (e) {

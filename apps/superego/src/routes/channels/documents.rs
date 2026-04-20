@@ -1,6 +1,9 @@
 use std::{
     collections::HashMap,
-    sync::{Arc, Weak},
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc, Weak,
+    },
 };
 
 use aide::axum::routing::{get_with, patch_with};
@@ -28,7 +31,7 @@ use yrs::{
         decoder::Decode,
         encoder::{Encode, Encoder, EncoderV1},
     },
-    Doc, Subscription, Update,
+    Doc, ReadTxn, Subscription, Transact, Update,
 };
 
 use crate::{
@@ -102,7 +105,14 @@ pub fn router() -> AppRouter<State> {
 // persisted in Postgres. Clients bootstrap the doc from markdown on join and
 // save markdown back via the existing REST endpoint.
 
-const BROADCAST_CAPACITY: usize = 64;
+const BROADCAST_CAPACITY: usize = 1024;
+
+// Custom y-sync-style message tag the server uses to tell exactly one peer
+// that it has been elected to seed the shared Y.Doc from the canonical
+// Postgres markdown. The client registers a handler on this tag via
+// `provider.messageHandlers[MSG_BOOTSTRAP_ELECT]`. Tags 0-3 are reserved by
+// the y-sync protocol; 10 is well clear of that range.
+const MSG_BOOTSTRAP_ELECT: u8 = 10;
 
 type RoomMap = Arc<Mutex<HashMap<String, Weak<Room>>>>;
 type AwarenessRef = Arc<RwLock<Awareness>>;
@@ -110,6 +120,14 @@ type AwarenessRef = Arc<RwLock<Awareness>>;
 struct Room {
     awareness: AwarenessRef,
     sender: broadcast::Sender<Vec<u8>>,
+    // Exactly one peer wins this `compare_exchange` per Room lifetime and is
+    // told to seed the shared Y.Doc from Postgres. Without this election,
+    // two peers connecting to a freshly-created room both see
+    // `root._xmlText._length === 0` client-side, both run
+    // `$convertFromMarkdownString`, and Yjs merges two independent bootstrap
+    // states — producing duplicated content and a transient "clear" during
+    // the merge.
+    bootstrap_claimed: AtomicBool,
     _doc_sub: Subscription,
     _awareness_sub: Subscription,
     _awareness_updater: JoinHandle<()>,
@@ -165,6 +183,7 @@ impl Room {
         Arc::new(Self {
             awareness,
             sender,
+            bootstrap_claimed: AtomicBool::new(false),
             _doc_sub: doc_sub,
             _awareness_sub: awareness_sub,
             _awareness_updater: awareness_updater,
@@ -278,15 +297,51 @@ async fn peer(room_id: String, ws: WebSocket, rooms: RoomMap) {
     let mut bcast_rx = room.sender.subscribe();
     let (reply_tx, mut reply_rx) = mpsc::unbounded_channel::<Vec<u8>>();
 
+    // Per the y-sync protocol, the server must proactively send its own
+    // SyncStep1 (state vector) + current Awareness state to a new peer. This
+    // prompts the client to reply with SyncStep2 containing updates the server
+    // is missing, and tells the client about other connected peers' presence.
+    // Without this, a client that holds state not yet on the server (e.g. a
+    // reconnect after a Room was garbage-collected) never transmits it, and
+    // late joiners never see initial awareness until someone moves their
+    // cursor.
+    {
+        let awareness = room.awareness.read().await;
+        let mut encoder = EncoderV1::new();
+        if DefaultProtocol.start(&awareness, &mut encoder).is_ok() {
+            let _ = reply_tx.send(encoder.to_vec());
+        }
+    }
+
+    // Atomically elect a bootstrapper. The winner of this compare_exchange is
+    // the ONLY peer that should seed the Y.Doc from Postgres markdown. Every
+    // other peer must wait for the seed to arrive over the sync protocol.
+    // This eliminates the "both peers bootstrap, content duplicates" race.
+    let elected = room
+        .bootstrap_claimed
+        .compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire)
+        .is_ok();
+    if elected {
+        let mut encoder = EncoderV1::new();
+        encoder.write_var(MSG_BOOTSTRAP_ELECT);
+        let _ = reply_tx.send(encoder.to_vec());
+    }
+
     // Writer task: pipes messages from two sources (broadcast + this peer's
     // direct replies) into the websocket sink.
+    //
+    // If the broadcast receiver lags past the channel capacity, we MUST NOT
+    // silently skip messages — Yjs peers need every update to keep their
+    // local state in sync. Instead we break out of the loop, which closes the
+    // socket and forces the client to reconnect + re-run SyncStep1/2 against
+    // the server's current state.
     let writer = tokio::spawn(async move {
         loop {
             let msg = tokio::select! {
                 bcast = bcast_rx.recv() => match bcast {
                     Ok(m) => m,
                     Err(broadcast::error::RecvError::Closed) => break,
-                    Err(broadcast::error::RecvError::Lagged(_)) => continue,
+                    Err(broadcast::error::RecvError::Lagged(_)) => break,
                 },
                 reply = reply_rx.recv() => match reply {
                     Some(m) => m,
@@ -323,4 +378,17 @@ async fn peer(room_id: String, ws: WebSocket, rooms: RoomMap) {
 
     drop(reply_tx);
     writer.abort();
+
+    // If the elected peer disconnected before actually seeding the Y.Doc,
+    // release the claim so another connected peer can take over. Without
+    // this, a dropped elected peer would leave the remaining peers waiting
+    // on an empty doc forever.
+    if elected {
+        let awareness = room.awareness.read().await;
+        let is_empty = awareness.doc().transact().state_vector().is_empty();
+        drop(awareness);
+        if is_empty {
+            room.bootstrap_claimed.store(false, Ordering::Release);
+        }
+    }
 }

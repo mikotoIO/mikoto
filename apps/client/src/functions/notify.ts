@@ -93,8 +93,6 @@ export function notifyFromMessage(
     return true;
   }
 
-  if (document.hasFocus()) return false;
-
   const channel = mikoto.channels._get(message.channelId);
   if (!channel) return false;
 

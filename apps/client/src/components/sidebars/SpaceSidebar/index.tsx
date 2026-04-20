@@ -47,6 +47,7 @@ const StyledIconWrapper = styled.div`
 
 function useSpaceUnreadState(mikoto: MikotoClient) {
   useSnapshot(ackStore);
+  useSnapshot(mikoto.channels.cache);
   return {
     isUnread: (spaceId: string) => isSpaceUnread(mikoto, spaceId),
   };

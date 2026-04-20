@@ -4,16 +4,42 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { env } from '@/env';
+import { notifyFromMessage } from '@/functions/notify';
 import { AuthContext, MikotoContext } from '@/hooks';
 import { authClient } from '@/store/authClient';
+import {
+  ackChannel,
+  getSpaceNotificationLevel,
+  loadAcksForAllSpaces,
+  loadNotificationPreferences,
+} from '@/store/unreads';
 
 const BASE_DELAY_MS = 1000;
 const MAX_DELAY_MS = 16000;
 
-function registerNotifications(_mikoto: MikotoClient) {
-  // mikoto.client.messages.onCreate((msg) => {
-  //   notifyFromMessage(mikoto, msg);
-  // });
+function registerNotifications(mikoto: MikotoClient) {
+  mikoto.ws.on('messages.onCreate', (msg) => {
+    const channel = mikoto.channels._get(msg.channelId);
+    if (channel) channel.lastUpdated = msg.timestamp;
+
+    if (msg.authorId === mikoto.user.me?.id) {
+      ackChannel(msg.channelId, msg.timestamp);
+      return;
+    }
+    if (!channel) return;
+
+    if (channel.spaceId) {
+      const pref = getSpaceNotificationLevel(channel.spaceId);
+      if (pref === 'NOTHING') return;
+      if (pref === 'MENTIONS') return;
+    }
+
+    const isViewingChannel = notifyFromMessage(mikoto, msg);
+    if (isViewingChannel) {
+      channel.ack();
+      ackChannel(msg.channelId, msg.timestamp);
+    }
+  });
 }
 
 interface MikotoClientProviderProps {
@@ -42,7 +68,9 @@ export function MikotoClientProvider({
 
       try {
         await Promise.all([mi.spaces.list(), mi.user.load()]);
+        await loadNotificationPreferences(mi);
         registerNotifications(mi);
+        await loadAcksForAllSpaces(mi);
         setMikoto(mi);
         return;
       } catch (e) {

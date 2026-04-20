@@ -9,7 +9,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoChannel, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useAtom, useSetAtom } from 'jotai';
 import { NumberSize, Resizable } from 're-resizable';
-import { useEffect, useState } from 'react';
 import { useSnapshot } from 'valtio/react';
 
 import {
@@ -22,6 +21,11 @@ import { MemberListSidebar } from '@/components/sidebars/MemberListSidebar';
 import { useFetchMember, useMikoto } from '@/hooks';
 import { explorerPanelsState } from '@/store';
 import { useTabkit } from '@/store/surface';
+import {
+  ackChannel,
+  ackStore,
+  isChannelUnread,
+} from '@/store/unreads';
 
 import { ChannelContextMenu, CreateChannelModal } from './ChannelContextMenu';
 import { ChannelTree } from './ChannelTree';
@@ -107,41 +111,17 @@ export function TreebarContextMenu({ space }: { space: MikotoSpace }) {
   );
 }
 
-function isUnread(lastUpdate: Date | undefined, ack: Date | null) {
-  if (lastUpdate === undefined || ack === null) return false;
-  return lastUpdate.getTime() > ack.getTime();
-}
-
-function useAcks(space: MikotoSpace) {
-  const [acks, setAcks] = useState<Record<string, Date>>({});
-
-  useEffect(() => {
-    space.listUnread().then((ur) => {
-      setAcks(
-        Object.fromEntries(ur.map((u) => [u.channelId, new Date(u.timestamp)])),
-      );
-    });
-  }, [space.id]);
-
-  useEffect(() => {
-    // FIXME: what the hell is this
-    // const destroy = mikoto.client.messages.onCreate((msg) => {
-    //   const ch = mikoto.channels.get(msg.channelId);
-    //   if (ch?.spaceId !== space.id) return;
-    //   if (msg.author?.id === mikoto.me.id) return;
-    //   ch.lastUpdated = msg.timestamp;
-    // });
-    // return () => {
-    //   destroy();
-    // };
-  }, [space.id]);
+function useAcks() {
+  useSnapshot(ackStore);
 
   return {
-    acks,
+    isChannelUnread(channel: MikotoChannel) {
+      return isChannelUnread(channel.lastUpdated, channel.id);
+    },
     ackChannel(channel: MikotoChannel) {
-      const now = new Date();
+      const now = new Date().toISOString();
       channel.ack().then(() => {
-        setAcks((xs) => ({ ...xs, [channel.id]: now }));
+        ackChannel(channel.id, now);
       });
     },
   };
@@ -150,7 +130,7 @@ function useAcks(space: MikotoSpace) {
 function ExplorerInner({ space }: { space: MikotoSpace }) {
   useFetchMember(space);
   const tabkit = useTabkit();
-  const { acks, ackChannel } = useAcks(space);
+  const { isChannelUnread: isUnread, ackChannel } = useAcks();
   const nodeContextMenu = useContextMenuX();
 
   useSnapshot(space);
@@ -160,7 +140,7 @@ function ExplorerInner({ space }: { space: MikotoSpace }) {
     icon: getIconFromChannelType(channel.type),
     id: channel.id,
     text: channel.name,
-    unread: isUnread(channel.lastUpdatedDate, acks[channel.id] ?? null),
+    unread: isUnread(channel),
     onClick(ev) {
       const tab = channelToTab(channel);
 

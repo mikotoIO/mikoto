@@ -313,6 +313,23 @@ export const SpaceUpdatePayload = z
   .partial();
 export type SpaceUpdatePayload = z.infer<typeof SpaceUpdatePayload>;
 
+export const NotificationLevel = z.enum(["ALL", "MENTIONS", "NOTHING"]);
+export type NotificationLevel = z.infer<typeof NotificationLevel>;
+
+export const NotificationPreference = z.object({
+  level: NotificationLevel,
+  spaceId: z.string().uuid(),
+  userId: z.string().uuid(),
+});
+export type NotificationPreference = z.infer<typeof NotificationPreference>;
+
+export const NotificationPreferencePayload = z.object({
+  level: NotificationLevel,
+});
+export type NotificationPreferencePayload = z.infer<
+  typeof NotificationPreferencePayload
+>;
+
 export const ChannelCreatePayload = z.object({
   name: z.string(),
   parentId: z.union([z.string(), z.null()]).optional(),
@@ -514,6 +531,9 @@ export const schemas = {
   SpaceExt,
   SpaceCreatePayload,
   SpaceUpdatePayload,
+  NotificationLevel,
+  NotificationPreference,
+  NotificationPreferencePayload,
   ChannelCreatePayload,
   ChannelPatch,
   ChannelUnread,
@@ -1237,6 +1257,27 @@ const endpoints = makeApi([
     response: MemberExt,
   },
   {
+    method: "get",
+    path: "/spaces/:spaceId/notification-preference",
+    alias: "spaces.getNotificationPreference",
+    requestFormat: "json",
+    response: NotificationPreference,
+  },
+  {
+    method: "post",
+    path: "/spaces/:spaceId/notification-preference",
+    alias: "spaces.setNotificationPreference",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: NotificationPreferencePayload,
+      },
+    ],
+    response: NotificationPreference,
+  },
+  {
     method: "post",
     path: "/spaces/:spaceId/roles/",
     alias: "roles.create",
@@ -1284,6 +1325,13 @@ const endpoints = makeApi([
     alias: "spaces.join",
     requestFormat: "json",
     response: SpaceExt,
+  },
+  {
+    method: "get",
+    path: "/spaces/notification-preferences",
+    alias: "spaces.listNotificationPreferences",
+    requestFormat: "json",
+    response: z.array(NotificationPreference),
   },
   {
     method: "get",

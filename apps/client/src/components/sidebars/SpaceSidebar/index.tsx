@@ -17,7 +17,9 @@ import { SpaceJoinModal } from '@/components/modals/SpaceJoin';
 import { reorder } from '@/functions/reorder';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState, workspaceState } from '@/store';
+import { ackStore, isSpaceUnread } from '@/store/unreads';
 
+import { Pill } from './Pill';
 import { SpaceBackContextMenu, SpaceContextMenu } from './SpaceContextMenu';
 import { SpaceIconTooltip } from './Tooltip';
 
@@ -43,13 +45,23 @@ const StyledIconWrapper = styled.div`
   padding-right: 8px;
 `;
 
+function useSpaceUnreadState(mikoto: MikotoClient) {
+  useSnapshot(ackStore);
+  useSnapshot(mikoto.channels.cache);
+  return {
+    isUnread: (spaceId: string) => isSpaceUnread(mikoto, spaceId),
+  };
+}
+
 interface SidebarSpaceIconProps {
   space: MikotoSpace;
+  unread?: boolean;
 }
 
 function SortableSpaceIcon({
   space,
   index,
+  unread,
 }: SidebarSpaceIconProps & { index: number }) {
   const { ref } = useSortable({
     id: space.id,
@@ -58,13 +70,12 @@ function SortableSpaceIcon({
 
   return (
     <div ref={ref}>
-      <SidebarSpaceIcon space={space} />
+      <SidebarSpaceIcon space={space} unread={unread} />
     </div>
   );
 }
 
-function SidebarSpaceIcon({ space }: SidebarSpaceIconProps) {
-  // TODO: TF is this name?
+function SidebarSpaceIcon({ space, unread }: SidebarSpaceIconProps) {
   const [leftSidebar, setLeftSidebar] = useAtom(treebarSpaceState);
   const isActive =
     leftSidebar &&
@@ -77,6 +88,7 @@ function SidebarSpaceIcon({ space }: SidebarSpaceIconProps) {
   return (
     <SpaceIconTooltip tooltip={space.name}>
       <StyledIconWrapper>
+        {unread && !isActive && <Pill h={8} />}
         <StyledSpaceIcon
           active={isActive}
           size={ICON_SIZE}
@@ -92,8 +104,6 @@ function SidebarSpaceIcon({ space }: SidebarSpaceIconProps) {
               key: `explorer/${space.id}`,
               spaceId: space.id,
             });
-            // FIXME: correctly fetch members
-            // space.fetchMembers().then();
           }}
         >
           {space.icon === null ? space.name[0] : ''}
@@ -155,6 +165,7 @@ const ICON_SIZE = '40px';
 export function SpaceSidebar() {
   const mikoto = useMikoto();
   const [spaceId, setSpaceId] = useAtom(treebarSpaceState);
+  const { isUnread } = useSpaceUnreadState(mikoto);
 
   useSnapshot(mikoto.spaces);
   const contextMenu = useContextMenu(() => <SpaceBackContextMenu />);
@@ -209,7 +220,12 @@ export function SpaceSidebar() {
         {spaceArray
           .filter((x) => x.type === 'NONE') // TODO: filter this on the server
           .map((space, index) => (
-            <SortableSpaceIcon key={space.id} space={space} index={index} />
+            <SortableSpaceIcon
+              key={space.id}
+              space={space}
+              index={index}
+              unread={isUnread(space.id)}
+            />
           ))}
         <JoinSpaceButon />
       </StyledSpaceSidebar>

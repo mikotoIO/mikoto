@@ -10,8 +10,8 @@ use uuid::Uuid;
 use crate::{
     db::db,
     entities::{
-        Ban, Handle, Invite, MemberExt, MemberKey, Space, SpaceExt, SpacePatch, SpaceUser,
-        SpaceVisibility,
+        Ban, Handle, Invite, MemberExt, MemberKey, NotificationLevel, NotificationPreference,
+        Space, SpaceExt, SpacePatch, SpaceUser, SpaceVisibility,
     },
     error::Error,
     functions::{
@@ -304,6 +304,43 @@ async fn complete_handle_verification(
     Ok(result.into())
 }
 
+#[derive(Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct NotificationPreferencePayload {
+    pub level: NotificationLevel,
+}
+
+async fn get_notification_preference(
+    claim: Claims,
+    Path(space_id): Path<Uuid>,
+) -> Result<Json<NotificationPreference>, Error> {
+    let user_id: Uuid = claim.sub.parse()?;
+    // Verify user is a member of the space
+    SpaceUser::get_by_key(&MemberKey::new(space_id, user_id), db()).await?;
+    let pref = NotificationPreference::get(user_id, space_id, db()).await?;
+    Ok(pref.into())
+}
+
+async fn set_notification_preference(
+    claim: Claims,
+    Path(space_id): Path<Uuid>,
+    Json(body): Json<NotificationPreferencePayload>,
+) -> Result<Json<NotificationPreference>, Error> {
+    let user_id: Uuid = claim.sub.parse()?;
+    // Verify user is a member of the space
+    SpaceUser::get_by_key(&MemberKey::new(space_id, user_id), db()).await?;
+    let pref = NotificationPreference::upsert(user_id, space_id, body.level, db()).await?;
+    Ok(pref.into())
+}
+
+async fn list_notification_preferences(
+    claim: Claims,
+) -> Result<Json<Vec<NotificationPreference>>, Error> {
+    let user_id: Uuid = claim.sub.parse()?;
+    let prefs = NotificationPreference::list_by_user(user_id, db()).await?;
+    Ok(prefs.into())
+}
+
 static TAG: &str = "Spaces";
 
 pub fn router() -> AppRouter<State> {
@@ -352,6 +389,30 @@ pub fn router() -> AppRouter<State> {
             "/:spaceId/leave",
             delete_with(leave, |o| {
                 o.tag(TAG).id("spaces.leave").summary("Leave Space")
+            }),
+        )
+        .route(
+            "/notification-preferences",
+            get_with(list_notification_preferences, |o| {
+                o.tag(TAG)
+                    .id("spaces.listNotificationPreferences")
+                    .summary("List Notification Preferences")
+            }),
+        )
+        .route(
+            "/:spaceId/notification-preference",
+            get_with(get_notification_preference, |o| {
+                o.tag(TAG)
+                    .id("spaces.getNotificationPreference")
+                    .summary("Get Notification Preference")
+            }),
+        )
+        .route(
+            "/:spaceId/notification-preference",
+            post_with(set_notification_preference, |o| {
+                o.tag(TAG)
+                    .id("spaces.setNotificationPreference")
+                    .summary("Set Notification Preference")
             }),
         )
         .route(

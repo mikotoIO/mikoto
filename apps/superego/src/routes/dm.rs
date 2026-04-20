@@ -85,6 +85,8 @@ async fn send(
     let message = Message::new(&channel, user_id, body.content);
     message.create(db()).await?;
 
+    Channel::update_last_updated(channel_id, message.timestamp, db()).await?;
+
     for (i, attachment_input) in body.attachments.into_iter().enumerate() {
         let attachment = MessageAttachment::new(message.id, attachment_input, i as i32);
         attachment.create(db()).await?;

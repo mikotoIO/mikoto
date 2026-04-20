@@ -343,6 +343,29 @@ pub struct MessageSendPayload2 {
     pub content: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum NotificationLevel {
+    #[serde(rename = "ALL")]
+    All,
+    #[serde(rename = "MENTIONS")]
+    Mentions,
+    #[serde(rename = "NOTHING")]
+    Nothing,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NotificationPreference {
+    pub level: NotificationLevel,
+    pub space_id: Uuid,
+    pub user_id: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NotificationPreferencePayload {
+    pub level: NotificationLevel,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ObjectWithId {
     pub id: Uuid,
@@ -1023,6 +1046,31 @@ impl<'a> HttpApi<'a> {
         let resp = req.send().await?.error_for_status()?;
         let _ = resp.text().await?;
         Ok(())
+    }
+
+    pub async fn spaces_list_notification_preferences(&self) -> Result<Vec<NotificationPreference>, ClientError> {
+        let path = "/spaces/notification-preferences".to_string();
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn spaces_get_notification_preference(&self, space_id: Uuid) -> Result<NotificationPreference, ClientError> {
+        let path = format!("/spaces/{}/notification-preference", space_id);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn spaces_set_notification_preference(&self, space_id: Uuid, body: &NotificationPreferencePayload) -> Result<NotificationPreference, ClientError> {
+        let path = format!("/spaces/{}/notification-preference", space_id);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        req = req.json(body);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
     }
 
     pub async fn spaces_start_handle_verification(&self, space_id: Uuid, body: &VerifyHandleRequest) -> Result<VerificationChallenge, ClientError> {

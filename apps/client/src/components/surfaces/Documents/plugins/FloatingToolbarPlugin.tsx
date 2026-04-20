@@ -44,7 +44,7 @@ const ToolbarContainer = styled.div`
   background: var(--chakra-colors-gray-800);
   border: 1px solid var(--chakra-colors-gray-600);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  position: absolute;
+  position: fixed;
   z-index: 100;
   opacity: 0;
   pointer-events: none;
@@ -140,9 +140,8 @@ function FloatingToolbar({
       const toolbarWidth = toolbar.offsetWidth;
       const toolbarHeight = toolbar.offsetHeight;
 
-      const top = rect.top - toolbarHeight - 8 + window.scrollY;
-      const left =
-        rect.left + rect.width / 2 - toolbarWidth / 2 + window.scrollX;
+      const top = rect.top - toolbarHeight - 8;
+      const left = rect.left + rect.width / 2 - toolbarWidth / 2;
 
       toolbar.style.top = `${Math.max(0, top)}px`;
       toolbar.style.left = `${Math.max(0, left)}px`;

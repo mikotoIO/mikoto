@@ -45,6 +45,19 @@ CREATE TYPE public."ChannelType" AS ENUM (
 ALTER TYPE public."ChannelType" OWNER TO postgres;
 
 --
+-- Name: NotificationLevel; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public."NotificationLevel" AS ENUM (
+    'ALL',
+    'MENTIONS',
+    'NOTHING'
+);
+
+
+ALTER TYPE public."NotificationLevel" OWNER TO postgres;
+
+--
 -- Name: RelationState; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -265,6 +278,19 @@ CREATE TABLE public."MessageAttachment" (
 
 
 ALTER TABLE public."MessageAttachment" OWNER TO postgres;
+
+--
+-- Name: NotificationPreference; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."NotificationPreference" (
+    "userId" uuid NOT NULL,
+    "spaceId" uuid NOT NULL,
+    level public."NotificationLevel" DEFAULT 'ALL'::public."NotificationLevel" NOT NULL
+);
+
+
+ALTER TABLE public."NotificationPreference" OWNER TO postgres;
 
 --
 -- Name: RefreshToken; Type: TABLE; Schema: public; Owner: postgres
@@ -497,6 +523,14 @@ ALTER TABLE ONLY public."MessageAttachment"
 
 ALTER TABLE ONLY public."Message"
     ADD CONSTRAINT "Message_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: NotificationPreference NotificationPreference_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."NotificationPreference"
+    ADD CONSTRAINT "NotificationPreference_pkey" PRIMARY KEY ("userId", "spaceId");
 
 
 --
@@ -846,6 +880,22 @@ ALTER TABLE ONLY public."Message"
 
 ALTER TABLE ONLY public."Message"
     ADD CONSTRAINT "Message_channelId_fkey" FOREIGN KEY ("channelId") REFERENCES public."Channel"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: NotificationPreference NotificationPreference_spaceId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."NotificationPreference"
+    ADD CONSTRAINT "NotificationPreference_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES public."Space"(id) ON DELETE CASCADE;
+
+
+--
+-- Name: NotificationPreference NotificationPreference_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."NotificationPreference"
+    ADD CONSTRAINT "NotificationPreference_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."User"(id) ON DELETE CASCADE;
 
 
 --

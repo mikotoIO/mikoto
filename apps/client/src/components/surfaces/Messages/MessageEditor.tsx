@@ -6,6 +6,7 @@ import {
   faPaperPlane,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import type { MikotoMember } from '@mikoto-io/mikoto.js';
 import useResizeObserver from '@react-hook/resize-observer';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
@@ -18,6 +19,7 @@ import { contextMenuState } from '@/components/ContextMenu';
 import { useIsMobile } from '@/hooks/useIsMobile';
 
 import { messageEditState } from './Message';
+import { useMentionAutocomplete } from './MentionAutocomplete';
 
 const EmojiPicker = lazy(() => import('./EmojiPicker'));
 
@@ -78,6 +80,7 @@ interface MessageEditorProps {
   onSubmit: (content: string, files: FileUpload[]) => void;
   onTyping?: () => void;
   onResize?: () => void;
+  members?: MikotoMember[];
 }
 
 const EditorButtons = styled.div`
@@ -228,6 +231,7 @@ export function MessageEditor({
   onSubmit,
   onTyping,
   onResize,
+  members = [],
 }: MessageEditorProps) {
   const currentEditState = useAtomValue(messageEditState);
   const setEditState = useSetAtom(messageEditState);
@@ -255,6 +259,9 @@ export function MessageEditor({
       ),
     [],
   );
+
+  const { overlay: mentionOverlay, onKeyDown: mentionKeyDown } =
+    useMentionAutocomplete({ editor, members });
 
   const setContextMenu = useSetAtom(contextMenuState);
   const ref = useRef<HTMLDivElement>(null);
@@ -325,6 +332,7 @@ export function MessageEditor({
           </UploadSection>
         )}
         <EditableContainer ref={ref}>
+          {mentionOverlay}
           <Slate
             editor={editor}
             initialValue={editorValue}
@@ -333,6 +341,8 @@ export function MessageEditor({
             <StyledEditable
               placeholder={placeholder}
               onKeyDown={(ev) => {
+                if (mentionKeyDown(ev)) return;
+
                 if (isMobile) {
                   onTyping?.();
                   return;

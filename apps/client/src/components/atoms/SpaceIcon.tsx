@@ -18,7 +18,7 @@ function hashString(str: string): number {
   return Math.abs(hash);
 }
 
-function colorFromId(id: string): string {
+export function colorFromId(id: string): string {
   const hash = hashString(id);
   const hue = hash % 360;
   return `oklch(0.55 0.25 ${hue})`;

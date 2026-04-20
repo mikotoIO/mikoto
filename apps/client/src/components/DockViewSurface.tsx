@@ -1,6 +1,7 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
+import { colorFromId } from '@/components/atoms/SpaceIcon';
 import {
   DockviewApi,
   DockviewDidDropEvent,
@@ -160,7 +161,7 @@ function CustomTabComponent(props: IDockviewPanelHeaderProps) {
           justifyContent: 'center',
         }}
       >
-        {tabName.icon && (
+        {(tabName.icon || tabName.spaceId) && (
           <span
             style={{
               marginRight: '6px',
@@ -169,12 +170,7 @@ function CustomTabComponent(props: IDockviewPanelHeaderProps) {
               flexShrink: 0,
             }}
           >
-            {isFontAwesomeIcon(tabName.icon) ? (
-              <FontAwesomeIcon
-                icon={tabName.icon}
-                style={{ fontSize: '12px' }}
-              />
-            ) : (
+            {tabName.icon && !isFontAwesomeIcon(tabName.icon) ? (
               <img
                 src={normalizeMediaUrl(tabName.icon as string)}
                 alt=""
@@ -185,7 +181,30 @@ function CustomTabComponent(props: IDockviewPanelHeaderProps) {
                   objectFit: 'cover',
                 }}
               />
-            )}
+            ) : tabName.spaceId ? (
+              <span
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '3px',
+                  backgroundColor: colorFromId(tabName.spaceId),
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  color: 'white',
+                  fontFamily: 'var(--font-heading)',
+                }}
+              >
+                {tabName.spaceName?.[0] ?? ''}
+              </span>
+            ) : tabName.icon ? (
+              <FontAwesomeIcon
+                icon={tabName.icon as IconDefinition}
+                style={{ fontSize: '12px' }}
+              />
+            ) : null}
           </span>
         )}
         {title}

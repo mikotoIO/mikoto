@@ -31,6 +31,8 @@ export const tabByIdSelector = atom((get) => (id: string) => {
 export interface TabNameProps {
   name: string;
   icon?: IconDefinition | string;
+  spaceId?: string;
+  spaceName?: string;
 }
 
 export const tabNameFamily = atomFamily((param: string) =>

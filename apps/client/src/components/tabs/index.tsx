@@ -4,7 +4,7 @@ import { useContext, useEffect } from 'react';
 
 import { TabContext, TabNameProps, tabNameFamily } from '@/store/surface';
 
-export function TabName({ name, icon }: TabNameProps) {
+export function TabName({ name, icon, spaceId, spaceName }: TabNameProps) {
   const tabInfo = useContext(TabContext);
   const [tabName, setTabName] = useAtom(tabNameFamily(tabInfo.key));
 
@@ -14,9 +14,11 @@ export function TabName({ name, icon }: TabNameProps) {
         ...tabName,
         name,
         icon,
+        spaceId,
+        spaceName,
       });
     }
-  }, [name, tabName, setTabName, tabInfo.key, icon]);
+  }, [name, tabName, setTabName, tabInfo.key, icon, spaceId, spaceName]);
 
   return <></>;
 }

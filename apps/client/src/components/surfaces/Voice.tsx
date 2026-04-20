@@ -64,7 +64,12 @@ export default function VoiceSurface({ channelId }: { channelId: string }) {
 
   return (
     <Surface data-lk-theme="default">
-      <TabName name={channel.name} icon={channel.space?.icon ?? faMicrophone} />
+      <TabName
+        name={channel.name}
+        icon={channel.space?.icon ?? faMicrophone}
+        spaceId={channel.space?.id}
+        spaceName={channel.space?.name}
+      />
       {voiceConfig && (
         <LiveKitRoom
           serverUrl={voiceConfig.url}

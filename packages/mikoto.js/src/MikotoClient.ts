@@ -75,4 +75,8 @@ export class MikotoClient {
       this.ws.ws.close();
     }
   }
+
+  getAccessToken(): string | undefined {
+    return this.token;
+  }
 }

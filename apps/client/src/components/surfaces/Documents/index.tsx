@@ -22,7 +22,6 @@ import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
@@ -40,6 +39,7 @@ import { createTooltip } from '@/ui';
 
 import { EDITOR_NODES } from './editorNodes';
 import { CodeBlockPlugin } from './plugins/CodeBlockPlugin';
+import { CollabPlugin } from './plugins/CollabPlugin';
 import { EmptyParagraphPlugin } from './plugins/EmptyParagraphPlugin';
 import { FloatingToolbarPlugin } from './plugins/FloatingToolbarPlugin';
 import { HotkeyPlugin } from './plugins/HotkeyPlugin';
@@ -285,6 +285,17 @@ function DocumentEditor({
     [],
   );
 
+  // Skip saves triggered by remote collab updates — only the peer whose
+  // local edit caused the change needs to persist. This avoids N^2 writes
+  // when multiple clients are co-editing.
+  const handleChange = useCallback(
+    (editorState: EditorState, _editor: unknown, tags: Set<string>) => {
+      if (tags.has('collaboration')) return;
+      onChange(editorState);
+    },
+    [onChange],
+  );
+
   return (
     <LexicalComposer
       initialConfig={{
@@ -292,7 +303,9 @@ function DocumentEditor({
         editable: true,
         nodes: EDITOR_NODES,
         theme: lexicalTheme,
-        editorState: () => markdownToEditor(document.content),
+        // Must be null when using CollaborationPlugin — Yjs owns the state.
+        // Initial markdown is seeded by CollabPlugin once the provider syncs.
+        editorState: null,
         onError(error: Error) {
           throw error;
         },
@@ -303,6 +316,7 @@ function DocumentEditor({
         placeholder={<></>}
         ErrorBoundary={LexicalErrorBoundary}
       />
+      <CollabPlugin channel={channel} content={document.content} />
       <MarkdownShortcutPlugin />
       <MarkdownPastePlugin />
       <AutoFocusPlugin />
@@ -312,8 +326,7 @@ function DocumentEditor({
       <CodeBlockPlugin />
       <EmptyParagraphPlugin />
       <FloatingToolbarPlugin />
-      <OnChangePlugin ignoreSelectionChange onChange={onChange} />
-      <HistoryPlugin />
+      <OnChangePlugin ignoreSelectionChange onChange={handleChange} />
     </LexicalComposer>
   );
 }

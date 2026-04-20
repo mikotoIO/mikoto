@@ -87,6 +87,7 @@ const SpaceIcon = styled.div<{ icon?: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: var(--font-heading);
   font-size: 12px;
   font-weight: 600;
 `;

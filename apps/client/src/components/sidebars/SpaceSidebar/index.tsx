@@ -80,6 +80,7 @@ function SidebarSpaceIcon({ space }: SidebarSpaceIconProps) {
         <StyledSpaceIcon
           active={isActive}
           size={ICON_SIZE}
+          spaceId={space.id}
           onContextMenu={contextMenu}
           icon={space.icon ? normalizeMediaUrl(space.icon) : undefined}
           onDoubleClick={() => {

@@ -4,9 +4,9 @@ import { useSortable } from '@dnd-kit/react/sortable';
 import styled from '@emotion/styled';
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { MessageExt, MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
+import { MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useAtom, useSetAtom } from 'jotai';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useSnapshot } from 'valtio/react';
 
 import { modalState, useContextMenu } from '@/components/ContextMenu';
@@ -17,6 +17,7 @@ import { SpaceJoinModal } from '@/components/modals/SpaceJoin';
 import { reorder } from '@/functions/reorder';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState, workspaceState } from '@/store';
+import { ackStore, isSpaceUnread } from '@/store/unreads';
 
 import { Pill } from './Pill';
 import { SpaceBackContextMenu, SpaceContextMenu } from './SpaceContextMenu';
@@ -45,50 +46,21 @@ const StyledIconWrapper = styled.div`
 `;
 
 function useSpaceUnreadState(mikoto: MikotoClient) {
-  const [unreadSpaces, setUnreadSpaces] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    const handler = (msg: MessageExt) => {
-      if (msg.authorId === mikoto.user.me?.id) return;
-      const channel = mikoto.channels._get(msg.channelId);
-      if (!channel?.spaceId) return;
-      setUnreadSpaces((prev) => {
-        if (prev.has(channel.spaceId!)) return prev;
-        const next = new Set(prev);
-        next.add(channel.spaceId!);
-        return next;
-      });
-    };
-    mikoto.ws.on('messages.onCreate', handler);
-    return () => {
-      mikoto.ws.off('messages.onCreate', handler);
-    };
-  }, []);
-
+  useSnapshot(ackStore);
   return {
-    isUnread: (spaceId: string) => unreadSpaces.has(spaceId),
-    clearUnread: (spaceId: string) => {
-      setUnreadSpaces((prev) => {
-        if (!prev.has(spaceId)) return prev;
-        const next = new Set(prev);
-        next.delete(spaceId);
-        return next;
-      });
-    },
+    isUnread: (spaceId: string) => isSpaceUnread(mikoto, spaceId),
   };
 }
 
 interface SidebarSpaceIconProps {
   space: MikotoSpace;
   unread?: boolean;
-  onClearUnread?: () => void;
 }
 
 function SortableSpaceIcon({
   space,
   index,
   unread,
-  onClearUnread,
 }: SidebarSpaceIconProps & { index: number }) {
   const { ref } = useSortable({
     id: space.id,
@@ -97,20 +69,12 @@ function SortableSpaceIcon({
 
   return (
     <div ref={ref}>
-      <SidebarSpaceIcon
-        space={space}
-        unread={unread}
-        onClearUnread={onClearUnread}
-      />
+      <SidebarSpaceIcon space={space} unread={unread} />
     </div>
   );
 }
 
-function SidebarSpaceIcon({
-  space,
-  unread,
-  onClearUnread,
-}: SidebarSpaceIconProps) {
+function SidebarSpaceIcon({ space, unread }: SidebarSpaceIconProps) {
   const [leftSidebar, setLeftSidebar] = useAtom(treebarSpaceState);
   const isActive =
     leftSidebar &&
@@ -139,7 +103,6 @@ function SidebarSpaceIcon({
               key: `explorer/${space.id}`,
               spaceId: space.id,
             });
-            onClearUnread?.();
           }}
         >
           {space.icon === null ? space.name[0] : ''}
@@ -201,7 +164,7 @@ const ICON_SIZE = '40px';
 export function SpaceSidebar() {
   const mikoto = useMikoto();
   const [spaceId, setSpaceId] = useAtom(treebarSpaceState);
-  const { isUnread, clearUnread } = useSpaceUnreadState(mikoto);
+  const { isUnread } = useSpaceUnreadState(mikoto);
 
   useSnapshot(mikoto.spaces);
   const contextMenu = useContextMenu(() => <SpaceBackContextMenu />);
@@ -261,7 +224,6 @@ export function SpaceSidebar() {
               space={space}
               index={index}
               unread={isUnread(space.id)}
-              onClearUnread={() => clearUnread(space.id)}
             />
           ))}
         <JoinSpaceButon />

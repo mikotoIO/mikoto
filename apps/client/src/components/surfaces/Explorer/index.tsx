@@ -6,14 +6,10 @@ import {
   faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  MessageExt,
-  MikotoChannel,
-  MikotoSpace,
-} from '@mikoto-io/mikoto.js';
+import { MikotoChannel, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useAtom, useSetAtom } from 'jotai';
 import { NumberSize, Resizable } from 're-resizable';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSnapshot } from 'valtio/react';
 
 import {
@@ -23,10 +19,15 @@ import {
 } from '@/components/ContextMenu';
 import { RESIZABLE_DISABLES } from '@/components/sidebars/Base';
 import { MemberListSidebar } from '@/components/sidebars/MemberListSidebar';
-import { getActiveChannelId } from '@/functions/notify';
 import { useFetchMember, useMikoto } from '@/hooks';
 import { explorerPanelsState } from '@/store';
 import { useTabkit } from '@/store/surface';
+import {
+  ackChannel,
+  ackStore,
+  isChannelUnread,
+  loadAcksForSpace,
+} from '@/store/unreads';
 
 import { ChannelContextMenu, CreateChannelModal } from './ChannelContextMenu';
 import { ChannelTree } from './ChannelTree';
@@ -112,50 +113,21 @@ export function TreebarContextMenu({ space }: { space: MikotoSpace }) {
   );
 }
 
-function isUnread(lastUpdate: Date | undefined, ack: Date | null) {
-  if (lastUpdate === undefined) return false;
-  if (ack === null) return true;
-  return lastUpdate.getTime() > ack.getTime();
-}
-
 function useAcks(space: MikotoSpace) {
-  const mikoto = useMikoto();
-  const [acks, setAcks] = useState<Record<string, Date>>({});
+  useSnapshot(ackStore);
 
   useEffect(() => {
-    space.listUnread().then((ur) => {
-      setAcks(
-        Object.fromEntries(ur.map((u) => [u.channelId, new Date(u.timestamp)])),
-      );
-    });
-  }, [space.id]);
-
-  useEffect(() => {
-    const handler = (msg: MessageExt) => {
-      const ch = mikoto.channels._get(msg.channelId);
-      if (ch?.spaceId !== space.id) return;
-      if (msg.authorId === mikoto.user.me?.id) return;
-
-      // Auto-ack if this channel tab is active
-      if (getActiveChannelId() === msg.channelId) {
-        setAcks((xs) => ({
-          ...xs,
-          [msg.channelId]: new Date(msg.timestamp),
-        }));
-      }
-    };
-    mikoto.ws.on('messages.onCreate', handler);
-    return () => {
-      mikoto.ws.off('messages.onCreate', handler);
-    };
+    loadAcksForSpace(space);
   }, [space.id]);
 
   return {
-    acks,
+    isChannelUnread(channel: MikotoChannel) {
+      return isChannelUnread(channel.lastUpdated, channel.id);
+    },
     ackChannel(channel: MikotoChannel) {
-      const now = new Date();
+      const now = new Date().toISOString();
       channel.ack().then(() => {
-        setAcks((xs) => ({ ...xs, [channel.id]: now }));
+        ackChannel(channel.id, now);
       });
     },
   };
@@ -164,7 +136,7 @@ function useAcks(space: MikotoSpace) {
 function ExplorerInner({ space }: { space: MikotoSpace }) {
   useFetchMember(space);
   const tabkit = useTabkit();
-  const { acks, ackChannel } = useAcks(space);
+  const { isChannelUnread: isUnread, ackChannel } = useAcks(space);
   const nodeContextMenu = useContextMenuX();
 
   useSnapshot(space);
@@ -174,7 +146,7 @@ function ExplorerInner({ space }: { space: MikotoSpace }) {
     icon: getIconFromChannelType(channel.type),
     id: channel.id,
     text: channel.name,
-    unread: isUnread(channel.lastUpdatedDate, acks[channel.id] ?? null),
+    unread: isUnread(channel),
     onClick(ev) {
       const tab = channelToTab(channel);
 

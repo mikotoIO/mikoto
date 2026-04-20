@@ -11,6 +11,7 @@ import { env } from '@/env';
 import { notifyFromMessage } from '@/functions/notify';
 import { AuthContext, MikotoContext } from '@/hooks';
 import { authClient } from '@/store/authClient';
+import { ackChannel, loadAcksForAllSpaces } from '@/store/unreads';
 
 const BASE_DELAY_MS = 1000;
 const MAX_DELAY_MS = 16000;
@@ -35,6 +36,7 @@ function registerNotifications(
     const isViewingChannel = notifyFromMessage(mikoto, msg);
     if (isViewingChannel) {
       channel.ack();
+      ackChannel(msg.channelId, msg.timestamp);
     }
   });
 }
@@ -74,6 +76,7 @@ export function MikotoClientProvider({
         await Promise.all([mi.spaces.list(), mi.user.load()]);
         const preferences = await loadNotificationPreferences(mi);
         registerNotifications(mi, preferences);
+        loadAcksForAllSpaces(mi);
         setMikoto(mi);
         return;
       } catch (e) {

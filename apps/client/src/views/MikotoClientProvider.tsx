@@ -30,7 +30,10 @@ function registerNotifications(
       if (pref === 'MENTIONS') return;
     }
 
-    notifyFromMessage(mikoto, msg);
+    const isViewingChannel = notifyFromMessage(mikoto, msg);
+    if (isViewingChannel) {
+      channel.ack();
+    }
   });
 }
 

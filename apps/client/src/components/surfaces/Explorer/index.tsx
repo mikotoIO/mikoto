@@ -23,6 +23,7 @@ import {
 } from '@/components/ContextMenu';
 import { RESIZABLE_DISABLES } from '@/components/sidebars/Base';
 import { MemberListSidebar } from '@/components/sidebars/MemberListSidebar';
+import { getActiveChannelId } from '@/functions/notify';
 import { useFetchMember, useMikoto } from '@/hooks';
 import { explorerPanelsState } from '@/store';
 import { useTabkit } from '@/store/surface';
@@ -135,6 +136,14 @@ function useAcks(space: MikotoSpace) {
       if (ch?.spaceId !== space.id) return;
       if (msg.authorId === mikoto.user.me?.id) return;
       if (ch) ch.lastUpdated = msg.timestamp;
+
+      // Auto-ack if this channel tab is active
+      if (getActiveChannelId() === msg.channelId) {
+        setAcks((xs) => ({
+          ...xs,
+          [msg.channelId]: new Date(msg.timestamp),
+        }));
+      }
     };
     mikoto.ws.on('messages.onCreate', handler);
     return () => {

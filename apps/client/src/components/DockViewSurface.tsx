@@ -29,6 +29,7 @@ import {
   LoadingSurface,
   surfaceMap,
 } from '@/components/surfaces';
+import { setActiveChannelId } from '@/functions/notify';
 import { useMikoto } from '@/hooks';
 import {
   TabContext,
@@ -253,6 +254,30 @@ export const DockViewSurface = () => {
   const navigate = useNavigate();
   const mikoto = useMikoto();
 
+  // Track the active channel for notification suppression
+  useEffect(() => {
+    if (!activeTabId) {
+      setActiveChannelId(null);
+      return;
+    }
+    const slashIndex = activeTabId.indexOf('/');
+    if (slashIndex === -1) {
+      setActiveChannelId(null);
+      return;
+    }
+    const kind = activeTabId.slice(0, slashIndex);
+    const channelId = activeTabId.slice(slashIndex + 1);
+    if (
+      kind === 'textChannel' ||
+      kind === 'voiceChannel' ||
+      kind === 'documentChannel'
+    ) {
+      setActiveChannelId(channelId);
+    } else {
+      setActiveChannelId(null);
+    }
+  }, [activeTabId]);
+
   // Helper to get the URL segment for a space (uses @handle if available, otherwise UUID)
   const getSpaceUrlSegment = useCallback(
     (spaceId: string) => {
@@ -406,12 +431,19 @@ export const DockViewSurface = () => {
         }
       });
 
-      // Listen for active panel changes to sync URL
+      // Listen for active panel changes to sync URL and active tab state
       event.api.onDidActivePanelChange((panel) => {
         const newPath = getUrlFromPanelRef.current(panel);
         // Only navigate if the path actually changes
         if (window.location.pathname !== newPath) {
           navigateRef.current(newPath, { replace: true });
+        }
+
+        // Sync DockView's active panel back to jotai state
+        const panelId = panel?.id ?? null;
+        if (panelId !== prevActiveTabIdRef.current) {
+          prevActiveTabIdRef.current = panelId;
+          setActiveTabId(panelId);
         }
       });
 

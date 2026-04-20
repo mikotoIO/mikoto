@@ -14,6 +14,16 @@ const recentByChannel = new Map<
   { count: number; timer: ReturnType<typeof setTimeout> }
 >();
 
+let _activeChannelId: string | null = null;
+
+export function setActiveChannelId(channelId: string | null) {
+  _activeChannelId = channelId;
+}
+
+export function getActiveChannelId() {
+  return _activeChannelId;
+}
+
 function isSoundEnabled() {
   return localStorage.getItem('notificationSound') !== 'false';
 }
@@ -34,12 +44,22 @@ function showNotification(title: string, body: string, icon?: string) {
   };
 }
 
-export function notifyFromMessage(mikoto: MikotoClient, message: MessageExt) {
-  if (message.authorId === mikoto.user.me!.id) return;
-  if (document.hasFocus()) return;
+/** Returns true if the message was suppressed because the user is viewing the channel. */
+export function notifyFromMessage(
+  mikoto: MikotoClient,
+  message: MessageExt,
+): boolean {
+  if (message.authorId === mikoto.user.me!.id) return false;
+
+  // If this channel tab is active, skip the notification and signal auto-ack
+  if (_activeChannelId === message.channelId) {
+    return true;
+  }
+
+  if (document.hasFocus()) return false;
 
   const channel = mikoto.channels._get(message.channelId);
-  if (!channel) return;
+  if (!channel) return false;
 
   const channelId = message.channelId;
   const existing = recentByChannel.get(channelId);
@@ -61,7 +81,7 @@ export function notifyFromMessage(mikoto: MikotoClient, message: MessageExt) {
       }, BATCH_WINDOW_MS);
       existing.timer = timer;
     }
-    return;
+    return false;
   }
 
   recentByChannel.set(channelId, {
@@ -74,7 +94,7 @@ export function notifyFromMessage(mikoto: MikotoClient, message: MessageExt) {
   let title: string;
   if (channel.spaceId) {
     const space = mikoto.spaces._get(channel.spaceId);
-    if (!space) return;
+    if (!space) return false;
     title = `${message.author?.name} (#${channel.name}, ${space.name})`;
   } else {
     title = `${message.author?.name} (DM)`;
@@ -85,4 +105,5 @@ export function notifyFromMessage(mikoto: MikotoClient, message: MessageExt) {
     message.content,
     normalizeMediaUrl(message.author?.avatar),
   );
+  return false;
 }

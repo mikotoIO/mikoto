@@ -12,6 +12,8 @@ import { ContextMenu, modalState } from '@/components/ContextMenu';
 import { InviteModal } from '@/components/modals/Invite';
 import { SpaceJoinModal } from '@/components/modals/SpaceJoin';
 import {
+  ackChannel,
+  isChannelUnread,
   notificationPreferenceStore,
   setSpaceNotificationLevel,
 } from '@/store/unreads';
@@ -62,6 +64,21 @@ export function SpaceContextMenu({ space }: { space: MikotoSpace }) {
         }}
       >
         Generate Invite
+      </ContextMenu.Link>
+      <ContextMenu.Link
+        onClick={async () => {
+          const now = new Date().toISOString();
+          await Promise.allSettled(
+            space.channels
+              .filter((ch) => isChannelUnread(ch.lastUpdated, ch.id))
+              .map(async (ch) => {
+                await ch.ack();
+                ackChannel(ch.id, now);
+              }),
+          );
+        }}
+      >
+        Mark All as Read
       </ContextMenu.Link>
       <hr
         style={{

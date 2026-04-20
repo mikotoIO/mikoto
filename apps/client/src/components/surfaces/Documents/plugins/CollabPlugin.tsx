@@ -6,11 +6,16 @@ import { CollaborationContext } from '@lexical/react/LexicalCollaborationContext
 import { CollaborationPlugin } from '@lexical/react/LexicalCollaborationPlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
+import type * as Y from 'yjs';
 
 import { useMikoto } from '@/hooks';
 
-import { SyncState, useProviderFactory } from '../providerFactory';
+import { buildProvider, SyncState } from '../providerFactory';
+
+export interface CollabPluginProps {
+  channel: MikotoChannel;
+}
 
 // Lexical's built-in `shouldBootstrap`/`initialEditorState` path is unsafe
 // with multiple peers: both peers that connect to a freshly-created room
@@ -19,10 +24,39 @@ import { SyncState, useProviderFactory } from '../providerFactory';
 // items that the CRDT then merges into duplicated content. The server picks
 // exactly one peer via an atomic compare_exchange and notifies it with a
 // custom message; this plugin runs the seed in response.
-export function CollabPlugin({ channel, content }: CollabPluginProps) {
+export function CollabPlugin({ channel }: CollabPluginProps) {
   const mikoto = useMikoto();
   const [editor] = useLexicalComposerContext();
-  const { providerFactory, providerRef } = useProviderFactory({ channel });
+
+  const seededRef = useRef(false);
+
+  // The server sends the authoritative Postgres markdown as the election
+  // payload. We seed from that, not from a React prop, so we're guaranteed
+  // to be in sync with the DB even across StrictMode remounts and room
+  // re-creations — both of which can cause the client to re-elect.
+  const onElected = useCallback(
+    (markdown: string) => {
+      if (seededRef.current) return;
+      seededRef.current = true;
+      editor.update(
+        () => {
+          $convertFromMarkdownString(markdown, TRANSFORMERS);
+        },
+        { tag: 'history-merge' },
+      );
+    },
+    [editor],
+  );
+
+  // Stable factory: only recreated if channel id or the mikoto client change.
+  // CollaborationPlugin's provider useMemo depends on `providerFactory`, so
+  // a stable reference is required to avoid tearing the Yjs binding down on
+  // every re-render.
+  const providerFactory = useCallback(
+    (id: string, yjsDocMap: Map<string, Y.Doc>) =>
+      buildProvider(id, yjsDocMap, { channel, mikoto, onElected }),
+    [channel, mikoto, onElected],
+  );
 
   // Isolate each editor instance's CollaborationContext. The default export
   // from @lexical/react is a module-level singleton with a shared yjsDocMap;
@@ -40,33 +74,6 @@ export function CollabPlugin({ channel, content }: CollabPluginProps) {
     [mikoto],
   );
 
-  // Seed the Y.Doc from markdown exactly once, and only if the server
-  // elected us. The provider emits `bootstrap-elect` when the custom
-  // message arrives; we hook it in an effect and run $convertFromMarkdownString
-  // inside an editor.update tagged `history-merge` so it mirrors through to
-  // the Yjs binding without being treated as a remote collab update.
-  const seededRef = useRef(false);
-  useEffect(() => {
-    const provider = providerRef.current;
-    if (!provider) return;
-
-    const onBootstrap = () => {
-      if (seededRef.current) return;
-      seededRef.current = true;
-      editor.update(
-        () => {
-          $convertFromMarkdownString(content, TRANSFORMERS);
-        },
-        { tag: 'history-merge' },
-      );
-    };
-
-    provider.on('bootstrap-elect', onBootstrap);
-    return () => {
-      provider.off('bootstrap-elect', onBootstrap);
-    };
-  }, [editor, content, providerRef]);
-
   return (
     <CollaborationContext.Provider value={collabContext}>
       <CollaborationPlugin
@@ -79,11 +86,6 @@ export function CollabPlugin({ channel, content }: CollabPluginProps) {
       />
     </CollaborationContext.Provider>
   );
-}
-
-export interface CollabPluginProps {
-  channel: MikotoChannel;
-  content: string;
 }
 
 export type { SyncState };

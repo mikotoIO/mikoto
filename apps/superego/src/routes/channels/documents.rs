@@ -277,10 +277,17 @@ async fn ws_handler(
             ))?;
     }
 
-    Ok(ws.on_upgrade(move |socket| peer(room, socket, rooms)))
+    // Pre-load the Postgres markdown so the elected peer can seed the Y.Doc
+    // with authoritative content from the moment of election. We do this
+    // here (not inside peer()) so any DB error surfaces as a real HTTP
+    // error during the upgrade rather than a silent ws failure.
+    let document = Document::get_by_channel_id(channel_id, db()).await?;
+    let seed_markdown = document.content.into_bytes();
+
+    Ok(ws.on_upgrade(move |socket| peer(room, socket, rooms, seed_markdown)))
 }
 
-async fn peer(room_id: String, ws: WebSocket, rooms: RoomMap) {
+async fn peer(room_id: String, ws: WebSocket, rooms: RoomMap, seed_markdown: Vec<u8>) {
     let room = {
         let mut rooms = rooms.lock().await;
         match rooms.get(&room_id).and_then(Weak::upgrade) {
@@ -317,6 +324,10 @@ async fn peer(room_id: String, ws: WebSocket, rooms: RoomMap) {
     // the ONLY peer that should seed the Y.Doc from Postgres markdown. Every
     // other peer must wait for the seed to arrive over the sync protocol.
     // This eliminates the "both peers bootstrap, content duplicates" race.
+    //
+    // We send the current Postgres markdown as the payload so the elected
+    // client seeds from authoritative content — not from whatever stale
+    // `content` prop it happened to have at mount time.
     let elected = room
         .bootstrap_claimed
         .compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire)
@@ -324,6 +335,7 @@ async fn peer(room_id: String, ws: WebSocket, rooms: RoomMap) {
     if elected {
         let mut encoder = EncoderV1::new();
         encoder.write_var(MSG_BOOTSTRAP_ELECT);
+        encoder.write_buf(&seed_markdown);
         let _ = reply_tx.send(encoder.to_vec());
     }
 

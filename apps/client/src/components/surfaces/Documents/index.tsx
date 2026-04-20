@@ -262,13 +262,6 @@ function DocumentEditor({
   channel: MikotoChannel;
   documentState: DocumentState;
 }) {
-  const { data: document } = useSuspenseQuery({
-    queryKey: ['documents.get', channel.spaceId, channel.id],
-    queryFn: async () => {
-      return channel.getDocument();
-    },
-  });
-
   const onChange = useCallback(
     debounce((editorState: EditorState) => {
       documentState.save = 'saving';
@@ -316,7 +309,7 @@ function DocumentEditor({
         placeholder={<></>}
         ErrorBoundary={LexicalErrorBoundary}
       />
-      <CollabPlugin channel={channel} content={document.content} />
+      <CollabPlugin channel={channel} />
       <MarkdownShortcutPlugin />
       <MarkdownPastePlugin />
       <AutoFocusPlugin />

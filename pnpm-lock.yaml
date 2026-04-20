@@ -200,6 +200,9 @@ importers:
       lexical:
         specifier: ^0.14.4
         version: 0.14.5
+      lib0:
+        specifier: ^0.2.97
+        version: 0.2.97
       livekit-client:
         specifier: ^2.18.3
         version: 2.18.3(@types/dom-mediacapture-record@1.0.22)

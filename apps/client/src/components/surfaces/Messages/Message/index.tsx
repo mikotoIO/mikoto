@@ -10,6 +10,7 @@ import { MikotoMessage } from '@mikoto-io/mikoto.js';
 import { atom, useSetAtom } from 'jotai';
 import { useSnapshot } from 'valtio/react';
 
+import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import { ContextMenu, useContextMenu } from '@/components/ContextMenu';
 import { MessageAvatar } from '@/components/atoms/MessageAvatar';
 import { Markdown } from '@/components/molecules/markdown';
@@ -178,7 +179,7 @@ export const MessageItem = ({ message, isSimple }: MessageProps) => {
               return (
                 <Link
                   key={attachment.id}
-                  href={attachment.url}
+                  href={normalizeMediaUrl(attachment.url)}
                   target="_blank"
                   rel="noopener noreferrer"
                   maxW={isImage ? '400px' : 'auto'}
@@ -186,7 +187,7 @@ export const MessageItem = ({ message, isSimple }: MessageProps) => {
                 >
                   {isImage ? (
                     <img
-                      src={attachment.url}
+                      src={normalizeMediaUrl(attachment.url)}
                       alt={attachment.filename}
                       style={{
                         maxWidth: '100%',

@@ -184,7 +184,7 @@ export const ChannelContextMenu = ({ channel }: { channel: MikotoChannel }) => {
       >
         Channel Settings
       </ContextMenu.Link>
-      {channel.space!.member!.checkPermission(permissions.superuser) && (
+      {channel.space?.member?.checkPermission(permissions.superuser) && (
         <>
           <ContextMenu.Link
             onClick={() => {

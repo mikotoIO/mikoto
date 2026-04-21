@@ -1,3 +1,4 @@
+import { Box } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { MessageExt } from '@mikoto-io/mikoto.js';
 
@@ -14,7 +15,6 @@ const DAYS_OF_WEEK = [
 const StyledDateSeparator = styled.div`
   text-align: center;
   margin: 4px 0;
-  color: var(--chakra-colors-gray-400);
   font-size: 12px;
   display: flex;
   align-items: center;
@@ -35,7 +35,9 @@ const StyledDateSeparator = styled.div`
 export function DateSeparator({ date }: { date: Date }) {
   return (
     <StyledDateSeparator>
-      {DAYS_OF_WEEK[date.getDay()]} {date.toLocaleDateString()}
+      <Box bg="gray.750" color="gray.400" px={4} py={0.5} rounded="xl">
+        {DAYS_OF_WEEK[date.getDay()]} {date.toLocaleDateString()}
+      </Box>
     </StyledDateSeparator>
   );
 }

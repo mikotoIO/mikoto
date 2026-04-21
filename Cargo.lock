@@ -4572,7 +4572,6 @@ dependencies = [
  "url",
  "uuid",
  "yrs",
- "yrs-axum",
 ]
 
 [[package]]
@@ -5768,21 +5767,6 @@ dependencies = [
  "smallstr",
  "smallvec",
  "thiserror 1.0.69",
-]
-
-[[package]]
-name = "yrs-axum"
-version = "0.1.0"
-source = "git+https://github.com/mikotoIO/yrs-axum?branch=master#d3f2401fb786cc5c87b4fdfcea456b1470fbdd83"
-dependencies = [
- "axum 0.7.9",
- "futures-util",
- "serde",
- "serde_json",
- "tokio",
- "tokio-util",
- "tracing",
- "yrs",
 ]
 
 [[package]]

@@ -28,17 +28,18 @@ export function useProviderFactory({
   const onSyncRef = useRef(onSync);
   onSyncRef.current = onSync;
 
-  // Per-mount cache of the Y.Doc + WebsocketProvider. Lexical's
+  // Per-channel cache of the Y.Doc + WebsocketProvider. Lexical's
   // CollaborationPlugin wraps providerFactory in a useMemo whose factory
   // gets invoked twice per render under React StrictMode. Without caching,
   // each invocation would create a separate WebsocketProvider on the same
   // Y.Doc; the orphan one would register a second _updateHandler on the
   // doc observer list and clobber local-edit broadcasting through
-  // y-websocket's BroadcastChannel. Caching returns the same provider for
-  // both invocations.
+  // y-websocket's BroadcastChannel. Keyed by channel id so a channel switch
+  // tears down the old provider instead of reusing it for the new room.
   const providerRef = useRef<{
     doc: Y.Doc;
     provider: WebsocketProvider;
+    channelId: string;
   } | null>(null);
 
   // `connect: false` — let Lexical's CollaborationPlugin call `.connect()`
@@ -47,6 +48,12 @@ export function useProviderFactory({
   // and shouldBootstrap never runs.
   const providerFactory = useCallback(
     (id: string, yjsDocMap: Map<string, Y.Doc>) => {
+      if (providerRef.current && providerRef.current.channelId !== id) {
+        providerRef.current.provider.disconnect();
+        providerRef.current.provider.destroy();
+        providerRef.current.doc.destroy();
+        providerRef.current = null;
+      }
       if (!providerRef.current) {
         const doc = new Y.Doc();
         const provider = new WebsocketProvider(
@@ -55,7 +62,7 @@ export function useProviderFactory({
           doc,
           {
             connect: false,
-            params: { token: mikoto.auth.accessToken ?? '' },
+            params: { token: mikoto.auth.getAccessToken() ?? '' },
           },
         );
 
@@ -71,7 +78,7 @@ export function useProviderFactory({
           if (status === 'disconnected') setSynced('error');
         });
 
-        providerRef.current = { doc, provider };
+        providerRef.current = { doc, provider, channelId: id };
       }
       yjsDocMap.set(id, providerRef.current.doc);
       return providerRef.current.provider;

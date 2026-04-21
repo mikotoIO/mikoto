@@ -2,9 +2,9 @@ use std::{
     collections::{HashMap, HashSet},
     sync::{
         atomic::{AtomicU64, Ordering},
-        Arc, OnceLock, Weak,
+        Arc, Mutex, OnceLock, Weak,
     },
-    time::Duration,
+    time::{Duration, Instant},
 };
 
 use aide::axum::routing::{get_with, patch_with, post_with};
@@ -95,36 +95,47 @@ async fn claim_bootstrap(
         return Err(Error::NotFound);
     }
 
-    // Stateless decision: bootstrap is needed iff the server's Y.Doc is
-    // currently empty. A stateful claim flag caused a hang when the first
-    // claimer disconnected before their initial Update reached us — the flag
-    // stayed set, so the next session saw shouldBootstrap=false *and* no
-    // content to sync, leaving an empty editor. By deciding per-call based
-    // on actual doc state, the client always gets shouldBootstrap=true until
-    // someone has successfully populated the doc, and otherwise syncs from
-    // the retained server state.
-    //
-    // Trade-off: two peers connecting to a cold room at the *same* instant
-    // can both see doc-empty and both bootstrap, producing duplicate content.
-    // For the single-user re-edit flow that's dominant here, that race
-    // doesn't apply.
+    // Bootstrap iff the doc is empty AND no other caller has an outstanding,
+    // unexpired claim. The doc-emptiness check handles "already populated by
+    // someone else"; the claim TTL handles the race where two clients hit a
+    // cold room in the same tick (without a claim, both would see empty and
+    // both bootstrap, duplicating content). The TTL self-heals the old
+    // stuck-flag bug: a claimer that disconnects before producing content
+    // releases the slot after CLAIM_TTL, so the next caller can re-claim.
     let room = get_or_create_room(channel_id);
     let should_bootstrap = {
         let awareness = room.awareness.read().await;
         let is_empty = awareness.doc().transact().state_vector().is_empty();
-        is_empty
+        drop(awareness);
+        if !is_empty {
+            false
+        } else {
+            let mut claim = room.claim.lock().unwrap_or_else(|e| e.into_inner());
+            let now = Instant::now();
+            match *claim {
+                Some(expires) if expires > now => false,
+                _ => {
+                    *claim = Some(now + CLAIM_TTL);
+                    true
+                }
+            }
+        }
     };
 
-    // Hold the room alive briefly so the client has time to actually open
-    // the WebSocket after getting this response.
+    // Hold the room alive briefly so the client has time to open the WS
+    // after getting this response. Applies regardless of `should_bootstrap`:
+    // a non-bootstrapping caller still needs the room to stay populated
+    // until their WS arrives to sync from it.
     let room_clone = room.clone();
     tokio::spawn(async move {
-        tokio::time::sleep(Duration::from_secs(30)).await;
-        drop(room_clone);
+        tokio::time::sleep(CLAIM_TTL).await;
+        let _ = room_clone;
     });
 
     Ok(Json(ClaimBootstrapResponse { should_bootstrap }))
 }
+
+const CLAIM_TTL: Duration = Duration::from_secs(30);
 
 static TAG: &str = "Documents";
 
@@ -156,6 +167,11 @@ struct Room {
     channel_id: Uuid,
     awareness: RwLock<Awareness>,
     tx: broadcast::Sender<(u64, Arc<Vec<u8>>)>,
+    // Bootstrap claim: `Some(expires_at)` when a caller of claim-bootstrap
+    // has been given the right to populate the empty doc. Cleared implicitly
+    // by the emptiness check in claim_bootstrap once content arrives, and
+    // expired by TTL if the claimer never produces content.
+    claim: Mutex<Option<Instant>>,
 }
 
 impl Drop for Room {
@@ -192,6 +208,7 @@ fn get_or_create_room(channel_id: Uuid) -> Arc<Room> {
         channel_id,
         awareness: RwLock::new(Awareness::new(Doc::new())),
         tx,
+        claim: Mutex::new(None),
     });
     map.insert(channel_id, Arc::downgrade(&r));
     r
@@ -286,7 +303,11 @@ async fn peer(ws: WebSocket, room: Arc<Room>) {
                         }
                     }
                     Err(broadcast::error::RecvError::Closed) => break,
-                    Err(broadcast::error::RecvError::Lagged(_)) => continue,
+                    // Lagged = this peer's receiver fell behind the broadcast
+                    // buffer and missed updates. Silently continuing would
+                    // leave them permanently out of sync. Drop the socket so
+                    // the client reconnects and resyncs from scratch.
+                    Err(broadcast::error::RecvError::Lagged(_)) => break,
                 },
             }
         }

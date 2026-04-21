@@ -89,9 +89,6 @@ importers:
       '@headlessui/react':
         specifier: ^2.2.9
         version: 2.2.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@hocuspocus/provider':
-        specifier: ^2.4.0
-        version: 2.13.6(y-protocols@1.0.6(yjs@13.6.30))(yjs@13.6.30)
       '@lexical/code':
         specifier: ^0.43.0
         version: 0.43.0
@@ -2555,15 +2552,6 @@ packages:
       react: ^18 || ^19 || ^19.0.0-rc
       react-dom: ^18 || ^19 || ^19.0.0-rc
 
-  '@hocuspocus/common@2.13.6':
-    resolution: {integrity: sha512-jeEawHoaBckfbjMRPqjANjtQkeHgCBsk3XN7CEs/1jvUm60d86FT4y5fp3MWTEE18qkZacbZldn32za+72RBdg==}
-
-  '@hocuspocus/provider@2.13.6':
-    resolution: {integrity: sha512-84tBdGU8275SXQirRQ5FbBGwsQ6iLNuIbmV2SV6/f361phBoAVUSobJ+CYAzdIJPlfIYSL2BwGJSRbbDhqJdJw==}
-    peerDependencies:
-      y-protocols: ^1.0.6
-      yjs: ^13.6.8
-
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
     engines: {node: '>=18.18.0'}
@@ -2750,9 +2738,6 @@ packages:
     resolution: {integrity: sha512-3ghY9BYZVo3Hg2TmY2+H3Q6+AhhGwNIhnr6mvCbdLBEsnSTXr4VZSPMXN2ae5phCPrI19eHrx4MvFNYodQcqrA==}
     peerDependencies:
       yjs: '>=13.5.22'
-
-  '@lifeomic/attempt@3.1.0':
-    resolution: {integrity: sha512-QZqem4QuAnAyzfz+Gj5/+SLxqwCAw2qmt7732ZXodr6VDWGeYLG6w1i/vYLa55JQM9wRuBKLmXmiZ2P0LtE5rw==}
 
   '@liuli-util/fs-extra@0.1.0':
     resolution: {integrity: sha512-eaAyDyMGT23QuRGbITVY3SOJff3G9ekAAyGqB9joAnTBmqvFN+9a1FazOdO70G6IUqgpKV451eBHYSRcOJ/FNQ==}
@@ -13777,22 +13762,6 @@ snapshots:
       react-dom: 19.2.4(react@19.2.4)
       use-sync-external-store: 1.6.0(react@19.2.4)
 
-  '@hocuspocus/common@2.13.6':
-    dependencies:
-      lib0: 0.2.117
-
-  '@hocuspocus/provider@2.13.6(y-protocols@1.0.6(yjs@13.6.30))(yjs@13.6.30)':
-    dependencies:
-      '@hocuspocus/common': 2.13.6
-      '@lifeomic/attempt': 3.1.0
-      lib0: 0.2.117
-      ws: 8.18.0
-      y-protocols: 1.0.6(yjs@13.6.30)
-      yjs: 13.6.30
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-
   '@humanfs/core@0.19.1': {}
 
   '@humanfs/node@0.16.6':
@@ -14106,8 +14075,6 @@ snapshots:
       '@lexical/selection': 0.43.0
       lexical: 0.43.0
       yjs: 13.6.30
-
-  '@lifeomic/attempt@3.1.0': {}
 
   '@liuli-util/fs-extra@0.1.0':
     dependencies:

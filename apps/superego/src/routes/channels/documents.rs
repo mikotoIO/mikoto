@@ -153,8 +153,24 @@ pub fn router() -> AppRouter<State> {
 }
 
 struct Room {
+    channel_id: Uuid,
     awareness: RwLock<Awareness>,
     tx: broadcast::Sender<(u64, Arc<Vec<u8>>)>,
+}
+
+impl Drop for Room {
+    fn drop(&mut self) {
+        // Proactively remove our slot from the map when the last Arc goes
+        // away. Guard against the race where get_or_create_room has already
+        // replaced this dead Weak with a fresh Room: only remove if the
+        // Weak still in the map fails to upgrade (i.e. it's ours).
+        let mut map = rooms().lock().unwrap_or_else(|e| e.into_inner());
+        if let Some(weak) = map.get(&self.channel_id) {
+            if weak.strong_count() == 0 {
+                map.remove(&self.channel_id);
+            }
+        }
+    }
 }
 
 type RoomMap = std::sync::Mutex<HashMap<Uuid, Weak<Room>>>;
@@ -173,6 +189,7 @@ fn get_or_create_room(channel_id: Uuid) -> Arc<Room> {
     }
     let (tx, _) = broadcast::channel(256);
     let r = Arc::new(Room {
+        channel_id,
         awareness: RwLock::new(Awareness::new(Doc::new())),
         tx,
     });

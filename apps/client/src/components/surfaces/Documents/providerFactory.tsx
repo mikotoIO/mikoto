@@ -89,7 +89,7 @@ export function useProviderFactory({
   const save = () => {
     const content = editor
       .getEditorState()
-      .read(() => $convertToMarkdownString(TRANSFORMERS));
+      .read(() => $convertToMarkdownString(TRANSFORMERS, undefined, true));
 
     channel
       .updateDocument({ content })

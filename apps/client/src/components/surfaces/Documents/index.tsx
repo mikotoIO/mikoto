@@ -40,7 +40,6 @@ import { createTooltip } from '@/ui';
 
 import { EDITOR_NODES } from './editorNodes';
 import { CodeBlockPlugin } from './plugins/CodeBlockPlugin';
-import { EmptyParagraphPlugin } from './plugins/EmptyParagraphPlugin';
 import { FloatingToolbarPlugin } from './plugins/FloatingToolbarPlugin';
 import { HotkeyPlugin } from './plugins/HotkeyPlugin';
 import { ListBehaviorPlugin } from './plugins/ListBehaviorPlugin';
@@ -75,9 +74,6 @@ function useRelativeTime(date: Date | undefined): string | undefined {
   return formatRelativeTime(date);
 }
 
-// Zero-width space used as placeholder for empty lines
-const ZERO_WIDTH_SPACE = '\u200B';
-
 const URL_REGEX =
   /((https?:\/\/(www\.)?)|(www\.))[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
 
@@ -91,26 +87,15 @@ const LINK_MATCHERS = [
   createLinkMatcherWithRegExp(EMAIL_REGEX, (text) => `mailto:${text}`),
 ];
 
-// Preserve multiple line breaks in markdown
-// Standard markdown collapses multiple newlines, so we use zero-width spaces
+// shouldPreserveNewLines=true makes Lexical's markdown import/export keep empty
+// paragraphs 1:1 with blank lines, so round-tripping between read and edit
+// modes doesn't collapse or multiply newlines.
 function markdownToEditor(markdown: string): void {
-  // Each ZWS paragraph represents 2 extra newlines in markdown
-  // So for N newlines, we need (N-2)/2 ZWS paragraphs
-  const preserved = markdown.replace(/\n{3,}/g, (match) => {
-    const numZwsParagraphs = Math.floor((match.length - 2) / 2);
-    if (numZwsParagraphs < 1) return '\n\n';
-    const zwsContent = Array(numZwsParagraphs)
-      .fill(ZERO_WIDTH_SPACE)
-      .join('\n\n');
-    return '\n\n' + zwsContent + '\n\n';
-  });
-  $convertFromMarkdownString(preserved, TRANSFORMERS);
+  $convertFromMarkdownString(markdown, TRANSFORMERS, undefined, true);
 }
 
 function editorToMarkdown(): string {
-  const markdown = $convertToMarkdownString(TRANSFORMERS);
-  // Remove zero-width space placeholders - they just become empty lines
-  return markdown.replace(new RegExp(ZERO_WIDTH_SPACE, 'g'), '');
+  return $convertToMarkdownString(TRANSFORMERS, undefined, true);
 }
 
 const EditorWrapper = styled.div`
@@ -358,7 +343,6 @@ function DocumentEditorInner({
       <HotkeyPlugin channel={channel} />
       <ListBehaviorPlugin />
       <CodeBlockPlugin />
-      <EmptyParagraphPlugin />
       <FloatingToolbarPlugin />
       <CollaborationPlugin
         id={channel.id}

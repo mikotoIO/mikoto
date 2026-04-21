@@ -1,19 +1,18 @@
-import { HocuspocusProvider } from '@hocuspocus/provider';
 import {
-  $convertFromMarkdownString,
   $convertToMarkdownString,
   TRANSFORMERS,
 } from '@lexical/markdown';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useCallback, useState } from 'react';
+import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
 
+import { useMikoto } from '@/hooks';
 import { env } from '@/env';
 
 export interface UseProviderFactoryProps {
   channel: MikotoChannel;
-  content: string;
   onSync?: () => void;
 }
 
@@ -21,39 +20,46 @@ export type SyncState = 'initial' | 'synced' | 'syncing' | 'error';
 
 export function useProviderFactory({
   channel,
-  content,
   onSync,
 }: UseProviderFactoryProps) {
   const [synced, setSynced] = useState<SyncState>('initial');
   const [editor] = useLexicalComposerContext();
+  const mikoto = useMikoto();
 
   const providerFactory = useCallback(
     (id: string, yjsDocMap: Map<string, Y.Doc>) => {
       const doc = new Y.Doc();
       yjsDocMap.set(id, doc);
 
-      const hocuspocus = new HocuspocusProvider({
-        url: env.PUBLIC_COLLABORATION_URL,
-        name: channel.id,
-        document: doc,
-      });
+      const provider = new WebsocketProvider(
+        env.PUBLIC_COLLABORATION_URL,
+        id,
+        doc,
+        {
+          connect: false,
+          params: { token: mikoto.auth.accessToken ?? '' },
+        },
+      );
 
-      hocuspocus.on('synced', () => {
-        if (doc.store.clients.size === 0) {
-          editor.update(
-            () => {
-              $convertFromMarkdownString(content, TRANSFORMERS);
-            },
-            { discrete: true },
-          );
+      provider.on('sync', (isSynced: boolean) => {
+        if (isSynced) {
+          onSync?.();
+          setSynced('synced');
         }
-        onSync?.();
-        setSynced('synced');
       });
 
-      return hocuspocus as any;
+      provider.on('status', ({ status }: { status: string }) => {
+        if (status === 'connecting') setSynced('syncing');
+        if (status === 'disconnected') setSynced('error');
+      });
+
+      mikoto.auth.refresh().finally(() => {
+        provider.connect();
+      });
+
+      return provider;
     },
-    [],
+    [mikoto, onSync],
   );
 
   const save = () => {

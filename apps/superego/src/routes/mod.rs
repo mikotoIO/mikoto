@@ -5,7 +5,7 @@ use aide::{
     openapi::{Info, OpenApi},
 };
 use axum::{extract::Request, middleware, Extension, Json, Router};
-use channels::voice;
+use channels::{documents::collab_ws, voice};
 use http::header::{AUTHORIZATION, CONTENT_TYPE};
 use router::AppRouter;
 use schemars::JsonSchema;
@@ -206,6 +206,7 @@ pub fn router() -> Router {
             },
             ..OpenApi::default()
         })
+        .nest("/collab", collab_ws())
         .layer(middleware::from_fn(security_headers))
         .layer({
             let cors = CorsLayer::new()

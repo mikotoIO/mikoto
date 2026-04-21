@@ -1695,6 +1695,27 @@
         }
       }
     },
+    "/spaces/{spaceId}/channels/{channelId}/documents/claim-bootstrap": {
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Claim Document Bootstrap",
+        "operationId": "documents.claimBootstrap",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimBootstrapResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/spaces/{spaceId}/members/": {
       "get": {
         "tags": [
@@ -2422,6 +2443,17 @@
           "userId": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "ClaimBootstrapResponse": {
+        "type": "object",
+        "required": [
+          "shouldBootstrap"
+        ],
+        "properties": {
+          "shouldBootstrap": {
+            "type": "boolean"
           }
         }
       },

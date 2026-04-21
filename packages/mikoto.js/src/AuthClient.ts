@@ -33,7 +33,7 @@ export class AuthClient {
   private setRefreshToken?: (token: string) => void;
   private inflightRefresh?: Promise<string>;
 
-  protected accessToken?: string;
+  accessToken?: string;
 
   constructor(options: AuthClientOptions) {
     this.api = createApiClient(options.url, {});

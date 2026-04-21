@@ -7,7 +7,7 @@ export const env = {
   PUBLIC_MEDIASERVER_URL:
     import.meta.env.PUBLIC_MEDIASERVER_URL ?? 'http://localhost:9501',
   PUBLIC_COLLABORATION_URL:
-    import.meta.env.PUBLIC_COLLABORATION_URL ?? 'ws://localhost:1234',
+    import.meta.env.PUBLIC_COLLABORATION_URL ?? 'ws://localhost:3511/collab',
   PUBLIC_CAPTCHA_KEY:
     import.meta.env.PUBLIC_CAPTCHA_KEY ?? '1x00000000000000000000AA',
 };

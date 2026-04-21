@@ -377,6 +377,11 @@ export const DocumentPatch = z
   .partial();
 export type DocumentPatch = z.infer<typeof DocumentPatch>;
 
+export const ClaimBootstrapResponse = z.object({
+  shouldBootstrap: z.boolean(),
+});
+export type ClaimBootstrapResponse = z.infer<typeof ClaimBootstrapResponse>;
+
 export const MemberExt = z.object({
   id: z.string().uuid(),
   name: z.union([z.string(), z.null()]).optional(),
@@ -542,6 +547,7 @@ export const schemas = {
   VoiceToken,
   Document,
   DocumentPatch,
+  ClaimBootstrapResponse,
   MemberExt,
   MemberCreatePayload,
   MemberUpdatePayload,
@@ -1038,6 +1044,13 @@ const endpoints = makeApi([
       },
     ],
     response: Document,
+  },
+  {
+    method: "post",
+    path: "/spaces/:spaceId/channels/:channelId/documents/claim-bootstrap",
+    alias: "documents.claimBootstrap",
+    requestFormat: "json",
+    response: z.object({ shouldBootstrap: z.boolean() }),
   },
   {
     method: "get",

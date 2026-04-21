@@ -1,7 +1,7 @@
 use std::{
     collections::HashMap,
     sync::{
-        atomic::{AtomicBool, AtomicU64, Ordering},
+        atomic::{AtomicU64, Ordering},
         Arc, OnceLock, Weak,
     },
     time::Duration,
@@ -30,7 +30,7 @@ use yrs::{
         decoder::{Decode, DecoderV1},
         encoder::{Encode, Encoder, EncoderV1},
     },
-    Doc, Update,
+    Doc, ReadTxn, Transact, Update,
 };
 
 use crate::{
@@ -95,24 +95,35 @@ async fn claim_bootstrap(
         return Err(Error::NotFound);
     }
 
+    // Stateless decision: bootstrap is needed iff the server's Y.Doc is
+    // currently empty. A stateful claim flag caused a hang when the first
+    // claimer disconnected before their initial Update reached us — the flag
+    // stayed set, so the next session saw shouldBootstrap=false *and* no
+    // content to sync, leaving an empty editor. By deciding per-call based
+    // on actual doc state, the client always gets shouldBootstrap=true until
+    // someone has successfully populated the doc, and otherwise syncs from
+    // the retained server state.
+    //
+    // Trade-off: two peers connecting to a cold room at the *same* instant
+    // can both see doc-empty and both bootstrap, producing duplicate content.
+    // For the single-user re-edit flow that's dominant here, that race
+    // doesn't apply.
     let room = get_or_create_room(channel_id);
-    let won = room
-        .bootstrap_claimed
-        .compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst)
-        .is_ok();
+    let should_bootstrap = {
+        let awareness = room.awareness.read().await;
+        let is_empty = awareness.doc().transact().state_vector().is_empty();
+        is_empty
+    };
 
-    // If the claimer never opens a WebSocket, release the claim so another
-    // peer can retry. The grace period keeps the room alive until the client
-    // has had a chance to connect.
+    // Hold the room alive briefly so the client has time to actually open
+    // the WebSocket after getting this response.
     let room_clone = room.clone();
     tokio::spawn(async move {
         tokio::time::sleep(Duration::from_secs(30)).await;
         drop(room_clone);
     });
 
-    Ok(Json(ClaimBootstrapResponse {
-        should_bootstrap: won,
-    }))
+    Ok(Json(ClaimBootstrapResponse { should_bootstrap }))
 }
 
 static TAG: &str = "Documents";
@@ -144,7 +155,6 @@ pub fn router() -> AppRouter<State> {
 struct Room {
     awareness: RwLock<Awareness>,
     tx: broadcast::Sender<(u64, Arc<Vec<u8>>)>,
-    bootstrap_claimed: AtomicBool,
 }
 
 type RoomMap = std::sync::Mutex<HashMap<Uuid, Weak<Room>>>;
@@ -165,7 +175,6 @@ fn get_or_create_room(channel_id: Uuid) -> Arc<Room> {
     let r = Arc::new(Room {
         awareness: RwLock::new(Awareness::new(Doc::new())),
         tx,
-        bootstrap_claimed: AtomicBool::new(false),
     });
     map.insert(channel_id, Arc::downgrade(&r));
     r

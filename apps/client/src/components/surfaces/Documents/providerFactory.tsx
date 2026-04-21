@@ -4,7 +4,7 @@ import {
 } from '@lexical/markdown';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
 
@@ -25,7 +25,16 @@ export function useProviderFactory({
   const [synced, setSynced] = useState<SyncState>('initial');
   const [editor] = useLexicalComposerContext();
   const mikoto = useMikoto();
+  const onSyncRef = useRef(onSync);
+  onSyncRef.current = onSync;
 
+  // Keep `connect: false` so Lexical's CollaborationPlugin is the one that
+  // calls .connect() — it needs to register its own `sync` handler *before*
+  // the WS opens, otherwise the initial sync event fires before the handler
+  // is attached and shouldBootstrap never runs. Don't schedule an async
+  // connect of our own either: a deferred .connect() that fires after the
+  // StrictMode cleanup would resurrect a disconnected provider and leave a
+  // zombie connection on the server.
   const providerFactory = useCallback(
     (id: string, yjsDocMap: Map<string, Y.Doc>) => {
       const doc = new Y.Doc();
@@ -43,7 +52,7 @@ export function useProviderFactory({
 
       provider.on('sync', (isSynced: boolean) => {
         if (isSynced) {
-          onSync?.();
+          onSyncRef.current?.();
           setSynced('synced');
         }
       });
@@ -53,13 +62,9 @@ export function useProviderFactory({
         if (status === 'disconnected') setSynced('error');
       });
 
-      mikoto.auth.refresh().finally(() => {
-        provider.connect();
-      });
-
       return provider;
     },
-    [mikoto, onSync],
+    [mikoto],
   );
 
   const save = () => {

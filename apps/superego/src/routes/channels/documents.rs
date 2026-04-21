@@ -342,8 +342,6 @@ async fn peer(ws: WebSocket, room: Arc<Room>) {
         }
     }
 
-    println!("[collab] peer {} disconnected", conn_id);
-
     if !owned_clients.is_empty() {
         let mut awareness = room.awareness.write().await;
         let to_remove: Vec<u64> = owned_clients

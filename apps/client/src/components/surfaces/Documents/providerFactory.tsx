@@ -30,23 +30,21 @@ export function useProviderFactory({
 
   // Per-mount cache of the Y.Doc + WebsocketProvider. Lexical's
   // CollaborationPlugin wraps providerFactory in a useMemo whose factory
-  // gets invoked *twice* per render in React StrictMode (purity check).
-  // Without caching, each invocation creates a brand new WebsocketProvider
-  // — both registered on the same Y.Doc observer list. Only one is wired up
-  // by Lexical's useEffect; the other becomes an orphan whose _updateHandler
-  // still fires on every Y.Doc transaction, publishing junk into the
-  // y-websocket BroadcastChannel and preventing local edits from being
-  // written/broadcast correctly. Using a ref means the second factory call
-  // returns the same provider the first did.
+  // gets invoked twice per render under React StrictMode. Without caching,
+  // each invocation would create a separate WebsocketProvider on the same
+  // Y.Doc; the orphan one would register a second _updateHandler on the
+  // doc observer list and clobber local-edit broadcasting through
+  // y-websocket's BroadcastChannel. Caching returns the same provider for
+  // both invocations.
   const providerRef = useRef<{
     doc: Y.Doc;
     provider: WebsocketProvider;
   } | null>(null);
 
-  // Keep `connect: false` so Lexical's CollaborationPlugin is the one that
-  // calls .connect() — it needs to register its own `sync` handler *before*
-  // the WS opens, otherwise the initial sync event fires before the handler
-  // is attached and shouldBootstrap never runs.
+  // `connect: false` — let Lexical's CollaborationPlugin call `.connect()`
+  // itself. Its `sync` handler must be registered before the WS opens,
+  // otherwise the initial sync event fires before the handler is attached
+  // and shouldBootstrap never runs.
   const providerFactory = useCallback(
     (id: string, yjsDocMap: Map<string, Y.Doc>) => {
       if (!providerRef.current) {
@@ -61,44 +59,7 @@ export function useProviderFactory({
           },
         );
 
-        const clientID = doc.clientID;
-        doc.on('update', (update: Uint8Array, origin: unknown) => {
-          const label =
-            origin === provider
-              ? 'provider(incoming)'
-              : origin == null
-                ? 'null'
-                : (origin as object).constructor.name;
-          console.log(
-            `[collab:${clientID}] doc update ${update.length}b origin=${label}`,
-          );
-        });
-
-        // Monkey-patch transact to see every attempted write, even empty ones
-        // (a transact that produces zero ops fires no 'update' event).
-        const origTransact = doc.transact.bind(doc);
-        (doc as unknown as { transact: typeof origTransact }).transact = ((
-          fn: (tx: unknown) => void,
-          origin: unknown,
-        ) => {
-          const label =
-            origin == null
-              ? 'null'
-              : (origin as object).constructor?.name ?? String(origin);
-          const svBefore = Y.encodeStateVector(doc);
-          const result = origTransact(fn, origin);
-          const svAfter = Y.encodeStateVector(doc);
-          const changed =
-            svBefore.length !== svAfter.length ||
-            svBefore.some((b, i) => b !== svAfter[i]);
-          console.log(
-            `[collab:${clientID}] transact origin=${label} changed=${changed} svBefore=${svBefore.length}b svAfter=${svAfter.length}b`,
-          );
-          return result;
-        }) as typeof doc.transact;
-
         provider.on('sync', (isSynced: boolean) => {
-          console.log(`[collab:${clientID}] sync event:`, isSynced);
           if (isSynced) {
             onSyncRef.current?.();
             setSynced('synced');
@@ -106,7 +67,6 @@ export function useProviderFactory({
         });
 
         provider.on('status', ({ status }: { status: string }) => {
-          console.log(`[collab:${clientID}] status:`, status);
           if (status === 'connecting') setSynced('syncing');
           if (status === 'disconnected') setSynced('error');
         });

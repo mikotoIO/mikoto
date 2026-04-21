@@ -1,5 +1,5 @@
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     sync::{
         atomic::{AtomicU64, Ordering},
         Arc, OnceLock, Weak,
@@ -230,6 +230,7 @@ async fn peer(ws: WebSocket, room: Arc<Room>) {
     let conn_id = CONN_SEQ.fetch_add(1, Ordering::Relaxed);
     let (mut sink, mut stream) = ws.split();
     let proto = DefaultProtocol;
+    let mut owned_clients: HashSet<u64> = HashSet::new();
 
     // Send initial sync payload (SyncStep1 + Awareness) to the new peer.
     let initial = {
@@ -308,6 +309,15 @@ async fn peer(ws: WebSocket, room: Arc<Room>) {
                     let _ = room.tx.send((conn_id, encoded));
                 }
                 YMessage::Awareness(upd) => {
+                    // Track which client IDs this connection is responsible
+                    // for so we can clean them up when the socket drops
+                    // without a graceful disconnect (tab closed, network
+                    // loss). Without this, stale cursors from past sessions
+                    // accumulate and peers — including the original user on
+                    // a fresh Y.Doc — see them as remote cursors.
+                    for client_id in upd.clients.keys() {
+                        owned_clients.insert(*client_id);
+                    }
                     let upd_bytes = upd.encode_v1();
                     let mut awareness = room.awareness.write().await;
                     let _ = awareness.apply_update(upd);
@@ -329,6 +339,27 @@ async fn peer(ws: WebSocket, room: Arc<Room>) {
                 }
                 YMessage::Auth(_) | YMessage::Custom(_, _) => {}
             }
+        }
+    }
+
+    println!("[collab] peer {} disconnected", conn_id);
+
+    if !owned_clients.is_empty() {
+        let mut awareness = room.awareness.write().await;
+        let to_remove: Vec<u64> = owned_clients
+            .iter()
+            .filter(|id| awareness.clients().contains_key(*id))
+            .copied()
+            .collect();
+        for client_id in &to_remove {
+            awareness.remove_state(*client_id);
+        }
+        let removal = awareness.update_with_clients(to_remove).ok();
+        drop(awareness);
+        if let Some(update) = removal {
+            let msg = YMessage::Awareness(update);
+            let encoded = Arc::new(encode_message(&msg));
+            let _ = room.tx.send((conn_id, encoded));
         }
     }
 

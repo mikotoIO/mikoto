@@ -332,6 +332,15 @@ function DocumentEditorInner({
   const username = me?.name ?? 'Anonymous';
   const cursorColor = me ? cursorColorFor(me.id) : CURSOR_COLORS[0];
 
+  // CollaborationPlugin has initialEditorState in its effect dep list, so
+  // passing a fresh function every render tears down and reconnects the
+  // provider on each re-render — which turned into an infinite reconnect
+  // loop once setSynced re-renders fed back into it.
+  const initialEditorState = useCallback(
+    () => markdownToEditor(initialContent),
+    [initialContent],
+  );
+
   return (
     <>
       <RichTextPlugin
@@ -356,7 +365,7 @@ function DocumentEditorInner({
         username={username}
         cursorColor={cursorColor}
         shouldBootstrap={shouldBootstrap}
-        initialEditorState={() => markdownToEditor(initialContent)}
+        initialEditorState={initialEditorState}
       />
       <DocumentAutosave channel={channel} documentState={documentState} />
     </>

@@ -37,8 +37,16 @@ export function useProviderFactory({
   // zombie connection on the server.
   const providerFactory = useCallback(
     (id: string, yjsDocMap: Map<string, Y.Doc>) => {
-      const doc = new Y.Doc();
-      yjsDocMap.set(id, doc);
+      // StrictMode runs useMemo's factory twice for purity checking, which
+      // would otherwise create two different Y.Docs — one wired up to the
+      // WebSocket, one bound to Lexical — and silently drop every edit.
+      // Reuse whatever is already in the docMap for this id so both
+      // invocations converge on the same Y.Doc.
+      let doc = yjsDocMap.get(id);
+      if (!doc) {
+        doc = new Y.Doc();
+        yjsDocMap.set(id, doc);
+      }
 
       const provider = new WebsocketProvider(
         env.PUBLIC_COLLABORATION_URL,

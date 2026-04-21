@@ -24,6 +24,18 @@ docker-start:
     docker compose up -d
     echo "Docker started!"
 
+# Generate Ed25519 keypair for domain handle verification
+generate-handle-keys:
+    #!/usr/bin/env bash
+    node -e "
+    const crypto = require('crypto');
+    const kp = crypto.generateKeyPairSync('ed25519');
+    const priv = kp.privateKey.export({type:'pkcs8',format:'der'}).subarray(-32);
+    const pub = kp.publicKey.export({type:'spki',format:'der'}).subarray(-32);
+    console.log('HANDLE_PRIVATE_KEY=' + priv.toString('base64'));
+    console.log('HANDLE_PUBLIC_KEY=' + pub.toString('base64'));
+    "
+
 # Reset Docker services (database, S3, and Redis)
 reset:
     #!/usr/bin/env bash

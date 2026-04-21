@@ -217,18 +217,16 @@ function documentContentQuery(channel: MikotoChannel) {
   };
 }
 
-function DocumentReader({ channel }: { channel: MikotoChannel }) {
-  const { data: document } = useSuspenseQuery(documentContentQuery(channel));
-
+function DocumentReadOnly({ content }: { content: string }) {
   return (
     <LexicalComposer
-      key={hash(document.content)}
+      key={hash(content)}
       initialConfig={{
         namespace: 'Editor',
         editable: false,
         nodes: EDITOR_NODES,
         theme: lexicalTheme,
-        editorState: () => markdownToEditor(document.content),
+        editorState: () => markdownToEditor(content),
         onError(error: Error) {
           throw error;
         },
@@ -241,6 +239,11 @@ function DocumentReader({ channel }: { channel: MikotoChannel }) {
       />
     </LexicalComposer>
   );
+}
+
+function DocumentReader({ channel }: { channel: MikotoChannel }) {
+  const { data: document } = useSuspenseQuery(documentContentQuery(channel));
+  return <DocumentReadOnly content={document.content} />;
 }
 
 function DocumentEditor({
@@ -262,29 +265,43 @@ function DocumentEditor({
     staleTime: Infinity,
     gcTime: Infinity,
   });
+  // The collab provider needs a round-trip to sync before the editor shows
+  // any content, which would otherwise flash empty. Keep a read-only view
+  // overlaid on top until the provider fires its first sync event.
+  const [synced, setSynced] = useState(false);
 
   return (
-    <LexicalCollaboration>
-      <LexicalComposer
-        initialConfig={{
-          namespace: 'Editor',
-          editable: true,
-          nodes: EDITOR_NODES,
-          theme: lexicalTheme,
-          editorState: null,
-          onError(error: Error) {
-            throw error;
-          },
-        }}
-      >
-        <DocumentEditorInner
-          channel={channel}
-          documentState={documentState}
-          initialContent={document.content}
-          shouldBootstrap={shouldBootstrap}
-        />
-      </LexicalComposer>
-    </LexicalCollaboration>
+    <Box position="relative">
+      <Box visibility={synced ? 'visible' : 'hidden'}>
+        <LexicalCollaboration>
+          <LexicalComposer
+            initialConfig={{
+              namespace: 'Editor',
+              editable: true,
+              nodes: EDITOR_NODES,
+              theme: lexicalTheme,
+              editorState: null,
+              onError(error: Error) {
+                throw error;
+              },
+            }}
+          >
+            <DocumentEditorInner
+              channel={channel}
+              documentState={documentState}
+              initialContent={document.content}
+              shouldBootstrap={shouldBootstrap}
+              onSync={() => setSynced(true)}
+            />
+          </LexicalComposer>
+        </LexicalCollaboration>
+      </Box>
+      {!synced && (
+        <Box position="absolute" top={0} left={0} right={0}>
+          <DocumentReadOnly content={document.content} />
+        </Box>
+      )}
+    </Box>
   );
 }
 
@@ -309,14 +326,16 @@ function DocumentEditorInner({
   documentState,
   initialContent,
   shouldBootstrap,
+  onSync,
 }: {
   channel: MikotoChannel;
   documentState: DocumentState;
   initialContent: string;
   shouldBootstrap: boolean;
+  onSync?: () => void;
 }) {
   const mikoto = useMikoto();
-  const { providerFactory } = useProviderFactory({ channel });
+  const { providerFactory } = useProviderFactory({ channel, onSync });
   const me = mikoto.user.me;
   const username = me?.name ?? 'Anonymous';
   const cursorColor = me ? cursorColorFor(me.id) : CURSOR_COLORS[0];

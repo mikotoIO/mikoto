@@ -1,3 +1,5 @@
+import { faGripVertical } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { eventFiles } from '@lexical/rich-text';
 import { calculateZoomLevel, mergeRegister } from '@lexical/utils';
@@ -407,13 +409,14 @@ function useDraggableBlockMenu(
   return createPortal(
     <>
       <div
-        className="icon draggable-block-menu"
+        className="draggable-block-menu"
         ref={menuRef}
-        draggable={true}
+        draggable={isEditable}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
+        aria-label="Drag to move block"
       >
-        <div className={isEditable ? 'icon' : ''} />
+        <FontAwesomeIcon icon={faGripVertical} size="lg" />
       </div>
       <div className="draggable-block-target-line" ref={targetLineRef} />
     </>,

@@ -40,6 +40,7 @@ import { createTooltip } from '@/ui';
 
 import { EDITOR_NODES } from './editorNodes';
 import { CodeBlockPlugin } from './plugins/CodeBlockPlugin';
+import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
 import { FloatingToolbarPlugin } from './plugins/FloatingToolbarPlugin';
 import { HotkeyPlugin } from './plugins/HotkeyPlugin';
 import { ListBehaviorPlugin } from './plugins/ListBehaviorPlugin';
@@ -102,6 +103,7 @@ const EditorWrapper = styled.div`
   line-height: 1.1;
   position: relative;
   cursor: text;
+  padding-left: 28px;
 
   .editor-input {
     outline: none;
@@ -138,9 +140,58 @@ const EditorWrapper = styled.div`
     font-size: 0.9em;
     padding: 1px 4px;
   }
+
+  .draggable-block-menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    color: var(--chakra-colors-gray-500);
+    font-size: 12px;
+    cursor: grab;
+    opacity: 0;
+    transition: opacity 0.12s ease, background-color 0.12s ease;
+    will-change: transform;
+    user-select: none;
+  }
+
+  &:hover .draggable-block-menu {
+    opacity: 1;
+  }
+
+  .draggable-block-menu:hover {
+    background-color: var(--chakra-colors-gray-700);
+    color: var(--chakra-colors-gray-200);
+  }
+
+  .draggable-block-menu:active {
+    cursor: grabbing;
+  }
+
+  .draggable-block-target-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: var(--chakra-colors-blue-400);
+    border-radius: 2px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    will-change: transform;
+  }
 `;
 
-function MikotoContentEditable() {
+function MikotoContentEditable({
+  onAnchorRef,
+}: {
+  onAnchorRef?: (el: HTMLDivElement | null) => void;
+}) {
   const [editor] = useLexicalComposerContext();
 
   const handleClick = () => {
@@ -148,7 +199,7 @@ function MikotoContentEditable() {
   };
 
   return (
-    <EditorWrapper onClick={handleClick}>
+    <EditorWrapper onClick={handleClick} ref={onAnchorRef}>
       <ContentEditable className="editor-input" />
     </EditorWrapper>
   );
@@ -343,6 +394,7 @@ function DocumentEditorInner({
   const me = mikoto.user.me;
   const username = me?.name ?? 'Anonymous';
   const cursorColor = me ? cursorColorFor(me.id) : CURSOR_COLORS[0];
+  const [anchorElem, setAnchorElem] = useState<HTMLDivElement | null>(null);
 
   // CollaborationPlugin has initialEditorState in its effect dep list, so
   // passing a fresh function every render tears down and reconnects the
@@ -356,7 +408,7 @@ function DocumentEditorInner({
   return (
     <>
       <RichTextPlugin
-        contentEditable={<MikotoContentEditable />}
+        contentEditable={<MikotoContentEditable onAnchorRef={setAnchorElem} />}
         placeholder={<></>}
         ErrorBoundary={LexicalErrorBoundary}
       />
@@ -368,6 +420,7 @@ function DocumentEditorInner({
       <ListBehaviorPlugin />
       <CodeBlockPlugin />
       <FloatingToolbarPlugin />
+      {anchorElem && <DraggableBlockPlugin anchorElem={anchorElem} />}
       <CollaborationPlugin
         id={channel.id}
         // y-websocket's awareness type is slightly looser than Lexical's;

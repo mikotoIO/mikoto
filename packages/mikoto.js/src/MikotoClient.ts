@@ -75,4 +75,8 @@ export class MikotoClient {
       this.ws.ws.close();
     }
   }
+
+  getAuthToken() {
+    return this.token;
+  }
 }

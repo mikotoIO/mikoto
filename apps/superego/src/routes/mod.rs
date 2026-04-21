@@ -25,6 +25,7 @@ pub mod account;
 pub mod bots;
 pub mod cdn;
 pub mod channels;
+pub mod collab;
 pub mod dm;
 pub mod handles;
 pub mod router;
@@ -206,6 +207,7 @@ pub fn router() -> Router {
             },
             ..OpenApi::default()
         })
+        .merge(collab::router())
         .layer(middleware::from_fn(security_headers))
         .layer({
             let cors = CorsLayer::new()

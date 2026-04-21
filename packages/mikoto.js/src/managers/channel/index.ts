@@ -142,6 +142,17 @@ export class MikotoChannel extends ZSchema(Channel) {
       },
     });
   }
+
+  async claimDocumentBootstrap(): Promise<boolean> {
+    if (!this.spaceId) throw new Error('DM channels do not support documents');
+    const res = await this.client.rest['documents.claimBootstrap'](undefined, {
+      params: {
+        spaceId: this.spaceId,
+        channelId: this.id,
+      },
+    });
+    return res.shouldBootstrap;
+  }
 }
 
 export class ChannelManager extends CachedManager<MikotoChannel> {

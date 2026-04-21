@@ -141,6 +141,12 @@ pub struct ChannelUnread {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ClaimBootstrapResponse {
+    pub should_bootstrap: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateBotPayload {
     pub name: String,
 }
@@ -1217,6 +1223,14 @@ impl<'a> HttpApi<'a> {
         let mut req = self.client.patch(self.url(&path))
             .bearer_auth(self.token);
         req = req.json(body);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn documents_claim_bootstrap(&self, space_id: Uuid, channel_id: Uuid) -> Result<ClaimBootstrapResponse, ClientError> {
+        let path = format!("/spaces/{}/channels/{}/documents/claim-bootstrap", space_id, channel_id);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }

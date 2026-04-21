@@ -42,9 +42,10 @@ export function MarkdownPastePlugin() {
               // Save the current root state
               const savedChildren = root.getChildren();
 
-              // Clear root and parse markdown into it
+              // Clear root and parse markdown into it. shouldPreserveNewLines=true
+              // keeps the scheme consistent with document save/load.
               root.clear();
-              $convertFromMarkdownString(textData, TRANSFORMERS);
+              $convertFromMarkdownString(textData, TRANSFORMERS, undefined, true);
 
               // Get the parsed nodes
               const parsedNodes = root.getChildren();

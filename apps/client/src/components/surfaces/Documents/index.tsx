@@ -18,17 +18,17 @@ import {
   AutoLinkPlugin,
   createLinkMatcherWithRegExp,
 } from '@lexical/react/LexicalAutoLinkPlugin';
+import { CollaborationPlugin } from '@lexical/react/LexicalCollaborationPlugin';
+import { LexicalCollaboration } from '@lexical/react/LexicalCollaborationContext';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
-import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
+import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { EditorState } from 'lexical';
 import { debounce } from 'lodash';
 import { PropsWithChildren, useCallback, useRef, useState } from 'react';
 import { proxy, useSnapshot } from 'valtio';
@@ -40,11 +40,11 @@ import { createTooltip } from '@/ui';
 
 import { EDITOR_NODES } from './editorNodes';
 import { CodeBlockPlugin } from './plugins/CodeBlockPlugin';
-import { EmptyParagraphPlugin } from './plugins/EmptyParagraphPlugin';
 import { FloatingToolbarPlugin } from './plugins/FloatingToolbarPlugin';
 import { HotkeyPlugin } from './plugins/HotkeyPlugin';
 import { ListBehaviorPlugin } from './plugins/ListBehaviorPlugin';
 import { MarkdownPastePlugin } from './plugins/MarkdownPastePlugin';
+import { useProviderFactory } from './providerFactory';
 import { lexicalTheme } from './theme';
 
 const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
@@ -74,9 +74,6 @@ function useRelativeTime(date: Date | undefined): string | undefined {
   return formatRelativeTime(date);
 }
 
-// Zero-width space used as placeholder for empty lines
-const ZERO_WIDTH_SPACE = '\u200B';
-
 const URL_REGEX =
   /((https?:\/\/(www\.)?)|(www\.))[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
 
@@ -90,26 +87,15 @@ const LINK_MATCHERS = [
   createLinkMatcherWithRegExp(EMAIL_REGEX, (text) => `mailto:${text}`),
 ];
 
-// Preserve multiple line breaks in markdown
-// Standard markdown collapses multiple newlines, so we use zero-width spaces
+// shouldPreserveNewLines=true makes Lexical's markdown import/export keep empty
+// paragraphs 1:1 with blank lines, so round-tripping between read and edit
+// modes doesn't collapse or multiply newlines.
 function markdownToEditor(markdown: string): void {
-  // Each ZWS paragraph represents 2 extra newlines in markdown
-  // So for N newlines, we need (N-2)/2 ZWS paragraphs
-  const preserved = markdown.replace(/\n{3,}/g, (match) => {
-    const numZwsParagraphs = Math.floor((match.length - 2) / 2);
-    if (numZwsParagraphs < 1) return '\n\n';
-    const zwsContent = Array(numZwsParagraphs)
-      .fill(ZERO_WIDTH_SPACE)
-      .join('\n\n');
-    return '\n\n' + zwsContent + '\n\n';
-  });
-  $convertFromMarkdownString(preserved, TRANSFORMERS);
+  $convertFromMarkdownString(markdown, TRANSFORMERS, undefined, true);
 }
 
 function editorToMarkdown(): string {
-  const markdown = $convertToMarkdownString(TRANSFORMERS);
-  // Remove zero-width space placeholders - they just become empty lines
-  return markdown.replace(new RegExp(ZERO_WIDTH_SPACE, 'g'), '');
+  return $convertToMarkdownString(TRANSFORMERS, undefined, true);
 }
 
 const EditorWrapper = styled.div`
@@ -262,42 +248,89 @@ function DocumentEditor({
   channel: MikotoChannel;
   documentState: DocumentState;
 }) {
-  const { data: document } = useSuspenseQuery({
-    queryKey: ['documents.get', channel.spaceId, channel.id],
+  const { data } = useSuspenseQuery({
+    queryKey: ['documents.editor-init', channel.spaceId, channel.id],
     queryFn: async () => {
-      return channel.getDocument();
+      // Fetch the document and claim bootstrap rights in parallel. Only one
+      // client per session gets shouldBootstrap=true, which prevents the
+      // duplicate-content race when multiple peers open a cold room together.
+      const [document, shouldBootstrap] = await Promise.all([
+        channel.getDocument(),
+        channel.claimDocumentBootstrap(),
+      ]);
+      return { document, shouldBootstrap };
     },
   });
 
-  const onChange = useCallback(
-    debounce((editorState: EditorState) => {
-      documentState.save = 'saving';
-      const content = editorState.read(() => editorToMarkdown());
-      channel
-        .updateDocument({ content })
-        .then(() => {
-          documentState.save = 'synced';
-        })
-        .catch(() => {
-          documentState.save = 'error';
-        });
-    }, 1000),
-    [],
+  return (
+    <LexicalCollaboration>
+      <LexicalComposer
+        initialConfig={{
+          namespace: 'Editor',
+          editable: true,
+          nodes: EDITOR_NODES,
+          theme: lexicalTheme,
+          editorState: null,
+          onError(error: Error) {
+            throw error;
+          },
+        }}
+      >
+        <DocumentEditorInner
+          channel={channel}
+          documentState={documentState}
+          initialContent={data.document.content}
+          shouldBootstrap={data.shouldBootstrap}
+        />
+      </LexicalComposer>
+    </LexicalCollaboration>
+  );
+}
+
+const CURSOR_COLORS = [
+  '#f87171',
+  '#fb923c',
+  '#facc15',
+  '#a3e635',
+  '#34d399',
+  '#22d3ee',
+  '#60a5fa',
+  '#a78bfa',
+  '#f472b6',
+];
+
+function cursorColorFor(userId: string): string {
+  return CURSOR_COLORS[Math.abs(hash(userId)) % CURSOR_COLORS.length];
+}
+
+function DocumentEditorInner({
+  channel,
+  documentState,
+  initialContent,
+  shouldBootstrap,
+}: {
+  channel: MikotoChannel;
+  documentState: DocumentState;
+  initialContent: string;
+  shouldBootstrap: boolean;
+}) {
+  const mikoto = useMikoto();
+  const { providerFactory } = useProviderFactory({ channel });
+  const me = mikoto.user.me;
+  const username = me?.name ?? 'Anonymous';
+  const cursorColor = me ? cursorColorFor(me.id) : CURSOR_COLORS[0];
+
+  // CollaborationPlugin has initialEditorState in its effect dep list, so
+  // passing a fresh function every render tears down and reconnects the
+  // provider on each re-render — which turned into an infinite reconnect
+  // loop once setSynced re-renders fed back into it.
+  const initialEditorState = useCallback(
+    () => markdownToEditor(initialContent),
+    [initialContent],
   );
 
   return (
-    <LexicalComposer
-      initialConfig={{
-        namespace: 'Editor',
-        editable: true,
-        nodes: EDITOR_NODES,
-        theme: lexicalTheme,
-        editorState: () => markdownToEditor(document.content),
-        onError(error: Error) {
-          throw error;
-        },
-      }}
-    >
+    <>
       <RichTextPlugin
         contentEditable={<MikotoContentEditable />}
         placeholder={<></>}
@@ -310,12 +343,50 @@ function DocumentEditor({
       <HotkeyPlugin channel={channel} />
       <ListBehaviorPlugin />
       <CodeBlockPlugin />
-      <EmptyParagraphPlugin />
       <FloatingToolbarPlugin />
-      <OnChangePlugin ignoreSelectionChange onChange={onChange} />
-      <HistoryPlugin />
-    </LexicalComposer>
+      <CollaborationPlugin
+        id={channel.id}
+        // y-websocket's awareness type is slightly looser than Lexical's;
+        // structural shape matches at runtime.
+        providerFactory={providerFactory as never}
+        username={username}
+        cursorColor={cursorColor}
+        shouldBootstrap={shouldBootstrap}
+        initialEditorState={initialEditorState}
+      />
+      <DocumentAutosave channel={channel} documentState={documentState} />
+    </>
   );
+}
+
+function DocumentAutosave({
+  channel,
+  documentState,
+}: {
+  channel: MikotoChannel;
+  documentState: DocumentState;
+}) {
+  const [editor] = useLexicalComposerContext();
+
+  const save = useCallback(
+    debounce(() => {
+      documentState.save = 'saving';
+      const content = editor
+        .getEditorState()
+        .read(() => editorToMarkdown());
+      channel
+        .updateDocument({ content })
+        .then(() => {
+          documentState.save = 'synced';
+        })
+        .catch(() => {
+          documentState.save = 'error';
+        });
+    }, 1500),
+    [channel, documentState, editor],
+  );
+
+  return <OnChangePlugin ignoreSelectionChange onChange={save} />;
 }
 
 export default function DocumentSurface({ channelId }: { channelId: string }) {

@@ -35,6 +35,10 @@ export class AuthClient {
 
   protected accessToken?: string;
 
+  getAccessToken(): string | undefined {
+    return this.accessToken;
+  }
+
   constructor(options: AuthClientOptions) {
     this.api = createApiClient(options.url, {});
     this.getRefreshToken = options.refreshToken;

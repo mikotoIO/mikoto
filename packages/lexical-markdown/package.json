@@ -9,14 +9,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@lexical/code": "^0.14.4",
-    "@lexical/link": "^0.14.4",
-    "@lexical/list": "^0.14.4",
-    "@lexical/markdown": "^0.14.4",
-    "@lexical/react": "^0.14.4",
-    "@lexical/rich-text": "^0.14.4",
-    "@lexical/table": "^0.14.4",
-    "lexical": "^0.14.4"
+    "@lexical/code": "^0.43.0",
+    "@lexical/link": "^0.43.0",
+    "@lexical/list": "^0.43.0",
+    "@lexical/markdown": "^0.43.0",
+    "@lexical/react": "^0.43.0",
+    "@lexical/rich-text": "^0.43.0",
+    "@lexical/table": "^0.43.0",
+    "lexical": "^0.43.0"
   },
   "devDependencies": {
     "typescript": "^5.4.2"

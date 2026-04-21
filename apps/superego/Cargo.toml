@@ -125,7 +125,3 @@ features = ["tokio-rustls-tls"]
 version = "0.12.3"
 default-features = false
 features = ["charset", "http2", "rustls-tls"]
-
-[dependencies.yrs-axum]
-git = "https://github.com/mikotoIO/yrs-axum"
-branch = "master"

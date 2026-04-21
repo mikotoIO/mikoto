@@ -28,7 +28,7 @@ import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPl
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { debounce } from 'lodash';
 import { PropsWithChildren, useCallback, useRef, useState } from 'react';
 import { proxy, useSnapshot } from 'valtio';
@@ -210,13 +210,15 @@ function hash(str: string) {
   return hash;
 }
 
-function DocumentReader({ channel }: { channel: MikotoChannel }) {
-  const { data: document } = useSuspenseQuery({
+function documentContentQuery(channel: MikotoChannel) {
+  return {
     queryKey: ['documents.get', channel.spaceId, channel.id],
-    queryFn: async () => {
-      return channel.getDocument();
-    },
-  });
+    queryFn: async () => channel.getDocument(),
+  };
+}
+
+function DocumentReader({ channel }: { channel: MikotoChannel }) {
+  const { data: document } = useSuspenseQuery(documentContentQuery(channel));
 
   return (
     <LexicalComposer
@@ -248,18 +250,17 @@ function DocumentEditor({
   channel: MikotoChannel;
   documentState: DocumentState;
 }) {
-  const { data } = useSuspenseQuery({
-    queryKey: ['documents.editor-init', channel.spaceId, channel.id],
-    queryFn: async () => {
-      // Fetch the document and claim bootstrap rights in parallel. Only one
-      // client per session gets shouldBootstrap=true, which prevents the
-      // duplicate-content race when multiple peers open a cold room together.
-      const [document, shouldBootstrap] = await Promise.all([
-        channel.getDocument(),
-        channel.claimDocumentBootstrap(),
-      ]);
-      return { document, shouldBootstrap };
-    },
+  // Reuse the reader's cached content so toggling into edit mode doesn't
+  // re-fetch and fall through Suspense (which flashes the surface loader).
+  const { data: document } = useSuspenseQuery(documentContentQuery(channel));
+  // Only one client per session gets shouldBootstrap=true — the server
+  // enforces single-claim semantics, and we cache the result forever so
+  // repeated read/edit toggles don't trigger a Suspense fallback.
+  const { data: shouldBootstrap } = useSuspenseQuery({
+    queryKey: ['documents.bootstrap-claim', channel.spaceId, channel.id],
+    queryFn: async () => channel.claimDocumentBootstrap(),
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 
   return (
@@ -279,8 +280,8 @@ function DocumentEditor({
         <DocumentEditorInner
           channel={channel}
           documentState={documentState}
-          initialContent={data.document.content}
-          shouldBootstrap={data.shouldBootstrap}
+          initialContent={document.content}
+          shouldBootstrap={shouldBootstrap}
         />
       </LexicalComposer>
     </LexicalCollaboration>
@@ -367,6 +368,7 @@ function DocumentAutosave({
   documentState: DocumentState;
 }) {
   const [editor] = useLexicalComposerContext();
+  const queryClient = useQueryClient();
 
   const save = useCallback(
     debounce(() => {
@@ -376,14 +378,21 @@ function DocumentAutosave({
         .read(() => editorToMarkdown());
       channel
         .updateDocument({ content })
-        .then(() => {
+        .then((updated) => {
           documentState.save = 'synced';
+          // Keep the reader's cache in sync with what we just persisted, so
+          // switching back to read mode doesn't trigger a background refetch
+          // that re-keys the LexicalComposer and flashes the surface.
+          queryClient.setQueryData(
+            ['documents.get', channel.spaceId, channel.id],
+            updated,
+          );
         })
         .catch(() => {
           documentState.save = 'error';
         });
     }, 1500),
-    [channel, documentState, editor],
+    [channel, documentState, editor, queryClient],
   );
 
   return <OnChangePlugin ignoreSelectionChange onChange={save} />;

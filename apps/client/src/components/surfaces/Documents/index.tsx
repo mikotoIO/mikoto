@@ -29,7 +29,13 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { debounce } from 'lodash';
-import { PropsWithChildren, useCallback, useRef, useState } from 'react';
+import {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { proxy, useSnapshot } from 'valtio';
 
 import { Surface } from '@/components/Surface';
@@ -368,8 +374,43 @@ function DocumentEditorInner({
         initialEditorState={initialEditorState}
       />
       <DocumentAutosave channel={channel} documentState={documentState} />
+      <EditorUpdateLogger />
     </>
   );
+}
+
+function EditorUpdateLogger() {
+  const [editor] = useLexicalComposerContext();
+  useEffect(() => {
+    return editor.registerUpdateListener(
+      ({ dirtyElements, dirtyLeaves, tags, editorState, prevEditorState }) => {
+        let prevText = '';
+        let nextText = '';
+        prevEditorState.read(() => {
+          const root = prevEditorState._nodeMap.get('root') as unknown as
+            | { getTextContent?: () => string }
+            | undefined;
+          prevText = root?.getTextContent?.() ?? '';
+        });
+        editorState.read(() => {
+          const root = editorState._nodeMap.get('root') as unknown as
+            | { getTextContent?: () => string }
+            | undefined;
+          nextText = root?.getTextContent?.() ?? '';
+        });
+        console.log('[lexical] update', {
+          dirtyElements: Array.from(dirtyElements.keys()),
+          dirtyLeaves: Array.from(dirtyLeaves),
+          tags: Array.from(tags),
+          rootDirty: dirtyElements.has('root'),
+          prevText,
+          nextText,
+          textChanged: prevText !== nextText,
+        });
+      },
+    );
+  }, [editor]);
+  return null;
 }
 
 function DocumentAutosave({

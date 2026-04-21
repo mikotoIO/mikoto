@@ -42,24 +42,26 @@ if (SENTRY) {
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <HelmetProvider>
-      <ChakraProvider forcedTheme="dark">
-        <QueryClientProvider client={queryClient}>
-          <>
-            <Helmet>
-              {env.DEV && (
-                <link rel="icon" type="image/png" href="/favicon-dev.ico" />
-              )}
-            </Helmet>
-            <Global styles={globalCss} />
-            <App />
-            <ToastContainer theme="dark" limit={3} />
-          </>
-        </QueryClientProvider>
-      </ChakraProvider>
-    </HelmetProvider>
-  </React.StrictMode>,
+  // TEMP: StrictMode disabled while diagnosing lexical-yjs binding mismatch.
+  // Lexical's CollaborationPlugin wraps createBinding in a useMemo whose
+  // factory is double-invoked in StrictMode, producing two Binding objects
+  // that can desync Bob's local edits from the Y.Doc.
+  <HelmetProvider>
+    <ChakraProvider forcedTheme="dark">
+      <QueryClientProvider client={queryClient}>
+        <>
+          <Helmet>
+            {env.DEV && (
+              <link rel="icon" type="image/png" href="/favicon-dev.ico" />
+            )}
+          </Helmet>
+          <Global styles={globalCss} />
+          <App />
+          <ToastContainer theme="dark" limit={3} />
+        </>
+      </QueryClientProvider>
+    </ChakraProvider>
+  </HelmetProvider>,
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -28,7 +28,7 @@ import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPl
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { debounce } from 'lodash';
 import { PropsWithChildren, useCallback, useRef, useState } from 'react';
 import { proxy, useSnapshot } from 'valtio';
@@ -162,6 +162,10 @@ const ActionTooltip = createTooltip({
 function DocumentActions({ children }: PropsWithChildren) {
   return (
     <Flex
+      position="sticky"
+      top={0}
+      zIndex={1}
+      bg="surface"
       borderBottom="1px solid"
       borderBottomColor="gray.650"
       px={4}
@@ -210,23 +214,23 @@ function hash(str: string) {
   return hash;
 }
 
-function DocumentReader({ channel }: { channel: MikotoChannel }) {
-  const { data: document } = useSuspenseQuery({
+function documentContentQuery(channel: MikotoChannel) {
+  return {
     queryKey: ['documents.get', channel.spaceId, channel.id],
-    queryFn: async () => {
-      return channel.getDocument();
-    },
-  });
+    queryFn: async () => channel.getDocument(),
+  };
+}
 
+function DocumentReadOnly({ content }: { content: string }) {
   return (
     <LexicalComposer
-      key={hash(document.content)}
+      key={hash(content)}
       initialConfig={{
         namespace: 'Editor',
         editable: false,
         nodes: EDITOR_NODES,
         theme: lexicalTheme,
-        editorState: () => markdownToEditor(document.content),
+        editorState: () => markdownToEditor(content),
         onError(error: Error) {
           throw error;
         },
@@ -241,6 +245,11 @@ function DocumentReader({ channel }: { channel: MikotoChannel }) {
   );
 }
 
+function DocumentReader({ channel }: { channel: MikotoChannel }) {
+  const { data: document } = useSuspenseQuery(documentContentQuery(channel));
+  return <DocumentReadOnly content={document.content} />;
+}
+
 function DocumentEditor({
   channel,
   documentState,
@@ -248,42 +257,55 @@ function DocumentEditor({
   channel: MikotoChannel;
   documentState: DocumentState;
 }) {
-  const { data } = useSuspenseQuery({
-    queryKey: ['documents.editor-init', channel.spaceId, channel.id],
-    queryFn: async () => {
-      // Fetch the document and claim bootstrap rights in parallel. Only one
-      // client per session gets shouldBootstrap=true, which prevents the
-      // duplicate-content race when multiple peers open a cold room together.
-      const [document, shouldBootstrap] = await Promise.all([
-        channel.getDocument(),
-        channel.claimDocumentBootstrap(),
-      ]);
-      return { document, shouldBootstrap };
-    },
+  // Reuse the reader's cached content so toggling into edit mode doesn't
+  // re-fetch and fall through Suspense (which flashes the surface loader).
+  const { data: document } = useSuspenseQuery(documentContentQuery(channel));
+  // Only one client per session gets shouldBootstrap=true — the server
+  // enforces single-claim semantics, and we cache the result forever so
+  // repeated read/edit toggles don't trigger a Suspense fallback.
+  const { data: shouldBootstrap } = useSuspenseQuery({
+    queryKey: ['documents.bootstrap-claim', channel.spaceId, channel.id],
+    queryFn: async () => channel.claimDocumentBootstrap(),
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
+  // The collab provider needs a round-trip to sync before the editor shows
+  // any content, which would otherwise flash empty. Keep a read-only view
+  // overlaid on top until the provider fires its first sync event.
+  const [synced, setSynced] = useState(false);
 
   return (
-    <LexicalCollaboration>
-      <LexicalComposer
-        initialConfig={{
-          namespace: 'Editor',
-          editable: true,
-          nodes: EDITOR_NODES,
-          theme: lexicalTheme,
-          editorState: null,
-          onError(error: Error) {
-            throw error;
-          },
-        }}
-      >
-        <DocumentEditorInner
-          channel={channel}
-          documentState={documentState}
-          initialContent={data.document.content}
-          shouldBootstrap={data.shouldBootstrap}
-        />
-      </LexicalComposer>
-    </LexicalCollaboration>
+    <Box position="relative">
+      <Box visibility={synced ? 'visible' : 'hidden'}>
+        <LexicalCollaboration>
+          <LexicalComposer
+            initialConfig={{
+              namespace: 'Editor',
+              editable: true,
+              nodes: EDITOR_NODES,
+              theme: lexicalTheme,
+              editorState: null,
+              onError(error: Error) {
+                throw error;
+              },
+            }}
+          >
+            <DocumentEditorInner
+              channel={channel}
+              documentState={documentState}
+              initialContent={document.content}
+              shouldBootstrap={shouldBootstrap}
+              onSync={() => setSynced(true)}
+            />
+          </LexicalComposer>
+        </LexicalCollaboration>
+      </Box>
+      {!synced && (
+        <Box position="absolute" top={0} left={0} right={0}>
+          <DocumentReadOnly content={document.content} />
+        </Box>
+      )}
+    </Box>
   );
 }
 
@@ -308,14 +330,16 @@ function DocumentEditorInner({
   documentState,
   initialContent,
   shouldBootstrap,
+  onSync,
 }: {
   channel: MikotoChannel;
   documentState: DocumentState;
   initialContent: string;
   shouldBootstrap: boolean;
+  onSync?: () => void;
 }) {
   const mikoto = useMikoto();
-  const { providerFactory } = useProviderFactory({ channel });
+  const { providerFactory } = useProviderFactory({ channel, onSync });
   const me = mikoto.user.me;
   const username = me?.name ?? 'Anonymous';
   const cursorColor = me ? cursorColorFor(me.id) : CURSOR_COLORS[0];
@@ -367,6 +391,7 @@ function DocumentAutosave({
   documentState: DocumentState;
 }) {
   const [editor] = useLexicalComposerContext();
+  const queryClient = useQueryClient();
 
   const save = useCallback(
     debounce(() => {
@@ -376,14 +401,21 @@ function DocumentAutosave({
         .read(() => editorToMarkdown());
       channel
         .updateDocument({ content })
-        .then(() => {
+        .then((updated) => {
           documentState.save = 'synced';
+          // Keep the reader's cache in sync with what we just persisted, so
+          // switching back to read mode doesn't trigger a background refetch
+          // that re-keys the LexicalComposer and flashes the surface.
+          queryClient.setQueryData(
+            ['documents.get', channel.spaceId, channel.id],
+            updated,
+          );
         })
         .catch(() => {
           documentState.save = 'error';
         });
     }, 1500),
-    [channel, documentState, editor],
+    [channel, documentState, editor, queryClient],
   );
 
   return <OnChangePlugin ignoreSelectionChange onChange={save} />;
@@ -452,7 +484,7 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
           </Group>
         </Flex>
       </DocumentActions>
-      <Box px={8}>
+      <Box px={8} pb={32}>
         {documentSnap.type === 'read' && <DocumentReader channel={channel} />}
         {documentSnap.type === 'edit' && (
           <DocumentEditor channel={channel} documentState={documentState} />

@@ -162,6 +162,10 @@ const ActionTooltip = createTooltip({
 function DocumentActions({ children }: PropsWithChildren) {
   return (
     <Flex
+      position="sticky"
+      top={0}
+      zIndex={1}
+      bg="surface"
       borderBottom="1px solid"
       borderBottomColor="gray.650"
       px={4}
@@ -480,7 +484,7 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
           </Group>
         </Flex>
       </DocumentActions>
-      <Box px={8}>
+      <Box px={8} pb={32}>
         {documentSnap.type === 'read' && <DocumentReader channel={channel} />}
         {documentSnap.type === 'edit' && (
           <DocumentEditor channel={channel} documentState={documentState} />

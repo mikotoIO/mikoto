@@ -1,7 +1,4 @@
-import {
-  $convertToMarkdownString,
-  TRANSFORMERS,
-} from '@lexical/markdown';
+import { $convertToMarkdownString } from '@lexical/markdown';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useCallback, useRef, useState } from 'react';
@@ -10,6 +7,8 @@ import * as Y from 'yjs';
 
 import { useMikoto } from '@/hooks';
 import { env } from '@/env';
+
+import { DOCUMENT_TRANSFORMERS } from './transformers';
 
 export interface UseProviderFactoryProps {
   channel: MikotoChannel;
@@ -89,7 +88,7 @@ export function useProviderFactory({
   const save = () => {
     const content = editor
       .getEditorState()
-      .read(() => $convertToMarkdownString(TRANSFORMERS, undefined, true));
+      .read(() => $convertToMarkdownString(DOCUMENT_TRANSFORMERS, undefined, true));
 
     channel
       .updateDocument({ content })

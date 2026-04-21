@@ -6,6 +6,8 @@ import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import { Klass, LexicalNode } from 'lexical';
 
+import { ImageNode } from './nodes/ImageNode';
+
 export const EDITOR_NODES: Klass<LexicalNode>[] = [
   HeadingNode,
   QuoteNode,
@@ -19,4 +21,5 @@ export const EDITOR_NODES: Klass<LexicalNode>[] = [
   TableNode,
   CodeNode,
   CodeHighlightNode,
+  ImageNode,
 ];

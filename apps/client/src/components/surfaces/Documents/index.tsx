@@ -11,7 +11,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   $convertFromMarkdownString,
   $convertToMarkdownString,
-  TRANSFORMERS,
 } from '@lexical/markdown';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import {
@@ -43,10 +42,12 @@ import { CodeBlockPlugin } from './plugins/CodeBlockPlugin';
 import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
 import { FloatingToolbarPlugin } from './plugins/FloatingToolbarPlugin';
 import { HotkeyPlugin } from './plugins/HotkeyPlugin';
+import { ImageUploadPlugin } from './plugins/ImageUploadPlugin';
 import { ListBehaviorPlugin } from './plugins/ListBehaviorPlugin';
 import { MarkdownPastePlugin } from './plugins/MarkdownPastePlugin';
 import { useProviderFactory } from './providerFactory';
 import { lexicalTheme } from './theme';
+import { DOCUMENT_TRANSFORMERS } from './transformers';
 
 const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
 
@@ -92,11 +93,11 @@ const LINK_MATCHERS = [
 // paragraphs 1:1 with blank lines, so round-tripping between read and edit
 // modes doesn't collapse or multiply newlines.
 function markdownToEditor(markdown: string): void {
-  $convertFromMarkdownString(markdown, TRANSFORMERS, undefined, true);
+  $convertFromMarkdownString(markdown, DOCUMENT_TRANSFORMERS, undefined, true);
 }
 
 function editorToMarkdown(): string {
-  return $convertToMarkdownString(TRANSFORMERS, undefined, true);
+  return $convertToMarkdownString(DOCUMENT_TRANSFORMERS, undefined, true);
 }
 
 const EditorWrapper = styled.div`
@@ -412,7 +413,8 @@ function DocumentEditorInner({
         placeholder={<></>}
         ErrorBoundary={LexicalErrorBoundary}
       />
-      <MarkdownShortcutPlugin />
+      <MarkdownShortcutPlugin transformers={DOCUMENT_TRANSFORMERS} />
+      <ImageUploadPlugin />
       <MarkdownPastePlugin />
       <AutoFocusPlugin />
       <AutoLinkPlugin matchers={LINK_MATCHERS} />

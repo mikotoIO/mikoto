@@ -19,10 +19,11 @@ import {
   createLinkMatcherWithRegExp,
 } from '@lexical/react/LexicalAutoLinkPlugin';
 import { CollaborationPlugin } from '@lexical/react/LexicalCollaborationPlugin';
+import { LexicalCollaboration } from '@lexical/react/LexicalCollaborationContext';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
-import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
+import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
@@ -277,25 +278,27 @@ function DocumentEditor({
   });
 
   return (
-    <LexicalComposer
-      initialConfig={{
-        namespace: 'Editor',
-        editable: true,
-        nodes: EDITOR_NODES,
-        theme: lexicalTheme,
-        editorState: null,
-        onError(error: Error) {
-          throw error;
-        },
-      }}
-    >
-      <DocumentEditorInner
-        channel={channel}
-        documentState={documentState}
-        initialContent={data.document.content}
-        shouldBootstrap={data.shouldBootstrap}
-      />
-    </LexicalComposer>
+    <LexicalCollaboration>
+      <LexicalComposer
+        initialConfig={{
+          namespace: 'Editor',
+          editable: true,
+          nodes: EDITOR_NODES,
+          theme: lexicalTheme,
+          editorState: null,
+          onError(error: Error) {
+            throw error;
+          },
+        }}
+      >
+        <DocumentEditorInner
+          channel={channel}
+          documentState={documentState}
+          initialContent={data.document.content}
+          shouldBootstrap={data.shouldBootstrap}
+        />
+      </LexicalComposer>
+    </LexicalCollaboration>
   );
 }
 

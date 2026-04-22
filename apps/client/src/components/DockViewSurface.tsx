@@ -410,6 +410,18 @@ export const DockViewSurface = () => {
       }
     });
 
+    prevTabs.forEach((prevTab) => {
+      const stillOpen = tabs.some(
+        (tab) => tab.kind === prevTab.kind && tab.key === prevTab.key,
+      );
+      if (stillOpen) return;
+      const panelId = `${prevTab.kind}/${prevTab.key}`;
+      const panel = api.getPanel(panelId);
+      if (panel) {
+        api.removePanel(panel);
+      }
+    });
+
     prevTabsRef.current = [...tabs];
   }, [tabs]);
 

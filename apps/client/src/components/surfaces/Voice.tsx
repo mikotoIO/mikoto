@@ -26,6 +26,7 @@ import { Surface } from '@/components/Surface';
 import { Avatar } from '@/components/atoms/Avatar';
 import { TabName } from '@/components/tabs';
 import { useMikoto } from '@/hooks';
+import { useTabkit } from '@/store/surface';
 
 function MikotoParticipantTileContent() {
   const trackRef = useEnsureTrackRef();
@@ -245,6 +246,7 @@ const VoiceViewWrapper = styled.div`
 
 export default function VoiceSurface({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
+  const tabkit = useTabkit();
   const channel = mikoto.channels._get(channelId)!;
 
   const [voiceConfig, setVoiceConfig] = useState<VoiceToken | null>(null);
@@ -273,6 +275,9 @@ export default function VoiceSurface({ channelId }: { channelId: string }) {
           serverUrl={voiceConfig.url}
           token={voiceConfig.token}
           audio
+          onDisconnected={() => {
+            tabkit.removeTab(`voiceChannel/${channelId}`);
+          }}
         >
           <VoiceViewWrapper>
             <Stage />

@@ -10,7 +10,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsdown",
     "typecheck": "tsc --noEmit",
     "generate": "tsx ./generator/openapi.ts",
     "test": "vitest run"
@@ -35,8 +35,8 @@
     "@types/lodash-es": "^4.17.12",
     "openapi-zod-client": "^1.18.2",
     "openapi3-ts": "^4.4.0",
-    "tsup": "^8.5.1",
-    "typescript": "^5.4.2",
+    "tsdown": "^0.21.9",
+    "typescript": "^6.0.3",
     "vitest": "^0.18.0"
   }
 }

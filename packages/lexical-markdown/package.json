@@ -19,6 +19,6 @@
     "lexical": "^0.43.0"
   },
   "devDependencies": {
-    "typescript": "^5.4.2"
+    "typescript": "^6.0.3"
   }
 }

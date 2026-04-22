@@ -1,4 +1,4 @@
-import { $convertFromMarkdownString, TRANSFORMERS } from '@lexical/markdown';
+import { $convertFromMarkdownString } from '@lexical/markdown';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
   $getRoot,
@@ -9,6 +9,8 @@ import {
   PASTE_COMMAND,
 } from 'lexical';
 import { useEffect } from 'react';
+
+import { DOCUMENT_TRANSFORMERS } from '../transformers';
 
 export function MarkdownPastePlugin() {
   const [editor] = useLexicalComposerContext();
@@ -45,7 +47,12 @@ export function MarkdownPastePlugin() {
               // Clear root and parse markdown into it. shouldPreserveNewLines=true
               // keeps the scheme consistent with document save/load.
               root.clear();
-              $convertFromMarkdownString(textData, TRANSFORMERS, undefined, true);
+              $convertFromMarkdownString(
+                textData,
+                DOCUMENT_TRANSFORMERS,
+                undefined,
+                true,
+              );
 
               // Get the parsed nodes
               const parsedNodes = root.getChildren();

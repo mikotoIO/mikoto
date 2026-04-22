@@ -36,7 +36,7 @@
     "@expo/ngrok": "^4.1.0",
     "@types/react": "^19.2.4",
     "eas-cli": "^5.9.1",
-    "typescript": "^5.4.2"
+    "typescript": "^6.0.3"
   },
   "private": true
 }

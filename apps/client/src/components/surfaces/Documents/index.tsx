@@ -17,8 +17,8 @@ import {
   AutoLinkPlugin,
   createLinkMatcherWithRegExp,
 } from '@lexical/react/LexicalAutoLinkPlugin';
-import { CollaborationPlugin } from '@lexical/react/LexicalCollaborationPlugin';
 import { LexicalCollaboration } from '@lexical/react/LexicalCollaborationContext';
+import { CollaborationPlugin } from '@lexical/react/LexicalCollaborationPlugin';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
@@ -106,6 +106,16 @@ const EditorWrapper = styled.div`
   cursor: text;
   padding-left: 28px;
 
+  .editor-paragraph,
+  .editor-list-ul,
+  .editor-list-ol {
+    margin: 16px 0;
+  }
+
+  .editor-listitem {
+    margin: 8px 0;
+  }
+
   .editor-input {
     outline: none;
     min-height: calc(100dvh - 200px);
@@ -156,7 +166,9 @@ const EditorWrapper = styled.div`
     font-size: 12px;
     cursor: grab;
     opacity: 0;
-    transition: opacity 0.12s ease, background-color 0.12s ease;
+    transition:
+      opacity 0.12s ease,
+      background-color 0.12s ease;
     will-change: transform;
     user-select: none;
   }
@@ -451,9 +463,7 @@ function DocumentAutosave({
   const save = useCallback(
     debounce(() => {
       documentState.save = 'saving';
-      const content = editor
-        .getEditorState()
-        .read(() => editorToMarkdown());
+      const content = editor.getEditorState().read(() => editorToMarkdown());
       channel
         .updateDocument({ content })
         .then((updated) => {

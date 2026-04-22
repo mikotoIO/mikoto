@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import {
+  IconDefinition,
   faCode,
   faFont,
   faHeading,
@@ -9,7 +10,6 @@ import {
   faListUl,
   faMinus,
   faQuoteRight,
-  IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { $createCodeNode } from '@lexical/code';

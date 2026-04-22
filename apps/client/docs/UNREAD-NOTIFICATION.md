@@ -8,18 +8,18 @@ Two tables drive this system:
 
 **ChannelUnread** — tracks per-user, per-channel read position:
 
-| Column    | Type      | Description                        |
-| --------- | --------- | ---------------------------------- |
-| channelId | UUID (PK) | FK to Channel                      |
-| userId    | UUID (PK) | FK to User                         |
+| Column    | Type      | Description                           |
+| --------- | --------- | ------------------------------------- |
+| channelId | UUID (PK) | FK to Channel                         |
+| userId    | UUID (PK) | FK to User                            |
 | timestamp | timestamp | Last time the user acked this channel |
 
 **NotificationPreference** — per-space notification level:
 
-| Column  | Type              | Description              |
-| ------- | ----------------- | ------------------------ |
-| userId  | UUID (PK)         | FK to User               |
-| spaceId | UUID (PK)         | FK to Space              |
+| Column  | Type              | Description                     |
+| ------- | ----------------- | ------------------------------- |
+| userId  | UUID (PK)         | FK to User                      |
+| spaceId | UUID (PK)         | FK to Space                     |
 | level   | NotificationLevel | `ALL`, `MENTIONS`, or `NOTHING` |
 
 The **Channel** table also stores a `lastUpdated` timestamp that is bumped every time a message is created in the channel.
@@ -43,13 +43,13 @@ ackStore.acks[channelId] = timestamp
 
 Key functions:
 
-| Function             | Purpose                                                                 |
-| -------------------- | ----------------------------------------------------------------------- |
-| `loadAcksForSpace`   | Calls `space.listUnread()` and populates `ackStore`                     |
-| `loadAcksForAllSpaces` | Loads acks for every space the user is in                             |
-| `ackChannel`         | Writes a new ack timestamp to the local store                           |
-| `isChannelUnread`    | Compares `channel.lastUpdated` against the stored ack timestamp         |
-| `isSpaceUnread`      | Returns `true` if **any** channel in the space is unread                |
+| Function               | Purpose                                                         |
+| ---------------------- | --------------------------------------------------------------- |
+| `loadAcksForSpace`     | Calls `space.listUnread()` and populates `ackStore`             |
+| `loadAcksForAllSpaces` | Loads acks for every space the user is in                       |
+| `ackChannel`           | Writes a new ack timestamp to the local store                   |
+| `isChannelUnread`      | Compares `channel.lastUpdated` against the stored ack timestamp |
+| `isSpaceUnread`        | Returns `true` if **any** channel in the space is unread        |
 
 ### When Ack Happens
 
@@ -89,11 +89,11 @@ On mount, `registerNotifications(mikoto, preferences)` subscribes to the `messag
 
 Three modes stored in `localStorage` under `notificationMode`:
 
-| Mode     | Behavior                                          |
-| -------- | ------------------------------------------------- |
-| `native` | Browser `Notification` API (requires permission)  |
-| `toast`  | In-app toast via Chakra toaster                   |
-| `none`   | Disabled                                          |
+| Mode     | Behavior                                         |
+| -------- | ------------------------------------------------ |
+| `native` | Browser `Notification` API (requires permission) |
+| `toast`  | In-app toast via Chakra toaster                  |
+| `none`   | Disabled                                         |
 
 Default is `native`.
 

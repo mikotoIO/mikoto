@@ -128,7 +128,5 @@ pub async fn route(
     let store_path = format!("{}/{}.{}", store_name, nanoid!(16), ext);
     bucket().put_object(&store_path, &buf).await?;
 
-    Ok(Json(UploadResponse {
-        url: store_path,
-    }))
+    Ok(Json(UploadResponse { url: store_path }))
 }

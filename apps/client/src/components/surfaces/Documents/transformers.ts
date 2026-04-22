@@ -1,14 +1,10 @@
 import {
   CHECK_LIST,
-  TextMatchTransformer,
   TRANSFORMERS,
+  TextMatchTransformer,
 } from '@lexical/markdown';
 
-import {
-  $createImageNode,
-  $isImageNode,
-  ImageNode,
-} from './nodes/ImageNode';
+import { $createImageNode, $isImageNode, ImageNode } from './nodes/ImageNode';
 
 // Obsidian-style image syntax: `![alt|WIDTH](src)` or
 // `![alt|WIDTHxHEIGHT](src)`. Height is parsed but ignored — resize locks

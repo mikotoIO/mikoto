@@ -1,7 +1,5 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { normalizeMediaUrl } from '@/components/atoms/Avatar';
-import { colorFromId } from '@/components/atoms/SpaceIcon';
 import {
   DockviewApi,
   DockviewDidDropEvent,
@@ -25,6 +23,8 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { useNavigate } from 'react-router-dom';
 
 import { WelcomePanel } from '@/components/WelcomePanel';
+import { normalizeMediaUrl } from '@/components/atoms/Avatar';
+import { colorFromId } from '@/components/atoms/SpaceIcon';
 import {
   ErrorSurface,
   LoadingSurface,

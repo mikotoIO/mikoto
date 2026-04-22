@@ -198,9 +198,11 @@ export function SpaceSidebar() {
       }}
     >
       <StyledSpaceSidebar onContextMenu={contextMenu}>
-        <StyledIconWrapper style={{
-          marginTop: '8px',
-        }}>
+        <StyledIconWrapper
+          style={{
+            marginTop: '8px',
+          }}
+        >
           <SpaceIconLike
             style={{
               background:
@@ -215,7 +217,13 @@ export function SpaceSidebar() {
             <FontAwesomeIcon icon={faMikoto} fontSize="24px" />
           </SpaceIconLike>
         </StyledIconWrapper>
-        <Separator borderColor="gray.600" ml={3} width={9} borderWidth="1px" my={2}/>
+        <Separator
+          borderColor="gray.600"
+          ml={3}
+          width={9}
+          borderWidth="1px"
+          my={2}
+        />
 
         {spaceArray
           .filter((x) => x.type === 'NONE') // TODO: filter this on the server

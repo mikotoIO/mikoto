@@ -19,8 +19,8 @@ import { contextMenuState } from '@/components/ContextMenu';
 import { useIsMobile } from '@/hooks/useIsMobile';
 
 import { useEmojiAutocomplete } from './EmojiAutocomplete';
-import { messageEditState } from './Message';
 import { useMentionAutocomplete } from './MentionAutocomplete';
+import { messageEditState } from './Message';
 
 const EmojiPicker = lazy(() => import('./EmojiPicker'));
 

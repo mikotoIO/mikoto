@@ -57,7 +57,8 @@ function NotificationPermissionBanner() {
     >
       <Box>
         <Text fontWeight="600" fontSize="14px">
-          Browser notifications are {permission === 'denied' ? 'blocked' : 'not enabled'}
+          Browser notifications are{' '}
+          {permission === 'denied' ? 'blocked' : 'not enabled'}
         </Text>
         <Text fontSize="13px" color="gray.300">
           {permission === 'denied'

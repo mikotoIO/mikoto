@@ -23,36 +23,49 @@ function hNode(
 
 export function remarkMention() {
   return (tree: TreeParam) => {
-    findAndReplace(tree, [
+    findAndReplace(
+      tree,
       [
-        /@([\w.]+)/g,
-        (_: string, username: string) =>
-          hNode('mention', { username }, `@${username}`),
+        [
+          /@([\w.]+)/g,
+          (_: string, username: string) =>
+            hNode('mention', { username }, `@${username}`),
+        ],
       ],
-    ], { ignore: ['link', 'linkReference'] });
+      { ignore: ['link', 'linkReference'] },
+    );
   };
 }
 
 export function remarkEmoji() {
   return (tree: TreeParam) => {
-    findAndReplace(tree, [
+    findAndReplace(
+      tree,
       [
-        /:(\+1|[-\w]+):/g,
-        (_: string, emoji: string) =>
-          hNode('emoji-shortcode', { emoji }, `:${emoji}:`),
+        [
+          /:(\+1|[-\w]+):/g,
+          (_: string, emoji: string) =>
+            hNode('emoji-shortcode', { emoji }, `:${emoji}:`),
+        ],
       ],
-    ], { ignore: ['link', 'linkReference'] });
+      { ignore: ['link', 'linkReference'] },
+    );
   };
 }
 
 export function remarkSpoiler() {
   return (tree: TreeParam) => {
-    findAndReplace(tree, [
+    findAndReplace(
+      tree,
       [
-        /\|\|([\s\S]+?)\|\|(?!\|)/g,
-        (_: string, content: string) => hNode('spoiler', { content }, content),
+        [
+          /\|\|([\s\S]+?)\|\|(?!\|)/g,
+          (_: string, content: string) =>
+            hNode('spoiler', { content }, content),
+        ],
       ],
-    ], { ignore: ['link', 'linkReference'] });
+      { ignore: ['link', 'linkReference'] },
+    );
   };
 }
 

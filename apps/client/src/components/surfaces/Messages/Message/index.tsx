@@ -10,8 +10,8 @@ import { MikotoMessage } from '@mikoto-io/mikoto.js';
 import { atom, useSetAtom } from 'jotai';
 import { useSnapshot } from 'valtio/react';
 
-import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import { ContextMenu, useContextMenu } from '@/components/ContextMenu';
+import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import { MessageAvatar } from '@/components/atoms/MessageAvatar';
 import { Markdown } from '@/components/molecules/markdown';
 import { Tag } from '@/components/ui';
@@ -131,7 +131,11 @@ export const MessageItem = ({ message, isSimple }: MessageProps) => {
   ));
 
   return (
-    <MessageContainer isSimple={isSimple} pending={message.pending} onContextMenu={menu}>
+    <MessageContainer
+      isSimple={isSimple}
+      pending={message.pending}
+      onContextMenu={menu}
+    >
       {isSimple ? (
         <Box m={0} w={10} />
       ) : (

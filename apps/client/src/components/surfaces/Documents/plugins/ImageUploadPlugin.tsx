@@ -46,7 +46,10 @@ async function uploadAndInsert(
   });
 }
 
-function selectionFromPoint(clientX: number, clientY: number): (() => void) | null {
+function selectionFromPoint(
+  clientX: number,
+  clientY: number,
+): (() => void) | null {
   const pos = document.caretPositionFromPoint(clientX, clientY);
   if (!pos) return null;
   const domRange = document.createRange();

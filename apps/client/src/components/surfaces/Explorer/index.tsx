@@ -21,11 +21,7 @@ import { MemberListSidebar } from '@/components/sidebars/MemberListSidebar';
 import { useFetchMember, useMikoto } from '@/hooks';
 import { explorerPanelsState } from '@/store';
 import { useTabkit } from '@/store/surface';
-import {
-  ackChannel,
-  ackStore,
-  isChannelUnread,
-} from '@/store/unreads';
+import { ackChannel, ackStore, isChannelUnread } from '@/store/unreads';
 
 import { ChannelContextMenu, CreateChannelModal } from './ChannelContextMenu';
 import { ChannelTree } from './ChannelTree';

@@ -31,7 +31,9 @@ export async function loadNotificationPreferences(mikoto: MikotoClient) {
   }
 }
 
-export async function loadAcksForSpace(space: { listUnread: () => Promise<{ channelId: string; timestamp: string }[]> }) {
+export async function loadAcksForSpace(space: {
+  listUnread: () => Promise<{ channelId: string; timestamp: string }[]>;
+}) {
   const unreads = await space.listUnread();
   for (const u of unreads) {
     ackStore.acks[u.channelId] = u.timestamp;
@@ -50,7 +52,10 @@ export function ackChannel(channelId: string, timestamp: string) {
   ackStore.acks[channelId] = timestamp;
 }
 
-export function isChannelUnread(lastUpdated: string | null | undefined, channelId: string): boolean {
+export function isChannelUnread(
+  lastUpdated: string | null | undefined,
+  channelId: string,
+): boolean {
   if (!lastUpdated) return false;
   const ack = ackStore.acks[channelId];
   if (!ack) return true;

@@ -1,10 +1,10 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
   $getNodeByKey,
-  DecoratorNode,
   DOMConversionMap,
   DOMConversionOutput,
   DOMExportOutput,
+  DecoratorNode,
   EditorConfig,
   LexicalEditor,
   LexicalNode,
@@ -138,12 +138,7 @@ export class ImageNode extends DecoratorNode<ReactNode> {
     return new ImageNode(node.__src, node.__altText, node.__width, node.__key);
   }
 
-  constructor(
-    src: string,
-    altText: string,
-    width?: number,
-    key?: NodeKey,
-  ) {
+  constructor(src: string, altText: string, width?: number, key?: NodeKey) {
     super(key);
     this.__src = src;
     this.__altText = altText;

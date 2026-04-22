@@ -337,7 +337,9 @@ function Overview({ space }: { space: MikotoSpace }) {
           <NativeSelect.Root size="sm">
             <NativeSelect.Field
               value={visibility}
-              onChange={(e) => setVisibility(e.target.value as 'PRIVATE' | 'PUBLIC')}
+              onChange={(e) =>
+                setVisibility(e.target.value as 'PRIVATE' | 'PUBLIC')
+              }
             >
               <option value="PRIVATE">Private</option>
               <option value="PUBLIC">Public</option>

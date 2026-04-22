@@ -70,8 +70,7 @@ export class AuthClient {
   private async _doRefresh(): Promise<string> {
     // Read the latest refresh token (e.g. from localStorage) in case
     // another tab rotated it since we last cached it in memory
-    const currentToken =
-      this.getRefreshToken?.() ?? this.refreshToken ?? '';
+    const currentToken = this.getRefreshToken?.() ?? this.refreshToken ?? '';
 
     try {
       const res = await this.api['account.refresh']({

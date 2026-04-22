@@ -11,13 +11,13 @@ import { useSnapshot } from 'valtio/react';
 import { ContextMenu, modalState } from '@/components/ContextMenu';
 import { InviteModal } from '@/components/modals/Invite';
 import { SpaceJoinModal } from '@/components/modals/SpaceJoin';
+import { useTabkit } from '@/store/surface';
 import {
   ackChannel,
   isChannelUnread,
   notificationPreferenceStore,
   setSpaceNotificationLevel,
 } from '@/store/unreads';
-import { useTabkit } from '@/store/surface';
 
 const NOTIFICATION_OPTIONS: {
   level: NotificationLevel;

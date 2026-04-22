@@ -101,7 +101,9 @@ export function useMentionAutocomplete({
   const [activeIndex, setActiveIndex] = useState(0);
   const activeIndexRef = useRef(0);
 
-  const filtered = mentionState ? filterMembers(members, mentionState.search) : [];
+  const filtered = mentionState
+    ? filterMembers(members, mentionState.search)
+    : [];
   const isOpen = mentionState !== null && filtered.length > 0;
 
   // Keep ref in sync

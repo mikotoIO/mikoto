@@ -92,7 +92,6 @@ const VoiceViewWrapper = styled.div`
   flex-direction: column;
   height: 100%;
   background-color: var(--chakra-colors-gray-800);
-
   && {
     --lk-fg: var(--chakra-colors-gray-50);
     --lk-fg2: var(--chakra-colors-gray-150);
@@ -148,7 +147,7 @@ const VoiceViewWrapper = styled.div`
     height: 100px;
     flex-basis: 0;
     padding: var(--lk-grid-gap);
-    background-color: var(--chakra-colors-gray-800);
+    background-color: var(--chakra-colors-gray-750);
   }
 
   .lk-participant-tile {
@@ -185,20 +184,20 @@ const VoiceViewWrapper = styled.div`
   }
 
   .lk-control-bar {
-    background-color: var(--chakra-colors-gray-850);
-    border-top: 1px solid var(--chakra-colors-gray-700);
+    background-color: var(--chakra-colors-gray-750);
+    border-top: none;
     padding: 8px 12px;
     gap: 8px;
   }
 
   .lk-button {
-    background-color: var(--chakra-colors-gray-750);
+    background-color: var(--chakra-colors-gray-700);
     color: var(--chakra-colors-gray-100);
     border-radius: 6px;
     font-weight: 500;
 
     &:hover {
-      background-color: var(--chakra-colors-gray-700);
+      background-color: var(--chakra-colors-gray-650);
     }
 
     &[aria-pressed='true'] {

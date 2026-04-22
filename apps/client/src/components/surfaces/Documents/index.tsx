@@ -17,6 +17,7 @@ import {
   AutoLinkPlugin,
   createLinkMatcherWithRegExp,
 } from '@lexical/react/LexicalAutoLinkPlugin';
+import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
 import { LexicalCollaboration } from '@lexical/react/LexicalCollaborationContext';
 import { CollaborationPlugin } from '@lexical/react/LexicalCollaborationPlugin';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
@@ -45,6 +46,7 @@ import { HotkeyPlugin } from './plugins/HotkeyPlugin';
 import { ImageUploadPlugin } from './plugins/ImageUploadPlugin';
 import { ListBehaviorPlugin } from './plugins/ListBehaviorPlugin';
 import { MarkdownPastePlugin } from './plugins/MarkdownPastePlugin';
+import { SlashMenuPlugin } from './plugins/SlashMenuPlugin';
 import { useProviderFactory } from './providerFactory';
 import { lexicalTheme } from './theme';
 import { DOCUMENT_TRANSFORMERS } from './transformers';
@@ -115,6 +117,56 @@ const EditorWrapper = styled.div`
 
   .editor-listitem {
     margin: 8px 0;
+  }
+
+  .editor-list-check {
+    list-style-type: none;
+    padding-left: 0;
+  }
+
+  .editor-listitem-checked,
+  .editor-listitem-unchecked {
+    position: relative;
+    list-style-type: none;
+    padding-left: 26px;
+    outline: none;
+    margin: 4px 0;
+  }
+
+  .editor-listitem-checked::before,
+  .editor-listitem-unchecked::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--chakra-colors-gray-500);
+    border-radius: 3px;
+    background-color: transparent;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition:
+      background-color 0.12s ease,
+      border-color 0.12s ease;
+  }
+
+  .editor-listitem-unchecked:hover::before {
+    border-color: var(--chakra-colors-gray-300);
+  }
+
+  .editor-listitem-checked::before {
+    background-color: var(--chakra-colors-blue-500);
+    border-color: var(--chakra-colors-blue-500);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='M13.485 1.929a1 1 0 0 1 1.414 1.414l-8.486 8.486a1 1 0 0 1-1.414 0L1.464 8.314a1 1 0 1 1 1.414-1.414l3.235 3.235 7.372-7.372z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 12px 12px;
+  }
+
+  .editor-listitem-checked {
+    text-decoration: line-through;
+    color: var(--chakra-colors-gray-500);
   }
 
   .editor-input {
@@ -433,7 +485,9 @@ function DocumentEditorInner({
       <AutoLinkPlugin matchers={LINK_MATCHERS} />
       <HotkeyPlugin channel={channel} />
       <ListBehaviorPlugin />
+      <CheckListPlugin />
       <CodeBlockPlugin />
+      <SlashMenuPlugin />
       <FloatingToolbarPlugin />
       {anchorElem && <DraggableBlockPlugin anchorElem={anchorElem} />}
       <CollaborationPlugin

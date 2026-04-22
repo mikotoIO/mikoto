@@ -1,4 +1,8 @@
-import { TextMatchTransformer, TRANSFORMERS } from '@lexical/markdown';
+import {
+  CHECK_LIST,
+  TextMatchTransformer,
+  TRANSFORMERS,
+} from '@lexical/markdown';
 
 import {
   $createImageNode,
@@ -38,4 +42,8 @@ export const IMAGE: TextMatchTransformer = {
 // swaps to a wider one if `endIndex > existingEnd`. `![alt](url)` and
 // `[alt](url)` end at the same index, so a later-iterated IMAGE cannot
 // displace a first-matched LINK — we have to iterate IMAGE first.
-export const DOCUMENT_TRANSFORMERS = [IMAGE, ...TRANSFORMERS];
+//
+// CHECK_LIST must come before the default TRANSFORMERS because UNORDERED_LIST's
+// regex `^(\s*)[-*+]\s/` would otherwise swallow the `- ` prefix of a `- [x]`
+// line before the stricter check-list regex got a chance to match.
+export const DOCUMENT_TRANSFORMERS = [IMAGE, CHECK_LIST, ...TRANSFORMERS];

@@ -47,24 +47,11 @@ async function uploadAndInsert(
 }
 
 function selectionFromPoint(clientX: number, clientY: number): (() => void) | null {
-  // Use the DOM caret-from-point APIs to translate the drop coordinates into
-  // a Lexical range so the image lands exactly where the user dropped it
-  // rather than at the previous caret position.
-  let domRange: Range | null = null;
-  const docWithCaretPosition = document as Document & {
-    caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null;
-  };
-  if (typeof docWithCaretPosition.caretPositionFromPoint === 'function') {
-    const pos = docWithCaretPosition.caretPositionFromPoint(clientX, clientY);
-    if (pos) {
-      domRange = document.createRange();
-      domRange.setStart(pos.offsetNode, pos.offset);
-      domRange.collapse(true);
-    }
-  } else if (typeof document.caretRangeFromPoint === 'function') {
-    domRange = document.caretRangeFromPoint(clientX, clientY);
-  }
-  if (!domRange) return null;
+  const pos = document.caretPositionFromPoint(clientX, clientY);
+  if (!pos) return null;
+  const domRange = document.createRange();
+  domRange.setStart(pos.offsetNode, pos.offset);
+  domRange.collapse(true);
 
   return () => {
     const selection = $createRangeSelection();

@@ -12,6 +12,7 @@
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "noEmit": true,
+    "ignoreDeprecations": "6.0",
     "lib": ["ES2023", "DOM"]
   },
   "include": ["src"],

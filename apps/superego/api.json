@@ -3093,12 +3093,6 @@
           "password"
         ],
         "properties": {
-          "captcha": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
           "email": {
             "type": "string"
           },
@@ -3179,12 +3173,6 @@
           "email"
         ],
         "properties": {
-          "captcha": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
           "email": {
             "type": "string"
           }

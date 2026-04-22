@@ -8,7 +8,6 @@ use crate::{
     entities::{Account, Handle, RefreshToken, TokenPair},
     error::Error,
     functions::{
-        captcha::captcha,
         jwt::{jwt_key, Claims},
         rate_limit::auth_rate_limiter,
         validation::validate_password,
@@ -30,7 +29,6 @@ pub struct RegisterPayload {
     pub email: String,
     pub name: String,
     pub password: String,
-    pub captcha: Option<String>,
 }
 
 pub async fn route(
@@ -40,7 +38,6 @@ pub async fn route(
     let ip = crate::functions::rate_limit::client_ip_from_headers(&headers);
     auth_rate_limiter().check(&ip)?;
 
-    captcha().validate(body.captcha.as_deref()).await?;
     validate_password(&body.password)?;
 
     let account = Account {

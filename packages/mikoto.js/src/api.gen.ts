@@ -10,7 +10,6 @@ export const IndexResponse = z.object({
 export type IndexResponse = z.infer<typeof IndexResponse>;
 
 export const RegisterPayload = z.object({
-  captcha: z.union([z.string(), z.null()]).optional(),
   email: z.string(),
   name: z.string(),
   password: z.string(),
@@ -38,10 +37,7 @@ export const ChangePasswordPayload = z.object({
 });
 export type ChangePasswordPayload = z.infer<typeof ChangePasswordPayload>;
 
-export const ResetPasswordPayload = z.object({
-  captcha: z.union([z.string(), z.null()]).optional(),
-  email: z.string(),
-});
+export const ResetPasswordPayload = z.object({ email: z.string() });
 export type ResetPasswordPayload = z.infer<typeof ResetPasswordPayload>;
 
 export const ResetPasswordConfirmData = z.object({
@@ -649,7 +645,7 @@ const endpoints = makeApi([
       {
         name: "body",
         type: "Body",
-        schema: ResetPasswordPayload,
+        schema: z.object({ email: z.string() }),
       },
     ],
     response: z.null(),

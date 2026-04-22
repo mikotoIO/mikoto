@@ -8,14 +8,12 @@ import {
 } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Turnstile } from '@marsidev/react-turnstile';
 import { useState } from 'react';
-import { Control, useController, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { faMikoto } from '@/components/icons';
 import { Button, Field } from '@/components/ui';
-import { env } from '@/env';
 import { useErrorElement } from '@/hooks/useErrorElement';
 import { authClient } from '@/store/authClient';
 
@@ -33,20 +31,6 @@ function Logo() {
     >
       <FontAwesomeIcon icon={faMikoto} color="#59e6ff" fontSize="36px" />
     </Flex>
-  );
-}
-
-// not always a real captcha
-function Captcha({ name, control }: { name: string; control: Control }) {
-  const { field } = useController({ name, control, defaultValue: null });
-
-  return (
-    <Turnstile
-      siteKey={env.PUBLIC_CAPTCHA_KEY}
-      onSuccess={(token) => {
-        field.onChange(token);
-      }}
-    />
   );
 }
 
@@ -86,7 +70,7 @@ const AuthForm = chakra('form', {
 });
 
 export function LoginView() {
-  const { register, handleSubmit, formState, control } = useForm();
+  const { register, handleSubmit, formState } = useForm();
   const error = useErrorElement();
 
   return (
@@ -97,7 +81,6 @@ export function LoginView() {
             const tk = await authClient.login({
               email: form.email,
               password: form.password,
-              // captcha: form.captcha,
             });
             if (tk.refreshToken) {
               localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
@@ -118,9 +101,10 @@ export function LoginView() {
           <Input type="password" {...register('password')} />
         </Field>
 
-        <Captcha name="captcha" control={control} />
         <Button
           colorPalette="blue"
+          mt={3}
+          mb={4}
           type="submit"
           loading={formState.isSubmitting}
         >
@@ -138,7 +122,7 @@ export function LoginView() {
 }
 
 export function RegisterView() {
-  const { register, handleSubmit, formState, control } = useForm();
+  const { register, handleSubmit, formState } = useForm();
   const error = useErrorElement();
 
   return (
@@ -150,7 +134,6 @@ export function RegisterView() {
               name: form.name,
               email: form.email,
               password: form.password,
-              captcha: form.captcha,
             });
             if (tk.refreshToken) {
               localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
@@ -174,10 +157,11 @@ export function RegisterView() {
         <Field label="Password">
           <Input type="password" {...register('password')} />
         </Field>
-        <Captcha name="captcha" control={control} />
 
         <Button
           colorPalette="blue"
+          mt={3}
+          mb={4}
           type="submit"
           loading={formState.isSubmitting}
         >
@@ -192,7 +176,7 @@ export function RegisterView() {
 }
 
 export function ResetPasswordView() {
-  const { register, handleSubmit, control } = useForm();
+  const { register, handleSubmit } = useForm();
   const [sent, setSent] = useState(false);
 
   return (
@@ -201,7 +185,6 @@ export function ResetPasswordView() {
         onSubmit={handleSubmit(async (data) => {
           await authClient.resetPassword({
             email: data.email,
-            captcha: data.captcha,
           });
           setSent(true);
         })}
@@ -220,7 +203,6 @@ export function ResetPasswordView() {
             <Button colorPalette="blue" type="submit">
               Send Password Reset Email
             </Button>
-            <Captcha name="captcha" control={control} />
           </>
         )}
       </AuthForm>

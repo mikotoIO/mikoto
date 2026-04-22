@@ -65,7 +65,7 @@ jsonwebtoken = "9.3.0"
 sha3 = "0.10.8"
 
 
-# Mailing and Captcha
+# Mailing
 lettre = { version = "0.11.7", default-features = false, features = [
     "tokio1-rustls-tls",
     "builder",
@@ -74,11 +74,6 @@ lettre = { version = "0.11.7", default-features = false, features = [
     "smtp-transport",
 ] }
 handlebars = "6.0.0"
-hcaptcha = { version = "3.0.30", default-features = false, features = [
-    "rustls-backend",
-    "ext",
-    "hex",
-] }
 futures-util = "0.3.30"
 fred = "10.1.0"
 tower-layer = "0.3.3"

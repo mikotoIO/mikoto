@@ -7,7 +7,6 @@ use crate::{
     env::env,
     error::Error,
     functions::{
-        captcha::captcha,
         mail::{mailer, MailTemplate},
         rate_limit::auth_rate_limiter,
         validation::validate_password,
@@ -18,7 +17,6 @@ use crate::{
 #[serde(rename_all = "camelCase")]
 pub struct ResetPasswordPayload {
     pub email: String,
-    pub captcha: Option<String>,
 }
 
 static RESET_PASSWORD_TEMPLATE: MailTemplate = MailTemplate {
@@ -38,8 +36,6 @@ pub async fn route(
 ) -> Result<Json<()>, Error> {
     let ip = crate::functions::rate_limit::client_ip_from_headers(&headers);
     auth_rate_limiter().check(&ip)?;
-
-    captcha().validate(body.captcha.as_deref()).await?;
 
     // Always return success to prevent account enumeration
     let account = match Account::find_by_email(&body.email, db()).await {

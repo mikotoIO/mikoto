@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::hash::Hash;
 use std::iter::IntoIterator;
 
-pub mod captcha;
 pub mod filetypes;
 pub mod handle_verification;
 pub mod jwt;

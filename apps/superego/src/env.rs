@@ -17,7 +17,6 @@ pub struct Env {
 
     pub s3: S3Env,
     pub smtp: Option<SmtpEnv>,
-    pub captcha: CaptchaEnv,
     pub livekit: Option<LivekitEnv>,
     pub handle: HandleEnv,
 }
@@ -33,13 +32,6 @@ pub struct LivekitEnv {
     pub server: String,
     pub key: String,
     pub secret: String,
-}
-
-#[derive(Deserialize, Debug)]
-pub struct CaptchaEnv {
-    pub provider: String,
-    pub secret: String,
-    pub url: Option<String>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -76,7 +68,6 @@ impl Env {
         if self.smtp.is_none() {
             warn!("SMTP server not configured. Please enable it for production use.");
         }
-        info!("Captcha provider: {}", self.captcha.provider);
         if self.livekit.is_none() {
             warn!("LiveKit server not configured. Please enable it for production use.");
         }

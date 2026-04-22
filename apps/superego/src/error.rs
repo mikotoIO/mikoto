@@ -43,8 +43,6 @@ pub enum Error {
     NetworkError,
     #[error("WebSocket terminated")]
     WebSocketTerminated,
-    #[error("Captcha failed")]
-    CaptchaFailed,
     #[error("Token expired")]
     TokenExpired,
     #[error("Wrong authentication type provided")]
@@ -111,7 +109,6 @@ impl IntoResponse for Error {
             Error::ValidationFailed => StatusCode::BAD_REQUEST,
             Error::BadRequest => StatusCode::BAD_REQUEST,
             Error::FileTooLarge => StatusCode::BAD_REQUEST,
-            Error::CaptchaFailed => StatusCode::BAD_REQUEST,
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         };
 

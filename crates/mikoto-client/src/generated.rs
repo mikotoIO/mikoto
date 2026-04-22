@@ -390,8 +390,6 @@ pub struct RefreshPayload {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RegisterPayload {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub captcha: Option<String>,
     pub email: String,
     pub name: String,
     pub password: String,
@@ -431,8 +429,6 @@ pub struct ResetPasswordConfirmData {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ResetPasswordPayload {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub captcha: Option<String>,
     pub email: String,
 }
 

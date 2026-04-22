@@ -6,6 +6,4 @@ export const env = {
     import.meta.env.PUBLIC_SERVER_URL ?? 'http://localhost:3511',
   PUBLIC_MEDIASERVER_URL:
     import.meta.env.PUBLIC_MEDIASERVER_URL ?? 'http://localhost:9501',
-  PUBLIC_CAPTCHA_KEY:
-    import.meta.env.PUBLIC_CAPTCHA_KEY ?? '1x00000000000000000000AA',
 };

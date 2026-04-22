@@ -29,7 +29,7 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { debounce } from 'lodash';
-import { PropsWithChildren, useCallback, useRef, useState } from 'react';
+import { PropsWithChildren, Suspense, useCallback, useRef, useState } from 'react';
 import { proxy, useSnapshot } from 'valtio';
 
 import { Surface } from '@/components/Surface';
@@ -553,7 +553,9 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
       <Box px={8} pb={32}>
         {documentSnap.type === 'read' && <DocumentReader channel={channel} />}
         {documentSnap.type === 'edit' && (
-          <DocumentEditor channel={channel} documentState={documentState} />
+          <Suspense fallback={<DocumentReader channel={channel} />}>
+            <DocumentEditor channel={channel} documentState={documentState} />
+          </Suspense>
         )}
       </Box>
     </Surface>

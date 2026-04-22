@@ -10,7 +10,10 @@ export const lexicalTheme = {
   image: 'editor-image',
   link: 'editor-link',
   list: {
+    checklist: 'editor-list-check',
     listitem: 'editor-listitem',
+    listitemChecked: 'editor-listitem-checked',
+    listitemUnchecked: 'editor-listitem-unchecked',
     nested: {
       listitem: 'editor-nested-listitem',
     },

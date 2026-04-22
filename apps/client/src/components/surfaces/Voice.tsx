@@ -2,27 +2,28 @@ import styled from '@emotion/styled';
 import { faMicrophone } from '@fortawesome/free-solid-svg-icons';
 import {
   AudioTrack,
+  BarVisualizer,
   ConnectionQualityIndicator,
   ControlBar,
   FocusToggle,
   GridLayout,
-  isTrackReference,
   LiveKitRoom,
   ParticipantName,
   ParticipantTile,
   RoomAudioRenderer,
   TrackMutedIndicator,
+  VideoTrack,
+  isTrackReference,
   useEnsureTrackRef,
   useTracks,
-  VideoTrack,
 } from '@livekit/components-react';
 import '@livekit/components-styles';
 import { VoiceToken } from '@mikoto-io/mikoto.js';
 import { RoomEvent, Track } from 'livekit-client';
 import { useEffect, useState } from 'react';
 
-import { Avatar } from '@/components/atoms/Avatar';
 import { Surface } from '@/components/Surface';
+import { Avatar } from '@/components/atoms/Avatar';
 import { TabName } from '@/components/tabs';
 import { useMikoto } from '@/hooks';
 
@@ -41,9 +42,10 @@ function MikotoParticipantTileContent() {
       {hasTrack && !isVideo && <AudioTrack trackRef={trackRef} />}
       <div className="lk-participant-placeholder mikoto-participant-placeholder">
         <Avatar userId={participant.identity} size={96} />
+        <ParticipantName className="mikoto-participant-placeholder-name" />
       </div>
       <div className="lk-participant-metadata">
-        <div className="lk-participant-metadata-item">
+        <div className="lk-participant-metadata-item mikoto-participant-metadata-name">
           <TrackMutedIndicator
             trackRef={{
               participant,
@@ -97,12 +99,24 @@ const VoiceViewWrapper = styled.div`
 
   .mikoto-participant-placeholder {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 8px;
 
-    svg {
+    > svg {
       display: none;
     }
+  }
+
+  .mikoto-participant-placeholder-name {
+    font-size: 14px;
+    color: var(--lk-fg);
+  }
+
+  .lk-participant-tile[data-lk-video-muted='true'][data-lk-source='camera']
+    .mikoto-participant-metadata-name {
+    display: none;
   }
 `;
 

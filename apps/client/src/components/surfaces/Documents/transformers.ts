@@ -6,17 +6,27 @@ import {
   ImageNode,
 } from './nodes/ImageNode';
 
+// Obsidian-style image syntax: `![alt|WIDTH](src)` or
+// `![alt|WIDTHxHEIGHT](src)`. Height is parsed but ignored — resize locks
+// aspect ratio, so only width is authoritative. The `|` acts as a delimiter
+// between alt text and dimensions, so alt text itself cannot contain `|`.
+const IMAGE_PATTERN = /!\[([^\]|]*)(?:\|(\d+)(?:x\d+)?)?\]\(([^)\s]+)\)/;
+const IMAGE_PATTERN_END = /!\[([^\]|]*)(?:\|(\d+)(?:x\d+)?)?\]\(([^)\s]+)\)$/;
+
 export const IMAGE: TextMatchTransformer = {
   dependencies: [ImageNode],
   export: (node) => {
     if (!$isImageNode(node)) return null;
-    return `![${node.getAltText()}](${node.getSrc()})`;
+    const width = node.getWidth();
+    const suffix = width ? `|${Math.round(width)}` : '';
+    return `![${node.getAltText()}${suffix}](${node.getSrc()})`;
   },
-  importRegExp: /!\[([^\]]*)\]\(([^)]+)\)/,
-  regExp: /!\[([^\]]*)\]\(([^)]+)\)$/,
+  importRegExp: IMAGE_PATTERN,
+  regExp: IMAGE_PATTERN_END,
   replace: (textNode, match) => {
-    const [, altText, src] = match;
-    const imageNode = $createImageNode(src, altText);
+    const [, altText, widthStr, src] = match;
+    const width = widthStr ? parseInt(widthStr, 10) : undefined;
+    const imageNode = $createImageNode(src, altText, width);
     textNode.replace(imageNode);
   },
   trigger: ')',

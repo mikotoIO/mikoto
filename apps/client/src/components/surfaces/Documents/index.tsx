@@ -110,6 +110,7 @@ const EditorWrapper = styled.div`
   .editor-list-ul,
   .editor-list-ol {
     margin: 16px 0;
+    line-height: 1.35;
   }
 
   .editor-listitem {

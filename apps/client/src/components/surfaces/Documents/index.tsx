@@ -551,7 +551,15 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
         </Flex>
       </DocumentActions>
       <Box px={8} pb={32}>
-        {documentSnap.type === 'read' && <DocumentReader channel={channel} />}
+        {documentSnap.type === 'read' && (
+          <Box
+            onDoubleClick={() => {
+              documentState.type = 'edit';
+            }}
+          >
+            <DocumentReader channel={channel} />
+          </Box>
+        )}
         {documentSnap.type === 'edit' && (
           <Suspense fallback={<DocumentReader channel={channel} />}>
             <DocumentEditor channel={channel} documentState={documentState} />

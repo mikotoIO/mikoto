@@ -56,7 +56,7 @@ export function useProviderFactory({
       if (!providerRef.current) {
         const doc = new Y.Doc();
         const provider = new WebsocketProvider(
-          env.PUBLIC_COLLABORATION_URL,
+          `${env.PUBLIC_SERVER_URL.replace(/^http/, 'ws')}/collab`,
           id,
           doc,
           {

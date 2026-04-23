@@ -1,8 +1,19 @@
 import styled from '@emotion/styled';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import {
+  $getSelection,
+  $isRangeSelection,
+  $isTextNode,
+  COMMAND_PRIORITY_CRITICAL,
+  KEY_ARROW_DOWN_COMMAND,
+  KEY_ARROW_UP_COMMAND,
+  KEY_ENTER_COMMAND,
+  KEY_ESCAPE_COMMAND,
+  KEY_TAB_COMMAND,
+  type LexicalEditor,
+  type TextNode,
+} from 'lexical';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { BaseRange } from 'slate';
-import { Editor, Range, Transforms } from 'slate';
-import { ReactEditor } from 'slate-react';
 
 const Overlay = styled.div`
   position: absolute;
@@ -84,38 +95,45 @@ function loadEmojis(): Promise<EmojiEntry[]> {
   return loadingPromise;
 }
 
-function getEmojiSearch(
-  editor: Editor,
-): { search: string; range: BaseRange } | null {
-  const { selection } = editor;
-  if (!selection || !Range.isCollapsed(selection)) return null;
+interface EmojiMatch {
+  search: string;
+  node: TextNode;
+  startOffset: number;
+  endOffset: number;
+}
 
-  const [start] = Range.edges(selection);
-  const beforeRange = {
-    anchor: { path: start.path, offset: 0 },
-    focus: start,
-  };
+function readEmojiSearch(editor: LexicalEditor): EmojiMatch | null {
+  let result: EmojiMatch | null = null;
+  editor.getEditorState().read(() => {
+    const selection = $getSelection();
+    if (!$isRangeSelection(selection) || !selection.isCollapsed()) return;
+    const anchor = selection.anchor;
+    const node = anchor.getNode();
+    if (!$isTextNode(node)) return;
 
-  const beforeText = Editor.string(editor, beforeRange);
-  const colonIndex = beforeText.lastIndexOf(':');
-  if (colonIndex === -1) return null;
+    const text = node.getTextContent();
+    const beforeText = text.slice(0, anchor.offset);
+    const colonIndex = beforeText.lastIndexOf(':');
+    if (colonIndex === -1) return;
 
-  // : must be at start or preceded by whitespace
-  if (colonIndex > 0 && !/\s/.test(beforeText[colonIndex - 1])) return null;
+    // : must be at start or preceded by whitespace
+    if (colonIndex > 0 && !/\s/.test(beforeText[colonIndex - 1])) return;
 
-  const search = beforeText.slice(colonIndex + 1);
-  // Only accept valid shortcode characters so smileys like ":D " or colons
-  // used as punctuation don't keep the popup open.
-  if (!/^[a-z0-9_+-]*$/i.test(search)) return null;
-  // Require at least 2 chars to avoid opening on bare `:` or single letters.
-  if (search.length < 2) return null;
+    const search = beforeText.slice(colonIndex + 1);
+    // Only accept valid shortcode characters so smileys like ":D " or colons
+    // used as punctuation don't keep the popup open.
+    if (!/^[a-z0-9_+-]*$/i.test(search)) return;
+    // Require at least 2 chars to avoid opening on bare `:` or single letters.
+    if (search.length < 2) return;
 
-  const range = {
-    anchor: { path: start.path, offset: colonIndex },
-    focus: start,
-  };
-
-  return { search, range };
+    result = {
+      search,
+      node,
+      startOffset: colonIndex,
+      endOffset: anchor.offset,
+    };
+  });
+  return result;
 }
 
 function filterEmojis(emojis: EmojiEntry[], search: string): EmojiEntry[] {
@@ -136,16 +154,10 @@ function filterEmojis(emojis: EmojiEntry[], search: string): EmojiEntry[] {
   return [...startsWith, ...idIncludes, ...keywordIncludes].slice(0, 10);
 }
 
-interface UseEmojiAutocompleteOptions {
-  editor: Editor & ReactEditor;
-}
-
-export function useEmojiAutocomplete({ editor }: UseEmojiAutocompleteOptions) {
+export function EmojiAutocompletePlugin() {
+  const [editor] = useLexicalComposerContext();
   const [emojis, setEmojis] = useState<EmojiEntry[]>([]);
-  const [emojiState, setEmojiState] = useState<{
-    search: string;
-    range: BaseRange;
-  } | null>(null);
+  const [match, setMatch] = useState<EmojiMatch | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeIndexRef = useRef(0);
 
@@ -159,87 +171,116 @@ export function useEmojiAutocomplete({ editor }: UseEmojiAutocompleteOptions) {
     };
   }, []);
 
-  const filtered = emojiState ? filterEmojis(emojis, emojiState.search) : [];
-  const isOpen = emojiState !== null && filtered.length > 0;
+  const filtered = match ? filterEmojis(emojis, match.search) : [];
+  const isOpen = match !== null && filtered.length > 0;
 
   activeIndexRef.current = activeIndex;
 
   useEffect(() => {
     setActiveIndex(0);
-  }, [emojiState?.search]);
-
-  const updateEmojiState = useCallback(() => {
-    try {
-      const result = getEmojiSearch(editor);
-      setEmojiState(result);
-    } catch {
-      setEmojiState(null);
-    }
-  }, [editor]);
+  }, [match?.search]);
 
   useEffect(() => {
-    let editorEl: HTMLElement;
-    try {
-      editorEl = ReactEditor.toDOMNode(editor, editor);
-    } catch {
-      return;
-    }
-
-    const observer = new MutationObserver(updateEmojiState);
-    observer.observe(editorEl, {
-      childList: true,
-      subtree: true,
-      characterData: true,
+    return editor.registerUpdateListener(() => {
+      setMatch(readEmojiSearch(editor));
     });
-    document.addEventListener('selectionchange', updateEmojiState);
-
-    return () => {
-      observer.disconnect();
-      document.removeEventListener('selectionchange', updateEmojiState);
-    };
-  }, [editor, updateEmojiState]);
+  }, [editor]);
 
   const insertEmoji = useCallback(
     (emoji: EmojiEntry) => {
-      if (!emojiState) return;
-      Transforms.select(editor, emojiState.range);
-      Transforms.insertText(editor, `:${emoji.id}: `);
-      setEmojiState(null);
+      const current = readEmojiSearch(editor);
+      if (!current) return;
+      editor.update(() => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) return;
+        selection.setTextNodeRange(
+          current.node,
+          current.startOffset,
+          current.node,
+          current.endOffset,
+        );
+        selection.insertText(`:${emoji.id}: `);
+      });
+      setMatch(null);
     },
-    [editor, emojiState],
+    [editor],
   );
 
-  const onKeyDown = useCallback(
-    (ev: React.KeyboardEvent): boolean => {
-      if (!isOpen) return false;
+  const filteredRef = useRef(filtered);
+  filteredRef.current = filtered;
+  const isOpenRef = useRef(isOpen);
+  isOpenRef.current = isOpen;
 
-      if (ev.key === 'ArrowUp') {
-        ev.preventDefault();
-        setActiveIndex((i) => (i <= 0 ? filtered.length - 1 : i - 1));
-        return true;
-      }
-      if (ev.key === 'ArrowDown') {
-        ev.preventDefault();
-        setActiveIndex((i) => (i >= filtered.length - 1 ? 0 : i + 1));
-        return true;
-      }
-      if (ev.key === 'Tab' || ev.key === 'Enter') {
-        ev.preventDefault();
-        const emoji = filtered[activeIndexRef.current];
-        if (emoji) insertEmoji(emoji);
-        return true;
-      }
-      if (ev.key === 'Escape') {
-        ev.preventDefault();
-        setEmojiState(null);
-        return true;
-      }
-      return false;
-    },
-    [isOpen, filtered, insertEmoji],
-  );
+  useEffect(() => {
+    const moveSelection = (delta: number) => {
+      const list = filteredRef.current;
+      if (list.length === 0) return;
+      setActiveIndex((i) => {
+        const n = list.length;
+        return (i + delta + n) % n;
+      });
+    };
 
-  const overlay = isOpen ? (
+    const unregisterUp = editor.registerCommand(
+      KEY_ARROW_UP_COMMAND,
+      (event) => {
+        if (!isOpenRef.current) return false;
+        event?.preventDefault();
+        moveSelection(-1);
+        return true;
+      },
+      COMMAND_PRIORITY_CRITICAL,
+    );
+    const unregisterDown = editor.registerCommand(
+      KEY_ARROW_DOWN_COMMAND,
+      (event) => {
+        if (!isOpenRef.current) return false;
+        event?.preventDefault();
+        moveSelection(1);
+        return true;
+      },
+      COMMAND_PRIORITY_CRITICAL,
+    );
+    const selectActive = (event: KeyboardEvent | null) => {
+      if (!isOpenRef.current) return false;
+      event?.preventDefault();
+      const emoji = filteredRef.current[activeIndexRef.current];
+      if (emoji) insertEmoji(emoji);
+      return true;
+    };
+    const unregisterEnter = editor.registerCommand(
+      KEY_ENTER_COMMAND,
+      selectActive,
+      COMMAND_PRIORITY_CRITICAL,
+    );
+    const unregisterTab = editor.registerCommand(
+      KEY_TAB_COMMAND,
+      selectActive,
+      COMMAND_PRIORITY_CRITICAL,
+    );
+    const unregisterEscape = editor.registerCommand(
+      KEY_ESCAPE_COMMAND,
+      (event) => {
+        if (!isOpenRef.current) return false;
+        event?.preventDefault();
+        setMatch(null);
+        return true;
+      },
+      COMMAND_PRIORITY_CRITICAL,
+    );
+
+    return () => {
+      unregisterUp();
+      unregisterDown();
+      unregisterEnter();
+      unregisterTab();
+      unregisterEscape();
+    };
+  }, [editor, insertEmoji]);
+
+  if (!isOpen) return null;
+
+  return (
     <Overlay
       onMouseDown={(e) => {
         e.preventDefault();
@@ -257,7 +298,5 @@ export function useEmojiAutocomplete({ editor }: UseEmojiAutocompleteOptions) {
         </EmojiItem>
       ))}
     </Overlay>
-  ) : null;
-
-  return { overlay, onKeyDown };
+  );
 }

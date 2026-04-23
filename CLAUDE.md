@@ -43,7 +43,7 @@ Check `ARCHITECTURE.md`.
 - PostgreSQL as primary database
 - Redis for pub/sub and caching
 - JWT for authentication
-- MinIO for S3-compatible object storage
+- RustFS for S3-compatible object storage
 - LiveKit integration for voice/video
 
 ### Development Tools
@@ -79,7 +79,7 @@ All Mikoto services use ports in the `351X` or `351XX` range to avoid conflicts 
 | ----------- | ------------------- | ----------------------- |
 | PostgreSQL  | 35101               | Database                |
 | Redis       | 35102               | Cache & pub/sub         |
-| MinIO (S3)  | 35103, 35104        | Object storage          |
+| RustFS (S3) | 35103, 35104        | Object storage          |
 | LiveKit     | 35105, 35106, 35107 | Real-time audio/video   |
 | MailHog     | 35108, 35109        | Development mail server |
 | Meilisearch | 35110               | Search engine           |

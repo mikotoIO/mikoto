@@ -40,10 +40,10 @@ generate-handle-keys:
 reset:
     #!/usr/bin/env bash
     echo "Stopping Docker services..."
-    docker compose down
+    docker compose down --remove-orphans
     echo "Removing volumes..."
     docker volume rm mikoto_postgresql mikoto_redis mikoto_meilisearch 2>/dev/null || true
-    rm -rf ./data/minio
+    rm -rf ./data/rustfs
     echo "Starting Docker services..."
     docker compose up -d
     echo "Docker services reset complete!"
@@ -52,10 +52,10 @@ reset:
 reset-dev-env:
     #!/usr/bin/env bash
     echo "Stopping Docker services..."
-    docker compose down
+    docker compose down --remove-orphans
     echo "Removing volumes..."
     docker volume rm mikoto_postgresql mikoto_redis mikoto_meilisearch 2>/dev/null || true
-    rm -rf ./data/minio
+    rm -rf ./data/rustfs
     echo "Starting Docker services..."
     docker compose up -d
     echo "Waiting for PostgreSQL to be ready..."
@@ -63,6 +63,19 @@ reset-dev-env:
         sleep 1
     done
     echo "Docker services ready!"
+    echo "Creating S3 bucket..."
+    docker run --rm --network host --entrypoint sh minio/mc:latest -c '
+        for i in $(seq 1 60); do
+            if mc alias set local http://localhost:35103 rustfs password >/dev/null 2>&1; then
+                mc mb --ignore-existing local/mikoto
+                exit 0
+            fi
+            sleep 1
+        done
+        echo "Timed out waiting for RustFS" >&2
+        exit 1
+    '
+    echo "Bucket ready!"
     echo "Running migrations..."
     cargo run --bin migrate --manifest-path apps/superego/Cargo.toml
     echo "Migrations complete!"

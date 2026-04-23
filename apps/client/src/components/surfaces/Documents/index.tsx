@@ -1,7 +1,6 @@
 import { Box, Button, Flex, Group } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import {
-  faBookAtlas,
   faCircleNotch,
   faFileLines,
   faPencilSquare,
@@ -600,11 +599,6 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
                 ) : (
                   <FontAwesomeIcon icon={faSave} />
                 )}
-              </Button>
-            </ActionTooltip>
-            <ActionTooltip tooltip="Publish">
-              <Button p={2} variant="ghost">
-                <FontAwesomeIcon icon={faBookAtlas} />
               </Button>
             </ActionTooltip>
           </Group>

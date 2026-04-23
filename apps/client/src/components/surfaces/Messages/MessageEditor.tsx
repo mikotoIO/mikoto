@@ -7,11 +7,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { PlainTextPlugin } from '@lexical/react/LexicalPlainTextPlugin';
 import type { MikotoMember } from '@mikoto-io/mikoto.js';
 import useResizeObserver from '@react-hook/resize-observer';
@@ -24,8 +24,8 @@ import {
   $isRangeSelection,
   COMMAND_PRIORITY_LOW,
   KEY_ENTER_COMMAND,
-  PASTE_COMMAND,
   type LexicalEditor,
+  PASTE_COMMAND,
 } from 'lexical';
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -303,7 +303,6 @@ function SubmitPlugin({
 
   return null;
 }
-
 
 function EditorApiPlugin({
   apiRef,

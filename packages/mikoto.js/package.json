@@ -21,7 +21,7 @@
   "dependencies": {
     "@zodios/core": "^10.9.6",
     "@zodios/plugins": "^10.6.0",
-    "axios": "^1.7.7",
+    "axios": "^1.15.2",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21",
     "typed-emitter": "^2.1.0",

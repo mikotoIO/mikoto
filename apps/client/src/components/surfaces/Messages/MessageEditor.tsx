@@ -6,26 +6,41 @@ import {
   faPaperPlane,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
+import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { ContentEditable } from '@lexical/react/LexicalContentEditable';
+import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
+import { PlainTextPlugin } from '@lexical/react/LexicalPlainTextPlugin';
 import type { MikotoMember } from '@mikoto-io/mikoto.js';
 import useResizeObserver from '@react-hook/resize-observer';
 import { useAtomValue, useSetAtom } from 'jotai';
+import {
+  $createParagraphNode,
+  $createTextNode,
+  $getRoot,
+  $getSelection,
+  $isRangeSelection,
+  COMMAND_PRIORITY_LOW,
+  KEY_ENTER_COMMAND,
+  PASTE_COMMAND,
+  type LexicalEditor,
+} from 'lexical';
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Node, Transforms, createEditor } from 'slate';
-import { withHistory } from 'slate-history';
-import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 
 import { contextMenuState } from '@/components/ContextMenu';
 import { useIsMobile } from '@/hooks/useIsMobile';
 
-import { useEmojiAutocomplete } from './EmojiAutocomplete';
-import { useMentionAutocomplete } from './MentionAutocomplete';
+import { EmojiAutocompletePlugin } from './EmojiAutocomplete';
+import { MentionAutocompletePlugin } from './MentionAutocomplete';
 import { messageEditState } from './Message';
 
 const EmojiPicker = lazy(() => import('./EmojiPicker'));
 
 // TODO: Fix the two-pixel snap
-const StyledEditable = styled(Editable)`
+const StyledContentEditable = styled(ContentEditable)`
   font-size: 14px;
 
   box-sizing: border-box;
@@ -41,6 +56,16 @@ const StyledEditable = styled(Editable)`
   }
 `;
 
+const Placeholder = styled.div`
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  color: var(--chakra-colors-gray-400);
+  pointer-events: none;
+  user-select: none;
+  font-size: 14px;
+`;
+
 const EditableContainer = styled.div`
   background-color: color-mix(
     in srgb,
@@ -53,20 +78,6 @@ const EditableContainer = styled.div`
   display: flex;
   align-items: flex-end;
 `;
-
-const initialEditorValue = [{ children: [{ text: '' }] }];
-
-function resetEditor(editor: ReactEditor, text: string = '') {
-  Transforms.setSelection(editor, {
-    anchor: { path: [0, 0], offset: 0 },
-    focus: { path: [0, 0], offset: 0 },
-  });
-  editor.children = [{ children: [{ text }] }];
-}
-
-function serialize(nodes: Node[]) {
-  return nodes.map((x) => Node.string(x)).join('\n');
-}
 
 // check if document.activeElement is either an input, textarea, or contenteditable
 function isInputLike() {
@@ -148,16 +159,6 @@ const UploadSection = styled.div`
   );
 `;
 
-const withFilePaste = (editor: ReactEditor, fileFn: (fs: FileList) => void) => {
-  const { insertData } = editor;
-  editor.insertData = (data) => {
-    const { files } = data;
-    fileFn(files);
-    insertData(data);
-  };
-  return editor;
-};
-
 const StyledFilePreview = styled.div`
   padding: 4px;
   display: flex;
@@ -227,6 +228,132 @@ const SendButton = styled.button`
   }
 `;
 
+export interface MessageEditorHandle {
+  insertText: (text: string) => void;
+  focus: () => void;
+  reset: () => void;
+  getText: () => string;
+}
+
+function resetEditor(editor: LexicalEditor) {
+  editor.update(() => {
+    const root = $getRoot();
+    root.clear();
+    root.append($createParagraphNode());
+  });
+}
+
+function FilePastePlugin({ onFiles }: { onFiles: (files: FileList) => void }) {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(
+    () =>
+      editor.registerCommand(
+        PASTE_COMMAND,
+        (event: ClipboardEvent) => {
+          const files = event.clipboardData?.files;
+          if (!files || files.length === 0) return false;
+          onFiles(files);
+          // Let other paste handlers still run (e.g. text paste alongside files)
+          return false;
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+    [editor, onFiles],
+  );
+
+  return null;
+}
+
+function SubmitPlugin({
+  onSubmit,
+  onTyping,
+  isMobile,
+  suppressTypingRef,
+}: {
+  onSubmit: () => void;
+  onTyping?: () => void;
+  isMobile: boolean;
+  suppressTypingRef: React.MutableRefObject<boolean>;
+}) {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    if (isMobile) return;
+    return editor.registerCommand(
+      KEY_ENTER_COMMAND,
+      (event) => {
+        if (event?.shiftKey) return false;
+        event?.preventDefault();
+        onSubmit();
+        return true;
+      },
+      COMMAND_PRIORITY_LOW,
+    );
+  }, [editor, onSubmit, isMobile]);
+
+  useEffect(() => {
+    return editor.registerUpdateListener(({ dirtyElements, dirtyLeaves }) => {
+      if (suppressTypingRef.current) return;
+      if (dirtyElements.size > 0 || dirtyLeaves.size > 0) {
+        onTyping?.();
+      }
+    });
+  }, [editor, onTyping, suppressTypingRef]);
+
+  return null;
+}
+
+
+function EditorApiPlugin({
+  apiRef,
+}: {
+  apiRef: React.MutableRefObject<MessageEditorHandle | null>;
+}) {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    apiRef.current = {
+      insertText: (text) => {
+        editor.focus();
+        editor.update(() => {
+          const selection = $getSelection();
+          if ($isRangeSelection(selection)) {
+            selection.insertText(text);
+            return;
+          }
+          const root = $getRoot();
+          const last = root.getLastDescendant();
+          if (last) {
+            last.selectEnd();
+            const sel = $getSelection();
+            if ($isRangeSelection(sel)) sel.insertText(text);
+          }
+        });
+      },
+      focus: () => editor.focus(),
+      reset: () => resetEditor(editor),
+      getText: () =>
+        editor.getEditorState().read(() => $getRoot().getTextContent()),
+    };
+    return () => {
+      apiRef.current = null;
+    };
+  }, [editor, apiRef]);
+
+  return null;
+}
+
+function initialEditorState(initialText: string) {
+  return () => {
+    const root = $getRoot();
+    if (root.getFirstChild() !== null) return;
+    const paragraph = $createParagraphNode();
+    if (initialText) paragraph.append($createTextNode(initialText));
+    root.append(paragraph);
+  };
+}
+
 export function MessageEditor({
   placeholder,
   onSubmit,
@@ -237,10 +364,9 @@ export function MessageEditor({
   const currentEditState = useAtomValue(messageEditState);
   const setEditState = useSetAtom(messageEditState);
   const isMobile = useIsMobile();
-  const [editorValue, setEditorValue] = useState<Node[]>(() => [
-    { children: [{ text: currentEditState?.content ?? '' }] },
-  ]);
   const [files, setFiles] = useState<FileUpload[]>([]);
+  const apiRef = useRef<MessageEditorHandle | null>(null);
+  const suppressTypingRef = useRef(false);
 
   const fileFn = (fs: FileList) => {
     setFiles((xs) => [
@@ -252,56 +378,58 @@ export function MessageEditor({
     ]);
   };
 
-  const editor: ReactEditor = useMemo(
-    () =>
-      withFilePaste(
-        withHistory(withReact(createEditor() as ReactEditor)),
-        fileFn,
-      ),
-    [],
-  );
-
-  const { overlay: mentionOverlay, onKeyDown: mentionKeyDown } =
-    useMentionAutocomplete({ editor, members });
-  const { overlay: emojiOverlay, onKeyDown: emojiKeyDown } =
-    useEmojiAutocomplete({ editor });
-
   const setContextMenu = useSetAtom(contextMenuState);
   const ref = useRef<HTMLDivElement>(null);
   useResizeObserver(ref as React.RefObject<HTMLElement>, () => {
     onResize?.();
   });
 
+  const initialConfig = useMemo(
+    () => ({
+      namespace: 'MessageEditor',
+      editable: true,
+      onError(error: Error) {
+        throw error;
+      },
+      editorState: initialEditorState(currentEditState?.content ?? ''),
+      theme: {
+        paragraph: 'editor-paragraph',
+        placeholder: 'editor-placeholder',
+      },
+    }),
+    // Parent re-keys MessageEditor on edit-state change; capturing the
+    // initial content once here is intentional.
+    [],
+  );
+
   const handleSubmit = () => {
-    const text = serialize(editorValue).trim();
+    const text = (apiRef.current?.getText() ?? '').trim();
     if (text === '' && files.length === 0) return;
     onSubmit(text, files);
-    setEditorValue(initialEditorValue);
-    resetEditor(editor);
+    suppressTypingRef.current = true;
+    apiRef.current?.reset();
+    suppressTypingRef.current = false;
     setFiles([]);
   };
 
   useEffect(() => {
-    if (!isMobile) {
-      ReactEditor.focus(editor);
-    }
     const fn = (ev: KeyboardEvent) => {
+      if (ev.defaultPrevented) return;
       if (ev.key === 'Escape' && currentEditState) {
         setEditState(null);
-        setEditorValue(initialEditorValue);
+        return;
       }
       if (isMobile) return;
       if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
       if (ev.key.length !== 1) return;
       if (isInputLike()) return;
-      ReactEditor.focus(editor);
-      editor.insertText(ev.key);
+      apiRef.current?.focus();
+      apiRef.current?.insertText(ev.key);
       ev.preventDefault();
     };
     document.addEventListener('keydown', fn);
-
     return () => document.removeEventListener('keydown', fn);
-  }, [isMobile]);
+  }, [isMobile, currentEditState, setEditState]);
 
   // upload logic
   const dropzone = useDropzone({
@@ -335,34 +463,25 @@ export function MessageEditor({
           </UploadSection>
         )}
         <EditableContainer ref={ref}>
-          {mentionOverlay}
-          {emojiOverlay}
-          <Slate
-            editor={editor}
-            initialValue={editorValue}
-            onChange={(x) => setEditorValue(x)}
-          >
-            <StyledEditable
-              placeholder={placeholder}
-              onKeyDown={(ev) => {
-                if (mentionKeyDown(ev)) return;
-                if (emojiKeyDown(ev)) return;
-
-                if (isMobile) {
-                  onTyping?.();
-                  return;
-                }
-                // submission via Enter on desktop
-                if (ev.key !== 'Enter' || ev.shiftKey) {
-                  onTyping?.();
-                  return;
-                }
-
-                ev.preventDefault();
-                handleSubmit();
-              }}
+          <LexicalComposer initialConfig={initialConfig}>
+            <PlainTextPlugin
+              contentEditable={<StyledContentEditable />}
+              placeholder={<Placeholder>{placeholder}</Placeholder>}
+              ErrorBoundary={LexicalErrorBoundary}
             />
-          </Slate>
+            <HistoryPlugin />
+            <FilePastePlugin onFiles={fileFn} />
+            <SubmitPlugin
+              onSubmit={handleSubmit}
+              onTyping={onTyping}
+              isMobile={isMobile}
+              suppressTypingRef={suppressTypingRef}
+            />
+            <MentionAutocompletePlugin members={members} />
+            <EmojiAutocompletePlugin />
+            <EditorApiPlugin apiRef={apiRef} />
+            {!isMobile && <AutoFocusPlugin />}
+          </LexicalComposer>
           {!isMobile && (
             <EditorButtons>
               {currentEditState === null && (
@@ -385,7 +504,7 @@ export function MessageEditor({
                       <Suspense>
                         <EmojiPicker
                           onEmojiSelect={(x) => {
-                            editor.insertText(x);
+                            apiRef.current?.insertText(x);
                           }}
                         />
                       </Suspense>

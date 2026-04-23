@@ -1,9 +1,20 @@
 import styled from '@emotion/styled';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { MikotoMember } from '@mikoto-io/mikoto.js';
+import {
+  $getSelection,
+  $isRangeSelection,
+  $isTextNode,
+  COMMAND_PRIORITY_CRITICAL,
+  KEY_ARROW_DOWN_COMMAND,
+  KEY_ARROW_UP_COMMAND,
+  KEY_ENTER_COMMAND,
+  KEY_ESCAPE_COMMAND,
+  KEY_TAB_COMMAND,
+  type LexicalEditor,
+  type TextNode,
+} from 'lexical';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { BaseRange } from 'slate';
-import { Editor, Range, Transforms } from 'slate';
-import { ReactEditor } from 'slate-react';
 
 import { Avatar } from '@/components/atoms/Avatar';
 
@@ -43,35 +54,42 @@ const Handle = styled.span`
   font-size: 12px;
 `;
 
-function getMentionSearch(
-  editor: Editor,
-): { search: string; range: BaseRange } | null {
-  const { selection } = editor;
-  if (!selection || !Range.isCollapsed(selection)) return null;
+interface MentionMatch {
+  search: string;
+  node: TextNode;
+  startOffset: number;
+  endOffset: number;
+}
 
-  const [start] = Range.edges(selection);
-  const beforeRange = {
-    anchor: { path: start.path, offset: 0 },
-    focus: start,
-  };
+function readMentionSearch(editor: LexicalEditor): MentionMatch | null {
+  let result: MentionMatch | null = null;
+  editor.getEditorState().read(() => {
+    const selection = $getSelection();
+    if (!$isRangeSelection(selection) || !selection.isCollapsed()) return;
+    const anchor = selection.anchor;
+    const node = anchor.getNode();
+    if (!$isTextNode(node)) return;
 
-  const beforeText = Editor.string(editor, beforeRange);
-  const atIndex = beforeText.lastIndexOf('@');
-  if (atIndex === -1) return null;
+    const text = node.getTextContent();
+    const beforeText = text.slice(0, anchor.offset);
+    const atIndex = beforeText.lastIndexOf('@');
+    if (atIndex === -1) return;
 
-  // @ must be at start or preceded by whitespace
-  if (atIndex > 0 && !/\s/.test(beforeText[atIndex - 1])) return null;
+    // @ must be at start or preceded by whitespace
+    if (atIndex > 0 && !/\s/.test(beforeText[atIndex - 1])) return;
 
-  const search = beforeText.slice(atIndex + 1);
-  // Don't show autocomplete if there's a space after partial mention
-  if (search.includes(' ')) return null;
+    const search = beforeText.slice(atIndex + 1);
+    // Don't show autocomplete if there's a space after partial mention
+    if (search.includes(' ')) return;
 
-  const range = {
-    anchor: { path: start.path, offset: atIndex },
-    focus: start,
-  };
-
-  return { search, range };
+    result = {
+      search,
+      node,
+      startOffset: atIndex,
+      endOffset: anchor.offset,
+    };
+  });
+  return result;
 }
 
 function filterMembers(members: MikotoMember[], search: string) {
@@ -85,109 +103,129 @@ function filterMembers(members: MikotoMember[], search: string) {
     .slice(0, 10);
 }
 
-interface UseMentionAutocompleteOptions {
-  editor: Editor & ReactEditor;
+interface MentionAutocompletePluginProps {
   members: MikotoMember[];
 }
 
-export function useMentionAutocomplete({
-  editor,
+export function MentionAutocompletePlugin({
   members,
-}: UseMentionAutocompleteOptions) {
-  const [mentionState, setMentionState] = useState<{
-    search: string;
-    range: BaseRange;
-  } | null>(null);
+}: MentionAutocompletePluginProps) {
+  const [editor] = useLexicalComposerContext();
+  const [match, setMatch] = useState<MentionMatch | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeIndexRef = useRef(0);
 
-  const filtered = mentionState
-    ? filterMembers(members, mentionState.search)
-    : [];
-  const isOpen = mentionState !== null && filtered.length > 0;
+  const filtered = match ? filterMembers(members, match.search) : [];
+  const isOpen = match !== null && filtered.length > 0;
 
-  // Keep ref in sync
   activeIndexRef.current = activeIndex;
 
-  // Reset index when search changes
   useEffect(() => {
     setActiveIndex(0);
-  }, [mentionState?.search]);
+  }, [match?.search]);
 
-  const updateMentionState = useCallback(() => {
-    try {
-      const result = getMentionSearch(editor);
-      setMentionState(result);
-    } catch {
-      setMentionState(null);
-    }
-  }, [editor]);
-
-  // Track editor changes via DOM observation
   useEffect(() => {
-    let editorEl: HTMLElement;
-    try {
-      editorEl = ReactEditor.toDOMNode(editor, editor);
-    } catch {
-      return;
-    }
-
-    const observer = new MutationObserver(updateMentionState);
-    observer.observe(editorEl, {
-      childList: true,
-      subtree: true,
-      characterData: true,
+    return editor.registerUpdateListener(() => {
+      setMatch(readMentionSearch(editor));
     });
-    document.addEventListener('selectionchange', updateMentionState);
-
-    return () => {
-      observer.disconnect();
-      document.removeEventListener('selectionchange', updateMentionState);
-    };
-  }, [editor, updateMentionState]);
+  }, [editor]);
 
   const insertMention = useCallback(
     (member: MikotoMember) => {
-      if (!mentionState) return;
+      const current = readMentionSearch(editor);
+      if (!current) return;
       const handle = member.user.handle ?? member.user.name;
-      Transforms.select(editor, mentionState.range);
-      Transforms.insertText(editor, `@${handle} `);
-      setMentionState(null);
+      editor.update(() => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) return;
+        selection.setTextNodeRange(
+          current.node,
+          current.startOffset,
+          current.node,
+          current.endOffset,
+        );
+        selection.insertText(`@${handle} `);
+      });
+      setMatch(null);
     },
-    [editor, mentionState],
+    [editor],
   );
 
-  const onKeyDown = useCallback(
-    (ev: React.KeyboardEvent): boolean => {
-      if (!isOpen) return false;
+  const filteredRef = useRef(filtered);
+  filteredRef.current = filtered;
+  const isOpenRef = useRef(isOpen);
+  isOpenRef.current = isOpen;
 
-      if (ev.key === 'ArrowUp') {
-        ev.preventDefault();
-        setActiveIndex((i) => (i <= 0 ? filtered.length - 1 : i - 1));
-        return true;
-      }
-      if (ev.key === 'ArrowDown') {
-        ev.preventDefault();
-        setActiveIndex((i) => (i >= filtered.length - 1 ? 0 : i + 1));
-        return true;
-      }
-      if (ev.key === 'Tab' || ev.key === 'Enter') {
-        ev.preventDefault();
-        const member = filtered[activeIndexRef.current];
-        if (member) insertMention(member);
-        return true;
-      }
-      if (ev.key === 'Escape') {
-        ev.preventDefault();
-        setMentionState(null);
-        return true;
-      }
-      return false;
-    },
-    [isOpen, filtered, insertMention],
-  );
+  useEffect(() => {
+    const moveSelection = (delta: number) => {
+      const list = filteredRef.current;
+      if (list.length === 0) return;
+      setActiveIndex((i) => {
+        const n = list.length;
+        return (i + delta + n) % n;
+      });
+    };
 
-  const overlay = isOpen ? (
+    const unregisterUp = editor.registerCommand(
+      KEY_ARROW_UP_COMMAND,
+      (event) => {
+        if (!isOpenRef.current) return false;
+        event?.preventDefault();
+        moveSelection(-1);
+        return true;
+      },
+      COMMAND_PRIORITY_CRITICAL,
+    );
+    const unregisterDown = editor.registerCommand(
+      KEY_ARROW_DOWN_COMMAND,
+      (event) => {
+        if (!isOpenRef.current) return false;
+        event?.preventDefault();
+        moveSelection(1);
+        return true;
+      },
+      COMMAND_PRIORITY_CRITICAL,
+    );
+    const selectActive = (event: KeyboardEvent | null) => {
+      if (!isOpenRef.current) return false;
+      event?.preventDefault();
+      const member = filteredRef.current[activeIndexRef.current];
+      if (member) insertMention(member);
+      return true;
+    };
+    const unregisterEnter = editor.registerCommand(
+      KEY_ENTER_COMMAND,
+      selectActive,
+      COMMAND_PRIORITY_CRITICAL,
+    );
+    const unregisterTab = editor.registerCommand(
+      KEY_TAB_COMMAND,
+      selectActive,
+      COMMAND_PRIORITY_CRITICAL,
+    );
+    const unregisterEscape = editor.registerCommand(
+      KEY_ESCAPE_COMMAND,
+      (event) => {
+        if (!isOpenRef.current) return false;
+        event?.preventDefault();
+        setMatch(null);
+        return true;
+      },
+      COMMAND_PRIORITY_CRITICAL,
+    );
+
+    return () => {
+      unregisterUp();
+      unregisterDown();
+      unregisterEnter();
+      unregisterTab();
+      unregisterEscape();
+    };
+  }, [editor, insertMention]);
+
+  if (!isOpen) return null;
+
+  return (
     <Overlay
       onMouseDown={(e) => {
         e.preventDefault();
@@ -205,7 +243,5 @@ export function useMentionAutocomplete({
         </MentionItem>
       ))}
     </Overlay>
-  ) : null;
-
-  return { overlay, onKeyDown };
+  );
 }

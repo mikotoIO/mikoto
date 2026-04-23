@@ -28,7 +28,7 @@ import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import {
   PropsWithChildren,
   Suspense,

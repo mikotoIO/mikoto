@@ -11,13 +11,12 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import throttle from 'lodash/throttle';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
-import { useSnapshot } from 'valtio';
 
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
 import { Skeleton, SkeletonCircle } from '@/components/ui/skeleton';
 import { uploadFile } from '@/functions/fileUpload';
-import { useFetchMember, useMikoto } from '@/hooks';
+import { useFetchMember, useMaybeSnapshot, useMikoto } from '@/hooks';
 import { CurrentSpaceContext } from '@/store';
 
 import { DateSeparator, showDateSeparator } from './DateSeparator';
@@ -112,7 +111,7 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
 
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const mikoto = useMikoto();
-  const membersCache = useSnapshot(channel.space?.members.cache ?? new Map());
+  const membersCache = useMaybeSnapshot(channel.space?.members.cache ?? new Map());
   const spaceMembers = useMemo(
     () => Array.from(membersCache.values()),
     [membersCache],

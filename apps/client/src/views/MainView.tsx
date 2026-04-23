@@ -226,18 +226,7 @@ const AppView = () => {
             spaceId: routeSpaceId,
           };
         }
-        // Space search: /space/:spaceId/search
-        else if (
-          routeSpaceId &&
-          !routeChannelId &&
-          pathname.endsWith('/search')
-        ) {
-          tabToOpen = {
-            kind: 'search',
-            key: routeSpaceId,
-            spaceId: routeSpaceId,
-          };
-        }
+
         // Channel settings: /space/:spaceId/channel/:channelId/settings
         else if (
           routeSpaceId &&

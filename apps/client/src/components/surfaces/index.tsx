@@ -8,7 +8,6 @@ import { DiscoverySurface } from './DiscoverySurface';
 import { ExplorerSurface } from './Explorer';
 import { FriendsSurface } from './FriendsSurface';
 import { MessageSurface } from './Messages';
-import { SearchSurface } from './SearchSurface';
 import { SpaceExplorerSurface } from './SpaceExplorerSurface';
 import { SpaceInviteSurface } from './SpaceInviteSurface';
 import { WelcomeSurface } from './WelcomeSurface';
@@ -20,7 +19,6 @@ export const surfaceMap = {
   textChannel: MessageSurface,
   voiceChannel: lazy(() => import('./Voice')),
   documentChannel: lazy(() => import('./Documents')),
-  search: SearchSurface,
   spaceSettings: SpaceSettingsSurface,
   accountSettings: AccountSettingsSurface,
   channelSettings: ChannelSettingsSurface,

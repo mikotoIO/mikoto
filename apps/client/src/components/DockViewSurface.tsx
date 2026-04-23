@@ -354,13 +354,6 @@ export const DockViewSurface = () => {
           return `/space/${getSpaceUrlSegment(spaceId)}/settings`;
         }
 
-        // Search: /space/:spaceRef/search
-        case 'search': {
-          const spaceId = (tab as any).spaceId;
-          if (!spaceId) return '/';
-          return `/space/${getSpaceUrlSegment(spaceId)}/search`;
-        }
-
         // Bot settings: /settings/bots/:botId
         case 'botSettings': {
           const botId = (tab as any).botId;

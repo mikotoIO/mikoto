@@ -78,7 +78,6 @@ const PanelContent = styled.div`
 
 export function TreebarContextMenu({ space }: { space: MikotoSpace }) {
   const setModal = useSetAtom(modalState);
-  const tabkit = useTabkit();
   return (
     <ContextMenu>
       <ContextMenu.Link
@@ -89,20 +88,6 @@ export function TreebarContextMenu({ space }: { space: MikotoSpace }) {
         Create Channel
       </ContextMenu.Link>
       <ContextMenu.Link>Invite People</ContextMenu.Link>
-      <ContextMenu.Link
-        onClick={() => {
-          tabkit.openTab(
-            {
-              kind: 'search',
-              key: 'search',
-              spaceId: space.id,
-            },
-            true,
-          );
-        }}
-      >
-        Search
-      </ContextMenu.Link>
     </ContextMenu>
   );
 }

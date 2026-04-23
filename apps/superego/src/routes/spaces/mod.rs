@@ -119,8 +119,11 @@ async fn create(
     claims: Claims,
     Json(body): Json<SpaceCreatePayload>,
 ) -> Result<Json<SpaceExt>, Error> {
-    let space = Space::new(body.name, claims.sub.parse()?);
-    space.create(db()).await?;
+    let space = Space::new(body.name.clone(), claims.sub.parse()?);
+    let mut tx = db().begin().await?;
+    space.create(&mut *tx).await?;
+    Handle::auto_assign_for_space(space.id, &body.name, &mut *tx).await?;
+    tx.commit().await?;
     let space = SpaceExt::dataload_one(space, db()).await?;
     join_space(&space, claims.sub.parse()?).await?;
     Ok(space.into())
@@ -136,30 +139,25 @@ async fn update(
 
     // Update handle if provided
     if let Some(ref new_handle) = body.handle {
-        if new_handle.is_empty() {
-            // Empty string means release the handle
-            Handle::release_for_space(space_id, db()).await?;
+        // Determine the full handle
+        let full_handle = if !new_handle.contains('.') {
+            // Plain name -> create default handle (e.g., "rust-lang" -> "rust-lang.mikoto.io")
+            Handle::validate_username(new_handle)?;
+            Handle::make_default_handle(new_handle)
+        } else if Handle::is_default_handle(new_handle) {
+            // Already a default handle, validate and use as-is
+            Handle::validate(new_handle)?;
+            new_handle.clone()
         } else {
-            // Determine the full handle
-            let full_handle = if !new_handle.contains('.') {
-                // Plain name -> create default handle (e.g., "rust-lang" -> "rust-lang.mikoto.io")
-                Handle::validate_username(new_handle)?;
-                Handle::make_default_handle(new_handle)
-            } else if Handle::is_default_handle(new_handle) {
-                // Already a default handle, validate and use as-is
-                Handle::validate(new_handle)?;
-                new_handle.clone()
-            } else {
-                // Looks like a custom domain - must go through verification
-                return Err(Error::new(
-                    "CustomDomainRequiresVerification",
-                    axum::http::StatusCode::BAD_REQUEST,
-                    "Custom domain handles require verification. Use the /:spaceId/handle/verify endpoint to verify your domain.",
-                ));
-            };
+            // Looks like a custom domain - must go through verification
+            return Err(Error::new(
+                "CustomDomainRequiresVerification",
+                axum::http::StatusCode::BAD_REQUEST,
+                "Custom domain handles require verification. Use the /:spaceId/handle/verify endpoint to verify your domain.",
+            ));
+        };
 
-            Handle::change_space_handle(space_id, full_handle, db()).await?;
-        }
+        Handle::change_space_handle(space_id, full_handle, db()).await?;
     }
 
     let space = Space::find_by_id(space_id, db()).await?;

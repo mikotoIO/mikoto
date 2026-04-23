@@ -582,25 +582,6 @@
             }
           }
         }
-      },
-      "delete": {
-        "tags": [
-          "Users"
-        ],
-        "summary": "Release User Handle",
-        "operationId": "user.deleteHandle",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserExt"
-                }
-              }
-            }
-          }
-        }
       }
     },
     "/users/me/handle/verify": {
@@ -3303,7 +3284,7 @@
             }
           },
           "handle": {
-            "description": "The space's handle (if claimed)",
+            "description": "The space's handle (None only for DM/GROUP spaces)",
             "type": [
               "string",
               "null"
@@ -3541,6 +3522,7 @@
         "description": "User with extended data including handle",
         "type": "object",
         "required": [
+          "handle",
           "id",
           "name"
         ],
@@ -3568,11 +3550,8 @@
             ]
           },
           "handle": {
-            "description": "The user's handle (if claimed)",
-            "type": [
-              "string",
-              "null"
-            ]
+            "description": "The user's handle",
+            "type": "string"
           },
           "id": {
             "type": "string",

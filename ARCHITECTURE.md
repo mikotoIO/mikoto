@@ -6,7 +6,6 @@
 - **apps/superego** - API server (Rust + Axum + SQLx + PostgreSQL)
 - **apps/content-proxy** - Content proxy service (Rust)
 - **apps/desktop** - Desktop app (Electron)
-- **apps/mobile** - Mobile app (React Native + Expo)
 - **packages/** - Shared packages including mikoto.js client library
 
 ### Client Architecture (React)

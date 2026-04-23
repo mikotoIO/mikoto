@@ -46,41 +46,35 @@ packages/
 All components are **functional** with **typed props interfaces**:
 
 ```tsx
-interface AvatarProps {
-  src?: string | null;
-  userId?: string;
-  size?: number;
-}
+export const Avatar = (
+  props: {
+    src?: string | null;
+    userId?: string;
+    size?: number;
+  } & React.HTMLAttributes<HTMLImageElement>,
+) => {
+  const { src, userId, size, ...rest } = props;
 
-export function Avatar({
-  src,
-  userId,
-  size,
-  ...rest
-}: AvatarProps & React.HTMLAttributes<HTMLImageElement>) {
   // implementation
-}
+
+  return <img src={src} size={size} {...rest} />;
+};
 ```
 
 ### Styling
 
-Both Emotion styled-components and Chakra UI are used together:
+We use [Chakra UI](/.claude/skills/chakra-ui)
 
 ```tsx
 import { chakra } from '@chakra-ui/react';
-import styled from '@emotion/styled';
-
-// Emotion styled component
-const Wrapper = styled.div`
-  display: flex;
-  background: var(--chakra-colors-gray-800);
-`;
 
 // Chakra factory
 const Card = chakra('div', {
   base: { p: '4', bg: 'bg.panel' },
 });
 ```
+
+There's a lot of legacy code that uses Emotion styled-components, but we're migrating to Chakra UI.
 
 ### Surface System (Tab/Panel Management)
 

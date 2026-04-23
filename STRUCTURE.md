@@ -25,7 +25,6 @@ mikoto/
 ├── data/                     # Data storage directory
 └── packages/                 # Shared packages
     ├── mikoto.js/            # JavaScript client library
-    ├── mikoto.py/            # Python client library
     ├── lexical-markdown/     # Custom markdown editor based on Lexical
     ├── tsconfig/             # Shared TypeScript configurations
     └── permcheck/            # Permission checking utilities

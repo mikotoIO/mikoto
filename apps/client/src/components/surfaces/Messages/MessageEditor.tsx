@@ -269,10 +269,12 @@ function SubmitPlugin({
   onSubmit,
   onTyping,
   isMobile,
+  suppressTypingRef,
 }: {
   onSubmit: () => void;
   onTyping?: () => void;
   isMobile: boolean;
+  suppressTypingRef: React.MutableRefObject<boolean>;
 }) {
   const [editor] = useLexicalComposerContext();
 
@@ -292,11 +294,12 @@ function SubmitPlugin({
 
   useEffect(() => {
     return editor.registerUpdateListener(({ dirtyElements, dirtyLeaves }) => {
+      if (suppressTypingRef.current) return;
       if (dirtyElements.size > 0 || dirtyLeaves.size > 0) {
         onTyping?.();
       }
     });
-  }, [editor, onTyping]);
+  }, [editor, onTyping, suppressTypingRef]);
 
   return null;
 }
@@ -363,6 +366,7 @@ export function MessageEditor({
   const isMobile = useIsMobile();
   const [files, setFiles] = useState<FileUpload[]>([]);
   const apiRef = useRef<MessageEditorHandle | null>(null);
+  const suppressTypingRef = useRef(false);
 
   const fileFn = (fs: FileList) => {
     setFiles((xs) => [
@@ -402,12 +406,15 @@ export function MessageEditor({
     const text = (apiRef.current?.getText() ?? '').trim();
     if (text === '' && files.length === 0) return;
     onSubmit(text, files);
+    suppressTypingRef.current = true;
     apiRef.current?.reset();
+    suppressTypingRef.current = false;
     setFiles([]);
   };
 
   useEffect(() => {
     const fn = (ev: KeyboardEvent) => {
+      if (ev.defaultPrevented) return;
       if (ev.key === 'Escape' && currentEditState) {
         setEditState(null);
         return;
@@ -468,6 +475,7 @@ export function MessageEditor({
               onSubmit={handleSubmit}
               onTyping={onTyping}
               isMobile={isMobile}
+              suppressTypingRef={suppressTypingRef}
             />
             <MentionAutocompletePlugin members={members} />
             <EmojiAutocompletePlugin />

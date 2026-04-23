@@ -1,10 +1,10 @@
-import { Box } from '@chakra-ui/react';
+import { Box, type BoxProps } from '@chakra-ui/react';
 
 function padTime(n: number): string {
   return String(n).padStart(2, '0');
 }
 
-const dateFormat = new Intl.DateTimeFormat('en', {
+export const MIKOTO_DATE_FORMAT = new Intl.DateTimeFormat('en', {
   day: 'numeric',
   month: 'long',
   year: 'numeric',
@@ -19,10 +19,10 @@ function isToday(someDate: Date): boolean {
   );
 }
 
-export function Timestamp({ time }: { time: Date }) {
+export function Timestamp({ time, ...rest }: { time: Date } & BoxProps) {
   return (
-    <Box color="gray.400" fontSize="xs">
-      {isToday(time) ? 'Today at ' : dateFormat.format(time)}{' '}
+    <Box color="gray.400" fontSize="xs" {...rest}>
+      {isToday(time) ? 'Today at ' : MIKOTO_DATE_FORMAT.format(time)}{' '}
       {padTime(time.getHours())}:{padTime(time.getMinutes())}
     </Box>
   );

@@ -111,7 +111,9 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
 
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const mikoto = useMikoto();
-  const membersCache = useMaybeSnapshot(channel.space?.members.cache ?? new Map());
+  const membersCache = useMaybeSnapshot(
+    channel.space?.members.cache ?? new Map(),
+  );
   const spaceMembers = useMemo(
     () => Array.from(membersCache.values()),
     [membersCache],

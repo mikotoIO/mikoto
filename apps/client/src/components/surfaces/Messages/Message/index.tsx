@@ -165,7 +165,7 @@ export const MessageItem = ({ message, isSimple }: MessageProps) => {
                 <FontAwesomeIcon icon={faGlasses} />
               </Tag>
             )}
-            <Timestamp time={new Date(messageSnap.timestamp)} />
+            <Timestamp time={new Date(messageSnap.timestamp)} ml="auto" />
           </Flex>
         )}
         <div>

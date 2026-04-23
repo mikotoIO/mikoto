@@ -34,7 +34,7 @@ The superego API server uses:
 - **SQLx** - Compile-time checked SQL queries with PostgreSQL
 - **Redis** - Pub/sub for real-time features and caching
 - **JWT authentication** - Token-based auth with refresh tokens
-- **File storage** - S3-compatible storage (MinIO) for media uploads
+- **File storage** - S3-compatible storage (RustFS) for media uploads
 - **WebSocket support** - Real-time messaging and collaboration
 
 Key server directories:
@@ -64,7 +64,7 @@ All apps use ports in the 351X range, while supporting infrastructure uses 351XX
 
 - PostgreSQL: 35101
 - Redis: 35102
-- MinIO S3: 35103 (API), 35104 (Console)
+- RustFS S3: 35103 (API), 35104 (Console)
 
 ## Package Management
 

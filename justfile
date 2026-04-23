@@ -43,7 +43,7 @@ reset:
     docker compose down
     echo "Removing volumes..."
     docker volume rm mikoto_postgresql mikoto_redis mikoto_meilisearch 2>/dev/null || true
-    rm -rf ./data/minio
+    rm -rf ./data/rustfs
     echo "Starting Docker services..."
     docker compose up -d
     echo "Docker services reset complete!"
@@ -55,7 +55,7 @@ reset-dev-env:
     docker compose down
     echo "Removing volumes..."
     docker volume rm mikoto_postgresql mikoto_redis mikoto_meilisearch 2>/dev/null || true
-    rm -rf ./data/minio
+    rm -rf ./data/rustfs
     echo "Starting Docker services..."
     docker compose up -d
     echo "Waiting for PostgreSQL to be ready..."

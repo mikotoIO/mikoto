@@ -1,8 +1,9 @@
-import { Box, Heading } from '@chakra-ui/react';
+import { Box, Flex, Heading, Text } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import {
   faChevronDown,
   faChevronRight,
+  faGlobe,
   faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -157,7 +158,21 @@ export function Explorer({ space }: { space: MikotoSpace }) {
   return (
     <ExplorerContainer>
       <Box p="16px" flexShrink={0}>
-        <Heading fontSize="16px">{space.name}</Heading>
+        <Heading fontSize="16px" mb={0}>
+          {space.name}
+        </Heading>
+        {space.visibility === 'PUBLIC' && (
+          <Flex
+            alignItems="center"
+            gap={1}
+            fontSize="12px"
+            color="gray.400"
+            mt="2px"
+          >
+            <FontAwesomeIcon icon={faGlobe} />
+            {space.memberCount} Members
+          </Flex>
+        )}
       </Box>
 
       <PanelHeader

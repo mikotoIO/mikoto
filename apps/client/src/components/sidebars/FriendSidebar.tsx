@@ -157,19 +157,21 @@ export function FriendSidebar() {
   const friends = mikoto.relationships.friends;
   const dmFriends = friends.filter((f) => f.channelId);
 
+  const lastActivityIso = (channelId: string | null | undefined) => {
+    if (!channelId) return null;
+    const channel = mikoto.channels._get(channelId);
+    return (
+      previewsSnap.previews[channelId]?.timestamp ??
+      channel?.lastUpdated ??
+      null
+    );
+  };
+
   const sortedDmFriends = [...dmFriends].sort((a, b) => {
-    const aChannel = a.channelId
-      ? mikoto.channels._get(a.channelId)
-      : undefined;
-    const bChannel = b.channelId
-      ? mikoto.channels._get(b.channelId)
-      : undefined;
-    const aTime = aChannel?.lastUpdated
-      ? new Date(aChannel.lastUpdated).getTime()
-      : 0;
-    const bTime = bChannel?.lastUpdated
-      ? new Date(bChannel.lastUpdated).getTime()
-      : 0;
+    const aIso = lastActivityIso(a.channelId);
+    const bIso = lastActivityIso(b.channelId);
+    const aTime = aIso ? new Date(aIso).getTime() : 0;
+    const bTime = bIso ? new Date(bIso).getTime() : 0;
     return bTime - aTime;
   });
 
@@ -224,12 +226,11 @@ export function FriendSidebar() {
       )}
       {sortedDmFriends.map((friend) => {
         const channelId = friend.channelId!;
-        const channel = mikoto.channels._get(channelId);
-        const unread = isChannelUnread(channel?.lastUpdated, channelId);
         const preview = previewsSnap.previews[channelId] as
           | DmPreview
           | undefined;
-        const timestampIso = preview?.timestamp ?? channel?.lastUpdated ?? null;
+        const timestampIso = lastActivityIso(channelId);
+        const unread = isChannelUnread(timestampIso, channelId);
         return (
           <DmItem
             key={friend.id}

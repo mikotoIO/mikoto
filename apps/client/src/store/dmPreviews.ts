@@ -51,9 +51,10 @@ export async function loadDmPreviews(
   await Promise.allSettled(
     channelIds.map(async (channelId) => {
       if (dmPreviewStore.previews[channelId]) return;
-      const channel = mikoto.channels._get(channelId);
-      if (!channel) return;
-      const msgs = await channel.listMessages(1, null);
+      const msgs = await mikoto.rest['dm.messages.list']({
+        params: { channelId },
+        queries: { limit: 1, cursor: null },
+      });
       const last = msgs[msgs.length - 1];
       if (last) {
         setDmPreview(channelId, last);

@@ -384,6 +384,13 @@ pub struct Ping {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct PushConfig {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub public_key: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RefreshPayload {
     pub refresh_token: String,
 }
@@ -520,6 +527,18 @@ pub enum SpaceVisibility {
     Public,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SubscribePayload {
+    pub auth: String,
+    pub endpoint: String,
+    pub p256dh: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SubscribeResponse {
+    pub id: Uuid,
+}
+
 pub type Timestamp = DateTime<Utc>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -541,6 +560,11 @@ pub struct TypingStart {
 pub struct TypingUpdate {
     pub channel_id: String,
     pub user_id: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UnsubscribePayload {
+    pub endpoint: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -980,6 +1004,33 @@ impl<'a> HttpApi<'a> {
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
+    }
+
+    pub async fn push_config(&self) -> Result<PushConfig, ClientError> {
+        let path = "/push/config".to_string();
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn push_subscribe(&self, body: &SubscribePayload) -> Result<SubscribeResponse, ClientError> {
+        let path = "/push/subscribe".to_string();
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        req = req.json(body);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn push_unsubscribe(&self, body: &UnsubscribePayload) -> Result<(), ClientError> {
+        let path = "/push/unsubscribe".to_string();
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        req = req.json(body);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
     }
 
     pub async fn spaces_list(&self) -> Result<Vec<SpaceExt>, ClientError> {

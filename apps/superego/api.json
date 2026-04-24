@@ -986,6 +986,89 @@
         }
       }
     },
+    "/push/config": {
+      "get": {
+        "tags": [
+          "Push"
+        ],
+        "summary": "Get Push Notification Config",
+        "operationId": "push.config",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushConfig"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/push/subscribe": {
+      "post": {
+        "tags": [
+          "Push"
+        ],
+        "summary": "Register a Push Subscription",
+        "operationId": "push.subscribe",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscribePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscribeResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/push/unsubscribe": {
+      "post": {
+        "tags": [
+          "Push"
+        ],
+        "summary": "Remove a Push Subscription",
+        "operationId": "push.unsubscribe",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnsubscribePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/spaces/": {
       "get": {
         "tags": [
@@ -3067,6 +3150,18 @@
           }
         }
       },
+      "PushConfig": {
+        "type": "object",
+        "properties": {
+          "publicKey": {
+            "description": "Base64 URL-safe encoded VAPID public key for PushManager.subscribe(). Null when push is not configured on this server.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
       "RefreshPayload": {
         "type": "object",
         "required": [
@@ -3402,6 +3497,37 @@
           "PUBLIC"
         ]
       },
+      "SubscribePayload": {
+        "type": "object",
+        "required": [
+          "auth",
+          "endpoint",
+          "p256dh"
+        ],
+        "properties": {
+          "auth": {
+            "type": "string"
+          },
+          "endpoint": {
+            "type": "string"
+          },
+          "p256dh": {
+            "type": "string"
+          }
+        }
+      },
+      "SubscribeResponse": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "Timestamp": {
         "type": "string",
         "format": "date-time"
@@ -3446,6 +3572,17 @@
             "type": "string"
           },
           "userId": {
+            "type": "string"
+          }
+        }
+      },
+      "UnsubscribePayload": {
+        "type": "object",
+        "required": [
+          "endpoint"
+        ],
+        "properties": {
+          "endpoint": {
             "type": "string"
           }
         }

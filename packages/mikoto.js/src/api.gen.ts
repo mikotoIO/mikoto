@@ -266,6 +266,24 @@ export type MessageSendPayload = z.infer<typeof MessageSendPayload>;
 export const MessageEditPayload = z.object({ content: z.string() });
 export type MessageEditPayload = z.infer<typeof MessageEditPayload>;
 
+export const PushConfig = z
+  .object({ publicKey: z.union([z.string(), z.null()]) })
+  .partial();
+export type PushConfig = z.infer<typeof PushConfig>;
+
+export const SubscribePayload = z.object({
+  auth: z.string(),
+  endpoint: z.string(),
+  p256dh: z.string(),
+});
+export type SubscribePayload = z.infer<typeof SubscribePayload>;
+
+export const SubscribeResponse = z.object({ id: z.string().uuid() });
+export type SubscribeResponse = z.infer<typeof SubscribeResponse>;
+
+export const UnsubscribePayload = z.object({ endpoint: z.string() });
+export type UnsubscribePayload = z.infer<typeof UnsubscribePayload>;
+
 export const Role = z.object({
   color: z.union([z.string(), z.null()]).optional(),
   id: z.string().uuid(),
@@ -526,6 +544,10 @@ export const schemas = {
   MessageAttachmentInput,
   MessageSendPayload,
   MessageEditPayload,
+  PushConfig,
+  SubscribePayload,
+  SubscribeResponse,
+  UnsubscribePayload,
   Role,
   SpaceType,
   SpaceVisibility,
@@ -823,6 +845,41 @@ const endpoints = makeApi([
     alias: "handles.resolve",
     requestFormat: "json",
     response: HandleResolution,
+  },
+  {
+    method: "get",
+    path: "/push/config",
+    alias: "push.config",
+    requestFormat: "json",
+    response: PushConfig,
+  },
+  {
+    method: "post",
+    path: "/push/subscribe",
+    alias: "push.subscribe",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: SubscribePayload,
+      },
+    ],
+    response: z.object({ id: z.string().uuid() }),
+  },
+  {
+    method: "post",
+    path: "/push/unsubscribe",
+    alias: "push.unsubscribe",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: z.object({ endpoint: z.string() }),
+      },
+    ],
+    response: z.null(),
   },
   {
     method: "get",

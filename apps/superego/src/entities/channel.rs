@@ -100,6 +100,26 @@ impl ChannelUnread {
         .await?;
         Ok(unreads)
     }
+
+    /// List all DM-channel unreads for a user (channels with no space, where
+    /// the user has a relationship row referencing the channel).
+    pub async fn list_dms_by_user<'c, X: sqlx::PgExecutor<'c>>(
+        user_id: Uuid,
+        db: X,
+    ) -> Result<Vec<Self>, Error> {
+        let unreads = sqlx::query_as(
+            r##"
+            SELECT cu.* FROM "ChannelUnread" cu
+            JOIN "Channel" c ON cu."channelId" = c."id"
+            JOIN "Relationship" r ON r."channelId" = c."id" AND r."userId" = $1
+            WHERE cu."userId" = $1 AND c."spaceId" IS NULL
+            "##,
+        )
+        .bind(user_id)
+        .fetch_all(db)
+        .await?;
+        Ok(unreads)
+    }
 }
 
 impl Channel {

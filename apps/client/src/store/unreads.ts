@@ -48,6 +48,13 @@ export async function loadAcksForAllSpaces(mikoto: MikotoClient) {
   );
 }
 
+export async function loadAcksForDms(mikoto: MikotoClient) {
+  const unreads = await mikoto.rest['dm.unreads']();
+  for (const u of unreads) {
+    ackStore.acks[u.channelId] = u.timestamp;
+  }
+}
+
 export function ackChannel(channelId: string, timestamp: string) {
   ackStore.acks[channelId] = timestamp;
 }

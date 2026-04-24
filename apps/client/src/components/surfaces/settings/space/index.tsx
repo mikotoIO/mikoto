@@ -334,7 +334,7 @@ function Overview({ space }: { space: MikotoSpace }) {
       </Text>
       <Form mb={4} maxW="480px">
         <Field label="Space Visibility">
-          <NativeSelect.Root size="sm">
+          <NativeSelect.Root>
             <NativeSelect.Field
               value={visibility}
               onChange={(e) =>

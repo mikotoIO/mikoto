@@ -53,6 +53,26 @@ export const chakraTheme = defineConfig({
         },
       },
     },
+    slotRecipes: {
+      nativeSelect: {
+        slots: ['root', 'field', 'indicator'],
+        variants: {
+          variant: {
+            outline: {
+              field: {
+                bg: 'gray.700',
+                borderStyle: 'solid',
+                borderColor: 'gray.600',
+                focusVisibleRing: 'none',
+                _focusVisible: {
+                  borderColor: 'gray.550',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     tokens: {
       colors: {
         gray: {

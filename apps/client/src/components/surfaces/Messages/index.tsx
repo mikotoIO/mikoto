@@ -196,14 +196,7 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
     setMsgs((xs) => {
       if (xs === null) return null;
       setCurrentTypers((ts) => ts.filter((y) => y.userId !== x.author?.id));
-      if (channel.spaceId) {
-        mikoto.rest['channels.acknowledge'](undefined, {
-          params: {
-            spaceId: channel.spaceId,
-            channelId: channel.id,
-          },
-        }).then(() => {});
-      }
+      channel.ack().catch(() => {});
       setScrollToBottom(true);
       // Replace optimistic message if one exists for this user
       const optimisticIndex = xs.findIndex(

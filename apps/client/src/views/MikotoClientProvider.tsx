@@ -8,9 +8,15 @@ import { notifyFromMessage } from '@/functions/notify';
 import { AuthContext, MikotoContext } from '@/hooks';
 import { authClient } from '@/store/authClient';
 import {
+  clearDmPreview,
+  setDmPreview,
+  updateDmPreview,
+} from '@/store/dmPreviews';
+import {
   ackChannel,
   getSpaceNotificationLevel,
   loadAcksForAllSpaces,
+  loadAcksForDms,
   loadNotificationPreferences,
 } from '@/store/unreads';
 
@@ -21,6 +27,10 @@ function registerNotifications(mikoto: MikotoClient) {
   mikoto.ws.on('messages.onCreate', (msg) => {
     const channel = mikoto.channels._get(msg.channelId);
     if (channel) channel.lastUpdated = msg.timestamp;
+
+    if (!channel?.spaceId) {
+      setDmPreview(msg.channelId, msg);
+    }
 
     if (msg.authorId === mikoto.user.me?.id) {
       ackChannel(msg.channelId, msg.timestamp);
@@ -38,6 +48,20 @@ function registerNotifications(mikoto: MikotoClient) {
     if (isViewingChannel) {
       channel.ack();
       ackChannel(msg.channelId, msg.timestamp);
+    }
+  });
+
+  mikoto.ws.on('messages.onUpdate', (msg) => {
+    const channel = mikoto.channels._get(msg.channelId);
+    if (!channel?.spaceId) {
+      updateDmPreview(msg.channelId, msg);
+    }
+  });
+
+  mikoto.ws.on('messages.onDelete', (key) => {
+    const channel = mikoto.channels._get(key.channelId);
+    if (!channel?.spaceId) {
+      clearDmPreview(key.channelId);
     }
   });
 }
@@ -70,7 +94,10 @@ export function MikotoClientProvider({
         await Promise.all([mi.spaces.list(), mi.user.load()]);
         await loadNotificationPreferences(mi);
         registerNotifications(mi);
-        await loadAcksForAllSpaces(mi);
+        await Promise.allSettled([
+          loadAcksForAllSpaces(mi),
+          loadAcksForDms(mi),
+        ]);
         setMikoto(mi);
         return;
       } catch (e) {

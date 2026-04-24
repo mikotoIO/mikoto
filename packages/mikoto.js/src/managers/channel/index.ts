@@ -67,12 +67,17 @@ export class MikotoChannel extends ZSchema(Channel) {
   }
 
   async ack() {
-    if (!this.spaceId) return;
-    await this.client.rest['channels.acknowledge'](undefined, {
-      params: {
-        spaceId: this.spaceId,
-        channelId: this.id,
-      },
+    if (this.spaceId) {
+      await this.client.rest['channels.acknowledge'](undefined, {
+        params: {
+          spaceId: this.spaceId,
+          channelId: this.id,
+        },
+      });
+      return;
+    }
+    await this.client.rest['dm.acknowledge'](undefined, {
+      params: { channelId: this.id },
     });
   }
 

@@ -266,6 +266,13 @@ export type MessageSendPayload = z.infer<typeof MessageSendPayload>;
 export const MessageEditPayload = z.object({ content: z.string() });
 export type MessageEditPayload = z.infer<typeof MessageEditPayload>;
 
+export const ChannelUnread = z.object({
+  channelId: z.string().uuid(),
+  timestamp: Timestamp.datetime({ offset: true }),
+  userId: z.string().uuid(),
+});
+export type ChannelUnread = z.infer<typeof ChannelUnread>;
+
 export const PushConfig = z
   .object({ publicKey: z.union([z.string(), z.null()]) })
   .partial();
@@ -355,13 +362,6 @@ export const ChannelPatch = z
   .object({ name: z.union([z.string(), z.null()]) })
   .partial();
 export type ChannelPatch = z.infer<typeof ChannelPatch>;
-
-export const ChannelUnread = z.object({
-  channelId: z.string().uuid(),
-  timestamp: Timestamp.datetime({ offset: true }),
-  userId: z.string().uuid(),
-});
-export type ChannelUnread = z.infer<typeof ChannelUnread>;
 
 export const MessageSendPayload2 = z.object({
   attachments: z.array(MessageAttachmentInput).optional().default([]),
@@ -544,6 +544,7 @@ export const schemas = {
   MessageAttachmentInput,
   MessageSendPayload,
   MessageEditPayload,
+  ChannelUnread,
   PushConfig,
   SubscribePayload,
   SubscribeResponse,
@@ -559,7 +560,6 @@ export const schemas = {
   NotificationPreferencePayload,
   ChannelCreatePayload,
   ChannelPatch,
-  ChannelUnread,
   MessageSendPayload2,
   MessageEditPayload2,
   VoiceToken,
@@ -786,6 +786,13 @@ const endpoints = makeApi([
     response: TokenPair,
   },
   {
+    method: "post",
+    path: "/dm/:channelId/ack",
+    alias: "dm.acknowledge",
+    requestFormat: "json",
+    response: z.null(),
+  },
+  {
     method: "get",
     path: "/dm/:channelId/messages/",
     alias: "dm.messages.list",
@@ -838,6 +845,13 @@ const endpoints = makeApi([
       },
     ],
     response: MessageExt,
+  },
+  {
+    method: "get",
+    path: "/dm/unreads",
+    alias: "dm.unreads",
+    requestFormat: "json",
+    response: z.array(ChannelUnread),
   },
   {
     method: "get",

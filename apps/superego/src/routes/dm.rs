@@ -9,14 +9,15 @@ use uuid::Uuid;
 use crate::{
     db::db,
     entities::{
-        Channel, Message, MessageAttachment, MessageAttachmentInput, MessageExt, MessageKey,
-        MessagePatch, Relationship,
+        Channel, ChannelUnread, Message, MessageAttachment, MessageAttachmentInput, MessageExt,
+        MessageKey, MessagePatch, Relationship,
     },
     error::Error,
     functions::{
         jwt::Claims,
         pubsub::emit_event,
         push::{self, PushPayload},
+        time::Timestamp,
     },
     routes::{router::AppRouter, ws::state::State},
 };
@@ -196,6 +197,19 @@ async fn delete(
     Ok(().into())
 }
 
+async fn acknowledge(claim: Claims, Path(channel_id): Path<Uuid>) -> Result<Json<()>, Error> {
+    let user_id: Uuid = claim.sub.parse()?;
+    verify_dm_access(channel_id, user_id).await?;
+    ChannelUnread::upsert(channel_id, user_id, Timestamp::now(), db()).await?;
+    Ok(().into())
+}
+
+async fn list_unreads(claim: Claims) -> Result<Json<Vec<ChannelUnread>>, Error> {
+    let user_id: Uuid = claim.sub.parse()?;
+    let unreads = ChannelUnread::list_dms_by_user(user_id, db()).await?;
+    Ok(unreads.into())
+}
+
 static TAG: &str = "DM";
 
 pub fn router() -> AppRouter<State> {
@@ -230,6 +244,26 @@ pub fn router() -> AppRouter<State> {
                 o.tag(TAG)
                     .id("dm.messages.delete")
                     .summary("Delete DM Message")
+            }),
+        )
+}
+
+pub fn channel_router() -> AppRouter<State> {
+    AppRouter::new()
+        .route(
+            "/unreads",
+            get_with(list_unreads, |o| {
+                o.tag(TAG)
+                    .id("dm.unreads")
+                    .summary("List DM Unreads")
+            }),
+        )
+        .route(
+            "/:channelId/ack",
+            post_with(acknowledge, |o| {
+                o.tag(TAG)
+                    .id("dm.acknowledge")
+                    .summary("Acknowledge DM Channel")
             }),
         )
 }

@@ -986,6 +986,51 @@
         }
       }
     },
+    "/dm/unreads": {
+      "get": {
+        "tags": [
+          "DM"
+        ],
+        "summary": "List DM Unreads",
+        "operationId": "dm.unreads",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChannelUnread"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dm/{channelId}/ack": {
+      "post": {
+        "tags": [
+          "DM"
+        ],
+        "summary": "Acknowledge DM Channel",
+        "operationId": "dm.acknowledge",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/push/config": {
       "get": {
         "tags": [

@@ -85,6 +85,7 @@ fn build_app_router() -> AppRouter<State> {
         .nest("users", "/users", users::router())
         .nest("relations", "/relations", users::relations::router())
         .nest("dm_messages", "/dm/:channelId/messages", dm::router())
+        .nest("dm_channels", "/dm", dm::channel_router())
         .nest("push", "/push", push::router())
         .nest("spaces", "/spaces", spaces::router())
         .nest("channels", "/spaces/:spaceId/channels", channels::router())

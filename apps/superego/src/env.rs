@@ -19,6 +19,18 @@ pub struct Env {
     pub smtp: Option<SmtpEnv>,
     pub livekit: Option<LivekitEnv>,
     pub handle: HandleEnv,
+    pub vapid: Option<VapidEnv>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct VapidEnv {
+    /// Base64 (URL-safe, no padding) encoded raw 32-byte P-256 private key.
+    pub private_key: String,
+    /// Base64 (URL-safe, no padding) encoded uncompressed P-256 public key (65 bytes).
+    /// Shared with clients for PushManager.subscribe().
+    pub public_key: String,
+    /// Contact URI (mailto: or https://) sent in the VAPID JWT `sub` claim.
+    pub subject: String,
 }
 
 #[derive(Deserialize, Debug)]
@@ -70,6 +82,9 @@ impl Env {
         }
         if self.livekit.is_none() {
             warn!("LiveKit server not configured. Please enable it for production use.");
+        }
+        if self.vapid.is_none() {
+            warn!("VAPID keys not configured. Web push notifications will be disabled.");
         }
     }
 }

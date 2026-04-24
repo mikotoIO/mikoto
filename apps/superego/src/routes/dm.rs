@@ -13,7 +13,11 @@ use crate::{
         MessagePatch, Relationship,
     },
     error::Error,
-    functions::{jwt::Claims, pubsub::emit_event},
+    functions::{
+        jwt::Claims,
+        pubsub::emit_event,
+        push::{self, PushPayload},
+    },
     routes::{router::AppRouter, ws::state::State},
 };
 
@@ -98,7 +102,36 @@ async fn send(
     emit_event("messages.onCreate", &message, &format!("user:{user_id}")).await?;
     emit_event("messages.onCreate", &message, &format!("user:{partner_id}")).await?;
 
+    if push::is_enabled() {
+        let title = message
+            .author
+            .as_ref()
+            .map(|a| a.name.clone())
+            .unwrap_or_else(|| "New message".to_string());
+        let body = truncate(&message.base.content, 140);
+        let icon = message.author.as_ref().and_then(|a| a.avatar.clone());
+        let payload = PushPayload {
+            title,
+            body,
+            url: format!("/dm/{channel_id}"),
+            icon,
+            tag: format!("dm:{channel_id}"),
+        };
+        tokio::spawn(async move {
+            push::send_to_user(partner_id, &payload).await;
+        });
+    }
+
     Ok(message.into())
+}
+
+fn truncate(s: &str, max_chars: usize) -> String {
+    if s.chars().count() <= max_chars {
+        return s.to_string();
+    }
+    let mut out: String = s.chars().take(max_chars).collect();
+    out.push('…');
+    out
 }
 
 #[derive(Deserialize, JsonSchema)]

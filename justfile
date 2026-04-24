@@ -36,6 +36,24 @@ generate-handle-keys:
     console.log('HANDLE_PUBLIC_KEY=' + pub.toString('base64'));
     "
 
+# Generate a P-256 VAPID keypair for Web Push. Output is url-safe base64 (no padding).
+generate-vapid-keys:
+    #!/usr/bin/env bash
+    node -e "
+    const crypto = require('crypto');
+    const kp = crypto.generateKeyPairSync('ec', { namedCurve: 'P-256' });
+    const jwk = kp.privateKey.export({ format: 'jwk' });
+    const b64url = (s) => Buffer.from(s, 'base64').toString('base64url');
+    const priv = b64url(jwk.d);
+    // Uncompressed P-256 public key: 0x04 || X || Y (65 bytes)
+    const x = Buffer.from(jwk.x, 'base64');
+    const y = Buffer.from(jwk.y, 'base64');
+    const pub = Buffer.concat([Buffer.from([0x04]), x, y]).toString('base64url');
+    console.log('VAPID_PRIVATE_KEY=' + priv);
+    console.log('VAPID_PUBLIC_KEY=' + pub);
+    console.log('VAPID_SUBJECT=mailto:admin@example.com');
+    "
+
 # Reset Docker services (database, S3, and Redis)
 reset:
     #!/usr/bin/env bash

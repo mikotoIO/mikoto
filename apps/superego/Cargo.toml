@@ -93,7 +93,8 @@ ed25519-dalek = { version = "2.2.0", features = ["rand_core"] }
 rand = "0.8"
 
 # Web Push
-web-push = { version = "0.10", default-features = false, features = ["hyper-client"] }
+web-push-native = "0.4"
+base64ct = { version = "1", features = ["alloc"] }
 
 # media processing
 mime = "0.3.17"

@@ -1,9 +1,8 @@
+use base64ct::{Base64UrlUnpadded, Encoding};
+use reqwest::StatusCode;
 use serde::Serialize;
 use uuid::Uuid;
-use web_push::{
-    ContentEncoding, HyperWebPushClient, SubscriptionInfo, SubscriptionKeys, URL_SAFE_NO_PAD,
-    VapidSignatureBuilder, WebPushClient, WebPushError, WebPushMessageBuilder,
-};
+use web_push_native::{jwt_simple::algorithms::ES256KeyPair, p256::PublicKey, Auth, WebPushBuilder};
 
 use crate::{db::db, entities::PushSubscription, env::env};
 
@@ -39,6 +38,17 @@ pub async fn send_to_user(user_id: Uuid, payload: &PushPayload) {
         return;
     };
 
+    let key_pair = match Base64UrlUnpadded::decode_vec(&vapid.private_key)
+        .map_err(|e| e.to_string())
+        .and_then(|bytes| ES256KeyPair::from_bytes(&bytes).map_err(|e| e.to_string()))
+    {
+        Ok(kp) => kp,
+        Err(e) => {
+            log::error!("failed to load VAPID key pair: {e}");
+            return;
+        }
+    };
+
     let subs = match PushSubscription::list_by_user(user_id, db()).await {
         Ok(s) => s,
         Err(e) => {
@@ -55,54 +65,83 @@ pub async fn send_to_user(user_id: Uuid, payload: &PushPayload) {
         }
     };
 
-    for sub in subs {
-        let info = SubscriptionInfo {
-            endpoint: sub.endpoint.clone(),
-            keys: SubscriptionKeys {
-                p256dh: sub.p256dh.clone(),
-                auth: sub.auth.clone(),
-            },
-        };
+    let client = reqwest::Client::new();
 
-        let sig = match VapidSignatureBuilder::from_base64(
-            &vapid.private_key,
-            URL_SAFE_NO_PAD,
-            &info,
-        ) {
-            Ok(mut b) => {
-                b.add_claim("sub", vapid.subject.as_str());
-                match b.build() {
-                    Ok(s) => s,
-                    Err(e) => {
-                        log::error!("vapid signing failed: {e}");
-                        continue;
-                    }
-                }
-            }
+    for sub in subs {
+        let ua_public = match Base64UrlUnpadded::decode_vec(&sub.p256dh)
+            .map_err(|e| e.to_string())
+            .and_then(|bytes| PublicKey::from_sec1_bytes(&bytes).map_err(|e| e.to_string()))
+        {
+            Ok(k) => k,
             Err(e) => {
-                log::error!("vapid builder failed: {e}");
+                log::error!("invalid p256dh key for subscription {}: {e}", sub.id);
                 continue;
             }
         };
 
-        let mut builder = WebPushMessageBuilder::new(&info);
-        builder.set_payload(ContentEncoding::Aes128Gcm, &payload_bytes);
-        builder.set_vapid_signature(sig);
+        let ua_auth = match Base64UrlUnpadded::decode_vec(&sub.auth) {
+            Ok(bytes) if bytes.len() == 16 => Auth::clone_from_slice(&bytes),
+            Ok(bytes) => {
+                log::error!(
+                    "invalid auth length for subscription {}: expected 16, got {}",
+                    sub.id,
+                    bytes.len()
+                );
+                continue;
+            }
+            Err(e) => {
+                log::error!("invalid auth base64 for subscription {}: {e}", sub.id);
+                continue;
+            }
+        };
 
-        let message = match builder.build() {
-            Ok(m) => m,
+        let endpoint = match sub.endpoint.parse() {
+            Ok(uri) => uri,
+            Err(e) => {
+                log::error!("invalid endpoint URI for subscription {}: {e}", sub.id);
+                continue;
+            }
+        };
+
+        let builder = WebPushBuilder::new(endpoint, ua_public, ua_auth)
+            .with_vapid(&key_pair, &vapid.subject);
+
+        let request = match builder.build(payload_bytes.clone()) {
+            Ok(r) => r,
             Err(e) => {
                 log::error!("push message build failed: {e}");
                 continue;
             }
         };
 
-        let client = HyperWebPushClient::new();
-        match client.send(message).await {
-            Ok(_) => {}
-            Err(WebPushError::EndpointNotValid) | Err(WebPushError::EndpointNotFound) => {
-                // 404/410 — the browser has revoked this subscription.
-                let _ = PushSubscription::delete_by_id(sub.id, db()).await;
+        let (parts, body) = request.into_parts();
+        let reqwest_req = match client
+            .post(parts.uri.to_string())
+            .headers(parts.headers)
+            .body(body)
+            .build()
+        {
+            Ok(r) => r,
+            Err(e) => {
+                log::error!("reqwest request build failed: {e}");
+                continue;
+            }
+        };
+
+        match client.execute(reqwest_req).await {
+            Ok(resp) => {
+                let status = resp.status();
+                match status {
+                    s if s.is_success() => {}
+                    StatusCode::GONE | StatusCode::NOT_FOUND => {
+                        // The browser has revoked this subscription.
+                        let _ = PushSubscription::delete_by_id(sub.id, db()).await;
+                    }
+                    s => {
+                        let body = resp.text().await.unwrap_or_default();
+                        log::warn!("push send failed for {} (HTTP {s}): {body}", sub.endpoint);
+                    }
+                }
             }
             Err(e) => {
                 log::warn!("push send failed for {}: {e}", sub.endpoint);

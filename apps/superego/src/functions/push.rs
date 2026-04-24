@@ -2,9 +2,15 @@ use base64ct::{Base64UrlUnpadded, Encoding};
 use reqwest::StatusCode;
 use serde::Serialize;
 use uuid::Uuid;
-use web_push_native::{jwt_simple::algorithms::ES256KeyPair, p256::PublicKey, Auth, WebPushBuilder};
+use web_push_native::{
+    jwt_simple::algorithms::ES256KeyPair, p256::PublicKey, Auth, WebPushBuilder,
+};
 
-use crate::{db::db, entities::PushSubscription, env::env};
+use crate::{
+    db::db,
+    entities::{MessageExt, PushSubscription},
+    env::env,
+};
 
 /// Payload delivered to the service worker. Keep this small —
 /// the Web Push protocol caps encrypted payloads at ~4KB.
@@ -21,6 +27,33 @@ pub struct PushPayload {
     /// Collapse key so a second push for the same conversation
     /// replaces the first instead of stacking.
     pub tag: String,
+}
+
+impl From<MessageExt> for PushPayload {
+    fn from(message: MessageExt) -> Self {
+        let channel_id = message.base.channel_id;
+
+        Self {
+            title: message
+                .author
+                .as_ref()
+                .map(|a| a.name.clone())
+                .unwrap_or_else(|| "New message".to_string()),
+            body: truncate(&message.base.content, 140),
+            url: format!("/dm/{channel_id}"),
+            icon: message.author.as_ref().and_then(|a| a.avatar.clone()),
+            tag: format!("dm:{channel_id}"),
+        }
+    }
+}
+
+fn truncate(s: &str, max_chars: usize) -> String {
+    if s.chars().count() <= max_chars {
+        return s.to_string();
+    }
+    let mut out: String = s.chars().take(max_chars).collect();
+    out.push('…');
+    out
 }
 
 pub fn is_enabled() -> bool {
@@ -103,8 +136,8 @@ pub async fn send_to_user(user_id: Uuid, payload: &PushPayload) {
             }
         };
 
-        let builder = WebPushBuilder::new(endpoint, ua_public, ua_auth)
-            .with_vapid(&key_pair, &vapid.subject);
+        let builder =
+            WebPushBuilder::new(endpoint, ua_public, ua_auth).with_vapid(&key_pair, &vapid.subject);
 
         let request = match builder.build(payload_bytes.clone()) {
             Ok(r) => r,

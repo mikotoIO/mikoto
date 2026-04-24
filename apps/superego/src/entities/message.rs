@@ -25,7 +25,7 @@ pub struct MessagePatch {
     pub edited_timestamp: Option<Timestamp>,
 }
 
-#[derive(Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct MessageExt {
     #[serde(flatten)]

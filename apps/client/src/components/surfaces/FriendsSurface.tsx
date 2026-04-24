@@ -60,9 +60,10 @@ const FriendRow = styled.div`
   padding: 8px 12px;
   border-radius: 8px;
   gap: 12px;
+  cursor: pointer;
 
   &:hover {
-    background: var(--chakra-colors-gray-750);
+    background: var(--chakra-colors-gray-700);
   }
 `;
 
@@ -74,7 +75,7 @@ function FriendItem({
   onMessage: () => void;
 }) {
   return (
-    <FriendRow>
+    <FriendRow onClick={onMessage}>
       <Avatar
         src={relation.user.avatar ?? undefined}
         userId={relation.user.id}

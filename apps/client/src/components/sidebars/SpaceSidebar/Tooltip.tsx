@@ -4,7 +4,7 @@ export function SpaceIconTooltip({
   children,
   tooltip,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   children: React.ReactElement<any>;
   tooltip: string;
 }) {

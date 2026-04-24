@@ -1,81 +1,58 @@
+import eslintReact from '@eslint-react/eslint-plugin';
 import js from '@eslint/js';
-import pluginReact from 'eslint-plugin-react';
-import globals from 'globals';
-import tseslint from 'typescript-eslint';
+import { defineConfig } from 'eslint/config';
+import ts from 'typescript-eslint';
 
-const sharedRules = {
-  '@typescript-eslint/no-explicit-any': 'off',
-  '@typescript-eslint/no-unused-vars': [
-    'warn',
-    {
-      args: 'all',
-      argsIgnorePattern: '^_',
-      caughtErrors: 'all',
-      caughtErrorsIgnorePattern: '^_',
-      destructuredArrayIgnorePattern: '^_',
-      varsIgnorePattern: '^_',
-      ignoreRestSiblings: true,
-    },
+export default defineConfig({
+  ignores: [
+    '**/node_modules/**',
+    '**/dist/**',
+    'build/**',
+    '**/*.min.js',
+    '**/metro.config.js',
+    '**/*.gen.ts',
+    '.claude/**',
+    'target/**',
+
+    // todo: revisit projects
+    'apps/desktop/**',
   ],
-};
 
-export default [
-  // Ignore patterns
-  {
-    ignores: [
-      'node_modules/**',
-      'apps/docs/.next/**',
-      'dist/**',
-      'build/**',
-      '**/*.min.js',
-      '**/metro.config.js',
-      '**/*.gen.ts',
-      '.claude/**',
-      'target/**',
-    ],
-  },
+  // files: ['**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+  files: ['**/*.{ts,tsx}'],
 
   // Base JS/TS configuration
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
+  extends: [
+    js.configs.recommended,
+    ts.configs.recommended,
+    eslintReact.configs['recommended-typescript'],
+  ],
 
-  {
-    files: ['**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
-      ecmaVersion: 'latest',
-      sourceType: 'module',
+  languageOptions: {
+    parser: ts.parser,
+    parserOptions: {
+      // Enable project service for better TypeScript integration
+      projectService: true,
+      // tsconfigRootDir: import.meta.dirname,
+      tsconfigRootDir: '/apps/client',
     },
-    rules: {
-      ...sharedRules,
-    },
-  },
 
-  // React configuration
-  {
-    files: ['**/*.{jsx,tsx}'],
-    plugins: {
-      react: pluginReact,
-    },
-    languageOptions: {
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
-      },
-    },
-    rules: {
-      ...pluginReact.configs.recommended.rules,
-      'react/react-in-jsx-scope': 'off',
-      ...sharedRules,
-    },
-    settings: {
-      react: {
-        version: 'detect',
-      },
-    },
+    ecmaVersion: 'latest',
+    sourceType: 'module',
   },
-];
+  rules: {
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      {
+        args: 'all',
+        argsIgnorePattern: '^_',
+        caughtErrors: 'all',
+        caughtErrorsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        ignoreRestSiblings: true,
+      },
+    ],
+  },
+});

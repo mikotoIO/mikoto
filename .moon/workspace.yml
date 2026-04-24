@@ -5,7 +5,9 @@ $schema: './cache/schemas/workspace.json'
 
 projects:
   - '.'
-  - 'apps/*'
+  - 'apps/client' # frontend
+  - 'apps/content-proxy' # cdn
+  - 'apps/superego' # backend
   - 'crates/*'
   - 'examples/*'
   - 'packages/*'

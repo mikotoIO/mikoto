@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::NaiveDateTime;
 use uuid::Uuid;
 
 use crate::{entity, error::Error};
@@ -10,7 +10,7 @@ entity!(
         pub endpoint: String,
         pub p256dh: String,
         pub auth: String,
-        pub created_at: DateTime<Utc>,
+        pub created_at: NaiveDateTime,
     }
 );
 

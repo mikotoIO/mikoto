@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-globals */
+ 
 // Mikoto push-only service worker.
 //
 // Deliberately has NO `fetch` handler — this SW never intercepts network

@@ -9,6 +9,8 @@ import { AuthContext, MikotoContext } from '@/hooks';
 import { authClient } from '@/store/authClient';
 import {
   clearDmPreview,
+  dmPreviewStore,
+  refreshDmPreview,
   setDmPreview,
   updateDmPreview,
 } from '@/store/dmPreviews';
@@ -60,9 +62,14 @@ function registerNotifications(mikoto: MikotoClient) {
 
   mikoto.ws.on('messages.onDelete', (key) => {
     const channel = mikoto.channels._get(key.channelId);
-    if (!channel?.spaceId) {
+    if (channel?.spaceId) return;
+
+    const existing = dmPreviewStore.previews[key.channelId];
+    if (!existing || existing.messageId !== key.messageId) return;
+
+    refreshDmPreview(mikoto, key.channelId).catch(() => {
       clearDmPreview(key.channelId);
-    }
+    });
   });
 }
 

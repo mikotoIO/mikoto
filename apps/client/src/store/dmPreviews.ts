@@ -2,6 +2,7 @@ import { MessageExt, MikotoClient } from '@mikoto-io/mikoto.js';
 import { proxy } from 'valtio/vanilla';
 
 export interface DmPreview {
+  messageId: string;
   content: string;
   timestamp: string;
   authorId: string | null;
@@ -15,6 +16,7 @@ export const dmPreviewStore = proxy<{ previews: Record<string, DmPreview> }>({
 
 function toPreview(msg: MessageExt): DmPreview {
   return {
+    messageId: msg.id,
     content: msg.content,
     timestamp: msg.timestamp,
     authorId: msg.authorId ?? null,
@@ -35,13 +37,29 @@ export function setDmPreview(channelId: string, msg: MessageExt) {
 
 export function updateDmPreview(channelId: string, msg: MessageExt) {
   const existing = dmPreviewStore.previews[channelId];
-  if (!existing || existing.timestamp === msg.timestamp) {
+  if (!existing || existing.messageId === msg.id) {
     dmPreviewStore.previews[channelId] = toPreview(msg);
   }
 }
 
 export function clearDmPreview(channelId: string) {
   delete dmPreviewStore.previews[channelId];
+}
+
+export async function refreshDmPreview(
+  mikoto: MikotoClient,
+  channelId: string,
+) {
+  const msgs = await mikoto.rest['dm.messages.list']({
+    params: { channelId },
+    queries: { limit: 1, cursor: null },
+  });
+  const last = msgs[msgs.length - 1];
+  if (last) {
+    dmPreviewStore.previews[channelId] = toPreview(last);
+  } else {
+    clearDmPreview(channelId);
+  }
 }
 
 export async function loadDmPreviews(

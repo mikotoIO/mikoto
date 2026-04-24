@@ -8,6 +8,7 @@ pub mod jwt;
 pub mod mail;
 pub mod permissions;
 pub mod pubsub;
+pub mod push;
 pub mod rate_limit;
 pub mod sha3;
 pub mod time;

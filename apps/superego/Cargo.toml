@@ -92,6 +92,10 @@ hickory-resolver = { version = "0.25.2", features = ["tokio", "https-ring"] }
 ed25519-dalek = { version = "2.2.0", features = ["rand_core"] }
 rand = "0.8"
 
+# Web Push
+web-push-native = "0.4"
+base64ct = { version = "1", features = ["alloc"] }
+
 # media processing
 mime = "0.3.17"
 mime_guess = "2.0.4"

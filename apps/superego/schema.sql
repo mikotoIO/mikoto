@@ -293,6 +293,22 @@ CREATE TABLE public."NotificationPreference" (
 ALTER TABLE public."NotificationPreference" OWNER TO postgres;
 
 --
+-- Name: PushSubscription; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."PushSubscription" (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    "userId" uuid NOT NULL,
+    endpoint text NOT NULL,
+    p256dh text NOT NULL,
+    auth text NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public."PushSubscription" OWNER TO postgres;
+
+--
 -- Name: RefreshToken; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -534,6 +550,14 @@ ALTER TABLE ONLY public."NotificationPreference"
 
 
 --
+-- Name: PushSubscription PushSubscription_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."PushSubscription"
+    ADD CONSTRAINT "PushSubscription_pkey" PRIMARY KEY (id);
+
+
+--
 -- Name: RefreshToken RefreshToken_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -666,6 +690,20 @@ CREATE INDEX "MessageAttachment_messageId_idx" ON public."MessageAttachment" USI
 --
 
 CREATE INDEX "Message_channelId_timestamp_idx" ON public."Message" USING btree ("channelId", "timestamp");
+
+
+--
+-- Name: PushSubscription_endpoint_key; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX "PushSubscription_endpoint_key" ON public."PushSubscription" USING btree (endpoint);
+
+
+--
+-- Name: PushSubscription_userId_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "PushSubscription_userId_idx" ON public."PushSubscription" USING btree ("userId");
 
 
 --
@@ -896,6 +934,14 @@ ALTER TABLE ONLY public."NotificationPreference"
 
 ALTER TABLE ONLY public."NotificationPreference"
     ADD CONSTRAINT "NotificationPreference_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."User"(id) ON DELETE CASCADE;
+
+
+--
+-- Name: PushSubscription PushSubscription_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."PushSubscription"
+    ADD CONSTRAINT "PushSubscription_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."User"(id) ON DELETE CASCADE;
 
 
 --

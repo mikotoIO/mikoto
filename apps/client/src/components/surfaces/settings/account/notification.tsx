@@ -1,7 +1,8 @@
 import { Box, Button, Flex, Text } from '@chakra-ui/react';
 import { NotificationLevel } from '@mikoto-io/mikoto.js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 import { useSnapshot } from 'valtio/react';
 
 import { Switch } from '@/components/ui';
@@ -10,6 +11,13 @@ import {
   getNotificationMode,
   setNotificationMode,
 } from '@/functions/notify';
+import {
+  PushSupport,
+  disablePush,
+  enablePush,
+  getPushState,
+  isPushSupported,
+} from '@/functions/webPush';
 import { useMikoto } from '@/hooks';
 import {
   notificationPreferenceStore,
@@ -79,6 +87,80 @@ function NotificationPermissionBanner() {
         </Button>
       )}
     </Flex>
+  );
+}
+
+function PushNotificationToggle() {
+  const [state, setState] = useState<PushSupport>('disabled');
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    getPushState().then(setState);
+  }, []);
+
+  if (!isPushSupported()) {
+    return (
+      <Box mb={6}>
+        <Text fontSize="14px" fontWeight="600" mb={1}>
+          Push Notifications
+        </Text>
+        <Text fontSize="12px" color="gray.400">
+          Your browser does not support push notifications. Install Mikoto to
+          your home screen on a supported browser to enable them.
+        </Text>
+      </Box>
+    );
+  }
+
+  const enabled = state === 'enabled';
+
+  const onToggle = async (checked: boolean) => {
+    setBusy(true);
+    try {
+      if (checked) {
+        const result = await enablePush();
+        setState(result);
+        if (result === 'blocked') {
+          toast.error(
+            'Notifications are blocked. Enable them in your browser settings.',
+          );
+        } else if (result !== 'enabled') {
+          toast.error('Could not enable push notifications.');
+        }
+      } else {
+        await disablePush();
+        setState('disabled');
+      }
+    } catch (e) {
+      toast.error(
+        e instanceof Error ? e.message : 'Failed to update push subscription',
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Box mb={6}>
+      <Flex align="center" justify="space-between">
+        <Box>
+          <Text fontSize="14px" fontWeight="600">
+            Push Notifications
+          </Text>
+          <Text fontSize="12px" color="gray.400">
+            Receive notifications for direct messages even when Mikoto is
+            closed.
+            {state === 'blocked' &&
+              ' Notifications are blocked in your browser settings.'}
+          </Text>
+        </Box>
+        <Switch
+          checked={enabled}
+          disabled={busy || state === 'blocked'}
+          onCheckedChange={(e) => onToggle(e.checked)}
+        />
+      </Flex>
+    </Box>
   );
 }
 
@@ -181,6 +263,8 @@ export function NotificationSurface() {
       </Box>
 
       {mode === 'native' && <NotificationPermissionBanner />}
+
+      <PushNotificationToggle />
 
       <Box mb={6}>
         <Flex align="center" justify="space-between" mb={2}>

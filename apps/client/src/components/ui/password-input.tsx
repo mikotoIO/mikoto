@@ -15,7 +15,7 @@ import {
   mergeRefs,
   useControllableState,
 } from '@chakra-ui/react';
-import { forwardRef, useRef } from 'react';
+import { useRef } from 'react';
 import { LuEye, LuEyeOff } from 'react-icons/lu';
 
 import { InputGroup } from './input-group';
@@ -33,80 +33,73 @@ export interface PasswordInputProps
   rootProps?: GroupProps;
 }
 
-export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
-  function PasswordInput(props, ref) {
-    const {
-      rootProps,
-      defaultVisible,
-      visible: visibleProp,
-      onVisibleChange,
-      visibilityIcon = { on: <LuEye />, off: <LuEyeOff /> },
-      ...rest
-    } = props;
+export const PasswordInput = function PasswordInput(props: PasswordInputProps, ref) {
+  const {
+    rootProps,
+    defaultVisible,
+    visible: visibleProp,
+    onVisibleChange,
+    visibilityIcon = { on: <LuEye />, off: <LuEyeOff /> },
+    ...rest
+  } = props;
 
-    const [visible, setVisible] = useControllableState({
-      value: visibleProp,
-      defaultValue: defaultVisible || false,
-      onChange: onVisibleChange,
-    });
+  const [visible, setVisible] = useControllableState({
+    value: visibleProp,
+    defaultValue: defaultVisible || false,
+    onChange: onVisibleChange,
+  });
 
-    const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-    return (
-      <InputGroup
-        width="full"
-        endElement={
-          <VisibilityTrigger
-            disabled={rest.disabled}
-            onPointerDown={(e) => {
-              if (rest.disabled) return;
-              if (e.button !== 0) return;
-              e.preventDefault();
-              setVisible(!visible);
-            }}
-          >
-            {visible ? visibilityIcon.off : visibilityIcon.on}
-          </VisibilityTrigger>
-        }
-        {...rootProps}
-      >
-        <Input
-          {...rest}
-          ref={mergeRefs(ref, inputRef)}
-          type={visible ? 'text' : 'password'}
-        />
-      </InputGroup>
-    );
-  },
-);
-
-const VisibilityTrigger = forwardRef<HTMLButtonElement, ButtonProps>(
-  function VisibilityTrigger(props, ref) {
-    return (
-      <IconButton
-        tabIndex={-1}
-        ref={ref}
-        me="-2"
-        aspectRatio="square"
-        size="sm"
-        variant="ghost"
-        height="calc(100% - {spacing.2})"
-        aria-label="Toggle password visibility"
-        {...props}
+  return (
+    <InputGroup
+      width="full"
+      endElement={
+        <VisibilityTrigger
+          disabled={rest.disabled}
+          onPointerDown={(e) => {
+            if (rest.disabled) return;
+            if (e.button !== 0) return;
+            e.preventDefault();
+            setVisible(!visible);
+          }}
+        >
+          {visible ? visibilityIcon.off : visibilityIcon.on}
+        </VisibilityTrigger>
+      }
+      {...rootProps}
+    >
+      <Input
+        {...rest}
+        ref={mergeRefs(ref, inputRef)}
+        type={visible ? 'text' : 'password'}
       />
-    );
-  },
-);
+    </InputGroup>
+  );
+};
+
+const VisibilityTrigger = function VisibilityTrigger(props: ButtonProps, ref) {
+  return (
+    <IconButton
+      tabIndex={-1}
+      ref={ref}
+      me="-2"
+      aspectRatio="square"
+      size="sm"
+      variant="ghost"
+      height="calc(100% - {spacing.2})"
+      aria-label="Toggle password visibility"
+      {...props}
+    />
+  );
+};
 
 interface PasswordStrengthMeterProps extends StackProps {
   max?: number;
   value: number;
 }
 
-export const PasswordStrengthMeter = forwardRef<
-  HTMLDivElement,
-  PasswordStrengthMeterProps
->(function PasswordStrengthMeter(props, ref) {
+export const PasswordStrengthMeter = function PasswordStrengthMeter(props: PasswordStrengthMeterProps, ref) {
   const { max = 4, value, ...rest } = props;
 
   const percent = (value / max) * 100;
@@ -134,7 +127,7 @@ export const PasswordStrengthMeter = forwardRef<
       {label && <HStack textStyle="xs">{label}</HStack>}
     </Stack>
   );
-});
+};
 
 function getColorPalette(percent: number) {
   switch (true) {

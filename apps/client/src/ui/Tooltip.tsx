@@ -25,7 +25,7 @@ export const Tooltip = chakra('div', {
 });
 
 interface FloatingTooltipProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   children: React.ReactElement<any>;
   tooltip: string;
   placement?: Placement;
@@ -86,7 +86,7 @@ export function createTooltip(props: {
     children,
     tooltip,
   }: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     children: React.ReactElement<any>;
     tooltip: string;
   }) {

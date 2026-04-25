@@ -5,7 +5,7 @@ import {
   Span,
   Spinner,
 } from '@chakra-ui/react';
-import { forwardRef } from 'react';
+import 'react';
 
 interface ButtonLoadingProps {
   loading?: boolean;
@@ -14,27 +14,25 @@ interface ButtonLoadingProps {
 
 export interface ButtonProps extends ChakraButtonProps, ButtonLoadingProps {}
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  function Button(props, ref) {
-    const { loading, disabled, loadingText, children, ...rest } = props;
-    return (
-      <ChakraButton disabled={loading || disabled} ref={ref} {...rest}>
-        {loading && !loadingText ? (
-          <>
-            <AbsoluteCenter display="inline-flex">
-              <Spinner size="inherit" color="inherit" />
-            </AbsoluteCenter>
-            <Span opacity={0}>{children}</Span>
-          </>
-        ) : loading && loadingText ? (
-          <>
+export const Button = function Button(props: ButtonProps) {
+  const { loading, disabled, loadingText, children, ...rest } = props;
+  return (
+    <ChakraButton disabled={loading || disabled} {...rest}>
+      {loading && !loadingText ? (
+        <>
+          <AbsoluteCenter display="inline-flex">
             <Spinner size="inherit" color="inherit" />
-            {loadingText}
-          </>
-        ) : (
-          children
-        )}
-      </ChakraButton>
-    );
-  },
-);
+          </AbsoluteCenter>
+          <Span opacity={0}>{children}</Span>
+        </>
+      ) : loading && loadingText ? (
+        <>
+          <Spinner size="inherit" color="inherit" />
+          {loadingText}
+        </>
+      ) : (
+        children
+      )}
+    </ChakraButton>
+  );
+};

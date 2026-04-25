@@ -148,7 +148,7 @@ export function CommandMenuKit() {
 
   const openDm = async (friend: (typeof dmFriends)[number]) => {
     const channel = await friend.openDm();
-    setLeftSidebar({ kind: 'friends', key: 'friends' });
+    setLeftSidebar(null);
     tabkit.openTab(
       { kind: 'textChannel', key: channel.id, channelId: channel.id },
       tabkit.getTabs().length > 0,

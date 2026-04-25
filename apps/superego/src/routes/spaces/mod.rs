@@ -35,6 +35,7 @@ pub mod bans;
 pub mod invites;
 pub mod members;
 pub mod roles;
+pub mod search;
 
 #[derive(Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]

@@ -209,7 +209,8 @@ ALTER TABLE public."ChannelUnread" OWNER TO postgres;
 CREATE TABLE public."Document" (
     id uuid NOT NULL,
     "channelId" uuid NOT NULL,
-    content character varying(262144) NOT NULL
+    content character varying(262144) NOT NULL,
+    "searchTsv" tsvector GENERATED ALWAYS AS (to_tsvector('simple'::regconfig, COALESCE(content, ''::character varying)::text)) STORED
 );
 
 
@@ -256,7 +257,8 @@ CREATE TABLE public."Message" (
     "timestamp" timestamp(3) without time zone NOT NULL,
     "editedTimestamp" timestamp(3) without time zone,
     "authorId" uuid,
-    "channelId" uuid NOT NULL
+    "channelId" uuid NOT NULL,
+    "searchTsv" tsvector GENERATED ALWAYS AS (to_tsvector('simple'::regconfig, COALESCE(content, ''::character varying)::text)) STORED
 );
 
 
@@ -665,6 +667,13 @@ CREATE UNIQUE INDEX "Document_channelId_key" ON public."Document" USING btree ("
 
 
 --
+-- Name: Document_searchTsv_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "Document_searchTsv_idx" ON public."Document" USING gin ("searchTsv");
+
+
+--
 -- Name: Handle_spaceId_idx; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -690,6 +699,13 @@ CREATE INDEX "MessageAttachment_messageId_idx" ON public."MessageAttachment" USI
 --
 
 CREATE INDEX "Message_channelId_timestamp_idx" ON public."Message" USING btree ("channelId", "timestamp");
+
+
+--
+-- Name: Message_searchTsv_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "Message_searchTsv_idx" ON public."Message" USING gin ("searchTsv");
 
 
 --

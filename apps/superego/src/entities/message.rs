@@ -1,5 +1,6 @@
 use chrono::TimeDelta;
 use schemars::JsonSchema;
+use sqlx::FromRow;
 use uuid::Uuid;
 
 use crate::{
@@ -125,7 +126,78 @@ impl Message {
         Ok(res)
     }
 
+    pub async fn search_in_space<'c, X: sqlx::PgExecutor<'c>>(
+        space_id: Uuid,
+        query: &str,
+        channel_id: Option<Uuid>,
+        author_id: Option<Uuid>,
+        limit: i32,
+        offset: i32,
+        db: X,
+    ) -> Result<Vec<MessageSearchHit>, Error> {
+        let res = sqlx::query_as(
+            r#"
+            SELECT m.*,
+                   ts_headline(
+                       'simple',
+                       m."content",
+                       websearch_to_tsquery('simple', $1),
+                       'StartSel=<mark>,StopSel=</mark>,MaxFragments=2,MaxWords=18,MinWords=4'
+                   ) AS "snippet"
+            FROM "Message" m
+            JOIN "Channel" c ON c."id" = m."channelId"
+            WHERE c."spaceId" = $2
+              AND m."searchTsv" @@ websearch_to_tsquery('simple', $1)
+              AND ($3::uuid IS NULL OR m."channelId" = $3)
+              AND ($4::uuid IS NULL OR m."authorId" = $4)
+            ORDER BY ts_rank_cd(m."searchTsv", websearch_to_tsquery('simple', $1)) DESC,
+                     m."timestamp" DESC
+            LIMIT $5 OFFSET $6
+            "#,
+        )
+        .bind(query)
+        .bind(space_id)
+        .bind(channel_id)
+        .bind(author_id)
+        .bind(limit as i64)
+        .bind(offset as i64)
+        .fetch_all(db)
+        .await?;
+        Ok(res)
+    }
+
     db_entity_delete!("Message");
+}
+
+#[derive(FromRow)]
+pub struct MessageSearchHit {
+    #[sqlx(flatten)]
+    pub message: Message,
+    pub snippet: String,
+}
+
+#[derive(Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct MessageSearchResult {
+    #[serde(flatten)]
+    pub message: MessageExt,
+    pub snippet: String,
+}
+
+impl MessageSearchResult {
+    pub async fn dataload<'c, X: sqlx::PgExecutor<'c> + Copy>(
+        hits: Vec<MessageSearchHit>,
+        db: X,
+    ) -> Result<Vec<Self>, Error> {
+        let snippets: Vec<String> = hits.iter().map(|h| h.snippet.clone()).collect();
+        let messages: Vec<Message> = hits.into_iter().map(|h| h.message).collect();
+        let exts = MessageExt::dataload(messages, db).await?;
+        Ok(exts
+            .into_iter()
+            .zip(snippets)
+            .map(|(message, snippet)| Self { message, snippet })
+            .collect())
+    }
 }
 
 impl MessagePatch {

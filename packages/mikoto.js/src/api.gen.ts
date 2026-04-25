@@ -451,6 +451,35 @@ export type Invite = z.infer<typeof Invite>;
 export const InviteCreatePayload = z.object({}).partial();
 export type InviteCreatePayload = z.infer<typeof InviteCreatePayload>;
 
+export const MessageSearchResult = z.object({
+  attachments: z.array(MessageAttachment),
+  author: z.union([User, z.null()]).optional(),
+  authorId: z.union([z.string(), z.null()]).optional(),
+  channelId: z.string().uuid(),
+  content: z.string(),
+  editedTimestamp: z.union([Timestamp, z.null()]).optional(),
+  id: z.string().uuid(),
+  snippet: z.string(),
+  timestamp: Timestamp.datetime({ offset: true }),
+});
+export type MessageSearchResult = z.infer<typeof MessageSearchResult>;
+
+export const DocumentSearchResult = z.object({
+  channelId: z.string().uuid(),
+  content: z.string(),
+  id: z.string().uuid(),
+  snippet: z.string(),
+});
+export type DocumentSearchResult = z.infer<typeof DocumentSearchResult>;
+
+export const DocumentSearchQuery = z.object({
+  channelId: z.union([z.string(), z.null()]).optional(),
+  limit: z.union([z.number(), z.null()]).optional(),
+  offset: z.union([z.number(), z.null()]).optional(),
+  q: z.string(),
+});
+export type DocumentSearchQuery = z.infer<typeof DocumentSearchQuery>;
+
 export const ListQuery = z
   .object({
     cursor: z.union([z.string(), z.null()]),
@@ -480,6 +509,15 @@ export const MessageListQuery = z
   })
   .partial();
 export type MessageListQuery = z.infer<typeof MessageListQuery>;
+
+export const MessageSearchQuery = z.object({
+  authorId: z.union([z.string(), z.null()]).optional(),
+  channelId: z.union([z.string(), z.null()]).optional(),
+  limit: z.union([z.number(), z.null()]).optional(),
+  offset: z.union([z.number(), z.null()]).optional(),
+  q: z.string(),
+});
+export type MessageSearchQuery = z.infer<typeof MessageSearchQuery>;
 
 export const ObjectWithId = z.object({ id: z.string().uuid() });
 export type ObjectWithId = z.infer<typeof ObjectWithId>;
@@ -575,10 +613,14 @@ export const schemas = {
   BanCreatePayload,
   Invite,
   InviteCreatePayload,
+  MessageSearchResult,
+  DocumentSearchResult,
+  DocumentSearchQuery,
   ListQuery,
   MemberListQuery,
   MessageKey,
   MessageListQuery,
+  MessageSearchQuery,
   ObjectWithId,
   Ping,
   ServeParams,
@@ -1391,6 +1433,69 @@ const endpoints = makeApi([
       },
     ],
     response: Role,
+  },
+  {
+    method: "get",
+    path: "/spaces/:spaceId/search/documents",
+    alias: "search.documents",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "channelId",
+        type: "Query",
+        schema: cursor,
+      },
+      {
+        name: "limit",
+        type: "Query",
+        schema: limit,
+      },
+      {
+        name: "offset",
+        type: "Query",
+        schema: limit,
+      },
+      {
+        name: "q",
+        type: "Query",
+        schema: z.string(),
+      },
+    ],
+    response: z.array(DocumentSearchResult),
+  },
+  {
+    method: "get",
+    path: "/spaces/:spaceId/search/messages",
+    alias: "search.messages",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "authorId",
+        type: "Query",
+        schema: cursor,
+      },
+      {
+        name: "channelId",
+        type: "Query",
+        schema: cursor,
+      },
+      {
+        name: "limit",
+        type: "Query",
+        schema: limit,
+      },
+      {
+        name: "offset",
+        type: "Query",
+        schema: limit,
+      },
+      {
+        name: "q",
+        type: "Query",
+        schema: z.string(),
+      },
+    ],
+    response: z.array(MessageSearchResult),
   },
   {
     method: "get",

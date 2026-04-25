@@ -8,6 +8,7 @@ import { DiscoverySurface } from './DiscoverySurface';
 import { ExplorerSurface } from './Explorer';
 import { FriendsSurface } from './FriendsSurface';
 import { MessageSurface } from './Messages';
+import { SearchSurface } from './Search';
 import { SpaceExplorerSurface } from './SpaceExplorerSurface';
 import { SpaceInviteSurface } from './SpaceInviteSurface';
 import { WelcomeSurface } from './WelcomeSurface';
@@ -30,6 +31,7 @@ export const surfaceMap = {
   explorer: ExplorerSurface,
   spaceInvite: SpaceInviteSurface,
   spaceExplorer: SpaceExplorerSurface,
+  search: SearchSurface,
 };
 
 type SurfaceMap = {

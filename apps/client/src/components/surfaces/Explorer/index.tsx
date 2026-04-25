@@ -4,6 +4,7 @@ import {
   faChevronDown,
   faChevronRight,
   faGlobe,
+  faMagnifyingGlass,
   faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -146,9 +147,31 @@ function ExplorerInner({ space }: { space: MikotoSpace }) {
   return <ChannelTree nodes={channelTree.descendant ?? []} />;
 }
 
+const SearchButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: 0 0 8px;
+  padding: 6px 12px;
+  background: var(--chakra-colors-gray-800);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--chakra-colors-gray-400);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    background: var(--chakra-colors-gray-700);
+    color: var(--chakra-colors-gray-200);
+  }
+`;
+
 export function Explorer({ space }: { space: MikotoSpace }) {
   const nodeContextMenu = useContextMenuX();
   const [panels, setPanels] = useAtom(explorerPanelsState);
+  const tabkit = useTabkit();
 
   const channelHeaderContextMenu = useContextMenuX();
 
@@ -173,6 +196,21 @@ export function Explorer({ space }: { space: MikotoSpace }) {
             {space.memberCount} Members
           </Flex>
         )}
+        <SearchButton
+          onClick={() =>
+            tabkit.openTab(
+              {
+                kind: 'search',
+                key: `search:${space.id}`,
+                spaceId: space.id,
+              },
+              false,
+            )
+          }
+        >
+          <FontAwesomeIcon icon={faMagnifyingGlass} fixedWidth />
+          <span>Search</span>
+        </SearchButton>
       </Box>
 
       <PanelHeader

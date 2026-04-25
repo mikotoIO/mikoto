@@ -42,22 +42,25 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const target = (event.notification.data && event.notification.data.url) || '/';
+  const target =
+    (event.notification.data && event.notification.data.url) || '/';
   const absolute = new URL(target, self.location.origin).href;
 
   event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
-      for (const client of clients) {
-        const clientOrigin = new URL(client.url).origin;
-        if (clientOrigin === self.location.origin && 'focus' in client) {
-          client.navigate(absolute).catch(() => {});
-          return client.focus();
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clients) => {
+        for (const client of clients) {
+          const clientOrigin = new URL(client.url).origin;
+          if (clientOrigin === self.location.origin && 'focus' in client) {
+            client.navigate(absolute).catch(() => {});
+            return client.focus();
+          }
         }
-      }
-      if (self.clients.openWindow) {
-        return self.clients.openWindow(absolute);
-      }
-      return undefined;
-    }),
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(absolute);
+        }
+        return undefined;
+      }),
   );
 });

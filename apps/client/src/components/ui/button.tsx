@@ -14,10 +14,10 @@ interface ButtonLoadingProps {
 
 export interface ButtonProps extends ChakraButtonProps, ButtonLoadingProps {}
 
-export const Button = function Button(props: ButtonProps, ref) {
+export const Button = function Button(props: ButtonProps) {
   const { loading, disabled, loadingText, children, ...rest } = props;
   return (
-    <ChakraButton disabled={loading || disabled} ref={ref} {...rest}>
+    <ChakraButton disabled={loading || disabled} {...rest}>
       {loading && !loadingText ? (
         <>
           <AbsoluteCenter display="inline-flex">

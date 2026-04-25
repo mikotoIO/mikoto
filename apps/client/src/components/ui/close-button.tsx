@@ -5,9 +5,9 @@ import { LuX } from 'react-icons/lu';
 
 export type CloseButtonProps = ChakraCloseButtonProps;
 
-export const CloseButton = function CloseButton(props: CloseButtonProps, ref) {
+export const CloseButton = function CloseButton(props: CloseButtonProps) {
   return (
-    <ChakraIconButton variant="ghost" aria-label="Close" ref={ref} {...props}>
+    <ChakraIconButton variant="ghost" aria-label="Close" {...props}>
       {props.children ?? <LuX />}
     </ChakraIconButton>
   );

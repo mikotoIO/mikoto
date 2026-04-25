@@ -69,10 +69,10 @@ const SpaceIcon = styled.div<{
   border-radius: 4px;
 `;
 
-const SpaceIconOutline = styled.div<{
+export const SpaceIconOutline = styled.div<{
   active?: boolean | null;
 }>`
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 2px;
   border: 2px solid transparent;
   border-color: ${(p) =>

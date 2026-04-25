@@ -11,7 +11,11 @@ import { useSnapshot } from 'valtio/react';
 
 import { modalState, useContextMenu } from '@/components/ContextMenu';
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
-import { SpaceIconLike, StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
+import {
+  SpaceIconLike,
+  SpaceIconOutline,
+  StyledSpaceIcon,
+} from '@/components/atoms/SpaceIcon';
 import { faMikoto } from '@/components/icons';
 import { SpaceJoinModal } from '@/components/modals/SpaceJoin';
 import { reorder } from '@/functions/reorder';
@@ -203,19 +207,21 @@ export function SpaceSidebar() {
             marginTop: '8px',
           }}
         >
-          <SpaceIconLike
-            style={{
-              background:
-                spaceId === null
-                  ? 'linear-gradient(133deg, #2298ff 0%, rgba(59,108,255,1) 100%)'
-                  : 'var(--chakra-colors-gray-700)',
-            }}
-            onClick={() => {
-              setSpaceId(null);
-            }}
-          >
-            <FontAwesomeIcon icon={faMikoto} fontSize="24px" />
-          </SpaceIconLike>
+          <SpaceIconOutline active={spaceId === null}>
+            <SpaceIconLike
+              style={{
+                background:
+                  spaceId === null
+                    ? 'linear-gradient(133deg, #2298ff 0%, rgba(59,108,255,1) 100%)'
+                    : 'var(--chakra-colors-gray-700)',
+              }}
+              onClick={() => {
+                setSpaceId(null);
+              }}
+            >
+              <FontAwesomeIcon icon={faMikoto} fontSize="24px" />
+            </SpaceIconLike>
+          </SpaceIconOutline>
         </StyledIconWrapper>
         <Separator
           borderColor="gray.600"

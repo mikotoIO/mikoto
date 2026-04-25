@@ -196,21 +196,6 @@ export function Explorer({ space }: { space: MikotoSpace }) {
             {space.memberCount} Members
           </Flex>
         )}
-        <SearchButton
-          onClick={() =>
-            tabkit.openTab(
-              {
-                kind: 'search',
-                key: `search:${space.id}`,
-                spaceId: space.id,
-              },
-              false,
-            )
-          }
-        >
-          <FontAwesomeIcon icon={faMagnifyingGlass} fixedWidth />
-          <span>Search</span>
-        </SearchButton>
       </Box>
 
       <PanelHeader
@@ -240,6 +225,25 @@ export function Explorer({ space }: { space: MikotoSpace }) {
           onClick={(ev) => {
             ev.stopPropagation();
             channelHeaderContextMenu(<TreebarContextMenu space={space} />)(ev);
+          }}
+        />
+        <FontAwesomeIcon
+          icon={faMagnifyingGlass}
+          style={{
+            marginRight: '8px',
+            fontSize: '12px',
+            opacity: 0.6,
+          }}
+          onClick={(ev) => {
+            ev.stopPropagation();
+            tabkit.openTab(
+              {
+                kind: 'search',
+                key: `search:${space.id}`,
+                spaceId: space.id,
+              },
+              false,
+            );
           }}
         />
       </PanelHeader>

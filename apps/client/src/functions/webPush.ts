@@ -28,7 +28,10 @@ function arrayBufferToBase64Url(buffer: ArrayBuffer | null): string {
   for (let i = 0; i < bytes.byteLength; i += 1) {
     binary += String.fromCharCode(bytes[i]);
   }
-  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return btoa(binary)
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
 }
 
 export function isPushSupported(): boolean {
@@ -111,7 +114,9 @@ export async function enablePush(): Promise<PushSupport> {
   // If an old subscription exists (e.g. VAPID key changed), drop it first.
   const existing = await reg.pushManager.getSubscription();
   if (existing) {
-    const existingKey = arrayBufferToBase64Url(existing.options.applicationServerKey);
+    const existingKey = arrayBufferToBase64Url(
+      existing.options.applicationServerKey,
+    );
     if (existingKey !== publicKey) {
       await postUnsubscribe(existing.endpoint).catch(() => {});
       await existing.unsubscribe();

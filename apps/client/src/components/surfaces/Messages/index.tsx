@@ -263,8 +263,7 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
         name={displayName}
         icon={
           !channel.spaceId && dmRelation
-            ? (dmRelation.user.avatar ??
-              `default-avatar/${dmRelation.user.id}`)
+            ? (dmRelation.user.avatar ?? `default-avatar/${dmRelation.user.id}`)
             : (channel.space?.icon ?? faHashtag)
         }
         spaceId={channel.space?.id}

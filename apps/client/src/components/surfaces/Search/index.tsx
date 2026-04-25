@@ -83,11 +83,7 @@ function MessageHit({
   const author = hit.author;
   return (
     <ResultRow onClick={onOpen}>
-      <Avatar
-        src={author?.avatar ?? undefined}
-        userId={author?.id}
-        size={36}
-      />
+      <Avatar src={author?.avatar ?? undefined} userId={author?.id} size={36} />
       <Box flex={1} minW={0}>
         <Flex gap={2} align="baseline" mb="2px">
           <Text fontWeight="600" fontSize="sm" truncate>
@@ -170,7 +166,10 @@ export function SearchSurface({ spaceId }: { spaceId: string }) {
     [mikoto, spaceId],
   );
 
-  const openChannel = (channelId: string, kind: 'textChannel' | 'documentChannel') => {
+  const openChannel = (
+    channelId: string,
+    kind: 'textChannel' | 'documentChannel',
+  ) => {
     tabkit.openTab(
       {
         kind,
@@ -189,7 +188,7 @@ export function SearchSurface({ spaceId }: { spaceId: string }) {
   return (
     <Surface padded scroll>
       <TabName
-        name={space ? `Search · ${space.name}` : 'Search'}
+        name="Search"
         icon={faMagnifyingGlass}
         spaceId={spaceId}
         spaceName={space?.name}
@@ -228,8 +227,8 @@ export function SearchSurface({ spaceId }: { spaceId: string }) {
       {messageHits.length > 0 && (
         <Box>
           <SectionHeading>
-            <FontAwesomeIcon icon={faMessage} fixedWidth />{' '}
-            Messages ({messageHits.length})
+            <FontAwesomeIcon icon={faMessage} fixedWidth /> Messages (
+            {messageHits.length})
           </SectionHeading>
           {messageHits.map((hit) => (
             <MessageHit
@@ -244,8 +243,8 @@ export function SearchSurface({ spaceId }: { spaceId: string }) {
       {documentHits.length > 0 && (
         <Box>
           <SectionHeading>
-            <FontAwesomeIcon icon={faFileLines} fixedWidth />{' '}
-            Documents ({documentHits.length})
+            <FontAwesomeIcon icon={faFileLines} fixedWidth /> Documents (
+            {documentHits.length})
           </SectionHeading>
           {documentHits.map((hit) => (
             <DocumentHit

@@ -73,10 +73,7 @@ impl PushSubscription {
         Ok(subs)
     }
 
-    pub async fn delete_by_id<'c, X: sqlx::PgExecutor<'c>>(
-        id: Uuid,
-        db: X,
-    ) -> Result<(), Error> {
+    pub async fn delete_by_id<'c, X: sqlx::PgExecutor<'c>>(id: Uuid, db: X) -> Result<(), Error> {
         sqlx::query(r##"DELETE FROM "PushSubscription" WHERE "id" = $1"##)
             .bind(id)
             .execute(db)

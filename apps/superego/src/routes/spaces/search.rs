@@ -5,9 +5,7 @@ use uuid::Uuid;
 
 use crate::{
     db::db,
-    entities::{
-        Document, DocumentSearchResult, MemberExt, Message, MessageSearchResult, SpaceExt,
-    },
+    entities::{Document, DocumentSearchResult, MemberExt, Message, MessageSearchResult, SpaceExt},
     error::Error,
     functions::jwt::Claims,
     middlewares::load::Load,
@@ -89,9 +87,7 @@ pub fn router() -> AppRouter<State> {
         .route(
             "/messages",
             get_with(search_messages, |o| {
-                o.tag(TAG)
-                    .id("search.messages")
-                    .summary("Search Messages")
+                o.tag(TAG).id("search.messages").summary("Search Messages")
             }),
         )
         .route(

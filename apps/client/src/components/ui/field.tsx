@@ -8,11 +8,11 @@ export interface FieldProps extends Omit<ChakraField.RootProps, 'label'> {
   optionalText?: React.ReactNode;
 }
 
-export const Field = function Field(props: FieldProps, ref) {
+export const Field = function Field(props: FieldProps) {
   const { label, children, helperText, errorText, optionalText, ...rest } =
     props;
   return (
-    <ChakraField.Root ref={ref} {...rest}>
+    <ChakraField.Root {...rest}>
       {label && (
         <ChakraField.Label>
           {label}
@@ -23,9 +23,7 @@ export const Field = function Field(props: FieldProps, ref) {
       {helperText && (
         <ChakraField.HelperText>{helperText}</ChakraField.HelperText>
       )}
-      {errorText && (
-        <ChakraField.ErrorText>{errorText}</ChakraField.ErrorText>
-      )}
+      {errorText && <ChakraField.ErrorText>{errorText}</ChakraField.ErrorText>}
     </ChakraField.Root>
   );
 };

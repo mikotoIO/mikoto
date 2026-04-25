@@ -210,7 +210,7 @@ CREATE TABLE public."Document" (
     id uuid NOT NULL,
     "channelId" uuid NOT NULL,
     content character varying(262144) NOT NULL,
-    "searchTsv" tsvector GENERATED ALWAYS AS (to_tsvector('simple'::regconfig, COALESCE(content, ''::character varying)::text)) STORED
+    "searchTsv" tsvector GENERATED ALWAYS AS (to_tsvector('simple'::regconfig, (COALESCE(content, ''::character varying))::text)) STORED
 );
 
 
@@ -258,7 +258,7 @@ CREATE TABLE public."Message" (
     "editedTimestamp" timestamp(3) without time zone,
     "authorId" uuid,
     "channelId" uuid NOT NULL,
-    "searchTsv" tsvector GENERATED ALWAYS AS (to_tsvector('simple'::regconfig, COALESCE(content, ''::character varying)::text)) STORED
+    "searchTsv" tsvector GENERATED ALWAYS AS (to_tsvector('simple'::regconfig, (COALESCE(content, ''::character varying))::text)) STORED
 );
 
 

@@ -11,24 +11,22 @@ import {
   useFileUploadContext,
   useRecipe,
 } from '@chakra-ui/react';
-import { forwardRef } from 'react';
+import 'react';
 import { LuFile, LuUpload, LuX } from 'react-icons/lu';
 
 export interface FileUploadRootProps extends ChakraFileUpload.RootProps {
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 }
 
-export const FileUploadRoot = forwardRef<HTMLInputElement, FileUploadRootProps>(
-  function FileUploadRoot(props, ref) {
-    const { children, inputProps, ...rest } = props;
-    return (
-      <ChakraFileUpload.Root {...rest}>
-        <ChakraFileUpload.HiddenInput ref={ref} {...inputProps} />
-        {children}
-      </ChakraFileUpload.Root>
-    );
-  },
-);
+export const FileUploadRoot = function FileUploadRoot(props: FileUploadRootProps, ref) {
+  const { children, inputProps, ...rest } = props;
+  return (
+    <ChakraFileUpload.Root {...rest}>
+      <ChakraFileUpload.HiddenInput ref={ref} {...inputProps} />
+      {children}
+    </ChakraFileUpload.Root>
+  );
+};
 
 export interface FileUploadDropzoneProps
   extends ChakraFileUpload.DropzoneProps {
@@ -36,10 +34,7 @@ export interface FileUploadDropzoneProps
   description?: React.ReactNode;
 }
 
-export const FileUploadDropzone = forwardRef<
-  HTMLInputElement,
-  FileUploadDropzoneProps
->(function FileUploadDropzone(props, ref) {
+export const FileUploadDropzone = function FileUploadDropzone(props: FileUploadDropzoneProps, ref) {
   const { children, label, description, ...rest } = props;
   return (
     <ChakraFileUpload.Dropzone ref={ref} {...rest}>
@@ -53,7 +48,7 @@ export const FileUploadDropzone = forwardRef<
       {children}
     </ChakraFileUpload.Dropzone>
   );
-});
+};
 
 interface VisibilityProps {
   showSize?: boolean;
@@ -100,29 +95,27 @@ interface FileUploadListProps
   files?: File[];
 }
 
-export const FileUploadList = forwardRef<HTMLUListElement, FileUploadListProps>(
-  function FileUploadList(props, ref) {
-    const { showSize, clearable, files, ...rest } = props;
+export const FileUploadList = function FileUploadList(props: FileUploadListProps, ref) {
+  const { showSize, clearable, files, ...rest } = props;
 
-    const fileUpload = useFileUploadContext();
-    const acceptedFiles = files ?? fileUpload.acceptedFiles;
+  const fileUpload = useFileUploadContext();
+  const acceptedFiles = files ?? fileUpload.acceptedFiles;
 
-    if (acceptedFiles.length === 0) return null;
+  if (acceptedFiles.length === 0) return null;
 
-    return (
-      <ChakraFileUpload.ItemGroup ref={ref} {...rest}>
-        {acceptedFiles.map((file) => (
-          <FileUploadItem
-            key={file.name}
-            file={file}
-            showSize={showSize}
-            clearable={clearable}
-          />
-        ))}
-      </ChakraFileUpload.ItemGroup>
-    );
-  },
-);
+  return (
+    <ChakraFileUpload.ItemGroup ref={ref} {...rest}>
+      {acceptedFiles.map((file) => (
+        <FileUploadItem
+          key={file.name}
+          file={file}
+          showSize={showSize}
+          clearable={clearable}
+        />
+      ))}
+    </ChakraFileUpload.ItemGroup>
+  );
+};
 
 type Assign<T, U> = Omit<T, keyof U> & U;
 
@@ -130,36 +123,34 @@ interface FileInputProps extends Assign<ButtonProps, RecipeProps<'input'>> {
   placeholder?: React.ReactNode;
 }
 
-export const FileInput = forwardRef<HTMLButtonElement, FileInputProps>(
-  function FileInput(props, ref) {
-    const inputRecipe = useRecipe({ key: 'input' });
-    const [recipeProps, restProps] = inputRecipe.splitVariantProps(props);
-    const { placeholder = 'Select file(s)', ...rest } = restProps;
-    return (
-      <ChakraFileUpload.Trigger asChild>
-        <Button
-          unstyled
-          py="0"
-          ref={ref}
-          {...rest}
-          css={[inputRecipe(recipeProps), props.css]}
-        >
-          <ChakraFileUpload.Context>
-            {({ acceptedFiles }) => {
-              if (acceptedFiles.length === 1) {
-                return <span>{acceptedFiles[0].name}</span>;
-              }
-              if (acceptedFiles.length > 1) {
-                return <span>{acceptedFiles.length} files</span>;
-              }
-              return <Span color="fg.subtle">{placeholder}</Span>;
-            }}
-          </ChakraFileUpload.Context>
-        </Button>
-      </ChakraFileUpload.Trigger>
-    );
-  },
-);
+export const FileInput = function FileInput(props: FileInputProps, ref) {
+  const inputRecipe = useRecipe({ key: 'input' });
+  const [recipeProps, restProps] = inputRecipe.splitVariantProps(props);
+  const { placeholder = 'Select file(s)', ...rest } = restProps;
+  return (
+    <ChakraFileUpload.Trigger asChild>
+      <Button
+        unstyled
+        py="0"
+        ref={ref}
+        {...rest}
+        css={[inputRecipe(recipeProps), props.css]}
+      >
+        <ChakraFileUpload.Context>
+          {({ acceptedFiles }) => {
+            if (acceptedFiles.length === 1) {
+              return <span>{acceptedFiles[0].name}</span>;
+            }
+            if (acceptedFiles.length > 1) {
+              return <span>{acceptedFiles.length} files</span>;
+            }
+            return <Span color="fg.subtle">{placeholder}</Span>;
+          }}
+        </ChakraFileUpload.Context>
+      </Button>
+    </ChakraFileUpload.Trigger>
+  );
+};
 
 export const FileUploadLabel = ChakraFileUpload.Label;
 export const FileUploadClearTrigger = ChakraFileUpload.ClearTrigger;

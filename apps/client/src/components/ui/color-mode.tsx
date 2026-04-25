@@ -4,7 +4,7 @@ import type { IconButtonProps } from '@chakra-ui/react';
 import { ClientOnly, IconButton, Skeleton } from '@chakra-ui/react';
 import { ThemeProvider, useTheme } from 'next-themes';
 import type { ThemeProviderProps } from 'next-themes';
-import { forwardRef } from 'react';
+import 'react';
 import { LuMoon, LuSun } from 'react-icons/lu';
 
 export type ColorModeProviderProps = ThemeProviderProps;
@@ -39,10 +39,7 @@ export function ColorModeIcon() {
 
 type ColorModeButtonProps = Omit<IconButtonProps, 'aria-label'>;
 
-export const ColorModeButton = forwardRef<
-  HTMLButtonElement,
-  ColorModeButtonProps
->(function ColorModeButton(props, ref) {
+export const ColorModeButton = function ColorModeButton(props: ColorModeButtonProps, ref) {
   const { toggleColorMode } = useColorMode();
   return (
     <ClientOnly fallback={<Skeleton boxSize="8" />}>
@@ -64,4 +61,4 @@ export const ColorModeButton = forwardRef<
       </IconButton>
     </ClientOnly>
   );
-});
+};

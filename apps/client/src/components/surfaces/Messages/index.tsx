@@ -261,7 +261,12 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
     <Surface key={channel.id}>
       <TabName
         name={displayName}
-        icon={channel.space?.icon ?? faHashtag}
+        icon={
+          !channel.spaceId && dmRelation
+            ? (dmRelation.user.avatar ??
+              `default-avatar/${dmRelation.user.id}`)
+            : (channel.space?.icon ?? faHashtag)
+        }
         spaceId={channel.space?.id}
         spaceName={channel.space?.name}
       />

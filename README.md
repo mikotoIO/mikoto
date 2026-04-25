@@ -95,7 +95,6 @@ All Mikoto services use ports in the `351X` or `351XX` range to avoid conflicts 
 | RustFS (S3) | 35103, 35104        | Object storage          |
 | LiveKit     | 35105, 35106, 35107 | Real-time audio/video   |
 | MailHog     | 35108, 35109        | Development mail server |
-| Meilisearch | 35110               | Search engine           |
 
 ## Docs
 

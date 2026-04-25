@@ -60,7 +60,7 @@ reset:
     echo "Stopping Docker services..."
     docker compose down --remove-orphans
     echo "Removing volumes..."
-    docker volume rm mikoto_postgresql mikoto_redis mikoto_meilisearch 2>/dev/null || true
+    docker volume rm mikoto_postgresql mikoto_redis 2>/dev/null || true
     rm -rf ./data/rustfs
     echo "Starting Docker services..."
     docker compose up -d
@@ -72,7 +72,7 @@ reset-dev-env:
     echo "Stopping Docker services..."
     docker compose down --remove-orphans
     echo "Removing volumes..."
-    docker volume rm mikoto_postgresql mikoto_redis mikoto_meilisearch 2>/dev/null || true
+    docker volume rm mikoto_postgresql mikoto_redis 2>/dev/null || true
     rm -rf ./data/rustfs
     echo "Starting Docker services..."
     docker compose up -d

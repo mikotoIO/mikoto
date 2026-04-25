@@ -38,16 +38,8 @@ services:
       - '35105:7880'
       - '35106:7881'
       - '35107:7882'
-  meilisearch:
-    image: 'getmeili/meilisearch:v1.4'
-    ports:
-      - '35110:7700'
-    volumes:
-      - 'meilisearch:/meili_data'
-    restart: 'on-failure:0'
 volumes:
   postgresql: null
   rustfs: null
   redis:
     driver: local
-  meilisearch: null

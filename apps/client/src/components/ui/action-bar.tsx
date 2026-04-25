@@ -1,5 +1,5 @@
 import { ActionBar, Portal } from '@chakra-ui/react';
-import { forwardRef } from 'react';
+import 'react';
 
 import { CloseButton } from './close-button';
 
@@ -8,10 +8,7 @@ interface ActionBarContentProps extends ActionBar.ContentProps {
   portalRef?: React.RefObject<HTMLElement>;
 }
 
-export const ActionBarContent = forwardRef<
-  HTMLDivElement,
-  ActionBarContentProps
->(function ActionBarContent(props, ref) {
+export const ActionBarContent = function ActionBarContent(props: ActionBarContentProps, ref) {
   const { children, portalled = true, portalRef, ...rest } = props;
 
   return (
@@ -23,18 +20,15 @@ export const ActionBarContent = forwardRef<
       </ActionBar.Positioner>
     </Portal>
   );
-});
+};
 
-export const ActionBarCloseTrigger = forwardRef<
-  HTMLButtonElement,
-  ActionBar.CloseTriggerProps
->(function ActionBarCloseTrigger(props, ref) {
+export const ActionBarCloseTrigger = function ActionBarCloseTrigger(props: ActionBar.CloseTriggerProps, ref) {
   return (
     <ActionBar.CloseTrigger {...props} asChild ref={ref}>
       <CloseButton size="sm" />
     </ActionBar.CloseTrigger>
   );
-});
+};
 
 export const ActionBarRoot = ActionBar.Root;
 export const ActionBarSelectionTrigger = ActionBar.SelectionTrigger;

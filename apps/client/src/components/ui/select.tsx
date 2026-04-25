@@ -2,7 +2,7 @@
 
 import type { CollectionItem } from '@chakra-ui/react';
 import { Select as ChakraSelect, Portal } from '@chakra-ui/react';
-import { forwardRef } from 'react';
+import 'react';
 
 import { CloseButton } from './close-button';
 
@@ -10,25 +10,20 @@ interface SelectTriggerProps extends ChakraSelect.ControlProps {
   clearable?: boolean;
 }
 
-export const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(
-  function SelectTrigger(props, ref) {
-    const { children, clearable, ...rest } = props;
-    return (
-      <ChakraSelect.Control {...rest}>
-        <ChakraSelect.Trigger ref={ref}>{children}</ChakraSelect.Trigger>
-        <ChakraSelect.IndicatorGroup>
-          {clearable && <SelectClearTrigger />}
-          <ChakraSelect.Indicator />
-        </ChakraSelect.IndicatorGroup>
-      </ChakraSelect.Control>
-    );
-  },
-);
+export const SelectTrigger = function SelectTrigger(props: SelectTriggerProps, ref) {
+  const { children, clearable, ...rest } = props;
+  return (
+    <ChakraSelect.Control {...rest}>
+      <ChakraSelect.Trigger ref={ref}>{children}</ChakraSelect.Trigger>
+      <ChakraSelect.IndicatorGroup>
+        {clearable && <SelectClearTrigger />}
+        <ChakraSelect.Indicator />
+      </ChakraSelect.IndicatorGroup>
+    </ChakraSelect.Control>
+  );
+};
 
-const SelectClearTrigger = forwardRef<
-  HTMLButtonElement,
-  ChakraSelect.ClearTriggerProps
->(function SelectClearTrigger(props, ref) {
+const SelectClearTrigger = function SelectClearTrigger(props: ChakraSelect.ClearTriggerProps, ref) {
   return (
     <ChakraSelect.ClearTrigger asChild {...props} ref={ref}>
       <CloseButton
@@ -40,47 +35,40 @@ const SelectClearTrigger = forwardRef<
       />
     </ChakraSelect.ClearTrigger>
   );
-});
+};
 
 interface SelectContentProps extends ChakraSelect.ContentProps {
   portalled?: boolean;
   portalRef?: React.RefObject<HTMLElement>;
 }
 
-export const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
-  function SelectContent(props, ref) {
-    const { portalled = true, portalRef, ...rest } = props;
-    return (
-      <Portal disabled={!portalled} container={portalRef}>
-        <ChakraSelect.Positioner>
-          <ChakraSelect.Content {...rest} ref={ref} />
-        </ChakraSelect.Positioner>
-      </Portal>
-    );
-  },
-);
+export const SelectContent = function SelectContent(props: SelectContentProps, ref) {
+  const { portalled = true, portalRef, ...rest } = props;
+  return (
+    <Portal disabled={!portalled} container={portalRef}>
+      <ChakraSelect.Positioner>
+        <ChakraSelect.Content {...rest} ref={ref} />
+      </ChakraSelect.Positioner>
+    </Portal>
+  );
+};
 
-export const SelectItem = forwardRef<HTMLDivElement, ChakraSelect.ItemProps>(
-  function SelectItem(props, ref) {
-    const { item, children, ...rest } = props;
-    return (
-      <ChakraSelect.Item key={item.value} item={item} {...rest} ref={ref}>
-        {children}
-        <ChakraSelect.ItemIndicator />
-      </ChakraSelect.Item>
-    );
-  },
-);
+export const SelectItem = function SelectItem(props: ChakraSelect.ItemProps, ref) {
+  const { item, children, ...rest } = props;
+  return (
+    <ChakraSelect.Item key={item.value} item={item} {...rest} ref={ref}>
+      {children}
+      <ChakraSelect.ItemIndicator />
+    </ChakraSelect.Item>
+  );
+};
 
 interface SelectValueTextProps
   extends Omit<ChakraSelect.ValueTextProps, 'children'> {
   children?(items: CollectionItem[]): React.ReactNode;
 }
 
-export const SelectValueText = forwardRef<
-  HTMLSpanElement,
-  SelectValueTextProps
->(function SelectValueText(props, ref) {
+export const SelectValueText = function SelectValueText(props: SelectValueTextProps, ref) {
   const { children, ...rest } = props;
   return (
     <ChakraSelect.ValueText {...rest} ref={ref}>
@@ -96,7 +84,7 @@ export const SelectValueText = forwardRef<
       </ChakraSelect.Context>
     </ChakraSelect.ValueText>
   );
-});
+};
 
 export const SelectRoot = forwardRef<HTMLDivElement, ChakraSelect.RootProps>(
   function SelectRoot(props, ref) {
@@ -123,17 +111,15 @@ interface SelectItemGroupProps extends ChakraSelect.ItemGroupProps {
   label: React.ReactNode;
 }
 
-export const SelectItemGroup = forwardRef<HTMLDivElement, SelectItemGroupProps>(
-  function SelectItemGroup(props, ref) {
-    const { children, label, ...rest } = props;
-    return (
-      <ChakraSelect.ItemGroup {...rest} ref={ref}>
-        <ChakraSelect.ItemGroupLabel>{label}</ChakraSelect.ItemGroupLabel>
-        {children}
-      </ChakraSelect.ItemGroup>
-    );
-  },
-);
+export const SelectItemGroup = function SelectItemGroup(props: SelectItemGroupProps, ref) {
+  const { children, label, ...rest } = props;
+  return (
+    <ChakraSelect.ItemGroup {...rest} ref={ref}>
+      <ChakraSelect.ItemGroupLabel>{label}</ChakraSelect.ItemGroupLabel>
+      {children}
+    </ChakraSelect.ItemGroup>
+  );
+};
 
 export const SelectLabel = ChakraSelect.Label;
 export const SelectItemText = ChakraSelect.ItemText;

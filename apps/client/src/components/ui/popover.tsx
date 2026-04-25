@@ -1,5 +1,5 @@
 import { Popover as ChakraPopover, Portal } from '@chakra-ui/react';
-import { forwardRef } from 'react';
+import 'react';
 
 import { CloseButton } from './close-button';
 
@@ -8,34 +8,26 @@ interface PopoverContentProps extends ChakraPopover.ContentProps {
   portalRef?: React.RefObject<HTMLElement>;
 }
 
-export const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(
-  function PopoverContent(props, ref) {
-    const { portalled = true, portalRef, ...rest } = props;
-    return (
-      <Portal disabled={!portalled} container={portalRef}>
-        <ChakraPopover.Positioner>
-          <ChakraPopover.Content ref={ref} {...rest} />
-        </ChakraPopover.Positioner>
-      </Portal>
-    );
-  },
-);
+export const PopoverContent = function PopoverContent(props: PopoverContentProps, ref) {
+  const { portalled = true, portalRef, ...rest } = props;
+  return (
+    <Portal disabled={!portalled} container={portalRef}>
+      <ChakraPopover.Positioner>
+        <ChakraPopover.Content ref={ref} {...rest} />
+      </ChakraPopover.Positioner>
+    </Portal>
+  );
+};
 
-export const PopoverArrow = forwardRef<
-  HTMLDivElement,
-  ChakraPopover.ArrowProps
->(function PopoverArrow(props, ref) {
+export const PopoverArrow = function PopoverArrow(props: ChakraPopover.ArrowProps, ref) {
   return (
     <ChakraPopover.Arrow {...props} ref={ref}>
       <ChakraPopover.ArrowTip />
     </ChakraPopover.Arrow>
   );
-});
+};
 
-export const PopoverCloseTrigger = forwardRef<
-  HTMLButtonElement,
-  ChakraPopover.CloseTriggerProps
->(function PopoverCloseTrigger(props, ref) {
+export const PopoverCloseTrigger = function PopoverCloseTrigger(props: ChakraPopover.CloseTriggerProps, ref) {
   return (
     <ChakraPopover.CloseTrigger
       position="absolute"
@@ -48,7 +40,7 @@ export const PopoverCloseTrigger = forwardRef<
       <CloseButton size="sm" />
     </ChakraPopover.CloseTrigger>
   );
-});
+};
 
 export const PopoverTitle = ChakraPopover.Title;
 export const PopoverDescription = ChakraPopover.Description;

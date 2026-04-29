@@ -93,7 +93,7 @@ impl Document {
                        'simple',
                        d."content",
                        websearch_to_tsquery('simple', $1),
-                       'StartSel=<mark>,StopSel=</mark>,MaxFragments=2,MaxWords=24,MinWords=6'
+                       'StartSel=<mark>,StopSel=</mark>,MaxFragments=2,MaxWords=24,MinWords=6,ShortWord=0'
                    ) AS "snippet"
             FROM "Document" d
             JOIN "Channel" c ON c."id" = d."channelId"

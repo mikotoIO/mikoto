@@ -166,6 +166,27 @@ pub struct DocumentPatch {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DocumentSearchQuery {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub channel_id: Option<Uuid>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub offset: Option<i32>,
+    pub q: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DocumentSearchResult {
+    pub channel_id: Uuid,
+    pub content: String,
+    pub id: Uuid,
+    pub snippet: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum HandleOwner {
     #[serde(rename = "user")]
@@ -333,6 +354,37 @@ pub struct MessageListQuery {
     pub cursor: Option<Uuid>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub limit: Option<i32>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MessageSearchQuery {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub author_id: Option<Uuid>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub channel_id: Option<Uuid>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub offset: Option<i32>,
+    pub q: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MessageSearchResult {
+    pub attachments: Vec<MessageAttachment>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub author: Option<User>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub author_id: Option<Uuid>,
+    pub channel_id: Uuid,
+    pub content: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub edited_timestamp: Option<DateTime<Utc>>,
+    pub id: Uuid,
+    pub snippet: String,
+    pub timestamp: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1006,6 +1058,23 @@ impl<'a> HttpApi<'a> {
         Ok(resp.json().await?)
     }
 
+    pub async fn dm_unreads(&self) -> Result<Vec<ChannelUnread>, ClientError> {
+        let path = "/dm/unreads".to_string();
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn dm_acknowledge(&self, channel_id: Uuid) -> Result<(), ClientError> {
+        let path = format!("/dm/{}/ack", channel_id);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
+    }
+
     pub async fn push_config(&self) -> Result<PushConfig, ClientError> {
         let path = "/push/config".to_string();
         let mut req = self.client.get(self.url(&path))
@@ -1420,6 +1489,31 @@ impl<'a> HttpApi<'a> {
         let resp = req.send().await?.error_for_status()?;
         let _ = resp.text().await?;
         Ok(())
+    }
+
+    pub async fn search_messages(&self, space_id: Uuid, author_id: Option<Uuid>, channel_id: Option<Uuid>, limit: Option<i32>, offset: Option<i32>, q: String) -> Result<Vec<MessageSearchResult>, ClientError> {
+        let path = format!("/spaces/{}/search/messages", space_id);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
+        if let Some(v) = &author_id { req = req.query(&[("authorId", v.to_string())]); }
+        if let Some(v) = &channel_id { req = req.query(&[("channelId", v.to_string())]); }
+        if let Some(v) = &limit { req = req.query(&[("limit", v.to_string())]); }
+        if let Some(v) = &offset { req = req.query(&[("offset", v.to_string())]); }
+        req = req.query(&[("q", q.to_string())]);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn search_documents(&self, space_id: Uuid, channel_id: Option<Uuid>, limit: Option<i32>, offset: Option<i32>, q: String) -> Result<Vec<DocumentSearchResult>, ClientError> {
+        let path = format!("/spaces/{}/search/documents", space_id);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
+        if let Some(v) = &channel_id { req = req.query(&[("channelId", v.to_string())]); }
+        if let Some(v) = &limit { req = req.query(&[("limit", v.to_string())]); }
+        if let Some(v) = &offset { req = req.query(&[("offset", v.to_string())]); }
+        req = req.query(&[("q", q.to_string())]);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
     }
 
 }

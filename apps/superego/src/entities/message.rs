@@ -142,7 +142,7 @@ impl Message {
                        'simple',
                        m."content",
                        websearch_to_tsquery('simple', $1),
-                       'StartSel=<mark>,StopSel=</mark>,MaxFragments=2,MaxWords=18,MinWords=4'
+                       'StartSel=<mark>,StopSel=</mark>,HighlightAll=TRUE'
                    ) AS "snippet"
             FROM "Message" m
             JOIN "Channel" c ON c."id" = m."channelId"

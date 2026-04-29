@@ -102,6 +102,4 @@ All Mikoto services use ports in the `351X` or `351XX` range to avoid conflicts 
 
 ## License
 
-Dual licensed under AGPL core and a proprietary license.
-
-See [LICENSE](./LICENSE)
+MIT Licensed. See [LICENSE](./LICENSE).

@@ -151,8 +151,12 @@ export class MemberManager extends CachedManager<MikotoMember> {
         const member = new MikotoMember(data, this.client);
         this._insert(member);
         return member;
-      } catch {
-        this.knownMissing.add(userId);
+      } catch (err) {
+        // Only treat a definitive 404 as "not a member" — transient
+        // failures (network drops, 5xx, timeouts) must stay retryable.
+        const status = (err as { response?: { status?: number } } | undefined)
+          ?.response?.status;
+        if (status === 404) this.knownMissing.add(userId);
         return undefined;
       } finally {
         this.inflight.delete(userId);

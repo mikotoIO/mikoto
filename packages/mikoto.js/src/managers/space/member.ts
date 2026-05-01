@@ -88,6 +88,8 @@ export class MemberManager extends CachedManager<MikotoMember> {
   hasMore = true;
   private nextCursor?: string;
   private fetching = false;
+  private inflight = ref(new Map<string, Promise<MikotoMember | undefined>>());
+  private knownMissing = ref(new Set<string>());
 
   constructor(public space: MikotoSpace) {
     super(space.client);
@@ -96,6 +98,7 @@ export class MemberManager extends CachedManager<MikotoMember> {
 
   override _insert(data: MikotoMember) {
     this.cache.set(data.userId, data);
+    this.knownMissing.delete(data.userId);
   }
 
   reset() {
@@ -103,6 +106,8 @@ export class MemberManager extends CachedManager<MikotoMember> {
     this.hasMore = true;
     this.nextCursor = undefined;
     this.fetching = false;
+    this.inflight.clear();
+    this.knownMissing.clear();
   }
 
   async list() {
@@ -123,6 +128,39 @@ export class MemberManager extends CachedManager<MikotoMember> {
     } finally {
       this.fetching = false;
     }
+  }
+
+  /**
+   * Ensure a member is loaded into the cache, fetching it if missing.
+   * Deduplicates concurrent calls and remembers users that aren't members
+   * so we don't retry forever.
+   */
+  ensureLoaded(userId: string): Promise<MikotoMember | undefined> {
+    const existing = this.cache.get(userId);
+    if (existing) return Promise.resolve(existing);
+    if (this.knownMissing.has(userId)) return Promise.resolve(undefined);
+
+    const pending = this.inflight.get(userId);
+    if (pending) return pending;
+
+    const promise = (async () => {
+      try {
+        const data = await this.client.rest['members.get']({
+          params: { spaceId: this.space.id, userId },
+        });
+        const member = new MikotoMember(data, this.client);
+        this._insert(member);
+        return member;
+      } catch {
+        this.knownMissing.add(userId);
+        return undefined;
+      } finally {
+        this.inflight.delete(userId);
+      }
+    })();
+
+    this.inflight.set(userId, promise);
+    return promise;
   }
 
   static _subscribe(client: MikotoClient) {

@@ -62,7 +62,7 @@ To develop apps and packages, run the following command:
 
 ```sh
 docker compose up -d # Run auxiliary services
-just start-dev # runs the base scripts
+just run-core # runs the base scripts
 ```
 
 ### Build

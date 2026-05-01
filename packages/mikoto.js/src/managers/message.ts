@@ -29,7 +29,15 @@ export class MikotoMessage extends ZSchema(MessageExt) {
 
   get member() {
     if (!this.authorId) return undefined;
-    return this.channel?.space?.members._get(this.authorId);
+    const members = this.channel?.space?.members;
+    if (!members) return undefined;
+    const cached = members._get(this.authorId);
+    if (cached) return cached;
+    // Lazy-load the member on first access. The valtio proxy will trigger
+    // a re-render once the cache is populated. Internal dedup prevents
+    // duplicate requests for the same user.
+    members.ensureLoaded(this.authorId);
+    return undefined;
   }
 
   async edit(content: string) {

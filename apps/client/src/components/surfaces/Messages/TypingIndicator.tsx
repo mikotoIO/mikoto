@@ -1,6 +1,6 @@
 import { Box } from '@chakra-ui/react';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useInterval, useMikoto } from '@/hooks';
 import { TypingDots } from '@/ui';
@@ -42,6 +42,14 @@ export function TypingIndicator({ typers, channel }: TypingIndicatorProps) {
   const space = channel.spaceId
     ? mikoto.spaces._get(channel.spaceId)
     : undefined;
+
+  useEffect(() => {
+    if (!space) return;
+    typers.forEach((t) => {
+      space.members.ensureLoaded(t.userId);
+    });
+  }, [space, typers]);
+
   const humanNames: string[] = [];
   const botNames: string[] = [];
 

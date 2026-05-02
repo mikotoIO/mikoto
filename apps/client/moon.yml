@@ -6,3 +6,10 @@ tasks:
     command: 'tsc --noEmit'
     deps:
       - 'mikoto.js:build'
+
+  # Run the client dev server against the production backend via a
+  # same-origin Vite proxy (see apps/client/docs/PROD-BACKEND-DEV.md).
+  # Intended as a design-engineer devflow: no local superego needed.
+  dev.prod-backend:
+    command: 'vite --mode prod-backend'
+    preset: 'server'

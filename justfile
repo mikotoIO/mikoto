@@ -1,5 +1,12 @@
 run-core:
     moon :start --query "tag~core-app"
+
+# Run only the client dev server, pointed at the production backend.
+# Designed for frontend/design-engineer iteration — no local superego,
+# redis, postgres, or media stack required. See
+# apps/client/docs/PROD-BACKEND-DEV.md for how the proxy works.
+run-client-prod:
+    moon run client:dev.prod-backend
 # Run database migrations for superego
 migrate:
     cd apps/superego && cargo run --bin migrate

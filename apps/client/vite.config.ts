@@ -4,17 +4,39 @@ import * as dotenv from 'dotenv';
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { defineConfig } from 'vite';
+import { defineConfig, type ProxyOptions } from 'vite';
 
 // import { VitePWA } from 'vite-plugin-pwa';
 
 dotenv.config();
+
+// When running against the production backend (`vite --mode prod-backend`),
+// we route /__api and /__media through the dev server so the browser stays
+// same-origin and CORS is a non-issue. The target URLs can be overridden
+// per-developer via PROXY_API_TARGET / PROXY_MEDIA_TARGET env vars (e.g.
+// to point at a staging instance) without editing this file.
+const PROD_BACKEND_PROXY: Record<string, ProxyOptions> = {
+  '/__api': {
+    target: process.env.PROXY_API_TARGET || 'https://server.platform.mikoto.io',
+    changeOrigin: true,
+    secure: true,
+    ws: true,
+    rewrite: (p) => p.replace(/^\/__api/, ''),
+  },
+  '/__media': {
+    target: process.env.PROXY_MEDIA_TARGET || 'https://cdn.platform.mikoto.io',
+    changeOrigin: true,
+    secure: true,
+    rewrite: (p) => p.replace(/^\/__media/, ''),
+  },
+};
 
 export default ({ mode }: { mode: string }) =>
   defineConfig({
     server: {
       host: process.env.HOST || undefined,
       port: parseInt(process.env.PORT || '', 10) || undefined,
+      proxy: mode === 'prod-backend' ? PROD_BACKEND_PROXY : undefined,
     },
     build: {
       target: 'es2020',

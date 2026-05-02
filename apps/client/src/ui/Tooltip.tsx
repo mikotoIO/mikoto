@@ -25,7 +25,6 @@ export const Tooltip = chakra('div', {
 });
 
 interface FloatingTooltipProps {
-   
   children: React.ReactElement<any>;
   tooltip: string;
   placement?: Placement;
@@ -76,28 +75,4 @@ export function FloatingTooltip({
       )}
     </>
   );
-}
-
-export function createTooltip(props: {
-  placement?: Placement;
-  offset?: [number, number];
-}) {
-  return function CreatedTooltip({
-    children,
-    tooltip,
-  }: {
-     
-    children: React.ReactElement<any>;
-    tooltip: string;
-  }) {
-    return (
-      <FloatingTooltip
-        tooltip={tooltip}
-        placement={props.placement}
-        offsetOptions={props.offset}
-      >
-        {children}
-      </FloatingTooltip>
-    );
-  };
 }

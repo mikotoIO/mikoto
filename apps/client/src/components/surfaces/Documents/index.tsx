@@ -33,6 +33,7 @@ import {
   PropsWithChildren,
   Suspense,
   useCallback,
+  useReducer,
   useRef,
   useState,
 } from 'react';
@@ -73,10 +74,10 @@ function formatRelativeTime(date: Date): string {
 }
 
 function useRelativeTime(date: Date | undefined): string | undefined {
-  const [, setTick] = useState(0);
+  const [, tick] = useReducer((x: number) => x + 1, 0);
 
   useInterval(() => {
-    setTick((t) => t + 1);
+    tick();
   }, 10000);
 
   if (!date) return undefined;

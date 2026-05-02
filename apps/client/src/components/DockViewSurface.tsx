@@ -90,17 +90,23 @@ function isFontAwesomeIcon(
 function useTitle(api: { title: string | undefined; onDidTitleChange: any }) {
   const [title, setTitle] = useState<string | undefined>(api.title);
 
+  // Derived-state reset: when the api's title diverges from our cached one
+  // (new api instance or external change), resync during render instead of
+  // in an effect to avoid the extra commit.
+  const [prevApiTitle, setPrevApiTitle] = useState(api.title);
+  if (prevApiTitle !== api.title) {
+    setPrevApiTitle(api.title);
+    setTitle(api.title);
+  }
+
   useEffect(() => {
     const disposable = api.onDidTitleChange(
       (event: { title: string | undefined }) => {
         setTitle(event.title);
       },
     );
-    if (title !== api.title) {
-      setTitle(api.title);
-    }
     return () => disposable.dispose();
-  }, [api, title]);
+  }, [api]);
 
   return title;
 }
@@ -111,7 +117,7 @@ function CustomTabComponent(props: IDockviewPanelHeaderProps) {
   const panelId = api.id;
   const tabName = useAtomValue(tabNameFamily(panelId));
   const title = useTitle(api);
-  const isMiddleMouseButton = useRef<boolean>(false);
+  const isMiddleMouseButtonRef = useRef<boolean>(false);
 
   const onClose = useCallback(
     (event: React.MouseEvent) => {
@@ -127,15 +133,15 @@ function CustomTabComponent(props: IDockviewPanelHeaderProps) {
 
   const onPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
-      isMiddleMouseButton.current = event.button === 1;
+      isMiddleMouseButtonRef.current = event.button === 1;
     },
     [],
   );
 
   const onPointerUp = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
-      if (isMiddleMouseButton.current && event.button === 1) {
-        isMiddleMouseButton.current = false;
+      if (isMiddleMouseButtonRef.current && event.button === 1) {
+        isMiddleMouseButtonRef.current = false;
         onClose(event);
       }
     },
@@ -143,7 +149,7 @@ function CustomTabComponent(props: IDockviewPanelHeaderProps) {
   );
 
   const onPointerLeave = useCallback(() => {
-    isMiddleMouseButton.current = false;
+    isMiddleMouseButtonRef.current = false;
   }, []);
 
   return (

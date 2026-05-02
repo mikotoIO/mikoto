@@ -141,11 +141,11 @@ export function MikotoClientProvider({
     }
   };
 
-  const initialized = useRef(false);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
-    if (!initialized.current) {
-      initialized.current = true;
+    if (!initializedRef.current) {
+      initializedRef.current = true;
       const abortController = new AbortController();
 
       const mi = new MikotoClient({

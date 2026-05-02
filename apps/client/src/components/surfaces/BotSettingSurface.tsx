@@ -278,7 +278,7 @@ function PermissionsSection({
   const authClient = useAuthClient();
   const [visibility, setVisibility] = useState(bot.visibility);
   const [perms, setPerms] = useState<Set<string>>(
-    new Set(bot.permissions ?? []),
+    () => new Set(bot.permissions ?? []),
   );
 
   const togglePerm = (key: string) => {

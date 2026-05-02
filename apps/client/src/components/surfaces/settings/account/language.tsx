@@ -13,7 +13,7 @@ const languages = [
 export function LanguageSurface() {
   const { t, i18n } = useTranslation();
   const [language, setLanguage] = useState(
-    localStorage.getItem('language') ?? 'en',
+    () => localStorage.getItem('language') ?? 'en',
   );
 
   return (

@@ -87,10 +87,8 @@ const Divider = styled.div`
 
 function FloatingToolbar({
   editor,
-  anchorElem,
 }: {
   editor: ReturnType<typeof useLexicalComposerContext>[0];
-  anchorElem: HTMLElement;
 }) {
   const toolbarRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -170,11 +168,15 @@ function FloatingToolbar({
 
   // Also update on mouse up to catch drag selections
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
     const onMouseUp = () => {
-      setTimeout(updateToolbar, 0);
+      timeoutId = setTimeout(updateToolbar, 0);
     };
     document.addEventListener('mouseup', onMouseUp);
-    return () => document.removeEventListener('mouseup', onMouseUp);
+    return () => {
+      document.removeEventListener('mouseup', onMouseUp);
+      if (timeoutId !== null) clearTimeout(timeoutId);
+    };
   }, [updateToolbar]);
 
   const toggleLink = useCallback(() => {
@@ -256,5 +258,6 @@ function FloatingToolbar({
 export function FloatingToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
 
-  return <FloatingToolbar editor={editor} anchorElem={document.body} />;
+  return <FloatingToolbar editor={editor} />;
 }
+

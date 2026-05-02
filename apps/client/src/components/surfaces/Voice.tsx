@@ -2,7 +2,6 @@ import styled from '@emotion/styled';
 import { faMicrophone } from '@fortawesome/free-solid-svg-icons';
 import {
   AudioTrack,
-  BarVisualizer,
   ConnectionQualityIndicator,
   ControlBar,
   FocusToggle,

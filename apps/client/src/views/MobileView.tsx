@@ -7,7 +7,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoChannel, MikotoSpace } from '@mikoto-io/mikoto.js';
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useSnapshot } from 'valtio/react';
 
@@ -203,23 +203,23 @@ function useSwipeDrawer() {
   const [offset, setOffset] = useState(-SIDEBAR_WIDTH);
   const [animate, setAnimate] = useState(true);
 
-  const tracking = useRef(false);
-  const startX = useRef(0);
-  const startY = useRef(0);
-  const currentOffset = useRef(-SIDEBAR_WIDTH);
-  const directionLocked = useRef<'horizontal' | 'vertical' | null>(null);
+  const trackingRef = useRef(false);
+  const startXRef = useRef(0);
+  const startYRef = useRef(0);
+  const currentOffsetRef = useRef(-SIDEBAR_WIDTH);
+  const directionLockedRef = useRef<'horizontal' | 'vertical' | null>(null);
 
   const open = useCallback(() => {
     setAnimate(true);
     setOffset(0);
-    currentOffset.current = 0;
+    currentOffsetRef.current = 0;
     setIsOpen(true);
   }, []);
 
   const close = useCallback(() => {
     setAnimate(true);
     setOffset(-SIDEBAR_WIDTH);
-    currentOffset.current = -SIDEBAR_WIDTH;
+    currentOffsetRef.current = -SIDEBAR_WIDTH;
     setIsOpen(false);
   }, []);
 
@@ -231,45 +231,45 @@ function useSwipeDrawer() {
 
       if (!inEdge && !inDrawer) return;
 
-      tracking.current = true;
-      directionLocked.current = null;
-      startX.current = touch.clientX;
-      startY.current = touch.clientY;
+      trackingRef.current = true;
+      directionLockedRef.current = null;
+      startXRef.current = touch.clientX;
+      startYRef.current = touch.clientY;
     },
     [isOpen],
   );
 
   const onTouchMove = useCallback(
     (e: React.TouchEvent) => {
-      if (!tracking.current) return;
+      if (!trackingRef.current) return;
       const touch = e.touches[0];
-      const dx = touch.clientX - startX.current;
-      const dy = touch.clientY - startY.current;
+      const dx = touch.clientX - startXRef.current;
+      const dy = touch.clientY - startYRef.current;
 
       // Lock direction on first significant movement
-      if (directionLocked.current === null) {
+      if (directionLockedRef.current === null) {
         if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
-        directionLocked.current =
+        directionLockedRef.current =
           Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical';
       }
 
-      if (directionLocked.current === 'vertical') return;
+      if (directionLockedRef.current === 'vertical') return;
 
       setAnimate(false);
       const base = isOpen ? 0 : -SIDEBAR_WIDTH;
       const next = Math.min(0, Math.max(-SIDEBAR_WIDTH, base + dx));
       setOffset(next);
-      currentOffset.current = next;
+      currentOffsetRef.current = next;
     },
     [isOpen],
   );
 
   const onTouchEnd = useCallback(() => {
-    if (!tracking.current) return;
-    tracking.current = false;
-    directionLocked.current = null;
+    if (!trackingRef.current) return;
+    trackingRef.current = false;
+    directionLockedRef.current = null;
 
-    const progress = (currentOffset.current + SIDEBAR_WIDTH) / SIDEBAR_WIDTH;
+    const progress = (currentOffsetRef.current + SIDEBAR_WIDTH) / SIDEBAR_WIDTH;
     if (progress > SWIPE_THRESHOLD) {
       open();
     } else {
@@ -535,18 +535,18 @@ function MobileAppView() {
   const [selectedSpaceId, setSelectedSpaceId] = useState<string | null>(null);
   const drawer = useSwipeDrawer();
 
-  // Auto-select first space if none selected
+  // Auto-select first space if none selected. Done during render as a
+  // derived-state pattern instead of an effect to avoid an extra commit.
   const mikoto = useMikoto();
   useSnapshot(mikoto.spaces);
-  useEffect(() => {
-    if (selectedSpaceId) return;
-    const spaces = Array.from(mikoto.spaces.cache.values()).filter(
+  if (!selectedSpaceId) {
+    const firstSpace = Array.from(mikoto.spaces.cache.values()).find(
       (s) => s.type === 'NONE',
     );
-    if (spaces.length > 0) {
-      setSelectedSpaceId(spaces[0].id);
+    if (firstSpace) {
+      setSelectedSpaceId(firstSpace.id);
     }
-  }, [mikoto.spaces, selectedSpaceId]);
+  }
 
   function handleSelectChannel(tab: Tabable, title: string) {
     setActiveView({ tab, title });

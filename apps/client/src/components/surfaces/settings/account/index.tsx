@@ -9,13 +9,12 @@ import {
   Textarea,
 } from '@chakra-ui/react';
 import { VerificationChallenge } from '@mikoto-io/mikoto.js';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { modalState } from '@/components/ContextMenu';
-import { userState } from '@/components/UserArea';
 import { AvatarEditor } from '@/components/molecules/AvatarEditor';
 import { BaseSettingsSurface } from '@/components/surfaces/BaseSettings';
 import { Button, DialogContent, Field } from '@/components/ui';

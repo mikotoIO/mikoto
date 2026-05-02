@@ -62,8 +62,12 @@ export function ContextMenuKit() {
   useLayoutEffect(() => {
     if (ref.current) {
       const rect = ref.current.getBoundingClientRect();
+      // Measure-then-set pattern: we need the DOM size post-layout to decide
+      // bottom-pinning. Keeping this as a layout effect avoids a visual flicker.
+      // eslint-disable-next-line @eslint-react/set-state-in-effect
       setBottomPin(rect.top + rect.height > window.innerHeight);
     } else {
+      // eslint-disable-next-line @eslint-react/set-state-in-effect
       setBottomPin(false);
     }
   }, [context ? 'something' : '']);

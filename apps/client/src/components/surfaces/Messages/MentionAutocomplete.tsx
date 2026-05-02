@@ -120,9 +120,13 @@ export function MentionAutocompletePlugin({
 
   activeIndexRef.current = activeIndex;
 
-  useEffect(() => {
+  // Reset the active index when the search term changes. Done during render
+  // via a tracked previous value so we don't double-commit in an effect.
+  const [prevSearch, setPrevSearch] = useState(match?.search);
+  if (prevSearch !== match?.search) {
+    setPrevSearch(match?.search);
     setActiveIndex(0);
-  }, [match?.search]);
+  }
 
   useEffect(() => {
     return editor.registerUpdateListener(() => {

@@ -124,7 +124,7 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
   // you will probably run out of memory before this number
   const [firstItemIndex, setFirstItemIndex] = useState(FUNNY_NUMBER);
   const [topLoaded, setTopLoaded] = useState(false);
-  const loadingOlder = useRef(false);
+  const loadingOlderRef = useRef(false);
 
   const [currentTypers, setCurrentTypers] = useTyping();
   const [bottomState, setBottomState] = useState(false);
@@ -183,6 +183,9 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
         align: 'start',
       });
       virtuosoRef.current.autoscrollToBottom();
+      // Reset the trigger flag after performing the scroll. Self-resetting
+      // boolean flag pattern — the effect only runs again when flipped back.
+      // eslint-disable-next-line @eslint-react/set-state-in-effect
       setScrollToBottom(false);
     }
   });
@@ -289,8 +292,8 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
                 startReached={async () => {
                   if (!msgs) return;
                   if (msgs.length === 0) return;
-                  if (loadingOlder.current) return;
-                  loadingOlder.current = true;
+                  if (loadingOlderRef.current) return;
+                  loadingOlderRef.current = true;
                   try {
                     const m = await channel.listMessages(50, msgs[0].id);
                     if (m.length === 0) {
@@ -300,7 +303,7 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
                     setFirstItemIndex((x) => x - m.length);
                     setMsgs((xs) => (xs ? [...m, ...xs] : null));
                   } finally {
-                    loadingOlder.current = false;
+                    loadingOlderRef.current = false;
                   }
                 }}
                 itemContent={(index, msg) => (

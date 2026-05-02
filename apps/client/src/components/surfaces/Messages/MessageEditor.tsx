@@ -191,14 +191,26 @@ interface FilePreviewProps {
 
 function FilePreview({ file, onRemove }: FilePreviewProps) {
   const isImage = ['image/gif', 'image/jpeg', 'image/png'].includes(file.type);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  // Canonical "side-effect-produced value" pattern: create the blob URL on
+  // mount/file-change, publish it via state, and revoke it on cleanup. The
+  // setState-in-effect is intentional — there's no way to surface the URL
+  // to the render tree without it.
+  useEffect(() => {
+    if (!isImage) return;
+    const url = URL.createObjectURL(file);
+    // eslint-disable-next-line @eslint-react/set-state-in-effect
+    setPreviewUrl(url);
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [file, isImage]);
+
   return (
     <StyledFilePreview onClick={onRemove}>
-      {isImage && (
-        <img
-          className="preview"
-          src={URL.createObjectURL(file)}
-          alt={file.name}
-        />
+      {isImage && previewUrl && (
+        <img className="preview" src={previewUrl} alt={file.name} />
       )}
       <div className="filename">{file.name}</div>
     </StyledFilePreview>

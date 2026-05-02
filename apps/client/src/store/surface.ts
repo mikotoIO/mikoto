@@ -28,7 +28,7 @@ export interface TabNameProps {
   spaceName?: string;
 }
 
-export const tabNameFamily = atomFamily((param: string) =>
+export const tabNameFamily = atomFamily((_param: string) =>
   atom<TabNameProps>({
     name: '',
   }),

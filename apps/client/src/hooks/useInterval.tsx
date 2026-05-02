@@ -5,11 +5,11 @@ export function useInterval(
   delay: number,
   immediate = false,
 ) {
-  const savedCallback = useRef<(() => void) | undefined>(undefined);
+  const savedCallbackRef = useRef<(() => void) | undefined>(undefined);
 
   // Remember the latest callback.
   useEffect(() => {
-    savedCallback.current = callback;
+    savedCallbackRef.current = callback;
     if (immediate) {
       callback();
     }
@@ -18,7 +18,7 @@ export function useInterval(
   // Set up the interval.
   useEffect(() => {
     function tick() {
-      savedCallback.current!();
+      savedCallbackRef.current!();
     }
 
     const id = setInterval(tick, delay);

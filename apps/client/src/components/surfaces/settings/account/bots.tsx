@@ -1,7 +1,6 @@
 import {
   Box,
   Code,
-  Group,
   HStack,
   Input,
   Stack,

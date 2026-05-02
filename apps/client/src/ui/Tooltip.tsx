@@ -58,6 +58,9 @@ export function FloatingTooltip({
 
   return (
     <>
+      {/* cloneElement is the standard Floating UI integration pattern for
+          injecting the reference ref + aria props into an arbitrary child. */}
+      {/* eslint-disable-next-line @eslint-react/no-clone-element */}
       {cloneElement(children, {
         ref: refs.setReference,
         ...getReferenceProps(),

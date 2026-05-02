@@ -8,11 +8,11 @@ export interface BlockquoteProps extends ChakraBlockquote.RootProps {
   showDash?: boolean;
 }
 
-export const Blockquote = function Blockquote(props: BlockquoteProps, ref) {
+export const Blockquote = function Blockquote(props: BlockquoteProps) {
   const { children, cite, citeUrl, showDash, icon, ...rest } = props;
 
   return (
-    <ChakraBlockquote.Root ref={ref} {...rest}>
+    <ChakraBlockquote.Root {...rest}>
       {icon}
       <ChakraBlockquote.Content cite={citeUrl}>
         {children}

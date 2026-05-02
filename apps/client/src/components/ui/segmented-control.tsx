@@ -20,12 +20,14 @@ function normalize(items: Array<string | Item>): Item[] {
   });
 }
 
-export const SegmentedControl = function SegmentedControl(props: SegmentedControlProps, ref) {
+export const SegmentedControl = function SegmentedControl(
+  props: SegmentedControlProps,
+) {
   const { items, ...rest } = props;
   const data = useMemo(() => normalize(items), [items]);
 
   return (
-    <SegmentGroup.Root ref={ref} {...rest}>
+    <SegmentGroup.Root {...rest}>
       <SegmentGroup.Indicator />
       <For each={data}>
         {(item) => (

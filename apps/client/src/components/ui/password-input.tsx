@@ -31,10 +31,12 @@ export interface PasswordInputProps
   extends InputProps,
     PasswordVisibilityProps {
   rootProps?: GroupProps;
+  ref?: React.Ref<HTMLInputElement>;
 }
 
-export const PasswordInput = function PasswordInput(props: PasswordInputProps, ref) {
+export const PasswordInput = function PasswordInput(props: PasswordInputProps) {
   const {
+    ref,
     rootProps,
     defaultVisible,
     visible: visibleProp,
@@ -78,11 +80,10 @@ export const PasswordInput = function PasswordInput(props: PasswordInputProps, r
   );
 };
 
-const VisibilityTrigger = function VisibilityTrigger(props: ButtonProps, ref) {
+const VisibilityTrigger = function VisibilityTrigger(props: ButtonProps) {
   return (
     <IconButton
       tabIndex={-1}
-      ref={ref}
       me="-2"
       aspectRatio="square"
       size="sm"
@@ -99,15 +100,17 @@ interface PasswordStrengthMeterProps extends StackProps {
   value: number;
 }
 
-export const PasswordStrengthMeter = function PasswordStrengthMeter(props: PasswordStrengthMeterProps, ref) {
+export const PasswordStrengthMeter = function PasswordStrengthMeter(
+  props: PasswordStrengthMeterProps,
+) {
   const { max = 4, value, ...rest } = props;
 
   const percent = (value / max) * 100;
   const { label, colorPalette } = getColorPalette(percent);
 
   return (
-    <Stack align="flex-end" gap="1" ref={ref} {...rest}>
-      <HStack width="full" ref={ref} {...rest}>
+    <Stack align="flex-end" gap="1" {...rest}>
+      <HStack width="full" {...rest}>
         {Array.from({ length: max }).map((_, index) => (
           <Box
             key={index}

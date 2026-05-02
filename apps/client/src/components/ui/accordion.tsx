@@ -6,10 +6,12 @@ interface AccordionItemTriggerProps extends Accordion.ItemTriggerProps {
   indicatorPlacement?: 'start' | 'end';
 }
 
-export const AccordionItemTrigger = function AccordionItemTrigger(props: AccordionItemTriggerProps, ref) {
+export const AccordionItemTrigger = function AccordionItemTrigger(
+  props: AccordionItemTriggerProps,
+) {
   const { children, indicatorPlacement = 'end', ...rest } = props;
   return (
-    <Accordion.ItemTrigger {...rest} ref={ref}>
+    <Accordion.ItemTrigger {...rest}>
       {indicatorPlacement === 'start' && (
         <Accordion.ItemIndicator rotate={{ base: '-90deg', _open: '0deg' }}>
           <LuChevronDown />
@@ -27,10 +29,12 @@ export const AccordionItemTrigger = function AccordionItemTrigger(props: Accordi
   );
 };
 
-export const AccordionItemContent = function AccordionItemContent(props: Accordion.ItemContentProps, ref) {
+export const AccordionItemContent = function AccordionItemContent(
+  props: Accordion.ItemContentProps,
+) {
   return (
     <Accordion.ItemContent>
-      <Accordion.ItemBody {...props} ref={ref} />
+      <Accordion.ItemBody {...props} />
     </Accordion.ItemContent>
   );
 };

@@ -9,12 +9,12 @@ interface DrawerContentProps extends ChakraDrawer.ContentProps {
   offset?: ChakraDrawer.ContentProps['padding'];
 }
 
-export const DrawerContent = function DrawerContent(props: DrawerContentProps, ref) {
+export const DrawerContent = function DrawerContent(props: DrawerContentProps) {
   const { children, portalled = true, portalRef, offset, ...rest } = props;
   return (
     <Portal disabled={!portalled} container={portalRef}>
       <ChakraDrawer.Positioner padding={offset}>
-        <ChakraDrawer.Content ref={ref} {...rest} asChild={false}>
+        <ChakraDrawer.Content {...rest} asChild={false}>
           {children}
         </ChakraDrawer.Content>
       </ChakraDrawer.Positioner>
@@ -22,7 +22,9 @@ export const DrawerContent = function DrawerContent(props: DrawerContentProps, r
   );
 };
 
-export const DrawerCloseTrigger = function DrawerCloseTrigger(props: ChakraDrawer.CloseTriggerProps, ref) {
+export const DrawerCloseTrigger = function DrawerCloseTrigger(
+  props: ChakraDrawer.CloseTriggerProps,
+) {
   return (
     <ChakraDrawer.CloseTrigger
       position="absolute"
@@ -31,7 +33,7 @@ export const DrawerCloseTrigger = function DrawerCloseTrigger(props: ChakraDrawe
       {...props}
       asChild
     >
-      <CloseButton size="sm" ref={ref} />
+      <CloseButton size="sm" />
     </ChakraDrawer.CloseTrigger>
   );
 };

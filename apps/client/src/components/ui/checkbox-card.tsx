@@ -11,7 +11,7 @@ export interface CheckboxCardProps extends ChakraCheckboxCard.RootProps {
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 }
 
-export const CheckboxCard = function CheckboxCard(props: CheckboxCardProps, ref) {
+export const CheckboxCard = function CheckboxCard(props: CheckboxCardProps) {
   const {
     inputProps,
     label,
@@ -28,7 +28,7 @@ export const CheckboxCard = function CheckboxCard(props: CheckboxCardProps, ref)
 
   return (
     <ChakraCheckboxCard.Root {...rest}>
-      <ChakraCheckboxCard.HiddenInput ref={ref} {...inputProps} />
+      <ChakraCheckboxCard.HiddenInput {...inputProps} />
       <ChakraCheckboxCard.Control>
         {indicatorPlacement === 'start' && indicator}
         {hasContent && (

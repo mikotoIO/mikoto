@@ -10,7 +10,7 @@ export interface TooltipProps extends ChakraTooltip.RootProps {
   disabled?: boolean;
 }
 
-export const Tooltip = function Tooltip(props: TooltipProps, ref) {
+export const Tooltip = function Tooltip(props: TooltipProps) {
   const {
     showArrow,
     children,
@@ -29,7 +29,7 @@ export const Tooltip = function Tooltip(props: TooltipProps, ref) {
       <ChakraTooltip.Trigger asChild>{children}</ChakraTooltip.Trigger>
       <Portal disabled={!portalled} container={portalRef}>
         <ChakraTooltip.Positioner>
-          <ChakraTooltip.Content ref={ref} {...contentProps}>
+          <ChakraTooltip.Content {...contentProps}>
             {showArrow && (
               <ChakraTooltip.Arrow>
                 <ChakraTooltip.ArrowTip />

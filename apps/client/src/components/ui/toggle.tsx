@@ -20,13 +20,13 @@ const variantMap = {
   ghost: { on: 'subtle', off: 'ghost' },
 } as const;
 
-export const Toggle = function Toggle(props: ToggleProps, ref) {
+export const Toggle = function Toggle(props: ToggleProps) {
   const { variant = 'subtle', size, children, ...rest } = props;
   const variantConfig = variantMap[variant];
 
   return (
     <ChakraToggle.Root asChild {...rest}>
-      <ToggleBaseButton size={size} variant={variantConfig} ref={ref}>
+      <ToggleBaseButton size={size} variant={variantConfig}>
         {children}
       </ToggleBaseButton>
     </ChakraToggle.Root>
@@ -37,15 +37,13 @@ interface ToggleBaseButtonProps extends Omit<ButtonProps, 'variant'> {
   variant: Record<'on' | 'off', ButtonProps['variant']>;
 }
 
-const ToggleBaseButton = function ToggleBaseButton(props: ToggleBaseButtonProps, ref) {
+const ToggleBaseButton = function ToggleBaseButton(
+  props: ToggleBaseButtonProps,
+) {
   const toggle = useToggleContext();
   const { variant, ...rest } = props;
   return (
-    <Button
-      variant={toggle.pressed ? variant.on : variant.off}
-      ref={ref}
-      {...rest}
-    />
+    <Button variant={toggle.pressed ? variant.on : variant.off} {...rest} />
   );
 };
 

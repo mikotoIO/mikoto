@@ -8,13 +8,15 @@ interface ActionBarContentProps extends ActionBar.ContentProps {
   portalRef?: React.RefObject<HTMLElement>;
 }
 
-export const ActionBarContent = function ActionBarContent(props: ActionBarContentProps, ref) {
+export const ActionBarContent = function ActionBarContent(
+  props: ActionBarContentProps,
+) {
   const { children, portalled = true, portalRef, ...rest } = props;
 
   return (
     <Portal disabled={!portalled} container={portalRef}>
       <ActionBar.Positioner>
-        <ActionBar.Content ref={ref} {...rest} asChild={false}>
+        <ActionBar.Content {...rest} asChild={false}>
           {children}
         </ActionBar.Content>
       </ActionBar.Positioner>
@@ -22,9 +24,11 @@ export const ActionBarContent = function ActionBarContent(props: ActionBarConten
   );
 };
 
-export const ActionBarCloseTrigger = function ActionBarCloseTrigger(props: ActionBar.CloseTriggerProps, ref) {
+export const ActionBarCloseTrigger = function ActionBarCloseTrigger(
+  props: ActionBar.CloseTriggerProps,
+) {
   return (
-    <ActionBar.CloseTrigger {...props} asChild ref={ref}>
+    <ActionBar.CloseTrigger {...props} asChild>
       <CloseButton size="sm" />
     </ActionBar.CloseTrigger>
   );

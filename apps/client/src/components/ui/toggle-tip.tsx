@@ -9,7 +9,7 @@ export interface ToggleTipProps extends ChakraPopover.RootProps {
   content?: React.ReactNode;
 }
 
-export const ToggleTip = function ToggleTip(props: ToggleTipProps, ref) {
+export const ToggleTip = function ToggleTip(props: ToggleTipProps) {
   const {
     showArrow,
     children,
@@ -33,7 +33,6 @@ export const ToggleTip = function ToggleTip(props: ToggleTipProps, ref) {
             py="1"
             textStyle="xs"
             rounded="sm"
-            ref={ref}
           >
             {showArrow && (
               <ChakraPopover.Arrow>

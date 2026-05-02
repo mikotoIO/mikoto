@@ -7,10 +7,12 @@ interface NativeSelectRootProps extends Select.RootProps {
   icon?: React.ReactNode;
 }
 
-export const NativeSelectRoot = function NativeSelect(props: NativeSelectRootProps, ref) {
+export const NativeSelectRoot = function NativeSelect(
+  props: NativeSelectRootProps,
+) {
   const { icon, children, ...rest } = props;
   return (
-    <Select.Root ref={ref} {...rest}>
+    <Select.Root {...rest}>
       {children}
       <Select.Indicator>{icon}</Select.Indicator>
     </Select.Root>
@@ -27,7 +29,9 @@ interface NativeSelectField extends Select.FieldProps {
   items?: Array<string | NativeSelectItem>;
 }
 
-export const NativeSelectField = function NativeSelectField(props: NativeSelectField, ref) {
+export const NativeSelectField = function NativeSelectField(
+  props: NativeSelectField,
+) {
   const { items: itemsProp, children, ...rest } = props;
 
   const items = useMemo(
@@ -39,7 +43,7 @@ export const NativeSelectField = function NativeSelectField(props: NativeSelectF
   );
 
   return (
-    <Select.Field ref={ref} {...rest}>
+    <Select.Field {...rest}>
       {children}
       {items?.map((item) => (
         <option key={item.value} value={item.value} disabled={item.disabled}>

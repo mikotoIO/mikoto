@@ -8,7 +8,7 @@ export interface TagProps extends ChakraTag.RootProps {
   closable?: boolean;
 }
 
-export const Tag = function Tag(props: TagProps, ref) {
+export const Tag = function Tag(props: TagProps) {
   const {
     startElement,
     endElement,
@@ -19,14 +19,12 @@ export const Tag = function Tag(props: TagProps, ref) {
   } = props;
 
   return (
-    <ChakraTag.Root ref={ref} {...rest}>
+    <ChakraTag.Root {...rest}>
       {startElement && (
         <ChakraTag.StartElement>{startElement}</ChakraTag.StartElement>
       )}
       <ChakraTag.Label>{children}</ChakraTag.Label>
-      {endElement && (
-        <ChakraTag.EndElement>{endElement}</ChakraTag.EndElement>
-      )}
+      {endElement && <ChakraTag.EndElement>{endElement}</ChakraTag.EndElement>}
       {closable && (
         <ChakraTag.EndElement>
           <ChakraTag.CloseTrigger onClick={onClose} />

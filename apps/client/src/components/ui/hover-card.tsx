@@ -6,21 +6,25 @@ interface HoverCardContentProps extends HoverCard.ContentProps {
   portalRef?: React.RefObject<HTMLElement>;
 }
 
-export const HoverCardContent = function HoverCardContent(props: HoverCardContentProps, ref) {
+export const HoverCardContent = function HoverCardContent(
+  props: HoverCardContentProps,
+) {
   const { portalled = true, portalRef, ...rest } = props;
 
   return (
     <Portal disabled={!portalled} container={portalRef}>
       <HoverCard.Positioner>
-        <HoverCard.Content ref={ref} {...rest} />
+        <HoverCard.Content {...rest} />
       </HoverCard.Positioner>
     </Portal>
   );
 };
 
-export const HoverCardArrow = function HoverCardArrow(props: HoverCard.ArrowProps, ref) {
+export const HoverCardArrow = function HoverCardArrow(
+  props: HoverCard.ArrowProps,
+) {
   return (
-    <HoverCard.Arrow ref={ref} {...props}>
+    <HoverCard.Arrow {...props}>
       <HoverCard.ArrowTip />
     </HoverCard.Arrow>
   );

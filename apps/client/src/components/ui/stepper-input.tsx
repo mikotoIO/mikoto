@@ -6,10 +6,10 @@ export interface StepperInputProps extends NumberInput.RootProps {
   label?: React.ReactNode;
 }
 
-export const StepperInput = function StepperInput(props: StepperInputProps, ref) {
+export const StepperInput = function StepperInput(props: StepperInputProps) {
   const { label, ...rest } = props;
   return (
-    <NumberInput.Root {...rest} unstyled ref={ref}>
+    <NumberInput.Root {...rest} unstyled>
       {label && <NumberInput.Label>{label}</NumberInput.Label>}
       <HStack gap="2">
         <DecrementTrigger />
@@ -20,9 +20,11 @@ export const StepperInput = function StepperInput(props: StepperInputProps, ref)
   );
 };
 
-const DecrementTrigger = function DecrementTrigger(props: NumberInput.DecrementTriggerProps, ref) {
+const DecrementTrigger = function DecrementTrigger(
+  props: NumberInput.DecrementTriggerProps,
+) {
   return (
-    <NumberInput.DecrementTrigger {...props} asChild ref={ref}>
+    <NumberInput.DecrementTrigger {...props} asChild>
       <IconButton variant="outline" size="sm">
         <LuMinus />
       </IconButton>
@@ -30,9 +32,11 @@ const DecrementTrigger = function DecrementTrigger(props: NumberInput.DecrementT
   );
 };
 
-const IncrementTrigger = function IncrementTrigger(props: NumberInput.IncrementTriggerProps, ref) {
+const IncrementTrigger = function IncrementTrigger(
+  props: NumberInput.IncrementTriggerProps,
+) {
   return (
-    <NumberInput.IncrementTrigger {...props} asChild ref={ref}>
+    <NumberInput.IncrementTrigger {...props} asChild>
       <IconButton variant="outline" size="sm">
         <LuPlus />
       </IconButton>

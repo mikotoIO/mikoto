@@ -22,10 +22,10 @@ export interface SkeletonTextProps extends ChakraSkeletonProps {
   noOfLines?: number;
 }
 
-export const SkeletonText = function SkeletonText(props: SkeletonTextProps, ref) {
+export const SkeletonText = function SkeletonText(props: SkeletonTextProps) {
   const { noOfLines = 3, gap, ...rest } = props;
   return (
-    <Stack gap={gap} width="full" ref={ref}>
+    <Stack gap={gap} width="full">
       {Array.from({ length: noOfLines }).map((_, index) => (
         <ChakraSkeleton
           height="4"

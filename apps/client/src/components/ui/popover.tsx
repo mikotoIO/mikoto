@@ -8,26 +8,32 @@ interface PopoverContentProps extends ChakraPopover.ContentProps {
   portalRef?: React.RefObject<HTMLElement>;
 }
 
-export const PopoverContent = function PopoverContent(props: PopoverContentProps, ref) {
+export const PopoverContent = function PopoverContent(
+  props: PopoverContentProps,
+) {
   const { portalled = true, portalRef, ...rest } = props;
   return (
     <Portal disabled={!portalled} container={portalRef}>
       <ChakraPopover.Positioner>
-        <ChakraPopover.Content ref={ref} {...rest} />
+        <ChakraPopover.Content {...rest} />
       </ChakraPopover.Positioner>
     </Portal>
   );
 };
 
-export const PopoverArrow = function PopoverArrow(props: ChakraPopover.ArrowProps, ref) {
+export const PopoverArrow = function PopoverArrow(
+  props: ChakraPopover.ArrowProps,
+) {
   return (
-    <ChakraPopover.Arrow {...props} ref={ref}>
+    <ChakraPopover.Arrow {...props}>
       <ChakraPopover.ArrowTip />
     </ChakraPopover.Arrow>
   );
 };
 
-export const PopoverCloseTrigger = function PopoverCloseTrigger(props: ChakraPopover.CloseTriggerProps, ref) {
+export const PopoverCloseTrigger = function PopoverCloseTrigger(
+  props: ChakraPopover.CloseTriggerProps,
+) {
   return (
     <ChakraPopover.CloseTrigger
       position="absolute"
@@ -35,7 +41,6 @@ export const PopoverCloseTrigger = function PopoverCloseTrigger(props: ChakraPop
       insetEnd="1"
       {...props}
       asChild
-      ref={ref}
     >
       <CloseButton size="sm" />
     </ChakraPopover.CloseTrigger>

@@ -6,11 +6,13 @@ export interface BreadcrumbRootProps extends Breadcrumb.RootProps {
   separatorGap?: SystemStyleObject['gap'];
 }
 
-export const BreadcrumbRoot = function BreadcrumbRoot(props: BreadcrumbRootProps, ref) {
+export const BreadcrumbRoot = function BreadcrumbRoot(
+  props: BreadcrumbRootProps,
+) {
   const { separator, separatorGap, children, ...rest } = props;
   const validChildren = Children.toArray(children).filter(isValidElement);
   return (
-    <Breadcrumb.Root ref={ref} {...rest}>
+    <Breadcrumb.Root {...rest}>
       <Breadcrumb.List gap={separatorGap}>
         {validChildren.map((child, index) => {
           const last = index === validChildren.length - 1;

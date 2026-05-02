@@ -76,30 +76,27 @@ function isMessageSimple(message: MessageExt, prevMessage?: MessageExt) {
   );
 }
 
-function ChannelHead({
-  displayName,
-  isDm,
-}: {
-  displayName: string;
-  isDm: boolean;
-}) {
+const Hed = (props: { top: string; sub: string }) => {
+  const { top, sub } = props;
   return (
     <Box py={4} px={16}>
       <Heading fontSize="24px" mb={2}>
-        {isDm ? (
-          <>Conversation with {displayName}</>
-        ) : (
-          <>Welcome to #{displayName}!</>
-        )}
+        {top}
+        <Box as="p" color="gray.250" m={0}>
+          {sub}
+        </Box>
       </Heading>
-      <Box as="p" color="gray.250" m={0}>
-        {isDm
-          ? 'This is the start of your direct message history.'
-          : 'This is the start of the channel.'}
-      </Box>
     </Box>
   );
-}
+};
+
+const HedSkelly = () => (
+  <Box py="16px">
+    {Array.from({ length: 8 }, (_, i) => (
+      <MessageSkeleton key={i} index={i} />
+    ))}
+  </Box>
+);
 
 // Please laugh
 // Meant to be a large sentinel value to mark the last message (when loaded) position
@@ -240,22 +237,7 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
     };
   }, [channel.id]);
 
-  const virtuosoComponents = useMemo(
-    () => ({
-      Header: topLoaded
-        ? () => (
-            <ChannelHead displayName={displayName} isDm={!channel.spaceId} />
-          )
-        : () => (
-            <Box py="16px">
-              {Array.from({ length: 8 }, (_, i) => (
-                <MessageSkeleton key={i} index={i} />
-              ))}
-            </Box>
-          ),
-    }),
-    [topLoaded, channel],
-  );
+  const isDm = !channel.spaceId;
 
   return (
     <Surface key={channel.id}>
@@ -282,13 +264,27 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
                 style={{ height: '100%', overflowX: 'hidden' }}
                 initialTopMostItemIndex={msgs.length - 1}
                 data={msgs}
-                computeItemKey={(index, msg) => msg.id}
-                atBottomStateChange={(atBottom) => {
-                  setBottomState(atBottom);
-                }}
+                computeItemKey={(_, msg) => msg.id}
+                atBottomStateChange={setBottomState}
                 atBottomThreshold={30}
                 overscan={1000}
-                components={virtuosoComponents}
+                components={{
+                  // eslint-disable-next-line @eslint-react/component-hook-factories, @eslint-react/no-nested-component-definitions
+                  Header: () =>
+                    !topLoaded ? (
+                      <HedSkelly />
+                    ) : isDm ? (
+                      <Hed
+                        top={`Conversation with ${displayName}`}
+                        sub="This is the start of your message history."
+                      />
+                    ) : (
+                      <Hed
+                        top={`Welcome to #${displayName}!`}
+                        sub="This is the start of the channel."
+                      />
+                    ),
+                }}
                 firstItemIndex={firstItemIndex}
                 startReached={async () => {
                   if (!msgs) return;

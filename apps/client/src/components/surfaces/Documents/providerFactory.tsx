@@ -10,12 +10,12 @@ import { useMikoto } from '@/hooks';
 
 import { DOCUMENT_TRANSFORMERS } from './transformers';
 
-export interface UseProviderFactoryProps {
+interface UseProviderFactoryProps {
   channel: MikotoChannel;
   onSync?: () => void;
 }
 
-export type SyncState = 'initial' | 'synced' | 'syncing' | 'error';
+type SyncState = 'initial' | 'synced' | 'syncing' | 'error';
 
 export function useProviderFactory({
   channel,

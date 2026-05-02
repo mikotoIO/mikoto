@@ -17,7 +17,7 @@ import { ReactNode, useCallback, useEffect, useState } from 'react';
 
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 
-export type SerializedImageNode = Spread<
+type SerializedImageNode = Spread<
   {
     src: string;
     altText: string;

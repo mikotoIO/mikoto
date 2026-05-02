@@ -45,7 +45,7 @@ const SpinnerElement = styled.div<SpinnerProps>`
   }
 `;
 
-export interface SpinnerProps {
+interface SpinnerProps {
   size?: string;
   color?: string;
   color2?: string;

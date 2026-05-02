@@ -228,7 +228,7 @@ const SendButton = styled.button`
   }
 `;
 
-export interface MessageEditorHandle {
+interface MessageEditorHandle {
   insertText: (text: string) => void;
   focus: () => void;
   reset: () => void;

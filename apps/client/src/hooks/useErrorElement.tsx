@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import { CloseButton } from '@/components/ui';
 
-export interface AppError {
+interface AppError {
   name: string;
   message: string;
 }

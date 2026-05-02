@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useInterval, useMikoto } from '@/hooks';
 import { TypingDots } from '@/ui';
 
-export interface Typer {
+interface Typer {
   timestamp: number;
   userId: string;
 }
@@ -20,7 +20,7 @@ export function useTyping() {
   return [currentTypers, setCurrentTypers] as const;
 }
 
-export interface TypingIndicatorProps {
+interface TypingIndicatorProps {
   typers: Typer[];
   channel: MikotoChannel;
 }

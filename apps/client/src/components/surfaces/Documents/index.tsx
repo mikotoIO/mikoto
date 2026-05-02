@@ -41,7 +41,7 @@ import { proxy, useSnapshot } from 'valtio';
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
 import { useInterval, useMikoto } from '@/hooks';
-import { createTooltip } from '@/ui';
+import { FloatingTooltip } from '@/ui';
 
 import { EDITOR_NODES } from './editorNodes';
 import { CodeBlockPlugin } from './plugins/CodeBlockPlugin';
@@ -275,11 +275,6 @@ function MikotoContentEditable({
     </EditorWrapper>
   );
 }
-
-const ActionTooltip = createTooltip({
-  placement: 'bottom',
-  offset: [0, 4],
-});
 
 function DocumentActions({ children }: PropsWithChildren) {
   return (
@@ -579,7 +574,11 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
         </Flex>
         <Flex className="right" fontSize="xl" gap={3}>
           <Group>
-            <ActionTooltip tooltip="Edit">
+            <FloatingTooltip
+              tooltip="Edit"
+              placement="bottom"
+              offsetOptions={[0, 4]}
+            >
               <Button
                 variant="ghost"
                 p={2}
@@ -600,7 +599,7 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
                   <FontAwesomeIcon icon={faSave} />
                 )}
               </Button>
-            </ActionTooltip>
+            </FloatingTooltip>
           </Group>
         </Flex>
       </DocumentActions>

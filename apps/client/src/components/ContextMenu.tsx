@@ -105,7 +105,7 @@ interface ContextMenuFns {
   destroy(): void;
 }
 
-function ContextMenuLink({ onClick, ...props }: JSX.IntrinsicElements['a']) {
+function ContextMenuLink({ onClick, ...props }: React.ComponentProps<'a'>) {
   const setContextMenu = useSetAtom(contextMenuState);
 
   return (

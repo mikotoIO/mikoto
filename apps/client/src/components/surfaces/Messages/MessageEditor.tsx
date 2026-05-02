@@ -274,7 +274,7 @@ function SubmitPlugin({
   onSubmit: () => void;
   onTyping?: () => void;
   isMobile: boolean;
-  suppressTypingRef: React.MutableRefObject<boolean>;
+  suppressTypingRef: React.RefObject<boolean>;
 }) {
   const [editor] = useLexicalComposerContext();
 
@@ -307,7 +307,7 @@ function SubmitPlugin({
 function EditorApiPlugin({
   apiRef,
 }: {
-  apiRef: React.MutableRefObject<MessageEditorHandle | null>;
+  apiRef: React.RefObject<MessageEditorHandle | null>;
 }) {
   const [editor] = useLexicalComposerContext();
 

@@ -2,14 +2,13 @@ import { RadioGroup as ChakraRadioGroup } from '@chakra-ui/react';
 import 'react';
 
 export interface RadioProps extends ChakraRadioGroup.ItemProps {
-  rootRef?: React.Ref<HTMLDivElement>;
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 }
 
 export const Radio = function Radio(props: RadioProps) {
-  const { children, inputProps, rootRef, ...rest } = props;
+  const { children, inputProps, ...rest } = props;
   return (
-    <ChakraRadioGroup.Item ref={rootRef} {...rest}>
+    <ChakraRadioGroup.Item {...rest}>
       <ChakraRadioGroup.ItemHiddenInput {...inputProps} />
       <ChakraRadioGroup.ItemIndicator />
       {children && (

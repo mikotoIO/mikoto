@@ -116,7 +116,7 @@ function TabViewSwitch({ tab }: { tab: Tabable }) {
     return null;
   }
   const { kind, key, ...rest } = tab;
-  return <Selected {...rest} key={key} />;
+  return <Selected key={key} {...rest} />;
 }
 
 const LeftBar = styled.div`

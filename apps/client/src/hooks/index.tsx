@@ -1,5 +1,5 @@
 import { AuthClient, MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { getVersion, proxy, useSnapshot } from 'valtio';
 
 import { useInterval } from './useInterval';
@@ -9,13 +9,13 @@ export { useInterval };
 export const MikotoContext = React.createContext<MikotoClient>(undefined!);
 
 export function useMikoto(): MikotoClient {
-  return useContext(MikotoContext);
+  return use(MikotoContext);
 }
 
 export const AuthContext = React.createContext<AuthClient>(undefined!);
 
 export function useAuthClient() {
-  return useContext(AuthContext);
+  return use(AuthContext);
 }
 
 export const useFetchMember = (space: MikotoSpace | undefined) => {

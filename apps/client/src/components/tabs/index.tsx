@@ -1,11 +1,11 @@
 import styled from '@emotion/styled';
 import { useAtom } from 'jotai';
-import { useContext, useEffect } from 'react';
+import { use, useEffect } from 'react';
 
 import { TabContext, TabNameProps, tabNameFamily } from '@/store/surface';
 
 export function TabName({ name, icon, spaceId, spaceName }: TabNameProps) {
-  const tabInfo = useContext(TabContext);
+  const tabInfo = use(TabContext);
   const [tabName, setTabName] = useAtom(tabNameFamily(tabInfo.key));
 
   useEffect(() => {

@@ -436,8 +436,8 @@ export function MessageSurface({ channelId }: { channelId: string }) {
   const channel = mikoto.channels._get(channelId)!;
 
   return (
-    <CurrentSpaceContext.Provider value={channel.space}>
+    <CurrentSpaceContext value={channel.space}>
       <RealMessageView channel={channel} />
-    </CurrentSpaceContext.Provider>
+    </CurrentSpaceContext>
   );
 }

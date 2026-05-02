@@ -488,13 +488,13 @@ function SurfaceView({ tab }: { tab: Tabable }) {
 
   return (
     <MobileContent style={{ overflow: 'hidden', display: 'flex' }}>
-      <TabContext.Provider value={{ key: `${kind}/${key}` }}>
+      <TabContext value={{ key: `${kind}/${key}` }}>
         <ErrorBoundary FallbackComponent={ErrorSurface}>
           <Suspense fallback={<LoadingSurface />}>
             <SurfaceComponent key={key} {...rest} />
           </Suspense>
         </ErrorBoundary>
-      </TabContext.Provider>
+      </TabContext>
     </MobileContent>
   );
 }

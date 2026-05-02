@@ -174,8 +174,8 @@ export function MikotoClientProvider({
 
   // TODO: Connection ID key, garbage collection for event emitters
   return (
-    <MikotoContext.Provider value={mikoto}>
-      <AuthContext.Provider value={authClient}>{children}</AuthContext.Provider>
-    </MikotoContext.Provider>
+    <MikotoContext value={mikoto}>
+      <AuthContext value={authClient}>{children}</AuthContext>
+    </MikotoContext>
   );
 }

@@ -86,10 +86,6 @@ interface MessageProps {
   isSimple?: boolean;
 }
 
-export const messageEditIdState = atom<{ id: string; content: string } | null>(
-  null,
-);
-
 export const messageEditState = atom<MikotoMessage | null>(null);
 
 export const MessageItem = ({ message, isSimple }: MessageProps) => {

@@ -37,10 +37,6 @@ export function setActiveChannelId(channelId: string | null) {
   _activeChannelId = channelId;
 }
 
-export function getActiveChannelId() {
-  return _activeChannelId;
-}
-
 function isSoundEnabled() {
   return localStorage.getItem('notificationSound') !== 'false';
 }

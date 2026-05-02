@@ -1,5 +1,5 @@
 import { MikotoSpace } from '@mikoto-io/mikoto.js';
-import { atom, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { atomWithStorage } from 'jotai/vanilla/utils';
 import React from 'react';
 import { z } from 'zod';
@@ -29,8 +29,6 @@ export const CurrentSpaceContext = React.createContext<MikotoSpace | undefined>(
   undefined,
 );
 
-export const rightBarOpenState = atom<boolean>(false);
-
 interface ExplorerPanels {
   channelsHeight: number;
   channelsCollapsed: boolean;
@@ -59,10 +57,6 @@ export const workspaceState = atomWithStorage<Workspace>('workspace', {
   right: 300,
   rightOpen: true,
 });
-
-// online status
-
-export const onlineState = atom<boolean>(true);
 
 export const DEFAULT_THEME_SETTINGS = {
   theme: 'dark',

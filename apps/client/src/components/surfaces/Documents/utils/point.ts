@@ -173,7 +173,3 @@ export class Rect {
     return Rect.fromLWTH(left, width, top, height);
   }
 }
-
-export function isHTMLElement(x: unknown): x is HTMLElement {
-  return x instanceof HTMLElement;
-}

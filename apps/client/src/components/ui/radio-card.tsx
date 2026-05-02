@@ -11,7 +11,7 @@ interface RadioCardItemProps extends RadioCard.ItemProps {
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 }
 
-export const RadioCardItem = function RadioCardItem(props: RadioCardItemProps, ref) {
+export const RadioCardItem = function RadioCardItem(props: RadioCardItemProps) {
   const {
     inputProps,
     label,
@@ -28,7 +28,7 @@ export const RadioCardItem = function RadioCardItem(props: RadioCardItemProps, r
 
   return (
     <RadioCard.Item {...rest}>
-      <RadioCard.ItemHiddenInput ref={ref} {...inputProps} />
+      <RadioCard.ItemHiddenInput {...inputProps} />
       <RadioCard.ItemControl>
         {indicatorPlacement === 'start' && indicator}
         {hasContent && (

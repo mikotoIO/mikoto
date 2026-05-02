@@ -7,11 +7,11 @@ export interface CheckboxProps extends ChakraCheckbox.RootProps {
   rootRef?: React.Ref<HTMLLabelElement>;
 }
 
-export const Checkbox = function Checkbox(props: CheckboxProps, ref) {
+export const Checkbox = function Checkbox(props: CheckboxProps) {
   const { icon, children, inputProps, rootRef, ...rest } = props;
   return (
     <ChakraCheckbox.Root ref={rootRef} {...rest}>
-      <ChakraCheckbox.HiddenInput ref={ref} {...inputProps} />
+      <ChakraCheckbox.HiddenInput {...inputProps} />
       <ChakraCheckbox.Control>
         {icon || <ChakraCheckbox.Indicator />}
       </ChakraCheckbox.Control>

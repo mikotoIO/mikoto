@@ -12,20 +12,24 @@ interface ProgressCircleRingProps extends ChakraProgressCircle.CircleProps {
   cap?: SystemStyleObject['strokeLinecap'];
 }
 
-export const ProgressCircleRing = function ProgressCircleRing(props: ProgressCircleRingProps, ref) {
+export const ProgressCircleRing = function ProgressCircleRing(
+  props: ProgressCircleRingProps,
+) {
   const { trackColor, cap, color, ...rest } = props;
   return (
-    <ChakraProgressCircle.Circle {...rest} ref={ref}>
+    <ChakraProgressCircle.Circle {...rest}>
       <ChakraProgressCircle.Track stroke={trackColor} />
       <ChakraProgressCircle.Range stroke={color} strokeLinecap={cap} />
     </ChakraProgressCircle.Circle>
   );
 };
 
-export const ProgressCircleValueText = function ProgressCircleValueText(props: ChakraProgressCircle.ValueTextProps, ref) {
+export const ProgressCircleValueText = function ProgressCircleValueText(
+  props: ChakraProgressCircle.ValueTextProps,
+) {
   return (
     <AbsoluteCenter>
-      <ChakraProgressCircle.ValueText {...props} ref={ref} />
+      <ChakraProgressCircle.ValueText {...props} />
     </AbsoluteCenter>
   );
 };

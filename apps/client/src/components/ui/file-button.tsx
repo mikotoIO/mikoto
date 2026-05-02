@@ -18,11 +18,13 @@ export interface FileUploadRootProps extends ChakraFileUpload.RootProps {
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 }
 
-export const FileUploadRoot = function FileUploadRoot(props: FileUploadRootProps, ref) {
+export const FileUploadRoot = function FileUploadRoot(
+  props: FileUploadRootProps,
+) {
   const { children, inputProps, ...rest } = props;
   return (
     <ChakraFileUpload.Root {...rest}>
-      <ChakraFileUpload.HiddenInput ref={ref} {...inputProps} />
+      <ChakraFileUpload.HiddenInput {...inputProps} />
       {children}
     </ChakraFileUpload.Root>
   );
@@ -34,10 +36,12 @@ export interface FileUploadDropzoneProps
   description?: React.ReactNode;
 }
 
-export const FileUploadDropzone = function FileUploadDropzone(props: FileUploadDropzoneProps, ref) {
+export const FileUploadDropzone = function FileUploadDropzone(
+  props: FileUploadDropzoneProps,
+) {
   const { children, label, description, ...rest } = props;
   return (
-    <ChakraFileUpload.Dropzone ref={ref} {...rest}>
+    <ChakraFileUpload.Dropzone {...rest}>
       <Icon fontSize="xl" color="fg.muted">
         <LuUpload />
       </Icon>
@@ -95,7 +99,9 @@ interface FileUploadListProps
   files?: File[];
 }
 
-export const FileUploadList = function FileUploadList(props: FileUploadListProps, ref) {
+export const FileUploadList = function FileUploadList(
+  props: FileUploadListProps,
+) {
   const { showSize, clearable, files, ...rest } = props;
 
   const fileUpload = useFileUploadContext();
@@ -104,7 +110,7 @@ export const FileUploadList = function FileUploadList(props: FileUploadListProps
   if (acceptedFiles.length === 0) return null;
 
   return (
-    <ChakraFileUpload.ItemGroup ref={ref} {...rest}>
+    <ChakraFileUpload.ItemGroup {...rest}>
       {acceptedFiles.map((file) => (
         <FileUploadItem
           key={file.name}
@@ -123,7 +129,7 @@ interface FileInputProps extends Assign<ButtonProps, RecipeProps<'input'>> {
   placeholder?: React.ReactNode;
 }
 
-export const FileInput = function FileInput(props: FileInputProps, ref) {
+export const FileInput = function FileInput(props: FileInputProps) {
   const inputRecipe = useRecipe({ key: 'input' });
   const [recipeProps, restProps] = inputRecipe.splitVariantProps(props);
   const { placeholder = 'Select file(s)', ...rest } = restProps;
@@ -132,7 +138,6 @@ export const FileInput = function FileInput(props: FileInputProps, ref) {
       <Button
         unstyled
         py="0"
-        ref={ref}
         {...rest}
         css={[inputRecipe(recipeProps), props.css]}
       >

@@ -7,10 +7,10 @@ export interface RatingProps extends RatingGroup.RootProps {
   label?: React.ReactNode;
 }
 
-export const Rating = function Rating(props: RatingProps, ref) {
+export const Rating = function Rating(props: RatingProps) {
   const { icon, count = 5, label, ...rest } = props;
   return (
-    <RatingGroup.Root ref={ref} count={count} {...rest}>
+    <RatingGroup.Root count={count} {...rest}>
       {label && <RatingGroup.Label>{label}</RatingGroup.Label>}
       <RatingGroup.HiddenInput />
       <RatingGroup.Control>

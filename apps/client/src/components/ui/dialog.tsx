@@ -9,7 +9,7 @@ interface DialogContentProps extends ChakraDialog.ContentProps {
   backdrop?: boolean;
 }
 
-export const DialogContent = function DialogContent(props: DialogContentProps, ref) {
+export const DialogContent = function DialogContent(props: DialogContentProps) {
   const {
     children,
     portalled = true,
@@ -22,7 +22,7 @@ export const DialogContent = function DialogContent(props: DialogContentProps, r
     <Portal disabled={!portalled} container={portalRef}>
       {backdrop && <ChakraDialog.Backdrop />}
       <ChakraDialog.Positioner>
-        <ChakraDialog.Content ref={ref} {...rest} asChild={false}>
+        <ChakraDialog.Content {...rest} asChild={false}>
           {children}
         </ChakraDialog.Content>
       </ChakraDialog.Positioner>
@@ -30,7 +30,9 @@ export const DialogContent = function DialogContent(props: DialogContentProps, r
   );
 };
 
-export const DialogCloseTrigger = function DialogCloseTrigger(props: ChakraDialog.CloseTriggerProps, ref) {
+export const DialogCloseTrigger = function DialogCloseTrigger(
+  props: ChakraDialog.CloseTriggerProps,
+) {
   return (
     <ChakraDialog.CloseTrigger
       position="absolute"
@@ -39,9 +41,7 @@ export const DialogCloseTrigger = function DialogCloseTrigger(props: ChakraDialo
       {...props}
       asChild
     >
-      <CloseButton size="sm" ref={ref}>
-        {props.children}
-      </CloseButton>
+      <CloseButton size="sm">{props.children}</CloseButton>
     </ChakraDialog.CloseTrigger>
   );
 };

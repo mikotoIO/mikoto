@@ -4,9 +4,11 @@ import { HiOutlineInformationCircle } from 'react-icons/hi';
 
 import { ToggleTip } from './toggle-tip';
 
-export const ProgressBar = function ProgressBar(props: ChakraProgress.TrackProps, ref) {
+export const ProgressBar = function ProgressBar(
+  props: ChakraProgress.TrackProps,
+) {
   return (
-    <ChakraProgress.Track {...props} ref={ref}>
+    <ChakraProgress.Track {...props}>
       <ChakraProgress.Range />
     </ChakraProgress.Track>
   );
@@ -19,10 +21,10 @@ export interface ProgressLabelProps extends ChakraProgress.LabelProps {
   info?: React.ReactNode;
 }
 
-export const ProgressLabel = function ProgressLabel(props: ProgressLabelProps, ref) {
+export const ProgressLabel = function ProgressLabel(props: ProgressLabelProps) {
   const { children, info, ...rest } = props;
   return (
-    <ChakraProgress.Label {...rest} ref={ref}>
+    <ChakraProgress.Label {...rest}>
       {children}
       {info && (
         <ToggleTip content={info}>

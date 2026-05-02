@@ -13,10 +13,10 @@ interface ItemProps extends ChakraDataList.ItemProps {
   grow?: boolean;
 }
 
-export const DataListItem = function DataListItem(props: ItemProps, ref) {
+export const DataListItem = function DataListItem(props: ItemProps) {
   const { label, info, value, children, grow, ...rest } = props;
   return (
-    <ChakraDataList.Item ref={ref} {...rest}>
+    <ChakraDataList.Item {...rest}>
       <ChakraDataList.ItemLabel flex={grow ? '1' : undefined}>
         {label}
         {info && (

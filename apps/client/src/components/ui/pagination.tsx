@@ -49,25 +49,25 @@ const variantMap: Record<PaginationVariant, ButtonVariantMap> = {
   subtle: { default: 'ghost', ellipsis: 'plain', current: 'subtle' },
 };
 
-export const PaginationRoot = function PaginationRoot(props: PaginationRootProps, ref) {
+export const PaginationRoot = function PaginationRoot(
+  props: PaginationRootProps,
+) {
   const { size = 'sm', variant = 'outline', getHref, ...rest } = props;
   return (
     <RootPropsProvider
       value={{ size, variantMap: variantMap[variant], getHref }}
     >
-      <ChakraPagination.Root
-        ref={ref}
-        type={getHref ? 'link' : 'button'}
-        {...rest}
-      />
+      <ChakraPagination.Root type={getHref ? 'link' : 'button'} {...rest} />
     </RootPropsProvider>
   );
 };
 
-export const PaginationEllipsis = function PaginationEllipsis(props: ChakraPagination.EllipsisProps, ref) {
+export const PaginationEllipsis = function PaginationEllipsis(
+  props: ChakraPagination.EllipsisProps,
+) {
   const { size, variantMap } = useRootProps();
   return (
-    <ChakraPagination.Ellipsis ref={ref} {...props} asChild>
+    <ChakraPagination.Ellipsis {...props} asChild>
       <Button as="span" variant={variantMap.ellipsis} size={size}>
         <HiMiniEllipsisHorizontal />
       </Button>
@@ -75,7 +75,9 @@ export const PaginationEllipsis = function PaginationEllipsis(props: ChakraPagin
   );
 };
 
-export const PaginationItem = function PaginationItem(props: ChakraPagination.ItemProps, ref) {
+export const PaginationItem = function PaginationItem(
+  props: ChakraPagination.ItemProps,
+) {
   const { page } = usePaginationContext();
   const { size, variantMap, getHref } = useRootProps();
 
@@ -91,7 +93,7 @@ export const PaginationItem = function PaginationItem(props: ChakraPagination.It
   }
 
   return (
-    <ChakraPagination.Item ref={ref} {...props} asChild>
+    <ChakraPagination.Item {...props} asChild>
       <Button variant={variant} size={size}>
         {props.value}
       </Button>
@@ -99,7 +101,9 @@ export const PaginationItem = function PaginationItem(props: ChakraPagination.It
   );
 };
 
-export const PaginationPrevTrigger = function PaginationPrevTrigger(props: ChakraPagination.PrevTriggerProps, ref) {
+export const PaginationPrevTrigger = function PaginationPrevTrigger(
+  props: ChakraPagination.PrevTriggerProps,
+) {
   const { size, variantMap, getHref } = useRootProps();
   const { previousPage } = usePaginationContext();
 
@@ -116,7 +120,7 @@ export const PaginationPrevTrigger = function PaginationPrevTrigger(props: Chakr
   }
 
   return (
-    <ChakraPagination.PrevTrigger ref={ref} asChild {...props}>
+    <ChakraPagination.PrevTrigger asChild {...props}>
       <IconButton variant={variantMap.default} size={size}>
         <HiChevronLeft />
       </IconButton>
@@ -124,7 +128,9 @@ export const PaginationPrevTrigger = function PaginationPrevTrigger(props: Chakr
   );
 };
 
-export const PaginationNextTrigger = function PaginationNextTrigger(props: ChakraPagination.NextTriggerProps, ref) {
+export const PaginationNextTrigger = function PaginationNextTrigger(
+  props: ChakraPagination.NextTriggerProps,
+) {
   const { size, variantMap, getHref } = useRootProps();
   const { nextPage } = usePaginationContext();
 
@@ -141,7 +147,7 @@ export const PaginationNextTrigger = function PaginationNextTrigger(props: Chakr
   }
 
   return (
-    <ChakraPagination.NextTrigger ref={ref} asChild {...props}>
+    <ChakraPagination.NextTrigger asChild {...props}>
       <IconButton variant={variantMap.default} size={size}>
         <HiChevronRight />
       </IconButton>
@@ -174,7 +180,9 @@ interface PageTextProps extends TextProps {
   format?: 'short' | 'compact' | 'long';
 }
 
-export const PaginationPageText = function PaginationPageText(props: PageTextProps, ref) {
+export const PaginationPageText = function PaginationPageText(
+  props: PageTextProps,
+) {
   const { format = 'compact', ...rest } = props;
   const { page, pages, pageRange, count } = usePaginationContext();
   const content = useMemo(() => {
@@ -184,7 +192,7 @@ export const PaginationPageText = function PaginationPageText(props: PageTextPro
   }, [format, page, pages.length, pageRange, count]);
 
   return (
-    <Text fontWeight="medium" ref={ref} {...rest}>
+    <Text fontWeight="medium" {...rest}>
       {content}
     </Text>
   );

@@ -10,7 +10,7 @@ export interface InputGroupProps extends BoxProps {
   children: React.ReactElement;
 }
 
-export const InputGroup = function InputGroup(props: InputGroupProps, ref) {
+export const InputGroup = function InputGroup(props: InputGroupProps) {
   const {
     startElement,
     startElementProps,
@@ -21,7 +21,7 @@ export const InputGroup = function InputGroup(props: InputGroupProps, ref) {
   } = props;
 
   return (
-    <Group ref={ref} {...rest}>
+    <Group {...rest}>
       {startElement && (
         <InputElement pointerEvents="none" {...startElementProps}>
           {startElement}

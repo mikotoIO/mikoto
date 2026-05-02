@@ -8,11 +8,11 @@ export interface PinInputProps extends ChakraPinInput.RootProps {
   attached?: boolean;
 }
 
-export const PinInput = function PinInput(props: PinInputProps, ref) {
+export const PinInput = function PinInput(props: PinInputProps) {
   const { count = 4, inputProps, rootRef, attached, ...rest } = props;
   return (
     <ChakraPinInput.Root ref={rootRef} {...rest}>
-      <ChakraPinInput.HiddenInput ref={ref} {...inputProps} />
+      <ChakraPinInput.HiddenInput {...inputProps} />
       <ChakraPinInput.Control>
         <Group attached={attached}>
           {Array.from({ length: count }).map((_, index) => (

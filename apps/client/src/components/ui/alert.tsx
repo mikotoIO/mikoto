@@ -12,7 +12,7 @@ export interface AlertProps extends Omit<ChakraAlert.RootProps, 'title'> {
   onClose?: () => void;
 }
 
-export const Alert = function Alert(props: AlertProps, ref) {
+export const Alert = function Alert(props: AlertProps) {
   const {
     title,
     children,
@@ -24,7 +24,7 @@ export const Alert = function Alert(props: AlertProps, ref) {
     ...rest
   } = props;
   return (
-    <ChakraAlert.Root ref={ref} {...rest}>
+    <ChakraAlert.Root {...rest}>
       {startElement || <ChakraAlert.Indicator>{icon}</ChakraAlert.Indicator>}
       {children ? (
         <ChakraAlert.Content>

@@ -7,7 +7,7 @@ export interface SliderProps extends ChakraSlider.RootProps {
   showValue?: boolean;
 }
 
-export const Slider = function Slider(props: SliderProps, ref) {
+export const Slider = function Slider(props: SliderProps) {
   const { marks: marksProp, label, showValue, ...rest } = props;
   const value = props.defaultValue ?? props.value;
 
@@ -19,7 +19,7 @@ export const Slider = function Slider(props: SliderProps, ref) {
   const hasMarkLabel = !!marks?.some((mark) => mark.label);
 
   return (
-    <ChakraSlider.Root ref={ref} thumbAlignment="center" {...rest}>
+    <ChakraSlider.Root thumbAlignment="center" {...rest}>
       {label && !showValue && (
         <ChakraSlider.Label fontWeight="medium">{label}</ChakraSlider.Label>
       )}

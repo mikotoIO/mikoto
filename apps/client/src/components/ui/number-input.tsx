@@ -3,10 +3,10 @@ import 'react';
 
 export type NumberInputProps = ChakraNumberInput.RootProps;
 
-export const NumberInputRoot = function NumberInput(props: NumberInputProps, ref) {
+export const NumberInputRoot = function NumberInput(props: NumberInputProps) {
   const { children, ...rest } = props;
   return (
-    <ChakraNumberInput.Root ref={ref} variant="outline" {...rest}>
+    <ChakraNumberInput.Root variant="outline" {...rest}>
       {children}
       <ChakraNumberInput.Control>
         <ChakraNumberInput.IncrementTrigger />

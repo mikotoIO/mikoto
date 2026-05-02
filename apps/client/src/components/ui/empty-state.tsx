@@ -7,10 +7,10 @@ export interface EmptyStateProps extends ChakraEmptyState.RootProps {
   icon?: React.ReactNode;
 }
 
-export const EmptyState = function EmptyState(props: EmptyStateProps, ref) {
+export const EmptyState = function EmptyState(props: EmptyStateProps) {
   const { title, description, icon, children, ...rest } = props;
   return (
-    <ChakraEmptyState.Root ref={ref} {...rest}>
+    <ChakraEmptyState.Root {...rest}>
       <ChakraEmptyState.Content>
         {icon && (
           <ChakraEmptyState.Indicator>{icon}</ChakraEmptyState.Indicator>

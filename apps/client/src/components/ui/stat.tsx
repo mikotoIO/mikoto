@@ -14,10 +14,10 @@ interface StatLabelProps extends ChakraStat.LabelProps {
   info?: React.ReactNode;
 }
 
-export const StatLabel = function StatLabel(props: StatLabelProps, ref) {
+export const StatLabel = function StatLabel(props: StatLabelProps) {
   const { info, children, ...rest } = props;
   return (
-    <ChakraStat.Label {...rest} ref={ref}>
+    <ChakraStat.Label {...rest}>
       {children}
       {info && (
         <ToggleTip content={info}>
@@ -35,28 +35,28 @@ interface StatValueTextProps extends ChakraStat.ValueTextProps {
   formatOptions?: Intl.NumberFormatOptions;
 }
 
-export const StatValueText = function StatValueText(props: StatValueTextProps, ref) {
+export const StatValueText = function StatValueText(props: StatValueTextProps) {
   const { value, formatOptions, children, ...rest } = props;
   return (
-    <ChakraStat.ValueText {...rest} ref={ref}>
+    <ChakraStat.ValueText {...rest}>
       {children ||
         (value != null && <FormatNumber value={value} {...formatOptions} />)}
     </ChakraStat.ValueText>
   );
 };
 
-export const StatUpTrend = function StatUpTrend(props: BadgeProps, ref) {
+export const StatUpTrend = function StatUpTrend(props: BadgeProps) {
   return (
-    <Badge colorPalette="green" gap="0" {...props} ref={ref}>
+    <Badge colorPalette="green" gap="0" {...props}>
       <ChakraStat.UpIndicator />
       {props.children}
     </Badge>
   );
 };
 
-export const StatDownTrend = function StatDownTrend(props: BadgeProps, ref) {
+export const StatDownTrend = function StatDownTrend(props: BadgeProps) {
   return (
-    <Badge colorPalette="red" gap="0" {...props} ref={ref}>
+    <Badge colorPalette="red" gap="0" {...props}>
       <ChakraStat.DownIndicator />
       {props.children}
     </Badge>

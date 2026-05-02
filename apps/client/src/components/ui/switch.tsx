@@ -8,13 +8,13 @@ export interface SwitchProps extends ChakraSwitch.RootProps {
   thumbLabel?: { on: React.ReactNode; off: React.ReactNode };
 }
 
-export const Switch = function Switch(props: SwitchProps, ref) {
+export const Switch = function Switch(props: SwitchProps) {
   const { inputProps, children, rootRef, trackLabel, thumbLabel, ...rest } =
     props;
 
   return (
     <ChakraSwitch.Root ref={rootRef} {...rest}>
-      <ChakraSwitch.HiddenInput ref={ref} {...inputProps} />
+      <ChakraSwitch.HiddenInput {...inputProps} />
       <ChakraSwitch.Control>
         <ChakraSwitch.Thumb>
           {thumbLabel && (
@@ -29,9 +29,7 @@ export const Switch = function Switch(props: SwitchProps, ref) {
           </ChakraSwitch.Indicator>
         )}
       </ChakraSwitch.Control>
-      {children != null && (
-        <ChakraSwitch.Label>{children}</ChakraSwitch.Label>
-      )}
+      {children != null && <ChakraSwitch.Label>{children}</ChakraSwitch.Label>}
     </ChakraSwitch.Root>
   );
 };

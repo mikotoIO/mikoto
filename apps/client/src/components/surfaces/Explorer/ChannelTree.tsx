@@ -87,7 +87,7 @@ function Node(props: ExplorerNode & { path: string[] }) {
         {open &&
           !isLeaf &&
           nodeSort(props.descendant)?.map((x) => (
-            <Node {...x} path={[...props.path, x.id]} key={x.id} />
+            <Node key={x.id} {...x} path={[...props.path, x.id]} />
           ))}
       </StyledSubtree>
     </div>
@@ -102,7 +102,7 @@ export function ChannelTree({
 }) {
   return (
     <StyledTreeBody {...props}>
-      {nodeSort(nodes)?.map((x) => <Node {...x} path={[x.id]} key={x.id} />)}
+      {nodeSort(nodes)?.map((x) => <Node key={x.id} {...x} path={[x.id]} />)}
     </StyledTreeBody>
   );
 }

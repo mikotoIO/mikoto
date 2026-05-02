@@ -72,7 +72,7 @@ function SurfaceComponent(props: SurfaceComponentProps) {
     <TabContext.Provider value={{ key: `${kind}/${key}` }}>
       <ErrorBoundary FallbackComponent={ErrorSurface}>
         <Suspense fallback={<LoadingSurface />}>
-          <SurfaceComponent {...rest} key={key} />
+          <SurfaceComponent key={key} {...rest} />
         </Suspense>
       </ErrorBoundary>
     </TabContext.Provider>

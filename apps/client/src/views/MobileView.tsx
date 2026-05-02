@@ -491,7 +491,7 @@ function SurfaceView({ tab }: { tab: Tabable }) {
       <TabContext.Provider value={{ key: `${kind}/${key}` }}>
         <ErrorBoundary FallbackComponent={ErrorSurface}>
           <Suspense fallback={<LoadingSurface />}>
-            <SurfaceComponent {...rest} key={key} />
+            <SurfaceComponent key={key} {...rest} />
           </Suspense>
         </ErrorBoundary>
       </TabContext.Provider>

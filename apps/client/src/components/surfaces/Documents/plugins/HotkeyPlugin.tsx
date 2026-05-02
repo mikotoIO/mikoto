@@ -5,7 +5,7 @@ import { COMMAND_PRIORITY_NORMAL, KEY_DOWN_COMMAND } from 'lexical';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
 
-export function saveWithToast(channel: MikotoChannel, content: string) {
+function saveWithToast(channel: MikotoChannel, content: string) {
   if (!channel.spaceId) return;
   const promise = channel.client.rest['documents.update'](
     { content },

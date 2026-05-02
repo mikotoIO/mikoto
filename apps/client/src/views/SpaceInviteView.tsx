@@ -22,7 +22,7 @@ const InvitationBox = styled.div`
   color: var(--chakra-colors-white);
 `;
 
-export function SpaceInviteViewInner() {
+export function SpaceInviteView() {
   const mikoto = useMikoto();
   const navigate = useNavigate();
   const [space, setSpace] = useState<SpaceExt | null>(null);
@@ -103,8 +103,4 @@ export function SpaceInviteViewInner() {
       />
     </Grid>
   );
-}
-
-export function SpaceInviteView() {
-  return <SpaceInviteViewInner />;
 }

@@ -1,10 +1,6 @@
 import { Box, Flex, Link } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import {
-  faGears,
-  faGlasses,
-  faSprayCanSparkles,
-} from '@fortawesome/free-solid-svg-icons';
+import { faGlasses } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoMessage } from '@mikoto-io/mikoto.js';
 import { atom, useSetAtom } from 'jotai';
@@ -16,7 +12,6 @@ import { MessageAvatar } from '@/components/atoms/MessageAvatar';
 import { Markdown } from '@/components/molecules/markdown';
 import { Tag } from '@/components/ui';
 import { useMikoto } from '@/hooks';
-import { TypingDots } from '@/ui';
 
 import { Timestamp } from './Timestamp';
 
@@ -226,20 +221,3 @@ export const MessageItem = ({ message, isSimple }: MessageProps) => {
   );
 };
 
-export function GhostMessage() {
-  return (
-    <MessageContainer>
-      <MessageAvatar />
-      <MessageInner>
-        <Flex align="center" gap="8px" mb="6px" opacity={0.5}>
-          <Name>Cactus</Name>
-        </Flex>
-
-        <Box opacity={0.5}>
-          <Markdown content="testing ghost message" />
-          <TypingDots />
-        </Box>
-      </MessageInner>
-    </MessageContainer>
-  );
-}

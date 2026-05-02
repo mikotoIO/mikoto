@@ -4,7 +4,7 @@ function padTime(n: number): string {
   return String(n).padStart(2, '0');
 }
 
-export const DATE_FORMAT = new Intl.DateTimeFormat('en', {
+const DATE_FORMAT = new Intl.DateTimeFormat('en', {
   day: 'numeric',
   month: 'long',
   year: 'numeric',

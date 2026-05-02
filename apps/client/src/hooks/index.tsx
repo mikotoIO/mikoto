@@ -18,8 +18,6 @@ export function useAuthClient() {
   return useContext(AuthContext);
 }
 
-export function useEvent() {}
-
 export const useFetchMember = (space: MikotoSpace | undefined) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);

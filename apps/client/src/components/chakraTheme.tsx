@@ -6,7 +6,7 @@ import {
 } from '@chakra-ui/react';
 import { css } from '@emotion/react';
 
-export const chakraTheme = defineConfig({
+const chakraTheme = defineConfig({
   // config: {
   //   initialColorMode: 'dark',
   //   useSystemColorMode: false,

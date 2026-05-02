@@ -13,7 +13,7 @@ import { $createImageNode, $isImageNode, ImageNode } from './nodes/ImageNode';
 const IMAGE_PATTERN = /!\[([^\]|]*)(?:\|(\d+)(?:x\d+)?)?\]\(([^)\s]+)\)/;
 const IMAGE_PATTERN_END = /!\[([^\]|]*)(?:\|(\d+)(?:x\d+)?)?\]\(([^)\s]+)\)$/;
 
-export const IMAGE: TextMatchTransformer = {
+const IMAGE: TextMatchTransformer = {
   dependencies: [ImageNode],
   export: (node) => {
     if (!$isImageNode(node)) return null;

@@ -1,5 +1,5 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { atom, useAtom, useAtomValue } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import { createContext } from 'react';
 
@@ -9,20 +9,13 @@ export type Tabable = TabBaseType & {
   key: string;
 };
 
-export interface DockViewLayout {
-  layout: string;
-  activeGroup?: string;
-}
-
 // Jotai atoms for tab state
 export const tabsState = atom<Tabable[]>([]);
-
-export const layoutState = atom<DockViewLayout | null>(null);
 
 export const activeTabIdState = atom<string | null>(null);
 
 // Derived atom to get a tab by ID
-export const tabByIdSelector = atom((get) => (id: string) => {
+const tabByIdSelector = atom((get) => (id: string) => {
   const tabs = get(tabsState);
   const [kind, key] = id.split('/');
   return tabs.find((tab) => tab.kind === kind && tab.key === key);
@@ -109,9 +102,6 @@ export function useTabkit() {
       setActiveTabId(id);
       saveActiveTabToStorage(id);
     },
-    updateLayout(_layout: DockViewLayout) {
-      // Removed localStorage persistence
-    },
   };
 }
 
@@ -124,6 +114,3 @@ export function useActiveTabId() {
   return useAtomValue(activeTabIdState);
 }
 
-export function useLayout() {
-  return useAtomValue(layoutState);
-}

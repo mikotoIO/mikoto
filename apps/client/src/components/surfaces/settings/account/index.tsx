@@ -34,7 +34,7 @@ import { ThemesSubsurface } from './themes';
 
 const bgUrl = '/images/artworks/2.jpg';
 
-export function PasswordChangeModal() {
+function PasswordChangeModal() {
   const authClient = useAuthClient();
 
   const { register, handleSubmit, getValues } = useForm();

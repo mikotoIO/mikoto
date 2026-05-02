@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 
 import { ExplorerNode, nodeSort } from './explorerNode';
 
-export const StyledTreeBody = styled.div`
+const StyledTreeBody = styled.div`
   margin: 0;
   padding: 4px;
   min-height: min-content;
@@ -49,7 +49,7 @@ const ChevronWrapper = styled.div`
   text-align: center;
 `;
 
-export const StyledSubtree = styled.div`
+const StyledSubtree = styled.div`
   margin-left: 12px;
   padding-left: 8px;
   border-left: 1px solid rgba(255, 255, 255, 0.1);

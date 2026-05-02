@@ -2,7 +2,7 @@ import { Box } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import { MessageExt } from '@mikoto-io/mikoto.js';
 
-export const DATE_FORMAT = new Intl.DateTimeFormat('en', {
+const DATE_FORMAT = new Intl.DateTimeFormat('en', {
   day: 'numeric',
   month: 'long',
   year: 'numeric',

@@ -11,7 +11,7 @@ import {
 } from '@floating-ui/react';
 import { cloneElement, useState } from 'react';
 
-export const Tooltip = chakra('div', {
+const Tooltip = chakra('div', {
   base: {
     color: 'white',
     backgroundColor: 'gray.900',

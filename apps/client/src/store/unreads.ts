@@ -31,7 +31,7 @@ export async function loadNotificationPreferences(mikoto: MikotoClient) {
   }
 }
 
-export async function loadAcksForSpace(space: {
+async function loadAcksForSpace(space: {
   listUnread: () => Promise<{ channelId: string; timestamp: string }[]>;
 }) {
   const unreads = await space.listUnread();

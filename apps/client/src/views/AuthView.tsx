@@ -44,7 +44,7 @@ const Art = styled.div`
   background-size: cover;
 `;
 
-export function AuthView({ children }: { children: React.ReactNode }) {
+function AuthView({ children }: { children: React.ReactNode }) {
   return (
     <Flex h="100%" align="center" justify="center" bg="gray.900">
       <Flex rounded="lg" overflow="hidden">

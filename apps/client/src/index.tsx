@@ -14,7 +14,7 @@ import 'react-toastify/dist/ReactToastify.css';
 // import { registerSW } from 'virtual:pwa-register';
 import App from '@/App';
 import { globalCss } from '@/components/chakraTheme';
-import { Provider as ChakraProvider } from '@/components/ui/provider';
+import { ThemeProvider } from '@/components/ui/provider';
 import { env } from '@/env';
 import reportWebVitals from '@/reportWebVitals';
 
@@ -44,7 +44,7 @@ if (SENTRY) {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <HelmetProvider>
-      <ChakraProvider forcedTheme="dark">
+      <ThemeProvider>
         <QueryClientProvider client={queryClient}>
           <>
             <Helmet>
@@ -57,7 +57,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <ToastContainer theme="dark" limit={3} />
           </>
         </QueryClientProvider>
-      </ChakraProvider>
+      </ThemeProvider>
     </HelmetProvider>
   </React.StrictMode>,
 );

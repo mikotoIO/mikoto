@@ -1,12 +1,18 @@
 import { ChakraProvider } from '@chakra-ui/react';
+import { ThemeProvider as NextThemeProvider } from 'next-themes';
 
 import { chakraSystem } from '../chakraTheme';
-import { ColorModeProvider, type ColorModeProviderProps } from './color-mode';
 
-export function Provider(props: ColorModeProviderProps) {
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (
     <ChakraProvider value={chakraSystem}>
-      <ColorModeProvider {...props} />
+      <NextThemeProvider
+        attribute="class"
+        disableTransitionOnChange
+        forcedTheme="dark"
+      >
+        {children}
+      </NextThemeProvider>
     </ChakraProvider>
   );
 }

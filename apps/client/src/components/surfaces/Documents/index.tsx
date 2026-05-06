@@ -572,36 +572,36 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
         </Flex>
         <Flex className="right" fontSize="xl" gap={3}>
           <Group>
-            <FloatingTooltip
-              tooltip="Edit"
-              placement="bottom"
-              offsetOptions={[0, 4]}
-            >
+            {documentSnap.type === 'read' && (
               <Button
                 colorPalette="blue"
                 size="sm"
                 p={2}
                 onClick={() => {
-                  if (documentSnap.type === 'read') {
-                    documentState.type = 'edit';
-                  } else if (documentSnap.type === 'edit') {
-                    documentState.type = 'read';
-                    documentState.save = 'synced';
-                  }
+                  documentState.type = 'edit';
                 }}
               >
-                {documentSnap.type === 'read' ? (
-                  <>
-                    <FontAwesomeIcon icon={faPencil} />
-                    Edit
-                  </>
-                ) : documentSnap.save === 'saving' ? (
+                <FontAwesomeIcon icon={faPencil} />
+                Edit
+              </Button>
+            )}
+            {documentSnap.type === 'edit' && (
+              <Button
+                variant="ghost"
+                size="sm"
+                p={2}
+                onClick={() => {
+                  documentState.type = 'read';
+                  documentState.save = 'synced';
+                }}
+              >
+                {documentSnap.save === 'saving' ? (
                   <FontAwesomeIcon icon={faCircleNotch} spin />
                 ) : (
                   <FontAwesomeIcon icon={faSave} />
                 )}
               </Button>
-            </FloatingTooltip>
+            )}
           </Group>
         </Flex>
       </DocumentActions>

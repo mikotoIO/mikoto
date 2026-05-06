@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import {
   faCircleNotch,
   faFileLines,
+  faPencil,
   faPencilSquare,
   faSave,
 } from '@fortawesome/free-solid-svg-icons';
@@ -177,7 +178,6 @@ const EditorWrapper = styled.div`
 
   .editor-input {
     outline: none;
-    min-height: calc(100dvh - 200px);
   }
 
   blockquote {
@@ -280,15 +280,12 @@ function MikotoContentEditable({
 function DocumentActions({ children }: PropsWithChildren) {
   return (
     <Flex
-      position="sticky"
-      top={0}
-      zIndex={1}
+      flexShrink={0}
       bg="surface"
       borderBottom="1px solid"
       borderBottomColor="gray.650"
       px={4}
       py={2}
-      mb={8}
       align="center"
       justify="space-between"
     >
@@ -555,7 +552,7 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
   const lastEdited = useRelativeTime(channel.lastUpdatedDate);
 
   return (
-    <Surface scroll>
+    <Surface>
       <TabName
         name={channel.name}
         icon={channel.space?.icon ?? faFileLines}
@@ -581,7 +578,8 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
               offsetOptions={[0, 4]}
             >
               <Button
-                variant="ghost"
+                colorPalette="blue"
+                size="sm"
                 p={2}
                 onClick={() => {
                   if (documentSnap.type === 'read') {
@@ -593,7 +591,10 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
                 }}
               >
                 {documentSnap.type === 'read' ? (
-                  <FontAwesomeIcon icon={faPencilSquare} />
+                  <>
+                    <FontAwesomeIcon icon={faPencil} />
+                    Edit
+                  </>
                 ) : documentSnap.save === 'saving' ? (
                   <FontAwesomeIcon icon={faCircleNotch} spin />
                 ) : (
@@ -604,7 +605,7 @@ export default function DocumentSurface({ channelId }: { channelId: string }) {
           </Group>
         </Flex>
       </DocumentActions>
-      <Box px={8} pb={32}>
+      <Box flex={1} overflowY="auto" px={8} pt={8} pb={32}>
         {documentSnap.type === 'read' && (
           <Box
             onDoubleClick={() => {

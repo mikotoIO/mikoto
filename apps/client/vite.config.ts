@@ -1,14 +1,11 @@
 /// <reference types="vitest" />
 import react from '@vitejs/plugin-react';
-import * as dotenv from 'dotenv';
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { defineConfig, type ProxyOptions } from 'vite';
+import { defineConfig, loadEnv, type ProxyOptions } from 'vite';
 
 // import { VitePWA } from 'vite-plugin-pwa';
-
-dotenv.config();
 
 // When running against the production backend (`vite --mode prod-backend`),
 // we route /__api and /__media through the dev server so the browser stays
@@ -31,11 +28,17 @@ const PROD_BACKEND_PROXY: Record<string, ProxyOptions> = {
   },
 };
 
-export default ({ mode }: { mode: string }) =>
-  defineConfig({
+export default ({ mode }: { mode: string }) => {
+  // Use Vite's loadEnv so .env.[mode] correctly overrides .env. We avoid
+  // calling dotenv.config() at module top-level because it pre-populates
+  // process.env, and Vite's own env loading then treats those process.env
+  // values as authoritative — clobbering the mode-specific overrides
+  // (e.g. PUBLIC_MEDIASERVER_URL in .env.prod-backend).
+  const env = loadEnv(mode, process.cwd(), '');
+  return defineConfig({
     server: {
-      host: process.env.HOST || undefined,
-      port: parseInt(process.env.PORT || '', 10) || undefined,
+      host: env.HOST || undefined,
+      port: parseInt(env.PORT || '', 10) || undefined,
       proxy: mode === 'prod-backend' ? PROD_BACKEND_PROXY : undefined,
     },
     build: {
@@ -75,3 +78,4 @@ export default ({ mode }: { mode: string }) =>
     },
     envPrefix: ['MIKOTO_', 'PUBLIC_'],
   });
+};

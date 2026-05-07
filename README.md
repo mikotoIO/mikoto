@@ -65,6 +65,21 @@ docker compose up -d # Run auxiliary services
 just run-core # runs the base scripts
 ```
 
+#### Frontend-only against production
+
+If you're iterating on client UI and don't need a local backend, you can
+point the dev client at the production API instead:
+
+```sh
+just run-client-prod
+```
+
+This runs the client on `http://localhost:3510` and proxies API, media,
+and WebSocket traffic through to the production services same-origin
+(no local Docker, superego, or migrations required). See
+[apps/client/docs/PROD-BACKEND-DEV.md](./apps/client/docs/PROD-BACKEND-DEV.md)
+for details.
+
 ### Build
 
 To build all apps and packages, run the following command:

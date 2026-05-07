@@ -55,8 +55,9 @@ export class MikotoClient {
     this.timeOfLastRefresh = new Date();
     const websocketUrl = new URL(this.options.url);
     websocketUrl.protocol = websocketUrl.protocol.replace('http', 'ws');
+    const basePath = websocketUrl.pathname.replace(/\/+$/, '');
     this.ws = new WebsocketApi({
-      url: `${websocketUrl.origin}/ws`,
+      url: `${websocketUrl.origin}${basePath}/ws`,
       token: this.token,
     });
 

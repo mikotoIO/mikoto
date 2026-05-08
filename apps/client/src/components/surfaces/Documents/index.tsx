@@ -122,8 +122,30 @@ const EditorWrapper = styled.div`
     line-height: 1.35;
   }
 
+  .editor-list-ul,
+  .editor-list-ol {
+    padding: 0 16px;
+  }
+
   .editor-listitem {
     margin: 8px 0;
+  }
+
+  .editor-nested-listitem {
+    list-style-type: none;
+  }
+
+  .editor-nested-listitem::before,
+  .editor-nested-listitem::after {
+    display: none;
+  }
+
+  .editor-list-ul .editor-list-ul,
+  .editor-list-ol .editor-list-ol,
+  .editor-list-ul .editor-list-ol,
+  .editor-list-ol .editor-list-ul {
+    margin: 0;
+    padding-left: 24px;
   }
 
   .editor-list-check {

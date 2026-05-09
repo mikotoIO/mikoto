@@ -2,7 +2,7 @@
   "accountSettings": {
     "title": "Account Settings",
     "general": {
-      "title": "My Account",
+      "title": "Profile",
       "authentication": "Authentication",
       "dangerous": "Dangerous Actions",
       "changePassword": "Change Password",

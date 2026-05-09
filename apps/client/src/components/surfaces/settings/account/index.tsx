@@ -8,6 +8,15 @@ import {
   Text,
   Textarea,
 } from '@chakra-ui/react';
+import {
+  faBell,
+  faCode,
+  faLanguage,
+  faLink,
+  faPalette,
+  faShieldHalved,
+  faUser,
+} from '@fortawesome/free-solid-svg-icons';
 import { VerificationChallenge } from '@mikoto-io/mikoto.js';
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
@@ -488,13 +497,29 @@ function Switch({ nav }: { nav: string }) {
 }
 
 const ACCOUNT_SETTING_CATEGORIES = [
-  { code: 'general', tkey: 'accountSettings.general.title' },
-  { code: 'safety', tkey: 'accountSettings.safety.title' },
-  { code: 'notifications', tkey: 'accountSettings.notifications.title' },
-  { code: 'bots', tkey: 'accountSettings.bots.title' },
-  { code: 'language', tkey: 'accountSettings.language.title' },
-  { code: 'connections', tkey: 'accountSettings.connections.title' },
-  { code: 'themes', tkey: 'accountSettings.themes.title' },
+  { code: 'general', tkey: 'accountSettings.general.title', icon: faUser },
+  {
+    code: 'safety',
+    tkey: 'accountSettings.safety.title',
+    icon: faShieldHalved,
+  },
+  {
+    code: 'notifications',
+    tkey: 'accountSettings.notifications.title',
+    icon: faBell,
+  },
+  { code: 'bots', tkey: 'accountSettings.bots.title', icon: faCode },
+  {
+    code: 'language',
+    tkey: 'accountSettings.language.title',
+    icon: faLanguage,
+  },
+  {
+    code: 'connections',
+    tkey: 'accountSettings.connections.title',
+    icon: faLink,
+  },
+  { code: 'themes', tkey: 'accountSettings.themes.title', icon: faPalette },
 ];
 
 export function AccountSettingsSurface() {

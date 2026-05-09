@@ -1,4 +1,11 @@
 import { Box, Code, Group, Input, NativeSelect, Text } from '@chakra-ui/react';
+import {
+  faBan,
+  faCircleInfo,
+  faEnvelope,
+  faFaceSmile,
+  faUserShield,
+} from '@fortawesome/free-solid-svg-icons';
 import { MikotoSpace, VerificationChallenge } from '@mikoto-io/mikoto.js';
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
@@ -398,11 +405,15 @@ function Switch({ nav, space }: { nav: string; space: MikotoSpace }) {
 }
 
 const SPACE_SETTING_CATEGORIES = [
-  { code: 'overview', tkey: 'spaceSettings.overview.title' },
-  { code: 'invites', tkey: 'spaceSettings.invites.title' },
-  { code: 'roles', tkey: 'spaceSettings.roles.title' },
-  { code: 'emojis', tkey: 'spaceSettings.emojis.title' },
-  { code: 'bans', tkey: 'spaceSettings.bans.title' },
+  {
+    code: 'overview',
+    tkey: 'spaceSettings.overview.title',
+    icon: faCircleInfo,
+  },
+  { code: 'invites', tkey: 'spaceSettings.invites.title', icon: faEnvelope },
+  { code: 'roles', tkey: 'spaceSettings.roles.title', icon: faUserShield },
+  { code: 'emojis', tkey: 'spaceSettings.emojis.title', icon: faFaceSmile },
+  { code: 'bans', tkey: 'spaceSettings.bans.title', icon: faBan },
 ];
 
 export function SpaceSettingsSurface({ spaceId }: { spaceId: string }) {

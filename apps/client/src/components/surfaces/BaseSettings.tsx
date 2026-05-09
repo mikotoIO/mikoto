@@ -1,4 +1,6 @@
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faCog } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -7,7 +9,7 @@ import { checkNonNull } from '@/functions/assertNonNull';
 import { SettingSurface } from '@/views';
 
 interface BaseSettingsSurfaceProps {
-  categories: { code: string; tkey: string }[];
+  categories: { code: string; tkey: string; icon?: IconDefinition }[];
   switcher: (nav: string) => React.ReactNode;
   defaultNav: string;
 }
@@ -31,6 +33,13 @@ export function BaseSettingsSurface({
             }}
             key={c.code}
           >
+            {c.icon && (
+              <FontAwesomeIcon
+                icon={c.icon}
+                fixedWidth
+                style={{ marginRight: 8 }}
+              />
+            )}
             {t(c.tkey)}
           </SettingSurface.Nav>
         ))}

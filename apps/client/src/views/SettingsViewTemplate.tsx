@@ -32,9 +32,13 @@ const Nav = styled.a<{ active?: boolean }>`
   padding: 8px 16px;
   border-radius: 4px;
   background-color: ${(p) =>
-    p.active ? `var(--chakra-colors-gray-650)` : 'transparent'};
+    p.active ? `var(--chakra-colors-gray-600)` : 'transparent'};
   color: var(--chakra-colors-white);
   user-select: none;
+
+  &:hover {
+    background-color: var(--chakra-colors-gray-650);
+  }
 `;
 
 export const SettingSurface = Object.assign(SettingsViewBase, {

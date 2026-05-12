@@ -12,7 +12,7 @@ use chrono::TimeDelta;
 use dotenvy::dotenv;
 use sqlx::PgPool;
 use superego::{
-    entities::{Account, Channel, ChannelType, Message, Role, SpaceUser},
+    entities::{Account, Channel, ChannelType, Handle, Message, Role, SpaceUser},
     error::Error as SuperegoError,
     functions::time::Timestamp,
 };
@@ -146,18 +146,29 @@ async fn create_user_with_account(pool: &PgPool, user: &TestUser) -> Result<(), 
         passhash,
     };
 
+    let mut tx = pool.begin().await?;
     account
-        .create_with_user(user.name, pool)
+        .create_with_user(user.name, &mut *tx)
         .await
         .map_err(|e| match e {
             SuperegoError::DatabaseError(e) => e,
             _ => sqlx::Error::Protocol("Unexpected error".to_string()),
         })?;
+    Handle::auto_assign_for_user(user.id, user.name, &mut *tx)
+        .await
+        .map_err(|e| match e {
+            SuperegoError::DatabaseError(e) => e,
+            _ => sqlx::Error::Protocol("Unexpected error".to_string()),
+        })?;
+    tx.commit().await?;
 
     Ok(())
 }
 
 async fn create_space(pool: &PgPool) -> Result<(), sqlx::Error> {
+    let space_name = "Test Community";
+    let mut tx = pool.begin().await?;
+
     // Create space directly without the default channel/role (we'll create our own)
     sqlx::query(
         r#"
@@ -166,10 +177,18 @@ async fn create_space(pool: &PgPool) -> Result<(), sqlx::Error> {
         "#,
     )
     .bind(TEST_SPACE_ID)
-    .bind("Test Community")
+    .bind(space_name)
     .bind(TEST_USERS[0].id)
-    .execute(pool)
+    .execute(&mut *tx)
     .await?;
+
+    Handle::auto_assign_for_space(TEST_SPACE_ID, space_name, &mut *tx)
+        .await
+        .map_err(|e| match e {
+            SuperegoError::DatabaseError(e) => e,
+            _ => sqlx::Error::Protocol("Unexpected error".to_string()),
+        })?;
+    tx.commit().await?;
 
     Ok(())
 }

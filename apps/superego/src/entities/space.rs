@@ -45,7 +45,7 @@ entity!(
 pub struct SpaceExt {
     #[serde(flatten)]
     pub base: Space,
-    /// The space's handle (if claimed)
+    /// The space's handle (None only for DM/GROUP spaces)
     pub handle: Option<String>,
     pub roles: Vec<Role>,
     pub channels: Vec<Channel>,

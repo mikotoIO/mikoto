@@ -1,4 +1,4 @@
-use aide::axum::routing::{delete_with, get_with, patch_with, post_with};
+use aide::axum::routing::{get_with, patch_with, post_with};
 use axum::Json;
 use chrono::Utc;
 use schemars::JsonSchema;
@@ -23,17 +23,7 @@ pub mod relations;
 
 async fn me(claim: Claims) -> Result<Json<UserExt>, Error> {
     let user = User::find_by_id(claim.sub.parse()?, db()).await?;
-    let mut user_ext = UserExt::from_user(user, db()).await?;
-
-    // Backfill: auto-assign a handle for users who don't have one yet
-    if user_ext.handle.is_none() {
-        if let Ok(h) =
-            Handle::auto_assign_for_user(user_ext.base.id, &user_ext.base.name, db()).await
-        {
-            user_ext.handle = Some(h.handle);
-        }
-    }
-
+    let user_ext = UserExt::from_user(user, db()).await?;
     Ok(user_ext.into())
 }
 
@@ -76,16 +66,6 @@ async fn set_handle(
     };
 
     Handle::change_user_handle(user_id, full_handle, db()).await?;
-
-    let user = User::find_by_id(user_id, db()).await?;
-    let user_ext = UserExt::from_user(user, db()).await?;
-    emit_event("users.onUpdate", &user_ext, &format!("user:{}", claim.sub)).await?;
-    Ok(user_ext.into())
-}
-
-async fn delete_handle(claim: Claims) -> Result<Json<UserExt>, Error> {
-    let user_id = claim.sub.parse()?;
-    Handle::release_for_user(user_id, db()).await?;
 
     let user = User::find_by_id(user_id, db()).await?;
     let user_ext = UserExt::from_user(user, db()).await?;
@@ -182,14 +162,6 @@ pub fn router() -> AppRouter<State> {
                 o.tag(TAG)
                     .id("user.setHandle")
                     .summary("Set or Change User Handle")
-            }),
-        )
-        .route(
-            "/me/handle",
-            delete_with(delete_handle, |o| {
-                o.tag(TAG)
-                    .id("user.deleteHandle")
-                    .summary("Release User Handle")
             }),
         )
         .route(

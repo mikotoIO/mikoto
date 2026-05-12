@@ -10,8 +10,8 @@ use uuid::Uuid;
 use crate::{
     db::db,
     entities::{
-        Bot, BotCreatedResponse, BotInfo, BotSpaceInfo, BotVisibility, MemberExt, MemberKey, Space,
-        SpaceExt, SpaceUser, TokenPair, User, UserPatch,
+        Bot, BotCreatedResponse, BotInfo, BotSpaceInfo, BotVisibility, Handle, MemberExt,
+        MemberKey, Space, SpaceExt, SpaceUser, TokenPair, User, UserPatch,
     },
     error::Error,
     functions::{
@@ -162,7 +162,10 @@ async fn create_bot(
         last_token_regenerated_at: None,
     };
 
-    bot.create_with_user(&body.name, db()).await?;
+    let mut tx = db().begin().await?;
+    bot.create_with_user(&body.name, &mut *tx).await?;
+    Handle::auto_assign_for_user(bot.id, &body.name, &mut *tx).await?;
+    tx.commit().await?;
 
     Ok(Json(BotCreatedResponse {
         id: bot.id,

@@ -112,6 +112,11 @@ fn build_app_router() -> AppRouter<State> {
         .nest("roles", "/spaces/:spaceId/roles", spaces::roles::router())
         .nest("bans", "/spaces/:spaceId/bans", spaces::bans::router())
         .nest(
+            "emojis",
+            "/spaces/:spaceId/emojis",
+            spaces::emojis::router(),
+        )
+        .nest(
             "roles",
             "/spaces/:spaceId/invites",
             spaces::invites::router(),

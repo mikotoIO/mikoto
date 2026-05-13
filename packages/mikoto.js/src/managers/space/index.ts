@@ -11,12 +11,14 @@ import {
 import { ZSchema } from '../../helpers/ZSchema';
 import { CachedManager } from '../base';
 import { MikotoChannel } from '../channel';
+import { EmojiManager } from './emoji';
 import { MemberManager } from './member';
 import { RoleManager } from './role';
 
 const SimpleSpaceExt = SpaceExt.omit({
   channels: true,
   roles: true,
+  emojis: true,
 });
 
 export class MikotoSpace extends ZSchema(SimpleSpaceExt) {
@@ -25,6 +27,7 @@ export class MikotoSpace extends ZSchema(SimpleSpaceExt) {
   channelIds!: string[];
   members!: MemberManager;
   roles!: RoleManager;
+  emojis!: EmojiManager;
 
   constructor(base: SpaceExt, client: MikotoClient) {
     const cached = client.spaces.cache.get(base.id);
@@ -42,6 +45,7 @@ export class MikotoSpace extends ZSchema(SimpleSpaceExt) {
     this.client = ref(client);
     this.roles = new RoleManager(this, base.roles);
     this.members = ref(new MemberManager(this));
+    this.emojis = new EmojiManager(this, base.emojis ?? []);
 
     // Prefetch members when space is created
     setTimeout(() => {
@@ -56,6 +60,7 @@ export class MikotoSpace extends ZSchema(SimpleSpaceExt) {
   _patch(data: SpaceExt) {
     Object.assign(this, SimpleSpaceExt.parse(data));
     this.roles._replace(data.roles);
+    if (data.emojis) this.emojis._replace(data.emojis);
   }
 
   get channels() {
@@ -173,5 +178,6 @@ export class SpaceManager extends CachedManager<MikotoSpace> {
   }
 }
 
+export * from './emoji';
 export * from './member';
 export * from './role';

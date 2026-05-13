@@ -85,6 +85,76 @@ export class MikotoMessage extends ZSchema(MessageExt) {
       });
     }
   }
+
+  /**
+   * Add a reaction to this message. Reactions in DMs are not currently
+   * supported on the server.
+   */
+  async addReaction(emoji: string) {
+    if (!this.channel.spaceId) return;
+    await this.client.rest['messages.reactions.add'](
+      { emoji },
+      {
+        params: {
+          spaceId: this.channel.spaceId,
+          channelId: this.channelId,
+          messageId: this.id,
+        },
+      },
+    );
+  }
+
+  async removeReaction(emoji: string) {
+    if (!this.channel.spaceId) return;
+    await this.client.rest['messages.reactions.remove'](
+      { emoji },
+      {
+        params: {
+          spaceId: this.channel.spaceId,
+          channelId: this.channelId,
+          messageId: this.id,
+        },
+      },
+    );
+  }
+
+  /**
+   * Toggle a reaction by the current user.
+   */
+  async toggleReaction(emoji: string) {
+    const me = this.client.user.me?.id;
+    if (!me) return;
+    const existing = this.reactions.find((r) => r.emoji === emoji);
+    if (existing && existing.userIds.includes(me)) {
+      await this.removeReaction(emoji);
+    } else {
+      await this.addReaction(emoji);
+    }
+  }
+
+  _applyReactionAdd(emoji: string, userId: string) {
+    const group = this.reactions.find((r) => r.emoji === emoji);
+    if (group) {
+      if (!group.userIds.includes(userId)) {
+        group.userIds.push(userId);
+        group.count = group.userIds.length;
+      }
+    } else {
+      this.reactions.push({ emoji, count: 1, userIds: [userId] });
+    }
+  }
+
+  _applyReactionRemove(emoji: string, userId: string) {
+    const idx = this.reactions.findIndex((r) => r.emoji === emoji);
+    if (idx === -1) return;
+    const group = this.reactions[idx];
+    const userIdx = group.userIds.indexOf(userId);
+    if (userIdx !== -1) group.userIds.splice(userIdx, 1);
+    group.count = group.userIds.length;
+    if (group.count === 0) {
+      this.reactions.splice(idx, 1);
+    }
+  }
 }
 
 export interface MessageListParams {

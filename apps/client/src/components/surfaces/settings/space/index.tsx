@@ -396,7 +396,7 @@ function Switch({ nav, space }: { nav: string; space: MikotoSpace }) {
     case 'roles':
       return <RolesSubsurface space={space} />;
     case 'emojis':
-      return <EmojiSubsurface />;
+      return <EmojiSubsurface space={space} />;
     case 'bans':
       return <BansSubsurface />;
     default:

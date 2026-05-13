@@ -5,7 +5,12 @@ import { WebsocketApi } from './WebsocketApi';
 import { type Api, createApiClient } from './api.gen';
 import { RelationshipManager, UserManager } from './managers';
 import { ChannelManager } from './managers/channel';
-import { MemberManager, RoleManager, SpaceManager } from './managers/space';
+import {
+  EmojiManager,
+  MemberManager,
+  RoleManager,
+  SpaceManager,
+} from './managers/space';
 
 export interface MikotoClientOptions {
   auth: AuthClient;
@@ -65,6 +70,7 @@ export class MikotoClient {
     ChannelManager._subscribe(this);
     MemberManager._subscribe(this);
     RoleManager._subscribe(this);
+    EmojiManager._subscribe(this);
     RelationshipManager._subscribe(this);
 
     // Prefetch relationships after connection

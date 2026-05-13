@@ -229,14 +229,48 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
     });
   };
 
+  const reactionAddFn = (event: {
+    channelId: string;
+    messageId: string;
+    userId: string;
+    emoji: string;
+  }) => {
+    if (event.channelId !== channel.id) return;
+    setMsgs((xs) => {
+      if (xs === null) return null;
+      const message = xs.find((m) => m.id === event.messageId);
+      message?._applyReactionAdd(event.emoji, event.userId);
+      return xs;
+    });
+  };
+
+  const reactionRemoveFn = (event: {
+    channelId: string;
+    messageId: string;
+    userId: string;
+    emoji: string;
+  }) => {
+    if (event.channelId !== channel.id) return;
+    setMsgs((xs) => {
+      if (xs === null) return null;
+      const message = xs.find((m) => m.id === event.messageId);
+      message?._applyReactionRemove(event.emoji, event.userId);
+      return xs;
+    });
+  };
+
   useEffect(() => {
     mikoto.ws.on('messages.onCreate', createFn);
     mikoto.ws.on('messages.onUpdate', updateFn);
     mikoto.ws.on('messages.onDelete', deleteFn);
+    mikoto.ws.on('messages.onReactionAdd', reactionAddFn);
+    mikoto.ws.on('messages.onReactionRemove', reactionRemoveFn);
     return () => {
       mikoto.ws.off('messages.onCreate', createFn);
       mikoto.ws.off('messages.onUpdate', updateFn);
       mikoto.ws.off('messages.onDelete', deleteFn);
+      mikoto.ws.off('messages.onReactionAdd', reactionAddFn);
+      mikoto.ws.off('messages.onReactionRemove', reactionRemoveFn);
     };
   }, [channel.id]);
 
@@ -398,6 +432,7 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
                     timestamp: new Date().toISOString(),
                     editedTimestamp: null,
                     attachments: [],
+                    reactions: [],
                   },
                   mikoto,
                   true,

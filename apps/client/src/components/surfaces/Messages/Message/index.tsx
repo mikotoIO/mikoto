@@ -4,16 +4,24 @@ import { faGlasses } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoMessage } from '@mikoto-io/mikoto.js';
 import { atom, useSetAtom } from 'jotai';
+import { Suspense, lazy } from 'react';
 import { useSnapshot } from 'valtio/react';
 
-import { ContextMenu, useContextMenu } from '@/components/ContextMenu';
+import {
+  ContextMenu,
+  contextMenuState,
+  useContextMenu,
+} from '@/components/ContextMenu';
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
 import { MessageAvatar } from '@/components/atoms/MessageAvatar';
 import { Markdown } from '@/components/molecules/markdown';
 import { Tag } from '@/components/ui';
 import { useMikoto } from '@/hooks';
 
+import { Reactions } from './Reactions';
 import { Timestamp } from './Timestamp';
+
+const EmojiPicker = lazy(() => import('../EmojiPicker'));
 
 const MessageContainer = styled.div<{ isSimple?: boolean; pending?: boolean }>`
   margin: 0;
@@ -92,8 +100,42 @@ export const MessageItem = ({ message, isSimple }: MessageProps) => {
   const messageSnap = useSnapshot(message);
   const mikoto = useMikoto();
   const setEditState = useSetAtom(messageEditState);
+  const setContextMenu = useSetAtom(contextMenuState);
+  const spaceId = message.channel?.spaceId;
+  const space = spaceId ? mikoto.spaces.cache.get(spaceId) : undefined;
+
+  const openReactionPicker = (ev: React.MouseEvent) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    setContextMenu({
+      position: { top: ev.clientY, left: ev.clientX },
+      elem: (
+        <Suspense fallback={null}>
+          <EmojiPicker
+            onEmojiSelect={async (shortcode) => {
+              setContextMenu(null);
+              const name = shortcode.replace(/:/g, '');
+              const custom = space?.emojis.getByName(name);
+              const emoji = custom ? `custom:${custom.id}` : `:${name}:`;
+              try {
+                await message.toggleReaction(emoji);
+              } catch {
+                /* ignore */
+              }
+            }}
+          />
+        </Suspense>
+      ),
+    });
+  };
+
   const menu = useContextMenu(() => (
     <ContextMenu>
+      {spaceId && (
+        <ContextMenu.Link onClick={openReactionPicker}>
+          Add Reaction
+        </ContextMenu.Link>
+      )}
       {message.authorId === mikoto.user.me!.id && (
         <ContextMenu.Link
           onClick={() => {
@@ -167,6 +209,7 @@ export const MessageItem = ({ message, isSimple }: MessageProps) => {
             </Box>
           )}
         </div>
+        <Reactions message={message} />
         {messageSnap.attachments && messageSnap.attachments.length > 0 && (
           <Flex mt={2} gap={2} flexWrap="wrap">
             {messageSnap.attachments.map((attachment) => {

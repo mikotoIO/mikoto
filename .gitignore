@@ -72,4 +72,5 @@ target/
 .moon/cache
 .moon/docker
 
-.brainstorm/
+# claude
+.claude/worktrees/

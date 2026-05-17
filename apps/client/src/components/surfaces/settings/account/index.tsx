@@ -29,7 +29,7 @@ import { BaseSettingsSurface } from '@/components/surfaces/BaseSettings';
 import { Button, DialogContent, Field } from '@/components/ui';
 import { Alert } from '@/components/ui/alert';
 import { uploadFile } from '@/functions/fileUpload';
-import { useAuthClient, useMikoto } from '@/hooks';
+import { useMikoto } from '@/hooks';
 import { useErrorElement } from '@/hooks/useErrorElement';
 import { Form } from '@/ui';
 import { SettingSurface } from '@/views';
@@ -41,61 +41,6 @@ import { SafetySurface } from './safety';
 import { ThemesSubsurface } from './themes';
 
 const bgUrl = '/images/artworks/2.jpg';
-
-function PasswordChangeModal() {
-  const authClient = useAuthClient();
-
-  const { register, handleSubmit, getValues } = useForm();
-  const error = useErrorElement();
-
-  return (
-    <DialogContent rounded="md" p={4} maxW="480px">
-      <Form
-        style={{ minWidth: 400 }}
-        onSubmit={handleSubmit(async (form) => {
-          try {
-            await authClient.changePassword({
-              oldPassword: form.oldPassword,
-              newPassword: form.newPassword,
-            });
-            window.location.href = '/login';
-          } catch (e) {
-            error.setError((e as any)?.response?.data);
-          }
-        })}
-      >
-        <h1>Change Password</h1>
-        {error.el}
-
-        <Field label="Old Password">
-          <Input
-            type="password"
-            {...register('oldPassword', { required: true })}
-          />
-        </Field>
-        <Field label="New Password">
-          <Input
-            type="password"
-            {...register('newPassword', { required: true })}
-          />
-        </Field>
-        <Field label="Confirm New Password">
-          <Input
-            type="password"
-            {...register('confirmNewPassword', {
-              required: true,
-              validate: (value) => value === getValues('newPassword'),
-            })}
-          />
-        </Field>
-
-        <Button colorPalette="primary" type="submit">
-          Change Password
-        </Button>
-      </Form>
-    </DialogContent>
-  );
-}
 
 function NameChangeModal() {
   const { register, handleSubmit } = useForm();
@@ -434,45 +379,10 @@ function Overview() {
         </Button>
       </Form>
 
-      <h2>{t('accountSettings.general.authentication')}</h2>
-
-      <Flex gap={2}>
-        <Button
-          variant="subtle"
-          onClick={() => {
-            setModal({
-              elem: <PasswordChangeModal />,
-            });
-          }}
-        >
-          {t('accountSettings.general.changePassword')}
-        </Button>
-        <Button
-          colorPalette="yellow"
-          type="submit"
-          height="auto"
-          blockSize="auto"
-        >
-          {t('accountSettings.general.logOutOfAllDevices')}
-        </Button>
-      </Flex>
-      <h2>{t('accountSettings.general.dangerous')}</h2>
-      <Box pb="16px">
-        Warning: This action is irreversible. You will lose all your data.
-      </Box>
-      <Flex gap={2}>
-        <Button colorPalette="red">
-          {t('accountSettings.general.deleteAccount')}
-        </Button>
-      </Flex>
-      <h2>Debug</h2>
+      {/* <h2>Debug</h2>
       <Text color="gray.400" fontSize="sm" mb={2} fontFamily="mono">
         Commit: {__COMMIT_HASH__}
-      </Text>
-      <Button size="md" variant="subtle">
-        Open Design Palette
-      </Button>
-      <Box mb="80px" />
+      </Text> */}
     </SettingSurface>
   );
 }

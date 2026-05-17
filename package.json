@@ -2,6 +2,7 @@
   "name": "mikoto-monorepo",
   "version": "0.0.0",
   "private": true,
+  "packageManager": "pnpm@10.18.0",
   "scripts": {
     "compose": "docker compose up -d",
     "eslint": "eslint",

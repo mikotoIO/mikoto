@@ -63,46 +63,24 @@ pub const LAYERS: &[LayerDef] = &[
     },
 ];
 
-pub enum AppliedColor {
-    AdjustHsv {
-        hue_shift: f32,
-        sat_mult: f32,
-        val_mult: f32,
-    },
-    RotateHue(f32),
-    None,
-}
-
-pub struct LayerDetail {
-    pub def: &'static LayerDef,
-    pub chosen: String,
-    pub applied_color: AppliedColor,
-}
-
-pub struct GenerateResult {
-    pub image: RgbaImage,
-    pub layers: Vec<LayerDetail>,
-}
-
-pub fn generate(assets: &Dir<'static>, rng: &mut impl Rng) -> GenerateResult {
+pub fn generate(assets: &Dir<'static>, rng: &mut impl Rng) -> RgbaImage {
     let mut canvas: Option<RgbaImage> = None;
     let mut hue_rotations: HashMap<&str, f32> = HashMap::new();
-    let mut layers = Vec::new();
 
     for def in LAYERS {
-        let (pick_name, mut img) = match def.source {
+        let mut img = match def.source {
             Source::File(path) => {
                 let file = assets
                     .get_file(path)
                     .unwrap_or_else(|| panic!("missing embedded {path}"));
-                (def.name, load_png(file.contents()))
+                load_png(file.contents())
             }
             Source::RandomFrom(dir_name) => {
                 let dir = assets
                     .get_dir(dir_name)
                     .unwrap_or_else(|| panic!("missing embedded {dir_name} dir"));
-                let (name, data) = pick_random_png(dir, rng);
-                (name, load_png(data))
+                let (_, data) = pick_random_png(dir, rng);
+                load_png(data)
             }
         };
 
@@ -110,39 +88,26 @@ pub fn generate(assets: &Dir<'static>, rng: &mut impl Rng) -> GenerateResult {
             scale_alpha(&mut img, def.alpha);
         }
 
-        let (img, applied_color) = match def.color {
+        let img = match def.color {
             ColorTransform::AdjustHsv => {
                 let hue_shift = rng.gen_range(-30.0..20.0f32);
                 let sat_mult = rng.gen_range(0.8..1.2f32);
                 let val_mult = rng.gen_range(0.7..1.15f32);
-                (
-                    adjust_hsv(&img, hue_shift, sat_mult, val_mult),
-                    AppliedColor::AdjustHsv {
-                        hue_shift,
-                        sat_mult,
-                        val_mult,
-                    },
-                )
+                adjust_hsv(&img, hue_shift, sat_mult, val_mult)
             }
             ColorTransform::RotateHue => {
                 let degrees = rng.gen_range(0.0..360.0f32);
                 hue_rotations.insert(def.name, degrees);
-                (rotate_hue(&img, degrees), AppliedColor::RotateHue(degrees))
+                rotate_hue(&img, degrees)
             }
             ColorTransform::ShareHue(source) => {
                 let &degrees = hue_rotations
                     .get(source)
                     .unwrap_or_else(|| panic!("{source} must be processed before {}", def.name));
-                (rotate_hue(&img, degrees), AppliedColor::RotateHue(degrees))
+                rotate_hue(&img, degrees)
             }
-            ColorTransform::None => (img, AppliedColor::None),
+            ColorTransform::None => img,
         };
-
-        layers.push(LayerDetail {
-            def,
-            chosen: pick_name.to_string(),
-            applied_color,
-        });
 
         match canvas.as_mut() {
             None => canvas = Some(img),
@@ -150,8 +115,5 @@ pub fn generate(assets: &Dir<'static>, rng: &mut impl Rng) -> GenerateResult {
         }
     }
 
-    GenerateResult {
-        image: canvas.expect("no layers defined"),
-        layers,
-    }
+    canvas.expect("no layers defined")
 }

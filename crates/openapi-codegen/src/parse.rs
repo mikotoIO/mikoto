@@ -58,7 +58,9 @@ pub struct Schema {
     pub any_of: Option<Vec<Schema>>,
     #[serde(default)]
     pub default: Option<serde_json::Value>,
+    #[allow(unused)]
     pub description: Option<String>,
+    #[allow(unused)]
     pub minimum: Option<f64>,
 }
 
@@ -228,7 +230,9 @@ pub struct Operation {
     pub request_body: Option<RequestBody>,
     pub responses: Option<IndexMap<String, Response>>,
     #[serde(default)]
+    #[allow(unused)]
     pub tags: Vec<String>,
+    #[allow(unused)]
     pub summary: Option<String>,
 }
 

@@ -21,10 +21,10 @@ pub fn generate(seed: &str) -> DynamicImage {
     let bg_hue = rng.gen_range(0.0..360.0f32);
     let mut canvas = background::generate(bg_hue, &mut rng);
 
-    let mut result = layers::generate(&ASSETS, &mut rng);
+    let mut image = layers::generate(&ASSETS, &mut rng);
 
-    compositing::add_outline(&mut result.image);
-    compositing::composite(&mut canvas, &result.image);
+    compositing::add_outline(&mut image);
+    compositing::composite(&mut canvas, &image);
 
     let (w, h) = (canvas.width(), canvas.height());
     image::DynamicImage::ImageRgba8(canvas).resize_exact(w * 20, h * 20, FilterType::Nearest)

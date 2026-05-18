@@ -18,63 +18,6 @@ type FeaturedCommunity = {
   fg: string;
 };
 
-const POPULAR: FeaturedCommunity[] = [
-  {
-    id: 'anime',
-    initial: 'A',
-    name: 'Anime & Manga',
-    members: '12.4k members',
-    tagline: 'Seasonal discussion, recs, art',
-    bg: 'magenta.500',
-    fg: 'white',
-  },
-  {
-    id: 'indie',
-    initial: 'I',
-    name: 'Indie Game Dev',
-    members: '3.1k members',
-    tagline: 'Devlogs, playtesting, feedback',
-    bg: 'cyan.500',
-    fg: 'gray.900',
-  },
-  {
-    id: 'music',
-    initial: 'M',
-    name: 'Music Production',
-    members: '8.7k members',
-    tagline: 'DAWs, samples, track reviews',
-    bg: 'purple.500',
-    fg: 'white',
-  },
-  {
-    id: 'rust',
-    initial: 'R',
-    name: 'Rust Nerds',
-    members: '5.9k members',
-    tagline: 'The good kind of rust',
-    bg: 'yellow.500',
-    fg: 'gray.900',
-  },
-  {
-    id: 'fediverse',
-    initial: 'F',
-    name: 'Fediverse Café',
-    members: '2.3k members',
-    tagline: 'ActivityPub & friends',
-    bg: '#34D399',
-    fg: 'gray.900',
-  },
-  {
-    id: 'study',
-    initial: 'S',
-    name: 'Study Together',
-    members: '6.0k members',
-    tagline: 'Pomodoro rooms & notes',
-    bg: 'blue.400',
-    fg: 'white',
-  },
-];
-
 function CommunityBadge({
   initial,
   bg,
@@ -241,20 +184,17 @@ export function WelcomePanel() {
           textTransform="uppercase"
           mb={2}
         >
-          Welcome, {greetingName} — Let's find your people
+          Hi there, {greetingName}
         </Text>
         <Heading
-          fontSize={{ base: '3xl', md: '4xl' }}
+          fontSize={{ base: 'xl', md: '2xl' }}
           fontWeight={700}
           color="gray.50"
           lineHeight={1.15}
           mb={3}
         >
-          Mikoto is more fun with company
+          Mikoto Platforms
         </Heading>
-        <Text fontSize="sm" color="gray.400" mb={8}>
-          Jump into a community below, or create your own space in the sidebar.
-        </Text>
 
         <Flex
           align="center"
@@ -287,7 +227,7 @@ export function WelcomePanel() {
                 fontWeight={700}
                 color="gray.50"
               >
-                The Mikoto Lounge
+                Mikoto Official Space
               </Heading>
               <Badge
                 colorPalette="primary"
@@ -300,43 +240,21 @@ export function WelcomePanel() {
               </Badge>
             </Flex>
             <Text fontSize="sm" color="gray.400" mb={1.5}>
-              The place to meet other Mikoto users, ask questions, and shape the
-              roadmap.
+              The place to meet other Mikoto users, ask questions about the
+              development, and shape the roadmap.
             </Text>
-            <Flex align="center" gap={2} fontSize="xs" color="gray.450">
-              <Box w="6px" h="6px" rounded="full" bg="#34D399" />
-              <Text>847 online · 24,301 members</Text>
-            </Flex>
           </Box>
-          <Button colorPalette="primary" size="md" flexShrink={0}>
-            Join Lounge
+          <Button asChild size="md" flexShrink={0}>
+            <a
+              href="https://platform.mikoto.io/invite/WtvbKS7mrLSd"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: 'none' }}
+            >
+              Join Official Space
+            </a>
           </Button>
         </Flex>
-
-        <Text
-          fontSize="xs"
-          fontWeight={700}
-          letterSpacing="0.12em"
-          color="gray.350"
-          textTransform="uppercase"
-          mb={3}
-        >
-          Popular this week
-        </Text>
-        <Box
-          display="grid"
-          gridTemplateColumns={{
-            base: '1fr',
-            sm: 'repeat(2, 1fr)',
-            md: 'repeat(3, 1fr)',
-          }}
-          gap={3}
-          mb={8}
-        >
-          {POPULAR.map((c) => (
-            <CommunityCard key={c.id} community={c} />
-          ))}
-        </Box>
 
         <Flex
           align="center"

@@ -21,25 +21,25 @@ end-user product, see [mikoto.io](https://mikoto.io).
 - `apps/mobile` — the mobile app (work in progress).
 - `apps/docs` — this documentation site (Next.js + Fumadocs).
 - `packages/*` — shared TypeScript packages, including the
-  [`mikoto.js`](/docs/packages/mikoto-js) client SDK and the
-  [`permcheck`](/docs/packages/permcheck) permission utilities.
+  [`mikoto.js`](/packages/mikoto-js) client SDK and the
+  [`permcheck`](/packages/permcheck) permission utilities.
 - `crates/*` — shared Rust crates, including a Rust client SDK and
   the OpenAPI codegen tool.
 
 ## Where to start
 
 If you just want to **run Mikoto locally**, head to the
-[Quickstart](/docs/quickstart). It walks through `proto`, `pnpm`, Docker
+[Quickstart](/quickstart). It walks through `proto`, `pnpm`, Docker
 Compose, and the `just reset-dev-env` command that creates a fully
 seeded local environment.
 
 If you want to **understand the system**, read the
-[Architecture overview](/docs/architecture) next, then dive into the
-[backend](/docs/superego) or [frontend](/docs/client) section depending
+[Architecture overview](/architecture) next, then dive into the
+[backend](/superego) or [frontend](/client) section depending
 on where you'll be working.
 
 If you're integrating against Mikoto from another app, see the
-[`mikoto.js` package](/docs/packages/mikoto-js) and the live OpenAPI
+[`mikoto.js` package](/packages/mikoto-js) and the live OpenAPI
 schema at `/api.json` (or [`/scalar`](http://localhost:3511/scalar) for
 an interactive renderer when superego is running).
 

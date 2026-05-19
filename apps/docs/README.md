@@ -40,14 +40,16 @@ moon run docs:build
 
 ## Layout
 
-| Path                            | What it does                                   |
-| ------------------------------- | ---------------------------------------------- |
-| `source.config.ts`              | Declares the MDX collection (`content/docs/`). |
-| `lib/source.ts`                 | Loader that the Fumadocs UI reads from.        |
-| `lib/layout.shared.tsx`         | Shared nav config (title, GitHub URL).         |
-| `app/layout.tsx`                | Root layout with `RootProvider`.               |
-| `app/page.tsx`                  | Landing page outside the docs sidebar.         |
-| `app/docs/layout.tsx`           | Docs shell with sidebar/header.                |
-| `app/docs/[[...slug]]/page.tsx` | Renders a single MDX page.                     |
-| `app/api/search/route.ts`       | Server-side search endpoint.                   |
-| `content/docs/`                 | All authored MDX content.                      |
+Docs are served from the root (`/`, `/quickstart`, …) so the site can be
+hosted at `docs.mikoto.io` directly with no URL prefix.
+
+| Path                               | What it does                                   |
+| ---------------------------------- | ---------------------------------------------- |
+| `source.config.ts`                 | Declares the MDX collection (`content/docs/`). |
+| `lib/source.ts`                    | Loader that the Fumadocs UI reads from.        |
+| `lib/layout.shared.tsx`            | Shared nav config (title, GitHub URL).         |
+| `app/layout.tsx`                   | Root layout with `RootProvider`.               |
+| `app/(docs)/layout.tsx`            | Docs shell with sidebar/header.                |
+| `app/(docs)/[[...slug]]/page.tsx`  | Renders a single MDX page (catches `/`).       |
+| `app/api/search/route.ts`          | Server-side search endpoint.                   |
+| `content/docs/`                    | All authored MDX content.                      |

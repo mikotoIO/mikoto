@@ -20,7 +20,7 @@ and (eventually) mobile apps wrap the same client.
   "surface" that the dockview can host.
 - **[Y.js](https://yjs.dev)** + **[Lexical](https://lexical.dev)** for
   the collaborative wiki channels. We use a custom Lexical theme +
-  custom nodes from [`packages/lexical-markdown`](/docs/packages).
+  custom nodes from [`packages/lexical-markdown`](/packages).
 - **[LiveKit](https://livekit.io)** client for voice/video.
 - **[React Query](https://tanstack.com/query)** for server state,
   **[Jotai](https://jotai.org)** for ephemeral UI atoms, and
@@ -61,7 +61,7 @@ component routed by a stable key. Surfaces register with the dockview
 through a tabkit; clicking a channel in the sidebar creates a new tab
 hosting that surface.
 
-The full breakdown is in [Surfaces & tabs](/docs/client/surfaces).
+The full breakdown is in [Surfaces & tabs](/client/surfaces).
 
 ## State
 
@@ -73,7 +73,7 @@ Three libraries, three jobs:
 | Jotai       | Local UI state with persistence: which sidebar is open, theme, layout prefs.              |
 | Valtio      | The live domain model: spaces, channels, members, messages — kept in sync with WS events. |
 
-Details and conventions in [State management](/docs/client/state).
+Details and conventions in [State management](/client/state).
 
 ## Dev workflows
 

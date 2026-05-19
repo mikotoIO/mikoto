@@ -49,7 +49,7 @@ its own dedicated section in the sidebar.
 
 ## Request shapes
 
-**REST:** the client uses [`mikoto.js`](/packages/mikoto-js), which
+**REST:** the client uses [`mikoto.js`](/contributors/packages/mikoto-js), which
 wraps an Axios client generated from the live OpenAPI schema. Auth is
 JWT-bearer; tokens are minted by `/account/login` and refreshed via
 `/account/refresh`.
@@ -58,7 +58,7 @@ JWT-bearer; tokens are minted by `/account/login` and refreshed via
 first message authenticates with the JWT; subsequent messages follow a
 custom `{ op, data }` envelope. The Rust side has a tiny event-bus
 layer that funnels Redis pub/sub messages to subscribed sockets — see
-[WebSocket protocol](/superego/websocket).
+[WebSocket protocol](/contributors/superego/websocket).
 
 **WebSocket (collab):** Y.js documents have their own
 `/collab/:channelId` WebSocket. Superego implements the y-websocket

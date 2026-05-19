@@ -1,5 +1,7 @@
 {
-  "title": "Mikoto",
+  "title": "Mikoto Contributors",
+  "root": true,
+  "icon": "Terminal",
   "pages": [
     "index",
     "---Getting Started---",

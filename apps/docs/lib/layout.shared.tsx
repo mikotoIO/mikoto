@@ -5,6 +5,12 @@ export function baseOptions(): BaseLayoutProps {
     nav: {
       title: 'Mikoto',
     },
+    links: [
+      {
+        text: 'API Reference',
+        url: '/api-reference',
+      },
+    ],
     githubUrl: 'https://github.com/mikoto-io/mikoto',
   };
 }

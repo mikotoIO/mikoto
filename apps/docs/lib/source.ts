@@ -20,5 +20,22 @@ export const source = loader(
       if (!icon) return;
       if (icon in icons) return createElement(icons[icon as keyof typeof icons]);
     },
+    pageTree: {
+      transformers: [
+        {
+          folder(node, folderPath) {
+            if (folderPath === 'api-reference') {
+              return {
+                ...node,
+                root: true,
+                name: 'API Reference',
+                icon: createElement(icons.Webhook),
+              };
+            }
+            return node;
+          },
+        },
+      ],
+    },
   },
 );

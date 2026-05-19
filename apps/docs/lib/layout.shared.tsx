@@ -9,18 +9,22 @@ export function baseOptions(): BaseLayoutProps {
       {
         text: 'Users',
         url: '/users',
+        on: 'nav',
       },
       {
         text: 'Developers',
         url: '/developers',
+        on: 'nav',
       },
       {
         text: 'Contributors',
         url: '/contributors',
+        on: 'nav',
       },
       {
         text: 'API Reference',
         url: '/api-reference',
+        on: 'nav',
       },
     ],
     githubUrl: 'https://github.com/mikoto-io/mikoto',

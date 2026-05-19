@@ -1,6 +1,6 @@
 import { Separator } from '@chakra-ui/react';
 import { DragDropProvider } from '@dnd-kit/react';
-import { useSortable } from '@dnd-kit/react/sortable';
+import { isSortable, useSortable } from '@dnd-kit/react/sortable';
 import styled from '@emotion/styled';
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -186,12 +186,13 @@ export function SpaceSidebar() {
   return (
     <DragDropProvider
       onDragEnd={(event) => {
-        const { source, target } = event.operation;
-        if (!source || !target) return;
+        if (event.canceled) return;
+        const { source } = event.operation;
+        if (!isSortable(source)) return;
 
-        const fromIndex = spaceArray.findIndex((s) => s.id === source.id);
-        const toIndex = spaceArray.findIndex((s) => s.id === target.id);
-        if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return;
+        const fromIndex = source.sortable.initialIndex;
+        const toIndex = source.sortable.index;
+        if (fromIndex === toIndex) return;
 
         const reordered = reorder(
           spaceArray.map((s) => s.id),

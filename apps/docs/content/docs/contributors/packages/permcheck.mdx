@@ -10,8 +10,8 @@ and a `checkPermission` helper.
 ```ts
 import { checkPermission, permissions } from '@mikoto-io/permcheck';
 
-// User's combined permission set (server-supplied)
-const userPerms = '0b11111';
+// User's combined permission set (server-supplied, base-10 string)
+const userPerms = '31';
 
 if (checkPermission(permissions.manageChannels, userPerms)) {
   // show the manage channels button

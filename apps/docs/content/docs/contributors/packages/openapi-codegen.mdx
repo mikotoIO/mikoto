@@ -1,12 +1,13 @@
 ---
 title: openapi-codegen
-description: The Rust crate that turns the superego OpenAPI schema into TypeScript bindings.
+description: The Rust crate that turns the superego OpenAPI schema into Rust bindings.
 ---
 
-`crates/openapi-codegen` is a small internal CLI that produces the
-`api.gen.ts` consumed by `@mikoto-io/mikoto.js`. You won't normally
-invoke it directly — `pnpm --filter @mikoto-io/mikoto.js generate`
-wraps it through `generator/openapi.ts`.
+`crates/openapi-codegen` is a small internal CLI that generates Rust
+bindings from the superego OpenAPI schema (consumed by the
+`mikoto-client` Rust crate). It does **not** produce the TypeScript
+`api.gen.ts` — that's handled by `packages/mikoto.js/generator/openapi.ts`,
+typically invoked via `pnpm --filter @mikoto-io/mikoto.js generate`.
 
 ## When to regenerate
 

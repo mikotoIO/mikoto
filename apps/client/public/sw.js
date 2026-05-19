@@ -1,4 +1,3 @@
- 
 // Mikoto push-only service worker.
 //
 // Deliberately has NO `fetch` handler — this SW never intercepts network

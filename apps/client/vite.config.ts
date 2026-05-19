@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { defineConfig, loadEnv, type ProxyOptions } from 'vite';
+import { type ProxyOptions, defineConfig, loadEnv } from 'vite';
 
 // import { VitePWA } from 'vite-plugin-pwa';
 

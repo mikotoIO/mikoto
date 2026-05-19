@@ -113,4 +113,3 @@ export function useTabs() {
 export function useActiveTabId() {
   return useAtomValue(activeTabIdState);
 }
-

@@ -405,7 +405,8 @@ CREATE TABLE public."User" (
     name character varying(64) NOT NULL,
     avatar character varying(256),
     description character varying(2048),
-    category public."UserCategory"
+    category public."UserCategory",
+    "spaceOrder" uuid[] DEFAULT '{}'::uuid[] NOT NULL
 );
 
 

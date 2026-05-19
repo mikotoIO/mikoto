@@ -4,7 +4,6 @@ export function SpaceIconTooltip({
   children,
   tooltip,
 }: {
-   
   children: React.ReactElement<any>;
   tooltip: string;
 }) {

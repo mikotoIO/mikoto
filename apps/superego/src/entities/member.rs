@@ -188,6 +188,7 @@ impl MemberExt {
                         .unwrap_or_else(|| UserExt {
                             base: User::ghost(),
                             handle: None,
+                            space_order: None,
                         }),
                     role_ids: role_ids
                         .get(&member_id)

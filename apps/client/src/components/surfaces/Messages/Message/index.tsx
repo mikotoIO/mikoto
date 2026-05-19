@@ -216,4 +216,3 @@ export const MessageItem = ({ message, isSimple }: MessageProps) => {
     </MessageContainer>
   );
 };
-

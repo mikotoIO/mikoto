@@ -1,0 +1,101 @@
+---
+title: Media & uploads
+description: How to upload avatars, attachments, and other media to the CDN.
+---
+
+Media in Mikoto — avatars, message attachments, space icons — is
+uploaded through the `/cdn` routes and stored in an S3-compatible
+bucket. Downloads are proxied back through `/cdn/<key>` so the
+bucket can stay private.
+
+## Upload
+
+POST `multipart/form-data` with a single `file` field:
+
+```http
+POST /cdn/upload
+authorization: Bearer <access>
+content-type: multipart/form-data; boundary=...
+
+--...
+content-disposition: form-data; name="file"; filename="avatar.png"
+content-type: image/png
+
+<binary>
+--...
+```
+
+Response:
+
+```json
+{
+  "url": "https://server.platform.mikoto.io/cdn/<key>",
+  "key": "<key>"
+}
+```
+
+Store the returned URL on whatever entity needs it (user avatar,
+message attachment, etc.) via the appropriate REST endpoint.
+
+## Limits
+
+The server enforces per-upload limits configured at deploy time.
+The hosted instance allows:
+
+- Up to **25 MB** per file.
+- Common image, video, audio, and document types.
+
+Uploads that exceed the limit get `413 Payload Too Large`.
+Disallowed content types get `415 Unsupported Media Type`.
+
+## Download
+
+```http
+GET /cdn/<key>
+```
+
+No auth header is required to download — the URL itself is the
+capability. If the file's owning resource has access controls
+(e.g. an attachment in a private channel), the proxy enforces them
+before streaming the bytes.
+
+## Attaching media to a message
+
+The typical flow:
+
+1. Upload the file → get back `{ url, key }`.
+2. POST the message with the attachment metadata:
+
+   ```http
+   POST /spaces/:spaceId/channels/:channelId/messages
+   content-type: application/json
+
+   {
+     "content": "Look at this picture",
+     "attachments": [{ "url": "...", "filename": "avatar.png" }]
+   }
+   ```
+
+The same `url` can be reused multiple times — it doesn't expire.
+
+## Avatars and icons
+
+User avatars, space icons, and channel icons all follow the same
+pattern: upload to `/cdn`, then PATCH the entity with the returned
+URL:
+
+```http
+PATCH /users/me
+content-type: application/json
+
+{ "avatar": "https://.../cdn/<key>" }
+```
+
+The server validates that the URL points to its own CDN before
+accepting it.
+
+## Self-hosted backend
+
+Self-hosted Mikoto deployments use any S3-compatible bucket. The
+URL surface above stays the same — only the upstream backend
+changes. The hosted product currently uses RustFS in production.

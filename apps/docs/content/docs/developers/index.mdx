@@ -1,0 +1,56 @@
+---
+title: Welcome
+description: Build apps, bots, and integrations against the Mikoto API.
+---
+
+The Mikoto API lets you build apps, bots, and integrations that
+read from and write to a Mikoto server. Anything the web client can
+do, the API can do — they speak the same protocol.
+
+This is the **integrator** guide. If you're a Mikoto end user, see
+the [Users guide](/users). If you're working on Mikoto's source
+code, see the [Contributors guide](/contributors).
+
+## What's exposed
+
+- A **REST API** with an auto-generated OpenAPI 3.1 schema.
+- A **WebSocket** for realtime events (messages, presence, typing).
+- A **Y.js WebSocket** for collaborative document editing.
+- A **bot** account type that authenticates with a long-lived
+  secret instead of a refresh token.
+
+All three are served by a single Rust process called **superego**.
+
+## Pick your path
+
+- **Just want to make HTTP calls?** Go straight to
+  [REST API](/developers/rest-api) — it covers auth headers, the
+  OpenAPI schema, and the live Scalar reference.
+- **Building a TypeScript app?** Use
+  [`@mikoto-io/mikoto.js`](/developers/typescript-sdk), the official
+  client. It handles refresh, reconnect, and gives you a typed
+  domain model on top of REST + WebSocket.
+- **Building a bot?** Start with [Bots](/developers/bots) for the
+  account setup and token exchange.
+- **Need realtime events?** See [WebSocket](/developers/websocket)
+  for the envelope and reconnect protocol.
+
+## Servers
+
+There are two kinds of Mikoto deployments you'll encounter:
+
+- **Hosted** — `https://server.platform.mikoto.io` is the API base
+  URL for the hosted product at [mikoto.io](https://mikoto.io).
+- **Self-hosted** — anyone running their own instance picks their
+  own domain. The dev default when running locally is
+  `http://localhost:3511`.
+
+The API surface is identical across deployments.
+
+## Versioning
+
+The API is **not yet 1.0** and changes occasionally. Breaking
+changes are called out in the changelog; the OpenAPI schema is
+re-dumped on every release so generated clients catch
+incompatibilities at build time. If you pin to a generated SDK
+version, you're insulated from in-flight changes.

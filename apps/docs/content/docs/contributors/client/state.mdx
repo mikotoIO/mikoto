@@ -1,0 +1,82 @@
+---
+title: State management
+description: When to reach for React Query, when for Jotai, when for Valtio.
+---
+
+The client maintains three flavors of state. Picking the right one
+matters — using Jotai for live message lists, or React Query for the
+sidebar collapse toggle, both lead to pain.
+
+## React Query — server state
+
+Use for: REST data that has a clear request → response shape.
+
+```ts
+const { data: invites } = useQuery({
+  queryKey: ['spaceInvites', spaceId],
+  queryFn: () => client.api.invites.list({ params: { spaceId } }),
+});
+```
+
+Mutations use `useMutation` and invalidate the affected query key on
+success. Most server data follows this shape — anything you'd
+otherwise expose as `GET /resource`.
+
+## Jotai — local UI atoms
+
+Use for: ephemeral or persisted-but-local UI prefs that don't belong
+on the server.
+
+```ts
+import { atomWithStorage } from 'jotai/utils';
+
+export const explorerPanelsState = atomWithStorage('explorerPanels', {
+  channelsHeight: 240,
+  channelsCollapsed: false,
+  membersCollapsed: false,
+});
+```
+
+`atomWithStorage` persists to `localStorage` under the key you provide.
+Use a plain `atom` for in-memory state.
+
+For atoms scoped to a context (e.g., per-space), prefer a Jotai-store
+keyed by the space ID over a global atom holding a map — it avoids
+re-rendering every component on every space change.
+
+## Valtio — the live domain model
+
+Use for: anything that gets mutated by WebSocket events. Spaces,
+channels, members, message lists.
+
+`mikoto.js` exposes its main client as a Valtio proxy. The web client
+binds to it with `useSnapshot`:
+
+```ts
+const space = useSnapshot(client.spaces.get(spaceId));
+```
+
+When a `message.onCreate` event arrives, `mikoto.js` mutates the
+relevant Valtio proxy in place; every component snapped to that proxy
+re-renders. You don't manage subscriptions explicitly — the proxy
+takes care of fine-grained reactivity.
+
+## What goes where (cheat sheet)
+
+| Concern                                                           | Library                                                |
+| ----------------------------------------------------------------- | ------------------------------------------------------ |
+| "What channels are in this space, and what's their unread state?" | Valtio (`mikoto.js` client)                            |
+| "What's the current paginated message list for channel X?"        | Valtio + a React Query bootstrap for the initial fetch |
+| "Is the explorer collapsed?"                                      | Jotai (`atomWithStorage`)                              |
+| "What's the user's profile?"                                      | Valtio (live-updated by WS)                            |
+| "Server discovery list of public spaces"                          | React Query (REST, no WS push)                         |
+| "Form draft text"                                                 | local `useState`                                       |
+
+## Don't do these
+
+- Don't `useState` for live data. The next WS event will leave you with
+  a stale snapshot.
+- Don't store the whole client tree in React Query. You'll waste cycles
+  invalidating manually after every WS event.
+- Don't put route state in Jotai. URL params are still the right place
+  for "which space is active".

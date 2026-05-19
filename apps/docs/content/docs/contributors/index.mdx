@@ -1,0 +1,55 @@
+---
+title: Welcome
+description: Developer documentation for Mikoto — the most overkill messaging platform in the world.
+---
+
+Mikoto is an open-source messaging platform designed for building online
+communities. It features thread-based messaging, voice/video chat, and
+real-time collaborative wiki channels, all powered by a Rust API server
+(superego) and a React client.
+
+This site is the **developer** documentation. If you're looking for the
+end-user product, see [mikoto.io](https://mikoto.io).
+
+## What's in this monorepo
+
+- `apps/client` — the React + Vite web client.
+- `apps/superego` — the Rust + Axum API and WebSocket server.
+- `apps/content-proxy` — a small Rust service that proxies third-party
+  media (link previews, avatars) through a Mikoto-owned origin.
+- `apps/desktop` — the Electron wrapper.
+- `apps/mobile` — the mobile app (work in progress).
+- `apps/docs` — this documentation site (Next.js + Fumadocs).
+- `packages/*` — shared TypeScript packages, including the
+  [`mikoto.js`](/contributors/packages/mikoto-js) client SDK and the
+  [`permcheck`](/contributors/packages/permcheck) permission utilities.
+- `crates/*` — shared Rust crates, including a Rust client SDK and
+  the OpenAPI codegen tool.
+
+## Where to start
+
+If you just want to **run Mikoto locally**, head to the
+[Quickstart](/contributors/quickstart). It walks through `proto`, `pnpm`, Docker
+Compose, and the `just reset-dev-env` command that creates a fully
+seeded local environment.
+
+If you want to **understand the system**, read the
+[Architecture overview](/contributors/architecture) next, then dive into the
+[backend](/contributors/superego) or [frontend](/contributors/client) section depending
+on where you'll be working.
+
+If you're integrating against Mikoto from another app, see the
+[`mikoto.js` package](/contributors/packages/mikoto-js) and the live OpenAPI
+schema at [`http://localhost:3511/api.json`](http://localhost:3511/api.json)
+(or [`/scalar`](http://localhost:3511/scalar) for an interactive renderer
+when superego is running).
+
+## Conventions in these docs
+
+- File paths are relative to the repo root unless prefixed otherwise.
+- Shell snippets assume the repo root as the working directory.
+- "Superego" refers to the Rust API server in `apps/superego/`. The
+  name is a hangover from an older architecture where the superego
+  also brokered access to other services — today it's the primary API.
+- "Collab" refers to the Y.js WebSocket service for collaborative
+  document editing. It lives inside superego on `/collab`.

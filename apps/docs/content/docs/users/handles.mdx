@@ -1,0 +1,66 @@
+---
+title: Handles & identity
+description: Default-domain handles, custom-domain handles, and how verification works.
+---
+
+A **handle** is your public, human-readable identity on Mikoto. It
+looks like a domain name:
+
+```
+hayley.mikoto.io
+alice.example.com
+```
+
+Handles replace the discriminator system used by older chat
+platforms (`alice#1234`). They're easier to share, more memorable,
+and let you bring your own domain.
+
+## Default-domain handles
+
+When you sign up, the server vends you a handle under its default
+domain — `you.mikoto.io` on the hosted product, or whatever the
+self-hosted server is configured to use.
+
+Picking one is a single step inside the **Settings → Handle** panel.
+Handles are unique within a domain; if your first choice is taken,
+the panel will tell you.
+
+You can change a default-domain handle later, but the old one is
+released back to the pool after a short cool-down.
+
+## Custom-domain handles
+
+If you own a domain (e.g. `example.com`), you can use it as your
+handle's suffix. The verification flow proves to the server that you
+control the domain's DNS:
+
+1. From **Settings → Handle → Custom domain**, enter the domain.
+2. The server gives you a signed attestation string.
+3. Add the attestation as a **TXT record** on the domain.
+4. Click **Verify**.
+5. The server looks up the TXT record over DNS-over-HTTPS and
+   checks the signature.
+
+Once verified, your handle becomes `you.example.com`. You can use
+the bare apex (`example.com`) or any subdomain you like.
+
+Verification is a one-time step per domain. You can keep the TXT
+record in place permanently, or remove it after verification — the
+server caches the result.
+
+## Why DID-style handles?
+
+Handles double as a **decentralized identifier** in the longer term.
+Because the verification is cryptographic and DNS-anchored, the same
+identity can move between Mikoto servers without losing its public
+name. (This portability is in progress — for now, handles are pinned
+to the server that vended them.)
+
+## Switching handles
+
+You can change your handle from **Settings → Handle**. Changing it:
+
+- Updates your public profile immediately.
+- Does **not** retroactively change your handle on past messages —
+  those keep showing your name at the time of sending.
+- Doesn't break invite links or friend relationships.

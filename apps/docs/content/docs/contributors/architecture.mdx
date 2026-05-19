@@ -1,0 +1,92 @@
+---
+title: Architecture
+description: A bird's-eye view of how Mikoto's services fit together.
+---
+
+Mikoto is a small constellation of services around a single Postgres
+database and a single Redis instance. This page is a map; each box has
+its own dedicated section in the sidebar.
+
+## The shape of the system
+
+```
+                    ┌──────────────────────────────────┐
+                    │            Web Client            │
+                    │  React + Vite + Chakra (3510)    │
+                    └──────────────┬───────────────────┘
+                                   │
+              REST + WebSocket     │     Y.js WebSocket
+              over /api, /ws       │     over /collab
+                                   ▼
+                    ┌──────────────────────────────────┐
+                    │             Superego             │
+                    │   Rust + Axum + SQLx (3511)      │
+                    └──────┬───────────────┬───────────┘
+                           │               │
+                    ┌──────▼──────┐  ┌─────▼──────┐
+                    │  Postgres   │  │   Redis    │
+                    │   (35101)   │  │  (pub/sub) │
+                    └─────────────┘  └────────────┘
+
+         ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+         │   RustFS S3  │  │   LiveKit    │  │   MailHog    │
+         │   (35103/4)  │  │  (35105-7)   │  │  (35108/9)   │
+         └──────────────┘  └──────────────┘  └──────────────┘
+```
+
+- **Superego** is the only service that talks to Postgres. Everything
+  else goes through its REST or WebSocket APIs.
+- **Redis** is used for pub/sub fan-out (typing indicators, presence,
+  message broadcast) and short-lived caching.
+- **RustFS** is an S3-compatible object store for avatars, attachments,
+  and media. The API is `localhost:35103`, the console
+  is `localhost:35104`.
+- **LiveKit** handles voice/video. Superego mints LiveKit access tokens
+  and the client connects directly to LiveKit.
+- **MailHog** is a dev-only SMTP sink so account verification emails
+  show up at [http://localhost:35109](http://localhost:35109) instead
+  of leaving the machine.
+
+## Request shapes
+
+**REST:** the client uses [`mikoto.js`](/contributors/packages/mikoto-js), which
+wraps an Axios client generated from the live OpenAPI schema. Auth is
+JWT-bearer; tokens are minted by `/account/login` and refreshed via
+`/account/refresh`.
+
+**WebSocket (main):** one connection per browser tab to `/ws`. The
+first message authenticates with the JWT; subsequent messages follow a
+custom `{ op, data }` envelope. The Rust side has a tiny event-bus
+layer that funnels Redis pub/sub messages to subscribed sockets — see
+[WebSocket protocol](/contributors/superego/websocket).
+
+**WebSocket (collab):** Y.js documents have their own
+`/collab/:channelId` WebSocket. Superego implements the y-websocket
+protocol directly using the `yrs` crate. Document state is persisted
+to Postgres on update.
+
+## Why "superego"?
+
+In the original design, the API server was the "ego" that mediated
+between user requests and the "id" (low-level services). The
+"superego" was the policy layer on top that enforced permissions and
+constraints. The id/ego split was eventually collapsed into a single
+service, and the name "superego" stuck.
+
+## Multi-tenancy
+
+There is none — at least not in the kubernetes/multi-instance sense.
+A Mikoto deployment is a single tenant with many **spaces** (the
+equivalent of Discord servers / Slack workspaces). All routing,
+permissions, and isolation happens at the space level inside the
+database.
+
+## What's not in the diagram
+
+- **content-proxy** (`apps/content-proxy`) — a small Rust service that
+  proxies third-party images (link previews, OpenGraph thumbnails)
+  through a Mikoto-owned origin so the client never embeds tracking
+  pixels directly. Optional; not required to run the core stack.
+- **mediaserver** — historically a separate process; today the
+  superego serves uploads on the same port. The `MEDIASERVER_URL` env
+  var exists so a future split is easy.

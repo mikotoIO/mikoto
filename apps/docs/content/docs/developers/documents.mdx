@@ -1,0 +1,106 @@
+---
+title: Collaborative documents
+description: The Y.js WebSocket protocol for real-time document editing.
+---
+
+Mikoto's collaborative documents are CRDT-backed pages built on
+[Y.js](https://yjs.dev). Each document channel maps to a single
+shared `Y.Doc`. Clients sync state over a dedicated WebSocket at
+`/collab/:channelId`.
+
+If you're just reading or writing document metadata (title,
+permissions), use the REST endpoints under
+`/spaces/:spaceId/channels/:channelId/documents`. This page is
+about **editing** document content.
+
+## Protocol
+
+The `/collab/:channelId` socket speaks the standard **y-websocket**
+binary protocol:
+
+- **Sync step 1** — client sends a state vector.
+- **Sync step 2** — server responds with missing updates.
+- **Update messages** — bidirectional patches as either side
+  changes the doc.
+- **Awareness updates** — cursors, selections, presence.
+
+This is the same protocol used by the upstream
+[`y-websocket`](https://github.com/yjs/y-websocket) reference client.
+Any Y.js client that speaks it will work — Mikoto doesn't require
+a custom transport.
+
+## Connecting
+
+In TypeScript, with [`y-websocket`](https://www.npmjs.com/package/y-websocket):
+
+```ts
+import { WebsocketProvider } from 'y-websocket';
+import * as Y from 'yjs';
+
+const doc = new Y.Doc();
+const provider = new WebsocketProvider(
+  'wss://server.platform.mikoto.io/collab',
+  channelId,
+  doc,
+  {
+    params: { token: accessToken },
+  },
+);
+```
+
+The collab socket currently accepts the access token as a query
+parameter rather than an in-band message — that's a Y.js client
+constraint, not a Mikoto one.
+
+## Permissions
+
+The server checks document permissions on connect:
+
+- **No permission** — the upgrade is rejected.
+- **View only** — the socket connects but rejects update messages
+  from the client. Awareness still works.
+- **Edit** — full read/write.
+
+Permissions are evaluated once at connect time. If a member's
+permissions change, they need to reconnect to pick up the change.
+
+## Persistence
+
+Every update is folded into the canonical `yrs::Doc` state and
+written to Postgres. On reconnect, the server replays the full
+state vector so late joiners catch up to the current document.
+
+The server keeps the full edit history — there's no eviction of
+old updates. You can roll back to an earlier version through the
+REST API.
+
+## Awareness
+
+Awareness state — cursor positions, selections, presence colors —
+is broadcast to all peers but **not persisted**. It evaporates when
+the last client disconnects.
+
+Use the standard Y.js awareness API:
+
+```ts
+provider.awareness.setLocalStateField('user', {
+  name: 'Alice',
+  color: '#ff8800',
+});
+```
+
+## Limits
+
+- Single document size: no hard limit, but expect noticeably
+  slower loads past ~10k blocks.
+- Concurrent editors per document: no hard limit; tested up to
+  ~100.
+- Reconnect storms: clients should back off exponentially after a
+  rejected connect, matching the main WebSocket reconnect pattern.
+
+## Editor choice
+
+Mikoto's official client uses [Lexical](https://lexical.dev) on
+top of Y.js, but the protocol is editor-agnostic. Any Y.js-backed
+editor — TipTap, ProseMirror with `y-prosemirror`, CodeMirror with
+`y-codemirror` — will work.

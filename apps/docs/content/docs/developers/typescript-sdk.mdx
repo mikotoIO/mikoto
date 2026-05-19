@@ -1,0 +1,145 @@
+---
+title: TypeScript SDK
+description: '@mikoto-io/mikoto.js — the official TypeScript client for REST and WebSocket.'
+---
+
+[`@mikoto-io/mikoto.js`](https://www.npmjs.com/package/@mikoto-io/mikoto.js)
+is the official TypeScript SDK for Mikoto. It wraps:
+
+- A typed **REST client** generated from the OpenAPI schema.
+- A **WebSocket client** with auto-reconnect and auth.
+- An **auth client** that owns refresh tokens and access tokens.
+- A reactive **domain model** (Spaces, Channels, Members) built on
+  [Valtio](https://valtio.pmnd.rs) so updates are pushed into your
+  UI automatically.
+
+If you're building anything against Mikoto in TypeScript — a web
+app, a bot, an Electron tool — start here.
+
+## Install
+
+```bash
+pnpm add @mikoto-io/mikoto.js
+# or: npm install @mikoto-io/mikoto.js
+```
+
+## Quick start
+
+```ts
+import { AuthClient, MikotoClient } from '@mikoto-io/mikoto.js';
+
+const auth = new AuthClient({
+  url: 'https://server.platform.mikoto.io',
+  refreshToken: () => localStorage.getItem('refreshToken') ?? '',
+  setRefreshToken: (t) => localStorage.setItem('refreshToken', t),
+});
+
+await auth.login({ email, password });
+
+const client = new MikotoClient({
+  auth,
+  url: 'https://server.platform.mikoto.io',
+});
+```
+
+From here, three surfaces are available on `client`:
+
+- `client.rest.*` — typed REST endpoints from the OpenAPI schema.
+- `client.ws.*` — typed WebSocket events and commands.
+- `client.spaces`, `client.channels`, etc. — reactive Valtio
+  proxies that stay in sync with WebSocket events.
+
+## REST calls
+
+The REST client is generated from `/api.json`, so every endpoint is
+fully typed:
+
+```ts
+const spaces = await client.rest.spaces.list();
+const channel = await client.rest.channels.get({
+  params: { spaceId, channelId },
+});
+```
+
+Auth headers, refresh-on-401, and JSON parsing are all handled by
+the SDK.
+
+## Reactive domain model
+
+The "manager" objects (`SpaceManager`, `ChannelManager`, …) wrap a
+Valtio proxy so React components re-render automatically when data
+changes:
+
+```tsx
+import { useSnapshot } from 'valtio';
+
+function ChannelTitle({ channel }) {
+  const snap = useSnapshot(channel);
+  return <h1>{snap.name}</h1>;
+}
+```
+
+When the server pushes a `channel.onUpdate`, the manager mutates
+the proxy and `useSnapshot` triggers a re-render — no manual cache
+invalidation or query refetch.
+
+## WebSocket
+
+You don't connect manually. The SDK opens the socket after the first
+successful refresh, authenticates, and resubscribes on reconnect.
+
+```ts
+// Listen for events
+client.ws.on('message.onCreate', (msg) => {
+  console.log('new message', msg);
+});
+
+// Send commands
+client.ws.emit('typing.start', { channelId });
+```
+
+Event and command names are typed from the same OpenAPI extension
+that powers the REST client, so misspellings are caught at compile
+time.
+
+## Bot accounts
+
+For server-side integrations, swap `AuthClient.login` for
+`botLogin`:
+
+```ts
+await auth.botLogin({
+  botId: process.env.BOT_ID!,
+  botSecret: process.env.BOT_SECRET!,
+});
+```
+
+The rest of the API is identical — `client.rest`, `client.ws`, and
+the managers all work the same way.
+
+See [Bots](/developers/bots) for getting a bot ID and secret.
+
+## Source
+
+The SDK is part of the Mikoto monorepo at
+[`packages/mikoto.js`](https://github.com/mikoto-io/mikoto/tree/main/packages/mikoto.js).
+The generated REST surface lives in `src/api.gen.ts` and is
+regenerated whenever the backend's OpenAPI schema changes — see
+the [contributor docs](/contributors/packages/mikoto-js) for the
+generator details.
+
+## Versioning
+
+The SDK is published with the same major version as the API surface
+it targets. Pin to a specific version in production:
+
+```jsonc
+{
+  "dependencies": {
+    "@mikoto-io/mikoto.js": "^0.x.x",
+  },
+}
+```
+
+Pre-1.0, minor versions can include breaking changes — review the
+changelog before upgrading.

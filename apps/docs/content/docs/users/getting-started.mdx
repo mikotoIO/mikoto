@@ -1,0 +1,66 @@
+---
+title: Getting started
+description: Create an account, claim a handle, and join your first space.
+---
+
+This page walks you from a fresh browser tab to a working account on
+Mikoto. The flow is the same on the hosted instance at
+[mikoto.io](https://mikoto.io) and on any self-hosted server.
+
+## 1. Create an account
+
+Open the client and choose **Sign up**. You'll be asked for:
+
+- An **email address** — used for password recovery and notifications.
+- A **password** — pick something unique; Mikoto stores only a hash.
+- A **display name** — the friendly name shown next to your messages.
+
+After submitting, check your inbox for a verification email. Until
+you click the link, account features that involve other people
+(joining spaces, sending DMs) are limited.
+
+If you're on a self-hosted dev instance, verification emails land in
+[MailHog](http://localhost:35109) instead of your real inbox.
+
+## 2. Claim a handle
+
+A **handle** is your public, human-readable identity. It looks like:
+
+```
+you.mikoto.io
+```
+
+The first part is yours to pick; the second part is the domain of
+your home instance (`mikoto.io` for the hosted product, or whatever
+the admin configured for a self-hosted server).
+
+You can also use a **custom domain** if you control its DNS — see
+[Handles & identity](/users/handles) for the verification flow.
+
+## 3. Find people to talk to
+
+Two ways to start a conversation:
+
+- **Add a friend.** Open the **Friends** panel, search by handle,
+  and send a friend request. Once they accept, you can DM them.
+- **Join a space.** Spaces are invite-based by default. Paste an
+  invite link or code into the **Join space** dialog.
+
+If you want to start your own community instead of joining one, see
+[Creating a space](/users/spaces).
+
+## 4. Pick your notifications
+
+By default Mikoto pings you for direct mentions and DMs only. Open
+**Settings → Notifications** to enable:
+
+- **Web push** — desktop notifications even when the tab is closed.
+- **Per-channel overrides** — mute noisy channels or boost important
+  ones to "all messages".
+
+## Where next
+
+- [Channels & messaging](/users/messaging) — the day-to-day chat
+  features.
+- [Voice & video](/users/voice) — joining a voice channel.
+- [Wiki documents](/users/documents) — collaborative pages.

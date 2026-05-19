@@ -1,0 +1,115 @@
+---
+title: WebSocket
+description: Realtime events — connecting to /ws, authenticating, and handling messages.
+---
+
+The WebSocket at `/ws` is how clients receive realtime events:
+incoming messages, typing indicators, presence updates, and so on.
+It also accepts a small set of commands from the client (e.g.
+"start typing").
+
+The Y.js document collaboration socket is separate — see
+[Documents](/developers/documents).
+
+## Connecting
+
+Open a WebSocket to `wss://<host>/ws` (or `ws://` for local dev).
+No auth is checked at the HTTP upgrade — authentication happens in
+the first message on the open socket.
+
+## Envelope
+
+Every text frame is JSON with two fields:
+
+```json
+{ "op": "message.onCreate", "data": { "...": "..." } }
+```
+
+- `op` — the command name (client → server) or event name
+  (server → client).
+- `data` — the typed payload for that op.
+
+Op names use a `noun.verb` convention, with event names usually
+`on*` (`message.onCreate`, `channel.onUpdate`). The full list is in
+the OpenAPI schema's `websocket` extension on `/api.json`.
+
+## Lifecycle
+
+```
+1. Client → ws_open       (HTTP upgrade)
+2. Client → authenticate  ({ "op": "authenticate", "data": { "token": "<jwt>" } })
+3. Server → authenticated (or close on failure)
+4. Server → events…       (subscribed automatically based on auth)
+5. Client → commands…     (typing.start, etc.)
+6. Either side → close
+```
+
+- You have **10 seconds** to send the auth message after opening
+  the socket. Past that, the server closes the connection.
+- A legacy `?token=<jwt>` query parameter is also accepted for
+  backwards compatibility, but the in-band auth message is
+  preferred.
+
+## Subscriptions
+
+You don't manually subscribe to channels. After auth, the server
+computes the set of topics you're allowed to see — your spaces,
+your DM partners, your own user channel — and pipes the matching
+events to your socket.
+
+When you join a space or accept a friend request mid-connection,
+the server adjusts the subscription set automatically; you don't
+have to reconnect.
+
+## Reconnecting
+
+Sockets close for many reasons — flaky networks, server restarts,
+laptop sleep. Robust clients should:
+
+1. Reconnect with **exponential backoff** (1s, 2s, 4s, …, capped).
+2. Re-authenticate on the new socket with the **current** access
+   token (refresh first if needed).
+3. Re-attach any event handlers.
+
+The official SDK does all of this for you — see
+[TypeScript SDK](/developers/typescript-sdk).
+
+## Common events
+
+A non-exhaustive list of the most useful events:
+
+| Op                  | Meaning                                         |
+| ------------------- | ----------------------------------------------- |
+| `message.onCreate`  | A new message was sent in a channel you can see |
+| `message.onUpdate`  | A message was edited                            |
+| `message.onDelete`  | A message was deleted                           |
+| `channel.onUpdate`  | Channel metadata changed                        |
+| `space.onUpdate`    | Space metadata changed                          |
+| `member.onUpdate`   | A member's roles or nickname changed            |
+| `presence.onUpdate` | A friend's presence state changed               |
+| `typing.onUpdate`   | Someone in a channel started/stopped typing     |
+| `relation.onUpdate` | A friend relationship state changed             |
+
+Browse the full list under `websocket` in
+[`/api.json`](/developers/rest-api#live-schema), or by op-prefix in
+the [scalar reference](https://server.platform.mikoto.io/scalar).
+
+## Common commands
+
+Currently the only client → server commands are a small set of
+hinting messages:
+
+| Op             | Purpose                                    |
+| -------------- | ------------------------------------------ |
+| `authenticate` | Initial handshake                          |
+| `typing.start` | Tell the server you're typing in a channel |
+
+Most data mutations go through the REST API, not the WebSocket.
+
+## Error handling
+
+If a command fails server-side, the server may respond with a
+single event on the same socket containing the error, then continue
+the session normally. Closure of the socket itself indicates a
+fatal-for-this-connection problem (invalid auth, server going down,
+etc.) — reconnect after a backoff.

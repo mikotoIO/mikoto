@@ -1,0 +1,21 @@
+{
+  "title": "Mikoto Developers",
+  "root": true,
+  "icon": "Code",
+  "pages": [
+    "index",
+    "---Getting Started---",
+    "quickstart",
+    "authentication",
+    "---APIs---",
+    "rest-api",
+    "websocket",
+    "documents",
+    "media",
+    "---Integrations---",
+    "typescript-sdk",
+    "bots",
+    "---Reference---",
+    "errors"
+  ]
+}

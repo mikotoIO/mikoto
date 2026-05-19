@@ -74,3 +74,16 @@ target/
 
 # claude
 .claude/worktrees/
+.bash_profile
+.bashrc
+.gitconfig
+.gitmodules
+.idea
+.mcp.json
+.profile
+.ripgreprc
+.vscode
+.zprofile
+.zshrc
+commands
+.playwright-mcp/

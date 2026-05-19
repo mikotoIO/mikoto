@@ -1,0 +1,96 @@
+---
+title: Client overview
+description: The Vite + React + Chakra web client that ships at platform.mikoto.io.
+---
+
+The web client is a React 19 SPA built with Vite. It's what end-users
+see at `platform.mikoto.io` (or `localhost:3510` in dev). The desktop
+and (eventually) mobile apps wrap the same client.
+
+## Stack
+
+- **React 19** + **TypeScript** (`tsconfig` paths `@/* → src/*`).
+- **[Vite](https://vitejs.dev)** for dev server, HMR, and prod builds.
+- **[Chakra UI v3](https://chakra-ui.com)** as the component library
+  and styling system. We use Chakra's `Box`, `Flex`, `Stack`, etc.,
+  rather than raw CSS for most layout. See the `chakra-ui` skill in
+  this repo for v3-specific patterns.
+- **[Dockview](https://dockview.dev)** powers the tiling tab/split
+  manager. Every main view (messages, documents, settings) is a
+  "surface" that the dockview can host.
+- **[Y.js](https://yjs.dev)** + **[Lexical](https://lexical.dev)** for
+  the collaborative wiki channels. We use a custom Lexical theme +
+  custom nodes from [`packages/lexical-markdown`](/contributors/packages).
+- **[LiveKit](https://livekit.io)** client for voice/video.
+- **[React Query](https://tanstack.com/query)** for server state,
+  **[Jotai](https://jotai.org)** for ephemeral UI atoms, and
+  **[Valtio](https://valtio.dev)** for the long-lived Mikoto domain
+  model proxies (spaces, channels, messages).
+- **[Socket.io style WS](https://socket.io)** — actually a raw
+  WebSocket; the client speaks superego's custom `{ op, data }`
+  protocol directly via `mikoto.js`.
+
+## Source layout
+
+```
+apps/client/
+├── index.html
+├── vite.config.ts
+├── tsconfig.json
+├── public/
+└── src/
+    ├── main.tsx                # entry point
+    ├── App.tsx
+    ├── components/
+    │   ├── surfaces/           # routable views (Messages, Documents, Settings, ...)
+    │   ├── sidebars/           # left sidebar, space sidebar, etc.
+    │   ├── ui/                 # design-system primitives over Chakra
+    │   ├── ContextMenu/
+    │   └── modals/
+    ├── store/                  # state (Jotai atoms, Valtio proxies, localDB)
+    ├── functions/              # pure helpers
+    ├── hooks/
+    ├── ui/                     # bare UI primitives
+    └── views/                  # router-level shells + providers
+```
+
+## Surfaces
+
+The main UI is a tiling window manager. Each "surface" is a React
+component routed by a stable key. Surfaces register with the dockview
+through a tabkit; clicking a channel in the sidebar creates a new tab
+hosting that surface.
+
+The full breakdown is in [Surfaces & tabs](/contributors/client/surfaces).
+
+## State
+
+Three libraries, three jobs:
+
+| Library     | Use it for                                                                                |
+| ----------- | ----------------------------------------------------------------------------------------- |
+| React Query | Anything fetched from the REST API: paginated lists, one-shot reads, mutations.           |
+| Jotai       | Local UI state with persistence: which sidebar is open, theme, layout prefs.              |
+| Valtio      | The live domain model: spaces, channels, members, messages — kept in sync with WS events. |
+
+Details and conventions in [State management](/contributors/client/state).
+
+## Dev workflows
+
+```sh
+# Standard: client + superego + infra
+just run-core
+
+# Client only, against prod backend (no docker, no superego)
+just run-client-prod
+
+# Tests
+pnpm --filter client test
+pnpm --filter client test:watch
+
+# Typecheck
+pnpm --filter client typecheck
+```
+
+The client dev server is on port **3510**. Hot reload works for
+everything except service worker changes (which require a hard refresh).

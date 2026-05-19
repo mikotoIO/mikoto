@@ -1,0 +1,19 @@
+{
+  "title": "Mikoto Users",
+  "root": true,
+  "icon": "Users",
+  "pages": [
+    "index",
+    "---Getting Started---",
+    "getting-started",
+    "handles",
+    "---Communities---",
+    "spaces",
+    "messaging",
+    "voice",
+    "documents",
+    "---People---",
+    "friends",
+    "notifications"
+  ]
+}

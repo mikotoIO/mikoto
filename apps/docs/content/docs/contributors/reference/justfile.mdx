@@ -1,0 +1,60 @@
+---
+title: Justfile reference
+description: Every top-level `just` recipe and when to use it.
+---
+
+The repo-root `justfile` is the entry point for the most common
+developer commands. Run `just` with no arguments to list them.
+
+## Running services
+
+| Command                | What it does                                                                                                                                    |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `just run-core`        | Start every app tagged `core-app` (currently client + superego).                                                                                |
+| `just run-client-prod` | Start only the client, proxying API/WS/media to prod. No local backend required. See [Dev against prod](/contributors/client/dev-against-prod). |
+| `just docker-start`    | `docker compose up -d` — bring up Postgres, Redis, RustFS, LiveKit, MailHog.                                                                    |
+
+## Database
+
+| Command                     | What it does                                                                                                         |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `just migrate`              | Run all pending migrations against the local DB.                                                                     |
+| `just seed`                 | Seed placeholder data into the local DB.                                                                             |
+| `just new-migration <name>` | Create a new timestamped migration file under `apps/superego/migrations/`.                                           |
+| `just reset`                | Stop docker, remove volumes, restart docker. Does **not** migrate or seed.                                           |
+| `just reset-dev-env`        | `just reset` + wait for Postgres + create S3 bucket + migrate + seed. Use after pulling a destructive schema change. |
+
+## Keys
+
+| Command                     | What it does                                                                                                                                           |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `just generate-handle-keys` | Generate an Ed25519 keypair for the domain-handle attestation system. Prints `HANDLE_PRIVATE_KEY` / `HANDLE_PUBLIC_KEY` to stdout — paste into `.env`. |
+| `just generate-vapid-keys`  | Generate a P-256 VAPID keypair for Web Push. Prints `VAPID_PRIVATE_KEY` / `VAPID_PUBLIC_KEY` / `VAPID_SUBJECT`.                                        |
+
+## Common workflows
+
+### "I just pulled main"
+
+```sh
+pnpm install              # in case dependencies changed
+just reset-dev-env        # in case migrations changed
+just run-core
+```
+
+### "Something is broken and I want a clean slate"
+
+```sh
+just reset-dev-env
+```
+
+This nukes the DB, Redis, and the S3 bucket, and rebuilds them from
+scratch. Your prod (or `just run-client-prod`) data is untouched.
+
+### "I want to test a destructive migration"
+
+Write the migration with `just new-migration`, then either:
+
+- Let it run on next boot — `AUTOMIGRATE=true` is on in dev — or
+- Run `just migrate` explicitly.
+
+If you mess it up, `just reset-dev-env` gets you back to baseline.

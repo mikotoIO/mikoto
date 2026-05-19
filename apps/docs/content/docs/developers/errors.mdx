@@ -1,0 +1,103 @@
+---
+title: Errors & rate limits
+description: Reference for error codes, HTTP statuses, and rate-limit headers.
+---
+
+This is the reference for everything that can go wrong when calling
+the API: the JSON envelope, the canonical error codes, and how
+rate limiting is signaled.
+
+## Error envelope
+
+Every non-2xx response is JSON in the same shape:
+
+```json
+{
+  "code": "NotFound",
+  "message": "Channel not found"
+}
+```
+
+- `code` — stable, machine-readable. Branch on this.
+- `message` — human-readable. Safe to show users; never includes
+  stack traces or internal details.
+
+The HTTP status mirrors the code:
+
+| Code               | HTTP | Meaning                                                   |
+| ------------------ | ---- | --------------------------------------------------------- |
+| `Unauthorized`     | 401  | Missing, malformed, or expired access token               |
+| `Forbidden`        | 403  | Authenticated but lacks the required permission           |
+| `NotFound`         | 404  | Resource doesn't exist or is hidden from you              |
+| `Conflict`         | 409  | Tried to create a duplicate (e.g. claim a taken handle)   |
+| `Gone`             | 410  | Resource existed but has been deleted                     |
+| `PayloadTooLarge`  | 413  | Upload exceeded the configured size limit                 |
+| `UnsupportedMedia` | 415  | Upload content type isn't allowed                         |
+| `ValidationFailed` | 422  | Body failed schema validation; see `message` for details  |
+| `RateLimited`      | 429  | Hit a rate limit; back off and retry                      |
+| `Internal`         | 500  | Unexpected server error; safe to retry once after a delay |
+
+Domain-specific codes (e.g. `InviteExpired`, `HandleTaken`) are
+documented per-endpoint in the [OpenAPI schema](/developers/rest-api#live-schema).
+
+## Rate limiting
+
+Write endpoints are rate-limited per account. When you hit a limit
+you get:
+
+```http
+HTTP/1.1 429 Too Many Requests
+Retry-After: 12
+content-type: application/json
+
+{ "code": "RateLimited", "message": "Slow down" }
+```
+
+- `Retry-After` is in **seconds**.
+- The TypeScript SDK respects this header automatically.
+- Read endpoints aren't rate-limited per account today, but treat
+  any 429 as recoverable regardless.
+
+## Retry strategy
+
+A reasonable client retry policy:
+
+- **401 Unauthorized**: refresh the access token once and retry.
+  If it fails again, prompt the user to log in.
+- **429 RateLimited**: wait `Retry-After` seconds and retry.
+- **500 Internal**: retry once after ~1 second.
+- **Other 4xx**: do **not** retry. The request is invalid as-is.
+- **Network errors**: retry with exponential backoff (1s, 2s, 4s,
+  capped at ~30s).
+
+## Validation errors
+
+`ValidationFailed` (422) is returned when the request body doesn't
+match the endpoint's schema. The `message` field includes the
+specific field that failed:
+
+```json
+{
+  "code": "ValidationFailed",
+  "message": "name: must be between 1 and 32 characters"
+}
+```
+
+Validation is performed against the same Rust types that produce
+the OpenAPI schema, so generated clients catch most of these at
+compile time before you ever hit the server.
+
+## WebSocket errors
+
+WebSocket sessions don't carry HTTP status codes. Fatal errors
+result in the socket being **closed** by the server with a close
+code in the `4000-4999` application range:
+
+| Close code | Meaning                                               |
+| ---------- | ----------------------------------------------------- |
+| `4001`     | Auth failed or timed out (didn't authenticate in 10s) |
+| `4002`     | Token expired during the session — refresh & retry    |
+| `4003`     | Banned from the resource you were subscribed to       |
+
+Non-fatal command errors are sent as a regular event on the open
+socket and the session continues.

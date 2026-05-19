@@ -6,3 +6,4 @@ hs-client.ts
 *.hbs
 api.json
 pnpm-lock.yaml
+next-env.d.ts

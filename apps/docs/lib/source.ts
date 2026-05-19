@@ -3,11 +3,22 @@ import { loader } from 'fumadocs-core/source';
 import { icons } from 'lucide-react';
 import { createElement } from 'react';
 
-export const source = loader({
-  baseUrl: '/',
-  source: docs.toFumadocsSource(),
-  icon(icon) {
-    if (!icon) return;
-    if (icon in icons) return createElement(icons[icon as keyof typeof icons]);
+import { openapi } from './openapi';
+
+export const source = loader(
+  {
+    docs: docs.toFumadocsSource(),
+    openapi: await openapi.staticSource({
+      baseDir: 'api-reference',
+      meta: true,
+    }),
   },
-});
+  {
+    baseUrl: '/',
+    plugins: [openapi.loaderPlugin()],
+    icon(icon) {
+      if (!icon) return;
+      if (icon in icons) return createElement(icons[icon as keyof typeof icons]);
+    },
+  },
+);

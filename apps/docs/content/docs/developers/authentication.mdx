@@ -1,0 +1,122 @@
+---
+title: Authentication
+description: JWT bearer tokens, the refresh flow, and how to keep a session healthy.
+---
+
+Mikoto uses bearer-token authentication. Every authenticated request
+carries an **access token** in the `Authorization` header; expired
+access tokens are exchanged for fresh ones via a **refresh token**.
+
+## Token types
+
+| Token            | Lifetime  | Where it goes                                          |
+| ---------------- | --------- | ------------------------------------------------------ |
+| Access token     | Minutes   | `Authorization: Bearer <token>` on every REST request  |
+| Refresh token    | Days      | POSTed to `/account/refresh` to mint a new access pair |
+| Bot access token | Long-lived | Same header; obtained via [bot login](/developers/bots)|
+
+Both access and refresh tokens are JWTs signed with the server's
+`SECRET`. The `iss` claim identifies the issuing server (e.g.
+`mikoto.io` for the hosted product).
+
+## Login
+
+```http
+POST /account/login
+content-type: application/json
+
+{ "email": "...", "password": "..." }
+```
+
+Response:
+
+```json
+{
+  "accessToken": "...",
+  "refreshToken": "..."
+}
+```
+
+Persist the refresh token in secure local storage on the client.
+The access token should be kept in memory.
+
+## Refresh
+
+When a request comes back with `401 Unauthorized`, swap the access
+token:
+
+```http
+POST /account/refresh
+content-type: application/json
+
+{ "refreshToken": "..." }
+```
+
+The response includes a **new refresh token** as well as a new
+access token. Replace your stored refresh token with the new one —
+the old one is invalidated immediately.
+
+## Logout
+
+```http
+POST /account/logout
+authorization: Bearer <access>
+```
+
+Invalidates the refresh token server-side so it can't be re-used.
+The access token will continue to work until it expires; if you
+need an immediate kill switch, also drop it from client state.
+
+## Using the access token
+
+### REST
+
+```http
+GET /users/me
+authorization: Bearer <access>
+```
+
+Every authenticated REST endpoint expects this header. Omitting it
+or sending an expired token returns `401`.
+
+### WebSocket
+
+The WebSocket carries the same token, but in the **first message**
+on the socket instead of a header — see
+[WebSocket](/developers/websocket).
+
+## Refresh strategy
+
+Two reasonable patterns:
+
+- **Lazy refresh.** Attach the current access token to every
+  request; on `401`, refresh and retry once. Simple, but every
+  user-facing request can pay one extra round-trip after expiry.
+- **Proactive refresh.** Refresh when the access token is older
+  than ~15 minutes. The SDK does this — the next request after the
+  15-minute mark transparently refreshes before being sent.
+
+Either pattern is fine. Avoid refreshing on every request — the
+refresh endpoint is rate-limited.
+
+## Bot accounts
+
+Bots use a different exchange that doesn't involve email or refresh
+tokens. See [Bots](/developers/bots) for the full flow.
+
+## Errors
+
+| Status | Meaning                                          |
+| ------ | ------------------------------------------------ |
+| `401`  | Missing/malformed/expired access token           |
+| `403`  | Token is valid but lacks permission for the call |
+| `419`  | (When configured) password reset is required     |
+
+All error responses share the same JSON shape:
+
+```json
+{ "code": "Unauthorized", "message": "..." }
+```
+
+Branch on `code` for machine-readable handling; `message` is meant
+for human-readable display.

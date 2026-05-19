@@ -1,0 +1,82 @@
+---
+title: Spaces
+description: Top-level communities — joining, creating, and managing them.
+---
+
+A **space** is the top-level container for a community on Mikoto.
+Spaces hold channels, members, roles, and invites. They're roughly
+equivalent to a Discord server or a Slack workspace.
+
+## Joining a space
+
+Spaces are invite-only by default. To join one you need an **invite
+code** or **invite link** from someone already inside.
+
+1. Open the space picker (left sidebar) and click **Join space**.
+2. Paste the invite code or link.
+3. Confirm. The space appears in your sidebar immediately.
+
+Invites can be revoked by the space's admins, so if a link stops
+working ask the inviter to mint a fresh one.
+
+## Creating a space
+
+Anyone with a verified account can create a space:
+
+1. Click the **+** at the bottom of the space picker.
+2. Choose a name and (optionally) an icon.
+3. Confirm.
+
+You become the **owner** of the new space — the role with full
+permissions. From here you can:
+
+- Create channels (text, voice, or document).
+- Invite people via the **Members → Invite** panel.
+- Define roles to delegate permissions.
+
+## Roles and permissions
+
+Permissions in Mikoto are role-based. A role bundles a set of
+permission bits — "send messages", "manage channels", "kick members",
+and so on — and gets assigned to members. A member's effective
+permissions are the union of the bits on all the roles they hold.
+
+The default roles in a new space:
+
+- **Owner** — full control, including deleting the space.
+- **Admin** — manage channels, roles, invites, members.
+- **Member** — read and write in channels.
+
+Owners and admins can create new roles from the **Settings → Roles**
+panel. Each role is a colored label and a permission bitset.
+
+## Channels in a space
+
+Channels are the rooms inside a space. A fresh space starts with
+one general text channel. Add more from **Settings → Channels**:
+
+- **Text** — threaded chat. See [Channels & messaging](/users/messaging).
+- **Voice** — drop-in voice and video. See [Voice & video](/users/voice).
+- **Document** — collaborative wiki page. See [Wiki documents](/users/documents).
+
+Channels can be reordered, renamed, and grouped into categories at
+any time.
+
+## Bans and moderation
+
+Removing people from a space comes in two flavors:
+
+- **Kick** — removes the member, but they can rejoin with a fresh
+  invite.
+- **Ban** — removes the member and blocks them from rejoining. You
+  can lift a ban from **Settings → Bans**.
+
+Both require the "moderate members" permission.
+
+## Leaving or deleting a space
+
+- **Leave**: right-click the space in your sidebar → **Leave space**.
+  You lose access immediately and need a new invite to come back.
+- **Delete**: only the owner can delete a space, from
+  **Settings → Space → Delete**. This is permanent — all channels,
+  messages, and documents in the space are removed.

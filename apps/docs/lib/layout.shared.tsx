@@ -7,6 +7,18 @@ export function baseOptions(): BaseLayoutProps {
     },
     links: [
       {
+        text: 'Users',
+        url: '/users',
+      },
+      {
+        text: 'Developers',
+        url: '/developers',
+      },
+      {
+        text: 'Contributors',
+        url: '/contributors',
+      },
+      {
         text: 'API Reference',
         url: '/api-reference',
       },

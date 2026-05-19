@@ -1,0 +1,140 @@
+---
+title: Bots
+description: Non-interactive accounts for server-side integrations.
+---
+
+A **bot** is a Mikoto account designed for programmatic use. Bots
+authenticate with a long-lived secret instead of an email and
+password, and have no inbox or refresh-token flow.
+
+Use bots for:
+
+- Automated message posters (status updates, CI notifications,
+  scheduled reminders).
+- Integration glue between Mikoto and other tools.
+- AI agents that read and write on behalf of a service.
+
+## Creating a bot
+
+Bots are owned by a regular user account. From a logged-in client,
+go to **Settings → Developer → Bots → New bot**. The response
+includes:
+
+- A **bot ID** — a UUID identifying the bot account.
+- A **bot secret** — a long random string. **Store this
+  immediately** — it's only shown once. You can rotate it later if
+  needed.
+
+Equivalent REST call:
+
+```http
+POST /bots
+authorization: Bearer <your access token>
+content-type: application/json
+
+{ "name": "my-bot" }
+```
+
+Response:
+
+```json
+{
+  "bot": { "id": "...", "name": "my-bot" },
+  "secret": "..."
+}
+```
+
+## Logging in as the bot
+
+Exchange the bot ID + secret for an access token:
+
+```http
+POST /bots/login
+content-type: application/json
+
+{ "botId": "...", "secret": "..." }
+```
+
+Response:
+
+```json
+{ "accessToken": "..." }
+```
+
+The access token is then used exactly like a user access token:
+`Authorization: Bearer <token>` on REST, in-band auth message on
+WebSocket. Bots have no refresh token — when the access token
+expires, log in again with the secret.
+
+## Inviting a bot to a space
+
+A bot only acts in spaces it's been added to. To invite one:
+
+1. Mint an invite in the target space (`POST /spaces/:id/invites`,
+   or use the UI).
+2. Have the bot redeem the invite the same way a user would:
+   `POST /spaces/join` with the invite code.
+
+After that the bot is a member like any other and behaves according
+to its assigned roles.
+
+## Permissions
+
+Bots use the same role-based permission system as users. A new bot
+member starts with no special privileges; assign roles to grant
+specific permissions.
+
+A useful pattern is to define a dedicated `bot` role with exactly
+the permissions the bot needs (e.g. "send messages" but not "manage
+channels"), and assign only that role to bots in the space.
+
+## Rotating the secret
+
+If a bot secret is leaked:
+
+```http
+POST /bots/:botId/rotate
+authorization: Bearer <owner access token>
+```
+
+The old secret is invalidated immediately. Update your deployment
+config with the new one before the next bot login.
+
+## Deleting a bot
+
+```http
+DELETE /bots/:botId
+authorization: Bearer <owner access token>
+```
+
+Deletes the bot account entirely. Its messages stay in place (so
+conversations aren't broken), but the bot can no longer log in or
+take actions.
+
+## Using the TypeScript SDK
+
+The official SDK supports bot auth out of the box:
+
+```ts
+import { AuthClient, MikotoClient } from '@mikoto-io/mikoto.js';
+
+const auth = new AuthClient({ url: process.env.MIKOTO_URL! });
+await auth.botLogin({
+  botId: process.env.BOT_ID!,
+  botSecret: process.env.BOT_SECRET!,
+});
+
+const client = new MikotoClient({ auth, url: process.env.MIKOTO_URL! });
+
+client.ws.on('message.onCreate', async (msg) => {
+  if (msg.content === '!ping') {
+    await client.rest.messages.create({
+      params: { spaceId: msg.spaceId, channelId: msg.channelId },
+      body: { content: 'pong' },
+    });
+  }
+});
+```
+
+Keep the bot secret out of source control — use environment
+variables, a secret manager, or your platform's equivalent.

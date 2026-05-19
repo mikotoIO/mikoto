@@ -1,0 +1,49 @@
+---
+title: Notifications
+description: Web push, per-channel overrides, and quiet hours.
+---
+
+Mikoto's default notification rules are deliberately quiet — you
+get pinged for direct mentions and DMs, and nothing else. Everything
+beyond that is opt-in per channel or per space.
+
+## Notification levels
+
+Each channel has one of three notification levels:
+
+- **All messages** — every message produces a notification.
+- **Mentions only** (default) — only direct mentions and replies to
+  your messages notify you.
+- **Nothing** — the channel never produces a notification.
+
+Right-click a channel → **Notifications** to change it. Whole
+spaces can be set the same way from the space header menu; per-
+channel overrides win over the space default.
+
+## Web push
+
+To get notifications when the Mikoto tab is closed (or you're using
+a different browser entirely on a mobile device), enable **web push**
+from **Settings → Notifications**.
+
+The first time you enable it, your browser will ask permission. From
+then on, mentions and DMs come through as native OS notifications.
+
+Web push is opt-in and can be disabled at any time — both from the
+Mikoto settings and from your browser's site permissions.
+
+## Quiet hours and "do not disturb"
+
+Two ways to silence notifications temporarily:
+
+- **Do not disturb** (DND) — set your presence to DND from the user
+  menu. All push notifications are suppressed; in-app indicators
+  still update.
+- **Per-channel mute** — set the channel's level to "Nothing" via
+  the right-click menu. This stays in effect until you change it.
+
+## Mobile
+
+The mobile app (in progress) uses the same web push subscription
+under the hood, so your notification preferences carry across
+devices automatically.

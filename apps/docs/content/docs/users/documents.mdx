@@ -1,0 +1,64 @@
+---
+title: Wiki documents
+description: Collaborative, long-form pages — like Notion or Google Docs, but inside a space.
+---
+
+A **document channel** is a single long-form page that multiple
+people can edit at the same time. They're useful for things that
+don't fit in a chat scrollback — meeting notes, design docs, FAQs,
+project plans.
+
+## Creating one
+
+From **Settings → Channels → New channel**, pick **Document** as
+the type. Documents live in the same sidebar as text and voice
+channels and can be reordered and renamed the same way.
+
+## Editing
+
+Click into the document and start typing. The editor supports:
+
+- Headings, lists, quotes, code blocks, tables.
+- Inline formatting (bold, italic, links, inline code).
+- Slash-commands — type `/` to insert blocks like callouts,
+  dividers, or embeds.
+- Drag-to-reorder blocks.
+
+Edits are saved continuously — there is no "save" button. If you
+lose your connection, your local changes are queued and replayed
+when you reconnect.
+
+## Real-time collaboration
+
+Multiple people can edit the same document simultaneously. You'll
+see other editors' cursors and selections in real time, color-coded
+per person. Edits merge cleanly even on overlapping paragraphs.
+
+The collaboration layer is built on [Y.js](https://yjs.dev), the
+same CRDT system used by Notion-style editors. No edits are lost,
+even if two people change the same word at the same time.
+
+## Versioning
+
+Document state is persisted on every change. The server keeps the
+full edit history; you can roll back to an earlier version from
+the document's **History** menu.
+
+## Permissions
+
+Document permissions follow the same role-based system as text
+channels:
+
+- **View** — required to read the document.
+- **Edit** — required to make changes.
+
+A common pattern is to make a document view-only for most members
+and editable for a small team — for example, a public roadmap that
+only the maintainers can edit.
+
+## Limits
+
+There's no hard size limit on a single document, but very long
+documents can be slow to load on slower devices. For pages that
+grow past a few thousand blocks, consider splitting them across
+multiple document channels.

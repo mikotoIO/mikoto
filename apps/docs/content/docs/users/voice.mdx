@@ -1,0 +1,61 @@
+---
+title: Voice & video
+description: Joining and using voice channels for audio and video chat.
+---
+
+Voice channels in Mikoto are drop-in rooms — there's no "call" to
+start or end. You join a channel and you can hear everyone else
+who's in it.
+
+## Joining
+
+Click any voice channel in the sidebar. The first time you do this,
+your browser will ask for microphone (and optionally camera)
+permission. Grant it and you're in.
+
+The voice bar at the bottom of the window shows who's currently
+connected and gives you quick toggles for:
+
+- **Mute** — disable your microphone.
+- **Deafen** — also stop receiving audio from others.
+- **Video** — turn your camera on or off.
+- **Screen share** — broadcast a window, tab, or full screen.
+- **Disconnect** — leave the channel.
+
+## Quality
+
+Mikoto uses [LiveKit](https://livekit.io) under the hood for media
+routing. Bitrate adapts automatically based on your network, and the
+client will downshift video quality before it drops calls.
+
+If you're hearing choppy audio or freezing video, the most common
+causes are:
+
+- A weak wifi signal — try a wired connection.
+- A browser extension intercepting WebRTC traffic.
+- Another app holding the microphone — close it and rejoin.
+
+## Push-to-talk vs voice activity
+
+Open **Settings → Voice & video** to switch input mode:
+
+- **Voice activity** (default) — your mic is open whenever you're
+  speaking above a configurable threshold.
+- **Push-to-talk** — your mic only opens while you hold a chosen
+  key.
+
+You can also pick a specific input/output device here if your
+system has more than one.
+
+## Permissions
+
+Joining a voice channel requires the "connect" permission on the
+channel. Speaking requires "speak". Admins can configure both
+per-role — for example, an "audience" role that can listen but not
+talk during an event.
+
+## Privacy
+
+Mikoto does **not** record voice channels. Audio and video are
+routed peer-to-server-to-peer through LiveKit and discarded as soon
+as they're delivered.

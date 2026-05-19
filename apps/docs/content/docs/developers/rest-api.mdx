@@ -1,0 +1,115 @@
+---
+title: REST API
+description: Endpoint groups, conventions, and how to consume the OpenAPI schema.
+---
+
+The REST API is the primary surface for reading and mutating data
+in Mikoto. Every endpoint takes JSON in and returns JSON out, with
+errors in a consistent `{ code, message }` envelope.
+
+## Live schema
+
+Two endpoints on every Mikoto server, no auth required:
+
+- **`/api.json`** — raw OpenAPI 3.1 document.
+- **`/scalar`** — interactive renderer powered by
+  [Scalar](https://scalar.com).
+
+For the hosted product the URLs are
+`https://server.platform.mikoto.io/api.json` and
+[`/scalar`](https://server.platform.mikoto.io/scalar).
+
+You can also browse a snapshot in this site's
+[API reference](/api-reference).
+
+## Conventions
+
+- **JSON only.** All bodies are `application/json`. The one
+  exception is `multipart/form-data` for media uploads under
+  `/cdn`.
+- **camelCase keys** in request and response bodies.
+- **ISO-8601 timestamps** (e.g. `2026-05-19T12:34:56.000Z`).
+- **UUIDs** for every entity ID — spaces, channels, messages,
+  users.
+- **Pagination** uses cursor-based parameters: `before`, `after`,
+  and `limit`. The endpoint docs note the maximum `limit`.
+
+## Endpoint groups
+
+Routes are grouped by domain. The full mount table:
+
+| Prefix                                           | Purpose                                                    |
+| ------------------------------------------------ | ---------------------------------------------------------- |
+| `/account`                                       | Login, signup, refresh, password reset, email verification |
+| `/bots`                                          | Bot registration and tokens                                |
+| `/cdn`                                           | Media upload and retrieval                                 |
+| `/handles`                                       | Username and custom-domain handles                         |
+| `/users`                                         | User profiles                                              |
+| `/relations`                                     | Friends, blocks, requests                                  |
+| `/dm`                                            | Direct message channels and messages                       |
+| `/spaces`                                        | Spaces (the top-level community)                           |
+| `/spaces/:spaceId/channels`                      | Channels inside a space                                    |
+| `/spaces/:spaceId/channels/:channelId/messages`  | Messages                                                   |
+| `/spaces/:spaceId/channels/:channelId/voice`     | LiveKit token mint                                         |
+| `/spaces/:spaceId/channels/:channelId/documents` | Y.js document metadata                                     |
+| `/spaces/:spaceId/members`                       | Membership                                                 |
+| `/spaces/:spaceId/roles`                         | Roles and permission bitsets                               |
+| `/spaces/:spaceId/bans`                          | Bans                                                       |
+| `/spaces/:spaceId/invites`                       | Invite codes                                               |
+| `/push`                                          | Web Push subscriptions                                     |
+| `/.well-known`                                   | Public server discovery metadata                           |
+
+## Errors
+
+Every error response is JSON:
+
+```json
+{ "code": "NotFound", "message": "Space not found" }
+```
+
+- `code` is stable and meant for branching.
+- `message` is human-readable.
+- The HTTP status matches the code (`NotFound` → 404,
+  `Unauthorized` → 401, etc.).
+
+Some specialized codes:
+
+| Code               | Meaning                                                |
+| ------------------ | ------------------------------------------------------ |
+| `Unauthorized`     | Missing or invalid auth token                          |
+| `Forbidden`        | Authenticated, but lacks permission                    |
+| `NotFound`         | Resource doesn't exist (or is hidden by permissions)   |
+| `Conflict`         | Tried to create a duplicate (e.g. existing handle)     |
+| `RateLimited`      | Too many requests; retry after the `Retry-After` header |
+| `ValidationFailed` | Request body failed schema validation; see `message`   |
+
+## Rate limits
+
+The server enforces per-account rate limits on write endpoints
+(message creation, friend requests, login). Hitting a limit returns
+`429 Too Many Requests` with a `Retry-After` header.
+
+Read endpoints are not currently rate-limited per-account, but
+clients should still treat 429s as recoverable and back off.
+
+## Media uploads
+
+Uploads use `multipart/form-data` under `/cdn`. The response
+includes a canonical URL you can store and serve back to users.
+Downloads go through the same `/cdn/<key>` path so the bucket can
+stay private.
+
+See the OpenAPI schema for the per-endpoint size limits and
+accepted content types.
+
+## Generated clients
+
+Don't hand-roll request types if you can avoid it. The OpenAPI
+schema is designed to be fed into code generators:
+
+- **TypeScript**: the official SDK
+  [`@mikoto-io/mikoto.js`](/developers/typescript-sdk) is generated
+  from this schema.
+- **Other languages**: any OpenAPI 3.1 generator should work.
+  Point [`openapi-generator`](https://openapi-generator.tech/) at
+  `/api.json` to scaffold a client.

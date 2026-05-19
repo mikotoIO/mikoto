@@ -1,0 +1,89 @@
+---
+title: Quickstart
+description: Authenticate and make your first API call in under five minutes.
+---
+
+This page gets you from zero to a successful API call. The example
+uses `curl` so it's language-agnostic; for TypeScript, jump to the
+[mikoto.js quickstart](/developers/typescript-sdk).
+
+## 1. Pick a server
+
+Anywhere `MIKOTO_URL` appears below, substitute the API base URL of
+the server you're targeting:
+
+- Hosted: `https://server.platform.mikoto.io`
+- Local dev: `http://localhost:3511`
+
+## 2. Get an access token
+
+The simplest flow is email + password against `/account/login`:
+
+```bash
+curl -X POST "$MIKOTO_URL/account/login" \
+  -H 'content-type: application/json' \
+  -d '{"email":"you@example.com","password":"your-password"}'
+```
+
+Response:
+
+```json
+{
+  "accessToken": "eyJhbGciOi…",
+  "refreshToken": "eyJhbGciOi…"
+}
+```
+
+- **`accessToken`** — short-lived (minutes). Use it as
+  `Authorization: Bearer <token>` on every request.
+- **`refreshToken`** — longer-lived. POST it back to
+  `/account/refresh` to get a new pair when the access token
+  expires.
+
+For server-to-server integrations (bots), use the bot login flow
+instead — see [Bots](/developers/bots).
+
+## 3. Make a request
+
+```bash
+curl "$MIKOTO_URL/users/me" \
+  -H "authorization: Bearer $ACCESS_TOKEN"
+```
+
+You should get back your own user record.
+
+## 4. Refresh when needed
+
+When you get a `401`, refresh:
+
+```bash
+curl -X POST "$MIKOTO_URL/account/refresh" \
+  -H 'content-type: application/json' \
+  -d "{\"refreshToken\":\"$REFRESH_TOKEN\"}"
+```
+
+You get a new `{ accessToken, refreshToken }` pair. The old refresh
+token is invalidated, so swap it out in your storage.
+
+The TypeScript SDK does this transparently — see
+[Authentication](/developers/authentication) for the full lifecycle.
+
+## 5. Explore the schema
+
+The full OpenAPI schema is served by every Mikoto server at two
+URLs:
+
+- `/api.json` — raw OpenAPI 3.1 document.
+- `/scalar` — interactive renderer. Open
+  [`$MIKOTO_URL/scalar`](http://localhost:3511/scalar) in a browser
+  to click through every endpoint.
+
+A statically-generated copy is also available at
+[/api-reference](/api-reference) on this docs site.
+
+## Where next
+
+- [REST API](/developers/rest-api) — endpoint groups and conventions.
+- [WebSocket](/developers/websocket) — realtime events.
+- [TypeScript SDK](/developers/typescript-sdk) — the easy path.
+- [Bots](/developers/bots) — non-interactive accounts.

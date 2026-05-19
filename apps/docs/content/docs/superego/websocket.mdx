@@ -1,0 +1,112 @@
+---
+title: WebSocket protocol
+description: How /ws and /collab work — message envelope, command/event split, Redis fan-out.
+---
+
+Superego exposes two WebSocket endpoints with very different purposes:
+
+- **`/ws`** — the main application socket. Carries presence, typing
+  indicators, message delivery, and other realtime updates.
+- **`/collab/:channelId`** — Y.js document collaboration. Implements
+  the y-websocket binary protocol on top of `yrs`.
+
+## `/ws` — main socket
+
+### Envelope
+
+Every text frame is JSON in the form `{ op, data }`:
+
+```json
+{ "op": "typing.start", "data": { "channelId": "..." } }
+```
+
+`op` selects the command (client → server) or event (server → client)
+name. `data` is the typed payload for that op.
+
+### Connection lifecycle
+
+1. **Open.** Client opens a WebSocket to `/ws`.
+2. **Authenticate.** The first message is the auth command:
+   ```json
+   { "op": "authenticate", "data": { "token": "<jwt>" } }
+   ```
+   If you don't send this within 10 seconds, the server closes the
+   socket. A legacy query-param token (`?token=...`) is also accepted
+   for backwards compat.
+3. **Subscribe.** After auth, the server computes the user's
+   subscription channels (their spaces, DM partners, etc.) and pipes
+   matching Redis pub/sub messages to the socket.
+4. **Use.** The client sends commands; the server pushes events. Both
+   directions share the same `{ op, data }` envelope.
+5. **Close.** Either side can close. The server tears down the Redis
+   subscription and clears state.
+
+### Commands and events
+
+The router exposes two registration methods:
+
+```rust
+.ws_command::<TypingStart, _, _>("typing.start", |payload, state| async move { ... })
+.ws_event::<TypingUpdate, _, _, _>("typing.onUpdate", |update, _| async move { Some(update) })
+```
+
+- **Commands** (`ws_command`) are RPC-style: client sends, server
+  executes a side effect. They typically end with `emit_event(...)`
+  to fan something back out.
+- **Events** (`ws_event`) are server-pushed messages. The handler runs
+  every time an event with that name arrives on Redis; it returns
+  `Some(payload)` to forward to the socket or `None` to drop it. This
+  is where you put per-socket authorization (don't leak events for
+  spaces the user isn't in).
+
+### Redis fan-out
+
+Anywhere in the request path you can emit:
+
+```rust
+emit_event("message.onCreate", &message, &format!("space:{space_id}")).await?;
+```
+
+That publishes the JSON `{ op, data }` to a Redis channel matching
+the topic string. Subscribed sockets pick it up, run the registered
+`ws_event` filter, and forward it to their client.
+
+Topic naming follows a `<scope>:<id>` convention:
+
+- `space:<uuid>` — broadcast to everyone in the space
+- `user:<uuid>` — broadcast to all sockets owned by that user
+- `conn:<uuid>` — broadcast to a single connection (e.g., echo replies)
+
+The subscription set per socket is computed at auth time and adjusted
+via `SocketAction::{Subscribe, Unsubscribe}` returned from
+`WebSocketState::clear_actions` whenever state changes (joining a
+space, accepting a friend request, etc.).
+
+### Schema visibility
+
+Every command and event registered through `ws_command` / `ws_event`
+is added to the OpenAPI extension `websocket` on
+[`/api.json`](/docs/superego/api). The TypeScript client uses that to
+generate typed `client.on(...)` / `client.emit(...)` bindings, so the
+two stay in sync.
+
+## `/collab/:channelId` — Y.js documents
+
+`apps/superego/src/routes/channels/documents` hosts the collaboration
+socket. The path parameter is the channel ID; one `Y.Doc` lives per
+channel, regardless of how many clients are connected.
+
+The protocol is the standard y-websocket binary protocol: sync step 1,
+sync step 2, update messages, awareness updates. We implement it
+inline using `yrs` rather than depending on the (unmaintained)
+`yrs-axum` crate.
+
+Persistence: every update is folded into the canonical `yrs::Doc`
+state and written to Postgres. On reconnect, the server replays the
+full state vector so late joiners catch up.
+
+### Why inline instead of `yrs-axum`?
+
+`yrs-axum` is unmaintained and adds a dependency we don't need — the
+protocol is small enough to handle directly with `axum::extract::ws`.
+Keep new collab code inline in superego; don't reach for `yrs-axum`.

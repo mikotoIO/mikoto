@@ -1,0 +1,78 @@
+---
+title: Monorepo Layout
+description: Where everything lives, and how Moon ties it together.
+---
+
+The repo is a hybrid pnpm + Cargo workspace, orchestrated by Moon.
+
+## Top-level
+
+```
+mikoto/
+├── apps/             # deployable services and end-user apps
+├── packages/         # shared TypeScript packages (pnpm workspace)
+├── crates/           # shared Rust crates (Cargo workspace)
+├── examples/         # example Rust bots
+├── data/             # local-only storage for RustFS, gitignored
+├── docker-compose.yml
+├── justfile
+├── moon.yml          # repo-level Moon tasks
+├── Cargo.toml        # Rust workspace root
+├── pnpm-workspace.yaml
+└── package.json
+```
+
+## `apps/`
+
+| Path | Language | Description |
+| ---- | -------- | ----------- |
+| `client` | TS/React | Web client (Vite, port 3510) |
+| `superego` | Rust | API + WebSocket server (Axum, port 3511) |
+| `content-proxy` | Rust | Optional third-party media proxy |
+| `desktop` | TS/Electron | Desktop wrapper around the web client |
+| `mobile` | TS/React Native | Mobile app (WIP) |
+| `design-language` | TS | Design system / Storybook |
+| `docs` | TS/Next.js | This documentation site |
+
+## `packages/`
+
+| Path | Description |
+| ---- | ----------- |
+| `mikoto.js` | The JS/TS client SDK consumed by the web client and external integrations. |
+| `permcheck` | Tiny shared bitset permission checker used by both client and any JS integrations. |
+| `mikoto-crypto` | Crypto primitives shared across packages. |
+| `mikoto-ui` | Cross-app UI primitives (separate from the client's Chakra-based design system). |
+| `lexical-markdown` | Custom Lexical nodes + serializer for Mikoto's markdown-flavored editor. |
+| `tsconfig` | Shared `tsconfig` base that other packages extend. |
+
+## `crates/`
+
+| Path | Description |
+| ---- | ----------- |
+| `mikoto-client` | Rust client SDK — for bots and server-side integrations. |
+| `mikoto-avatars` | Procedural avatar generator (used as a fallback when a user has no uploaded avatar). |
+| `openapi-codegen` | Internal codegen tool that converts the superego OpenAPI schema into TS bindings for `mikoto.js`. |
+
+## Moon orchestration
+
+[Moon](https://moonrepo.dev) is the task runner. Two patterns matter:
+
+1. **Per-project tasks** live in `apps/<x>/moon.yml` or
+   `packages/<x>/moon.yml`. Example: `moon run client:dev` runs the
+   client dev server.
+2. **Wildcard tasks** at the workspace level. `moon :typecheck` runs
+   the `typecheck` task in every project that defines one. The
+   repo-level `moon.yml` adds a few wildcards of its own (`:lint`,
+   `:lint.fix`, `:format`).
+
+The `core-app` tag (set in `apps/client/moon.yml` and
+`apps/superego/moon.yml`) is what `just run-core` matches on with
+`moon :start --query "tag~core-app"`.
+
+## pnpm and Cargo
+
+- **JS:** `pnpm-workspace.yaml` declares `apps/*` and `packages/*` as
+  workspace members. Use `workspace:*` in package.json `dependencies`
+  to depend on a sibling package without versioning headaches.
+- **Rust:** `Cargo.toml` at the root declares an explicit list of
+  workspace members. Add new crates to that list when you create them.

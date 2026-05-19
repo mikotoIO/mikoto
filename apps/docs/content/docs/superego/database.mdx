@@ -1,0 +1,99 @@
+---
+title: Database & migrations
+description: Postgres schema, migrations, and the entity pattern.
+---
+
+Superego owns a single Postgres database. SQLx with the `postgres`
+feature handles connections, query checking, and migrations.
+
+## Reading the schema
+
+The committed `apps/superego/schema.sql` is an up-to-date `pg_dump`
+snapshot. **Read it instead of replaying migrations** when you need
+to understand the current shape of the database.
+
+If you need to regenerate it manually:
+
+```sh
+docker compose exec postgres pg_dump -U postgres mikoto --schema-only > apps/superego/schema.sql
+```
+
+## Migrations
+
+Migrations live under `apps/superego/migrations/` and use SQLx's
+filename convention: `<timestamp>_<name>.sql`. Each file is plain SQL
+and runs in a single transaction.
+
+### Creating one
+
+```sh
+just new-migration add_some_column
+# → apps/superego/migrations/20260519151643_add_some_column.sql
+```
+
+Then open the file and write your `ALTER TABLE …` / `CREATE TABLE …`.
+
+### Running them
+
+Two ways, depending on the situation:
+
+- **Automatically on boot** — superego reads `AUTOMIGRATE` from the env
+  and runs pending migrations at startup if it's `true`. The dev env
+  has this on by default.
+- **Explicitly** — `just migrate` or
+  `cargo run --bin migrate --manifest-path apps/superego/Cargo.toml`.
+
+There is no down migration. If you need to revert, write a new
+forward migration that undoes the previous one.
+
+## The entity pattern
+
+Each table has a file under `src/entities/`. The `entity!` and
+`db_enum!` macros (in `entities/macros.rs`) cut the boilerplate.
+
+```rust
+entity!(
+    pub struct Space {
+        pub id: Uuid,
+        pub name: String,
+        pub icon: Option<String>,
+        pub owner_id: Option<Uuid>,
+        #[serde(rename = "type")]
+        #[sqlx(rename = "type")]
+        pub space_type: SpaceType,
+        pub visibility: Option<SpaceVisibility>,
+    }
+);
+```
+
+`entity!` derives `Serialize`, `Deserialize`, `FromRow`, `JsonSchema`,
+and the usual `find_by_id` / `delete` helpers via `db_find_by_id!` /
+`db_entity_delete!`. Anything more complex (joins, custom WHEREs)
+goes as a method on the `impl` block in the same file.
+
+Two-tier shape:
+
+- `Foo` — the raw row, what's in the database.
+- `FooExt` — the API-facing extended struct (often `#[serde(flatten)]`s
+  the base and adds joined fields like role lists or member counts).
+
+## Connecting to the dev DB
+
+```sh
+psql 'postgresql://postgres:postgres@localhost:35101/mikoto'
+```
+
+Postgres listens on host port 35101 (mapped from container 5432). The
+default creds are `postgres` / `postgres` — fine for local, not for
+anything you care about.
+
+## Resetting
+
+```sh
+just reset-dev-env
+```
+
+This stops Docker, removes the `mikoto_postgresql`, `mikoto_redis`, and
+RustFS volumes, brings everything back up, runs migrations, and seeds
+placeholder data. Use it any time the local DB drifts into a state
+you'd rather not debug.

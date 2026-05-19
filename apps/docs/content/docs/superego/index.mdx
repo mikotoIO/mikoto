@@ -1,0 +1,127 @@
+---
+title: Superego overview
+description: The Rust API + WebSocket server that backs Mikoto.
+---
+
+Superego is the brain of a Mikoto deployment. It exposes a REST API,
+two WebSocket endpoints (`/ws` and `/collab`), and an OpenAPI schema
+auto-derived from the route handlers. It's the only service that owns
+direct connections to Postgres and Redis.
+
+## Stack
+
+- **[Axum 0.7](https://docs.rs/axum/0.7)** — async web framework on top
+  of `tokio` and `hyper`.
+- **[SQLx 0.8](https://docs.rs/sqlx/0.8)** with the `postgres` and
+  `migrate` features. Queries are written as raw SQL inside Rust
+  source.
+- **[`aide`](https://docs.rs/aide)** + **[`schemars`](https://docs.rs/schemars)** —
+  derives an OpenAPI schema from the route handlers and their typed
+  request/response structs.
+- **[`yrs`](https://docs.rs/yrs)** — Rust port of Y.js for the
+  collaborative document service. We implement the y-websocket protocol
+  inline rather than pulling in the unmaintained `yrs-axum` crate.
+- **[`fred`](https://docs.rs/fred)** — async Redis client used for
+  pub/sub.
+- **[`rust-s3`](https://docs.rs/rust-s3)** — forked Scuffle build for
+  rustls compatibility, used to talk to RustFS / S3.
+- **[`livekit-api`](https://docs.rs/livekit-api)** — mints LiveKit
+  access tokens for voice channels.
+- **[`web-push-native`](https://docs.rs/web-push-native)** — sends VAPID
+  push notifications.
+
+## Source layout
+
+```
+apps/superego/
+├── Cargo.toml
+├── schema.sql            # Up-to-date pg_dump snapshot (read this, not migrations)
+├── migrations/           # Timestamped SQL files (sqlx::migrate!)
+├── api.json              # Last-dumped OpenAPI schema (committed)
+├── src/
+│   ├── main.rs           # Boot, ascii art, tcp listener
+│   ├── lib.rs            # Module roots
+│   ├── env.rs            # Typed env via serde-env
+│   ├── error.rs          # crate-wide Error + ResponseError mapping
+│   ├── db.rs             # Postgres + Redis pool init
+│   ├── dump.rs           # api.json / api.json.bak roundtrip
+│   ├── routes/
+│   │   ├── mod.rs        # router() entrypoint, mounts all subrouters
+│   │   ├── router.rs     # AppRouter — http + ws combined builder
+│   │   ├── account/      # Login, signup, refresh, password reset
+│   │   ├── spaces/       # Spaces, members, roles, invites, bans
+│   │   ├── channels/     # Channels, messages, voice, documents
+│   │   ├── dm.rs         # Direct messages
+│   │   ├── users/        # Users + relations (friends/blocks)
+│   │   ├── handles.rs    # Handle (username) claim/verify
+│   │   ├── push.rs       # Web Push subscription
+│   │   ├── bots.rs
+│   │   ├── cdn/          # Media upload + retrieval
+│   │   ├── well_known.rs # /.well-known/...
+│   │   └── ws/           # WebSocket handler + protocol
+│   ├── entities/         # DB-backed structs + queries (one file per table)
+│   ├── middlewares/      # auth, load (request-scoped state)
+│   ├── functions/        # Pure utilities (jwt, push, permissions, ...)
+│   └── services/         # Background workers / longer-lived tasks
+└── bin/
+    ├── migrate.rs        # `cargo run --bin migrate`
+    ├── seed.rs           # `cargo run --bin seed`
+    └── dump_api.rs       # Dumps OpenAPI schema to api.json
+```
+
+## Adding a new route
+
+1. Pick or create the right module in `src/routes/`. Each module
+   defines a `pub fn router() -> ApiRouter<()>` and exports it from
+   `mod.rs`.
+2. Write the handler as an `async fn` returning
+   `Result<Json<T>, Error>`. The return type must implement
+   `JsonSchema + Serialize` for OpenAPI to pick it up.
+3. Register the handler on the router with `.api_route(path, method)`
+   so it lands in the OpenAPI schema (and not just the bare Axum
+   router).
+4. Mount the subrouter from `routes/mod.rs::build_app_router()`.
+5. Add or update SQL in the appropriate `entities/` file. Use
+   `sqlx::query_as!` for typed result rows so the SQL is checked at
+   compile time.
+
+## Adding a new WebSocket event
+
+The WebSocket layer separates **commands** (client → server) and
+**events** (server → client). See
+[WebSocket protocol](/docs/superego/websocket) for the full lifecycle.
+
+```rust
+router
+    .ws_command("typing.start", |payload: TypingStart, state| async move {
+        // ... do something, optionally emit an event
+        emit_event("typing.onUpdate", &update, &format!("space:{space_id}")).await?;
+        Ok(())
+    })
+    .ws_event("typing.onUpdate", |update: TypingUpdate, _| async move {
+        Some(update)
+    })
+```
+
+Both methods take a name and a typed handler. The framework registers
+the type in the generated OpenAPI extension under `websocket`, so the
+TypeScript client sees the same shape.
+
+## Running
+
+```sh
+# From repo root:
+moon run superego:start
+# or
+cargo run --bin superego --manifest-path apps/superego/Cargo.toml
+```
+
+On boot you'll see:
+
+```
+👉⚡🪙  Mikoto API server is running on on http://0.0.0.0:3511
+You can see the API documentation on http://0.0.0.0:3511/scalar
+```
+
+`/scalar` is an interactive OpenAPI renderer; `/api.json` is the raw
+schema if you want to feed it to another codegen tool.

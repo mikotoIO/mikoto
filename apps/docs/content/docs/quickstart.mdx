@@ -1,0 +1,96 @@
+---
+title: Quickstart
+description: Get a full Mikoto stack running locally in a few minutes.
+---
+
+This page takes you from a fresh checkout to a logged-in client talking
+to a local API.
+
+## Prerequisites
+
+- **Docker** and **Docker Compose** — for Postgres, Redis, RustFS (S3),
+  LiveKit, and MailHog.
+- **[Rustup](https://rustup.rs/)** — the Rust toolchain.
+- **[Proto](https://moonrepo.dev/proto)** — the tool manager Mikoto uses
+  to install Moon and pin Node/PNPM versions.
+- **[Just](https://github.com/casey/just)** — the task runner used by
+  the repo-level scripts under [`justfile`](https://github.com/mikoto-io/mikoto/blob/main/justfile).
+
+## First-time setup
+
+```sh
+# 1. Install pinned tool versions (Moon, Node, pnpm, etc.)
+proto install
+
+# 2. Install JS dependencies across the workspace
+pnpm install
+
+# 3. Copy the example env file and adjust if needed
+cp ./.env.example ./.env
+
+# 4. Bring up infra, run migrations, and seed the database
+just reset-dev-env
+```
+
+`just reset-dev-env` is destructive — it deletes the Postgres, Redis,
+and RustFS volumes, recreates them, runs migrations, and seeds
+placeholder data. It's safe to re-run any time you want a clean slate.
+
+## Day-to-day development
+
+Two terminals, two commands:
+
+```sh
+# Terminal 1: bring up infra in the background
+docker compose up -d
+
+# Terminal 2: run all the core apps
+just run-core
+```
+
+`just run-core` runs `moon :start --query "tag~core-app"`, which starts
+every app tagged `core-app` in [`moon.yml`](https://github.com/mikoto-io/mikoto/blob/main/moon.yml)
+in parallel — currently the client and superego.
+
+The web client will be at [http://localhost:3510](http://localhost:3510),
+the API at [http://localhost:3511](http://localhost:3511), and an
+interactive API reference at
+[http://localhost:3511/scalar](http://localhost:3511/scalar).
+
+## Other useful commands
+
+```sh
+just migrate                       # run migrations against the local DB
+just seed                          # seed placeholder data
+just new-migration my_migration    # create a new timestamped migration file
+just reset                         # nuke and recreate Docker volumes (no migrate/seed)
+just generate-handle-keys          # Ed25519 keypair for domain handle attestations
+just generate-vapid-keys           # P-256 VAPID keypair for Web Push
+```
+
+For the full list, see the [justfile reference](/docs/reference/justfile).
+
+## Repo-wide checks
+
+```sh
+moon :typecheck    # tsc --noEmit + cargo check across the workspace
+moon :test         # vitest + cargo test
+moon :lint         # eslint + cargo clippy
+moon :lint.fix     # auto-fix what's auto-fixable
+moon :format       # cargo fmt + prettier
+```
+
+Always run `moon :typecheck` before you push — it catches both
+TypeScript and Rust regressions in a single pass.
+
+## Frontend-only against production
+
+If you're iterating on client UI and don't need a local backend at all,
+point the dev client at the production API instead:
+
+```sh
+just run-client-prod
+```
+
+See [Dev against prod](/docs/client/dev-against-prod) for how the proxy
+trick works.

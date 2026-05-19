@@ -1,0 +1,32 @@
+{
+  "title": "Mikoto",
+  "pages": [
+    "index",
+    "---Getting Started---",
+    "quickstart",
+    "architecture",
+    "monorepo",
+    "---Backend---",
+    "superego/index",
+    "superego/database",
+    "superego/api",
+    "superego/websocket",
+    "superego/auth",
+    "superego/media",
+    "---Frontend---",
+    "client/index",
+    "client/state",
+    "client/surfaces",
+    "client/dev-against-prod",
+    "---Packages---",
+    "packages/index",
+    "packages/mikoto-js",
+    "packages/permcheck",
+    "packages/openapi-codegen",
+    "---Reference---",
+    "reference/ports",
+    "reference/justfile",
+    "reference/env",
+    "reference/contributing"
+  ]
+}

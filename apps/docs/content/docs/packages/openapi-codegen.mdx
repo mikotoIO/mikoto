@@ -1,0 +1,56 @@
+---
+title: openapi-codegen
+description: The Rust crate that turns the superego OpenAPI schema into TypeScript bindings.
+---
+
+`crates/openapi-codegen` is a small internal CLI that produces the
+`api.gen.ts` consumed by `@mikoto-io/mikoto.js`. You won't normally
+invoke it directly — `pnpm --filter @mikoto-io/mikoto.js generate`
+wraps it through `generator/openapi.ts`.
+
+## When to regenerate
+
+After any backend change that touches:
+
+- A REST route signature (path, method, request body, response body).
+- A WebSocket command or event.
+- Any struct that ends up in a route signature (transitively).
+
+The two-step flow:
+
+```sh
+# 1. Dump the live OpenAPI from superego into apps/superego/api.json
+cargo run --bin dump_api --manifest-path apps/superego/Cargo.toml
+
+# 2. Regenerate the typed JS client
+pnpm --filter @mikoto-io/mikoto.js generate
+```
+
+Commit both files together — they have to stay in sync.
+
+## How it works
+
+`apps/superego/src/bin/dump_api.rs` calls
+`superego::routes::build_openapi_schema()` and writes the JSON to
+`api.json`. The schema includes both the standard `paths` (REST) and
+a custom `websocket` extension that lists the registered commands and
+events with their JSON Schema types.
+
+`packages/mikoto.js/generator/openapi.ts` then runs
+`openapi-zod-client` over the schema to produce typed Zodios endpoint
+definitions. The result lands at `packages/mikoto.js/src/api.gen.ts`
+and is exported as `Api` plus all the request/response type aliases.
+
+## What `openapi-codegen` (the Rust crate) is actually for
+
+Despite the name, the Rust crate doesn't do the JS-side generation —
+that's the TS generator above. The Rust crate is a complementary tool
+for turning OpenAPI schemas into Rust type definitions (used by the
+`mikoto-client` Rust crate to stay in sync with superego).
+
+| Direction | Tool |
+| --------- | ---- |
+| OpenAPI → TS bindings | `openapi-zod-client` invoked by `packages/mikoto.js/generator/openapi.ts` |
+| OpenAPI → Rust bindings | `crates/openapi-codegen` consumed by `crates/mikoto-client` |
+
+Both read from the same `apps/superego/api.json`.

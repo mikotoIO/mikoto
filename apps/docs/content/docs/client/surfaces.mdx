@@ -1,0 +1,94 @@
+---
+title: Surfaces & tabs
+description: How the tiling window manager works, and how to add a new surface.
+---
+
+The main client UI is a tiling window manager built on
+[Dockview](https://dockview.dev). The user can split panes, drag tabs,
+and route different content into each pane.
+
+## What's a surface?
+
+A **surface** is a React component that fills a single dockview pane.
+Each surface has:
+
+- A unique **kind** (`'messages'`, `'documents'`, `'settings'`, …)
+  that identifies which surface component to render.
+- A serializable **props bag** (channel ID, settings key, etc.) that
+  describes which instance to show.
+
+Together those become a *tabable*: `{ kind, props }`. The dockview
+serializes these so the layout survives page reloads.
+
+Existing surfaces live in `src/components/surfaces/`:
+
+| Folder/file | What it shows |
+| ----------- | ------------- |
+| `Messages/` | A channel's message log |
+| `Documents/` | A collaborative wiki channel (Lexical + Y.js) |
+| `Voice.tsx` | A voice/video channel (LiveKit) |
+| `Explorer/` | The space sidebar with channels and members |
+| `settings/` | Space, user, and channel settings panes |
+| `FriendsSurface.tsx` | DM friend list |
+| `DiscoverySurface.tsx` | Public-space discovery |
+| `SpaceExplorerSurface.tsx` | The space chooser sidebar surface |
+| `WelcomeSurface.tsx` | Empty-state welcome panel |
+| `LoadingSurface.tsx` | Suspense fallback |
+| `ErrorSurface.tsx` | Error-boundary fallback |
+
+## Tab click behavior
+
+The rules baked into `components/surfaces/Explorer/index.tsx`:
+
+1. **Ctrl/Cmd + click** on any node → open in a **new** tab.
+2. **Plain click**, no tabs exist yet → open in the **first** tab.
+3. **Plain click**, tabs exist → open in a **new** tab.
+
+This makes the UI start clean and grow into a multi-pane workflow as
+the user opens more things.
+
+## Adding a new surface
+
+1. Create the component under `src/components/surfaces/MySurface.tsx`:
+
+   ```tsx
+   export function MySurface({ id }: { id: string }) {
+     return <Box>Hello {id}</Box>;
+   }
+   ```
+
+2. Register it in the surface registry (look for the
+   `surfaceMap` / kind → component table in `surfaces/index.tsx`).
+
+3. Add a tabkit helper if you want to open it from somewhere outside
+   the dockview (e.g., a sidebar click handler):
+
+   ```ts
+   tabkit.open({ kind: 'mySurface', props: { id } });
+   ```
+
+4. Make sure the props are serializable JSON — the dockview persists
+   them, so functions and class instances will get dropped on reload.
+
+## Documents and Y.js
+
+Document surfaces are special: they bridge a Y.js doc (synced through
+`/collab/:channelId`) to a Lexical editor. The bridge lives in
+`packages/lexical-markdown` and includes custom nodes for Mikoto-
+flavored markdown (mentions, embeds, etc.).
+
+If you're editing the wiki editor, work in `packages/lexical-markdown`
+for node logic and in `Documents/` for the surface chrome.
+
+## Existing internal docs
+
+The client repo ships a couple of focused docs in `apps/client/docs/`:
+
+- [`PROD-BACKEND-DEV.md`](/docs/client/dev-against-prod) — the
+  same-origin proxy trick for `just run-client-prod`.
+- `UNREAD-NOTIFICATION.md` — how unread state and notification badges
+  are computed.
+- `domain-handles.md` — frontend notes on the handle system.
+
+These get folded into this docs site over time; for now they're the
+ground truth.

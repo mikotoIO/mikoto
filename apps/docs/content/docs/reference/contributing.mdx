@@ -1,0 +1,90 @@
+---
+title: Contributing
+description: Conventions, checks, and tools the repo expects.
+---
+
+## Toolchain
+
+Pinned by [`proto`](https://moonrepo.dev/proto) via `.prototools`:
+
+- Node, pnpm, Moon versions
+- Rust toolchain pinned in `rust-toolchain.toml`
+
+Run `proto install` once and these stay correct across pulls.
+
+## Before you push
+
+```sh
+moon :typecheck    # tsc + cargo check across the workspace
+moon :test         # vitest + cargo test
+moon :lint         # eslint + cargo clippy
+```
+
+`moon :typecheck` is the most important — it catches both TypeScript
+and Rust regressions in one pass.
+
+If lint complains, `moon :lint.fix` will fix what it can.
+
+## Formatting
+
+```sh
+moon :format
+```
+
+Runs `cargo fmt` over Rust and `prettier --write .` over JS/TS/MDX.
+Prettier is configured at `.prettierrc`:
+
+- `singleQuote: true`
+- `trailingComma: 'all'`
+- Imports sorted by `@trivago/prettier-plugin-sort-imports`
+  with the order: third-party → `@/*` → relative.
+
+## Adding dependencies
+
+### JavaScript
+
+```sh
+pnpm --filter <package-name> add <dep>
+pnpm --filter <package-name> add -D <dev-dep>
+```
+
+Always go through the workspace filter so the dep lands in the right
+`package.json`.
+
+### Rust
+
+Before adding a new crate, **check the latest version on
+[docs.rs](https://docs.rs)** rather than guessing. Then edit the
+crate's `Cargo.toml`:
+
+```toml
+[dependencies]
+new-crate = "1.2"
+```
+
+Run `cargo build -p <crate>` to fetch and verify.
+
+## Commit style
+
+Recent history uses Conventional-Commits-ish prefixes (`feat`, `fix`,
+`chore`, `build`, `docs`, `refactor`) with an optional scope:
+
+```
+feat(client): redesign WelcomePanel into a community discovery view
+build(moon): pin pnpm version in toolchain
+chore(openapi-codegen): silence unused metadata field warnings
+```
+
+PRs are squashed.
+
+## Where to start
+
+If you're new and want a tractable first PR:
+
+- Look at the `apps/client/docs/` files — short focused docs that
+  exist because someone hit a sharp edge. Adding more of these is
+  always welcome.
+- Hunt for `TODO` and `FIXME` in `apps/superego/src/`. Many of them
+  are scoped enough for a first-time contribution.
+- Run `moon :lint` and fix something the linter is unhappy about
+  that isn't strictly broken but isn't great.

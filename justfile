@@ -7,6 +7,10 @@ run-core:
 # apps/client/docs/PROD-BACKEND-DEV.md for how the proxy works.
 run-client-prod:
     moon run client:dev.prod-backend
+
+# Run the Fumadocs developer documentation site on http://localhost:3514
+run-docs:
+    moon run docs:dev
 # Run database migrations for superego
 migrate:
     cd apps/superego && cargo run --bin migrate

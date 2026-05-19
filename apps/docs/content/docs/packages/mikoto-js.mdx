@@ -1,0 +1,142 @@
+---
+title: '@mikoto-io/mikoto.js'
+description: The JS/TS client SDK. Wraps the REST + WebSocket APIs in a live Valtio domain model.
+---
+
+`mikoto.js` is the canonical way to talk to a Mikoto server from
+JavaScript. It bundles:
+
+- An **AuthClient** that owns refresh tokens and access tokens.
+- A **REST client** generated from the OpenAPI schema as a typed Zodios
+  client (`api.gen.ts`).
+- A **WebSocket client** that speaks superego's `{ op, data }`
+  protocol.
+- **Manager classes** (`SpaceManager`, `ChannelManager`, …) that
+  expose the same data as Valtio proxies, kept in sync with WS events.
+
+## Quick start
+
+```ts
+import { AuthClient, MikotoClient } from '@mikoto-io/mikoto.js';
+
+const auth = new AuthClient({
+  url: 'https://server.platform.mikoto.io',
+  refreshToken: () => localStorage.getItem('refreshToken') ?? '',
+  setRefreshToken: (t) => localStorage.setItem('refreshToken', t),
+});
+
+await auth.login({ email, password });
+
+const client = new MikotoClient({
+  auth,
+  url: 'https://server.platform.mikoto.io',
+});
+
+// REST calls — fully typed against the OpenAPI schema
+const spaces = await client.rest.spaces.list();
+
+// Domain model — reactive Valtio proxies
+const space = client.spaces.get(spaceId);
+console.log(space.channels);
+
+// WebSocket events
+client.ws.on('message.onCreate', (msg) => {
+  console.log('new message', msg);
+});
+
+// Send a WS command
+client.ws.emit('typing.start', { channelId });
+```
+
+## Source layout
+
+```
+packages/mikoto.js/
+├── package.json
+├── tsdown.config.ts
+├── generator/
+│   └── openapi.ts            # the codegen entrypoint
+└── src/
+    ├── index.ts              # public re-exports
+    ├── MikotoClient.ts       # main client class
+    ├── AuthClient.ts         # auth + refresh
+    ├── WebsocketApi.ts       # WS framing + reconnect
+    ├── api.gen.ts            # GENERATED, do not edit
+    ├── managers/             # SpaceManager, ChannelManager, …
+    └── helpers/
+```
+
+## Regenerating the REST client
+
+The committed `api.gen.ts` is generated from
+`apps/superego/api.json`. To regenerate after a backend change:
+
+```sh
+# 1. Re-dump the OpenAPI schema from superego
+cargo run --bin dump_api --manifest-path apps/superego/Cargo.toml
+
+# 2. Regenerate the typed client
+pnpm --filter @mikoto-io/mikoto.js generate
+
+# 3. Build, or just typecheck
+pnpm --filter @mikoto-io/mikoto.js build
+```
+
+The generator (`generator/openapi.ts`) walks the OpenAPI doc with
+`openapi-zod-client`, which produces Zodios endpoint definitions —
+that's where the runtime validation and the TypeScript types both
+come from.
+
+## Tokens and refresh
+
+The flow:
+
+1. `AuthClient.login(...)` calls `/account/login`, receives an access
+   and refresh token, and persists the refresh token through
+   `setRefreshToken`.
+2. Every REST request adds the access token as a bearer via Zodios'
+   `pluginToken`. The plugin calls back into `MikotoClient` to ensure
+   a fresh token; if the last refresh was more than 15 minutes ago,
+   it transparently refreshes.
+3. On 401 responses, the same plugin forces a refresh and retries.
+
+For server-side integrations (bots), use `AuthClient.botLogin(...)`
+which exchanges a bot ID + secret for an access token without the
+interactive flow.
+
+## WebSocket reconnect
+
+`WebsocketApi` handles:
+
+- Initial connect after the first refresh succeeds.
+- Authenticate by sending `{ op: "authenticate", data: { token } }` as
+  the first message.
+- Reconnect with exponential backoff on close.
+- Buffering outbound messages while reconnecting.
+- Resubscribing to event handlers across reconnects.
+
+Consumers don't need to call `connect()` or check connection state —
+just `.on()` / `.emit()` and let the SDK handle it.
+
+## Domain model (Valtio)
+
+`client.spaces`, `client.channels`, `client.user`, `client.relationships`
+each expose a Valtio proxy. Sample reactivity in React:
+
+```tsx
+import { useSnapshot } from 'valtio';
+
+function ChannelTitle({ channel }) {
+  const snap = useSnapshot(channel);
+  return <h1>{snap.name}</h1>;
+}
+```
+
+When the server pushes a `channel.onUpdate`, the manager mutates the
+proxy and `useSnapshot` triggers a re-render — no manual cache
+invalidation.
+
+## Testing
+
+`pnpm --filter @mikoto-io/mikoto.js test` runs the Vitest suite in
+`src/tests/`.

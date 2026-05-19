@@ -1,0 +1,16 @@
+language: 'typescript'
+tags: ['docs']
+
+tasks:
+  dev:
+    command: 'next dev -p 3514'
+    preset: 'server'
+
+  build:
+    command: 'next build'
+
+  start:
+    command: 'next start -p 3514'
+
+  typecheck:
+    command: 'tsc --noEmit'

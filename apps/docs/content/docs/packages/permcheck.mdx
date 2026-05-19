@@ -1,0 +1,74 @@
+---
+title: '@mikoto-io/permcheck'
+description: Tiny shared bitset for Mikoto permissions.
+---
+
+`permcheck` is the canonical permissions vocabulary for Mikoto. It's
+tiny on purpose — just a `permissions` object of `bigint` bit values
+and a `checkPermission` helper.
+
+```ts
+import { checkPermission, permissions } from '@mikoto-io/permcheck';
+
+// User's combined permission set (server-supplied)
+const userPerms = '0b11111';
+
+if (checkPermission(permissions.manageChannels, userPerms)) {
+  // show the manage channels button
+}
+```
+
+## The permission set
+
+```ts
+export const permissions = {
+  superuser: 1n << 0n,
+
+  // Management
+  manageSpace: 1n << 1n,
+  manageChannels: 1n << 2n,
+  manageRoles: 1n << 3n,
+  assignRoles: 1n << 4n,
+  manageMemberProfiles: 1n << 5n,
+  manageInvites: 1n << 6n,
+  manageEmojis: 1n << 7n,
+  manageMessages: 1n << 8n,
+  manageBots: 1n << 9n,
+  ban: 1n << 10n,
+
+  // Channel-wise
+  readChannel: 1n << 11n,
+  sendInChannel: 1n << 12n,
+  createSubChannels: 1n << 13n,
+  manageSubChannels: 1n << 14n,
+};
+```
+
+`checkPermission(rule, perms)` returns true if any bit in `rule` is
+set in `perms`. `rule` is normally a single permission bit, but
+nothing stops you from passing a combined mask.
+
+`perms` can be a `bigint` or a base-2/10/16 numeric string — the helper
+parses strings with `BigInt(...)` for you, which matters because the
+server transports permission sets as strings to avoid 53-bit JSON
+number truncation.
+
+## Sync with the Rust side
+
+The same constants live in `apps/superego/src/functions/permissions.rs`.
+**Both copies must stay in lock-step.** If you add a bit, add it to
+both files in the same PR, and check the wire format hasn't changed
+(it's a base-10 string of a u64-fitting bitset).
+
+There's no codegen for this — it's small enough that hand-syncing is
+the right tradeoff.
+
+## What it doesn't do
+
+- It doesn't compute the effective permission set. The server does
+  that: union of role permissions, then channel overrides, then any
+  per-user overrides. Permcheck just answers "given this final
+  bitset, can the user do X?".
+- It doesn't gate routes. Authorization on the server side is in
+  `apps/superego/src/middlewares/` and the individual route handlers.
+  Permcheck is purely about presentation gating on the client.

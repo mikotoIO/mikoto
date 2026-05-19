@@ -1,0 +1,71 @@
+---
+title: Dev against prod
+description: Iterate on the client UI with no local backend.
+---
+
+If you're iterating on client UI and don't need a local superego, point
+the dev client at the production API:
+
+```sh
+just run-client-prod
+# open http://localhost:3510
+```
+
+You'll log in with your normal prod Mikoto account. All REST, WS,
+collab (Y.js), and media traffic transparently proxies through to the
+prod services — same-origin from the browser's perspective, so CORS
+stays out of your way.
+
+## How it works
+
+Going directly from `localhost` to
+`https://server.platform.mikoto.io` would hit CORS — prod superego
+strictly allows only its own `WEB_URL` origin. Instead of loosening
+CORS, the dev client routes everything through Vite's dev-server
+proxy:
+
+```
+browser ──► http://localhost:3510/__api/...     ──► https://server.platform.mikoto.io/...
+browser ──► ws://localhost:3510/__api/ws        ──► wss://server.platform.mikoto.io/ws
+browser ──► ws://localhost:3510/__api/collab    ──► wss://server.platform.mikoto.io/collab
+browser ──► http://localhost:3510/__media/...   ──► https://cdn.platform.mikoto.io/...
+```
+
+Three pieces make this work:
+
+1. **`apps/client/.env.prod-backend`** sets `PUBLIC_SERVER_URL` and
+   `PUBLIC_MEDIASERVER_URL` to the dev server's own origin with
+   `/__api` and `/__media` prefixes.
+2. **`server.proxy` in `vite.config.ts`** rewrites those prefixes away
+   and forwards to the prod origins, with `changeOrigin: true`,
+   `secure: true`, and `ws: true` so the WebSocket upgrades pass
+   through.
+3. **`dev.prod-backend` moon task** (in `apps/client/moon.yml`) runs
+   `vite --mode prod-backend` so Vite picks up the env file.
+   `just run-client-prod` is the top-level wrapper.
+
+## Pointing at a different backend
+
+Override the proxy targets without editing the committed config:
+
+```sh
+PROXY_API_TARGET=https://server-staging.platform.mikoto.io \
+PROXY_MEDIA_TARGET=https://cdn-staging.platform.mikoto.io \
+  just run-client-prod
+```
+
+## Gotchas
+
+- **Port 3510 is required.** `.env.prod-backend` hard-codes
+  `http://localhost:3510/__api` because the mikoto.js client parses it
+  with `new URL(...)` and needs an absolute URL.
+- **Invite links use the prod frontend URL.** `PUBLIC_FRONTEND_URL`
+  points at `https://platform.mikoto.io`, so invites you generate
+  locally land on prod. Override in a gitignored
+  `.env.prod-backend.local` if you really want local-facing invites.
+- **This is the real prod DB.** Every action (sending a message,
+  deleting a channel, changing your avatar) is real. Use throwaway
+  spaces for destructive testing.
+- **Service workers** — push notifications won't work meaningfully from
+  localhost; the SW is scoped to the dev origin and VAPID endpoints
+  tie to it.

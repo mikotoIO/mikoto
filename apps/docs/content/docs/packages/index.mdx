@@ -1,0 +1,42 @@
+---
+title: Packages
+description: Shared TypeScript packages in the monorepo.
+---
+
+`packages/` holds shared TypeScript code consumed by the apps and (in
+the case of `mikoto.js`) by external integrators.
+
+## Index
+
+| Package | Purpose |
+| ------- | ------- |
+| [`@mikoto-io/mikoto.js`](/docs/packages/mikoto-js) | The client SDK — REST + WS + a live Valtio domain model. The web client and any external integration go through this. |
+| [`@mikoto-io/permcheck`](/docs/packages/permcheck) | Tiny bitset permission checker. Same constants as the Rust side. |
+| `@mikoto-io/mikoto-crypto` | Shared crypto primitives (key derivation, signing). |
+| `@mikoto-io/mikoto-ui` | Cross-app UI primitives — separate from the web client's Chakra-based design system because it needs to render in React Native too. |
+| `@mikoto-io/lexical-markdown` | Custom Lexical nodes + markdown serializer for the wiki editor. |
+| [`openapi-codegen`](/docs/packages/openapi-codegen) | Rust tool that converts the superego OpenAPI schema into the typed Zodios client `mikoto.js` re-exports. |
+| `tsconfig` | Shared `package.tsconfig.json` base — other packages extend it. |
+
+### Workspace pattern
+
+Apps and packages depend on each other via `workspace:*`:
+
+```jsonc
+{
+  "dependencies": {
+    "@mikoto-io/mikoto.js": "workspace:*",
+    "@mikoto-io/permcheck": "workspace:*"
+  }
+}
+```
+
+pnpm resolves these to the local source directory, so changes are
+picked up immediately without publishing.
+
+### Building
+
+Most packages either build to `dist/` with `tsdown` (see
+`packages/mikoto.js/tsdown.config.ts`) or are consumed source-first
+(`"exports": { ".": "./src/index.ts" }`). `pnpm --filter <name> build`
+runs the package's build.

@@ -1,0 +1,111 @@
+---
+title: Authentication
+description: JWT bearer tokens, refresh flow, and the handle system.
+---
+
+Mikoto auth is JWT-bearer. Tokens are minted by the `/account` routes
+and verified by the `Account` middleware on every authenticated REST
+route. WebSockets carry the same token in their first message.
+
+## Token shapes
+
+Two tokens, both JWT:
+
+- **Access token** — short-lived (minutes). Sent as
+  `Authorization: Bearer <token>` on every REST request and as the
+  first WebSocket message.
+- **Refresh token** — longer-lived. Exchanged at `/account/refresh`
+  for a new access token. The client persists it in `localStorage`.
+
+Both are signed with the `SECRET` env var (HMAC-SHA256). The `iss`
+claim is `ISSUER` (e.g., `test.mikoto.io` in dev).
+
+## Endpoints
+
+| Method | Path | Purpose |
+| ------ | ---- | ------- |
+| `POST` | `/account/login` | Email + password → `{ accessToken, refreshToken }` |
+| `POST` | `/account/register` | Sign up + send verification email |
+| `POST` | `/account/refresh` | Refresh token → new access + refresh pair |
+| `POST` | `/account/logout` | Invalidate the refresh token |
+| `POST` | `/account/change-password` | While authenticated |
+| `POST` | `/account/reset-password` | Email-based reset flow |
+
+The full schema is in [`/api.json`](/docs/superego/api).
+
+## Server side
+
+The `Account` extractor (in `middlewares/auth.rs`) is the
+authenticated request guard:
+
+```rust
+async fn me(Account(account): Account) -> Result<Json<AccountResponse>, Error> {
+    // account.id, account.email, etc.
+}
+```
+
+If the bearer token is missing, malformed, or expired, the extractor
+returns `Error::Unauthorized` and Axum short-circuits the request
+with a 401 — the handler body never runs.
+
+Some routes accept an optional account (e.g., public space discovery
+that's slightly enriched for logged-in users). For those, use
+`OptionalAccount` instead of `Account`.
+
+## Client side
+
+`mikoto.js` keeps tokens in memory and persists them via a configurable
+storage adapter. The default in the web client is `localStorage`.
+Every Axios request is intercepted to attach the bearer header and to
+auto-refresh on 401:
+
+```ts
+client.api.use({
+  onError: async (err) => {
+    if (err.response?.status === 401) {
+      await client.refresh();
+      return retry();
+    }
+    throw err;
+  },
+});
+```
+
+See [mikoto.js](/docs/packages/mikoto-js) for the full wrapper.
+
+## Handles
+
+A "handle" is the human-readable identifier for a user or space — the
+DID-style replacement for Discord-style discriminators (#1234).
+Handles look like `hayley.mikoto.io` (default domain) or
+`hayley.example.com` (custom domain you proved control of).
+
+The default-domain case is straightforward: the server vends them
+under `HANDLE_DOMAIN`. The custom-domain case uses an Ed25519
+signature flow:
+
+1. The server (with the private half of an Ed25519 keypair) signs an
+   attestation tying a domain to a user/space.
+2. The owner publishes the attestation in a TXT record under their
+   domain.
+3. On verification, the server fetches the TXT record via DNS-over-
+   HTTPS (`hickory-resolver` with the `https-ring` feature) and checks
+   the signature against `HANDLE_PUBLIC_KEY`.
+
+Generate a keypair:
+
+```sh
+just generate-handle-keys
+```
+
+…then drop the two env vars (`HANDLE_PRIVATE_KEY`, `HANDLE_PUBLIC_KEY`)
+into `.env`. Without them, custom handles are disabled but default-
+domain handles still work.
+
+## Web Push
+
+Push notifications use VAPID. Generate a keypair with
+`just generate-vapid-keys` and set `VAPID_PRIVATE_KEY`,
+`VAPID_PUBLIC_KEY`, and `VAPID_SUBJECT`. Without those env vars, the
+push routes return 503 and the client falls back to in-app
+notifications only.

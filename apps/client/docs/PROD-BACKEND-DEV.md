@@ -39,7 +39,7 @@ Three things make this work:
    `/__api` / `/__media` prefix.
 2. **`server.proxy` in `vite.config.ts`** rewrites those prefixes away
    and forwards to the prod origins, with `changeOrigin: true`, `secure:
-   true`, and `ws: true` so WebSocket upgrades (main socket +
+true`, and `ws: true` so WebSocket upgrades (main socket +
    `y-websocket` collab) pass through.
 3. **`dev.prod-backend` moon task** (declared in `apps/client/moon.yml`)
    runs `vite --mode prod-backend` so Vite picks up the env file.

@@ -260,4 +260,3 @@ export function FloatingToolbarPlugin() {
 
   return <FloatingToolbar editor={editor} />;
 }
-

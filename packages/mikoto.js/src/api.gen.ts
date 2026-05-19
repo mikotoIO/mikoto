@@ -56,6 +56,7 @@ export const UserExt = z.object({
   handle: z.union([z.string(), z.null()]).optional(),
   id: z.string().uuid(),
   name: z.string(),
+  spaceOrder: z.union([z.array(z.string().uuid()), z.null()]).optional(),
 });
 export type UserExt = z.infer<typeof UserExt>;
 
@@ -138,6 +139,7 @@ export const UserPatch = z
     avatar: z.union([z.string(), z.null()]),
     description: z.union([z.string(), z.null()]),
     name: z.union([z.string(), z.null()]),
+    spaceOrder: z.union([z.array(z.string().uuid()), z.null()]),
   })
   .partial();
 export type UserPatch = z.infer<typeof UserPatch>;

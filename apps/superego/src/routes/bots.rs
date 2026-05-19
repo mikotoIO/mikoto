@@ -206,6 +206,7 @@ async fn update_bot(
                 name: body.name.clone(),
                 avatar: body.avatar.clone(),
                 description: body.description.clone(),
+                space_order: None,
             },
             db(),
         )

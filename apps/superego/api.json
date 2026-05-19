@@ -3762,6 +3762,17 @@
           },
           "name": {
             "type": "string"
+          },
+          "spaceOrder": {
+            "description": "Persisted ordering of the user's spaces in the sidebar. Always present on responses; optional in the schema so the base `User` shape remains structurally assignable to `UserExt`.",
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         }
       },
@@ -3785,6 +3796,16 @@
               "string",
               "null"
             ]
+          },
+          "spaceOrder": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         }
       },

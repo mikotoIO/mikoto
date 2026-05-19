@@ -22,6 +22,11 @@ entity!(
         pub avatar: Option<String>,
         pub description: Option<String>,
         pub category: Option<UserCategory>,
+        /// Persisted ordering of the user's spaces in the sidebar.
+        /// Exposed via `UserExt`, not the base `User` shape.
+        #[serde(skip)]
+        #[schemars(skip)]
+        pub space_order: Vec<Uuid>,
     }
 );
 
@@ -245,6 +250,7 @@ impl RelationshipExt {
                     .unwrap_or_else(|| UserExt {
                         base: User::ghost(),
                         handle: None,
+                        space_order: None,
                     });
                 Self { base: rel, user }
             })
@@ -260,6 +266,10 @@ pub struct UserExt {
     pub base: User,
     /// The user's handle (if claimed)
     pub handle: Option<String>,
+    /// Persisted ordering of the user's spaces in the sidebar.
+    /// Always present on responses; optional in the schema so the base
+    /// `User` shape remains structurally assignable to `UserExt`.
+    pub space_order: Option<Vec<Uuid>>,
 }
 
 #[derive(Deserialize, JsonSchema)]
@@ -268,6 +278,7 @@ pub struct UserPatch {
     pub name: Option<String>,
     pub avatar: Option<String>,
     pub description: Option<String>,
+    pub space_order: Option<Vec<Uuid>>,
 }
 
 impl User {
@@ -278,6 +289,7 @@ impl User {
             avatar: None,
             description: None,
             category: None,
+            space_order: Vec::new(),
         }
     }
 
@@ -309,7 +321,8 @@ impl User {
             SET
             "name" = COALESCE($2, "name"),
             "avatar" = COALESCE($3, "avatar"),
-            "description" = COALESCE($4, "description")
+            "description" = COALESCE($4, "description"),
+            "spaceOrder" = COALESCE($5, "spaceOrder")
             WHERE "id" = $1
             RETURNING *
             "##,
@@ -318,6 +331,7 @@ impl User {
         .bind(patch.name)
         .bind(patch.avatar)
         .bind(patch.description)
+        .bind(patch.space_order)
         .fetch_optional(db)
         .await?
         .ok_or(Error::NotFound)?;
@@ -330,6 +344,7 @@ impl UserExt {
         let handle = Handle::for_user(user.id, db).await?;
         Ok(Self {
             handle: handle.map(|h| h.handle),
+            space_order: Some(user.space_order.clone()),
             base: user,
         })
     }
@@ -345,7 +360,12 @@ impl UserExt {
             .into_iter()
             .map(|user| {
                 let handle = handles.get(&user.id).cloned();
-                Self { handle, base: user }
+                let space_order = Some(user.space_order.clone());
+                Self {
+                    handle,
+                    space_order,
+                    base: user,
+                }
             })
             .collect())
     }

@@ -174,9 +174,8 @@ export function SpaceSidebar() {
   useSnapshot(mikoto.spaces);
   const contextMenu = useContextMenu(() => <SpaceBackContextMenu />);
 
-  const [order, setOrder] = useState<string[]>(() =>
-    // TODO: persist to server
-    JSON.parse(localStorage.getItem('spaceOrder') ?? '[]'),
+  const [order, setOrder] = useState<string[]>(
+    () => mikoto.user.me?.spaceOrder ?? [],
   );
   const [spaceArray, isOrdered] = orderSpaces(mikoto, order);
   if (!isOrdered) {
@@ -194,11 +193,16 @@ export function SpaceSidebar() {
         const toIndex = spaceArray.findIndex((s) => s.id === target.id);
         if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return;
 
-        setOrder((spaceOrders) => {
-          const reordered = reorder(spaceOrders, fromIndex, toIndex);
-          localStorage.setItem('spaceOrder', JSON.stringify(reordered));
-          return reordered;
-        });
+        const reordered = reorder(
+          spaceArray.map((s) => s.id),
+          fromIndex,
+          toIndex,
+        );
+        setOrder(reordered);
+        if (mikoto.user.me) {
+          mikoto.user.me.spaceOrder = reordered;
+        }
+        void mikoto.rest['user.update']({ spaceOrder: reordered }, {});
       }}
     >
       <StyledSpaceSidebar onContextMenu={contextMenu}>

@@ -9,7 +9,7 @@ const config = {
     return [
       {
         source: '/',
-        destination: '/contributors',
+        destination: '/users',
         permanent: false,
       },
     ];

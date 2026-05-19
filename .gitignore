@@ -86,3 +86,4 @@ target/
 .zprofile
 .zshrc
 commands
+.playwright-mcp/

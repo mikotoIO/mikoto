@@ -602,6 +602,7 @@ pub enum UserCategory {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct UserExt {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub avatar: Option<String>,
@@ -613,9 +614,12 @@ pub struct UserExt {
     pub handle: Option<String>,
     pub id: Uuid,
     pub name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub space_order: Option<Vec<Uuid>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct UserPatch {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub avatar: Option<String>,
@@ -623,6 +627,8 @@ pub struct UserPatch {
     pub description: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub space_order: Option<Vec<Uuid>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1004,6 +1010,23 @@ impl<'a> HttpApi<'a> {
         req = req.json(body);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
+    }
+
+    pub async fn dm_unreads(&self) -> Result<Vec<ChannelUnread>, ClientError> {
+        let path = "/dm/unreads".to_string();
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn dm_acknowledge(&self, channel_id: Uuid) -> Result<(), ClientError> {
+        let path = format!("/dm/{}/ack", channel_id);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
     }
 
     pub async fn push_config(&self) -> Result<PushConfig, ClientError> {

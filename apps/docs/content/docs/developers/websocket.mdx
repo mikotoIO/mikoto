@@ -78,17 +78,17 @@ The official SDK does all of this for you — see
 
 A non-exhaustive list of the most useful events:
 
-| Op                   | Meaning                                                   |
-| -------------------- | --------------------------------------------------------- |
-| `message.onCreate`   | A new message was sent in a channel you can see           |
-| `message.onUpdate`   | A message was edited                                      |
-| `message.onDelete`   | A message was deleted                                     |
-| `channel.onUpdate`   | Channel metadata changed                                  |
-| `space.onUpdate`     | Space metadata changed                                    |
-| `member.onUpdate`    | A member's roles or nickname changed                      |
-| `presence.onUpdate`  | A friend's presence state changed                         |
-| `typing.onUpdate`    | Someone in a channel started/stopped typing               |
-| `relation.onUpdate`  | A friend relationship state changed                       |
+| Op                  | Meaning                                         |
+| ------------------- | ----------------------------------------------- |
+| `message.onCreate`  | A new message was sent in a channel you can see |
+| `message.onUpdate`  | A message was edited                            |
+| `message.onDelete`  | A message was deleted                           |
+| `channel.onUpdate`  | Channel metadata changed                        |
+| `space.onUpdate`    | Space metadata changed                          |
+| `member.onUpdate`   | A member's roles or nickname changed            |
+| `presence.onUpdate` | A friend's presence state changed               |
+| `typing.onUpdate`   | Someone in a channel started/stopped typing     |
+| `relation.onUpdate` | A friend relationship state changed             |
 
 Browse the full list under `websocket` in
 [`/api.json`](/developers/rest-api#live-schema), or by op-prefix in
@@ -99,10 +99,10 @@ the [scalar reference](https://server.platform.mikoto.io/scalar).
 Currently the only client → server commands are a small set of
 hinting messages:
 
-| Op             | Purpose                                       |
-| -------------- | --------------------------------------------- |
-| `authenticate` | Initial handshake                             |
-| `typing.start` | Tell the server you're typing in a channel    |
+| Op             | Purpose                                    |
+| -------------- | ------------------------------------------ |
+| `authenticate` | Initial handshake                          |
+| `typing.start` | Tell the server you're typing in a channel |
 
 Most data mutations go through the REST API, not the WebSocket.
 

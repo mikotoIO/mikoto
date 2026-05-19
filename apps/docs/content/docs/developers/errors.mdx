@@ -24,17 +24,17 @@ Every non-2xx response is JSON in the same shape:
 
 The HTTP status mirrors the code:
 
-| Code               | HTTP | Meaning                                                  |
-| ------------------ | ---- | -------------------------------------------------------- |
-| `Unauthorized`     | 401  | Missing, malformed, or expired access token              |
-| `Forbidden`        | 403  | Authenticated but lacks the required permission          |
-| `NotFound`         | 404  | Resource doesn't exist or is hidden from you             |
-| `Conflict`         | 409  | Tried to create a duplicate (e.g. claim a taken handle)  |
-| `Gone`             | 410  | Resource existed but has been deleted                    |
-| `PayloadTooLarge`  | 413  | Upload exceeded the configured size limit                |
-| `UnsupportedMedia` | 415  | Upload content type isn't allowed                        |
-| `ValidationFailed` | 422  | Body failed schema validation; see `message` for details |
-| `RateLimited`      | 429  | Hit a rate limit; back off and retry                     |
+| Code               | HTTP | Meaning                                                   |
+| ------------------ | ---- | --------------------------------------------------------- |
+| `Unauthorized`     | 401  | Missing, malformed, or expired access token               |
+| `Forbidden`        | 403  | Authenticated but lacks the required permission           |
+| `NotFound`         | 404  | Resource doesn't exist or is hidden from you              |
+| `Conflict`         | 409  | Tried to create a duplicate (e.g. claim a taken handle)   |
+| `Gone`             | 410  | Resource existed but has been deleted                     |
+| `PayloadTooLarge`  | 413  | Upload exceeded the configured size limit                 |
+| `UnsupportedMedia` | 415  | Upload content type isn't allowed                         |
+| `ValidationFailed` | 422  | Body failed schema validation; see `message` for details  |
+| `RateLimited`      | 429  | Hit a rate limit; back off and retry                      |
 | `Internal`         | 500  | Unexpected server error; safe to retry once after a delay |
 
 Domain-specific codes (e.g. `InviteExpired`, `HandleTaken`) are

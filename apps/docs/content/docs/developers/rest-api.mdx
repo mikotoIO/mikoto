@@ -74,14 +74,14 @@ Every error response is JSON:
 
 Some specialized codes:
 
-| Code               | Meaning                                                |
-| ------------------ | ------------------------------------------------------ |
-| `Unauthorized`     | Missing or invalid auth token                          |
-| `Forbidden`        | Authenticated, but lacks permission                    |
-| `NotFound`         | Resource doesn't exist (or is hidden by permissions)   |
-| `Conflict`         | Tried to create a duplicate (e.g. existing handle)     |
+| Code               | Meaning                                                 |
+| ------------------ | ------------------------------------------------------- |
+| `Unauthorized`     | Missing or invalid auth token                           |
+| `Forbidden`        | Authenticated, but lacks permission                     |
+| `NotFound`         | Resource doesn't exist (or is hidden by permissions)    |
+| `Conflict`         | Tried to create a duplicate (e.g. existing handle)      |
 | `RateLimited`      | Too many requests; retry after the `Retry-After` header |
-| `ValidationFailed` | Request body failed schema validation; see `message`   |
+| `ValidationFailed` | Request body failed schema validation; see `message`    |
 
 ## Rate limits
 

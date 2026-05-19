@@ -8,11 +8,11 @@ developer commands. Run `just` with no arguments to list them.
 
 ## Running services
 
-| Command                | What it does                                                                                                                            |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `just run-core`        | Start every app tagged `core-app` (currently client + superego).                                                                        |
+| Command                | What it does                                                                                                                                    |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `just run-core`        | Start every app tagged `core-app` (currently client + superego).                                                                                |
 | `just run-client-prod` | Start only the client, proxying API/WS/media to prod. No local backend required. See [Dev against prod](/contributors/client/dev-against-prod). |
-| `just docker-start`    | `docker compose up -d` — bring up Postgres, Redis, RustFS, LiveKit, MailHog.                                                            |
+| `just docker-start`    | `docker compose up -d` — bring up Postgres, Redis, RustFS, LiveKit, MailHog.                                                                    |
 
 ## Database
 

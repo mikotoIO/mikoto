@@ -27,6 +27,6 @@ export function baseOptions(): BaseLayoutProps {
         on: 'nav',
       },
     ],
-    githubUrl: 'https://github.com/mikoto-io/mikoto',
+    githubUrl: 'https://github.com/mikotoIO/mikoto',
   };
 }

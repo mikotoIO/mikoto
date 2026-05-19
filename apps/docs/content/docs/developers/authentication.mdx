@@ -9,11 +9,11 @@ access tokens are exchanged for fresh ones via a **refresh token**.
 
 ## Token types
 
-| Token            | Lifetime  | Where it goes                                          |
-| ---------------- | --------- | ------------------------------------------------------ |
-| Access token     | Minutes   | `Authorization: Bearer <token>` on every REST request  |
-| Refresh token    | Days      | POSTed to `/account/refresh` to mint a new access pair |
-| Bot access token | Long-lived | Same header; obtained via [bot login](/developers/bots)|
+| Token            | Lifetime   | Where it goes                                           |
+| ---------------- | ---------- | ------------------------------------------------------- |
+| Access token     | Minutes    | `Authorization: Bearer <token>` on every REST request   |
+| Refresh token    | Days       | POSTed to `/account/refresh` to mint a new access pair  |
+| Bot access token | Long-lived | Same header; obtained via [bot login](/developers/bots) |
 
 Both access and refresh tokens are JWTs signed with the server's
 `SECRET`. The `iss` claim identifies the issuing server (e.g.

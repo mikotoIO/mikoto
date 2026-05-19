@@ -26,28 +26,28 @@ This snapshot is what `mikoto.js` regenerates its typed client from.
 Routes are grouped by domain under `src/routes/`. The top-level layout
 (from `routes/mod.rs::build_app_router()`):
 
-| Mount point | Module | Notes |
-| ----------- | ------ | ----- |
-| `/account` | `account` | Login, signup, refresh, password reset, email verify |
-| `/bots` | `bots` | Bot registration and tokens |
-| `/cdn` | `cdn` | Media upload and retrieval |
-| `/handles` | `handles` | Username + custom domain handles |
-| `/users` | `users` | User profiles |
-| `/relations` | `users::relations` | Friends, blocks, requests |
-| `/dm` | `dm` | Direct message channels and messages |
-| `/spaces` | `spaces` | Spaces (servers) |
-| `/spaces/:spaceId/channels` | `channels` | Channels inside a space |
-| `/spaces/:spaceId/channels/:channelId/messages` | `channels::messages` | Messages |
-| `/spaces/:spaceId/channels/:channelId/voice` | `channels::voice` | LiveKit token mint |
-| `/spaces/:spaceId/channels/:channelId/documents` | `channels::documents` | Y.js document metadata |
-| `/spaces/:spaceId/members` | `spaces::members` | Membership |
-| `/spaces/:spaceId/roles` | `spaces::roles` | Roles + permission bitsets |
-| `/spaces/:spaceId/bans` | `spaces::bans` | Bans |
-| `/spaces/:spaceId/invites` | `spaces::invites` | Invite codes |
-| `/push` | `push` | Web Push subscriptions |
-| `/.well-known` | `well_known` | Public discovery metadata |
-| `/ws` | `routes::ws` | Main WebSocket endpoint |
-| `/collab/:channelId` | `channels::documents::collab_ws` | Y.js WebSocket |
+| Mount point                                      | Module                           | Notes                                                |
+| ------------------------------------------------ | -------------------------------- | ---------------------------------------------------- |
+| `/account`                                       | `account`                        | Login, signup, refresh, password reset, email verify |
+| `/bots`                                          | `bots`                           | Bot registration and tokens                          |
+| `/cdn`                                           | `cdn`                            | Media upload and retrieval                           |
+| `/handles`                                       | `handles`                        | Username + custom domain handles                     |
+| `/users`                                         | `users`                          | User profiles                                        |
+| `/relations`                                     | `users::relations`               | Friends, blocks, requests                            |
+| `/dm`                                            | `dm`                             | Direct message channels and messages                 |
+| `/spaces`                                        | `spaces`                         | Spaces (servers)                                     |
+| `/spaces/:spaceId/channels`                      | `channels`                       | Channels inside a space                              |
+| `/spaces/:spaceId/channels/:channelId/messages`  | `channels::messages`             | Messages                                             |
+| `/spaces/:spaceId/channels/:channelId/voice`     | `channels::voice`                | LiveKit token mint                                   |
+| `/spaces/:spaceId/channels/:channelId/documents` | `channels::documents`            | Y.js document metadata                               |
+| `/spaces/:spaceId/members`                       | `spaces::members`                | Membership                                           |
+| `/spaces/:spaceId/roles`                         | `spaces::roles`                  | Roles + permission bitsets                           |
+| `/spaces/:spaceId/bans`                          | `spaces::bans`                   | Bans                                                 |
+| `/spaces/:spaceId/invites`                       | `spaces::invites`                | Invite codes                                         |
+| `/push`                                          | `push`                           | Web Push subscriptions                               |
+| `/.well-known`                                   | `well_known`                     | Public discovery metadata                            |
+| `/ws`                                            | `routes::ws`                     | Main WebSocket endpoint                              |
+| `/collab/:channelId`                             | `channels::documents::collab_ws` | Y.js WebSocket                                       |
 
 ## Writing a handler
 

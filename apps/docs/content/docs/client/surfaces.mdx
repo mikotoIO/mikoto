@@ -17,24 +17,24 @@ Each surface has:
 - A serializable **props bag** (channel ID, settings key, etc.) that
   describes which instance to show.
 
-Together those become a *tabable*: `{ kind, props }`. The dockview
+Together those become a _tabable_: `{ kind, props }`. The dockview
 serializes these so the layout survives page reloads.
 
 Existing surfaces live in `src/components/surfaces/`:
 
-| Folder/file | What it shows |
-| ----------- | ------------- |
-| `Messages/` | A channel's message log |
-| `Documents/` | A collaborative wiki channel (Lexical + Y.js) |
-| `Voice.tsx` | A voice/video channel (LiveKit) |
-| `Explorer/` | The space sidebar with channels and members |
-| `settings/` | Space, user, and channel settings panes |
-| `FriendsSurface.tsx` | DM friend list |
-| `DiscoverySurface.tsx` | Public-space discovery |
-| `SpaceExplorerSurface.tsx` | The space chooser sidebar surface |
-| `WelcomeSurface.tsx` | Empty-state welcome panel |
-| `LoadingSurface.tsx` | Suspense fallback |
-| `ErrorSurface.tsx` | Error-boundary fallback |
+| Folder/file                | What it shows                                 |
+| -------------------------- | --------------------------------------------- |
+| `Messages/`                | A channel's message log                       |
+| `Documents/`               | A collaborative wiki channel (Lexical + Y.js) |
+| `Voice.tsx`                | A voice/video channel (LiveKit)               |
+| `Explorer/`                | The space sidebar with channels and members   |
+| `settings/`                | Space, user, and channel settings panes       |
+| `FriendsSurface.tsx`       | DM friend list                                |
+| `DiscoverySurface.tsx`     | Public-space discovery                        |
+| `SpaceExplorerSurface.tsx` | The space chooser sidebar surface             |
+| `WelcomeSurface.tsx`       | Empty-state welcome panel                     |
+| `LoadingSurface.tsx`       | Suspense fallback                             |
+| `ErrorSurface.tsx`         | Error-boundary fallback                       |
 
 ## Tab click behavior
 

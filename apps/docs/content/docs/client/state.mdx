@@ -63,14 +63,14 @@ takes care of fine-grained reactivity.
 
 ## What goes where (cheat sheet)
 
-| Concern | Library |
-| ------- | ------- |
-| "What channels are in this space, and what's their unread state?" | Valtio (`mikoto.js` client) |
-| "What's the current paginated message list for channel X?" | Valtio + a React Query bootstrap for the initial fetch |
-| "Is the explorer collapsed?" | Jotai (`atomWithStorage`) |
-| "What's the user's profile?" | Valtio (live-updated by WS) |
-| "Server discovery list of public spaces" | React Query (REST, no WS push) |
-| "Form draft text" | local `useState` |
+| Concern                                                           | Library                                                |
+| ----------------------------------------------------------------- | ------------------------------------------------------ |
+| "What channels are in this space, and what's their unread state?" | Valtio (`mikoto.js` client)                            |
+| "What's the current paginated message list for channel X?"        | Valtio + a React Query bootstrap for the initial fetch |
+| "Is the explorer collapsed?"                                      | Jotai (`atomWithStorage`)                              |
+| "What's the user's profile?"                                      | Valtio (live-updated by WS)                            |
+| "Server discovery list of public spaces"                          | React Query (REST, no WS push)                         |
+| "Form draft text"                                                 | local `useState`                                       |
 
 ## Don't do these
 

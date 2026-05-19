@@ -8,9 +8,9 @@ export default function HomePage() {
       </h1>
       <p className="mt-4 text-fd-muted-foreground">
         Mikoto is an open-source messaging platform for online communities —
-        threads, voice/video, and real-time wiki channels in a single
-        Rust + React stack. This site documents the moving pieces for
-        developers who want to run it, hack on it, or build on top of it.
+        threads, voice/video, and real-time wiki channels in a single Rust +
+        React stack. This site documents the moving pieces for developers who
+        want to run it, hack on it, or build on top of it.
       </p>
       <div className="mt-8 flex gap-3">
         <Link

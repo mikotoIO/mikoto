@@ -9,31 +9,31 @@ with things you probably already run.
 
 ## Application services (`351X`)
 
-| Service | Port | Description |
-| ------- | ---- | ----------- |
-| Client | 3510 | Web client (Vite dev server) |
-| Superego | 3511 | API + WebSocket server |
-| Collab | 3512 | Reserved for the collab service (currently colocated with superego) |
-| MediaServer | 3513 | Reserved for media (currently colocated with superego) |
-| **Docs** | **3514** | **This documentation site** |
+| Service     | Port     | Description                                                         |
+| ----------- | -------- | ------------------------------------------------------------------- |
+| Client      | 3510     | Web client (Vite dev server)                                        |
+| Superego    | 3511     | API + WebSocket server                                              |
+| Collab      | 3512     | Reserved for the collab service (currently colocated with superego) |
+| MediaServer | 3513     | Reserved for media (currently colocated with superego)              |
+| **Docs**    | **3514** | **This documentation site**                                         |
 
 ## Infrastructure services (`351XX`)
 
-| Service | Ports | Description |
-| ------- | ----- | ----------- |
-| PostgreSQL | 35101 | Database (mapped from container 5432) |
-| Redis | 35102 | Pub/sub + cache |
-| RustFS (S3) | 35103, 35104 | S3 API + admin console |
-| LiveKit | 35105, 35106, 35107 | Voice/video — TCP + WebRTC ports |
-| MailHog | 35108, 35109 | SMTP sink + web UI |
+| Service     | Ports               | Description                           |
+| ----------- | ------------------- | ------------------------------------- |
+| PostgreSQL  | 35101               | Database (mapped from container 5432) |
+| Redis       | 35102               | Pub/sub + cache                       |
+| RustFS (S3) | 35103, 35104        | S3 API + admin console                |
+| LiveKit     | 35105, 35106, 35107 | Voice/video — TCP + WebRTC ports      |
+| MailHog     | 35108, 35109        | SMTP sink + web UI                    |
 
 ## Useful URLs
 
-| URL | What |
-| --- | ---- |
-| [http://localhost:3510](http://localhost:3510) | Web client |
-| [http://localhost:3511/scalar](http://localhost:3511/scalar) | Interactive API reference |
-| [http://localhost:3511/api.json](http://localhost:3511/api.json) | Raw OpenAPI schema |
-| [http://localhost:3514](http://localhost:3514) | This docs site |
-| [http://localhost:35104](http://localhost:35104) | RustFS admin (creds: `rustfs` / `password`) |
-| [http://localhost:35109](http://localhost:35109) | MailHog inbox |
+| URL                                                              | What                                        |
+| ---------------------------------------------------------------- | ------------------------------------------- |
+| [http://localhost:3510](http://localhost:3510)                   | Web client                                  |
+| [http://localhost:3511/scalar](http://localhost:3511/scalar)     | Interactive API reference                   |
+| [http://localhost:3511/api.json](http://localhost:3511/api.json) | Raw OpenAPI schema                          |
+| [http://localhost:3514](http://localhost:3514)                   | This docs site                              |
+| [http://localhost:35104](http://localhost:35104)                 | RustFS admin (creds: `rustfs` / `password`) |
+| [http://localhost:35109](http://localhost:35109)                 | MailHog inbox                               |

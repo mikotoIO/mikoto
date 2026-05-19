@@ -48,9 +48,9 @@ that's the TS generator above. The Rust crate is a complementary tool
 for turning OpenAPI schemas into Rust type definitions (used by the
 `mikoto-client` Rust crate to stay in sync with superego).
 
-| Direction | Tool |
-| --------- | ---- |
-| OpenAPI → TS bindings | `openapi-zod-client` invoked by `packages/mikoto.js/generator/openapi.ts` |
-| OpenAPI → Rust bindings | `crates/openapi-codegen` consumed by `crates/mikoto-client` |
+| Direction               | Tool                                                                      |
+| ----------------------- | ------------------------------------------------------------------------- |
+| OpenAPI → TS bindings   | `openapi-zod-client` invoked by `packages/mikoto.js/generator/openapi.ts` |
+| OpenAPI → Rust bindings | `crates/openapi-codegen` consumed by `crates/mikoto-client`               |
 
 Both read from the same `apps/superego/api.json`.

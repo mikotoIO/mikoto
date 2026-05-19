@@ -24,33 +24,33 @@ mikoto/
 
 ## `apps/`
 
-| Path | Language | Description |
-| ---- | -------- | ----------- |
-| `client` | TS/React | Web client (Vite, port 3510) |
-| `superego` | Rust | API + WebSocket server (Axum, port 3511) |
-| `content-proxy` | Rust | Optional third-party media proxy |
-| `desktop` | TS/Electron | Desktop wrapper around the web client |
-| `mobile` | TS/React Native | Mobile app (WIP) |
-| `design-language` | TS | Design system / Storybook |
-| `docs` | TS/Next.js | This documentation site |
+| Path              | Language        | Description                              |
+| ----------------- | --------------- | ---------------------------------------- |
+| `client`          | TS/React        | Web client (Vite, port 3510)             |
+| `superego`        | Rust            | API + WebSocket server (Axum, port 3511) |
+| `content-proxy`   | Rust            | Optional third-party media proxy         |
+| `desktop`         | TS/Electron     | Desktop wrapper around the web client    |
+| `mobile`          | TS/React Native | Mobile app (WIP)                         |
+| `design-language` | TS              | Design system / Storybook                |
+| `docs`            | TS/Next.js      | This documentation site                  |
 
 ## `packages/`
 
-| Path | Description |
-| ---- | ----------- |
-| `mikoto.js` | The JS/TS client SDK consumed by the web client and external integrations. |
-| `permcheck` | Tiny shared bitset permission checker used by both client and any JS integrations. |
-| `mikoto-crypto` | Crypto primitives shared across packages. |
-| `mikoto-ui` | Cross-app UI primitives (separate from the client's Chakra-based design system). |
-| `lexical-markdown` | Custom Lexical nodes + serializer for Mikoto's markdown-flavored editor. |
-| `tsconfig` | Shared `tsconfig` base that other packages extend. |
+| Path               | Description                                                                        |
+| ------------------ | ---------------------------------------------------------------------------------- |
+| `mikoto.js`        | The JS/TS client SDK consumed by the web client and external integrations.         |
+| `permcheck`        | Tiny shared bitset permission checker used by both client and any JS integrations. |
+| `mikoto-crypto`    | Crypto primitives shared across packages.                                          |
+| `mikoto-ui`        | Cross-app UI primitives (separate from the client's Chakra-based design system).   |
+| `lexical-markdown` | Custom Lexical nodes + serializer for Mikoto's markdown-flavored editor.           |
+| `tsconfig`         | Shared `tsconfig` base that other packages extend.                                 |
 
 ## `crates/`
 
-| Path | Description |
-| ---- | ----------- |
-| `mikoto-client` | Rust client SDK — for bots and server-side integrations. |
-| `mikoto-avatars` | Procedural avatar generator (used as a fallback when a user has no uploaded avatar). |
+| Path              | Description                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------- |
+| `mikoto-client`   | Rust client SDK — for bots and server-side integrations.                                          |
+| `mikoto-avatars`  | Procedural avatar generator (used as a fallback when a user has no uploaded avatar).              |
 | `openapi-codegen` | Internal codegen tool that converts the superego OpenAPI schema into TS bindings for `mikoto.js`. |
 
 ## Moon orchestration

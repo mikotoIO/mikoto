@@ -22,14 +22,14 @@ claim is `ISSUER` (e.g., `test.mikoto.io` in dev).
 
 ## Endpoints
 
-| Method | Path | Purpose |
-| ------ | ---- | ------- |
-| `POST` | `/account/login` | Email + password → `{ accessToken, refreshToken }` |
-| `POST` | `/account/register` | Sign up + send verification email |
-| `POST` | `/account/refresh` | Refresh token → new access + refresh pair |
-| `POST` | `/account/logout` | Invalidate the refresh token |
-| `POST` | `/account/change-password` | While authenticated |
-| `POST` | `/account/reset-password` | Email-based reset flow |
+| Method | Path                       | Purpose                                            |
+| ------ | -------------------------- | -------------------------------------------------- |
+| `POST` | `/account/login`           | Email + password → `{ accessToken, refreshToken }` |
+| `POST` | `/account/register`        | Sign up + send verification email                  |
+| `POST` | `/account/refresh`         | Refresh token → new access + refresh pair          |
+| `POST` | `/account/logout`          | Invalidate the refresh token                       |
+| `POST` | `/account/change-password` | While authenticated                                |
+| `POST` | `/account/reset-password`  | Email-based reset flow                             |
 
 The full schema is in [`/api.json`](/docs/superego/api).
 

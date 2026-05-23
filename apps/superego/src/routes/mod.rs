@@ -116,6 +116,11 @@ fn build_app_router() -> AppRouter<State> {
             "/spaces/:spaceId/invites",
             spaces::invites::router(),
         )
+        .nest(
+            "search",
+            "/spaces/:spaceId/search",
+            spaces::search::router(),
+        )
         .ws_command("ping", |ping: Ping, state: Arc<RwLock<State>>| async move {
             let reader = state.read().await;
             emit_event("pong", ping, &format!("conn:{}", reader.conn_id)).await?;

@@ -115,6 +115,12 @@ async fn list(claims: Claims) -> Result<Json<Vec<SpaceExt>>, Error> {
     Ok(spaces.into())
 }
 
+async fn list_public() -> Result<Json<Vec<SpaceExt>>, Error> {
+    let spaces = Space::list_public(db()).await?;
+    let spaces = SpaceExt::dataload(spaces, db()).await?;
+    Ok(spaces.into())
+}
+
 async fn create(
     claims: Claims,
     Json(body): Json<SpaceCreatePayload>,
@@ -348,7 +354,13 @@ pub fn router() -> AppRouter<State> {
         .route(
             "/",
             get_with(list, |o| {
-                o.tag(TAG).id("spaces.list").summary("List Spaces")
+                o.tag(TAG).id("spaces.list").summary("List My Spaces")
+            }),
+        )
+        .route(
+            "/discover",
+            get_with(list_public, |o| {
+                o.tag(TAG).id("spaces.discover").summary("List Public Spaces")
             }),
         )
         .route(

@@ -145,6 +145,10 @@ export class SpaceManager extends CachedManager<MikotoSpace> {
     return spaces.map((space) => new MikotoSpace(space, this.client));
   }
 
+  async discover(): Promise<SpaceExt[]> {
+    return await this.client.rest['spaces.discover']();
+  }
+
   async listNotificationPreferences(): Promise<NotificationPreference[]> {
     return await this.client.rest['spaces.listNotificationPreferences']();
   }

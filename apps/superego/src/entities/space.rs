@@ -91,6 +91,18 @@ impl Space {
         Ok(res)
     }
 
+    pub async fn list_public<'c, X: sqlx::PgExecutor<'c>>(db: X) -> Result<Vec<Space>, Error> {
+        let res = sqlx::query_as(
+            r##"
+            SELECT * FROM "Space"
+            WHERE "visibility" = 'PUBLIC'
+            "##,
+        )
+        .fetch_all(db)
+        .await?;
+        Ok(res)
+    }
+
     pub async fn create<'c, X: sqlx::PgExecutor<'c>>(&self, db: X) -> Result<(), Error> {
         sqlx::query(
             r##"

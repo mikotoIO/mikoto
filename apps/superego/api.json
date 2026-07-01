@@ -1119,7 +1119,7 @@
         "tags": [
           "Spaces"
         ],
-        "summary": "List Spaces",
+        "summary": "List My Spaces",
         "operationId": "spaces.list",
         "responses": {
           "200": {
@@ -1160,6 +1160,30 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SpaceExt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/discover": {
+      "get": {
+        "tags": [
+          "Spaces"
+        ],
+        "summary": "List Public Spaces",
+        "operationId": "spaces.discover",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SpaceExt"
+                  }
                 }
               }
             }

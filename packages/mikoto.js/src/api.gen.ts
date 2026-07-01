@@ -1396,6 +1396,13 @@ const endpoints = makeApi([
   },
   {
     method: "get",
+    path: "/spaces/discover",
+    alias: "spaces.discover",
+    requestFormat: "json",
+    response: z.array(SpaceExt),
+  },
+  {
+    method: "get",
     path: "/spaces/join/:invite",
     alias: "spaces.preview",
     requestFormat: "json",

@@ -330,7 +330,6 @@ export const DockViewSurface = () => {
         case 'spaceExplorer':
         case 'accountSettings':
         case 'palette':
-        case 'welcome':
           return GLOBAL_SURFACE_ROUTES[tab.kind];
 
         // Channel surfaces: /space/:spaceRef/channel/:channelId

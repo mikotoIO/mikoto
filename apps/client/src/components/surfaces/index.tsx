@@ -9,8 +9,6 @@ import { ExplorerSurface } from './Explorer';
 import { FriendsSurface } from './FriendsSurface';
 import { MessageSurface } from './Messages';
 import { SpaceExplorerSurface } from './SpaceExplorerSurface';
-import { SpaceInviteSurface } from './SpaceInviteSurface';
-import { WelcomeSurface } from './WelcomeSurface';
 import { AccountSettingsSurface } from './settings/account';
 import { ChannelSettingsSurface } from './settings/channel';
 import { SpaceSettingsSurface } from './settings/space';
@@ -26,9 +24,7 @@ export const surfaceMap = {
   friends: FriendsSurface,
   discovery: DiscoverySurface,
   palette: DesignStory,
-  welcome: WelcomeSurface,
   explorer: ExplorerSurface,
-  spaceInvite: SpaceInviteSurface,
   spaceExplorer: SpaceExplorerSurface,
 };
 

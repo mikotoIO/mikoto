@@ -80,7 +80,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.9",
+    "@babel/core": "^7.29.6",
     "@emotion/babel-plugin": "^11.12.0",
     "@types/events": "^3.0.0",
     "@types/lodash": "^4.17.9",

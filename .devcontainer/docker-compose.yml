@@ -1,0 +1,10 @@
+services:
+  devcontainer:
+    image: mcr.microsoft.com/devcontainers/base:ubuntu
+    volumes:
+      - ..:/workspaces/mikoto:cached
+    command: sleep infinity
+    depends_on:
+      - postgres
+      - redis
+      - minio

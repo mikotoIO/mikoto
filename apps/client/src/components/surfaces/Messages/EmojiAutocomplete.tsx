@@ -13,7 +13,14 @@ import {
   type LexicalEditor,
   type TextNode,
 } from 'lexical';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { use, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { proxyMap } from 'valtio/utils';
+import { useSnapshot } from 'valtio/react';
+
+import { normalizeMediaUrl } from '@/components/atoms/Avatar';
+import { CurrentSpaceContext } from '@/store';
+
+const EMPTY_EMOJI_CACHE = proxyMap<string, never>();
 
 const Overlay = styled.div`
   position: absolute;
@@ -70,6 +77,7 @@ type EmojiEntry = {
   name: string;
   native: string;
   keywords: string[];
+  customUrl?: string;
 };
 
 let emojiListCache: EmojiEntry[] | null = null;
@@ -161,6 +169,22 @@ export function EmojiAutocompletePlugin() {
   const [activeIndex, setActiveIndex] = useState(0);
   const activeIndexRef = useRef(0);
 
+  const space = use(CurrentSpaceContext);
+  const emojiCacheSnap = useSnapshot(
+    space?.emojis.cache ?? EMPTY_EMOJI_CACHE,
+  );
+
+  const customEmojis = useMemo<EmojiEntry[]>(() => {
+    if (!space) return [];
+    return [...emojiCacheSnap.values()].map((e) => ({
+      id: e.name,
+      name: e.name,
+      native: '',
+      keywords: ['custom'],
+      customUrl: e.url,
+    }));
+  }, [space, emojiCacheSnap]);
+
   useEffect(() => {
     let cancelled = false;
     loadEmojis().then((list) => {
@@ -171,7 +195,12 @@ export function EmojiAutocompletePlugin() {
     };
   }, []);
 
-  const filtered = match ? filterEmojis(emojis, match.search) : [];
+  const allEmojis = useMemo(
+    () => [...customEmojis, ...emojis],
+    [customEmojis, emojis],
+  );
+
+  const filtered = match ? filterEmojis(allEmojis, match.search) : [];
   const isOpen = match !== null && filtered.length > 0;
 
   activeIndexRef.current = activeIndex;
@@ -292,11 +321,21 @@ export function EmojiAutocompletePlugin() {
     >
       {filtered.map((emoji, i) => (
         <EmojiItem
-          key={emoji.id}
+          key={emoji.customUrl ? `c:${emoji.id}` : emoji.id}
           active={i === activeIndex}
           onClick={() => insertEmoji(emoji)}
         >
-          <Native>{emoji.native}</Native>
+          <Native>
+            {emoji.customUrl ? (
+              <img
+                src={normalizeMediaUrl(emoji.customUrl)}
+                alt={`:${emoji.name}:`}
+                style={{ width: 18, height: 18 }}
+              />
+            ) : (
+              emoji.native
+            )}
+          </Native>
           <Name>{emoji.name}</Name>
           <Shortcode>:{emoji.id}:</Shortcode>
         </EmojiItem>

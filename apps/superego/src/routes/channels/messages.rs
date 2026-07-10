@@ -1,4 +1,4 @@
-use aide::axum::routing::{delete_with, get_with, patch_with, post_with};
+use aide::axum::routing::{delete_with, get_with, patch_with, post_with, put_with};
 use axum::{
     extract::{Path, Query},
     Json,
@@ -9,8 +9,8 @@ use uuid::Uuid;
 use crate::{
     db::db,
     entities::{
-        Channel, MemberExt, Message, MessageAttachment, MessageAttachmentInput, MessageExt,
-        MessageKey, MessagePatch, SpaceExt,
+        Channel, Emoji, MemberExt, Message, MessageAttachment, MessageAttachmentInput, MessageExt,
+        MessageKey, MessagePatch, MessageReaction, SpaceExt,
     },
     error::Error,
     functions::{
@@ -188,6 +188,115 @@ async fn delete(
     Ok(().into())
 }
 
+#[derive(Serialize, Deserialize, JsonSchema, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ReactionPayload {
+    pub emoji: String,
+}
+
+#[derive(Serialize, Deserialize, JsonSchema, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ReactionEvent {
+    pub channel_id: Uuid,
+    pub message_id: Uuid,
+    pub user_id: Uuid,
+    pub emoji: String,
+}
+
+const MAX_REACTION_LEN: usize = 96;
+
+fn validate_reaction(emoji: &str) -> Result<(), Error> {
+    if emoji.is_empty() || emoji.len() > MAX_REACTION_LEN {
+        return Err(Error::ValidationFailed);
+    }
+    Ok(())
+}
+
+async fn ensure_emoji_usable(space_id: Uuid, emoji: &str) -> Result<(), Error> {
+    // Custom emoji reference format: "custom:<uuid>". Verify it exists and
+    // (for now) restrict use to the owning space.
+    if let Some(id_str) = emoji.strip_prefix("custom:") {
+        let id: Uuid = id_str.parse().map_err(|_| Error::ValidationFailed)?;
+        let custom = Emoji::find_by_id(id, db()).await?;
+        if custom.space_id != space_id {
+            return Err(Error::forbidden(
+                "Custom emoji is not available in this space",
+            ));
+        }
+    }
+    Ok(())
+}
+
+async fn add_reaction(
+    claim: Claims,
+    _member: Load<MemberExt>,
+    Load(space): Load<SpaceExt>,
+    Path((_, channel_id, message_id)): Path<(Uuid, Uuid, Uuid)>,
+    Json(body): Json<ReactionPayload>,
+) -> Result<Json<()>, Error> {
+    validate_reaction(&body.emoji)?;
+    let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != Some(space.base.id) {
+        return Err(Error::NotFound);
+    }
+    let message = Message::find_by_id(message_id, db()).await?;
+    if message.channel_id != channel_id {
+        return Err(Error::NotFound);
+    }
+
+    ensure_emoji_usable(space.base.id, &body.emoji).await?;
+
+    let user_id: Uuid = claim.sub.parse()?;
+    MessageReaction::add(message_id, user_id, &body.emoji, db()).await?;
+
+    emit_event(
+        "messages.onReactionAdd",
+        ReactionEvent {
+            channel_id,
+            message_id,
+            user_id,
+            emoji: body.emoji,
+        },
+        &format!("space:{}", space.base.id),
+    )
+    .await?;
+    Ok(Json(()))
+}
+
+async fn remove_reaction(
+    claim: Claims,
+    _member: Load<MemberExt>,
+    Load(space): Load<SpaceExt>,
+    Path((_, channel_id, message_id)): Path<(Uuid, Uuid, Uuid)>,
+    Json(body): Json<ReactionPayload>,
+) -> Result<Json<()>, Error> {
+    validate_reaction(&body.emoji)?;
+    let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != Some(space.base.id) {
+        return Err(Error::NotFound);
+    }
+    let message = Message::find_by_id(message_id, db()).await?;
+    if message.channel_id != channel_id {
+        return Err(Error::NotFound);
+    }
+
+    let user_id: Uuid = claim.sub.parse()?;
+    MessageReaction::remove(message_id, user_id, &body.emoji, db()).await?;
+
+    emit_event(
+        "messages.onReactionRemove",
+        ReactionEvent {
+            channel_id,
+            message_id,
+            user_id,
+            emoji: body.emoji,
+        },
+        &format!("space:{}", space.base.id),
+    )
+    .await?;
+    Ok(Json(()))
+}
+
 static TAG: &str = "Messages";
 
 pub fn router() -> AppRouter<State> {
@@ -222,6 +331,22 @@ pub fn router() -> AppRouter<State> {
                 o.tag(TAG).id("messages.delete").summary("Delete Message")
             }),
         )
+        .route(
+            "/:messageId/reactions",
+            put_with(add_reaction, |o| {
+                o.tag(TAG)
+                    .id("messages.reactions.add")
+                    .summary("Add Reaction")
+            }),
+        )
+        .route(
+            "/:messageId/reactions",
+            delete_with(remove_reaction, |o| {
+                o.tag(TAG)
+                    .id("messages.reactions.remove")
+                    .summary("Remove Reaction")
+            }),
+        )
         .ws_event(
             "onCreate",
             |message: MessageExt, _| async move { Some(message) },
@@ -233,5 +358,13 @@ pub fn router() -> AppRouter<State> {
         .ws_event(
             "onDelete",
             |message: MessageKey, _| async move { Some(message) },
+        )
+        .ws_event(
+            "onReactionAdd",
+            |event: ReactionEvent, _| async move { Some(event) },
+        )
+        .ws_event(
+            "onReactionRemove",
+            |event: ReactionEvent, _| async move { Some(event) },
         )
 }

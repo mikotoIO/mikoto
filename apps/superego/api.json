@@ -1776,6 +1776,66 @@
         }
       }
     },
+    "/spaces/{spaceId}/channels/{channelId}/messages/{messageId}/reactions": {
+      "put": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Add Reaction",
+        "operationId": "messages.reactions.add",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReactionPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Remove Reaction",
+        "operationId": "messages.reactions.remove",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReactionPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/spaces/{spaceId}/channels/{channelId}/voice/": {
       "post": {
         "tags": [
@@ -2204,6 +2264,109 @@
               "application/json": {
                 "schema": {
                   "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/emojis/": {
+      "get": {
+        "tags": [
+          "Emojis"
+        ],
+        "summary": "List Emojis",
+        "operationId": "emojis.list",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Emoji"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Emojis"
+        ],
+        "summary": "Create Emoji",
+        "operationId": "emojis.create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmojiCreatePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Emoji"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/emojis/{emojiId}": {
+      "delete": {
+        "tags": [
+          "Emojis"
+        ],
+        "summary": "Delete Emoji",
+        "operationId": "emojis.delete",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Emojis"
+        ],
+        "summary": "Update Emoji",
+        "operationId": "emojis.update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmojiUpdatePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Emoji"
                 }
               }
             }
@@ -2652,6 +2815,68 @@
           }
         }
       },
+      "Emoji": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "id",
+          "name",
+          "spaceId",
+          "url"
+        ],
+        "properties": {
+          "createdAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "spaceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uploaderId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "EmojiCreatePayload": {
+        "type": "object",
+        "required": [
+          "name",
+          "url"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "EmojiUpdatePayload": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "HandleOwner": {
         "description": "Represents what entity type owns a handle",
         "oneOf": [
@@ -3079,6 +3304,13 @@
             "type": "string",
             "format": "uuid"
           },
+          "reactions": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReactionGroup"
+            }
+          },
           "timestamp": {
             "$ref": "#/components/schemas/Timestamp"
           }
@@ -3228,6 +3460,68 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "ReactionEvent": {
+        "type": "object",
+        "required": [
+          "channelId",
+          "emoji",
+          "messageId",
+          "userId"
+        ],
+        "properties": {
+          "channelId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "emoji": {
+            "type": "string"
+          },
+          "messageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "ReactionGroup": {
+        "description": "A grouped reaction for a single emoji on a message.",
+        "type": "object",
+        "required": [
+          "count",
+          "emoji",
+          "userIds"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "emoji": {
+            "type": "string"
+          },
+          "userIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "ReactionPayload": {
+        "type": "object",
+        "required": [
+          "emoji"
+        ],
+        "properties": {
+          "emoji": {
+            "type": "string"
           }
         }
       },
@@ -3464,6 +3758,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Channel"
+            }
+          },
+          "emojis": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Emoji"
             }
           },
           "handle": {
@@ -3966,6 +4267,15 @@
       "channels.onUpdate": {
         "$ref": "#/components/schemas/Channel"
       },
+      "emojis.onCreate": {
+        "$ref": "#/components/schemas/Emoji"
+      },
+      "emojis.onDelete": {
+        "$ref": "#/components/schemas/Emoji"
+      },
+      "emojis.onUpdate": {
+        "$ref": "#/components/schemas/Emoji"
+      },
       "members.onCreate": {
         "$ref": "#/components/schemas/MemberExt"
       },
@@ -3980,6 +4290,12 @@
       },
       "messages.onDelete": {
         "$ref": "#/components/schemas/MessageKey"
+      },
+      "messages.onReactionAdd": {
+        "$ref": "#/components/schemas/ReactionEvent"
+      },
+      "messages.onReactionRemove": {
+        "$ref": "#/components/schemas/ReactionEvent"
       },
       "messages.onUpdate": {
         "$ref": "#/components/schemas/MessageExt"

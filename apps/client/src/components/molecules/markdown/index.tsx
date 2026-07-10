@@ -38,7 +38,8 @@ const MarkdownWrapper = styled.div<{ emojiSize: string }>`
   gap: 8px;
   display: flex;
   flex-direction: column;
-  .emoji-mart-emoji img {
+  .emoji-mart-emoji img,
+  img.emoji {
     max-width: ${(p) => p.emojiSize} !important;
     max-height: ${(p) => p.emojiSize} !important;
   }

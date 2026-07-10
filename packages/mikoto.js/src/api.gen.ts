@@ -239,6 +239,13 @@ export const User = z.object({
 });
 export type User = z.infer<typeof User>;
 
+export const ReactionGroup = z.object({
+  count: z.number().int(),
+  emoji: z.string(),
+  userIds: z.array(z.string().uuid()),
+});
+export type ReactionGroup = z.infer<typeof ReactionGroup>;
+
 export const MessageExt = z.object({
   attachments: z.array(MessageAttachment),
   author: z.union([User, z.null()]).optional(),
@@ -247,6 +254,7 @@ export const MessageExt = z.object({
   content: z.string(),
   editedTimestamp: z.union([Timestamp, z.null()]).optional(),
   id: z.string().uuid(),
+  reactions: z.array(ReactionGroup).optional().default([]),
   timestamp: Timestamp.datetime({ offset: true }),
 });
 export type MessageExt = z.infer<typeof MessageExt>;
@@ -293,6 +301,16 @@ export type SubscribeResponse = z.infer<typeof SubscribeResponse>;
 export const UnsubscribePayload = z.object({ endpoint: z.string() });
 export type UnsubscribePayload = z.infer<typeof UnsubscribePayload>;
 
+export const Emoji = z.object({
+  createdAt: Timestamp.datetime({ offset: true }),
+  id: z.string().uuid(),
+  name: z.string(),
+  spaceId: z.string().uuid(),
+  uploaderId: z.union([z.string(), z.null()]).optional(),
+  url: z.string(),
+});
+export type Emoji = z.infer<typeof Emoji>;
+
 export const Role = z.object({
   color: z.union([z.string(), z.null()]).optional(),
   id: z.string().uuid(),
@@ -311,6 +329,7 @@ export type SpaceVisibility = z.infer<typeof SpaceVisibility>;
 
 export const SpaceExt = z.object({
   channels: z.array(Channel),
+  emojis: z.array(Emoji).optional().default([]),
   handle: z.union([z.string(), z.null()]).optional(),
   icon: z.union([z.string(), z.null()]).optional(),
   id: z.string().uuid(),
@@ -373,6 +392,9 @@ export type MessageSendPayload2 = z.infer<typeof MessageSendPayload2>;
 
 export const MessageEditPayload2 = z.object({ content: z.string() });
 export type MessageEditPayload2 = z.infer<typeof MessageEditPayload2>;
+
+export const ReactionPayload = z.object({ emoji: z.string() });
+export type ReactionPayload = z.infer<typeof ReactionPayload>;
 
 export const VoiceToken = z.object({
   channelId: z.string().uuid(),
@@ -442,6 +464,15 @@ export const BanCreatePayload = z.object({
 });
 export type BanCreatePayload = z.infer<typeof BanCreatePayload>;
 
+export const EmojiCreatePayload = z.object({
+  name: z.string(),
+  url: z.string(),
+});
+export type EmojiCreatePayload = z.infer<typeof EmojiCreatePayload>;
+
+export const EmojiUpdatePayload = z.object({ name: z.string() });
+export type EmojiUpdatePayload = z.infer<typeof EmojiUpdatePayload>;
+
 export const Invite = z.object({
   createdAt: Timestamp.datetime({ offset: true }),
   creatorId: z.string().uuid(),
@@ -488,6 +519,14 @@ export type ObjectWithId = z.infer<typeof ObjectWithId>;
 
 export const Ping = z.object({ message: z.string() });
 export type Ping = z.infer<typeof Ping>;
+
+export const ReactionEvent = z.object({
+  channelId: z.string().uuid(),
+  emoji: z.string(),
+  messageId: z.string().uuid(),
+  userId: z.string().uuid(),
+});
+export type ReactionEvent = z.infer<typeof ReactionEvent>;
 
 export const ServeParams = z
   .object({
@@ -542,6 +581,7 @@ export const schemas = {
   limit,
   MessageAttachment,
   User,
+  ReactionGroup,
   MessageExt,
   MessageAttachmentInput,
   MessageSendPayload,
@@ -551,6 +591,7 @@ export const schemas = {
   SubscribePayload,
   SubscribeResponse,
   UnsubscribePayload,
+  Emoji,
   Role,
   SpaceType,
   SpaceVisibility,
@@ -564,6 +605,7 @@ export const schemas = {
   ChannelPatch,
   MessageSendPayload2,
   MessageEditPayload2,
+  ReactionPayload,
   VoiceToken,
   Document,
   DocumentPatch,
@@ -575,6 +617,8 @@ export const schemas = {
   RolePatch,
   BanInfo,
   BanCreatePayload,
+  EmojiCreatePayload,
+  EmojiUpdatePayload,
   Invite,
   InviteCreatePayload,
   ListQuery,
@@ -583,6 +627,7 @@ export const schemas = {
   MessageListQuery,
   ObjectWithId,
   Ping,
+  ReactionEvent,
   ServeParams,
   TypingStart,
   TypingUpdate,
@@ -1183,6 +1228,34 @@ const endpoints = makeApi([
     response: MessageExt,
   },
   {
+    method: "put",
+    path: "/spaces/:spaceId/channels/:channelId/messages/:messageId/reactions",
+    alias: "messages.reactions.add",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: z.object({ emoji: z.string() }),
+      },
+    ],
+    response: z.null(),
+  },
+  {
+    method: "delete",
+    path: "/spaces/:spaceId/channels/:channelId/messages/:messageId/reactions",
+    alias: "messages.reactions.remove",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: z.object({ emoji: z.string() }),
+      },
+    ],
+    response: z.null(),
+  },
+  {
     method: "post",
     path: "/spaces/:spaceId/channels/:channelId/voice/",
     alias: "voice.join",
@@ -1195,6 +1268,48 @@ const endpoints = makeApi([
     alias: "channels.unreads",
     requestFormat: "json",
     response: z.array(ChannelUnread),
+  },
+  {
+    method: "get",
+    path: "/spaces/:spaceId/emojis/",
+    alias: "emojis.list",
+    requestFormat: "json",
+    response: z.array(Emoji),
+  },
+  {
+    method: "post",
+    path: "/spaces/:spaceId/emojis/",
+    alias: "emojis.create",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: EmojiCreatePayload,
+      },
+    ],
+    response: Emoji,
+  },
+  {
+    method: "delete",
+    path: "/spaces/:spaceId/emojis/:emojiId",
+    alias: "emojis.delete",
+    requestFormat: "json",
+    response: z.null(),
+  },
+  {
+    method: "patch",
+    path: "/spaces/:spaceId/emojis/:emojiId",
+    alias: "emojis.update",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: z.object({ name: z.string() }),
+      },
+    ],
+    response: Emoji,
   },
   {
     method: "post",
@@ -1513,11 +1628,16 @@ export const websocketEvents = {
   "channels.onCreate": Channel,
   "channels.onDelete": Channel,
   "channels.onUpdate": Channel,
+  "emojis.onCreate": Emoji,
+  "emojis.onDelete": Emoji,
+  "emojis.onUpdate": Emoji,
   "members.onCreate": MemberExt,
   "members.onDelete": MemberExt,
   "members.onUpdate": MemberExt,
   "messages.onCreate": MessageExt,
   "messages.onDelete": MessageKey,
+  "messages.onReactionAdd": ReactionEvent,
+  "messages.onReactionRemove": ReactionEvent,
   "messages.onUpdate": MessageExt,
   pong: Ping,
   "relations.onCreate": RelationshipExt,

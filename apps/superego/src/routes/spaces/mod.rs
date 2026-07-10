@@ -32,6 +32,7 @@ use super::{
 };
 
 pub mod bans;
+pub mod emojis;
 pub mod invites;
 pub mod members;
 pub mod roles;

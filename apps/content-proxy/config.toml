@@ -9,6 +9,12 @@ store_type = "image"
 max_size = 10485760
 image_resize = { width = 512, height = 512 }
 
+[stores.emoji]
+store_type = "image"
+# 1 MB
+max_size = 1048576
+image_resize = { width = 128, height = 128 }
+
 [stores.attachment]
 store_type = "attachment"
 # 50 MB

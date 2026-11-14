@@ -1,4 +1,4 @@
-name: 'Moon'
+name: 'CI'
 permissions:
   contents: read
 on:
@@ -19,8 +19,6 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Install pnpm
         uses: pnpm/action-setup@v4
       - name: Use Node.js 22
@@ -32,7 +30,10 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Install Rust toolchain
         run: rustup show
-      - uses: 'moonrepo/setup-toolchain@v0'
+      - uses: Swatinem/rust-cache@v2
         with:
-          moon-version: '1.41.8'
-      - run: 'moon ci :${{ matrix.task }}'
+          key: ${{ matrix.task }}
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just
+      - run: just ${{ matrix.task }}

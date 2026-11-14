@@ -4,18 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Mikoto is an open-source messaging platform designed for building online communities. It features thread-based messaging, voice/video chat, and real-time collaborative wiki editing. The project uses a monorepo structure with Moon for task orchestration.
+Mikoto is an open-source messaging platform designed for building online communities. It features thread-based messaging, voice/video chat, and real-time collaborative wiki editing. The project uses a monorepo structure with `just` for task orchestration.
 
 ## Development Commands
 
 ### Useful Tools
 
 ```bash
-moon :typecheck # Typecheck everything
-moon :test # Run all tests
-moon :lint # Lint entire project
-moon :lint.fix # Fix linting issues
-moon :format # Format the entire codebase
+just typecheck # Typecheck everything
+just test # Run all tests
+just lint # Lint entire project
+just lint-fix # Fix linting issues
+just format # Format the entire codebase
 just new-migration migration_name # new migration
 ```
 
@@ -48,7 +48,7 @@ Check `ARCHITECTURE.md`.
 
 ### Development Tools
 
-- Moon for monorepo task orchestration
+- Just for monorepo task orchestration
 - Docker Compose for local development services
 - ESLint + Prettier for code formatting
 - Cargo clippy for Rust linting
@@ -87,4 +87,4 @@ All Mikoto services use ports in the `351X` or `351XX` range to avoid conflicts 
 
 - Before adding any new package, use the rustdoc crate search to check for the version.
 - Instead of reading the migrations, you can read schema.sql for the up-to-date dump of the database schema.
-- at the end of your task, run moon :typecheck to check both Rust and TypeScript parts of the codebase.
+- at the end of your task, run `just typecheck` to check both Rust and TypeScript parts of the codebase.

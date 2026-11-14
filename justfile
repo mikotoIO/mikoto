@@ -1,16 +1,83 @@
+# List available recipes
+default:
+    @just --list
+
+# --- Dev servers -------------------------------------------------------------
+
+# Run superego, content-proxy and the web client together. Ctrl-C stops all;
+# if any one of them exits, the others are stopped too.
 run-core:
-    moon :start --query "tag~core-app"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # Build both Rust binaries up front so the two `cargo run`s don't fight
+    # over the target-dir lock.
+    cargo build --bin superego --bin content-proxy
+    trap 'kill 0' EXIT
+    (cd apps/superego && cargo run --bin superego) &
+    (cd apps/content-proxy && cargo run --bin content-proxy) &
+    pnpm --filter client start &
+    wait -n
+
+# Run superego only
+run-superego:
+    cd apps/superego && cargo run --bin superego
+
+# Run the web client dev server only
+run-client:
+    pnpm --filter client start
 
 # Run only the client dev server, pointed at the production backend.
 # Designed for frontend/design-engineer iteration — no local superego,
 # redis, postgres, or media stack required. See
 # apps/client/docs/PROD-BACKEND-DEV.md for how the proxy works.
 run-client-prod:
-    moon run client:dev.prod-backend
+    pnpm --filter client exec vite --mode prod-backend
 
 # Run the Fumadocs developer documentation site on http://localhost:3514
 run-docs:
-    moon run docs:dev
+    pnpm --filter docs dev
+
+# --- Checks ------------------------------------------------------------------
+
+# Typecheck Rust and TypeScript
+typecheck: build-mikoto-js
+    cargo check --workspace
+    pnpm -r typecheck
+
+# Run all Rust and TypeScript tests
+test:
+    cargo test --workspace
+    pnpm -r test
+
+# Lint with clippy and eslint
+lint:
+    cargo clippy --workspace
+    pnpm eslint .
+
+# Auto-fix lint issues
+lint-fix:
+    cargo clippy --workspace --fix --allow-dirty
+    pnpm eslint . --fix
+
+# Format Rust and TypeScript
+format:
+    cargo fmt --all
+    pnpm prettier --write . --log-level warn
+
+# Build mikoto.js (the client typechecks against its build output)
+build-mikoto-js:
+    pnpm --filter @mikoto-io/mikoto.js build
+
+# --- Codegen -----------------------------------------------------------------
+
+# Regenerate the OpenAPI schema and the TS + Rust client bindings
+generate:
+    cd apps/superego && cargo run --bin dump_api
+    pnpm --filter @mikoto-io/mikoto.js generate
+    cargo run --bin openapi-codegen -- apps/superego/api.json crates/mikoto-client/src/generated.rs
+
+# --- Database & services -----------------------------------------------------
+
 # Run database migrations for superego
 migrate:
     cd apps/superego && cargo run --bin migrate

@@ -11,8 +11,7 @@ just run-client-prod
 # open http://localhost:3510
 ```
 
-Under the hood this runs `moon run client:dev.prod-backend`, which runs
-`vite --mode prod-backend` from `apps/client/`.
+Under the hood this runs `vite --mode prod-backend` in the client package.
 
 You'll log in with your regular prod Mikoto account. All REST calls,
 WebSockets, collab (Y.js), and media uploads/downloads transparently
@@ -41,9 +40,8 @@ Three things make this work:
    and forwards to the prod origins, with `changeOrigin: true`, `secure:
 true`, and `ws: true` so WebSocket upgrades (main socket +
    `y-websocket` collab) pass through.
-3. **`dev.prod-backend` moon task** (declared in `apps/client/moon.yml`)
-   runs `vite --mode prod-backend` so Vite picks up the env file.
-   `just run-client-prod` is the top-level wrapper.
+3. **`just run-client-prod`** runs `vite --mode prod-backend` in the
+   client package so Vite picks up the env file.
 
 ## Pointing at a different backend (staging, a coworker's tunnel, etc.)
 

@@ -1,9 +1,9 @@
 ---
 title: Monorepo Layout
-description: Where everything lives, and how Moon ties it together.
+description: Where everything lives, and how `just` ties it together.
 ---
 
-The repo is a hybrid pnpm + Cargo workspace, orchestrated by Moon.
+The repo is a hybrid pnpm + Cargo workspace, driven by a top-level `justfile`.
 
 ## Top-level
 
@@ -15,8 +15,7 @@ mikoto/
 ├── examples/         # example Rust bots
 ├── data/             # local-only storage for RustFS, gitignored
 ├── docker-compose.yml
-├── justfile
-├── moon.yml          # repo-level Moon tasks
+├── justfile          # repo-level task recipes
 ├── Cargo.toml        # Rust workspace root
 ├── pnpm-workspace.yaml
 └── package.json
@@ -53,21 +52,24 @@ mikoto/
 | `mikoto-avatars`  | Procedural avatar generator (used as a fallback when a user has no uploaded avatar).              |
 | `openapi-codegen` | Internal codegen tool that converts the superego OpenAPI schema into TS bindings for `mikoto.js`. |
 
-## Moon orchestration
+## The justfile
 
-[Moon](https://moonrepo.dev) is the task runner. Two patterns matter:
+[Just](https://github.com/casey/just) is the task runner; run `just` to
+list every recipe. They fall into four groups:
 
-1. **Per-project tasks** live in `apps/<x>/moon.yml` or
-   `packages/<x>/moon.yml`. Example: `moon run client:dev` runs the
-   client dev server.
-2. **Wildcard tasks** at the workspace level. `moon :typecheck` runs
-   the `typecheck` task in every project that defines one. The
-   repo-level `moon.yml` adds a few wildcards of its own (`:lint`,
-   `:lint.fix`, `:format`).
+- **Dev servers** — `just run-core` (superego, content-proxy and the
+  client in parallel), `just run-superego`, `just run-client`,
+  `just run-client-prod`, `just run-docs`.
+- **Checks** — `just typecheck`, `just test`, `just lint`,
+  `just lint-fix`, `just format`.
+- **Codegen** — `just generate` regenerates superego's `api.json`, then
+  the `mikoto.js` TS bindings, then the Rust `mikoto-client` bindings.
+- **Database & services** — `just migrate`, `just seed`,
+  `just new-migration`, `just reset-dev-env`, and friends.
 
-The `core-app` tag (set in `apps/client/moon.yml` and
-`apps/superego/moon.yml`) is what `just run-core` matches on with
-`moon :start --query "tag~core-app"`.
+There are no per-project task files: Rust steps run across the Cargo
+workspace (`cargo check --workspace`, etc.) and TypeScript steps run
+across the pnpm workspace with `pnpm -r`.
 
 ## pnpm and Cargo
 

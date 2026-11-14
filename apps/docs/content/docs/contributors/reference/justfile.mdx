@@ -10,9 +10,25 @@ developer commands. Run `just` with no arguments to list them.
 
 | Command                | What it does                                                                                                                                    |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `just run-core`        | Start every app tagged `core-app` (currently client + superego).                                                                                |
+| `just run-core`        | Start superego, content-proxy and the client in parallel. Ctrl-C stops all of them; if one exits, the rest are stopped.                         |
+| `just run-superego`    | Start only superego.                                                                                                                            |
+| `just run-client`      | Start only the client dev server.                                                                                                               |
 | `just run-client-prod` | Start only the client, proxying API/WS/media to prod. No local backend required. See [Dev against prod](/contributors/client/dev-against-prod). |
+| `just run-docs`        | Start this docs site on http://localhost:3514.                                                                                                  |
 | `just docker-start`    | `docker compose up -d` — bring up Postgres, Redis, RustFS, LiveKit, MailHog.                                                                    |
+
+## Checks & codegen
+
+| Command          | What it does                                                                                            |
+| ---------------- | ------------------------------------------------------------------------------------------------------- |
+| `just typecheck` | Build mikoto.js, then `cargo check --workspace` + `pnpm -r typecheck`. Run before pushing.              |
+| `just test`      | `cargo test --workspace` + `pnpm -r test`.                                                              |
+| `just lint`      | `cargo clippy --workspace` + `eslint .`.                                                                |
+| `just lint-fix`  | Auto-fix what clippy and eslint can.                                                                    |
+| `just format`    | `cargo fmt --all` + prettier.                                                                           |
+| `just generate`  | Regenerate superego's `api.json`, then the mikoto.js TS bindings and the Rust `mikoto-client` bindings. |
+
+CI (`.github/workflows/ci.yaml`) runs `just typecheck`, `just test` and `just lint`.
 
 ## Database
 

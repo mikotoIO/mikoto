@@ -5,9 +5,9 @@ description: Conventions, checks, and tools the repo expects.
 
 ## Toolchain
 
-Pinned by [`proto`](https://moonrepo.dev/proto) via `.prototools`:
+Optionally pinned by [`proto`](https://moonrepo.dev/proto) via `.prototools`:
 
-- Node, pnpm, Moon versions
+- Node and pnpm versions
 - Rust toolchain pinned in `rust-toolchain.toml`
 
 Run `proto install` once and these stay correct across pulls.
@@ -15,20 +15,20 @@ Run `proto install` once and these stay correct across pulls.
 ## Before you push
 
 ```sh
-moon :typecheck    # tsc + cargo check across the workspace
-moon :test         # vitest + cargo test
-moon :lint         # eslint + cargo clippy
+just typecheck     # tsc + cargo check across the workspace
+just test          # vitest + cargo test
+just lint          # eslint + cargo clippy
 ```
 
-`moon :typecheck` is the most important — it catches both TypeScript
+`just typecheck` is the most important — it catches both TypeScript
 and Rust regressions in one pass.
 
-If lint complains, `moon :lint.fix` will fix what it can.
+If lint complains, `just lint-fix` will fix what it can.
 
 ## Formatting
 
 ```sh
-moon :format
+just format
 ```
 
 Runs `cargo fmt` over Rust and `prettier --write .` over JS/TS/MDX.
@@ -71,7 +71,7 @@ Recent history uses Conventional-Commits-ish prefixes (`feat`, `fix`,
 
 ```
 feat(client): redesign WelcomePanel into a community discovery view
-build(moon): pin pnpm version in toolchain
+build(just): add run-docs recipe
 chore(openapi-codegen): silence unused metadata field warnings
 ```
 
@@ -86,5 +86,5 @@ If you're new and want a tractable first PR:
   always welcome.
 - Hunt for `TODO` and `FIXME` in `apps/superego/src/`. Many of them
   are scoped enough for a first-time contribution.
-- Run `moon :lint` and fix something the linter is unhappy about
+- Run `just lint` and fix something the linter is unhappy about
   that isn't strictly broken but isn't great.

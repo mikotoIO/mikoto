@@ -8,15 +8,39 @@ default:
 # if any one of them exits, the others are stopped too.
 run-core:
     #!/usr/bin/env bash
-    set -euo pipefail
+    # Must stay compatible with macOS's bash 3.2 (no `wait -n`).
+    set -o pipefail
     # Build both Rust binaries up front so the two `cargo run`s don't fight
     # over the target-dir lock.
-    cargo build --bin superego --bin content-proxy
-    trap 'kill 0' EXIT
-    (cd apps/superego && cargo run --bin superego) &
-    (cd apps/content-proxy && cargo run --bin content-proxy) &
-    pnpm --filter client start &
-    wait -n
+    cargo build --bin superego --bin content-proxy || exit 1
+
+    # Job control puts each service in its own process group, so cleanup can
+    # stop a service's whole process tree without touching our caller.
+    set -m
+    pids=()
+    cleanup() {
+        trap - EXIT INT TERM
+        for pid in ${pids[@]+"${pids[@]}"}; do
+            kill -TERM -- "-$pid" 2>/dev/null
+        done
+        wait 2>/dev/null
+    }
+    trap cleanup EXIT
+    trap 'exit 130' INT TERM
+
+    # stdin from /dev/null: background process groups that read the TTY get
+    # stopped by SIGTTIN.
+    (cd apps/superego && exec cargo run --bin superego) </dev/null & pids+=($!)
+    (cd apps/content-proxy && exec cargo run --bin content-proxy) </dev/null & pids+=($!)
+    pnpm --filter client start </dev/null & pids+=($!)
+
+    # Stop everything as soon as any one service exits.
+    while :; do
+        for pid in "${pids[@]}"; do
+            kill -0 "$pid" 2>/dev/null || exit 1
+        done
+        sleep 1
+    done
 
 # Run superego only
 run-superego:

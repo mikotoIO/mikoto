@@ -11,15 +11,15 @@ to a local API.
 - **Docker** and **Docker Compose** — for Postgres, Redis, RustFS (S3),
   LiveKit, and MailHog.
 - **[Rustup](https://rustup.rs/)** — the Rust toolchain.
-- **[Proto](https://moonrepo.dev/proto)** — the tool manager Mikoto uses
-  to install Moon and pin Node/PNPM versions.
+- **[Proto](https://moonrepo.dev/proto)** — optional tool manager for installing
+  the pinned Node/pnpm versions.
 - **[Just](https://github.com/casey/just)** — the task runner used by
   the repo-level scripts under [`justfile`](https://github.com/mikoto-io/mikoto/blob/main/justfile).
 
 ## First-time setup
 
 ```sh
-# 1. Install pinned tool versions (Moon, Node, pnpm, etc.)
+# 1. Install pinned tool versions (Node, pnpm; optional)
 proto install
 
 # 2. Install JS dependencies across the workspace
@@ -48,9 +48,8 @@ docker compose up -d
 just run-core
 ```
 
-`just run-core` runs `moon :start --query "tag~core-app"`, which starts
-every app tagged `core-app` in [`moon.yml`](https://github.com/mikoto-io/mikoto/blob/main/moon.yml)
-in parallel — currently the client and superego.
+`just run-core` starts superego, content-proxy, and the client in
+parallel. Ctrl-C stops all of them.
 
 The web client will be at [http://localhost:3510](http://localhost:3510),
 the API at [http://localhost:3511](http://localhost:3511), and an
@@ -73,14 +72,14 @@ For the full list, see the [justfile reference](/contributors/reference/justfile
 ## Repo-wide checks
 
 ```sh
-moon :typecheck    # tsc --noEmit + cargo check across the workspace
-moon :test         # vitest + cargo test
-moon :lint         # eslint + cargo clippy
-moon :lint.fix     # auto-fix what's auto-fixable
-moon :format       # cargo fmt + prettier
+just typecheck     # tsc --noEmit + cargo check across the workspace
+just test          # vitest + cargo test
+just lint          # eslint + cargo clippy
+just lint-fix      # auto-fix what's auto-fixable
+just format        # cargo fmt + prettier
 ```
 
-Always run `moon :typecheck` before you push — it catches both
+Always run `just typecheck` before you push — it catches both
 TypeScript and Rust regressions in a single pass.
 
 ## Frontend-only against production

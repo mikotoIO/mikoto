@@ -28,9 +28,9 @@
     "Bash(git push:*)",
     "Bash(git log:*)",
 
-    "Bash(moon :typecheck:*)",
-    "Bash(moon :lint:*)",
-    "Bash(moon :format:*)",
+    "Bash(just typecheck:*)",
+    "Bash(just lint:*)",
+    "Bash(just format:*)",
 
     "WebSearch",
     "WebFetch(domain:docs.rs)",

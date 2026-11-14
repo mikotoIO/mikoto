@@ -40,7 +40,7 @@ Prerequisites:
 
 - Docker
 - [Rustup](https://rustup.rs/)
-- [Proto](https://moonrepo.dev/proto) (tool manager, used to install moonrepo)
+- [Proto](https://moonrepo.dev/proto) (optional tool manager for pinned Node/pnpm versions)
 - Just (task runner)
 
 ```sh
@@ -56,7 +56,7 @@ just reset-dev-env
 
 ### Development
 
-Mikoto uses a Moon-based monorepo.
+Mikoto is a pnpm + Cargo workspace, driven by `just`. Run `just` to list the available recipes.
 
 To develop apps and packages, run the following command:
 
@@ -85,7 +85,7 @@ for details.
 To build all apps and packages, run the following command:
 
 ```sh
-moon :build
+pnpm -r build
 ```
 
 ## Port Configuration

@@ -68,9 +68,6 @@ target/
 # Prisma Rust
 **/prisma.rs
 .vscode/
-# moon
-.moon/cache
-.moon/docker
 
 # claude
 .claude/worktrees/

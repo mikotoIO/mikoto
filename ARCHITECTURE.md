@@ -67,7 +67,7 @@ All apps use ports in the 351X range, while supporting infrastructure uses 351XX
 
 ## Package Management
 
-- **Root level** - pnpm workspace with Moon task runner
+- **Root level** - pnpm workspace with `just` task runner
 - **Client dependencies** - Uses pnpm, managed in apps/client/package.json
 - **Rust dependencies** - Cargo workspaces, managed in Cargo.toml files
 - **Shared packages** - TypeScript packages in packages/ directory

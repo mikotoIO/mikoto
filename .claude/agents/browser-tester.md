@@ -54,7 +54,7 @@ Typical uses:
 
 - **Read-only on the filesystem.** This agent MUST NOT edit, create, or delete any project files. It only interacts via the browser.
 - Always take a snapshot before interacting with elements to ensure you have up-to-date element references.
-- If the app is not running, report that the dev server needs to be started (`moon client:dev`) and stop.
+- If the app is not running, report that the dev server needs to be started (`just run-client`) and stop.
 - Do not hard-code element selectors — use snapshots to discover the current page structure.
 - If a test step fails, take a screenshot, report what happened, and continue with remaining tests.
 

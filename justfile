@@ -1,16 +1,107 @@
+# List available recipes
+default:
+    @just --list
+
+# --- Dev servers -------------------------------------------------------------
+
+# Run superego, content-proxy and the web client together. Ctrl-C stops all;
+# if any one of them exits, the others are stopped too.
 run-core:
-    moon :start --query "tag~core-app"
+    #!/usr/bin/env bash
+    # Must stay compatible with macOS's bash 3.2 (no `wait -n`).
+    set -o pipefail
+    # Build both Rust binaries up front so the two `cargo run`s don't fight
+    # over the target-dir lock.
+    cargo build --bin superego --bin content-proxy || exit 1
+
+    # Job control puts each service in its own process group, so cleanup can
+    # stop a service's whole process tree without touching our caller.
+    set -m
+    pids=()
+    cleanup() {
+        trap - EXIT INT TERM
+        for pid in ${pids[@]+"${pids[@]}"}; do
+            kill -TERM -- "-$pid" 2>/dev/null
+        done
+        wait 2>/dev/null
+    }
+    trap cleanup EXIT
+    trap 'exit 130' INT TERM
+
+    # stdin from /dev/null: background process groups that read the TTY get
+    # stopped by SIGTTIN.
+    (cd apps/superego && exec cargo run --bin superego) </dev/null & pids+=($!)
+    (cd apps/content-proxy && exec cargo run --bin content-proxy) </dev/null & pids+=($!)
+    pnpm --filter client start </dev/null & pids+=($!)
+
+    # Stop everything as soon as any one service exits.
+    while :; do
+        for pid in "${pids[@]}"; do
+            kill -0 "$pid" 2>/dev/null || exit 1
+        done
+        sleep 1
+    done
+
+# Run superego only
+run-superego:
+    cd apps/superego && cargo run --bin superego
+
+# Run the web client dev server only
+run-client:
+    pnpm --filter client start
 
 # Run only the client dev server, pointed at the production backend.
 # Designed for frontend/design-engineer iteration — no local superego,
 # redis, postgres, or media stack required. See
 # apps/client/docs/PROD-BACKEND-DEV.md for how the proxy works.
 run-client-prod:
-    moon run client:dev.prod-backend
+    pnpm --filter client exec vite --mode prod-backend
 
 # Run the Fumadocs developer documentation site on http://localhost:3514
 run-docs:
-    moon run docs:dev
+    pnpm --filter docs dev
+
+# --- Checks ------------------------------------------------------------------
+
+# Typecheck Rust and TypeScript
+typecheck: build-mikoto-js
+    cargo check --workspace
+    pnpm -r typecheck
+
+# Run all Rust and TypeScript tests
+test:
+    cargo test --workspace
+    pnpm -r test
+
+# Lint with clippy and eslint
+lint:
+    cargo clippy --workspace
+    pnpm eslint .
+
+# Auto-fix lint issues
+lint-fix:
+    cargo clippy --workspace --fix --allow-dirty
+    pnpm eslint . --fix
+
+# Format Rust and TypeScript
+format:
+    cargo fmt --all
+    pnpm prettier --write . --log-level warn
+
+# Build mikoto.js (the client typechecks against its build output)
+build-mikoto-js:
+    pnpm --filter @mikoto-io/mikoto.js build
+
+# --- Codegen -----------------------------------------------------------------
+
+# Regenerate the OpenAPI schema and the TS + Rust client bindings
+generate:
+    cd apps/superego && cargo run --bin dump_api
+    pnpm --filter @mikoto-io/mikoto.js generate
+    cargo run --bin openapi-codegen -- apps/superego/api.json crates/mikoto-client/src/generated.rs
+
+# --- Database & services -----------------------------------------------------
+
 # Run database migrations for superego
 migrate:
     cd apps/superego && cargo run --bin migrate

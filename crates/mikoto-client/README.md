@@ -26,7 +26,7 @@ The types and API methods in `src/generated.rs` are auto-generated from the Supe
 To regenerate:
 
 ```bash
-moon mikoto-client:generate
+just generate
 ```
 
 ## Modules

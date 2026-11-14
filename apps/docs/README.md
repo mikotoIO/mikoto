@@ -7,7 +7,7 @@ documentation for the Mikoto monorepo. Lives under `apps/docs/`.
 
 ```sh
 pnpm install              # at the repo root
-moon run docs:dev         # or: pnpm --filter docs dev
+just run-docs             # or: pnpm --filter docs dev
 ```
 
 The site runs at <http://localhost:3514>.
@@ -15,7 +15,7 @@ The site runs at <http://localhost:3514>.
 ## Build
 
 ```sh
-moon run docs:build
+pnpm --filter docs build
 ```
 
 ## Write a new page

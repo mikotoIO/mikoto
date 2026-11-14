@@ -1,81 +1,76 @@
-import { Box, Button, Flex, Grid, Heading, Text } from '@chakra-ui/react';
-import { faUser } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { SpaceExt } from '@mikoto-io/mikoto.js';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { Check, Compass, Plus } from 'lucide-react';
 import { Suspense, useState } from 'react';
+import { useSnapshot } from 'valtio/react';
 
 import { Surface } from '@/components/Surface';
-import { normalizeMediaUrl } from '@/components/atoms/Avatar';
-import { StyledSpaceIcon } from '@/components/atoms/SpaceIcon';
+import { SpaceJoinModal } from '@/components/modals/SpaceJoin';
 import { TabName } from '@/components/tabs';
+import {
+  Button,
+  DelayedFallback,
+  EmptyState,
+  PageTitle,
+  RegionErrorBoundary,
+  describeError,
+  toast,
+} from '@/design';
 import { useMikoto } from '@/hooks';
-import { Spinner } from '@/ui/Spinner';
+import { useModalKit } from '@/store';
 
-function DiscoverCard({ space }: { space: SpaceExt }) {
+import { SpaceCard, SpaceCardGridSkeleton, spaceCardStyles } from './SpaceCard';
+
+function JoinButton({ space }: { space: SpaceExt }) {
   const mikoto = useMikoto();
+  useSnapshot(mikoto.spaces.cache);
   const [joining, setJoining] = useState(false);
-
   const joined = mikoto.spaces.cache.has(space.id);
+
+  if (joined) {
+    return (
+      <Button size="sm" block disabled>
+        <Check size={14} aria-hidden />
+        Joined
+      </Button>
+    );
+  }
 
   const join = async () => {
     if (!space.handle) return;
     setJoining(true);
     try {
       await mikoto.spaces.join(`@${space.handle}`);
+      toast({ type: 'success', title: `Joined ${space.name}` });
+    } catch (err) {
+      toast({
+        type: 'error',
+        title: `Couldn't join ${space.name}`,
+        description: describeError(err, { context: 'action' }).message,
+      });
     } finally {
       setJoining(false);
     }
   };
 
   return (
-    <Flex
-      direction="column"
-      gap={4}
-      p={5}
-      rounded="lg"
-      bg="gray.800"
-      borderWidth="1px"
-      borderColor="gray.700"
-      transition="border-color 0.15s, transform 0.15s"
-      _hover={{
-        borderColor: 'gray.600',
-        transform: 'translateY(-1px)',
-      }}
+    <Button
+      size="sm"
+      variant="primary"
+      block
+      loading={joining}
+      disabled={!space.handle}
+      title={space.handle ? undefined : 'This space has no public handle yet'}
+      onClick={join}
     >
-      <Flex gap={4} align="center" minW={0}>
-        <StyledSpaceIcon
-          size="56px"
-          spaceId={space.id}
-          icon={normalizeMediaUrl(space.icon)}
-        >
-          {space.icon === null ? space.name[0] : ''}
-        </StyledSpaceIcon>
-        <Box minW={0} flex={1}>
-          <Text fontWeight={700} fontSize="md" color="gray.50" truncate>
-            {space.name}
-          </Text>
-          <Flex align="center" gap={1.5} color="gray.400" fontSize="xs" mt={1}>
-            <FontAwesomeIcon icon={faUser} />
-            <Text as="span">{space.memberCount} members</Text>
-          </Flex>
-        </Box>
-      </Flex>
-      <Button
-        colorPalette="primary"
-        size="sm"
-        loading={joining}
-        disabled={joined || !space.handle}
-        onClick={join}
-      >
-        {joined ? 'Joined' : 'Join Space'}
-      </Button>
-    </Flex>
+      Join space
+    </Button>
   );
 }
 
 function DiscoverList() {
   const mikoto = useMikoto();
+  const setModal = useModalKit();
   const { data: spaces } = useSuspenseQuery({
     queryKey: ['spaces.discover'],
     queryFn: () => mikoto.spaces.discover(),
@@ -83,44 +78,61 @@ function DiscoverList() {
 
   if (spaces.length === 0) {
     return (
-      <Text color="gray.400" mt={4}>
-        No public spaces to discover yet. Check back later!
-      </Text>
+      <EmptyState
+        className={spaceCardStyles.state}
+        icon={<Compass size={20} aria-hidden />}
+        title="No public spaces yet"
+        description="Be the first: create a space and make it public in its settings, so others can find it here."
+        action={
+          <Button
+            variant="primary"
+            onClick={() => setModal(<SpaceJoinModal />)}
+          >
+            <Plus size={14} aria-hidden />
+            Create a space
+          </Button>
+        }
+      />
     );
   }
 
   return (
-    <Grid
-      templateColumns="repeat(auto-fill, minmax(280px, 1fr))"
-      gap={4}
-      mt={6}
-    >
+    <div className={spaceCardStyles.grid}>
       {spaces.map((space) => (
-        <DiscoverCard key={space.id} space={space} />
+        <SpaceCard
+          key={space.id}
+          space={space}
+          actions={<JoinButton space={space} />}
+        />
       ))}
-    </Grid>
+    </div>
   );
 }
 
 export function DiscoverySurface() {
   return (
     <Surface padded scroll>
-      <TabName name="Discover Spaces" />
-      <Heading size="2xl" m={0}>
-        Find Your Space
-      </Heading>
-      <Text color="gray.400" mt={2}>
-        Browse public communities and join the ones that catch your eye.
-      </Text>
-      <Suspense
-        fallback={
-          <Flex justify="center" mt={12}>
-            <Spinner />
-          </Flex>
-        }
-      >
-        <DiscoverList />
-      </Suspense>
+      <TabName name="Discover spaces" icon={Compass} />
+      <div className={spaceCardStyles.page}>
+        <PageTitle
+          title="Discover spaces"
+          description="Browse public communities and join the ones you like. You can leave a space at any time."
+        />
+        <RegionErrorBoundary
+          what="Public spaces"
+          className={spaceCardStyles.state}
+        >
+          <Suspense
+            fallback={
+              <DelayedFallback>
+                <SpaceCardGridSkeleton label="public spaces" />
+              </DelayedFallback>
+            }
+          >
+            <DiscoverList />
+          </Suspense>
+        </RegionErrorBoundary>
+      </div>
     </Surface>
   );
 }

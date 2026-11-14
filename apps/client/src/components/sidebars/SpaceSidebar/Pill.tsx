@@ -1,14 +1,14 @@
-import styled from '@emotion/styled';
+import { cx } from '@/design';
 
-export const Pill = styled.div<{ h?: number }>`
-  background-color: white;
-  width: 4px;
-  height: ${(p) => p.h ?? 8}px;
-  position: absolute;
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
-  left: 0;
-  top: 50%;
-  transform: translate(0, -50%);
-  transition-duration: 200ms;
-`;
+import styles from './SpaceSidebar.module.css';
+
+/** Unread pip on the rail's left edge. */
+export function Pill({ h = 8, className }: { h?: number; className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={cx(styles.pip, className)}
+      style={{ height: h, marginTop: -h / 2 }}
+    />
+  );
+}

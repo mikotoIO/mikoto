@@ -1,190 +1,144 @@
-import {
-  Box,
-  Code,
-  HStack,
-  Input,
-  Stack,
-  Text,
-  Textarea,
-} from '@chakra-ui/react';
-import styled from '@emotion/styled';
-import { faCopy, faRobot } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { BotCreatedResponse } from '@mikoto-io/mikoto.js';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
+import { Bot, Eye, EyeOff, Plus } from 'lucide-react';
 import { useState } from 'react';
-import { useAsync } from 'react-async-hook';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'react-toastify';
 
 import { modalState } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';
-import { Button, Field } from '@/components/ui';
-import { DialogContent } from '@/components/ui';
+import {
+  Button,
+  DelayedFallback,
+  DialogClose,
+  DialogContent,
+  ErrorState,
+  Field,
+  Form,
+  IconButton,
+  Input,
+  PageTitle,
+  Tag,
+} from '@/design';
 import { useAuthClient } from '@/hooks';
+import { useErrorElement } from '@/hooks/useErrorElement';
 import { useTabkit } from '@/store/surface';
-import { Form } from '@/ui';
 import { SettingSurface } from '@/views';
 
-const BotCardContainer = styled.div`
-  background-color: var(--chakra-colors-gray-800);
-  display: flex;
-  gap: 16px;
-  margin: 16px 0 0;
-  padding: 16px;
-  width: 800px;
-  max-width: 100%;
-  box-sizing: border-box;
-  cursor: pointer;
-  transition: background-color 0.15s;
-  &:hover {
-    background-color: var(--chakra-colors-gray-700);
-  }
-`;
+import {
+  CopyField,
+  ListEmpty,
+  RowsSkeleton,
+  SettingsList,
+  SettingsRow,
+  WarningNote,
+  settingsStyles,
+} from '../common';
 
-const StatusPill = styled.span<{ online?: boolean }>`
-  display: inline-block;
-  padding: 2px 8px;
-  font-size: 12px;
-  font-weight: 600;
-  background-color: ${(p) =>
-    p.online
-      ? 'var(--chakra-colors-green-600)'
-      : 'var(--chakra-colors-gray-600)'};
-  color: white;
-`;
+export const botsQueryKey = ['account', 'bots'] as const;
 
-interface BotProps {
-  id: string;
-  name: string;
-  visibility: string;
-  user?: { avatar?: string | null } | null;
-}
-
-function BotCard({ id, name, visibility, user }: BotProps) {
-  const tabkit = useTabkit();
-  return (
-    <BotCardContainer
-      onClick={() => {
-        tabkit.openTab(
-          {
-            kind: 'botSettings',
-            botId: id,
-            key: id,
-          },
-          true,
-        );
-      }}
-    >
-      <Avatar src={user?.avatar ?? undefined} size={64} />
-      <Box flex="1">
-        <HStack gap={2} mb={1}>
-          <Text fontWeight="bold" fontSize="lg">
-            {name}
-          </Text>
-          <StatusPill>
-            {visibility === 'PUBLIC' ? 'Public' : 'Private'}
-          </StatusPill>
-        </HStack>
-        <Text fontSize="sm" color="gray.400">
-          Bot ID: {id}
-        </Text>
-      </Box>
-    </BotCardContainer>
-  );
-}
-
-function TokenDisplay({ token }: { token: string }) {
+/** A secret shown once, masked until revealed. */
+export function TokenDisplay({ token }: { token: string }) {
   const [visible, setVisible] = useState(false);
   return (
-    <Stack gap={2}>
-      <Box bg="yellow.900" p={3} borderWidth="1px" borderColor="yellow.600">
-        <Text fontWeight="bold" color="yellow.200" fontSize="sm">
-          This token will only be shown once. Store it securely.
-        </Text>
-      </Box>
-      <HStack>
-        <Code flex="1" p={2} fontSize="sm" fontFamily="mono" overflow="hidden">
-          {visible ? token : '•'.repeat(32)}
-        </Code>
-        <Button size="sm" onClick={() => setVisible(!visible)}>
-          {visible ? 'Hide' : 'Show'}
-        </Button>
-        <Button
-          size="sm"
-          onClick={() => {
-            navigator.clipboard.writeText(token);
-            toast.success('Token copied to clipboard!');
-          }}
-        >
-          <FontAwesomeIcon icon={faCopy} /> Copy
-        </Button>
-      </HStack>
-    </Stack>
+    <div className={settingsStyles.methods}>
+      <WarningNote>
+        This token is shown only once. Copy it now and store it somewhere safe;
+        anyone with it can act as your bot.
+      </WarningNote>
+      <CopyField
+        value={token}
+        what="Token"
+        display={visible ? token : '•'.repeat(32)}
+        extra={
+          <IconButton
+            aria-label={visible ? 'Hide token' : 'Show token'}
+            onClick={() => setVisible(!visible)}
+          >
+            {visible ? <EyeOff size={15} /> : <Eye size={15} />}
+          </IconButton>
+        }
+      />
+    </div>
   );
 }
+
+const CREATE_BOT_FORM_ID = 'create-bot-form';
 
 function BotCreateModal() {
   const authClient = useAuthClient();
-  const { register, handleSubmit } = useForm();
+  const queryClient = useQueryClient();
+  const { register, handleSubmit, formState } = useForm<{ name: string }>();
   const setModal = useSetAtom(modalState);
   const [created, setCreated] = useState<BotCreatedResponse | null>(null);
+  const error = useErrorElement();
 
   if (created) {
     return (
-      <DialogContent rounded="md" p={4} maxW="520px">
-        <Stack gap={3}>
-          <HStack gap={2}>
-            <Text fontSize="xl" fontWeight="bold" color="green.400">
-              ✓ Bot Created
-            </Text>
-          </HStack>
+      <DialogContent
+        title={`${created.name} is ready`}
+        description="Use the bot ID and token to sign in from your code."
+        footer={
+          <Button variant="primary" onClick={() => setModal(null)}>
+            Done
+          </Button>
+        }
+      >
+        <div className={settingsStyles.methods}>
           <Field label="Bot ID">
-            <HStack>
-              <Code flex="1" p={2} fontSize="sm">
-                {created.id}
-              </Code>
-              <Button
-                size="sm"
-                onClick={() => {
-                  navigator.clipboard.writeText(created.id);
-                  toast.success('Bot ID copied!');
-                }}
-              >
-                <FontAwesomeIcon icon={faCopy} />
-              </Button>
-            </HStack>
+            <CopyField value={created.id} what="Bot ID" />
           </Field>
           <Field label="Token">
             <TokenDisplay token={created.token} />
           </Field>
-          <Button colorPalette="primary" onClick={() => setModal(null)}>
-            Done
-          </Button>
-        </Stack>
+        </div>
       </DialogContent>
     );
   }
 
   return (
-    <DialogContent rounded="md" p={4} maxW="480px">
+    <DialogContent
+      title="Create a bot"
+      description="Bots can join your spaces and act through the Mikoto API."
+      footer={
+        <>
+          <DialogClose render={<Button variant="ghost" />}>Cancel</DialogClose>
+          <Button
+            variant="primary"
+            type="submit"
+            form={CREATE_BOT_FORM_ID}
+            loading={formState.isSubmitting}
+          >
+            Create bot
+          </Button>
+        </>
+      }
+    >
       <Form
+        id={CREATE_BOT_FORM_ID}
         onSubmit={handleSubmit(async (form) => {
-          const res = await authClient.createBot({ name: form.name });
-          setCreated(res);
+          error.setError(null);
+          try {
+            const res = await authClient.createBot({ name: form.name.trim() });
+            setCreated(res);
+            void queryClient.invalidateQueries({ queryKey: botsQueryKey });
+          } catch (e) {
+            error.setError(e);
+          }
         })}
       >
-        <h1>Create Bot</h1>
-        <Field label="Bot Name">
-          <Input autoComplete="off" {...register('name', { required: true })} />
+        {error.el}
+        <Field label="Bot name" error={formState.errors.name?.message}>
+          <Input
+            autoComplete="off"
+            autoFocus
+            placeholder="Release notes bot"
+            {...register('name', {
+              validate: (v) => v.trim().length > 0 || 'Give your bot a name.',
+            })}
+          />
         </Field>
-        <Field label="Description (optional)">
-          <Textarea {...register('description')} />
-        </Field>
-        <Button colorPalette="primary" type="submit">
-          Create Bot
-        </Button>
       </Form>
     </DialogContent>
   );
@@ -193,50 +147,79 @@ function BotCreateModal() {
 export function BotsSurface() {
   const authClient = useAuthClient();
   const setModal = useSetAtom(modalState);
+  const tabkit = useTabkit();
   const { t } = useTranslation();
 
-  const { result: bots } = useAsync(() => authClient.listBots(), []);
+  const bots = useQuery({
+    queryKey: botsQueryKey,
+    queryFn: () => authClient.listBots(),
+  });
+
+  const openCreate = () => setModal({ elem: <BotCreateModal /> });
 
   return (
     <SettingSurface>
-      <h1>{t('accountSettings.bots.title')}</h1>
-      <Text color="gray.400" mb={4}>
-        Create and manage bots that can interact with your spaces via the Mikoto
-        API.
-      </Text>
-      <Button
-        colorPalette="primary"
-        onClick={() => {
-          setModal({
-            elem: <BotCreateModal />,
-          });
-        }}
-      >
-        {t('accountSettings.bots.createBot')}
-      </Button>
+      <PageTitle
+        title={t('accountSettings.bots.title')}
+        description="Create and manage bots that work in your spaces through the Mikoto API."
+        actions={
+          bots.data && bots.data.length > 0 ? (
+            <Button variant="primary" onClick={openCreate}>
+              <Plus size={15} aria-hidden />
+              {t('accountSettings.bots.createBot')}
+            </Button>
+          ) : undefined
+        }
+      />
 
-      {bots && bots.length === 0 && (
-        <Box textAlign="center" py={12}>
-          <FontAwesomeIcon icon={faRobot} size="3x" color="gray" />
-          <Text mt={4} color="gray.400" fontSize="lg">
-            No bots yet
-          </Text>
-          <Text color="gray.500" fontSize="sm">
-            Create your first bot to get started with the Mikoto API.
-          </Text>
-        </Box>
+      {bots.isPending ? (
+        <DelayedFallback>
+          <RowsSkeleton label="bots" action={false} />
+        </DelayedFallback>
+      ) : bots.isError && !bots.data ? (
+        <ErrorState
+          variant="region"
+          what="Your bots"
+          error={bots.error}
+          onRetry={() => void bots.refetch()}
+        />
+      ) : bots.data.length === 0 ? (
+        <ListEmpty
+          icon={<Bot size={18} />}
+          title="No bots yet"
+          description="Create a bot to post updates, run commands or connect another service to your spaces."
+          action={
+            <Button variant="primary" onClick={openCreate}>
+              <Plus size={15} aria-hidden />
+              {t('accountSettings.bots.createBot')}
+            </Button>
+          }
+        />
+      ) : (
+        <SettingsList>
+          {bots.data.map((bot) => (
+            <SettingsRow
+              key={bot.id}
+              leading={<Avatar src={bot.user?.avatar ?? undefined} size={40} />}
+              title={
+                <>
+                  {bot.name}
+                  <Tag tone={bot.visibility === 'PUBLIC' ? 'ok' : 'neutral'}>
+                    {bot.visibility === 'PUBLIC' ? 'Public' : 'Private'}
+                  </Tag>
+                </>
+              }
+              meta={<span className={settingsStyles.mono}>{bot.id}</span>}
+              onClick={() =>
+                tabkit.openTab(
+                  { kind: 'botSettings', botId: bot.id, key: bot.id },
+                  true,
+                )
+              }
+            />
+          ))}
+        </SettingsList>
       )}
-
-      {bots &&
-        bots.map((bot) => (
-          <BotCard
-            key={bot.id}
-            id={bot.id}
-            name={bot.name}
-            visibility={bot.visibility}
-            user={bot.user}
-          />
-        ))}
     </SettingSurface>
   );
 }

@@ -1,38 +1,26 @@
-import styled from '@emotion/styled';
-import { useAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { use, useEffect } from 'react';
 
 import { TabContext, TabNameProps, tabNameFamily } from '@/store/surface';
 
+/**
+ * Declares the current tab's name and icon (shown in the dock's tab strip).
+ * Render it anywhere inside a surface; it renders nothing itself.
+ */
 export function TabName({ name, icon, spaceId, spaceName }: TabNameProps) {
   const tabInfo = use(TabContext);
-  const [tabName, setTabName] = useAtom(tabNameFamily(tabInfo.key));
+  const setTabName = useSetAtom(tabNameFamily(tabInfo.key));
 
   useEffect(() => {
-    if (tabName.name !== name) {
-      setTabName({
-        ...tabName,
-        name,
-        icon,
-        spaceId,
-        spaceName,
-      });
-    }
-  }, [name, tabName, setTabName, tabInfo.key, icon, spaceId, spaceName]);
+    setTabName((current) =>
+      current.name === name &&
+      current.icon === icon &&
+      current.spaceId === spaceId &&
+      current.spaceName === spaceName
+        ? current
+        : { ...current, name, icon, spaceId, spaceName },
+    );
+  }, [name, icon, spaceId, spaceName, setTabName]);
 
-  return <></>;
+  return null;
 }
-
-export const TabBarButton = styled.button`
-  border: none;
-  margin: 4px 0 4px;
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
-
-  color: var(--chakra-colors-gray-300);
-  background-color: transparent;
-  &:hover {
-    background-color: var(--chakra-colors-gray-600);
-  }
-`;

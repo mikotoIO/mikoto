@@ -1,11 +1,3 @@
-import { chakra } from '@chakra-ui/react';
-import styled from '@emotion/styled';
-import {
-  faFaceSmileWink,
-  faFileArrowUp,
-  faPaperPlane,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -27,57 +19,28 @@ import {
   type LexicalEditor,
   PASTE_COMMAND,
 } from 'lexical';
-import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowUp, FileText, Paperclip, Smile, X } from 'lucide-react';
+import {
+  type ReactNode,
+  Suspense,
+  lazy,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useDropzone } from 'react-dropzone';
 
 import { contextMenuState } from '@/components/ContextMenu';
+import { IconButton } from '@/design';
 import { useIsMobile } from '@/hooks/useIsMobile';
 
 import { EmojiAutocompletePlugin } from './EmojiAutocomplete';
 import { MentionAutocompletePlugin } from './MentionAutocomplete';
 import { messageEditState } from './Message';
+import styles from './MessageEditor.module.css';
 
 const EmojiPicker = lazy(() => import('./EmojiPicker'));
-
-// TODO: Fix the two-pixel snap
-const StyledContentEditable = styled(ContentEditable)`
-  font-size: 14px;
-
-  box-sizing: border-box;
-  outline: none;
-  word-break: break-word;
-  min-height: auto !important;
-  max-height: 300px;
-  overflow-y: auto;
-  flex-grow: 1;
-
-  ::selection {
-    background: var(--chakra-colors-blue-500);
-  }
-`;
-
-const Placeholder = styled.div`
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  color: var(--chakra-colors-gray-400);
-  pointer-events: none;
-  user-select: none;
-  font-size: 14px;
-`;
-
-const EditableContainer = styled.div`
-  background-color: color-mix(
-    in srgb,
-    var(--chakra-colors-gray-650) 65%,
-    transparent
-  );
-  padding: 16px;
-  padding-right: 80px;
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-`;
 
 // check if document.activeElement is either an input, textarea, or contenteditable
 function isInputLike() {
@@ -87,110 +50,31 @@ function isInputLike() {
   );
 }
 
+export type FileUpload = {
+  file: File;
+  id: string;
+};
+
 interface MessageEditorProps {
   placeholder: string;
   onSubmit: (content: string, files: FileUpload[]) => void;
   onTyping?: () => void;
   onResize?: () => void;
   members?: MikotoMember[];
+  /** Rendered on the line above the box (the typing indicator). */
+  above?: ReactNode;
 }
 
-const EditorButtons = styled.div`
-  display: flex;
-  position: absolute;
-  gap: 16px;
-  right: 16px;
-  transform: translateY(8px);
-  font-size: 24px;
-`;
+const PREVIEWABLE = ['image/gif', 'image/jpeg', 'image/png', 'image/webp'];
 
-const EditorButton = chakra('div', {
-  base: {
-    color: 'gray.400',
-    cursor: 'pointer',
-    _hover: {
-      color: 'gray.200',
-    },
-  },
-});
-
-const EditMode = styled.div`
-  background-color: var(--chakra-colors-gray-800);
-  height: 32px;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  padding-left: 16px;
-`;
-
-const EditorRow = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 16px 16px 4px;
-  gap: 8px;
-`;
-
-const TopContainer = styled.div`
-  border: 1px solid var(--chakra-colors-gray-600);
-  border-radius: 8px;
-  flex: 1;
-  min-width: 0;
-
-  & > *:first-of-type {
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-  }
-
-  & > *:last-of-type {
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-  }
-`;
-
-const UploadSection = styled.div`
-  display: flex;
-  padding: 8px;
-  gap: 8px;
-  border-bottom: 1px solid var(--chakra-colors-gray-600);
-  background-color: color-mix(
-    in srgb,
-    var(--chakra-colors-gray-650) 65%,
-    transparent
-  );
-`;
-
-const StyledFilePreview = styled.div`
-  padding: 4px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 160px;
-  height: 140px;
-  border-radius: 4px;
-  background-color: var(--chakra-colors-gray-800);
-  overflow: hidden;
-
-  .preview {
-    max-width: 100px;
-    max-height: 100px;
-    border-radius: 4px;
-  }
-
-  .filename {
-    margin-top: 8px;
-    font-size: 12px;
-    color: var(--chakra-colors-gray-300);
-  }
-`;
-
-interface FilePreviewProps {
+function FilePreview({
+  file,
+  onRemove,
+}: {
   file: File;
   onRemove?: () => void;
-}
-
-function FilePreview({ file, onRemove }: FilePreviewProps) {
-  const isImage = ['image/gif', 'image/jpeg', 'image/png'].includes(file.type);
+}) {
+  const isImage = PREVIEWABLE.includes(file.type);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   // Canonical "side-effect-produced value" pattern: create the blob URL on
@@ -208,37 +92,27 @@ function FilePreview({ file, onRemove }: FilePreviewProps) {
   }, [file, isImage]);
 
   return (
-    <StyledFilePreview onClick={onRemove}>
-      {isImage && previewUrl && (
-        <img className="preview" src={previewUrl} alt={file.name} />
+    <div className={styles.file}>
+      {isImage && previewUrl ? (
+        <img className={styles.preview} src={previewUrl} alt="" />
+      ) : (
+        <FileText className={styles.fileIcon} size={28} aria-hidden />
       )}
-      <div className="filename">{file.name}</div>
-    </StyledFilePreview>
+      <span className={styles.fileName} title={file.name}>
+        {file.name}
+      </span>
+      {onRemove && (
+        <IconButton
+          className={styles.remove}
+          aria-label={`Remove ${file.name}`}
+          onClick={onRemove}
+        >
+          <X size={14} />
+        </IconButton>
+      )}
+    </div>
   );
 }
-
-type FileUpload = {
-  file: File;
-  id: string;
-};
-
-const SendButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border: none;
-  border-radius: 4px;
-  background-color: var(--chakra-colors-blue-600);
-  color: white;
-  cursor: pointer;
-  flex-shrink: 0;
-  font-size: 16px;
-  &:active {
-    background-color: var(--chakra-colors-blue-700);
-  }
-`;
 
 interface MessageEditorHandle {
   insertText: (text: string) => void;
@@ -280,11 +154,13 @@ function FilePastePlugin({ onFiles }: { onFiles: (files: FileList) => void }) {
 function SubmitPlugin({
   onSubmit,
   onTyping,
+  onEmptyChange,
   isMobile,
   suppressTypingRef,
 }: {
   onSubmit: () => void;
   onTyping?: () => void;
+  onEmptyChange: (empty: boolean) => void;
   isMobile: boolean;
   suppressTypingRef: React.RefObject<boolean>;
 }) {
@@ -305,13 +181,18 @@ function SubmitPlugin({
   }, [editor, onSubmit, isMobile]);
 
   useEffect(() => {
-    return editor.registerUpdateListener(({ dirtyElements, dirtyLeaves }) => {
-      if (suppressTypingRef.current) return;
-      if (dirtyElements.size > 0 || dirtyLeaves.size > 0) {
-        onTyping?.();
-      }
-    });
-  }, [editor, onTyping, suppressTypingRef]);
+    return editor.registerUpdateListener(
+      ({ editorState, dirtyElements, dirtyLeaves }) => {
+        onEmptyChange(
+          editorState.read(() => $getRoot().getTextContent().trim() === ''),
+        );
+        if (suppressTypingRef.current) return;
+        if (dirtyElements.size > 0 || dirtyLeaves.size > 0) {
+          onTyping?.();
+        }
+      },
+    );
+  }, [editor, onTyping, onEmptyChange, suppressTypingRef]);
 
   return null;
 }
@@ -371,15 +252,17 @@ export function MessageEditor({
   onTyping,
   onResize,
   members = [],
+  above,
 }: MessageEditorProps) {
   const currentEditState = useAtomValue(messageEditState);
   const setEditState = useSetAtom(messageEditState);
   const isMobile = useIsMobile();
   const [files, setFiles] = useState<FileUpload[]>([]);
+  const [empty, setEmpty] = useState(!currentEditState?.content);
   const apiRef = useRef<MessageEditorHandle | null>(null);
   const suppressTypingRef = useRef(false);
 
-  const fileFn = (fs: FileList) => {
+  const addFiles = (fs: Iterable<File>) => {
     setFiles((xs) => [
       ...xs,
       ...Array.from(fs).map((file) => ({
@@ -390,8 +273,8 @@ export function MessageEditor({
   };
 
   const setContextMenu = useSetAtom(contextMenuState);
-  const ref = useRef<HTMLDivElement>(null);
-  useResizeObserver(ref as React.RefObject<HTMLElement>, () => {
+  const [editableEl, setEditableEl] = useState<HTMLDivElement | null>(null);
+  useResizeObserver(editableEl, () => {
     onResize?.();
   });
 
@@ -444,24 +327,31 @@ export function MessageEditor({
 
   // upload logic
   const dropzone = useDropzone({
-    onDrop: (fl) => {
-      setFiles((xs) => [
-        ...xs,
-        ...fl.map((file) => ({
-          file,
-          id: crypto.randomUUID(),
-        })),
-      ]);
-    },
+    onDrop: addFiles,
   });
 
+  const canSend = !empty || files.length > 0;
+
   return (
-    <EditorRow>
-      <TopContainer>
+    <div className={styles.wrap}>
+      {above}
+      <div className={styles.composer}>
         <input {...dropzone.getInputProps()} />
-        {currentEditState && <EditMode>Editing Message</EditMode>}
+        {currentEditState && (
+          <div className={styles.editBar}>
+            <b>Editing message</b>
+            <span className={styles.editHint}>Esc to cancel</span>
+            <button
+              type="button"
+              className={styles.linkButton}
+              onClick={() => setEditState(null)}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
         {files.length !== 0 && (
-          <UploadSection>
+          <div className={styles.uploads}>
             {files.map((fileUpload) => (
               <FilePreview
                 file={fileUpload.file}
@@ -471,20 +361,29 @@ export function MessageEditor({
                 }}
               />
             ))}
-          </UploadSection>
+          </div>
         )}
-        <EditableContainer ref={ref}>
+        <div className={styles.editable} ref={setEditableEl}>
           <LexicalComposer initialConfig={initialConfig}>
             <PlainTextPlugin
-              contentEditable={<StyledContentEditable />}
-              placeholder={<Placeholder>{placeholder}</Placeholder>}
+              contentEditable={
+                <ContentEditable
+                  className={styles.input}
+                  aria-label={placeholder}
+                  aria-placeholder={placeholder}
+                  placeholder={
+                    <div className={styles.placeholder}>{placeholder}</div>
+                  }
+                />
+              }
               ErrorBoundary={LexicalErrorBoundary}
             />
             <HistoryPlugin />
-            <FilePastePlugin onFiles={fileFn} />
+            <FilePastePlugin onFiles={addFiles} />
             <SubmitPlugin
               onSubmit={handleSubmit}
               onTyping={onTyping}
+              onEmptyChange={setEmpty}
               isMobile={isMobile}
               suppressTypingRef={suppressTypingRef}
             />
@@ -493,51 +392,56 @@ export function MessageEditor({
             <EditorApiPlugin apiRef={apiRef} />
             {!isMobile && <AutoFocusPlugin />}
           </LexicalComposer>
-          {!isMobile && (
-            <EditorButtons>
-              {currentEditState === null && (
-                <EditorButton
-                  onClick={() => {
-                    dropzone.open();
-                  }}
-                >
-                  <FontAwesomeIcon icon={faFileArrowUp} />
-                </EditorButton>
-              )}
-              <EditorButton
-                onClick={(ev) => {
-                  if (!ref.current) return;
-                  const bounds = ref.current.getBoundingClientRect();
-                  ev.preventDefault();
-                  ev.stopPropagation();
-                  setContextMenu({
-                    elem: (
-                      <Suspense>
-                        <EmojiPicker
-                          onEmojiSelect={(x) => {
-                            apiRef.current?.insertText(x);
-                          }}
-                        />
-                      </Suspense>
-                    ),
-                    position: {
-                      right: window.innerWidth - bounds.right,
-                      bottom: window.innerHeight - bounds.top + 16,
-                    },
-                  });
-                }}
-              >
-                <FontAwesomeIcon icon={faFaceSmileWink} />
-              </EditorButton>
-            </EditorButtons>
+        </div>
+        <div className={styles.bar}>
+          {currentEditState === null && (
+            <IconButton aria-label="Attach a file" onClick={dropzone.open}>
+              <Paperclip size={16} />
+            </IconButton>
           )}
-        </EditableContainer>
-      </TopContainer>
-      {isMobile && (
-        <SendButton onClick={handleSubmit}>
-          <FontAwesomeIcon icon={faPaperPlane} />
-        </SendButton>
-      )}
-    </EditorRow>
+          {!isMobile && (
+            <IconButton
+              aria-label="Emoji"
+              onClick={(ev) => {
+                const bounds = ev.currentTarget.getBoundingClientRect();
+                ev.preventDefault();
+                ev.stopPropagation();
+                setContextMenu({
+                  elem: (
+                    <Suspense>
+                      <EmojiPicker
+                        onEmojiSelect={(x) => {
+                          apiRef.current?.insertText(x);
+                        }}
+                      />
+                    </Suspense>
+                  ),
+                  position: {
+                    left: bounds.left,
+                    bottom: window.innerHeight - bounds.top + 8,
+                  },
+                });
+              }}
+            >
+              <Smile size={16} />
+            </IconButton>
+          )}
+          {!isMobile && (
+            <span className={styles.hint}>Shift+Enter for a new line</span>
+          )}
+          <span className={styles.grow} />
+          <button
+            type="button"
+            className={styles.send}
+            aria-label={currentEditState ? 'Save edit' : 'Send'}
+            title={currentEditState ? 'Save edit' : 'Send'}
+            disabled={!canSend}
+            onClick={handleSubmit}
+          >
+            <ArrowUp size={16} aria-hidden />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

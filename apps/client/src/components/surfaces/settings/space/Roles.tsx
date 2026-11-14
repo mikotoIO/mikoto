@@ -1,103 +1,132 @@
-import {
-  Box,
-  Button,
-  Circle,
-  Flex,
-  Grid,
-  Group,
-  Heading,
-  Input,
-} from '@chakra-ui/react';
-import styled from '@emotion/styled';
-import { faCirclePlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoSpace, Role } from '@mikoto-io/mikoto.js';
 import { checkPermission, permissions } from '@mikoto-io/permcheck';
+import { useSetAtom } from 'jotai';
+import { Ban, Plus, Shield, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { HexColorPicker } from 'react-colorful';
 import { useForm } from 'react-hook-form';
-import { useSnapshot } from 'valtio';
+import { useTranslation } from 'react-i18next';
+import { useSnapshot } from 'valtio/react';
 
-import { useContextMenu } from '@/components/ContextMenu';
-import { Field, Switch } from '@/components/ui';
+import { modalState } from '@/components/ContextMenu';
+import {
+  Button,
+  Field,
+  Form,
+  IconButton,
+  Input,
+  PageTitle,
+  RoleName,
+  Section,
+  Switch,
+  Tag,
+  cx,
+  toast,
+  useAppearance,
+} from '@/design';
 import { useMikoto } from '@/hooks';
-import { Form } from '@/ui';
+import { toAppError, useErrorElement } from '@/hooks/useErrorElement';
 import { SettingSurface } from '@/views';
 
-const SidebarButton = styled.a<{ selected?: boolean }>`
-  display: block;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 8px 16px;
-  border-radius: 4px;
-  background-color: ${(p) =>
-    p.selected ? 'var(--chakra-colors-gray-650)' : 'transparent'};
-  color: ${(p) => (p.selected ? 'white' : 'rgba(255,255,255,0.8)')};
-  user-select: none;
-`;
+import { ConfirmDialog, ListEmpty, SaveBar } from '../common';
+import styles from './Roles.module.css';
+
+const EVERYONE = '@everyone';
 
 const rolePermissionData = [
-  { name: 'Superuser', permission: permissions.superuser },
-  { name: 'Manage Space', permission: permissions.manageSpace },
-  { name: 'Manage Channel', permission: permissions.manageChannels },
-  { name: 'Manage Roles', permission: permissions.manageRoles },
+  {
+    name: 'Superuser',
+    description:
+      'Grants every permission. Give this only to people you fully trust.',
+    permission: permissions.superuser,
+  },
+  {
+    name: 'Manage space',
+    description: "Change the space's name, icon, handle and visibility.",
+    permission: permissions.manageSpace,
+  },
+  {
+    name: 'Manage channels',
+    description: 'Create, rename, reorder and delete channels.',
+    permission: permissions.manageChannels,
+  },
+  {
+    name: 'Manage roles',
+    description: 'Create, edit and delete roles.',
+    permission: permissions.manageRoles,
+  },
 ];
 
-const StyledColorPicker = styled(HexColorPicker)`
-  &.react-colorful {
-    height: 150px;
-  }
-`;
-
-type ColorPickerProps = Partial<{
-  value: string | null;
-  onChange: (x: string | null) => void;
-}>;
-
-const defaultColors = [
+const ROLE_COLORS = [
   '#F80688',
   '#AD0DF2',
   '#006FFF',
   '#00D68B',
   '#FF981A',
-  '#f72649',
+  '#F72649',
 ];
 
-function RoleColorPicker({ value, onChange }: ColorPickerProps) {
-  const menu = useContextMenu(() => (
-    <StyledColorPicker color={value ?? '#006FFF'} onChange={onChange} />
-  ));
+const HEX = /^#[0-9a-f]{6}$/i;
+
+function RoleColorPicker({
+  value,
+  onChange,
+}: {
+  value: string | null;
+  onChange: (color: string | null) => void;
+}) {
+  const normalized = value?.toLowerCase() ?? null;
   return (
-    <Flex py={4} gap={2}>
-      <Box w={16} h={16} bg={value ?? 'gray.300'} rounded={4} onClick={menu} />
-      <Flex
-        align="center"
-        justify="center"
-        fontSize="32px"
-        w="64px"
-        h="64px"
-        bg="gray.200"
-        color="gray.300"
-        rounded={4}
-        onClick={() => {
-          onChange?.(null);
-        }}
+    <div className={styles.colors}>
+      <IconButton
+        aria-label="No color"
+        aria-pressed={value === null}
+        className={cx(styles.swatch, styles.noColor)}
+        onClick={() => onChange(null)}
       >
-        <FontAwesomeIcon icon={faCircleXmark} />
-      </Flex>
-      <Flex gap={2}>
-        {defaultColors.map((x) => (
-          <Box
-            w={8}
-            h={8}
-            bg={x}
-            rounded="md"
-            key={x}
-            onClick={() => onChange?.(x)}
-          />
-        ))}
-      </Flex>
-    </Flex>
+        <Ban size={14} />
+      </IconButton>
+      {ROLE_COLORS.map((c) => (
+        <button
+          key={c}
+          type="button"
+          className={styles.swatch}
+          style={{ '--c': c }}
+          aria-label={c}
+          aria-pressed={normalized === c.toLowerCase()}
+          onClick={() => onChange(c)}
+        />
+      ))}
+      <label className={styles.custom}>
+        <input
+          type="color"
+          aria-label="Custom role color"
+          value={value && HEX.test(value) ? value : '#006fff'}
+          onChange={(e) => onChange(e.target.value)}
+        />
+        {value ? value.toUpperCase() : 'Custom'}
+      </label>
+    </div>
+  );
+}
+
+function RolePreview({ name, color }: { name: string; color: string | null }) {
+  const mikoto = useMikoto();
+  const [appearance] = useAppearance();
+  const memberName = mikoto.user.me?.name ?? 'Member';
+  return (
+    <div className={styles.preview} aria-label="Preview" role="group">
+      <span className={styles.previewItem}>
+        <RoleName
+          className={styles.previewName}
+          name={memberName}
+          roleColor={color}
+          roleName={name || 'Role'}
+        />
+      </span>
+      {appearance.roleStyle === 'color' && (
+        <Tag color={color}>{name || 'Role'}</Tag>
+      )}
+    </div>
   );
 }
 
@@ -106,157 +135,282 @@ function RolePermissionEditor({
   onChange,
 }: {
   perms: string;
-  onChange?: (x: string) => void;
+  onChange: (perms: string) => void;
 }) {
   const perm = BigInt(perms);
-
   return (
-    <Box>
+    <>
       {rolePermissionData.map((x) => (
-        <Box py={4} key={x.permission.toString()}>
-          <Flex justifyContent="space-between">
-            <Heading as="h3" m={0} fontSize="lg">
-              {x.name}
-            </Heading>
-            <Switch
-              size="lg"
-              checked={checkPermission(x.permission, perm)}
-              onCheckedChange={(t) => {
-                // if X is true, switch the bitset to 1
-                // if X is false, switch the bitset to 0
-
-                if (t.checked) {
-                  onChange?.((perm | x.permission).toString());
-                } else {
-                  onChange?.((perm & ~x.permission).toString());
-                }
-              }}
-            />
-          </Flex>
-          <Box color="gray.200">Description of the perm goes here.</Box>
-        </Box>
+        <Field
+          key={x.permission.toString()}
+          orientation="horizontal"
+          label={x.name}
+          description={x.description}
+        >
+          <Switch
+            checked={checkPermission(x.permission, perm)}
+            onCheckedChange={(on) =>
+              onChange(
+                (on ? perm | x.permission : perm & ~x.permission).toString(),
+              )
+            }
+          />
+        </Field>
       ))}
-    </Box>
+    </>
   );
 }
 
-const StyledRoleEditor = styled(Form)`
-  overflow-y: scroll;
-  padding: 0 40px;
-  max-width: 640px;
-`;
+interface RoleValues {
+  name: string;
+  position: number;
+  color: string | null;
+  permissions: string;
+}
 
-function RoleEditor({ role, space }: { space: MikotoSpace; role: Role }) {
+const ROLE_FORM_ID = 'role-editor-form';
+
+function RoleEditor({
+  role,
+  space,
+  onDeleted,
+}: {
+  space: MikotoSpace;
+  role: Role;
+  onDeleted: () => void;
+}) {
   const mikoto = useMikoto();
-  const form = useForm({
+  const setModal = useSetAtom(modalState);
+  const error = useErrorElement();
+  const isEveryone = role.name === EVERYONE;
+
+  const form = useForm<RoleValues>({
     defaultValues: {
       name: role.name,
       position: role.position,
+      color: role.color ?? null,
+      permissions: role.permissions,
     },
   });
-  const [perms, setPerms] = useState(role.permissions);
-  const [color, setColor] = useState<string | null | undefined>(role.color);
-
-  useSnapshot(space.roles);
+  const { isDirty, isSubmitting, errors } = form.formState;
+  const name = form.watch('name');
+  const color = form.watch('color');
+  const perms = form.watch('permissions');
 
   return (
-    <StyledRoleEditor
-      p={16}
-      h="100%"
-      onSubmit={form.handleSubmit((d) => {
-        const data = { ...d, permissions: perms, color };
-        mikoto.rest['roles.update'](data, {
-          params: { spaceId: space.id, roleId: role.id },
-        }).then(() => {});
-      })}
-    >
-      <h2>Edit {role.name}</h2>
+    <div className={styles.editor}>
+      <h3 className={styles.editorTitle}>Edit {role.name}</h3>
+      {error.el}
+      <Form
+        id={ROLE_FORM_ID}
+        onSubmit={form.handleSubmit(async (data) => {
+          error.setError(null);
+          try {
+            const payload = { ...data, name: data.name.trim() };
+            await mikoto.rest['roles.update'](payload, {
+              params: { spaceId: space.id, roleId: role.id },
+            });
+            form.reset(payload);
+            toast({ title: 'Role saved', type: 'success' });
+          } catch (e) {
+            error.setError(e);
+          }
+        })}
+      >
+        {!isEveryone && (
+          <Section title="Display">
+            <Field label="Role name" error={errors.name?.message}>
+              <Input
+                autoComplete="off"
+                {...form.register('name', {
+                  validate: (v) =>
+                    v.trim().length > 0 || 'Enter a name for the role.',
+                })}
+              />
+            </Field>
+            <Field
+              label="Priority"
+              description="Higher numbers rank higher. A member's highest role sets their name color."
+              error={errors.position?.message}
+            >
+              <Input
+                className={styles.position}
+                autoComplete="off"
+                type="number"
+                min={0}
+                max={99}
+                {...form.register('position', {
+                  valueAsNumber: true,
+                  validate: (v) =>
+                    (Number.isInteger(v) && v >= 0 && v <= 99) ||
+                    'Use a whole number from 0 to 99.',
+                })}
+              />
+            </Field>
+            <Field
+              label="Color"
+              description="Colors are adjusted automatically so names stay readable."
+            >
+              <RoleColorPicker
+                value={color}
+                onChange={(c) =>
+                  form.setValue('color', c, { shouldDirty: true })
+                }
+              />
+            </Field>
+            <RolePreview name={name} color={color} />
+          </Section>
+        )}
 
-      {role.name !== '@everyone' && (
-        <>
-          <Field label="Role Name">
-            <Input autoComplete="off" {...form.register('name')} />
+        <Section
+          title="Permissions"
+          description={
+            isEveryone
+              ? 'What everyone in the space can do, before other roles are added.'
+              : 'Members with this role can do the following, in addition to what @everyone can.'
+          }
+        >
+          <RolePermissionEditor
+            perms={perms}
+            onChange={(p) =>
+              form.setValue('permissions', p, { shouldDirty: true })
+            }
+          />
+        </Section>
+      </Form>
+
+      {!isEveryone && (
+        <Section title="Delete role">
+          <Field
+            orientation="horizontal"
+            label="Delete this role"
+            description="Members keep their other roles."
+          >
+            <Button
+              variant="dangerGhost"
+              onClick={() =>
+                setModal({
+                  elem: (
+                    <ConfirmDialog
+                      title={`Delete ${role.name}?`}
+                      description="Everyone with this role loses it and the permissions it grants. This can't be undone."
+                      confirmLabel="Delete role"
+                      onConfirm={async () => {
+                        await mikoto.rest['roles.delete'](undefined, {
+                          params: { spaceId: space.id, roleId: role.id },
+                        });
+                        toast({
+                          title: `${role.name} deleted`,
+                          type: 'success',
+                        });
+                        onDeleted();
+                      }}
+                    />
+                  ),
+                })
+              }
+            >
+              <Trash2 size={14} aria-hidden />
+              Delete role
+            </Button>
           </Field>
-          <Field label="Role Priority">
-            <Input
-              autoComplete="off"
-              type="number"
-              min={0}
-              max={99}
-              {...form.register('position', { valueAsNumber: true })}
-            />
-          </Field>
-          <RoleColorPicker value={color} onChange={setColor} />
-        </>
+        </Section>
       )}
 
-      <RolePermissionEditor perms={perms} onChange={setPerms} />
-      <Group>
-        <Button colorPalette="primary" type="submit">
-          Save Changes
-        </Button>
-        {role.name !== '@everyone' && (
-          <Button
-            type="button"
-            colorPalette="danger"
-            onClick={async () => {
-              await mikoto.rest['roles.delete'](undefined, {
-                params: { spaceId: space.id, roleId: role.id },
-              });
-            }}
-          >
-            Delete Role
-          </Button>
-        )}
-      </Group>
-    </StyledRoleEditor>
+      <SaveBar
+        dirty={isDirty}
+        saving={isSubmitting}
+        form={ROLE_FORM_ID}
+        onReset={() => form.reset()}
+      />
+    </div>
   );
 }
 
 export function RolesSubsurface({ space }: { space: MikotoSpace }) {
+  const { t } = useTranslation();
   const mikoto = useMikoto();
   const spaceRoles = useSnapshot(space.roles);
-
+  const [creating, setCreating] = useState(false);
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
-  const role = spaceRoles.values().find((x) => x.id === selectedRoleId);
-  // const role = rolesDelta.data.find((x) => x.id === selectedRoleId);
+
+  // Highest priority first, @everyone at the bottom.
+  const roles = [...spaceRoles.values()].sort((a, b) => {
+    if (a.name === EVERYONE) return 1;
+    if (b.name === EVERYONE) return -1;
+    return b.position - a.position;
+  });
+  const role = roles.find((x) => x.id === selectedRoleId) ?? roles[0];
+
+  const createRole = async () => {
+    setCreating(true);
+    try {
+      const created = await mikoto.rest['roles.create'](
+        { name: 'New role' },
+        { params: { spaceId: space.id } },
+      );
+      setSelectedRoleId(created.id);
+      toast({ title: 'Role created', type: 'success' });
+    } catch (e) {
+      toast({
+        title: "Couldn't create a role",
+        description: toAppError(e)?.message,
+        type: 'error',
+      });
+    } finally {
+      setCreating(false);
+    }
+  };
+
   return (
-    <SettingSurface style={{ paddingRight: 0 }}>
-      <Grid w="100%" h="100%" templateColumns="200px auto">
-        <Box pr={4}>
-          <Button
-            my={4}
-            colorPalette="primary"
-            onClick={async () => {
-              await mikoto.rest['roles.create'](
-                { name: 'New Role' },
-                {
-                  params: { spaceId: space.id },
-                },
-              );
-            }}
-          >
-            <FontAwesomeIcon icon={faCirclePlus} />
-            New Role
+    <SettingSurface wide>
+      <PageTitle
+        title={t('spaceSettings.roles.title')}
+        description="Roles group permissions and give members a color or tag."
+        actions={
+          <Button variant="primary" loading={creating} onClick={createRole}>
+            <Plus size={15} aria-hidden />
+            Create role
           </Button>
-          {spaceRoles.values().map((r) => (
-            <SidebarButton
-              key={r.id}
-              selected={selectedRoleId === r.id}
-              onClick={() => setSelectedRoleId(r.id)}
-            >
-              <Circle
-                display="inline-block"
-                size="12px"
-                mr="12px"
-                bg={r.color ?? '#99AAB5'}
-              />
-              {r.name}
-            </SidebarButton>
-          ))}
-        </Box>
-        {role && <RoleEditor role={role} space={space} key={role.id} />}
-      </Grid>
+        }
+      />
+      {roles.length === 0 || !role ? (
+        <ListEmpty
+          icon={<Shield size={18} />}
+          title="No roles yet"
+          description="Create a role to give members permissions and a color."
+        />
+      ) : (
+        <div className={styles.layout}>
+          <nav className={styles.list} aria-label="Roles">
+            <div className={styles.listHead}>
+              {roles.length} {roles.length === 1 ? 'role' : 'roles'}
+            </div>
+            {roles.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                className={styles.roleRow}
+                aria-current={role.id === r.id}
+                onClick={() => setSelectedRoleId(r.id)}
+              >
+                <span
+                  className={cx(styles.dot, r.color && styles.dotColored)}
+                  style={r.color ? { '--role': r.color } : undefined}
+                  aria-hidden
+                />
+                <span className={styles.roleName}>{r.name}</span>
+              </button>
+            ))}
+          </nav>
+          <RoleEditor
+            key={role.id}
+            role={role}
+            space={space}
+            onDeleted={() => setSelectedRoleId(null)}
+          />
+        </div>
+      )}
     </SettingSurface>
   );
 }

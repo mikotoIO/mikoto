@@ -1,0 +1,37 @@
+.avatar {
+  width: var(--size);
+  height: var(--size);
+  flex-shrink: 0;
+  border-radius: 50%;
+  user-select: none;
+  object-fit: cover;
+  background: var(--raised);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+/* Initials fallback: the hue comes from the user id, lightness is fixed per
+   theme so the letter always reads against its own background. */
+.fallback {
+  --av-l: 0.76;
+  --av-fg-l: 0.28;
+  display: inline-grid;
+  place-items: center;
+  background: oklch(var(--av-l) 0.09 var(--h));
+  color: oklch(var(--av-fg-l) 0.07 var(--h));
+  font: 600 calc(var(--size) * 0.4) / 1 var(--font-ui);
+  overflow: hidden;
+}
+
+:global(:root[data-theme='light']) .fallback {
+  --av-l: 0.84;
+  --av-fg-l: 0.32;
+}
+
+/* No identity at all: a neutral silhouette. */
+.anonymous {
+  background: var(--raised);
+  color: var(--faint);
+}

@@ -1,0 +1,120 @@
+.root {
+  height: 100%;
+  min-height: 0;
+}
+
+.list {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+.groupLabel {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 10px 16px 4px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--faint);
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: calc(100% - 16px);
+  height: 38px;
+  margin: 0 8px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--r-ctl);
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.member:hover,
+.member[aria-expanded='true'] {
+  background: var(--hover);
+}
+
+.avatarWrap {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.nameLine {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: calc(var(--text-md) - 0.5px);
+  line-height: 1.2;
+}
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.crown {
+  flex-shrink: 0;
+  color: var(--warn);
+}
+
+.status {
+  font-size: var(--text-xs);
+  color: var(--faint);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+}
+.pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ok);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+:global(:root[data-motion='reduce']) .pulse {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse {
+    animation: none;
+  }
+}
+
+/* skeleton mirrors .member rows */
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  margin: 0 8px;
+  padding: 0 8px;
+}
+.skeletonLabel {
+  display: block;
+  margin: 14px 16px 10px;
+}

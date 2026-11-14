@@ -1,0 +1,40 @@
+.identity {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+.identityFields {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.description {
+  min-height: 96px;
+}
+.scopes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.addSpace {
+  display: flex;
+  gap: var(--space-2);
+}
+.addSpace > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+.lastSection {
+  border-bottom: 1px solid var(--line);
+}
+.contents {
+  display: contents;
+}
+
+@container (max-width: 480px) {
+  .identity {
+    flex-direction: column;
+  }
+}

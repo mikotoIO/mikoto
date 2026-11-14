@@ -1,30 +1,8 @@
-import { Circle, chakra } from '@chakra-ui/react';
-import { Role } from '@mikoto-io/mikoto.js';
+import type { Role } from '@mikoto-io/mikoto.js';
 
-export const BaseRoleBadge = chakra('div', {
-  base: {
-    display: 'inline-block',
-    px: 2,
-    py: 1,
-    borderColor: 'text',
-    bgColor: 'gray.700',
-    color: 'text',
-    borderRadius: '4px',
-    fontSize: '12px',
-  },
-});
+import { Tag } from '@/design';
 
+/** A role as a tag in the role's color (contrast-clamped per theme). */
 export function RoleBadge({ role }: { role: Role }) {
-  return (
-    <BaseRoleBadge>
-      <Circle
-        display="inline-block"
-        mr={1}
-        size="10px"
-        className="circle"
-        bg={role.color ?? 'text'}
-      />
-      {role.name}
-    </BaseRoleBadge>
-  );
+  return <Tag color={role.color}>{role.name}</Tag>;
 }

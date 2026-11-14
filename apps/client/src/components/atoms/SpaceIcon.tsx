@@ -1,14 +1,9 @@
-import styled from '@emotion/styled';
-import React from 'react';
+import { type CSSProperties, type ComponentProps } from 'react';
 
-interface SpaceIconProps {
-  icon?: string;
-  size?: string;
-  color?: string;
-  fontSize?: string;
-  active?: boolean | null;
-  spaceId?: string;
-}
+import { normalizeMediaUrl } from '@/components/atoms/Avatar';
+import { cx, onColor, spaceAccent } from '@/design';
+
+import styles from './SpaceIcon.module.css';
 
 function hashString(str: string): number {
   let hash = 0;
@@ -18,85 +13,129 @@ function hashString(str: string): number {
   return Math.abs(hash);
 }
 
+/** Deterministic fallback color for a space without an accent or image. */
 export function colorFromId(id: string): string {
   const hash = hashString(id);
   const hue = hash % 360;
   return `oklch(0.55 0.25 ${hue})`;
 }
 
-// layout equivalent to a space icon
-export const SpaceIconLike = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/** Up to two initials from a space name ("Tide Pool" -> "TP"). */
+export function spaceInitials(name: string | null | undefined): string {
+  const words = (name ?? '').trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return '?';
+  if (words.length === 1) return Array.from(words[0]).slice(0, 2).join('');
+  return words
+    .slice(0, 2)
+    .map((w) => Array.from(w)[0])
+    .join('')
+    .toUpperCase();
+}
 
-  width: 40px;
-  height: 40px;
+/** Anything space-shaped: a MikotoSpace, an API Space, or a partial. */
+export interface SpaceLike {
+  id: string;
+  name: string;
+  icon?: string | null;
+}
 
-  font-family: var(--font-heading);
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 4px;
-`;
+/**
+ * Background, foreground and image for a space's icon:
+ * image > owner accent > colorFromId.
+ */
+export function spaceIconStyle(space: SpaceLike): CSSProperties {
+  if (space.icon) {
+    return {
+      backgroundImage: `url(${normalizeMediaUrl(space.icon)})`,
+      '--sa': 'transparent',
+    };
+  }
+  const accent = spaceAccent(space);
+  if (accent) return { '--sa': accent, '--sa-fg': onColor(accent) };
+  return { '--sa': colorFromId(space.id), '--sa-fg': '#FFFFFF' };
+}
 
-const SpaceIcon = styled.div<{
+export interface SpaceIconProps
+  extends Omit<ComponentProps<'span'>, 'children'> {
+  space: SpaceLike;
+  /** px. Defaults to 38 (the rail size). */
+  size?: number;
+  /** 2px accent ring with a base-colored gap. */
+  active?: boolean;
+}
+
+/**
+ * A space's icon: its image, else initials on its accent color (or a
+ * deterministic color from its id). Purely visual: wrap it in a button
+ * when it's interactive.
+ */
+export function SpaceIcon({
+  space,
+  size = 38,
+  active,
+  className,
+  style,
+  ...rest
+}: SpaceIconProps) {
+  return (
+    <span
+      aria-hidden
+      className={cx(
+        styles.icon,
+        size < 28 && styles.small,
+        active && styles.active,
+        className,
+      )}
+      style={{ '--size': `${size}px`, ...spaceIconStyle(space), ...style }}
+      {...rest}
+    >
+      {space.icon ? null : spaceInitials(space.name)}
+    </span>
+  );
+}
+
+interface LegacySpaceIconProps {
   icon?: string;
   size?: string;
+  color?: string;
   fontSize?: string;
   active?: boolean | null;
-  bgColor?: string;
-}>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  spaceId?: string;
+}
 
-  width: ${(p) => p.size ?? '40px'};
-  height: ${(p) => p.size ?? '40px'};
-  background-color: ${(p) =>
-    p.icon
-      ? 'transparent'
-      : p.bgColor
-        ? p.bgColor
-        : p.active
-          ? 'var(--chakra-colors-gray-700)'
-          : 'var(--chakra-colors-surface)'};
-  background-size: cover;
-  background-image: ${(p) => (p.icon ? `url(${p.icon})` : 'none')};
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 4px;
-`;
-
-export const SpaceIconOutline = styled.div<{
-  active?: boolean | null;
-}>`
-  border-radius: 8px;
-  padding: 2px;
-  border: 2px solid transparent;
-  border-color: ${(p) =>
-    p.active ? 'var(--chakra-colors-gray-150)' : 'transparent'};
-`;
-
+/**
+ * @deprecated Use `<SpaceIcon space={space} />`. Kept with its old props so
+ * existing callers keep working.
+ */
 export function StyledSpaceIcon({
   icon,
   size,
+  color,
   fontSize,
   active,
   spaceId,
+  className,
+  style,
   ...rest
-}: SpaceIconProps & React.HTMLAttributes<HTMLDivElement>) {
+}: LegacySpaceIconProps & ComponentProps<'div'>) {
+  const bg = icon ? 'transparent' : spaceId ? colorFromId(spaceId) : undefined;
   return (
-    <SpaceIconOutline active={active}>
-      <SpaceIcon
-        icon={icon}
-        size={size}
-        fontSize={fontSize}
-        active={active}
-        bgColor={spaceId && !icon ? colorFromId(spaceId) : undefined}
-        {...rest}
-      />
-    </SpaceIconOutline>
+    <div
+      className={cx(
+        styles.icon,
+        styles.legacy,
+        active && styles.active,
+        className,
+      )}
+      style={{
+        '--size': size ?? '38px',
+        '--sa': bg,
+        '--sa-fg': spaceId && !icon ? '#FFFFFF' : color,
+        backgroundImage: icon ? `url(${icon})` : undefined,
+        fontSize,
+        ...style,
+      }}
+      {...rest}
+    />
   );
 }

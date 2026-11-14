@@ -1,67 +1,67 @@
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
+import type { LucideIcon } from 'lucide-react';
 
 export interface ExplorerNode {
   id: string;
   text: string;
-  icon?: IconDefinition;
+  icon?: LucideIcon;
   descendant?: ExplorerNode[];
   unread?: boolean;
+  /** The channel is open in the focused tab. */
+  active?: boolean;
   onClick?(ev: React.MouseEvent): void;
   onContextMenu?(ev: React.MouseEvent): void;
   onDragStart?(ev: React.DragEvent): void;
 }
 
 /**
- * This function converts an array of channels into a structured tree of NodeObjects.
- * Each NodeObject represents a channel and contains an id, text, and an array of descendants.
- * The function uses a map to keep track of all NodeObjects by their id for easy lookup.
- * If a channel has a parentId, it is added as a descendant of the corresponding parent NodeObject.
- * If a channel does not have a parentId, it is added as a descendant of the root NodeObject.
- *
- * @param channels An array of channels to be converted into a structured tree.
- * @param nodeObjectFactory A factory function that takes a channel and returns a NodeObject.
- * @returns The root NodeObject of the structured tree.
+ * Converts a flat channel list into a tree rooted at a synthetic 'root'
+ * node. Channels whose parent isn't in the list are attached to the root,
+ * so a missing or deleted parent never hides its children.
  */
 export function channelToStructuredTree(
   channels: MikotoChannel[],
   nodeObjectFactory: (ch: MikotoChannel) => ExplorerNode,
 ): ExplorerNode {
+  const rootChildren: ExplorerNode[] = [];
   const root: ExplorerNode = {
     id: 'root',
     text: '',
-    descendant: [],
+    descendant: rootChildren,
   };
 
-  // first pass: create a map of nodes keyed by id
-  // the root node (which does not correspond to a channel) has id 'root'
   const map = new Map<string, ExplorerNode>();
-  map.set(root.id, root);
   channels.forEach((channel) => {
-    const node: ExplorerNode = nodeObjectFactory(channel);
-    map.set(node.id, node);
+    map.set(channel.id, nodeObjectFactory(channel));
   });
 
-  // second pass: add each node to its parent's descendant array
   channels.forEach((channel) => {
-    const node = map.get(channel.id)!;
-    if (channel.parentId) {
-      const parent = map.get(channel.parentId);
-      if (parent) {
-        if (parent.descendant === undefined) parent.descendant = [];
-        parent.descendant.push(node);
-      }
+    const node = map.get(channel.id);
+    if (!node) return;
+    const parent = channel.parentId ? map.get(channel.parentId) : undefined;
+    if (parent && parent !== node) {
+      parent.descendant = [...(parent.descendant ?? []), node];
     } else {
-      root.descendant!.push(node);
+      rootChildren.push(node);
     }
   });
   return root;
 }
 
-/**
- * sorts an array of nodes by alphabetical order.
- */
+/** Sorts nodes alphabetically (locale-aware, case-insensitive). */
 export function nodeSort(nodes?: ExplorerNode[]) {
   if (nodes === undefined) return undefined;
-  return [...nodes].sort((a, b) => (a.text > b.text ? 1 : -1));
+  return [...nodes].sort((a, b) =>
+    a.text.localeCompare(b.text, undefined, { sensitivity: 'base' }),
+  );
+}
+
+/** True if the node or any descendant is unread. */
+export function subtreeUnread(node: ExplorerNode): boolean {
+  return Boolean(node.unread) || (node.descendant ?? []).some(subtreeUnread);
+}
+
+/** True if the node or any descendant is the active channel. */
+export function subtreeActive(node: ExplorerNode): boolean {
+  return Boolean(node.active) || (node.descendant ?? []).some(subtreeActive);
 }

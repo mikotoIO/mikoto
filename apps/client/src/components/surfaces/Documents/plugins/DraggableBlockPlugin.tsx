@@ -1,5 +1,3 @@
-import { faGripVertical } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { eventFiles } from '@lexical/rich-text';
 import { calculateZoomLevel, mergeRegister } from '@lexical/utils';
@@ -14,15 +12,16 @@ import {
   LexicalEditor,
   isHTMLElement,
 } from 'lexical';
+import { GripVertical } from 'lucide-react';
 import { DragEvent as ReactDragEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { Point, Rect } from '../utils';
+import styles from './plugins.module.css';
 
 const SPACE = 4;
 const TARGET_LINE_HALF_HEIGHT = 2;
-const DRAGGABLE_BLOCK_MENU_CLASSNAME = 'draggable-block-menu';
 const DRAG_DATA_FORMAT = 'application/x-lexical-drag-block';
 const TEXT_BOX_HORIZONTAL_PADDING = 28;
 
@@ -166,7 +165,7 @@ function getBlockElement(
 }
 
 function isOnMenu(element: HTMLElement): boolean {
-  return !!element.closest(`.${DRAGGABLE_BLOCK_MENU_CLASSNAME}`);
+  return !!element.closest('[data-drag-handle]');
 }
 
 function setMenuPosition(
@@ -236,7 +235,7 @@ function setTargetLine(
   targetLineElem.style.width = `${
     anchorWidth - (TEXT_BOX_HORIZONTAL_PADDING - SPACE) * 2
   }px`;
-  targetLineElem.style.opacity = '.4';
+  targetLineElem.style.opacity = '1';
 }
 
 function hideTargetLine(targetLineElem: HTMLElement | null) {
@@ -409,16 +408,18 @@ function useDraggableBlockMenu(
   return createPortal(
     <>
       <div
-        className="draggable-block-menu"
+        className={styles.dragHandle}
+        data-drag-handle=""
         ref={menuRef}
         draggable={isEditable}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
-        aria-label="Drag to move block"
+        aria-label="Drag to move this block"
+        title="Drag to move"
       >
-        <FontAwesomeIcon icon={faGripVertical} size="lg" />
+        <GripVertical size={15} aria-hidden />
       </div>
-      <div className="draggable-block-target-line" ref={targetLineRef} />
+      <div className={styles.targetLine} ref={targetLineRef} />
     </>,
     anchorElem,
   );

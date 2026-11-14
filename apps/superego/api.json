@@ -3442,6 +3442,13 @@
           "name"
         ],
         "properties": {
+          "accent": {
+            "description": "Accent color of the space, as a `#RRGGBB` hex string.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "name": {
             "type": "string"
           }
@@ -3460,6 +3467,13 @@
           "type"
         ],
         "properties": {
+          "accent": {
+            "description": "Accent color of the space, as a `#RRGGBB` hex string.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "channels": {
             "type": "array",
             "items": {
@@ -3529,6 +3543,13 @@
       "SpaceUpdatePayload": {
         "type": "object",
         "properties": {
+          "accent": {
+            "description": "Accent color as a `#RRGGBB` hex string. Omit to leave unchanged, `null` to clear.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "handle": {
             "type": [
               "string",

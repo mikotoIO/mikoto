@@ -1,50 +1,38 @@
-import { Box } from '@chakra-ui/react';
-import styled from '@emotion/styled';
-import { MessageExt } from '@mikoto-io/mikoto.js';
+import type { MessageExt } from '@mikoto-io/mikoto.js';
 
-const DATE_FORMAT = new Intl.DateTimeFormat('en', {
+import styles from './Messages.module.css';
+
+const DATE_FORMAT = new Intl.DateTimeFormat(undefined, {
+  weekday: 'long',
   day: 'numeric',
   month: 'long',
   year: 'numeric',
 });
 
-const DAYS_OF_WEEK = [
-  'Sunday',
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-];
-
-const StyledDateSeparator = styled.div`
-  text-align: center;
-  margin: 4px 0;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-
-  &:before,
-  &:after {
-    content: '';
-    display: block;
-    flex-grow: 1;
-    height: 0.5px;
-    display: block;
-    margin: 0 16px;
-    background-color: var(--chakra-colors-gray-250);
-    opacity: 0.1;
-  }
-`;
-
-export function DateSeparator({ date }: { date: Date }) {
+function sameDay(a: Date, b: Date) {
   return (
-    <StyledDateSeparator>
-      <Box bg="gray.750" color="gray.400" px={4} py={0.5} rounded="xl">
-        {DAYS_OF_WEEK[date.getDay()]} {DATE_FORMAT.format(date)}
-      </Box>
-    </StyledDateSeparator>
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+function label(date: Date) {
+  const now = new Date();
+  if (sameDay(date, now)) return 'Today';
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (sameDay(date, yesterday)) return 'Yesterday';
+  return DATE_FORMAT.format(date);
+}
+
+/** A centered day label between hairlines. */
+export function DateSeparator({ date }: { date: Date }) {
+  if (Number.isNaN(date.getTime())) return null;
+  return (
+    <div className={styles.day} role="separator">
+      <time dateTime={date.toISOString()}>{label(date)}</time>
+    </div>
   );
 }
 
@@ -53,11 +41,5 @@ export function showDateSeparator(
   prevMessage?: MessageExt,
 ) {
   if (!prevMessage) return true;
-  const prevDate = new Date(prevMessage.timestamp);
-  const currDate = new Date(message.timestamp);
-  return (
-    prevDate.getFullYear() !== currDate.getFullYear() ||
-    prevDate.getMonth() !== currDate.getMonth() ||
-    prevDate.getDate() !== currDate.getDate()
-  );
+  return !sameDay(new Date(prevMessage.timestamp), new Date(message.timestamp));
 }

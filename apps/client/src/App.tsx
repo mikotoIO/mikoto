@@ -1,4 +1,3 @@
-import styled from '@emotion/styled';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import {
@@ -12,12 +11,7 @@ import { MikotoClientProvider } from '@/views/MikotoClientProvider';
 import { NotFound } from '@/views/NotFoundPage';
 import { SpaceInviteView } from '@/views/SpaceInviteView';
 
-const AppShell = styled.div`
-  height: 100dvh;
-  width: 100dvw;
-  display: flex;
-  flex-direction: column;
-`;
+import styles from './App.module.css';
 
 const router = createBrowserRouter([
   // Base route
@@ -106,9 +100,9 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <AppShell>
+    <div className={styles.shell}>
       <RouterProvider router={router} />
-    </AppShell>
+    </div>
   );
 }
 

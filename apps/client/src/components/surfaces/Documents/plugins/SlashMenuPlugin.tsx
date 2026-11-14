@@ -1,17 +1,3 @@
-import styled from '@emotion/styled';
-import {
-  IconDefinition,
-  faCode,
-  faFont,
-  faHeading,
-  faImage,
-  faListCheck,
-  faListOl,
-  faListUl,
-  faMinus,
-  faQuoteRight,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { $createCodeNode } from '@lexical/code';
 import {
   INSERT_CHECK_LIST_COMMAND,
@@ -40,30 +26,49 @@ import {
   LexicalEditor,
   TextNode,
 } from 'lexical';
+import {
+  Code,
+  Heading1,
+  Heading2,
+  Heading3,
+  Image,
+  List,
+  ListChecks,
+  ListOrdered,
+  type LucideIcon,
+  Minus,
+  Quote,
+  Type,
+} from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { describeError, toast } from '@/design';
 import { uploadFile } from '@/functions/fileUpload';
 
 import { $createImageNode } from '../nodes/ImageNode';
+import styles from './plugins.module.css';
 
 class SlashMenuOption extends MenuOption {
   readonly label: string;
-  readonly iconDef: IconDefinition;
+  readonly blockIcon: LucideIcon;
+  readonly hint?: string;
   readonly keywords: string[];
   readonly onSelect: (editor: LexicalEditor) => void;
 
   constructor(
     label: string,
     options: {
-      icon: IconDefinition;
+      icon: LucideIcon;
+      hint?: string;
       keywords?: string[];
       onSelect: (editor: LexicalEditor) => void;
     },
   ) {
     super(label);
     this.label = label;
-    this.iconDef = options.icon;
+    this.blockIcon = options.icon;
+    this.hint = options.hint;
     this.keywords = options.keywords ?? [];
     this.onSelect = options.onSelect;
   }
@@ -83,61 +88,70 @@ function $setHeading(level: HeadingTagType) {
 function getBaseOptions(editor: LexicalEditor): SlashMenuOption[] {
   return [
     new SlashMenuOption('Text', {
-      icon: faFont,
+      icon: Type,
       keywords: ['paragraph', 'text', 'plain'],
       onSelect: () => $setBlockType(() => $createParagraphNode()),
     }),
     new SlashMenuOption('Heading 1', {
-      icon: faHeading,
+      icon: Heading1,
+      hint: '#',
       keywords: ['heading', 'header', 'h1', 'title'],
       onSelect: () => $setHeading('h1'),
     }),
     new SlashMenuOption('Heading 2', {
-      icon: faHeading,
+      icon: Heading2,
+      hint: '##',
       keywords: ['heading', 'header', 'h2', 'subtitle'],
       onSelect: () => $setHeading('h2'),
     }),
     new SlashMenuOption('Heading 3', {
-      icon: faHeading,
+      icon: Heading3,
+      hint: '###',
       keywords: ['heading', 'header', 'h3'],
       onSelect: () => $setHeading('h3'),
     }),
-    new SlashMenuOption('Bulleted List', {
-      icon: faListUl,
+    new SlashMenuOption('Bulleted list', {
+      icon: List,
+      hint: '-',
       keywords: ['bullet', 'unordered', 'ul', 'list'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined),
     }),
-    new SlashMenuOption('Numbered List', {
-      icon: faListOl,
+    new SlashMenuOption('Numbered list', {
+      icon: ListOrdered,
+      hint: '1.',
       keywords: ['number', 'ordered', 'ol', 'list'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined),
     }),
-    new SlashMenuOption('Check List', {
-      icon: faListCheck,
+    new SlashMenuOption('Checklist', {
+      icon: ListChecks,
+      hint: '[]',
       keywords: ['check', 'checklist', 'todo', 'task', 'list'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined),
     }),
     new SlashMenuOption('Quote', {
-      icon: faQuoteRight,
+      icon: Quote,
+      hint: '>',
       keywords: ['quote', 'blockquote'],
       onSelect: () => $setBlockType(() => $createQuoteNode()),
     }),
-    new SlashMenuOption('Code Block', {
-      icon: faCode,
+    new SlashMenuOption('Code block', {
+      icon: Code,
+      hint: '```',
       keywords: ['code', 'codeblock', 'pre', 'snippet'],
       onSelect: () => $setBlockType(() => $createCodeNode()),
     }),
     new SlashMenuOption('Divider', {
-      icon: faMinus,
+      icon: Minus,
+      hint: '---',
       keywords: ['divider', 'hr', 'horizontal', 'rule', 'separator'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined),
     }),
     new SlashMenuOption('Image', {
-      icon: faImage,
+      icon: Image,
       keywords: ['image', 'picture', 'photo', 'media'],
       onSelect: () => {
         const input = document.createElement('input');
@@ -146,11 +160,22 @@ function getBaseOptions(editor: LexicalEditor): SlashMenuOption[] {
         input.onchange = async () => {
           const file = input.files?.[0];
           if (!file) return;
-          const response = await uploadFile('/attachment', file);
+          let url: string;
+          try {
+            const response = await uploadFile('/attachment', file);
+            url = response.data.url;
+          } catch (err) {
+            toast({
+              type: 'error',
+              title: `Couldn't upload ${file.name}`,
+              description: describeError(err, { context: 'action' }).message,
+            });
+            return;
+          }
           editor.update(() => {
             const selection = $getSelection();
             if (!$isRangeSelection(selection)) return;
-            $insertNodes([$createImageNode(response.data.url, file.name)]);
+            $insertNodes([$createImageNode(url, file.name)]);
           });
         };
         input.click();
@@ -158,56 +183,6 @@ function getBaseOptions(editor: LexicalEditor): SlashMenuOption[] {
     }),
   ];
 }
-
-const MenuContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 240px;
-  max-height: 320px;
-  overflow-y: auto;
-  padding: 4px;
-  background: var(--chakra-colors-gray-800);
-  border: 1px solid var(--chakra-colors-gray-600);
-  border-radius: 6px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-`;
-
-const MenuItem = styled.button<{ selected?: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 6px 8px;
-  border: none;
-  background: ${(p) =>
-    p.selected ? 'var(--chakra-colors-gray-700)' : 'transparent'};
-  color: var(--chakra-colors-gray-100);
-  border-radius: 4px;
-  cursor: pointer;
-  text-align: left;
-  font-size: 13px;
-
-  &:hover {
-    background: var(--chakra-colors-gray-700);
-  }
-`;
-
-const MenuItemIcon = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  color: var(--chakra-colors-gray-300);
-  font-size: 12px;
-`;
-
-const EmptyMessage = styled.div`
-  padding: 8px;
-  color: var(--chakra-colors-gray-400);
-  font-size: 12px;
-`;
 
 export function SlashMenuPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -253,30 +228,50 @@ export function SlashMenuPlugin() {
       ) => {
         if (!anchorElementRef.current) return null;
         return createPortal(
-          <MenuContainer>
+          <div
+            className={styles.menu}
+            role="listbox"
+            aria-label="Insert a block"
+          >
             {options.length === 0 ? (
-              <EmptyMessage>No matching blocks</EmptyMessage>
+              <div className={styles.menuEmpty}>No blocks match “{query}”.</div>
             ) : (
-              options.map((option, i) => (
-                <MenuItem
-                  key={option.key}
-                  ref={(el) => option.setRefElement(el)}
-                  selected={selectedIndex === i}
-                  onMouseEnter={() => setHighlightedIndex(i)}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    setHighlightedIndex(i);
-                    selectOptionAndCleanUp(option);
-                  }}
-                >
-                  <MenuItemIcon>
-                    <FontAwesomeIcon icon={option.iconDef} />
-                  </MenuItemIcon>
-                  {option.label}
-                </MenuItem>
-              ))
+              <>
+                <div className={styles.menuLabel} aria-hidden>
+                  Blocks
+                </div>
+                {options.map((option, i) => {
+                  const Icon = option.blockIcon;
+                  return (
+                    <button
+                      type="button"
+                      key={option.key}
+                      ref={(el) => option.setRefElement(el)}
+                      role="option"
+                      aria-selected={selectedIndex === i}
+                      className={styles.menuItem}
+                      onMouseEnter={() => setHighlightedIndex(i)}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        setHighlightedIndex(i);
+                        selectOptionAndCleanUp(option);
+                      }}
+                    >
+                      <span className={styles.menuIcon} aria-hidden>
+                        <Icon size={14} />
+                      </span>
+                      <span className={styles.menuText}>{option.label}</span>
+                      {option.hint && (
+                        <span className={styles.menuHint} aria-hidden>
+                          {option.hint}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </>
             )}
-          </MenuContainer>,
+          </div>,
           anchorElementRef.current,
         );
       }}

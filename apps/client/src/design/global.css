@@ -1,0 +1,125 @@
+/* Element defaults. Keep this small: components own their own styling. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+#root {
+  /* keeps Base UI portals stacking above app content */
+  isolation: isolate;
+}
+
+body {
+  margin: 0;
+  background: var(--base);
+  color: var(--text);
+  font: 400 var(--text-md) / 1.5 var(--font-ui);
+  font-feature-settings: 'cv11' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--accent-ink);
+  text-underline-offset: 3px;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: var(--font-mono);
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+}
+
+/* :where() keeps these at zero specificity so any component's own focus
+   style wins, regardless of stylesheet order. */
+:where(:focus) {
+  outline: none;
+}
+
+:where(:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Text-entry surfaces (Lexical editors) show focus with their caret and
+   container, never a ring; contenteditable always matches :focus-visible. */
+:where([contenteditable]:focus-visible) {
+  outline: none;
+}
+
+::selection {
+  background: color-mix(in oklch, var(--accent) 40%, transparent);
+}
+
+/* scrollbars: thin, low-contrast, never shifting layout */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 10px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* utility: visually hidden but available to screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

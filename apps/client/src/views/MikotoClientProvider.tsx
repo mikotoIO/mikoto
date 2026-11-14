@@ -1,6 +1,5 @@
-import { MikotoClient } from '@mikoto-io/mikoto.js';
-import { AxiosError } from 'axios';
-import React, { useEffect, useRef, useState } from 'react';
+import { MikotoClient, isAuthError, retry } from '@mikoto-io/mikoto.js';
+import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { env } from '@/env';
@@ -21,9 +20,6 @@ import {
   loadAcksForDms,
   loadNotificationPreferences,
 } from '@/store/unreads';
-
-const BASE_DELAY_MS = 1000;
-const MAX_DELAY_MS = 16000;
 
 function registerNotifications(mikoto: MikotoClient) {
   mikoto.ws.on('messages.onCreate', (msg) => {
@@ -78,103 +74,90 @@ interface MikotoClientProviderProps {
   children: React.ReactNode;
 }
 
-// exists to "cheat" React Strict Mode
+type ProviderState =
+  | { kind: 'loading' }
+  | { kind: 'ready'; client: MikotoClient }
+  | { kind: 'signedOut' };
 
-type MikotoConnectionState =
-  | MikotoClient
-  | 'connecting'
-  | 'reconnecting'
-  | 'disconnected';
+/** Data the app needs before it can render anything useful. */
+async function loadInitialData(mikoto: MikotoClient) {
+  await Promise.all([mikoto.spaces.sync(), mikoto.user.load()]);
+  await loadNotificationPreferences(mikoto);
+}
 
+function loadUnreadState(mikoto: MikotoClient) {
+  return Promise.allSettled([
+    loadAcksForAllSpaces(mikoto),
+    loadAcksForDms(mikoto),
+  ]);
+}
+
+/**
+ * Creates the client, loads initial data (retrying transient failures with
+ * backoff), and keeps it in sync across reconnects. Live-connection retries
+ * are handled inside mikoto.js; this only reacts to the outcome.
+ */
 export function MikotoClientProvider({
   children,
   fallback,
 }: MikotoClientProviderProps) {
-  const [mikoto, setMikoto] = useState<MikotoConnectionState>('connecting');
-  const [err, setErr] = useState<AxiosError | null>(null);
+  const [state, setState] = useState<ProviderState>({ kind: 'loading' });
 
-  const setupMikotoClient = async (mi: MikotoClient, signal: AbortSignal) => {
-    for (let attempt = 0; ; attempt++) {
-      if (signal.aborted) return;
-
-      try {
-        await Promise.all([mi.spaces.list(), mi.user.load()]);
-        await loadNotificationPreferences(mi);
-        registerNotifications(mi);
-        await Promise.allSettled([
-          loadAcksForAllSpaces(mi),
-          loadAcksForDms(mi),
-        ]);
-        setMikoto(mi);
-        return;
-      } catch (e) {
-        const axiosErr = e as AxiosError;
-        const status = axiosErr.response?.status;
-
-        // Don't retry auth errors
-        if (status === 401 || status === 403) {
-          setMikoto('disconnected');
-          setErr(axiosErr);
-          return;
-        }
-
-        const delay = Math.min(
-          BASE_DELAY_MS * 2 ** attempt + Math.random() * 500,
-          MAX_DELAY_MS,
-        );
-        console.warn(
-          `Connection attempt ${attempt + 1} failed, retrying in ${Math.round(delay)}ms...`,
-        );
-        setMikoto('reconnecting');
-        await new Promise<void>((resolve) => {
-          const timer = setTimeout(resolve, delay);
-          signal.addEventListener(
-            'abort',
-            () => {
-              clearTimeout(timer);
-              resolve();
-            },
-            { once: true },
-          );
-        });
-      }
-    }
-  };
-
-  const initializedRef = useRef(false);
-
+  // Each run owns its client and disposes it in cleanup, so Strict Mode's
+  // double-invoke in development just creates and discards one extra.
   useEffect(() => {
-    if (!initializedRef.current) {
-      initializedRef.current = true;
-      const abortController = new AbortController();
+    const abort = new AbortController();
+    const mikoto = new MikotoClient({
+      url: env.PUBLIC_SERVER_URL,
+      auth: authClient,
+    });
 
-      const mi = new MikotoClient({
-        url: env.PUBLIC_SERVER_URL,
-        auth: authClient,
+    const unsubscribers = [
+      // Credentials rejected mid-session (e.g. refresh token revoked).
+      mikoto.onConnectionChange(({ status }) => {
+        if (status === 'unauthorized') setState({ kind: 'signedOut' });
+      }),
+      // Unread markers may have moved while we were disconnected.
+      mikoto.onResync(() => {
+        void loadUnreadState(mikoto);
+      }),
+    ];
+
+    retry(() => loadInitialData(mikoto), {
+      signal: abort.signal,
+      maxMs: 16_000,
+      shouldRetry: (error) => !isAuthError(error),
+      onRetry: (error, attempt, delay) => {
+        console.warn(
+          `[mikoto] initial load failed (attempt ${attempt + 1}), retrying in ${Math.round(delay)}ms`,
+          error,
+        );
+      },
+    })
+      .then(async () => {
+        if (abort.signal.aborted) return;
+        registerNotifications(mikoto);
+        await loadUnreadState(mikoto);
+        if (!abort.signal.aborted) setState({ kind: 'ready', client: mikoto });
+      })
+      .catch((error: unknown) => {
+        if (abort.signal.aborted) return;
+        // Only auth errors stop the retry loop.
+        if (isAuthError(error)) setState({ kind: 'signedOut' });
       });
-      setupMikotoClient(mi, abortController.signal);
 
-      return () => {
-        abortController.abort();
-        mi.disconnect();
-        setMikoto('disconnected');
-      };
-    }
-
-    return () => {};
+    return () => {
+      abort.abort();
+      unsubscribers.forEach((unsubscribe) => unsubscribe());
+      mikoto.disconnect();
+    };
   }, []);
 
-  if (err !== null) {
-    const status = err.response?.status;
-    if (status === 401 || status === 403) {
-      return <Navigate to="/login" />;
-    }
-  }
-  if (!(mikoto instanceof MikotoClient)) return fallback;
+  if (state.kind === 'signedOut') return <Navigate to="/login" />;
+  if (state.kind !== 'ready') return fallback;
 
-  // TODO: Connection ID key, garbage collection for event emitters
   return (
-    <MikotoContext value={mikoto}>
+    <MikotoContext value={state.client}>
       <AuthContext value={authClient}>{children}</AuthContext>
     </MikotoContext>
   );

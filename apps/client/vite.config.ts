@@ -54,11 +54,7 @@ export default ({ mode }: { mode: string }) => {
       dedupe: ['valtio', 'react', 'react-dom'],
     },
     plugins: [
-      react({
-        babel: {
-          plugins: ['@emotion/babel-plugin'],
-        },
-      }),
+      react(),
       // tsconfigPaths(),
       visualizer() as any,
       // PWA disabled due to caching issues

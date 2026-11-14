@@ -1,13 +1,3 @@
-import { Box, Button, Flex, Group } from '@chakra-ui/react';
-import styled from '@emotion/styled';
-import {
-  faCircleNotch,
-  faFileLines,
-  faPencil,
-  faPencilSquare,
-  faSave,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   $convertFromMarkdownString,
   $convertToMarkdownString,
@@ -30,21 +20,33 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
+import { FileText, TriangleAlert } from 'lucide-react';
 import {
-  PropsWithChildren,
+  type ReactNode,
   Suspense,
   useCallback,
+  useEffect,
+  useMemo,
   useReducer,
-  useRef,
   useState,
 } from 'react';
-import { proxy, useSnapshot } from 'valtio';
 
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
+import {
+  DelayedFallback,
+  EmptyState,
+  PaneHeader,
+  RegionErrorBoundary,
+  SegmentedControl,
+  Skeleton,
+  SkeletonGroup,
+  SurfaceErrorBoundary,
+} from '@/design';
 import { useInterval, useMikoto } from '@/hooks';
-import { FloatingTooltip } from '@/ui';
 
+import { DocumentPresence, describePeers } from './DocumentPresence';
+import styles from './Documents.module.css';
 import { EDITOR_NODES } from './editorNodes';
 import { CodeBlockPlugin } from './plugins/CodeBlockPlugin';
 import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
@@ -54,7 +56,11 @@ import { ImageUploadPlugin } from './plugins/ImageUploadPlugin';
 import { ListBehaviorPlugin } from './plugins/ListBehaviorPlugin';
 import { MarkdownPastePlugin } from './plugins/MarkdownPastePlugin';
 import { SlashMenuPlugin } from './plugins/SlashMenuPlugin';
-import { useProviderFactory } from './providerFactory';
+import {
+  type DocPeer,
+  type SyncState,
+  useProviderFactory,
+} from './providerFactory';
 import { lexicalTheme } from './theme';
 import { DOCUMENT_TRANSFORMERS } from './transformers';
 
@@ -81,7 +87,7 @@ function useRelativeTime(date: Date | undefined): string | undefined {
     tick();
   }, 10000);
 
-  if (!date) return undefined;
+  if (!date || Number.isNaN(date.getTime())) return undefined;
   return formatRelativeTime(date);
 }
 
@@ -109,177 +115,59 @@ function editorToMarkdown(): string {
   return $convertToMarkdownString(DOCUMENT_TRANSFORMERS, undefined, true);
 }
 
-const EditorWrapper = styled.div`
-  line-height: 1.1;
-  position: relative;
-  cursor: text;
-  padding-left: 28px;
+type DocumentMode = 'read' | 'edit';
+type SaveState = 'synced' | 'saving' | 'error';
 
-  .editor-paragraph,
-  .editor-list-ul,
-  .editor-list-ol {
-    margin: 16px 0;
-    line-height: 1.35;
-  }
+const MODE_OPTIONS = [
+  { value: 'read', label: 'Read' },
+  { value: 'edit', label: 'Edit' },
+] as const;
 
-  .editor-list-ul,
-  .editor-list-ol {
-    padding: 0 16px;
-  }
+/* ------------------------------------------------------------- skeleton */
 
-  .editor-listitem {
-    margin: 8px 0;
-  }
+// width in %, 0 marks a heading
+const SKELETON_LINES = [
+  { id: 'p1', w: 92 },
+  { id: 'p2', w: 97 },
+  { id: 'p3', w: 70 },
+  { id: 'h1', w: 0 },
+  { id: 'p4', w: 88 },
+  { id: 'p5', w: 95 },
+  { id: 'p6', w: 60 },
+];
 
-  .editor-nested-listitem {
-    list-style-type: none;
-  }
+/** Mirrors the doc body: paragraph lines with a heading partway down. */
+function DocumentSkeleton() {
+  return (
+    <SkeletonGroup label="doc" className={styles.skeleton}>
+      {SKELETON_LINES.map(({ id, w }) =>
+        w ? (
+          <Skeleton
+            key={id}
+            width={`${w}%`}
+            height={13}
+            className={styles.skeletonLine}
+          />
+        ) : (
+          <Skeleton
+            key={id}
+            width="30%"
+            height={20}
+            className={styles.skeletonHeading}
+          />
+        ),
+      )}
+    </SkeletonGroup>
+  );
+}
 
-  .editor-nested-listitem::before,
-  .editor-nested-listitem::after {
-    display: none;
-  }
+const skeletonFallback = (
+  <DelayedFallback>
+    <DocumentSkeleton />
+  </DelayedFallback>
+);
 
-  .editor-list-ul .editor-list-ul,
-  .editor-list-ol .editor-list-ol,
-  .editor-list-ul .editor-list-ol,
-  .editor-list-ol .editor-list-ul {
-    margin: 0;
-    padding-left: 24px;
-  }
-
-  .editor-list-check {
-    list-style-type: none;
-    padding-left: 0;
-  }
-
-  .editor-listitem-checked,
-  .editor-listitem-unchecked {
-    position: relative;
-    list-style-type: none;
-    padding-left: 26px;
-    outline: none;
-    margin: 4px 0;
-  }
-
-  .editor-listitem-checked::before,
-  .editor-listitem-unchecked::before {
-    content: '';
-    position: absolute;
-    left: 2px;
-    top: 4px;
-    width: 16px;
-    height: 16px;
-    border: 1.5px solid var(--chakra-colors-gray-500);
-    border-radius: 3px;
-    background-color: transparent;
-    cursor: pointer;
-    box-sizing: border-box;
-    transition:
-      background-color 0.12s ease,
-      border-color 0.12s ease;
-  }
-
-  .editor-listitem-unchecked:hover::before {
-    border-color: var(--chakra-colors-gray-300);
-  }
-
-  .editor-listitem-checked::before {
-    background-color: var(--chakra-colors-blue-500);
-    border-color: var(--chakra-colors-blue-500);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='M13.485 1.929a1 1 0 0 1 1.414 1.414l-8.486 8.486a1 1 0 0 1-1.414 0L1.464 8.314a1 1 0 1 1 1.414-1.414l3.235 3.235 7.372-7.372z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 12px 12px;
-  }
-
-  .editor-listitem-checked {
-    text-decoration: line-through;
-    color: var(--chakra-colors-gray-500);
-  }
-
-  .editor-input {
-    outline: none;
-  }
-
-  blockquote {
-    border-left: 2px solid var(--chakra-colors-gray-600);
-    color: var(--chakra-colors-gray-400);
-    margin: 0;
-    padding-left: 1em;
-  }
-
-  a {
-    color: #00aff4;
-  }
-
-  .editor-code {
-    display: block;
-    background-color: var(--chakra-colors-gray-800);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.9em;
-    line-height: 1.5;
-    padding: 12px 16px;
-    margin: 8px 0;
-    overflow-x: auto;
-    tab-size: 2;
-    white-space: pre;
-  }
-
-  .editor-text-code {
-    background-color: var(--chakra-colors-gray-800);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.9em;
-    padding: 1px 4px;
-  }
-
-  .draggable-block-menu {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
-    color: var(--chakra-colors-gray-500);
-    font-size: 12px;
-    cursor: grab;
-    opacity: 0;
-    transition:
-      opacity 0.12s ease,
-      background-color 0.12s ease;
-    will-change: transform;
-    user-select: none;
-  }
-
-  &:hover .draggable-block-menu {
-    opacity: 1;
-  }
-
-  .draggable-block-menu:hover {
-    background-color: var(--chakra-colors-gray-700);
-    color: var(--chakra-colors-gray-200);
-  }
-
-  .draggable-block-menu:active {
-    cursor: grabbing;
-  }
-
-  .draggable-block-target-line {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 4px;
-    background: var(--chakra-colors-blue-400);
-    border-radius: 2px;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.1s ease;
-    will-change: transform;
-  }
-`;
+/* --------------------------------------------------------------- editor */
 
 function MikotoContentEditable({
   onAnchorRef,
@@ -288,56 +176,32 @@ function MikotoContentEditable({
 }) {
   const [editor] = useLexicalComposerContext();
 
-  const handleClick = () => {
-    editor.focus();
-  };
-
   return (
-    <EditorWrapper onClick={handleClick} ref={onAnchorRef}>
-      <ContentEditable className="editor-input" />
-    </EditorWrapper>
-  );
-}
-
-function DocumentActions({ children }: PropsWithChildren) {
-  return (
-    <Flex
-      flexShrink={0}
-      bg="surface"
-      borderBottom="1px solid"
-      borderBottomColor="gray.650"
-      px={4}
-      py={2}
-      align="center"
-      justify="space-between"
+    <div
+      className={styles.editor}
+      onClick={() => editor.focus()}
+      ref={onAnchorRef}
     >
-      {children}
-    </Flex>
+      <ContentEditable className={styles.input} />
+    </div>
   );
 }
 
-function DocumentReaderPlaceholder() {
+function ReadPlaceholder() {
   return (
-    <Flex
-      color="gray.500"
-      top={0}
-      justify="center"
-      pointerEvents="none"
-      align="center"
-      direction="column"
-    >
-      <Box mb={8}>
-        <FontAwesomeIcon icon={faFileLines} fontSize="100px" opacity={0.2} />
-      </Box>
-      <Box>It&apos;s a blank page for now.</Box>
-      <Box>but also an empty canvas to write something beautiful.</Box>
-    </Flex>
+    <div className={styles.emptyRead}>
+      <p>This doc is empty.</p>
+      <p>Switch to Edit, or double-click here, to start writing.</p>
+    </div>
   );
 }
 
-interface DocumentState {
-  type: 'read' | 'edit';
-  save: 'synced' | 'saving' | 'error';
+function EditPlaceholder() {
+  return (
+    <div className={styles.placeholder}>
+      Start writing, or type / to insert a heading, list or image.
+    </div>
+  );
 }
 
 function hash(str: string) {
@@ -373,11 +237,13 @@ function DocumentReadOnly({ content }: { content: string }) {
         },
       }}
     >
-      <RichTextPlugin
-        contentEditable={<MikotoContentEditable />}
-        placeholder={<DocumentReaderPlaceholder />}
-        ErrorBoundary={LexicalErrorBoundary}
-      />
+      <div className={styles.shell}>
+        <RichTextPlugin
+          contentEditable={<MikotoContentEditable />}
+          placeholder={<ReadPlaceholder />}
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+      </div>
     </LexicalComposer>
   );
 }
@@ -387,12 +253,21 @@ function DocumentReader({ channel }: { channel: MikotoChannel }) {
   return <DocumentReadOnly content={document.content} />;
 }
 
+/** How long to wait for the first sync before telling the user. */
+const SYNC_TIMEOUT = 10_000;
+/** Ignore brief disconnects (reconnects, StrictMode remounts). */
+const WARNING_GRACE = 1_500;
+
 function DocumentEditor({
   channel,
-  documentState,
+  onSaveStateChange,
+  onPeersChange,
+  onLiveUnavailableChange,
 }: {
   channel: MikotoChannel;
-  documentState: DocumentState;
+  onSaveStateChange: (state: SaveState) => void;
+  onPeersChange: (peers: DocPeer[]) => void;
+  onLiveUnavailableChange: (unavailable: boolean) => void;
 }) {
   // Reuse the reader's cached content so toggling into edit mode doesn't
   // re-fetch and fall through Suspense (which flashes the surface loader).
@@ -410,10 +285,34 @@ function DocumentEditor({
   // any content, which would otherwise flash empty. Keep a read-only view
   // overlaid on top until the provider fires its first sync event.
   const [synced, setSynced] = useState(false);
+  const [status, setStatus] = useState<SyncState>('initial');
+  const [timedOut, setTimedOut] = useState(false);
+
+  useEffect(() => {
+    if (synced) return;
+    const t = setTimeout(() => setTimedOut(true), SYNC_TIMEOUT);
+    return () => clearTimeout(t);
+  }, [synced]);
+
+  // If the provider can't connect, the read-only copy stays on screen and
+  // the surface shows a non-blocking warning instead of a blank doc.
+  const unavailable = status === 'error' || (!synced && timedOut);
+  useEffect(() => {
+    if (!unavailable) {
+      onLiveUnavailableChange(false);
+      return;
+    }
+    const t = setTimeout(() => onLiveUnavailableChange(true), WARNING_GRACE);
+    return () => clearTimeout(t);
+  }, [unavailable, onLiveUnavailableChange]);
+  useEffect(
+    () => () => onLiveUnavailableChange(false),
+    [onLiveUnavailableChange],
+  );
 
   return (
-    <Box position="relative">
-      <Box visibility={synced ? 'visible' : 'hidden'}>
+    <div className={styles.shell}>
+      <div className={synced ? undefined : styles.hidden}>
         <LexicalCollaboration>
           <LexicalComposer
             initialConfig={{
@@ -429,58 +328,83 @@ function DocumentEditor({
           >
             <DocumentEditorInner
               channel={channel}
-              documentState={documentState}
               initialContent={document.content}
               shouldBootstrap={shouldBootstrap}
               onSync={() => setSynced(true)}
+              onStatusChange={setStatus}
+              onPeersChange={onPeersChange}
+              onSaveStateChange={onSaveStateChange}
             />
           </LexicalComposer>
         </LexicalCollaboration>
-      </Box>
+      </div>
       {!synced && (
-        <Box position="absolute" top={0} left={0} right={0}>
+        <div className={styles.overlay}>
           <DocumentReadOnly content={document.content} />
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }
 
+// Per-user identity colors for collaboration cursors (like role colors,
+// these identify people rather than theme the UI).
 const CURSOR_COLORS = [
-  '#f87171',
-  '#fb923c',
-  '#facc15',
-  '#a3e635',
-  '#34d399',
-  '#22d3ee',
-  '#60a5fa',
-  '#a78bfa',
-  '#f472b6',
+  'oklch(0.75 0.15 25)',
+  'oklch(0.8 0.14 60)',
+  'oklch(0.86 0.15 95)',
+  'oklch(0.84 0.17 130)',
+  'oklch(0.78 0.14 160)',
+  'oklch(0.8 0.13 200)',
+  'oklch(0.74 0.13 250)',
+  'oklch(0.74 0.15 295)',
+  'oklch(0.76 0.15 345)',
 ];
 
 function cursorColorFor(userId: string): string {
   return CURSOR_COLORS[Math.abs(hash(userId)) % CURSOR_COLORS.length];
 }
 
+function PluginBoundary({
+  what,
+  children,
+}: {
+  what: string;
+  children: ReactNode;
+}) {
+  return <RegionErrorBoundary what={what}>{children}</RegionErrorBoundary>;
+}
+
 function DocumentEditorInner({
   channel,
-  documentState,
   initialContent,
   shouldBootstrap,
   onSync,
+  onStatusChange,
+  onPeersChange,
+  onSaveStateChange,
 }: {
   channel: MikotoChannel;
-  documentState: DocumentState;
   initialContent: string;
   shouldBootstrap: boolean;
   onSync?: () => void;
+  onStatusChange: (status: SyncState) => void;
+  onPeersChange: (peers: DocPeer[]) => void;
+  onSaveStateChange: (state: SaveState) => void;
 }) {
   const mikoto = useMikoto();
-  const { providerFactory } = useProviderFactory({ channel, onSync });
+  const { providerFactory } = useProviderFactory({
+    channel,
+    onSync,
+    onStatusChange,
+    onPeersChange,
+  });
   const me = mikoto.user.me;
   const username = me?.name ?? 'Anonymous';
   const cursorColor = me ? cursorColorFor(me.id) : CURSOR_COLORS[0];
   const [anchorElem, setAnchorElem] = useState<HTMLDivElement | null>(null);
+  // Lets other clients show who's here with the right identity.
+  const awarenessData = useMemo(() => ({ userId: me?.id }), [me?.id]);
 
   // CollaborationPlugin has initialEditorState in its effect dep list, so
   // passing a fresh function every render tears down and reconnects the
@@ -495,7 +419,7 @@ function DocumentEditorInner({
     <>
       <RichTextPlugin
         contentEditable={<MikotoContentEditable onAnchorRef={setAnchorElem} />}
-        placeholder={<></>}
+        placeholder={<EditPlaceholder />}
         ErrorBoundary={LexicalErrorBoundary}
       />
       <MarkdownShortcutPlugin transformers={DOCUMENT_TRANSFORMERS} />
@@ -507,9 +431,17 @@ function DocumentEditorInner({
       <ListBehaviorPlugin />
       <CheckListPlugin />
       <CodeBlockPlugin />
-      <SlashMenuPlugin />
-      <FloatingToolbarPlugin />
-      {anchorElem && <DraggableBlockPlugin anchorElem={anchorElem} />}
+      <PluginBoundary what="The block menu">
+        <SlashMenuPlugin />
+      </PluginBoundary>
+      <PluginBoundary what="The formatting toolbar">
+        <FloatingToolbarPlugin />
+      </PluginBoundary>
+      {anchorElem && (
+        <PluginBoundary what="Block dragging">
+          <DraggableBlockPlugin anchorElem={anchorElem} />
+        </PluginBoundary>
+      )}
       <CollaborationPlugin
         id={channel.id}
         // y-websocket's awareness type is slightly looser than Lexical's;
@@ -517,132 +449,185 @@ function DocumentEditorInner({
         providerFactory={providerFactory as never}
         username={username}
         cursorColor={cursorColor}
+        awarenessData={awarenessData}
         shouldBootstrap={shouldBootstrap}
         initialEditorState={initialEditorState}
       />
-      <DocumentAutosave channel={channel} documentState={documentState} />
+      <DocumentAutosave
+        channel={channel}
+        onSaveStateChange={onSaveStateChange}
+      />
     </>
   );
 }
 
 function DocumentAutosave({
   channel,
-  documentState,
+  onSaveStateChange,
 }: {
   channel: MikotoChannel;
-  documentState: DocumentState;
+  onSaveStateChange: (state: SaveState) => void;
 }) {
   const [editor] = useLexicalComposerContext();
   const queryClient = useQueryClient();
 
-  const save = useCallback(
-    debounce(() => {
-      documentState.save = 'saving';
-      const content = editor.getEditorState().read(() => editorToMarkdown());
-      channel
-        .updateDocument({ content })
-        .then((updated) => {
-          documentState.save = 'synced';
-          // Keep the reader's cache in sync with what we just persisted, so
-          // switching back to read mode doesn't trigger a background refetch
-          // that re-keys the LexicalComposer and flashes the surface.
-          queryClient.setQueryData(
-            ['documents.get', channel.spaceId, channel.id],
-            updated,
-          );
-        })
-        .catch(() => {
-          documentState.save = 'error';
-        });
-    }, 1500),
-    [channel, documentState, editor, queryClient],
+  const save = useMemo(
+    () =>
+      debounce(() => {
+        onSaveStateChange('saving');
+        const content = editor.getEditorState().read(() => editorToMarkdown());
+        channel
+          .updateDocument({ content })
+          .then((updated) => {
+            onSaveStateChange('synced');
+            // Keep the reader's cache in sync with what we just persisted, so
+            // switching back to read mode doesn't trigger a background refetch
+            // that re-keys the LexicalComposer and flashes the surface.
+            queryClient.setQueryData(
+              ['documents.get', channel.spaceId, channel.id],
+              updated,
+            );
+          })
+          .catch(() => {
+            onSaveStateChange('error');
+          });
+      }, 1500),
+    [channel, onSaveStateChange, editor, queryClient],
   );
 
   return <OnChangePlugin ignoreSelectionChange onChange={save} />;
 }
 
+/* -------------------------------------------------------------- surface */
+
+function SaveStatus({ state }: { state: SaveState }) {
+  if (state === 'saving') return <span>Saving…</span>;
+  if (state === 'error')
+    return (
+      <span className={styles.saveError} role="status">
+        Couldn&apos;t save your latest changes. Press Ctrl+S to try again.
+      </span>
+    );
+  return <span>Saved</span>;
+}
+
+function DocumentView({ channel }: { channel: MikotoChannel }) {
+  const [mode, setMode] = useState<DocumentMode>('read');
+  const [saveState, setSaveState] = useState<SaveState>('synced');
+  const [peers, setPeers] = useState<DocPeer[]>([]);
+  const [liveUnavailable, setLiveUnavailable] = useState(false);
+  const lastEdited = useRelativeTime(channel.lastUpdatedDate);
+
+  const changeMode = (next: DocumentMode) => {
+    setMode(next);
+    if (next === 'read') setSaveState('synced');
+  };
+
+  const editing = describePeers(peers);
+
+  return (
+    <>
+      <PaneHeader
+        icon={<FileText size={16} aria-hidden />}
+        title={channel.name}
+        actions={
+          <div className={styles.headerActions}>
+            {mode === 'edit' && <DocumentPresence peers={peers} />}
+            <SegmentedControl
+              aria-label="Mode"
+              value={mode}
+              onValueChange={changeMode}
+              options={MODE_OPTIONS}
+            />
+          </div>
+        }
+      />
+      {mode === 'edit' && liveUnavailable && (
+        <div className={styles.liveWarning} role="status">
+          <TriangleAlert size={14} aria-hidden />
+          Live editing is unavailable. Changes you make may not sync.
+        </div>
+      )}
+      <div className={styles.scroll}>
+        <div className={styles.inner}>
+          <h1 className={styles.title}>{channel.name}</h1>
+          <div className={styles.meta}>
+            {lastEdited && <span>Edited {lastEdited}</span>}
+            {mode === 'edit' && (
+              <>
+                {lastEdited && (
+                  <span className={styles.metaSep} aria-hidden>
+                    ·
+                  </span>
+                )}
+                <SaveStatus state={saveState} />
+              </>
+            )}
+            {mode === 'edit' && editing && (
+              <>
+                <span className={styles.metaSep} aria-hidden>
+                  ·
+                </span>
+                <span>{editing}</span>
+              </>
+            )}
+          </div>
+          <SurfaceErrorBoundary what="This doc" resetKeys={[channel.id, mode]}>
+            {mode === 'read' ? (
+              <div onDoubleClick={() => changeMode('edit')}>
+                <Suspense fallback={skeletonFallback}>
+                  <DocumentReader channel={channel} />
+                </Suspense>
+              </div>
+            ) : (
+              <Suspense
+                fallback={
+                  <Suspense fallback={skeletonFallback}>
+                    <DocumentReader channel={channel} />
+                  </Suspense>
+                }
+              >
+                <DocumentEditor
+                  channel={channel}
+                  onSaveStateChange={setSaveState}
+                  onPeersChange={setPeers}
+                  onLiveUnavailableChange={setLiveUnavailable}
+                />
+              </Suspense>
+            )}
+          </SurfaceErrorBoundary>
+        </div>
+      </div>
+    </>
+  );
+}
+
 export default function DocumentSurface({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
-  const channel = mikoto.channels._get(channelId)!;
-  const documentState = useRef<DocumentState>(
-    proxy({
-      type: 'read',
-      save: 'synced',
-    }),
-  ).current;
-  const documentSnap = useSnapshot(documentState);
-  const lastEdited = useRelativeTime(channel.lastUpdatedDate);
+  const channel = mikoto.channels._get(channelId);
+
+  if (!channel) {
+    return (
+      <Surface>
+        <TabName name="Doc" icon={FileText} />
+        <EmptyState
+          icon={<FileText size={20} aria-hidden />}
+          title="This doc isn't available"
+          description="It may have been deleted, or you no longer have access to its space. Close this tab, or pick another doc from the sidebar."
+        />
+      </Surface>
+    );
+  }
 
   return (
     <Surface>
       <TabName
         name={channel.name}
-        icon={channel.space?.icon ?? faFileLines}
+        icon={channel.space?.icon ?? FileText}
         spaceId={channel.space?.id}
         spaceName={channel.space?.name}
       />
-      <DocumentActions>
-        <Flex className="left" direction="column">
-          <Box fontWeight="semibold" color="gray.200">
-            {channel.name}
-          </Box>
-          {lastEdited && (
-            <Box fontSize="xs" color="gray.500">
-              edited {lastEdited}
-            </Box>
-          )}
-        </Flex>
-        <Flex className="right" fontSize="xl" gap={3}>
-          <Group>
-            {documentSnap.type === 'read' && (
-              <Button
-                colorPalette="blue"
-                size="sm"
-                p={2}
-                onClick={() => {
-                  documentState.type = 'edit';
-                }}
-              >
-                <FontAwesomeIcon icon={faPencil} />
-                Edit
-              </Button>
-            )}
-            {documentSnap.type === 'edit' && (
-              <Button
-                variant="ghost"
-                size="sm"
-                p={2}
-                onClick={() => {
-                  documentState.type = 'read';
-                  documentState.save = 'synced';
-                }}
-              >
-                {documentSnap.save === 'saving' ? (
-                  <FontAwesomeIcon icon={faCircleNotch} spin />
-                ) : (
-                  <FontAwesomeIcon icon={faSave} />
-                )}
-              </Button>
-            )}
-          </Group>
-        </Flex>
-      </DocumentActions>
-      <Box flex={1} overflowY="auto" px={8} pt={8} pb={32}>
-        {documentSnap.type === 'read' && (
-          <Box
-            onDoubleClick={() => {
-              documentState.type = 'edit';
-            }}
-          >
-            <DocumentReader channel={channel} />
-          </Box>
-        )}
-        {documentSnap.type === 'edit' && (
-          <Suspense fallback={<DocumentReader channel={channel} />}>
-            <DocumentEditor channel={channel} documentState={documentState} />
-          </Suspense>
-        )}
-      </Box>
+      <DocumentView channel={channel} />
     </Surface>
   );
 }

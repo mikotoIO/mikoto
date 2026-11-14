@@ -1,11 +1,3 @@
-import { Box, Button, Group, Heading, Input } from '@chakra-ui/react';
-import styled from '@emotion/styled';
-import {
-  faFileAlt,
-  faHashtag,
-  faMicrophone,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   Channel,
   ChannelType,
@@ -14,43 +6,55 @@ import {
 } from '@mikoto-io/mikoto.js';
 import { permissions } from '@mikoto-io/permcheck';
 import { useSetAtom } from 'jotai';
-import { useState } from 'react';
+import {
+  CheckCheck,
+  FileText,
+  FolderPlus,
+  Hash,
+  Link,
+  type LucideIcon,
+  Settings,
+  SquareArrowOutUpRight,
+  Trash2,
+  Volume2,
+} from 'lucide-react';
+import { useId, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { ContextMenu, modalState } from '@/components/ContextMenu';
-import { DialogContent, Field } from '@/components/ui';
-import { useErrorElement } from '@/hooks/useErrorElement';
+import {
+  Button,
+  DialogClose,
+  DialogContent,
+  Field,
+  Form,
+  Input,
+  describeError,
+  toast,
+} from '@/design';
 import { useTabkit } from '@/store/surface';
-import { Form } from '@/ui';
+import { ackChannel } from '@/store/unreads';
 
+import styles from './Explorer.module.css';
 import { channelToTab } from './channelToTab';
 
-const channelTypes = [
-  { id: 'TEXT', name: 'Text', icon: faHashtag },
-  { id: 'VOICE', name: 'Voice', icon: faMicrophone },
-  { id: 'DOCUMENT', name: 'Note', icon: faFileAlt },
+const ICON = 15;
+
+const channelTypes: {
+  id: ChannelType;
+  name: string;
+  hint: string;
+  icon: LucideIcon;
+}[] = [
+  { id: 'TEXT', name: 'Text', hint: 'Messages and threads', icon: Hash },
+  { id: 'VOICE', name: 'Voice', hint: 'Talk and share screens', icon: Volume2 },
+  {
+    id: 'DOCUMENT',
+    name: 'Doc',
+    hint: 'A page everyone can edit together',
+    icon: FileText,
+  },
 ];
-
-const ChannelTypeButton = styled.button<{ active?: boolean }>`
-  background-color: var(--chakra-colors-gray-800);
-  border: 2px solid
-    ${(p) => (p.active ? 'var(--chakra-colors-blue-500)' : 'transparent')};
-  color: var(--chakra-colors-gray-200);
-  font-size: 16px;
-  border-radius: 8px;
-  min-width: 100px;
-  min-height: 100px;
-  margin: 8px;
-  cursor: pointer;
-
-  .icon {
-    margin-bottom: 8px;
-    font-size: 24px;
-    color: var(--chakra-colors-gray-500);
-  }
-
-  transition: border-color 0.1s ease-in-out;
-`;
 
 export function CreateChannelModal({
   space,
@@ -60,117 +64,182 @@ export function CreateChannelModal({
   channel?: Channel;
 }) {
   const setModal = useSetAtom(modalState);
-  const { register, handleSubmit } = useForm();
-
+  const formId = useId();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<{ name: string }>();
   const [channelType, setChannelType] = useState<ChannelType>('TEXT');
-  const error = useErrorElement();
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   return (
-    <DialogContent rounded="md" p={4} maxW="480px">
-      <Box>
-        <Heading fontSize="xl" mt={0} mb={1}>
-          {channel ? 'Create Subchannel' : 'Create Channel'}
-        </Heading>
-        {channel && (
-          <Box as="p" m={0} color="gray.300">
-            In #{channel.name}
-          </Box>
-        )}
-        <Form
-          mt={4}
-          onSubmit={handleSubmit((data) => {
-            try {
-              space.createChannel({
-                name: data.name,
-                type: channelType,
-                parentId: channel?.id ?? null,
-              });
-              setModal(null);
-            } catch (e) {
-              console.log(e);
-              error.setError((e as any)?.response?.data);
-            }
-          })}
+    <DialogContent
+      size="sm"
+      title={channel ? 'Create subchannel' : 'Create channel'}
+      description={channel ? `Inside #${channel.name}` : `In ${space.name}`}
+      footer={
+        <>
+          <DialogClose render={<Button variant="ghost" />}>Cancel</DialogClose>
+          <Button
+            variant="primary"
+            type="submit"
+            form={formId}
+            loading={isSubmitting}
+          >
+            Create channel
+          </Button>
+        </>
+      }
+    >
+      <Form
+        id={formId}
+        onSubmit={handleSubmit(async (data) => {
+          setSubmitError(null);
+          try {
+            await space.createChannel({
+              name: data.name.trim(),
+              type: channelType,
+              parentId: channel?.id ?? null,
+            });
+            setModal(null);
+            toast({ type: 'success', title: 'Channel created' });
+          } catch (e) {
+            setSubmitError(describeError(e, { context: 'action' }).message);
+          }
+        })}
+      >
+        <div
+          className={styles.typePicker}
+          role="radiogroup"
+          aria-label="Channel type"
         >
-          {error.el}
-          <div>
-            {channelTypes.map((type) => (
-              <ChannelTypeButton
+          {channelTypes.map((type) => {
+            const Icon = type.icon;
+            return (
+              <button
                 key={type.id}
                 type="button"
-                active={channelType === type.id}
-                onClick={() => setChannelType(type.id as ChannelType)}
+                role="radio"
+                aria-checked={channelType === type.id}
+                className={styles.typeOption}
+                onClick={() => setChannelType(type.id)}
               >
-                <FontAwesomeIcon className="icon" icon={type.icon} />
-                <br />
-                {type.name}
-              </ChannelTypeButton>
-            ))}
-          </div>
-          <Field label="Channel Name">
-            <Input
-              autoComplete="off"
-              placeholder="New Channel"
-              {...register('name')}
-            />
-          </Field>
-
-          <Button colorPalette="blue" type="submit">
-            Create Channel
-          </Button>
-        </Form>
-      </Box>
+                <Icon size={18} aria-hidden />
+                <strong>{type.name}</strong>
+                <small>{type.hint}</small>
+              </button>
+            );
+          })}
+        </div>
+        <Field
+          label="Channel name"
+          required
+          error={errors.name?.message ?? submitError ?? undefined}
+        >
+          <Input
+            autoComplete="off"
+            autoFocus
+            placeholder="general"
+            {...register('name', {
+              validate: (v) =>
+                v.trim().length > 0 || 'Give the channel a name.',
+            })}
+          />
+        </Field>
+      </Form>
     </DialogContent>
   );
 }
 
 function DeleteChannelModal({ channel }: { channel: MikotoChannel }) {
   const setModal = useSetAtom(modalState);
+  const [deleting, setDeleting] = useState(false);
 
   return (
-    <DialogContent rounded="md" p={4} maxW="480px">
-      <Box pb={4}>
-        Are you sure you want to delete the channel{' '}
-        <strong>#{channel.name}</strong>?
-      </Box>
-      <Group>
-        <Button
-          colorPalette="danger"
-          onClick={async () => {
-            await channel.delete();
-            setModal(null);
-          }}
-        >
-          Delete
-        </Button>
-        <Button
-          colorPalette="secondary"
-          onClick={() => {
-            setModal(null);
-          }}
-        >
-          Cancel
-        </Button>
-      </Group>
-    </DialogContent>
+    <DialogContent
+      size="sm"
+      title={`Delete #${channel.name}?`}
+      description="The channel and its messages are deleted for everyone. This can't be undone."
+      footer={
+        <>
+          <DialogClose render={<Button variant="ghost" />}>Cancel</DialogClose>
+          <Button
+            variant="danger"
+            loading={deleting}
+            onClick={async () => {
+              setDeleting(true);
+              try {
+                await channel.delete();
+                setModal(null);
+                toast({ type: 'success', title: 'Channel deleted' });
+              } catch (err) {
+                setDeleting(false);
+                toast({
+                  type: 'error',
+                  title: `Couldn't delete #${channel.name}`,
+                  description: describeError(err, { context: 'action' })
+                    .message,
+                });
+              }
+            }}
+          >
+            Delete channel
+          </Button>
+        </>
+      }
+    />
   );
+}
+
+async function copyText(text: string, success: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast({ type: 'success', title: success });
+  } catch {
+    toast({
+      type: 'error',
+      title: "Couldn't copy to the clipboard",
+      description: 'Allow clipboard access for this site and try again.',
+    });
+  }
 }
 
 export const ChannelContextMenu = ({ channel }: { channel: MikotoChannel }) => {
   const tabkit = useTabkit();
   const setModal = useSetAtom(modalState);
+  const isAdmin = channel.space?.member?.checkPermission(permissions.superuser);
 
   return (
     <ContextMenu>
-      <ContextMenu.Link
+      <ContextMenu.Item
+        icon={<SquareArrowOutUpRight size={ICON} />}
         onClick={() => {
           tabkit.openTab(channelToTab(channel), true);
         }}
       >
         Open in new tab
-      </ContextMenu.Link>
-      <ContextMenu.Link>Mark as Read</ContextMenu.Link>
-      <ContextMenu.Link
+      </ContextMenu.Item>
+      <ContextMenu.Item
+        icon={<CheckCheck size={ICON} />}
+        onClick={async () => {
+          const now = new Date().toISOString();
+          try {
+            await channel.ack();
+            ackChannel(channel.id, now);
+          } catch (err) {
+            toast({
+              type: 'error',
+              title: `Couldn't mark #${channel.name} as read`,
+              description: describeError(err, { context: 'action' }).message,
+            });
+          }
+        }}
+      >
+        Mark as read
+      </ContextMenu.Item>
+      <ContextMenu.Item
+        icon={<Settings size={ICON} />}
         onClick={() => {
           tabkit.openTab(
             {
@@ -182,15 +251,22 @@ export const ChannelContextMenu = ({ channel }: { channel: MikotoChannel }) => {
           );
         }}
       >
-        Channel Settings
-      </ContextMenu.Link>
-      {channel.space?.member?.checkPermission(permissions.superuser) && (
+        Channel settings
+      </ContextMenu.Item>
+      {isAdmin && (
         <>
-          <ContextMenu.Link
+          <ContextMenu.Separator />
+          <ContextMenu.Item
+            icon={<FolderPlus size={ICON} />}
             onClick={() => {
               const { space } = channel;
               if (!space) {
-                console.error('channel has no space. probably a bug.');
+                toast({
+                  type: 'error',
+                  title: "Couldn't create a subchannel",
+                  description:
+                    "This channel's space hasn't loaded. Reload and try again.",
+                });
                 return;
               }
               setModal({
@@ -198,24 +274,29 @@ export const ChannelContextMenu = ({ channel }: { channel: MikotoChannel }) => {
               });
             }}
           >
-            Create Subchannel
-          </ContextMenu.Link>
-          <ContextMenu.Link
-            onClick={() => {
-              navigator.clipboard.writeText(
+            Create subchannel
+          </ContextMenu.Item>
+          <ContextMenu.Item
+            icon={<Link size={ICON} />}
+            onClick={() =>
+              copyText(
                 `${window.location.origin}/?m=${channel.id}`,
-              );
-            }}
+                'Channel link copied',
+              )
+            }
           >
-            Copy Channel Link
-          </ContextMenu.Link>
-          <ContextMenu.Link
+            Copy channel link
+          </ContextMenu.Item>
+          <ContextMenu.Separator />
+          <ContextMenu.Item
+            icon={<Trash2 size={ICON} />}
+            danger
             onClick={() => {
               setModal({ elem: <DeleteChannelModal channel={channel} /> });
             }}
           >
-            Delete Channel
-          </ContextMenu.Link>
+            Delete channel
+          </ContextMenu.Item>
         </>
       )}
     </ContextMenu>

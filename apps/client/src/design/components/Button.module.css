@@ -1,0 +1,137 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: var(--ctl-h);
+  padding: 0 14px;
+  border-radius: var(--r-ctl);
+  border: 1px solid transparent;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+  transition:
+    background-color var(--dur-fast),
+    border-color var(--dur-fast),
+    color var(--dur-fast);
+}
+
+.button:disabled,
+.button[data-disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sm {
+  height: var(--ctl-h-sm);
+  padding: 0 10px;
+  gap: 6px;
+  font-size: var(--text-sm);
+}
+
+.lg {
+  height: calc(var(--ctl-h) + 6px);
+  padding: 0 18px;
+  font-size: var(--text-md);
+}
+
+.block {
+  width: 100%;
+}
+
+/* variants */
+.primary {
+  --fg: var(--on-accent);
+  background: var(--accent);
+}
+.primary:not(:disabled):hover {
+  background: color-mix(in oklch, var(--accent) 88%, var(--text));
+}
+
+.secondary {
+  --fg: var(--text);
+  background: var(--sheet);
+  border-color: var(--line-strong);
+}
+.secondary:not(:disabled):hover {
+  background: var(--hover);
+}
+
+.ghost {
+  --fg: var(--muted);
+  background: transparent;
+}
+.ghost:not(:disabled):hover {
+  --fg: var(--text);
+  background: var(--hover);
+}
+
+.danger {
+  --fg: #fff;
+  background: var(--danger-solid);
+}
+.danger:not(:disabled):hover {
+  background: color-mix(in oklch, var(--danger-solid) 88%, black);
+}
+
+.dangerGhost {
+  --fg: var(--danger);
+  background: transparent;
+}
+.dangerGhost:not(:disabled):hover {
+  background: var(--danger-soft);
+}
+
+/* every variant sets --fg; text follows it */
+.button {
+  color: var(--fg, var(--text));
+}
+
+/* loading: keep width stable, hide the label (text nodes included), overlay a spinner */
+.loading {
+  color: transparent;
+}
+.loading > :not(.spinnerWrap) {
+  visibility: hidden;
+}
+.spinnerWrap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--fg, var(--text));
+}
+
+/* icon buttons */
+.icon {
+  width: var(--ctl-h-sm);
+  height: var(--ctl-h-sm);
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+}
+.icon:not(:disabled):hover,
+.icon[aria-pressed='true'],
+.icon[aria-expanded='true'] {
+  background: var(--hover);
+  color: var(--text);
+}
+.icon[aria-pressed='true'] {
+  background: var(--press);
+}
+.icon.md {
+  width: var(--ctl-h);
+  height: var(--ctl-h);
+}
+.icon.primary {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.icon.primary:disabled {
+  background: var(--press);
+  color: var(--faint);
+  opacity: 1;
+}

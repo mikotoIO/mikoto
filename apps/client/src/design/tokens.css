@@ -1,0 +1,189 @@
+/*
+ * Design tokens.
+ *
+ * Everything visual derives from a handful of user preferences, applied as
+ * data attributes on <html> by `applyAppearance()`:
+ *   data-theme    dark | light
+ *   data-tint     neutral | subtle | rich   (accent mixed into backgrounds)
+ *   data-density  comfortable | compact
+ *   data-radius   sharp | soft | round
+ *   data-font     inter | plex | atkinson | onest | system
+ *   data-motion   full | reduce
+ * plus two custom properties set inline: --accent and --fs (base text size).
+ *
+ * Components must only reference the semantic tokens below, never raw hex.
+ */
+
+:root {
+  --accent: #7c8cf8;
+  --on-accent: #14121c;
+  --fs: 14px;
+  --tint: 0%;
+
+  --font-ui: 'Inter Variable', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace,
+    monospace;
+
+  /* type scale, relative to the user's base size */
+  --text-xs: calc(var(--fs) - 2.5px);
+  --text-sm: calc(var(--fs) - 1px);
+  --text-md: var(--fs);
+  --text-lg: calc(var(--fs) + 2px);
+  --text-xl: calc(var(--fs) * 1.43);
+  --text-2xl: calc(var(--fs) * 1.86);
+  --text-3xl: calc(var(--fs) * 2.5);
+
+  /* spacing (4px grid) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* shape */
+  --r-sheet: 12px;
+  --r-ctl: 8px;
+  --r-pill: 999px;
+
+  /* density-dependent */
+  --row: 30px;
+  --ctl-h: 34px;
+  --ctl-h-sm: 28px;
+  --av: 34px;
+  --msg-pad: 10px;
+
+  /* layering */
+  --z-dropdown: 100;
+  --z-dialog: 200;
+  --z-menu: 300;
+  --z-toast: 400;
+  --z-tooltip: 500;
+
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur: 180ms;
+}
+
+/* ---------------------------------------------------------------- dark */
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --base: color-mix(in oklch, var(--accent) var(--tint), #0e0f11);
+  --sheet: color-mix(in oklch, var(--accent) var(--tint), #17181b);
+  --raised: color-mix(in oklch, var(--accent) var(--tint), #202125);
+  --overlay: color-mix(in oklch, var(--accent) var(--tint), #232428);
+  --hover: rgb(255 255 255 / 0.045);
+  --press: rgb(255 255 255 / 0.08);
+  --line: color-mix(in oklch, var(--accent) var(--tint), #2a2b30);
+  --line-strong: color-mix(in oklch, var(--accent) var(--tint), #393a40);
+
+  --text: #ecedef;
+  --muted: #9ea0a8;
+  --faint: #6e7078;
+
+  --accent-ink: color-mix(in oklch, var(--accent) 80%, white);
+  --accent-soft: color-mix(in oklch, var(--accent) 17%, transparent);
+
+  --danger: #ff7070;
+  --warn: #f2b84b;
+  --ok: #4fd18b;
+  /* filled destructive buttons: dark enough for white text (>= 4.5:1) */
+  --danger-solid: #c93535;
+  --danger-soft: color-mix(in oklch, var(--danger) 14%, transparent);
+  --warn-soft: color-mix(in oklch, var(--warn) 14%, transparent);
+  --ok-soft: color-mix(in oklch, var(--ok) 14%, transparent);
+
+  --shimmer: rgb(255 255 255 / 0.05);
+  --scrim: rgb(0 0 0 / 0.55);
+  --shadow: 0 12px 40px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 4px 14px rgb(0 0 0 / 0.35);
+
+  /* role colors: lightness floor + chroma cap keeps names >= WCAG AA */
+  --role-l: max(l, 0.8);
+  --role-c: min(c, 0.13);
+}
+
+/* --------------------------------------------------------------- light */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --base: color-mix(in oklch, var(--accent) var(--tint), #edeef0);
+  --sheet: color-mix(in oklch, var(--accent) calc(var(--tint) / 3), #ffffff);
+  --raised: color-mix(in oklch, var(--accent) var(--tint), #f4f5f6);
+  --overlay: #ffffff;
+  --hover: rgb(20 20 40 / 0.045);
+  --press: rgb(20 20 40 / 0.08);
+  --line: color-mix(in oklch, var(--accent) var(--tint), #e2e3e6);
+  --line-strong: color-mix(in oklch, var(--accent) var(--tint), #cfd1d6);
+
+  --text: #18191c;
+  --muted: #5e6068;
+  --faint: #8c8e96;
+
+  --accent-ink: color-mix(in oklch, var(--accent) 62%, black);
+  --accent-soft: color-mix(in oklch, var(--accent) 15%, transparent);
+
+  --danger: #d23b3b;
+  --warn: #b87a0a;
+  --ok: #1e9e5a;
+  --danger-solid: #c93535;
+
+  --shimmer: rgb(255 255 255 / 0.7);
+  --scrim: rgb(20 20 30 / 0.35);
+  --shadow: 0 12px 40px rgb(30 30 60 / 0.14), 0 2px 6px rgb(30 30 60 / 0.08);
+  --shadow-sm: 0 4px 14px rgb(30 30 60 / 0.1);
+
+  --role-l: min(l, 0.48);
+  --role-c: min(c, 0.16);
+}
+
+/* ------------------------------------------------------- preferences */
+:root[data-tint='subtle'] {
+  --tint: 4%;
+}
+:root[data-tint='rich'] {
+  --tint: 9%;
+}
+
+:root[data-density='compact'] {
+  --row: 26px;
+  --ctl-h: 30px;
+  --ctl-h-sm: 24px;
+  --av: 28px;
+  --msg-pad: 6px;
+}
+
+:root[data-radius='sharp'] {
+  --r-sheet: 4px;
+  --r-ctl: 4px;
+}
+:root[data-radius='round'] {
+  --r-sheet: 18px;
+  --r-ctl: 11px;
+}
+
+:root[data-font='plex'] {
+  --font-ui: 'IBM Plex Sans', system-ui, sans-serif;
+}
+:root[data-font='atkinson'] {
+  --font-ui: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+}
+:root[data-font='onest'] {
+  --font-ui: 'Onest Variable', 'Onest', system-ui, sans-serif;
+}
+:root[data-font='system'] {
+  --font-ui: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+:root[data-motion='reduce'] {
+  --dur-fast: 0ms;
+  --dur: 0ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur: 0ms;
+  }
+}

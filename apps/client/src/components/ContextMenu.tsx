@@ -1,9 +1,22 @@
-import styled from '@emotion/styled';
-import useEventListener from '@use-it/event-listener';
 import { atom, useAtom, useSetAtom } from 'jotai';
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, {
+  type ComponentProps,
+  type ReactNode,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
-import { DialogBackdrop, DialogRoot } from '@/components/ui';
+import { Dialog, cx } from '@/design';
+
+import styles from './ContextMenu.module.css';
+
+/*
+ * Imperative context menus: `onContextMenu={useContextMenu(() => <Menu/>)}`.
+ * One menu is open at a time; it closes on outside click, Escape, scroll,
+ * blur, or after an item is chosen.
+ */
 
 interface Positions {
   top?: number;
@@ -19,125 +32,173 @@ interface ContextMenuData {
 
 export const contextMenuState = atom<ContextMenuData | null>(null);
 
-const StyledContextMenuOverlay = styled.div`
-  position: fixed;
-  pointer-events: none;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 200;
-`;
-
-const ContextMenuBase = styled.div`
-  color: var(--chakra-colors-text);
-  width: 160px;
-  padding: 4px;
-  font-size: 14px;
-  border-radius: 8px;
-  background-color: var(--chakra-colors-gray-650);
-  border: 1px solid var(--chakra-colors-gray-600);
-  box-shadow: rgba(0, 0, 0, 0.1) 0 8px 24px;
-`;
-
-interface StyledContextMenuProps {
-  bottomPin?: boolean;
-}
-
-// TODO: probably a smarter way to do this
-const StyledContextMenu = styled.div<StyledContextMenuProps>`
-  pointer-events: all;
-  position: absolute;
-  &:focus {
-    outline: none;
-  }
-  ${(p) => p.bottomPin && `bottom: 0 !important; top: unset !important;`}
-`;
+const MARGIN = 8;
 
 export function ContextMenuKit() {
   const [context, setContext] = useAtom(contextMenuState);
-  const [bottomPin, setBottomPin] = useState<boolean>(false);
-
   const ref = useRef<HTMLDivElement>(null);
+  const [placed, setPlaced] = useState<{ top: number; left: number } | null>(
+    null,
+  );
+
+  // Measure, then clamp into the viewport on both axes. This has to be a
+  // layout effect: the size is only known after render, and placing before
+  // paint avoids a visible jump.
   useLayoutEffect(() => {
-    if (ref.current) {
-      const rect = ref.current.getBoundingClientRect();
-      // Measure-then-set pattern: we need the DOM size post-layout to decide
-      // bottom-pinning. Keeping this as a layout effect avoids a visual flicker.
+    const el = ref.current;
+    if (!context || !el) {
       // eslint-disable-next-line @eslint-react/set-state-in-effect
-      setBottomPin(rect.top + rect.height > window.innerHeight);
-    } else {
-      // eslint-disable-next-line @eslint-react/set-state-in-effect
-      setBottomPin(false);
+      setPlaced(null);
+      return;
     }
-  }, [context ? 'something' : '']);
+    const { width, height } = el.getBoundingClientRect();
+    const p = context.position;
+    let left = p.left ?? window.innerWidth - (p.right ?? 0) - width;
+    let top = p.top ?? window.innerHeight - (p.bottom ?? 0) - height;
+    if (left + width > window.innerWidth - MARGIN) left -= width;
+    if (top + height > window.innerHeight - MARGIN) {
+      top = window.innerHeight - MARGIN - height;
+    }
+    // eslint-disable-next-line @eslint-react/set-state-in-effect
+    setPlaced({
+      left: Math.max(MARGIN, left),
+      top: Math.max(MARGIN, top),
+    });
+  }, [context]);
 
-  useEventListener('mousedown', (ev) => {
-    if (ref.current && !ref.current.contains(ev.target as any)) {
-      setContext(null);
+  // Focus the first item so keyboard users land inside the menu.
+  useEffect(() => {
+    if (placed) {
+      ref.current
+        ?.querySelector<HTMLElement>('[role="menuitem"]:not([aria-disabled])')
+        ?.focus({ preventScroll: true });
     }
-  });
+  }, [placed]);
 
-  useEventListener('touchstart', (ev) => {
-    if (ref.current && !ref.current.contains(ev.target as any)) {
-      setContext(null);
-    }
-  });
+  useEffect(() => {
+    if (!context) return;
+    const close = () => setContext(null);
+    const onPointer = (ev: Event) => {
+      if (ev.target instanceof Node && ref.current?.contains(ev.target)) return;
+      close();
+    };
+    const onKey = (ev: KeyboardEvent) => {
+      if (ev.key === 'Escape') close();
+    };
+    window.addEventListener('pointerdown', onPointer, true);
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('blur', close);
+    window.addEventListener('resize', close);
+    window.addEventListener('wheel', close, { passive: true });
+    return () => {
+      window.removeEventListener('pointerdown', onPointer, true);
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('blur', close);
+      window.removeEventListener('resize', close);
+      window.removeEventListener('wheel', close);
+    };
+  }, [context, setContext]);
 
-  useEventListener('keydown', (ev: KeyboardEvent) => {
-    if (ev.code === 'Escape') {
-      setContext(null);
-    }
-  });
+  if (!context) return null;
 
   return (
-    <StyledContextMenuOverlay tabIndex={0}>
-      {context && (
-        <StyledContextMenu
-          ref={ref}
-          style={{ ...context.position }}
-          bottomPin={bottomPin}
-        >
-          {context.elem}
-        </StyledContextMenu>
-      )}
-    </StyledContextMenuOverlay>
+    <div
+      ref={ref}
+      className={styles.layer}
+      style={
+        placed
+          ? { top: placed.top, left: placed.left }
+          : { top: 0, left: 0, visibility: 'hidden' }
+      }
+      onKeyDown={(ev) => {
+        if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(ev.key)) return;
+        ev.preventDefault();
+        const items = Array.from(
+          ref.current?.querySelectorAll<HTMLElement>(
+            '[role="menuitem"]:not([aria-disabled])',
+          ) ?? [],
+        );
+        if (!items.length) return;
+        const i = items.findIndex((el) => el === document.activeElement);
+        const next =
+          ev.key === 'Home'
+            ? 0
+            : ev.key === 'End'
+              ? items.length - 1
+              : ev.key === 'ArrowDown'
+                ? (i + 1) % items.length
+                : (i - 1 + items.length) % items.length;
+        items[next].focus();
+      }}
+    >
+      {context.elem}
+    </div>
   );
 }
+
+function ContextMenuRoot({ className, ...props }: ComponentProps<'div'>) {
+  return <div role="menu" className={cx(styles.menu, className)} {...props} />;
+}
+
+interface ItemProps extends Omit<ComponentProps<'button'>, 'onClick'> {
+  onClick?: (ev: React.MouseEvent<HTMLButtonElement>) => void;
+  icon?: ReactNode;
+  /** Destructive actions (delete, leave, ban) are red. */
+  danger?: boolean;
+  shortcut?: string;
+}
+
+function ContextMenuItem({
+  onClick,
+  icon,
+  danger,
+  shortcut,
+  disabled,
+  className,
+  children,
+  ...props
+}: ItemProps) {
+  const setContextMenu = useSetAtom(contextMenuState);
+  return (
+    <button
+      type="button"
+      role="menuitem"
+      tabIndex={-1}
+      aria-disabled={disabled || undefined}
+      className={cx(styles.item, danger && styles.danger, className)}
+      onClick={(e) => {
+        if (disabled) return;
+        onClick?.(e);
+        setContextMenu(null);
+      }}
+      {...props}
+    >
+      {icon && <span className={styles.icon}>{icon}</span>}
+      <span className={styles.label}>{children}</span>
+      {shortcut && <kbd className={styles.shortcut}>{shortcut}</kbd>}
+    </button>
+  );
+}
+
+function ContextMenuSeparator() {
+  return <div role="separator" className={styles.separator} />;
+}
+
+function ContextMenuLabel({ children }: { children: ReactNode }) {
+  return <div className={styles.groupLabel}>{children}</div>;
+}
+
+export const ContextMenu = Object.assign(ContextMenuRoot, {
+  Item: ContextMenuItem,
+  /** @deprecated use ContextMenu.Item */
+  Link: ContextMenuItem,
+  Separator: ContextMenuSeparator,
+  Label: ContextMenuLabel,
+});
 
 interface ContextMenuFns {
   destroy(): void;
 }
-
-function ContextMenuLink({ onClick, ...props }: React.ComponentProps<'a'>) {
-  const setContextMenu = useSetAtom(contextMenuState);
-
-  return (
-    <a
-      {...props}
-      onClick={(e) => {
-        onClick?.(e);
-        setContextMenu(null);
-      }}
-    />
-  );
-}
-
-const StyledContextMenuLink = styled(ContextMenuLink)`
-  display: block;
-  padding: 4px;
-  box-sizing: border-box;
-  border-radius: 4px;
-  width: 100%;
-
-  &:hover {
-    background-color: var(--chakra-colors-gray-700);
-  }
-`;
-
-export const ContextMenu = Object.assign(ContextMenuBase, {
-  Link: StyledContextMenuLink,
-});
 
 export function useContextMenuX(position?: Positions) {
   const setContextMenu = useSetAtom(contextMenuState);
@@ -170,7 +231,10 @@ export function useContextMenu(
   };
 }
 
-// modal stuff
+/* ------------------------------------------------------------------ modals
+ * `useModalKit()(<MyModal/>)` or `setModal({ elem })`. The element should
+ * render a <DialogContent> from '@/design'.
+ */
 interface ModalData {
   elem: React.ReactNode;
 }
@@ -179,19 +243,14 @@ export const modalState = atom<ModalData | null>(null);
 
 export function ModalKit() {
   const [modal, setModal] = useAtom(modalState);
-
-  // opened={modal !== null}
   return (
-    <DialogRoot
+    <Dialog
       open={modal !== null}
-      onOpenChange={({ open }) => {
-        if (!open) {
-          setModal(null);
-        }
+      onOpenChange={(open) => {
+        if (!open) setModal(null);
       }}
     >
-      {modal && <DialogBackdrop />}
       {modal?.elem}
-    </DialogRoot>
+    </Dialog>
   );
 }

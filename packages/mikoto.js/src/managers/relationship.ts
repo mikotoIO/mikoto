@@ -77,6 +77,16 @@ export class RelationshipManager extends CachedManager<MikotoRelationship> {
     return rels.map((r) => new MikotoRelationship(r, this.client));
   }
 
+  /** Like `list()`, but also drops cached relationships that no longer exist. */
+  async sync() {
+    const rels = await this.list();
+    const current = new Set(rels.map((r) => r.id));
+    for (const id of [...this.cache.keys()]) {
+      if (!current.has(id)) this._delete(id);
+    }
+    return rels;
+  }
+
   async sendRequest(userId: string) {
     const rel = await this.client.rest['relations.sendRequest'](undefined, {
       params: { relationId: userId },

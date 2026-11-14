@@ -1,218 +1,352 @@
-import { Box, Flex, Link } from '@chakra-ui/react';
-import styled from '@emotion/styled';
-import { faGlasses } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { MikotoMessage } from '@mikoto-io/mikoto.js';
-import { atom, useSetAtom } from 'jotai';
+import type { MikotoMessage } from '@mikoto-io/mikoto.js';
+import { atom, useAtomValue, useSetAtom } from 'jotai';
+import {
+  Bot,
+  CircleAlert,
+  Copy,
+  Ellipsis,
+  FileText,
+  Pencil,
+  Trash2,
+} from 'lucide-react';
+import { type ReactNode, useRef } from 'react';
 import { useSnapshot } from 'valtio/react';
 
-import { ContextMenu, useContextMenu } from '@/components/ContextMenu';
+import {
+  ContextMenu,
+  contextMenuState,
+  useContextMenu,
+} from '@/components/ContextMenu';
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
-import { MessageAvatar } from '@/components/atoms/MessageAvatar';
-import { Markdown } from '@/components/molecules/markdown';
-import { Tag } from '@/components/ui';
+import {
+  MemberContextMenu,
+  MessageAvatar,
+  roleNameProps,
+} from '@/components/atoms/MessageAvatar';
+import { Markdown, MessageImage } from '@/components/molecules/markdown';
+import {
+  IconButton,
+  ItemErrorBoundary,
+  RoleName,
+  Skeleton,
+  Tag,
+  cx,
+  describeError,
+  toast,
+} from '@/design';
 import { useMikoto } from '@/hooks';
 
+import styles from './Message.module.css';
 import { Timestamp } from './Timestamp';
 
-const MessageContainer = styled.div<{ isSimple?: boolean; pending?: boolean }>`
-  margin: 0;
-  display: flex;
-  min-height: 20px;
-  gap: 16px;
-  padding: 2px 20px 6px;
-  padding-top: ${(p) => (p.isSimple ? '2px' : '8px')};
-  opacity: ${(p) => (p.pending ? 0.5 : 1)};
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.06);
-  }
+export { Timestamp } from './Timestamp';
 
-  p {
-    margin: 0;
-  }
-
-  .avatar {
-    margin-top: 4px;
-  }
-`;
-
-const MessageInner = styled.div`
-  flex: 1;
-  min-width: 0;
-  margin: 0;
-  font-size: 14px;
-  overflow-wrap: break-word;
-  word-break: break-word;
-
-  a {
-    color: #00aff4;
-
-    &:not(:hover) {
-      text-decoration: none;
-    }
-  }
-
-  img {
-    max-height: 300px;
-    max-width: 400px;
-  }
-
-  ul,
-  ol {
-    padding-inline-start: 24px;
-  }
-
-  p:not(:first-of-type),
-  pre:not(:first-of-type) {
-    margin-top: 8px;
-  }
-`;
-
-const Name = styled.div<{ color?: string | null }>`
-  font-family: var(--font-heading);
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0;
-  color: ${(p) => p.color ?? 'currentColor'};
-  cursor: pointer;
-  &:hover {
-    text-decoration: underline;
-    text-decoration-color: ${(p) => p.color ?? 'currentColor'};
-  }
-`;
-
-interface MessageProps {
-  message: MikotoMessage;
-  isSimple?: boolean;
-}
-
+/** The message currently being edited in the composer, if any. */
 export const messageEditState = atom<MikotoMessage | null>(null);
 
-export const MessageItem = ({ message, isSimple }: MessageProps) => {
+function escapeRegExp(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/** Whether `content` @-mentions the given handle (as the markdown renders it). */
+export function mentionsHandle(content: string, handle?: string | null) {
+  if (!handle) return false;
+  return new RegExp(
+    `(^|[^\\w\\\\])@${escapeRegExp(handle)}(?![\\w.])`,
+    'i',
+  ).test(content);
+}
+
+function formatSize(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
+async function copyText(text: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast({ type: 'success', title: 'Copied message text' });
+  } catch {
+    toast({
+      type: 'error',
+      title: "Couldn't copy the message",
+      description: 'Your browser blocked clipboard access.',
+    });
+  }
+}
+
+async function deleteMessage(message: MikotoMessage) {
+  try {
+    await message.delete();
+  } catch (err) {
+    toast({
+      type: 'error',
+      title: "Couldn't delete the message",
+      description: describeError(err, { context: 'action' }).message,
+    });
+  }
+}
+
+export interface MessageItemProps {
+  message: MikotoMessage;
+  /** A continuation of the previous author's group: no avatar or header. */
+  isSimple?: boolean;
+  /** Messages in a space get role-colored names; DMs never do. */
+  inSpace?: boolean;
+  /** Set when sending this (optimistic) message failed. */
+  failed?: boolean;
+  onRetry?: () => void;
+  onDiscard?: () => void;
+}
+
+function MessageRow({
+  message,
+  isSimple,
+  inSpace,
+  failed,
+  onRetry,
+  onDiscard,
+}: MessageItemProps) {
   const messageSnap = useSnapshot(message);
   const mikoto = useMikoto();
   const setEditState = useSetAtom(messageEditState);
-  const menu = useContextMenu(() => (
+  const editing = useAtomValue(messageEditState);
+  const setContextMenu = useSetAtom(contextMenuState);
+  const nameRef = useRef<HTMLButtonElement>(null);
+
+  const me = mikoto.user.me;
+  const isMine = !!me && message.authorId === me.id;
+  const isPending = !!messageSnap.pending;
+  const member = inSpace ? message.member : undefined;
+  const author = member?.user ?? messageSnap.author ?? undefined;
+  const authorName = author?.name ?? 'Deleted user';
+  const timestamp = new Date(messageSnap.timestamp);
+  const mentionsMe =
+    !isMine && !isPending && mentionsHandle(messageSnap.content, me?.handle);
+
+  const menuItems = (): ReactNode => (
     <ContextMenu>
-      {message.authorId === mikoto.user.me!.id && (
-        <ContextMenu.Link
-          onClick={() => {
-            setEditState(message);
-          }}
+      {isMine && (
+        <ContextMenu.Item
+          icon={<Pencil size={15} />}
+          onClick={() => setEditState(message)}
         >
-          Edit Message
-        </ContextMenu.Link>
+          Edit message
+        </ContextMenu.Item>
       )}
-      <ContextMenu.Link
-        onClick={async () => {
-          await navigator.clipboard.writeText(message.content);
-        }}
+      <ContextMenu.Item
+        icon={<Copy size={15} />}
+        onClick={() => copyText(message.content)}
       >
-        Copy Markdown
-      </ContextMenu.Link>
-      <ContextMenu.Link>Reply to Message</ContextMenu.Link>
-      <ContextMenu.Link
-        onClick={async () => {
-          await message.delete();
-        }}
+        Copy text
+      </ContextMenu.Item>
+      <ContextMenu.Separator />
+      <ContextMenu.Item
+        icon={<Trash2 size={15} />}
+        danger
+        onClick={() => deleteMessage(message)}
       >
-        Delete Message
-      </ContextMenu.Link>
+        Delete message
+      </ContextMenu.Item>
     </ContextMenu>
-  ));
+  );
+  const onContextMenu = useContextMenu(menuItems);
+
+  const openMoreMenu = (el: HTMLElement) => {
+    const { bottom, right } = el.getBoundingClientRect();
+    setContextMenu({
+      position: { top: bottom + 4, right: window.innerWidth - right },
+      elem: menuItems(),
+    });
+  };
+
+  const openProfileCard = () => {
+    if (!author || !nameRef.current) return;
+    const { top, right } = nameRef.current.getBoundingClientRect();
+    setContextMenu({
+      position: { top, left: right + 8 },
+      elem: <MemberContextMenu member={member} user={author} />,
+    });
+  };
+
+  const attachments = messageSnap.attachments ?? [];
 
   return (
-    <MessageContainer
-      isSimple={isSimple}
-      pending={message.pending}
-      onContextMenu={menu}
+    <article
+      className={cx(
+        styles.msg,
+        isSimple && styles.cont,
+        mentionsMe && styles.mention,
+        (isPending || failed) && styles.pending,
+      )}
+      aria-label={`${authorName}, ${timestamp.toLocaleString()}`}
+      onContextMenu={isPending ? undefined : onContextMenu}
     >
       {isSimple ? (
-        <Box m={0} w={10} />
+        <Timestamp className={styles.gutterTime} time={timestamp} timeOnly />
       ) : (
-        <MessageAvatar
-          member={message.member ?? undefined}
-          src={messageSnap.author?.avatar ?? undefined}
-          user={messageSnap.author ?? undefined}
-        />
+        <div className={styles.avatarCell}>
+          <MessageAvatar
+            member={member}
+            src={author?.avatar ?? undefined}
+            user={author}
+          />
+        </div>
       )}
-      <MessageInner>
+      <div className={styles.main}>
         {!isSimple && (
-          <Flex align="center" gap="8px" mb="6px">
-            <Name color={messageSnap.member?.roleColor}>
-              {messageSnap.author?.name ?? 'Ghost'}
-            </Name>
-
-            {messageSnap.author?.category === 'BOT' && (
-              <Tag
-                size="sm"
-                fontSize="2xs"
-                px={1}
-                minH="18px"
-                variant="solid"
-                bg="blue.500"
-                color="white"
-              >
-                <FontAwesomeIcon icon={faGlasses} />
+          <header className={styles.head}>
+            <button
+              ref={nameRef}
+              type="button"
+              className={styles.name}
+              disabled={!author}
+              onClick={openProfileCard}
+            >
+              <RoleName
+                name={authorName}
+                {...(inSpace ? roleNameProps(member) : {})}
+              />
+            </button>
+            {author?.category === 'BOT' && (
+              <Tag>
+                <Bot size={12} aria-hidden />
+                Bot
               </Tag>
             )}
-            <Timestamp time={new Date(messageSnap.timestamp)} ml="auto" />
-          </Flex>
+            <Timestamp className={styles.time} time={timestamp} />
+          </header>
         )}
-        <div>
+        <div className={styles.body}>
           <Markdown content={messageSnap.content} />
-          {message.editedTimestamp && (
-            <Box as="span" ml={1} color="gray.400" fontSize="xs">
+          {messageSnap.editedTimestamp && (
+            <span
+              className={styles.edited}
+              title={`Edited ${new Date(messageSnap.editedTimestamp).toLocaleString()}`}
+            >
               (edited)
-            </Box>
+            </span>
           )}
         </div>
-        {messageSnap.attachments && messageSnap.attachments.length > 0 && (
-          <Flex mt={2} gap={2} flexWrap="wrap">
-            {messageSnap.attachments.map((attachment) => {
-              const isImage = attachment.contentType.startsWith('image/');
+        {attachments.length > 0 && (
+          <div className={styles.attachments}>
+            {attachments.map((attachment) => {
+              const url = normalizeMediaUrl(attachment.url);
+              if (attachment.contentType.startsWith('image/')) {
+                return (
+                  <ItemErrorBoundary key={attachment.id} what="This image">
+                    <MessageImage src={url} alt={attachment.filename} />
+                  </ItemErrorBoundary>
+                );
+              }
               return (
-                <Link
+                <a
                   key={attachment.id}
-                  href={normalizeMediaUrl(attachment.url)}
+                  className={styles.file}
+                  href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  maxW={isImage ? '400px' : 'auto'}
-                  _hover={{ textDecoration: 'none' }}
                 >
-                  {isImage ? (
-                    <img
-                      src={normalizeMediaUrl(attachment.url)}
-                      alt={attachment.filename}
-                      style={{
-                        maxWidth: '100%',
-                        maxHeight: '300px',
-                        borderRadius: '4px',
-                      }}
-                    />
-                  ) : (
-                    <Box
-                      p={2}
-                      bg="gray.700"
-                      borderRadius="4px"
-                      _hover={{ bg: 'gray.600' }}
-                    >
-                      <Flex align="center" gap={2}>
-                        <Box fontSize="sm" fontWeight="medium">
-                          {attachment.filename}
-                        </Box>
-                        <Box fontSize="xs" color="gray.400">
-                          ({(attachment.size / 1024).toFixed(1)} KB)
-                        </Box>
-                      </Flex>
-                    </Box>
-                  )}
-                </Link>
+                  <FileText className={styles.fileIcon} size={20} aria-hidden />
+                  <span className={styles.fileText}>
+                    <span className={styles.fileName}>
+                      {attachment.filename}
+                    </span>
+                    <span className={styles.fileSize}>
+                      {formatSize(attachment.size)}
+                    </span>
+                  </span>
+                </a>
               );
             })}
-          </Flex>
+          </div>
         )}
-      </MessageInner>
-    </MessageContainer>
+        {failed && (
+          <div className={cx(styles.status, styles.failed)} role="alert">
+            <CircleAlert size={14} aria-hidden />
+            Not sent.
+            {onRetry && (
+              <button type="button" className={styles.link} onClick={onRetry}>
+                Try again
+              </button>
+            )}
+            {onDiscard && (
+              <button type="button" className={styles.link} onClick={onDiscard}>
+                Delete
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {!isPending && !failed && editing?.id !== message.id && (
+        <div
+          className={styles.actions}
+          role="toolbar"
+          aria-label="Message actions"
+        >
+          {isMine && (
+            <IconButton
+              aria-label="Edit message"
+              onClick={() => setEditState(message)}
+            >
+              <Pencil size={16} />
+            </IconButton>
+          )}
+          {isMine && (
+            <IconButton
+              aria-label="Delete message"
+              onClick={() => deleteMessage(message)}
+            >
+              <Trash2 size={16} />
+            </IconButton>
+          )}
+          <IconButton
+            aria-label="More actions"
+            aria-haspopup="menu"
+            onClick={(ev) => {
+              ev.stopPropagation();
+              openMoreMenu(ev.currentTarget);
+            }}
+          >
+            <Ellipsis size={16} />
+          </IconButton>
+        </div>
+      )}
+    </article>
   );
-};
+}
+
+/** One message. A message that fails to render shows a one-line notice. */
+export function MessageItem(props: MessageItemProps) {
+  return (
+    <ItemErrorBoundary
+      what="This message"
+      className={styles.broken}
+      resetKeys={[props.message]}
+    >
+      <MessageRow {...props} />
+    </ItemErrorBoundary>
+  );
+}
+
+/** Skeleton rows shaped like grouped messages, for first load and paging. */
+export function MessageSkeleton({ index }: { index: number }) {
+  const widths = [82, 64, 90, 55, 74, 68, 88, 60];
+  return (
+    <div className={styles.skeleton} aria-hidden>
+      <Skeleton circle width="var(--av)" />
+      <div className={styles.skeletonLines}>
+        <Skeleton width={90 + ((index * 13) % 60)} height={12} />
+        <Skeleton width={`${widths[index % widths.length]}%`} height={12} />
+        {index % 3 === 0 && (
+          <Skeleton
+            width={`${widths[(index + 3) % widths.length] - 20}%`}
+            height={12}
+          />
+        )}
+      </div>
+    </div>
+  );
+}

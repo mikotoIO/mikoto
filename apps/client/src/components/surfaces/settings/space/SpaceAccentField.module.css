@@ -1,0 +1,103 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.preview {
+  --space: var(--raised);
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 72px;
+  padding: 10px;
+  border-radius: calc(var(--r-ctl) + 2px);
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    var(--space),
+    oklch(from var(--space) calc(l - 0.14) c h)
+  );
+  border: 1px solid var(--line);
+}
+.preview::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgb(0 0 0 / 0.35), transparent 65%);
+}
+.previewIcon {
+  position: relative;
+  z-index: 1;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: calc(var(--r-ctl) + 2px);
+  background: var(--space);
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.35);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--text);
+}
+.previewName {
+  position: relative;
+  z-index: 1;
+  font-weight: 600;
+  color: #fff;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.swatch {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--c);
+}
+.swatch[aria-checked='true'] {
+  box-shadow:
+    0 0 0 2px var(--sheet),
+    0 0 0 4px var(--c, var(--muted));
+}
+.none {
+  background: var(--raised);
+  border: 1px dashed var(--line-strong);
+}
+
+.custom {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 10px 0 4px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-ctl);
+  font: var(--text-xs) var(--font-mono);
+  color: var(--muted);
+  cursor: pointer;
+}
+.custom input {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

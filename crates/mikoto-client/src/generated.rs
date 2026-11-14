@@ -475,12 +475,16 @@ pub struct ServeParams {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SpaceCreatePayload {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub accent: Option<String>,
     pub name: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SpaceExt {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub accent: Option<String>,
     pub channels: Vec<Channel>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub handle: Option<String>,
@@ -509,6 +513,8 @@ pub enum SpaceType {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SpaceUpdatePayload {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub accent: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub handle: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1069,6 +1075,14 @@ impl<'a> HttpApi<'a> {
         let mut req = self.client.post(self.url(&path))
             .bearer_auth(self.token);
         req = req.json(body);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn spaces_discover(&self) -> Result<Vec<SpaceExt>, ClientError> {
+        let path = "/spaces/discover".to_string();
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
         let resp = req.send().await?.error_for_status()?;
         Ok(resp.json().await?)
     }

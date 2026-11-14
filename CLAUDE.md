@@ -28,7 +28,7 @@ Check `ARCHITECTURE.md`.
 ### Frontend Stack
 
 - React 18 with TypeScript
-- Chakra UI for component library
+- In-house design system (`apps/client/src/design`): Base UI primitives + CSS Modules + design tokens
 - React Router for navigation
 - Vite for build tooling
 - Vitest for testing

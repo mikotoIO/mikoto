@@ -1,18 +1,28 @@
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
+import { type ComponentProps } from 'react';
 
-export const viewContainerCss = css`
-  display: flex;
-  box-sizing: border-box;
-  flex: 1;
-  background-color: var(--chakra-colors-surface);
-  height: 100%;
-  flex-direction: column;
-`;
+import { cx } from '@/design';
 
-export const Surface = styled.div<{ padded?: boolean; scroll?: boolean }>`
-  ${viewContainerCss}
+import styles from './Surface.module.css';
 
-  padding: ${(p) => (p.padded ? '32px' : '0')};
-  overflow-y: ${(p) => (p.scroll ? 'scroll' : 'hidden')};
-`;
+export interface SurfaceProps extends ComponentProps<'div'> {
+  /** Page-like content (settings, discovery) gets 32px padding. */
+  padded?: boolean;
+  scroll?: boolean;
+}
+
+/** The body of a tab: fills its dock sheet, owns its own scrolling. */
+export function Surface({ padded, scroll, className, ...props }: SurfaceProps) {
+  return (
+    <div
+      className={cx(
+        styles.surface,
+        padded && styles.padded,
+        scroll && styles.scroll,
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export { styles as surfaceStyles };

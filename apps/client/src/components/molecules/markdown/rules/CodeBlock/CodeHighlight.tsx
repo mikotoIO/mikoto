@@ -28,12 +28,9 @@ export default function CodeHighlight({
   language: string;
   content: string;
 }) {
-  const langExt = languageExtensions[language as any];
+  const langExt = languageExtensions[language];
   return (
-    <SyntaxHighlighter
-      language={langExt ?? language}
-      style={highlightTheme as any}
-    >
+    <SyntaxHighlighter language={langExt ?? language} style={highlightTheme}>
       {content}
     </SyntaxHighlighter>
   );

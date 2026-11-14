@@ -1,9 +1,9 @@
-import { Box } from '@chakra-ui/react';
-import { MikotoChannel } from '@mikoto-io/mikoto.js';
+import type { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { useEffect, useState } from 'react';
 
 import { useInterval, useMikoto } from '@/hooks';
-import { TypingDots } from '@/ui';
+
+import styles from './Messages.module.css';
 
 interface Typer {
   timestamp: number;
@@ -20,22 +20,44 @@ export function useTyping() {
   return [currentTypers, setCurrentTypers] as const;
 }
 
+/** Three bobbing dots. Static when the user prefers reduced motion. */
+export function TypingDots() {
+  return (
+    <span className={styles.dots} aria-hidden>
+      <i />
+      <i />
+      <i />
+    </span>
+  );
+}
+
+function formatGroup(names: string[], verb: string) {
+  if (names.length === 0) return null;
+  const shown =
+    names.length > 3
+      ? [`${names.length} people`]
+      : names.length === 1
+        ? names
+        : [names.slice(0, -1).join(', '), names[names.length - 1]];
+  return (
+    <>
+      {shown.map((n, i) => (
+        <span key={n}>
+          {i > 0 && ' and '}
+          <b>{n}</b>
+        </span>
+      ))}{' '}
+      {names.length === 1 ? `is ${verb}` : `are ${verb}`}
+    </>
+  );
+}
+
 interface TypingIndicatorProps {
   typers: Typer[];
   channel: MikotoChannel;
 }
 
-function formatTyperGroup(names: string[], verb: string) {
-  if (names.length === 0) return null;
-  const joined = names.join(', ');
-  const plural = names.length > 1 ? `are ${verb}` : `is ${verb}`;
-  return (
-    <>
-      <strong>{joined}</strong> {plural}
-    </>
-  );
-}
-
+/** "Theo is typing" above the composer. Always reserves its line. */
 export function TypingIndicator({ typers, channel }: TypingIndicatorProps) {
   const mikoto = useMikoto();
 
@@ -55,27 +77,34 @@ export function TypingIndicator({ typers, channel }: TypingIndicatorProps) {
 
   for (const t of typers) {
     const member = space?.members?._get(t.userId);
-    const name = member?.user.name ?? 'Unknown';
-    if (member?.user.category === 'BOT') {
+    const dmUser = !space
+      ? mikoto.relationships.values().find((r) => r.relationId === t.userId)
+          ?.user
+      : undefined;
+    const user = member?.user ?? dmUser;
+    const name = member?.name ?? user?.name ?? 'Someone';
+    if (user?.category === 'BOT') {
       botNames.push(name);
     } else {
       humanNames.push(name);
     }
   }
 
-  const humanPart = formatTyperGroup(humanNames, 'typing...');
-  const botPart = formatTyperGroup(botNames, 'thinking...');
+  const humanPart = formatGroup(humanNames, 'typing');
+  const botPart = formatGroup(botNames, 'thinking');
 
   return (
-    <Box px={4} fontSize="12px">
+    <div className={styles.typing} aria-live="polite">
       {typers.length > 0 && (
-        <div>
+        <>
           <TypingDots />
-          {humanPart}
-          {humanPart && botPart && ' '}
-          {botPart}
-        </div>
+          <span className={styles.typingText}>
+            {humanPart}
+            {humanPart && botPart && ', '}
+            {botPart}
+          </span>
+        </>
       )}
-    </Box>
+    </div>
   );
 }

@@ -1,0 +1,77 @@
+.me {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 6px var(--space-1) 0 6px;
+  margin-top: 6px;
+  border-top: 1px solid var(--line);
+}
+
+.who {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--space-1);
+  margin-left: calc(var(--space-1) * -1);
+  border: 0;
+  border-radius: var(--r-ctl);
+  background: none;
+  text-align: left;
+  line-height: 1.25;
+}
+.who:hover,
+.who[data-popup-open] {
+  background: var(--hover);
+}
+
+.avatar {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+}
+.avatar img {
+  border-radius: 50%;
+}
+
+.text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sub {
+  font-size: var(--text-xs);
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* profile card at the top of the account menu */
+.card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-3);
+  min-width: 240px;
+}
+.card img {
+  border-radius: 50%;
+}
+.cardName {
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+.cardSub {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}

@@ -1,35 +1,59 @@
-import { Box, type BoxProps } from '@chakra-ui/react';
+const TIME_FORMAT = new Intl.DateTimeFormat(undefined, {
+  hour: '2-digit',
+  minute: '2-digit',
+});
 
-function padTime(n: number): string {
-  return String(n).padStart(2, '0');
-}
-
-const DATE_FORMAT = new Intl.DateTimeFormat('en', {
+const DATE_FORMAT = new Intl.DateTimeFormat(undefined, {
   day: 'numeric',
-  month: 'long',
+  month: 'short',
   year: 'numeric',
 });
 
-function dateFormat(date: Date): string {
-  if (isToday(date)) {
-    return `${padTime(date.getHours())}:${padTime(date.getMinutes())}`;
-  }
-  return `${DATE_FORMAT.format(date)} ${padTime(date.getHours())}:${padTime(date.getMinutes())}`;
-}
+const FULL_FORMAT = new Intl.DateTimeFormat(undefined, {
+  dateStyle: 'full',
+  timeStyle: 'short',
+});
 
-function isToday(someDate: Date): boolean {
-  const today = new Date();
+function sameDay(a: Date, b: Date) {
   return (
-    someDate.getDate() === today.getDate() &&
-    someDate.getMonth() === today.getMonth() &&
-    someDate.getFullYear() === today.getFullYear()
+    a.getDate() === b.getDate() &&
+    a.getMonth() === b.getMonth() &&
+    a.getFullYear() === b.getFullYear()
   );
 }
 
-export function Timestamp({ time, ...rest }: { time: Date } & BoxProps) {
+function dateFormat(date: Date): string {
+  const now = new Date();
+  if (sameDay(date, now)) return TIME_FORMAT.format(date);
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (sameDay(date, yesterday)) {
+    return `Yesterday at ${TIME_FORMAT.format(date)}`;
+  }
+  return `${DATE_FORMAT.format(date)}, ${TIME_FORMAT.format(date)}`;
+}
+
+/**
+ * A message time. `timeOnly` is for the hover gutter of continuation rows,
+ * where the date is already given by the group above.
+ */
+export function Timestamp({
+  time,
+  timeOnly,
+  className,
+}: {
+  time: Date;
+  timeOnly?: boolean;
+  className?: string;
+}) {
+  if (Number.isNaN(time.getTime())) return null;
   return (
-    <Box color="gray.400" fontSize="xs" {...rest}>
-      {dateFormat(time)}
-    </Box>
+    <time
+      className={className}
+      dateTime={time.toISOString()}
+      title={FULL_FORMAT.format(time)}
+    >
+      {timeOnly ? TIME_FORMAT.format(time) : dateFormat(time)}
+    </time>
   );
 }

@@ -1,5 +1,5 @@
-import { faFile, faMicrophone } from '@fortawesome/free-solid-svg-icons';
 import { Channel } from '@mikoto-io/mikoto.js';
+import { FileText, Hash, type LucideIcon, Volume2 } from 'lucide-react';
 
 import { Tabable } from '@/store/surface';
 
@@ -24,17 +24,39 @@ export function channelToTab(channel: Channel): Tabable {
         channelId: channel.id,
       };
     default:
-      throw new Error('Unknown channel type');
+      throw new Error(`Unknown channel type: ${String(channel.type)}`);
   }
 }
 
-export function getIconFromChannelType(type: Channel['type']) {
+/** Like channelToTab, but returns null for channel types the client can't open. */
+export function tryChannelToTab(channel: Channel): Tabable | null {
+  try {
+    return channelToTab(channel);
+  } catch {
+    return null;
+  }
+}
+
+/** The Lucide icon for a channel type. Text (and anything unknown) is `Hash`. */
+export function getIconFromChannelType(type: Channel['type']): LucideIcon {
   switch (type) {
     case 'VOICE':
-      return faMicrophone;
+      return Volume2;
     case 'DOCUMENT':
-      return faFile;
+      return FileText;
     default:
-      return undefined;
+      return Hash;
+  }
+}
+
+/** Short, user-facing name of a channel type. */
+export function channelKindLabel(type: Channel['type']): string {
+  switch (type) {
+    case 'VOICE':
+      return 'Voice';
+    case 'DOCUMENT':
+      return 'Doc';
+    default:
+      return 'Channel';
   }
 }

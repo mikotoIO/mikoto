@@ -1,0 +1,33 @@
+.icon {
+  --size: 38px;
+  width: var(--size);
+  height: var(--size);
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  position: relative;
+  border-radius: calc(var(--r-ctl) + 3px);
+  background-color: var(--sa, var(--raised));
+  background-size: cover;
+  background-position: center;
+  color: var(--sa-fg, var(--text));
+  font: 600 calc(var(--size) * 0.34) / 1 var(--font-ui);
+  letter-spacing: -0.01em;
+  user-select: none;
+  overflow: hidden;
+}
+
+.small {
+  border-radius: calc(var(--r-ctl) - 3px);
+}
+
+.active {
+  box-shadow:
+    0 0 0 2px var(--base),
+    0 0 0 4px var(--accent);
+}
+
+/* legacy StyledSpaceIcon */
+.legacy {
+  cursor: pointer;
+}

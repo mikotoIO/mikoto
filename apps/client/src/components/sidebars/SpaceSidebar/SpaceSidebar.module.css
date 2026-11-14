@@ -1,0 +1,92 @@
+.rail {
+  width: 60px;
+  flex-shrink: 0;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 14px 0 var(--space-3);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+.divider {
+  width: 24px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: var(--space-1) 0;
+  flex-shrink: 0;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.spaceBtn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: calc(var(--r-ctl) + 3px);
+  background: none;
+  color: var(--text);
+  flex-shrink: 0;
+  transition:
+    transform var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease);
+}
+.spaceBtn:active {
+  transform: scale(0.96);
+}
+
+.home {
+  background: var(--raised);
+  color: var(--text);
+}
+.home:hover {
+  background: color-mix(in oklch, var(--raised) 80%, var(--text));
+}
+
+.active {
+  box-shadow:
+    0 0 0 2px var(--base),
+    0 0 0 4px var(--accent);
+}
+
+.plain {
+  background: transparent;
+  color: var(--muted);
+  border: 1px dashed var(--line-strong);
+}
+.plain:hover {
+  color: var(--text);
+  border-color: var(--muted);
+}
+
+.pip {
+  position: absolute;
+  left: -11px;
+  top: 50%;
+  width: 4px;
+  border-radius: 0 3px 3px 0;
+  background: var(--text);
+  pointer-events: none;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.dragging {
+  opacity: 0.6;
+}

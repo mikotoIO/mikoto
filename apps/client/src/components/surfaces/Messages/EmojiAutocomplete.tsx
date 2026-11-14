@@ -1,4 +1,3 @@
-import styled from '@emotion/styled';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
   $getSelection,
@@ -14,56 +13,23 @@ import {
   type TextNode,
 } from 'lexical';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { z } from 'zod';
 
-const Overlay = styled.div`
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  background-color: var(--chakra-colors-gray-800);
-  border: 1px solid var(--chakra-colors-gray-600);
-  border-radius: 8px;
-  padding: 4px;
-  max-height: 240px;
-  overflow-y: auto;
-  width: 320px;
-  z-index: 10;
-  margin-bottom: 4px;
-`;
+import { cx } from '@/design';
 
-const EmojiItem = styled.div<{ active: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  background-color: ${(p) =>
-    p.active ? 'var(--chakra-colors-gray-600)' : 'transparent'};
+import styles from './MessageEditor.module.css';
 
-  &:hover {
-    background-color: var(--chakra-colors-gray-600);
-  }
-`;
-
-const Native = styled.span`
-  font-size: 18px;
-  width: 24px;
-  text-align: center;
-  flex-shrink: 0;
-`;
-
-const Shortcode = styled.span`
-  color: var(--chakra-colors-gray-400);
-  font-size: 12px;
-  margin-left: auto;
-`;
-
-const Name = styled.span`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
+const emojiDataSchema = z.object({
+  emojis: z.record(
+    z.string(),
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      keywords: z.array(z.string()).optional(),
+      skins: z.array(z.object({ native: z.string() })).optional(),
+    }),
+  ),
+});
 
 type EmojiEntry = {
   id: string;
@@ -80,13 +46,15 @@ function loadEmojis(): Promise<EmojiEntry[]> {
   if (!loadingPromise) {
     loadingPromise = import('@emoji-mart/data/sets/14/twitter.json').then(
       (mod) => {
-        const data: any = (mod as any).default ?? mod;
-        const list: EmojiEntry[] = Object.values<any>(data.emojis).map((e) => ({
-          id: e.id,
-          name: e.name,
-          native: e.skins?.[0]?.native ?? '',
-          keywords: e.keywords ?? [],
-        }));
+        const parsed = emojiDataSchema.safeParse(mod.default);
+        const list: EmojiEntry[] = parsed.success
+          ? Object.values(parsed.data.emojis).map((e) => ({
+              id: e.id,
+              name: e.name,
+              native: e.skins?.[0]?.native ?? '',
+              keywords: e.keywords ?? [],
+            }))
+          : [];
         emojiListCache = list;
         return list;
       },
@@ -285,22 +253,27 @@ export function EmojiAutocompletePlugin() {
   if (!isOpen) return null;
 
   return (
-    <Overlay
+    <div
+      className={styles.popup}
+      role="listbox"
+      aria-label="Emoji"
       onMouseDown={(e) => {
         e.preventDefault();
       }}
     >
       {filtered.map((emoji, i) => (
-        <EmojiItem
+        <div
           key={emoji.id}
-          active={i === activeIndex}
+          role="option"
+          aria-selected={i === activeIndex}
+          className={cx(styles.option, i === activeIndex && styles.active)}
           onClick={() => insertEmoji(emoji)}
         >
-          <Native>{emoji.native}</Native>
-          <Name>{emoji.name}</Name>
-          <Shortcode>:{emoji.id}:</Shortcode>
-        </EmojiItem>
+          <span className={styles.native}>{emoji.native}</span>
+          <span className={styles.optionName}>{emoji.name}</span>
+          <span className={styles.optionMeta}>:{emoji.id}:</span>
+        </div>
       ))}
-    </Overlay>
+    </div>
   );
 }

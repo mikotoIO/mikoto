@@ -1,4 +1,11 @@
-import { Global } from '@emotion/react';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/jetbrains-mono';
+import '@fontsource-variable/onest';
+import '@fontsource/atkinson-hyperlegible-next/400.css';
+import '@fontsource/atkinson-hyperlegible-next/600.css';
+import '@fontsource/ibm-plex-sans/400.css';
+import '@fontsource/ibm-plex-sans/500.css';
+import '@fontsource/ibm-plex-sans/600.css';
 import * as Sentry from '@sentry/react';
 import { QueryClientProvider } from '@tanstack/react-query';
 // Import styles
@@ -6,19 +13,23 @@ import 'dockview-react/dist/styles/dockview.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
-import 'react-loading-skeleton/dist/skeleton.css';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 // PWA disabled due to caching issues
 // import { registerSW } from 'virtual:pwa-register';
 import App from '@/App';
-import { globalCss } from '@/components/chakraTheme';
-import { ThemeProvider } from '@/components/ui/provider';
+import {
+  AppearanceRoot,
+  Toaster,
+  TooltipProvider,
+  appearanceDB,
+  applyAppearance,
+} from '@/design';
+import '@/design/dockview.css';
+import '@/design/global.css';
+import '@/design/tokens.css';
 import { env } from '@/env';
 import reportWebVitals from '@/reportWebVitals';
 
-import './fonts.css';
 import { queryClient } from './functions/queryClient';
 import './i18n';
 
@@ -41,23 +52,26 @@ if (SENTRY) {
   });
 }
 
+// Apply saved appearance before the first paint so there is no theme flash.
+applyAppearance(appearanceDB.get());
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <HelmetProvider>
-      <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
-          <>
-            <Helmet>
-              {env.DEV && (
-                <link rel="icon" type="image/png" href="/favicon-dev.ico" />
-              )}
-            </Helmet>
-            <Global styles={globalCss} />
+      <QueryClientProvider client={queryClient}>
+        <>
+          <Helmet>
+            {env.DEV && (
+              <link rel="icon" type="image/png" href="/favicon-dev.ico" />
+            )}
+          </Helmet>
+          <AppearanceRoot />
+          <TooltipProvider delay={400}>
             <App />
-            <ToastContainer theme="dark" limit={3} />
-          </>
-        </QueryClientProvider>
-      </ThemeProvider>
+          </TooltipProvider>
+          <Toaster />
+        </>
+      </QueryClientProvider>
     </HelmetProvider>
   </React.StrictMode>,
 );

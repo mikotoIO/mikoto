@@ -1,32 +1,23 @@
-import { Box, Button, Code, Flex, Group, Heading } from '@chakra-ui/react';
-import { faRefresh } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
-import { FallbackProps } from 'react-error-boundary';
+import { type FallbackProps } from 'react-error-boundary';
 
 import { Surface } from '@/components/Surface';
 import { TabName } from '@/components/tabs';
+import { ErrorState } from '@/design';
 
+/**
+ * Fallback for a crashed tab. Prefer wrapping surfaces in
+ * <SurfaceErrorBoundary what="#general"> so the message names what failed.
+ */
 export function ErrorSurface({ error, resetErrorBoundary }: FallbackProps) {
-  const [showDetails, setShowDetails] = useState(false);
   return (
-    <Surface padded>
-      <TabName name="Error" />
-      <Flex direction="column" alignItems="center" gap={4}>
-        <Heading m={0}>Error!</Heading>
-        <Box>You were probably not supposed to see this.</Box>
-        <Box>Please contact the devs, and they&apos;ll fix it soon!</Box>
-        <Group>
-          <Button size="sm" onClick={resetErrorBoundary} colorPalette="primary">
-            <FontAwesomeIcon icon={faRefresh} />
-            Reload
-          </Button>
-          <Button size="sm" onClick={() => setShowDetails(!showDetails)}>
-            Show Error Details
-          </Button>
-        </Group>
-        {showDetails && <Code variant="solid">{error.message}</Code>}
-      </Flex>
+    <Surface>
+      <TabName name="Didn't load" />
+      <ErrorState
+        what="This tab"
+        error={error}
+        onRetry={resetErrorBoundary}
+        note="Your other tabs aren't affected."
+      />
     </Surface>
   );
 }

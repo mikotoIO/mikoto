@@ -376,7 +376,8 @@ CREATE TABLE public."Space" (
     icon character varying(256),
     "ownerId" uuid,
     type public."SpaceType" DEFAULT 'NONE'::public."SpaceType" NOT NULL,
-    visibility public."SpaceVisibility"
+    visibility public."SpaceVisibility",
+    accent text
 );
 
 

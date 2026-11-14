@@ -1,6 +1,6 @@
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { atom, useAtom, useAtomValue } from 'jotai';
 import { atomFamily } from 'jotai/utils';
+import type { LucideIcon } from 'lucide-react';
 import { createContext } from 'react';
 
 import type { TabBaseType } from '@/components/surfaces';
@@ -23,7 +23,8 @@ const tabByIdSelector = atom((get) => (id: string) => {
 
 export interface TabNameProps {
   name: string;
-  icon?: IconDefinition | string;
+  /** A Lucide icon component, or an image URL (e.g. a space icon). */
+  icon?: LucideIcon | string;
   spaceId?: string;
   spaceName?: string;
 }

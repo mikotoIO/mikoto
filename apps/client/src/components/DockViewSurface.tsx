@@ -1,16 +1,16 @@
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   DockviewApi,
   DockviewDidDropEvent,
   DockviewReact,
   DockviewReadyEvent,
+  type DockviewTheme,
   IDockviewPanel,
   IDockviewPanelHeaderProps,
   IDockviewPanelProps,
   positionToDirection,
 } from 'dockview-react';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { X } from 'lucide-react';
 import {
   Suspense,
   useCallback,
@@ -19,21 +19,23 @@ import {
   useRef,
   useState,
 } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
 import { useNavigate } from 'react-router-dom';
+import { useSnapshot } from 'valtio/react';
 
 import { WelcomePanel } from '@/components/WelcomePanel';
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
-import { colorFromId } from '@/components/atoms/SpaceIcon';
+import { SpaceIcon } from '@/components/atoms/SpaceIcon';
 import {
-  ErrorSurface,
   LoadingSurface,
-  surfaceMap,
+  isTabable,
+  renderSurface,
 } from '@/components/surfaces';
+import { Skeleton, SurfaceErrorBoundary } from '@/design';
 import { setActiveChannelId } from '@/functions/notify';
 import { useMikoto } from '@/hooks';
 import {
   TabContext,
+  type TabNameProps,
   Tabable,
   activeTabIdState,
   tabNameFamily,
@@ -41,6 +43,185 @@ import {
   useActiveTabId,
   useTabs,
 } from '@/store/surface';
+import { ackStore, isChannelUnread } from '@/store/unreads';
+
+import styles from './DockViewSurface.module.css';
+
+/** Groups are sheets separated by an 8px gap; see design/dockview.css. */
+const mikotoDockviewTheme: DockviewTheme = {
+  name: 'mikoto',
+  className: 'dockview-theme-mikoto',
+  gap: 8,
+  dndOverlayMounting: 'relative',
+  dndPanelOverlay: 'content',
+};
+
+const CHANNEL_KINDS = new Set([
+  'textChannel',
+  'voiceChannel',
+  'documentChannel',
+]);
+
+const tabId = (tab: Tabable) => `${tab.kind}/${tab.key}`;
+
+/** Splits a panel id ("kind/key") without assuming the key has no slash. */
+function parseTabId(id: string): { kind: string; key: string } | null {
+  const i = id.indexOf('/');
+  if (i === -1) return null;
+  return { kind: id.slice(0, i), key: id.slice(i + 1) };
+}
+
+/* ------------------------------------------------------------- surface */
+
+interface SurfaceComponentProps extends IDockviewPanelProps {
+  params: {
+    tab: Tabable;
+  };
+}
+
+function SurfaceComponent({ params }: SurfaceComponentProps) {
+  const { tab } = params;
+  const id = tabId(tab);
+  const tabName = useAtomValue(tabNameFamily(id));
+
+  return (
+    <TabContext value={{ key: id }}>
+      <SurfaceErrorBoundary
+        what={tabName.name || 'This tab'}
+        resetKeys={[tab.key]}
+        note="Your other tabs aren't affected."
+      >
+        <Suspense fallback={<LoadingSurface />}>{renderSurface(tab)}</Suspense>
+      </SurfaceErrorBoundary>
+    </TabContext>
+  );
+}
+
+/* ----------------------------------------------------------------- tab */
+
+function TabIcon({ tabName }: { tabName: TabNameProps }) {
+  const mikoto = useMikoto();
+  const { icon, spaceId, spaceName } = tabName;
+
+  if (typeof icon === 'string') {
+    return (
+      <img className={styles.image} src={normalizeMediaUrl(icon)} alt="" />
+    );
+  }
+  if (icon) {
+    const Icon = icon;
+    return <Icon size={14} aria-hidden />;
+  }
+  if (spaceId) {
+    const space = mikoto.spaces._get(spaceId) ?? {
+      id: spaceId,
+      name: spaceName ?? '',
+    };
+    return <SpaceIcon space={space} size={16} />;
+  }
+  return null;
+}
+
+/** Unread dot for channel tabs that aren't the active tab. */
+function useTabUnread(panelId: string): boolean {
+  const mikoto = useMikoto();
+  const activeTabId = useActiveTabId();
+  useSnapshot(ackStore);
+  useSnapshot(mikoto.channels.cache);
+  if (panelId === activeTabId) return false;
+  const parsed = parseTabId(panelId);
+  if (!parsed || !CHANNEL_KINDS.has(parsed.kind)) return false;
+  const channel = mikoto.channels._get(parsed.key);
+  return channel ? isChannelUnread(channel.lastUpdated, channel.id) : false;
+}
+
+function DockTab({ api }: IDockviewPanelHeaderProps) {
+  const tabName = useAtomValue(tabNameFamily(api.id));
+  const unread = useTabUnread(api.id);
+  const middleDownRef = useRef(false);
+
+  const close = useCallback(
+    (event: React.SyntheticEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+      api.close();
+    },
+    [api],
+  );
+
+  return (
+    <div
+      className={styles.tab}
+      title={tabName.name || undefined}
+      onPointerDown={(event) => {
+        middleDownRef.current = event.button === 1;
+      }}
+      onPointerUp={(event) => {
+        if (middleDownRef.current && event.button === 1) {
+          middleDownRef.current = false;
+          close(event);
+        }
+      }}
+      onPointerLeave={() => {
+        middleDownRef.current = false;
+      }}
+    >
+      <span className={styles.icon}>
+        <TabIcon tabName={tabName} />
+      </span>
+      <span className={styles.title}>
+        {tabName.name || (
+          <>
+            <Skeleton width={64} height={10} />
+            <span className="sr-only">Loading</span>
+          </>
+        )}
+      </span>
+      {unread && <span className={styles.dot} aria-label="Unread" />}
+      <button
+        type="button"
+        className={styles.close}
+        aria-label={tabName.name ? `Close ${tabName.name}` : 'Close tab'}
+        onPointerDown={(event) => event.preventDefault()}
+        onClick={close}
+      >
+        <X size={14} aria-hidden />
+      </button>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------- title sync */
+
+// Keeps dockview's own panel titles (used in its overflow menu and for
+// accessibility) in sync with the names surfaces declare via <TabName>.
+function SingleTabTitleSync({
+  panelId,
+  api,
+}: {
+  panelId: string;
+  api: DockviewApi;
+}) {
+  const tabName = useAtomValue(tabNameFamily(panelId));
+
+  useEffect(() => {
+    api.getPanel(panelId)?.api.setTitle(tabName.name || 'Loading…');
+  }, [tabName.name, panelId, api]);
+
+  return null;
+}
+
+function TabTitleSync({ tabs, api }: { tabs: Tabable[]; api: DockviewApi }) {
+  return (
+    <>
+      {tabs.map((tab) => (
+        <SingleTabTitleSync key={tabId(tab)} panelId={tabId(tab)} api={api} />
+      ))}
+    </>
+  );
+}
+
+/* --------------------------------------------------------------- dock */
 
 // Global surface kinds mapped to their static routes
 const GLOBAL_SURFACE_ROUTES: Record<string, string> = {
@@ -52,279 +233,46 @@ const GLOBAL_SURFACE_ROUTES: Record<string, string> = {
   welcome: '/',
 };
 
-interface SurfaceComponentProps extends IDockviewPanelProps {
-  params: {
-    tab: Tabable;
-  };
-}
-
-function SurfaceComponent(props: SurfaceComponentProps) {
-  const { params } = props;
-  const { tab } = params;
-  const { kind, key, ...rest } = tab;
-  const SurfaceComponent = surfaceMap[kind] as any;
-
-  if (!SurfaceComponent) {
-    return null;
-  }
-
-  return (
-    <TabContext value={{ key: `${kind}/${key}` }}>
-      <ErrorBoundary FallbackComponent={ErrorSurface}>
-        <Suspense fallback={<LoadingSurface />}>
-          <SurfaceComponent key={key} {...rest} />
-        </Suspense>
-      </ErrorBoundary>
-    </TabContext>
-  );
-}
-
-// Helper to check if an icon is a FontAwesome icon definition
-function isFontAwesomeIcon(
-  icon: IconDefinition | string,
-): icon is IconDefinition {
-  return typeof icon === 'object' && 'icon' in icon;
-}
-
-// Hook to sync with panel title changes
-function useTitle(api: { title: string | undefined; onDidTitleChange: any }) {
-  const [title, setTitle] = useState<string | undefined>(api.title);
-
-  // Derived-state reset: when the api's title diverges from our cached one
-  // (new api instance or external change), resync during render instead of
-  // in an effect to avoid the extra commit.
-  const [prevApiTitle, setPrevApiTitle] = useState(api.title);
-  if (prevApiTitle !== api.title) {
-    setPrevApiTitle(api.title);
-    setTitle(api.title);
-  }
-
-  useEffect(() => {
-    const disposable = api.onDidTitleChange(
-      (event: { title: string | undefined }) => {
-        setTitle(event.title);
-      },
-    );
-    return () => disposable.dispose();
-  }, [api]);
-
-  return title;
-}
-
-// Custom tab component that displays the space icon before the title
-function CustomTabComponent(props: IDockviewPanelHeaderProps) {
-  const { api } = props;
-  const panelId = api.id;
-  const tabName = useAtomValue(tabNameFamily(panelId));
-  const title = useTitle(api);
-  const isMiddleMouseButtonRef = useRef<boolean>(false);
-
-  const onClose = useCallback(
-    (event: React.MouseEvent) => {
-      event.preventDefault();
-      api.close();
-    },
-    [api],
-  );
-
-  const onBtnPointerDown = useCallback((event: React.MouseEvent) => {
-    event.preventDefault();
-  }, []);
-
-  const onPointerDown = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>) => {
-      isMiddleMouseButtonRef.current = event.button === 1;
-    },
-    [],
-  );
-
-  const onPointerUp = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>) => {
-      if (isMiddleMouseButtonRef.current && event.button === 1) {
-        isMiddleMouseButtonRef.current = false;
-        onClose(event);
-      }
-    },
-    [onClose],
-  );
-
-  const onPointerLeave = useCallback(() => {
-    isMiddleMouseButtonRef.current = false;
-  }, []);
-
-  return (
-    <div
-      className="dv-default-tab"
-      onPointerDown={onPointerDown}
-      onPointerUp={onPointerUp}
-      onPointerLeave={onPointerLeave}
-    >
-      <span
-        className="dv-default-tab-content"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        {(tabName.icon || tabName.spaceId) && (
-          <span
-            style={{
-              marginRight: '6px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              flexShrink: 0,
-            }}
-          >
-            {tabName.icon && !isFontAwesomeIcon(tabName.icon) ? (
-              <img
-                src={normalizeMediaUrl(tabName.icon as string)}
-                alt=""
-                style={{
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '3px',
-                  objectFit: 'cover',
-                }}
-              />
-            ) : tabName.spaceId ? (
-              <span
-                style={{
-                  width: '20px',
-                  height: '20px',
-                  borderRadius: '3px',
-                  backgroundColor: colorFromId(tabName.spaceId),
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  color: 'white',
-                  fontFamily: 'var(--font-heading)',
-                }}
-              >
-                {tabName.spaceName?.[0] ?? ''}
-              </span>
-            ) : tabName.icon ? (
-              <FontAwesomeIcon
-                icon={tabName.icon as IconDefinition}
-                style={{ fontSize: '12px' }}
-              />
-            ) : null}
-          </span>
-        )}
-        {title}
-      </span>
-      <div
-        className="dv-default-tab-action"
-        onPointerDown={onBtnPointerDown}
-        onClick={onClose}
-      >
-        <svg viewBox="0 0 11 11" width="11" height="11">
-          <path d="M2.1 2.1 L8.9 8.9 M8.9 2.1 L2.1 8.9" stroke="currentColor" />
-        </svg>
-      </div>
-    </div>
-  );
-}
-
-// Helper component to sync a single tab name with its panel title
-function SingleTabTitleSync({
-  panelId,
-  api,
-}: {
-  panelId: string;
-  api: DockviewApi;
-}) {
-  const tabName = useAtomValue(tabNameFamily(panelId));
-
-  useEffect(() => {
-    const panel = api.getPanel(panelId);
-    if (panel) {
-      // Set title even if empty to override the panel ID default
-      // Use a loading placeholder if name is not set yet
-      const title = tabName.name || 'Loading...';
-      panel.api.setTitle(title);
-    }
-  }, [tabName.name, panelId, api]);
-
-  return null;
-}
-
-// Helper component to sync all tab names with panel titles
-function TabTitleSync({ tabs, api }: { tabs: Tabable[]; api: DockviewApi }) {
-  return (
-    <>
-      {tabs.map((tab) => (
-        <SingleTabTitleSync
-          key={`${tab.kind}/${tab.key}`}
-          panelId={`${tab.kind}/${tab.key}`}
-          api={api}
-        />
-      ))}
-    </>
-  );
-}
-
 export const DockViewSurface = () => {
   const tabs = useTabs();
   const activeTabId = useActiveTabId();
   const dockviewRef = useRef<{ api: DockviewApi | null }>({ api: null });
   const [dockviewApi, setDockviewApi] = useState<DockviewApi | null>(null);
-  const setTabs = useAtom(tabsState)[1];
-  const setActiveTabId = useAtom(activeTabIdState)[1];
+  const setTabs = useSetAtom(tabsState);
+  const setActiveTabId = useSetAtom(activeTabIdState);
   // Keep track of the last processed tabs array
   const prevTabsRef = useRef<Tabable[]>([]);
   const prevActiveTabIdRef = useRef<string | null>(null);
+  // panel id -> tab, recorded whenever we add a panel
+  const panelTabsRef = useRef(new Map<string, Tabable>());
   const navigate = useNavigate();
   const mikoto = useMikoto();
 
   // Track the active channel for notification suppression
   useEffect(() => {
-    if (!activeTabId) {
-      setActiveChannelId(null);
-      return;
-    }
-    const slashIndex = activeTabId.indexOf('/');
-    if (slashIndex === -1) {
-      setActiveChannelId(null);
-      return;
-    }
-    const kind = activeTabId.slice(0, slashIndex);
-    const channelId = activeTabId.slice(slashIndex + 1);
-    if (
-      kind === 'textChannel' ||
-      kind === 'voiceChannel' ||
-      kind === 'documentChannel'
-    ) {
-      setActiveChannelId(channelId);
-    } else {
-      setActiveChannelId(null);
-    }
+    const parsed = activeTabId ? parseTabId(activeTabId) : null;
+    setActiveChannelId(
+      parsed && CHANNEL_KINDS.has(parsed.kind) ? parsed.key : null,
+    );
   }, [activeTabId]);
 
-  // Helper to get the URL segment for a space (uses @handle if available, otherwise UUID)
+  // URL segment for a space (uses @handle if available, otherwise UUID)
   const getSpaceUrlSegment = useCallback(
     (spaceId: string) => {
       const space = mikoto.spaces._get(spaceId);
-      if (space?.handle) {
-        return `@${space.handle}`;
-      }
-      return spaceId;
+      return space?.handle ? `@${space.handle}` : spaceId;
     },
     [mikoto],
   );
 
-  // Helper to get URL path from an active panel
+  // URL path for the active panel
   const getUrlFromPanel = useCallback(
     (panel: IDockviewPanel | undefined) => {
       if (!panel) return '/';
-
-      const tab = panel.params?.tab as Tabable | undefined;
+      const tab = panelTabsRef.current.get(panel.id);
       if (!tab) return '/';
 
       switch (tab.kind) {
-        // Global surfaces with static routes
         case 'friends':
         case 'discovery':
         case 'spaceExplorer':
@@ -336,35 +284,25 @@ export const DockViewSurface = () => {
         case 'textChannel':
         case 'voiceChannel':
         case 'documentChannel': {
-          const channelId = (tab as any).channelId;
-          if (!channelId) return '/';
-          const channel = mikoto.channels._get(channelId);
+          const channel = mikoto.channels._get(tab.channelId);
           if (!channel || !channel.spaceId) return '/';
           return `/space/${getSpaceUrlSegment(channel.spaceId)}/channel/${channel.id}`;
         }
 
         // Channel settings: /space/:spaceRef/channel/:channelId/settings
         case 'channelSettings': {
-          const channelId = (tab as any).channelId;
-          if (!channelId) return '/';
-          const channel = mikoto.channels._get(channelId);
+          const channel = mikoto.channels._get(tab.channelId);
           if (!channel || !channel.spaceId) return '/';
           return `/space/${getSpaceUrlSegment(channel.spaceId)}/channel/${channel.id}/settings`;
         }
 
         // Space settings: /space/:spaceRef/settings
-        case 'spaceSettings': {
-          const spaceId = (tab as any).spaceId;
-          if (!spaceId) return '/';
-          return `/space/${getSpaceUrlSegment(spaceId)}/settings`;
-        }
+        case 'spaceSettings':
+          return `/space/${getSpaceUrlSegment(tab.spaceId)}/settings`;
 
         // Bot settings: /settings/bots/:botId
-        case 'botSettings': {
-          const botId = (tab as any).botId;
-          if (!botId) return '/';
-          return `/settings/bots/${botId}`;
-        }
+        case 'botSettings':
+          return `/settings/bots/${tab.botId}`;
 
         default:
           return '/';
@@ -373,19 +311,41 @@ export const DockViewSurface = () => {
     [mikoto, getSpaceUrlSegment],
   );
 
-  // Store navigate and getUrlFromPanel in refs so onReady callback can use them
+  // Refs so the onReady listeners always call the latest versions
   const navigateRef = useRef(navigate);
   const getUrlFromPanelRef = useRef(getUrlFromPanel);
-  navigateRef.current = navigate;
-  getUrlFromPanelRef.current = getUrlFromPanel;
+  useEffect(() => {
+    navigateRef.current = navigate;
+    getUrlFromPanelRef.current = getUrlFromPanel;
+  });
 
-  const components = useMemo(() => {
-    return {
+  const addPanel = useCallback(
+    (
+      api: DockviewApi,
+      tab: Tabable,
+      position?: Parameters<DockviewApi['addPanel']>[0]['position'],
+    ) => {
+      const id = tabId(tab);
+      panelTabsRef.current.set(id, tab);
+      api.addPanel({
+        id,
+        component: 'surface',
+        params: { tab },
+        title: 'Loading…',
+        position,
+      });
+    },
+    [],
+  );
+
+  const components = useMemo(
+    () => ({
       surface: (props: SurfaceComponentProps) => (
         <SurfaceComponent {...props} />
       ),
-    };
-  }, []);
+    }),
+    [],
+  );
 
   // Sync new tabs from state → dockview (for tabs opened via click, not drag-drop)
   useEffect(() => {
@@ -394,17 +354,11 @@ export const DockViewSurface = () => {
 
     const prevTabs = prevTabsRef.current;
     tabs.forEach((tab) => {
-      const panelId = `${tab.kind}/${tab.key}`;
       const isNewTab = !prevTabs.some(
         (prevTab) => prevTab.kind === tab.kind && prevTab.key === tab.key,
       );
-      if (isNewTab && !api.getPanel(panelId)) {
-        api.addPanel({
-          id: panelId,
-          component: 'surface',
-          params: { tab },
-          title: 'Loading...',
-        });
+      if (isNewTab && !api.getPanel(tabId(tab))) {
+        addPanel(api, tab);
       }
     });
 
@@ -413,15 +367,14 @@ export const DockViewSurface = () => {
         (tab) => tab.kind === prevTab.kind && tab.key === prevTab.key,
       );
       if (stillOpen) return;
-      const panelId = `${prevTab.kind}/${prevTab.key}`;
-      const panel = api.getPanel(panelId);
+      const panel = api.getPanel(tabId(prevTab));
       if (panel) {
         api.removePanel(panel);
       }
     });
 
     prevTabsRef.current = [...tabs];
-  }, [tabs]);
+  }, [tabs, addPanel]);
 
   // Sync active tab — only when activeTabId actually changes
   useEffect(() => {
@@ -429,25 +382,23 @@ export const DockViewSurface = () => {
     if (!api || !activeTabId) return;
     if (activeTabId === prevActiveTabIdRef.current) return;
     prevActiveTabIdRef.current = activeTabId;
-
-    const panel = api.getPanel(activeTabId);
-    if (panel) {
-      panel.api.setActive();
-    }
+    api.getPanel(activeTabId)?.api.setActive();
   }, [activeTabId]);
 
   const onReady = useCallback(
     (event: DockviewReadyEvent) => {
       dockviewRef.current.api = event.api;
-      setDockviewApi(event.api); // Trigger re-render so TabTitleSync component renders
+      setDockviewApi(event.api); // re-render so TabTitleSync renders
 
-      // Set up event listeners BEFORE adding panels so we catch the first activation
-      // Listen for panel removal to sync tabs state
+      // Set up listeners BEFORE adding panels so we catch the first activation.
       event.api.onDidRemovePanel((panel) => {
-        const panelId = panel.id;
-        const [kind, key] = panelId.split('/');
+        panelTabsRef.current.delete(panel.id);
+        const parsed = parseTabId(panel.id);
+        if (!parsed) return;
         setTabs((currentTabs) =>
-          currentTabs.filter((tab) => !(tab.kind === kind && tab.key === key)),
+          currentTabs.filter(
+            (tab) => !(tab.kind === parsed.kind && tab.key === parsed.key),
+          ),
         );
       });
 
@@ -460,15 +411,13 @@ export const DockViewSurface = () => {
         }
       });
 
-      // Listen for active panel changes to sync URL and active tab state
+      // Sync URL and active tab state with the active panel
       event.api.onDidActivePanelChange((panel) => {
         const newPath = getUrlFromPanelRef.current(panel);
-        // Only navigate if the path actually changes
         if (window.location.pathname !== newPath) {
           navigateRef.current(newPath, { replace: true });
         }
 
-        // Sync DockView's active panel back to jotai state
         const panelId = panel?.id ?? null;
         if (panelId !== prevActiveTabIdRef.current) {
           prevActiveTabIdRef.current = panelId;
@@ -476,24 +425,11 @@ export const DockViewSurface = () => {
         }
       });
 
-      // Set up panels for initial tabs (after listeners are ready)
-      tabs.forEach((tab) => {
-        const panelId = `${tab.kind}/${tab.key}`;
-        event.api.addPanel({
-          id: panelId,
-          component: 'surface',
-          params: { tab },
-          title: 'Loading...', // Temporary title until TabName component sets the actual name
-        });
-
-        // Panel title will be updated by TabTitleSync component
-        // which reads from the tabNameFamily atom
-      });
-
-      // Store initial tabs
+      // Panels for the initial tabs (titles are filled in by TabTitleSync)
+      tabs.forEach((tab) => addPanel(event.api, tab));
       prevTabsRef.current = [...tabs];
     },
-    [tabs, setTabs],
+    [tabs, setTabs, setActiveTabId, addPanel],
   );
 
   const onDidDrop = useCallback(
@@ -503,56 +439,58 @@ export const DockViewSurface = () => {
       );
       if (!rawTab) return;
 
-      const tab: Tabable = JSON.parse(rawTab);
-      const panelId = `${tab.kind}/${tab.key}`;
+      let tab: unknown;
+      try {
+        tab = JSON.parse(rawTab);
+      } catch {
+        return;
+      }
+      if (!isTabable(tab)) return;
+      const panelId = tabId(tab);
 
-      // Don't add duplicate panels — just activate existing one
-      const api = dockviewRef.current.api;
-      if (api?.getPanel(panelId)) {
-        api.getPanel(panelId)!.api.setActive();
+      // Don't add duplicate panels — just activate the existing one
+      const existing = dockviewRef.current.api?.getPanel(panelId);
+      if (existing) {
+        existing.api.setActive();
         return;
       }
 
-      // Add panel at the drop position in dockview first
-      event.api.addPanel({
-        id: panelId,
-        component: 'surface',
-        params: { tab },
-        title: 'Loading...',
-        position: {
-          direction: positionToDirection(event.position),
-          referenceGroup: event.group ?? undefined,
-        },
+      // Add the panel at the drop position first...
+      addPanel(event.api, tab, {
+        direction: positionToDirection(event.position),
+        referenceGroup: event.group ?? undefined,
       });
 
-      // Then sync tab to state (effect will skip addPanel since it already exists)
-      setTabs((currentTabs) => {
-        if (currentTabs.some((t) => t.kind === tab.kind && t.key === tab.key)) {
-          return currentTabs;
-        }
-        return [...currentTabs, tab];
-      });
+      // ...then sync it to state (the effect skips addPanel since it exists)
+      setTabs((currentTabs) =>
+        currentTabs.some((t) => t.kind === tab.kind && t.key === tab.key)
+          ? currentTabs
+          : [...currentTabs, tab],
+      );
       // Sync activeTabId so it doesn't fight with dockview's activation
       setActiveTabId(panelId);
       prevActiveTabIdRef.current = panelId;
     },
-    [setTabs, setActiveTabId],
+    [setTabs, setActiveTabId, addPanel],
   );
 
   if (tabs.length === 0) {
-    return <WelcomePanel />;
+    return (
+      <div className={styles.empty}>
+        <WelcomePanel />
+      </div>
+    );
   }
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div className={styles.root}>
       <DockviewReact
         components={components}
         onReady={onReady}
         onDidDrop={onDidDrop}
-        className="dockview-theme-mikoto"
-        defaultTabComponent={CustomTabComponent}
+        theme={mikotoDockviewTheme}
+        defaultTabComponent={DockTab}
       />
-      {/* Sync tab names from TabName components to DockView panel titles */}
       {dockviewApi && <TabTitleSync tabs={tabs} api={dockviewApi} />}
     </div>
   );

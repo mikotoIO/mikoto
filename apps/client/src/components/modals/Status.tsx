@@ -1,32 +1,46 @@
-import { Button, Heading, Input } from '@chakra-ui/react';
 import { useSetAtom } from 'jotai';
+import { useId } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { modalState } from '@/components/ContextMenu';
-import { DialogContent, Field } from '@/components/ui';
-import { Form } from '@/ui';
+import { Button, DialogContent, Field, Form, Input } from '@/design';
 
 export function SetStatusModal() {
   const setModalState = useSetAtom(modalState);
-  const form = useForm();
+  const form = useForm<{ status: string }>({ defaultValues: { status: '' } });
+  const formId = useId();
 
   return (
-    <DialogContent rounded="md" p={4} maxW="400px">
-      <Heading fontSize="xl">Set Status</Heading>
+    <DialogContent
+      size="sm"
+      title="Set a status"
+      description="Let people know what you're up to."
+      footer={
+        <>
+          <Button variant="ghost" onClick={() => form.reset({ status: '' })}>
+            Clear status
+          </Button>
+          <Button variant="primary" type="submit" form={formId}>
+            Set status
+          </Button>
+        </>
+      }
+    >
       <Form
+        id={formId}
         onSubmit={form.handleSubmit((data) => {
           console.log(data);
           setModalState(null);
         })}
       >
-        <Field label="Your Status">
-          <Input autoComplete="off" {...form.register('status')} />
+        <Field label="Status">
+          <Input
+            autoComplete="off"
+            placeholder="In a meeting until 3"
+            maxLength={128}
+            {...form.register('status')}
+          />
         </Field>
-
-        <Button colorPalette="primary" type="submit">
-          Set status
-        </Button>
-        <Button type="button">Clear Status</Button>
       </Form>
     </DialogContent>
   );

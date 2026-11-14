@@ -7,7 +7,9 @@ import { z } from 'zod';
 export class LocalDB<T> {
   constructor(
     public key: string,
-    public schema: z.ZodType<T>,
+    // Input is unknown so schemas with .catch() defaults (which accept
+    // partial/garbage input) are allowed.
+    public schema: z.ZodType<T, z.ZodTypeDef, unknown>,
     public init: () => T,
   ) {
     if (!localStorage.getItem(this.key)) {

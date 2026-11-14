@@ -1,6 +1,6 @@
 # client (React web app)
 
-React + Vite + Chakra UI v3, talking to superego through `@mikoto-io/mikoto.js`.
+React + Vite + an in-house design system (Base UI + CSS Modules), talking to superego through `@mikoto-io/mikoto.js`.
 
 ```
 src/
@@ -8,8 +8,7 @@ src/
 │   ├── atoms/ molecules/   # small → compound components
 │   ├── surfaces/           # tab/panel views (one per surface kind)
 │   ├── modals/ sidebars/ tabs/
-│   ├── ui/                 # Chakra component wrappers: import from '@/components/ui'
-│   └── design/
+├── design/                 # design system: import from '@/design' (read design/README.md)
 ├── views/                  # top-level routes (MainView, auth views)
 ├── hooks/                  # useMikoto(), useAuthClient(), ...
 ├── store/                  # Jotai atoms, LocalDB, surface/tab state
@@ -18,7 +17,7 @@ src/
 
 ## Patterns
 
-- **Styling**: Chakra v3 (not v2; the APIs differ), using semantic tokens (`bg.subtle`, `fg.muted`, `border`). Lots of legacy code uses `@emotion/styled`; new code should prefer Chakra.
+- **Styling**: components from `@/design` plus a CSS Module next to each component, using only the tokens in `design/tokens.css` (never raw colors or sizes a token covers; users customize them). Follow the loading (delayed, layout-matching skeletons) and error (Surface/Region/Item boundaries) rules in `design/README.md`. Icons come from `lucide-react`.
 - **Surfaces**: tabs/panels are surface kinds mapped to components in `components/surfaces` and rendered in DockView. Tabs are keyed `kind/key`; heavy surfaces are `React.lazy`-loaded. Use `useTabkit()` (`store/surface.ts`) to open/close tabs.
 - **Modals**: `useModalKit()` (`store/index.ts`). **Context menus**: `useContextMenu` / `useContextMenuX` (`components/ContextMenu.tsx`).
 - **State**:

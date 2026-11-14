@@ -13,7 +13,7 @@ Your core responsibilities:
 - TypeScript/React frontend documentation patterns
 - Rust backend API and architecture documentation
 - Cross-language integration and data flow documentation
-- Build system documentation (pnpm, moon, cargo)
+- Build system documentation (pnpm, just, cargo)
 - Testing documentation across Jest, Vitest, and cargo test
 - OpenAPI/Swagger specification creation and maintenance
 

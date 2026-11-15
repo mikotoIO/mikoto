@@ -1,4 +1,4 @@
-use aide::axum::routing::{delete_with, get_with, patch_with, post_with};
+use aide::axum::routing::{delete_with, get_with, patch_with, post_with, put_with};
 use axum::{
     extract::{Path, Query},
     Json,
@@ -10,7 +10,7 @@ use crate::{
     db::db,
     entities::{
         Channel, MemberExt, Message, MessageAttachment, MessageAttachmentInput, MessageExt,
-        MessageKey, MessagePatch, SpaceExt,
+        MessageKey, MessagePatch, MessageReaction, ReactionEmoji, ReactionEvent, SpaceExt,
     },
     error::Error,
     functions::{
@@ -188,6 +188,76 @@ async fn delete(
     Ok(().into())
 }
 
+/// The message `message_id`, checked to be in `channel_id` of `space`.
+async fn find_message(
+    space: &SpaceExt,
+    channel_id: Uuid,
+    message_id: Uuid,
+) -> Result<Message, Error> {
+    let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != Some(space.base.id) {
+        return Err(Error::NotFound);
+    }
+    let message = Message::find_by_id(message_id, db()).await?;
+    if message.channel_id != channel_id {
+        return Err(Error::NotFound);
+    }
+    Ok(message)
+}
+
+fn reaction_event(message: &Message, user_id: Uuid, emoji: &ReactionEmoji) -> ReactionEvent {
+    ReactionEvent {
+        message_id: message.id,
+        channel_id: message.channel_id,
+        user_id,
+        emoji: emoji.key(),
+        emoji_id: emoji.emoji_id(),
+    }
+}
+
+async fn add_reaction(
+    claim: Claims,
+    _member: Load<MemberExt>,
+    Load(space): Load<SpaceExt>,
+    Path((_, channel_id, message_id, emoji)): Path<(Uuid, Uuid, Uuid, String)>,
+) -> Result<Json<()>, Error> {
+    let emoji = ReactionEmoji::parse(&emoji)?;
+    let message = find_message(&space, channel_id, message_id).await?;
+    emoji.verify(Some(space.base.id), db()).await?;
+
+    let user_id: Uuid = claim.sub.parse()?;
+    if MessageReaction::add(&message, user_id, &emoji, db()).await? {
+        emit_event(
+            "messages.onReactionAdd",
+            reaction_event(&message, user_id, &emoji),
+            &format!("space:{}", space.base.id),
+        )
+        .await?;
+    }
+    Ok(().into())
+}
+
+async fn remove_reaction(
+    claim: Claims,
+    _member: Load<MemberExt>,
+    Load(space): Load<SpaceExt>,
+    Path((_, channel_id, message_id, emoji)): Path<(Uuid, Uuid, Uuid, String)>,
+) -> Result<Json<()>, Error> {
+    let emoji = ReactionEmoji::parse(&emoji)?;
+    let message = find_message(&space, channel_id, message_id).await?;
+
+    let user_id: Uuid = claim.sub.parse()?;
+    if MessageReaction::remove(message.id, user_id, &emoji, db()).await? {
+        emit_event(
+            "messages.onReactionRemove",
+            reaction_event(&message, user_id, &emoji),
+            &format!("space:{}", space.base.id),
+        )
+        .await?;
+    }
+    Ok(().into())
+}
+
 static TAG: &str = "Messages";
 
 pub fn router() -> AppRouter<State> {
@@ -222,6 +292,23 @@ pub fn router() -> AppRouter<State> {
                 o.tag(TAG).id("messages.delete").summary("Delete Message")
             }),
         )
+        .route(
+            "/:messageId/reactions/:emoji",
+            put_with(add_reaction, |o| {
+                o.tag(TAG)
+                    .id("messages.addReaction")
+                    .summary("Add Reaction")
+                    .description("The emoji is a standard emoji shortcode, like +1, or the id of a custom emoji in this space.")
+            }),
+        )
+        .route(
+            "/:messageId/reactions/:emoji",
+            delete_with(remove_reaction, |o| {
+                o.tag(TAG)
+                    .id("messages.removeReaction")
+                    .summary("Remove Reaction")
+            }),
+        )
         .ws_event(
             "onCreate",
             |message: MessageExt, _| async move { Some(message) },
@@ -233,5 +320,13 @@ pub fn router() -> AppRouter<State> {
         .ws_event(
             "onDelete",
             |message: MessageKey, _| async move { Some(message) },
+        )
+        .ws_event(
+            "onReactionAdd",
+            |event: ReactionEvent, _| async move { Some(event) },
+        )
+        .ws_event(
+            "onReactionRemove",
+            |event: ReactionEvent, _| async move { Some(event) },
         )
 }

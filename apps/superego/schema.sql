@@ -216,6 +216,22 @@ CREATE TABLE public."Document" (
 ALTER TABLE public."Document" OWNER TO postgres;
 
 --
+-- Name: Emoji; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Emoji" (
+    id uuid NOT NULL,
+    "spaceId" uuid NOT NULL,
+    name text NOT NULL,
+    image text NOT NULL,
+    "creatorId" uuid,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public."Emoji" OWNER TO postgres;
+
+--
 -- Name: Handle; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -278,6 +294,21 @@ CREATE TABLE public."MessageAttachment" (
 
 
 ALTER TABLE public."MessageAttachment" OWNER TO postgres;
+
+--
+-- Name: MessageReaction; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."MessageReaction" (
+    "messageId" uuid NOT NULL,
+    "userId" uuid NOT NULL,
+    emoji text NOT NULL,
+    "emojiId" uuid,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public."MessageReaction" OWNER TO postgres;
 
 --
 -- Name: NotificationPreference; Type: TABLE; Schema: public; Owner: postgres
@@ -512,6 +543,14 @@ ALTER TABLE ONLY public."Document"
 
 
 --
+-- Name: Emoji Emoji_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Emoji"
+    ADD CONSTRAINT "Emoji_pkey" PRIMARY KEY (id);
+
+
+--
 -- Name: Handle Handle_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533,6 +572,14 @@ ALTER TABLE ONLY public."Invite"
 
 ALTER TABLE ONLY public."MessageAttachment"
     ADD CONSTRAINT "MessageAttachment_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: MessageReaction MessageReaction_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."MessageReaction"
+    ADD CONSTRAINT "MessageReaction_pkey" PRIMARY KEY ("messageId", "userId", emoji);
 
 
 --
@@ -667,6 +714,13 @@ CREATE UNIQUE INDEX "Document_channelId_key" ON public."Document" USING btree ("
 
 
 --
+-- Name: Emoji_spaceId_name_key; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX "Emoji_spaceId_name_key" ON public."Emoji" USING btree ("spaceId", lower(name));
+
+
+--
 -- Name: Handle_spaceId_idx; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -685,6 +739,13 @@ CREATE INDEX "Handle_userId_idx" ON public."Handle" USING btree ("userId");
 --
 
 CREATE INDEX "MessageAttachment_messageId_idx" ON public."MessageAttachment" USING btree ("messageId");
+
+
+--
+-- Name: MessageReaction_emojiId_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "MessageReaction_emojiId_idx" ON public."MessageReaction" USING btree ("emojiId");
 
 
 --
@@ -867,6 +928,22 @@ ALTER TABLE ONLY public."Document"
 
 
 --
+-- Name: Emoji Emoji_creatorId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Emoji"
+    ADD CONSTRAINT "Emoji_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES public."User"(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: Emoji Emoji_spaceId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Emoji"
+    ADD CONSTRAINT "Emoji_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES public."Space"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
 -- Name: Handle Handle_spaceId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -904,6 +981,30 @@ ALTER TABLE ONLY public."Invite"
 
 ALTER TABLE ONLY public."MessageAttachment"
     ADD CONSTRAINT "MessageAttachment_messageId_fkey" FOREIGN KEY ("messageId") REFERENCES public."Message"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: MessageReaction MessageReaction_emojiId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."MessageReaction"
+    ADD CONSTRAINT "MessageReaction_emojiId_fkey" FOREIGN KEY ("emojiId") REFERENCES public."Emoji"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: MessageReaction MessageReaction_messageId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."MessageReaction"
+    ADD CONSTRAINT "MessageReaction_messageId_fkey" FOREIGN KEY ("messageId") REFERENCES public."Message"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: MessageReaction MessageReaction_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."MessageReaction"
+    ADD CONSTRAINT "MessageReaction_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."User"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1045,4 +1146,5 @@ ALTER TABLE ONLY public."_RoleToSpaceUser"
 --
 -- PostgreSQL database dump complete
 --
+
 

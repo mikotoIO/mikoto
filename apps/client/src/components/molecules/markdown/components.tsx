@@ -4,9 +4,10 @@ import { Suspense, lazy, useState } from 'react';
 import type { Components } from 'react-markdown';
 
 import { modalState } from '@/components/ContextMenu';
-import { DialogContent, ItemErrorBoundary } from '@/design';
+import { DialogContent, ItemErrorBoundary, Tooltip } from '@/design';
 
 import styles from './Markdown.module.css';
+import { useCustomEmojis } from './customEmoji';
 
 const CodeHighlight = lazy(() => import('./rules/CodeBlock/CodeHighlight'));
 const EmojiElement = lazy(() => import('./EmojiElement'));
@@ -82,6 +83,30 @@ function Spoiler({ children }: { children: React.ReactNode }) {
     >
       {children}
     </button>
+  );
+}
+
+/** `:name:`: the space's custom emoji of that name, else a standard emoji. */
+function EmojiShortcode({ emoji }: { emoji: string }) {
+  const custom = useCustomEmojis().byName.get(emoji.toLowerCase());
+  if (custom) {
+    return (
+      <Tooltip content={`:${custom.name}:`}>
+        <span className={styles.emoji}>
+          <img
+            className={styles.customEmoji}
+            src={custom.url}
+            alt={`:${custom.name}:`}
+            draggable={false}
+          />
+        </span>
+      </Tooltip>
+    );
+  }
+  return (
+    <Suspense fallback={`:${emoji}:`}>
+      <EmojiElement emoji={emoji} />
+    </Suspense>
   );
 }
 
@@ -164,11 +189,7 @@ export const markdownComponents: Partial<Components> = {
   },
 
   'emoji-shortcode'({ emoji }: { emoji: string }) {
-    return (
-      <Suspense fallback={`:${emoji}:`}>
-        <EmojiElement emoji={emoji} />
-      </Suspense>
-    );
+    return <EmojiShortcode emoji={emoji} />;
   },
 
   spoiler({ content }: { content: string }) {

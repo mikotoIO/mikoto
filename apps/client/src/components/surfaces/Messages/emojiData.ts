@@ -1,4 +1,7 @@
+import { useEffect, useState } from 'react';
 import { z } from 'zod';
+
+import type { CustomEmoji } from '@/components/molecules/markdown';
 
 /*
  * Twemoji data shared by the emoji picker and the `:shortcode` autocomplete.
@@ -23,11 +26,17 @@ const emojiDataSchema = z.object({
 });
 
 export interface EmojiEntry {
+  /** The shortcode: what `:id:` means in a message. */
   id: string;
   name: string;
   native: string;
   unified: string;
   keywords: string[];
+  /** Unique across standard and custom emoji (a custom emoji may share a
+   *  standard one's shortcode). Also what a reaction with it is keyed by. */
+  key: string;
+  /** Set for a space's custom emoji. */
+  custom?: CustomEmoji;
 }
 
 export interface EmojiCategory {
@@ -65,6 +74,7 @@ export function loadEmojis(): Promise<EmojiSet> {
           native: skin.native,
           unified: skin.unified,
           keywords: e.keywords ?? [],
+          key: e.id,
         });
       }
       for (const c of parsed.data.categories) {
@@ -80,6 +90,22 @@ export function loadEmojis(): Promise<EmojiSet> {
     return cache;
   });
   return loading;
+}
+
+/** The standard emoji set, loading it on first use. */
+export function useEmojiSet() {
+  const [set, setSet] = useState<EmojiSet | null>(getLoadedEmojis);
+  useEffect(() => {
+    if (set) return;
+    let cancelled = false;
+    void loadEmojis().then((s) => {
+      if (!cancelled) setSet(s);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [set]);
+  return set;
 }
 
 /** Ranked search: id prefix, then id substring, then keyword/name match. */
@@ -109,7 +135,21 @@ export function searchEmojis(
   return [...startsWith, ...idIncludes, ...other].slice(0, limit);
 }
 
+/** Picker/autocomplete entries for a space's custom emoji. */
+export function customEmojiEntries(emojis: CustomEmoji[]): EmojiEntry[] {
+  return emojis.map((custom) => ({
+    id: custom.name,
+    name: custom.name.replaceAll('_', ' '),
+    native: `:${custom.name}:`,
+    unified: '',
+    keywords: [],
+    key: custom.id,
+    custom,
+  }));
+}
+
 /** The same Twemoji images messages render (see markdown/EmojiElement). */
-export function emojiImageUrl(e: EmojiEntry) {
+export function emojiImageUrl(e: Pick<EmojiEntry, 'unified' | 'custom'>) {
+  if (e.custom) return e.custom.url;
   return `https://cdn.jsdelivr.net/npm/emoji-datasource-twitter@15.0.1/img/twitter/64/${e.unified}.png`;
 }

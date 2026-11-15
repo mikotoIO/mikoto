@@ -157,6 +157,24 @@ impl Cache {
                 self.roles.remove(&r.id);
             }
 
+            // Emoji live on their space
+            WsEvent::EmojisOnCreate(e) | WsEvent::EmojisOnUpdate(e) => {
+                if let Some(mut space) = self.spaces.get_mut(&e.space_id) {
+                    let emojis = space.emojis.get_or_insert_with(Vec::new);
+                    match emojis.iter_mut().find(|x| x.id == e.id) {
+                        Some(existing) => *existing = e.clone(),
+                        None => emojis.push(e.clone()),
+                    }
+                }
+            }
+            WsEvent::EmojisOnDelete(e) => {
+                if let Some(mut space) = self.spaces.get_mut(&e.space_id) {
+                    if let Some(emojis) = space.emojis.as_mut() {
+                        emojis.retain(|x| x.id != e.id);
+                    }
+                }
+            }
+
             // Spaces
             WsEvent::SpacesOnCreate(s) | WsEvent::SpacesOnUpdate(s) => {
                 // Also update embedded channels/roles
@@ -201,6 +219,8 @@ impl Cache {
             WsEvent::MessagesOnCreate(_)
             | WsEvent::MessagesOnDelete(_)
             | WsEvent::MessagesOnUpdate(_)
+            | WsEvent::MessagesOnReactionAdd(_)
+            | WsEvent::MessagesOnReactionRemove(_)
             | WsEvent::TypingOnUpdate(_)
             | WsEvent::Pong(_)
             | WsEvent::RelationsOnCreate(_)

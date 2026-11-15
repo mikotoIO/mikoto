@@ -219,6 +219,12 @@
   text-align: center;
   flex-shrink: 0;
 }
+.customEmoji {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
 
 @media (max-width: 600px) {
   .wrap {

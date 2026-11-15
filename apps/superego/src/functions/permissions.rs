@@ -174,6 +174,7 @@ mod tests {
             handle: None,
             roles,
             channels: vec![],
+            emojis: vec![],
             member_count: 0,
         }
     }

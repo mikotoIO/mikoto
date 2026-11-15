@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 use crate::{db_entity_delete, db_enum, db_find_by_id, entities::Role, entity, error::Error};
 
-use super::{Channel, Handle};
+use super::{Channel, Emoji, Handle};
 
 db_enum!(
     #[sqlx(type_name = "\"SpaceType\"")]
@@ -55,6 +55,9 @@ pub struct SpaceExt {
     pub handle: Option<String>,
     pub roles: Vec<Role>,
     pub channels: Vec<Channel>,
+    /// The space's custom emoji.
+    #[serde(default)]
+    pub emojis: Vec<Emoji>,
     pub member_count: i64,
 }
 
@@ -195,9 +198,10 @@ impl SpaceExt {
         space: Space,
         db: X,
     ) -> Result<Self, Error> {
-        let (channels, roles, handle, member_count) = tokio::try_join!(
+        let (channels, roles, emojis, handle, member_count) = tokio::try_join!(
             Channel::list(space.id, db),
             Role::list(space.id, db),
+            Emoji::list(space.id, db),
             Handle::for_space(space.id, db),
             async {
                 let row: (i64,) =
@@ -214,6 +218,7 @@ impl SpaceExt {
             handle: handle.map(|h| h.handle),
             channels,
             roles,
+            emojis,
             member_count,
         })
     }
@@ -224,9 +229,10 @@ impl SpaceExt {
     ) -> Result<Vec<Self>, Error> {
         let space_ids: Vec<Uuid> = spaces.iter().map(|s| s.id).collect();
 
-        let (mut channels, mut roles, handles, member_counts) = tokio::try_join!(
+        let (mut channels, mut roles, mut emojis, handles, member_counts) = tokio::try_join!(
             Channel::dataload_space(space_ids.clone(), db),
             Role::dataload_space(space_ids.clone(), db),
+            Emoji::dataload_space(space_ids.clone(), db),
             Handle::for_spaces(&space_ids, db),
             async {
                 let rows: Vec<(Uuid, i64)> = sqlx::query_as(
@@ -245,6 +251,7 @@ impl SpaceExt {
             .map(|space| {
                 let channels = channels.remove(&space.id).unwrap_or_default();
                 let roles = roles.remove(&space.id).unwrap_or_default();
+                let emojis = emojis.remove(&space.id).unwrap_or_default();
                 let handle = handles.get(&space.id).cloned();
                 let member_count = member_counts.get(&space.id).copied().unwrap_or(0);
 
@@ -253,6 +260,7 @@ impl SpaceExt {
                     handle,
                     channels,
                     roles,
+                    emojis,
                     member_count,
                 }
             })

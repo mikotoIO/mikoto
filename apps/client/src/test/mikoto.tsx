@@ -42,6 +42,7 @@ export function makeSpace(overrides: Partial<SpaceExt> = {}): SpaceExt {
       },
     ],
     roles: [],
+    emojis: [],
     ...overrides,
   };
 }
@@ -70,6 +71,10 @@ export class TestBackend {
   members = new Map<string, MemberExt[]>();
   /** Paths requested, in order. */
   requests: string[] = [];
+  /** Reaction changes, as `PUT path` / `DELETE path`. */
+  reactionCalls: string[] = [];
+  /** Make reaction requests fail with this status. */
+  reactionStatus = 200;
 
   adapter: AxiosAdapter = async (config: InternalAxiosRequestConfig) => {
     const path = new URL(config.url ?? '', config.baseURL).pathname.replace(
@@ -87,6 +92,10 @@ export class TestBackend {
       return { status, statusText: 'OK', headers: {}, config, data };
     };
 
+    if (/\/messages\/[^/]+\/reactions\/[^/]+$/.test(path)) {
+      this.reactionCalls.push(`${config.method?.toUpperCase()} ${path}`);
+      return respond(this.reactionStatus, null);
+    }
     const one = /^\/spaces\/([^/]+)\/members\/([^/]+)$/.exec(path);
     if (one) {
       const found = this.members.get(one[1])?.find((m) => m.userId === one[2]);

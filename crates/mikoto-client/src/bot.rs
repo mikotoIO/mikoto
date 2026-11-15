@@ -174,6 +174,8 @@ async fn dispatch_event(handler: &dyn EventHandler, ctx: Context, event: WsEvent
         WsEvent::MessagesOnCreate(msg) => handler.message_create(ctx, msg).await,
         WsEvent::MessagesOnUpdate(msg) => handler.message_update(ctx, msg).await,
         WsEvent::MessagesOnDelete(key) => handler.message_delete(ctx, key).await,
+        WsEvent::MessagesOnReactionAdd(ev) => handler.reaction_add(ctx, ev).await,
+        WsEvent::MessagesOnReactionRemove(ev) => handler.reaction_remove(ctx, ev).await,
 
         WsEvent::ChannelsOnCreate(ch) => handler.channel_create(ctx, ch).await,
         WsEvent::ChannelsOnUpdate(ch) => handler.channel_update(ctx, ch).await,
@@ -186,6 +188,10 @@ async fn dispatch_event(handler: &dyn EventHandler, ctx: Context, event: WsEvent
         WsEvent::RolesOnCreate(r) => handler.role_create(ctx, r).await,
         WsEvent::RolesOnUpdate(r) => handler.role_update(ctx, r).await,
         WsEvent::RolesOnDelete(r) => handler.role_delete(ctx, r).await,
+
+        WsEvent::EmojisOnCreate(e) => handler.emoji_create(ctx, e).await,
+        WsEvent::EmojisOnUpdate(e) => handler.emoji_update(ctx, e).await,
+        WsEvent::EmojisOnDelete(e) => handler.emoji_delete(ctx, e).await,
 
         WsEvent::SpacesOnCreate(s) => handler.space_create(ctx, s).await,
         WsEvent::SpacesOnUpdate(s) => handler.space_update(ctx, s).await,

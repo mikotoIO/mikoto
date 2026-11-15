@@ -6,7 +6,7 @@ use crate::{
     db_entity_delete, db_find_by_id, entity, error::Error, functions::time::Timestamp, model,
 };
 
-use super::{Channel, MessageAttachment, User};
+use super::{Channel, MessageAttachment, MessageReaction, Reaction, User};
 
 entity!(
     pub struct Message {
@@ -32,6 +32,8 @@ pub struct MessageExt {
     pub base: Message,
     pub author: Option<User>,
     pub attachments: Vec<MessageAttachment>,
+    #[serde(default)]
+    pub reactions: Vec<Reaction>,
 }
 
 model!(
@@ -148,10 +150,15 @@ impl MessageExt {
             None
         };
         let attachments = MessageAttachment::list_by_message(message.id, db).await?;
+        let reactions = MessageReaction::dataload(&[message.id], db)
+            .await?
+            .remove(&message.id)
+            .unwrap_or_default();
         Ok(MessageExt {
             base: message,
             author,
             attachments,
+            reactions,
         })
     }
 
@@ -181,6 +188,7 @@ impl MessageExt {
 
         let attachments_by_message =
             crate::entities::group_by_key(all_attachments, |a| a.message_id);
+        let mut reactions_by_message = MessageReaction::dataload(&message_ids, db).await?;
 
         let res = messages
             .into_iter()
@@ -194,10 +202,12 @@ impl MessageExt {
                     .get(&message.id)
                     .cloned()
                     .unwrap_or_default();
+                let reactions = reactions_by_message.remove(&message.id).unwrap_or_default();
                 MessageExt {
                     base: message,
                     author,
                     attachments,
+                    reactions,
                 }
             })
             .collect();

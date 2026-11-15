@@ -15,6 +15,7 @@ import {
 } from './plugins';
 
 export { MessageImage } from './components';
+export * from './customEmoji';
 
 function isUrl(s: string) {
   let url;

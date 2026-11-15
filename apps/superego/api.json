@@ -986,6 +986,47 @@
         }
       }
     },
+    "/dm/{channelId}/messages/{messageId}/reactions/{emoji}": {
+      "put": {
+        "tags": [
+          "DM"
+        ],
+        "summary": "Add DM Reaction",
+        "description": "The emoji is a standard emoji shortcode, like +1.",
+        "operationId": "dm.messages.addReaction",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "DM"
+        ],
+        "summary": "Remove DM Reaction",
+        "operationId": "dm.messages.removeReaction",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/dm/unreads": {
       "get": {
         "tags": [
@@ -1776,6 +1817,47 @@
         }
       }
     },
+    "/spaces/{spaceId}/channels/{channelId}/messages/{messageId}/reactions/{emoji}": {
+      "put": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Add Reaction",
+        "description": "The emoji is a standard emoji shortcode, like +1, or the id of a custom emoji in this space.",
+        "operationId": "messages.addReaction",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Remove Reaction",
+        "operationId": "messages.removeReaction",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/spaces/{spaceId}/channels/{channelId}/voice/": {
       "post": {
         "tags": [
@@ -2204,6 +2286,109 @@
               "application/json": {
                 "schema": {
                   "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/emojis/": {
+      "get": {
+        "tags": [
+          "Emojis"
+        ],
+        "summary": "List Emojis",
+        "operationId": "emojis.list",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Emoji"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Emojis"
+        ],
+        "summary": "Create Emoji",
+        "operationId": "emojis.create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmojiCreatePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Emoji"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{spaceId}/emojis/{emojiId}": {
+      "delete": {
+        "tags": [
+          "Emojis"
+        ],
+        "summary": "Delete Emoji",
+        "operationId": "emojis.delete",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Emojis"
+        ],
+        "summary": "Rename Emoji",
+        "operationId": "emojis.update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmojiPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Emoji"
                 }
               }
             }
@@ -2652,6 +2837,68 @@
           }
         }
       },
+      "Emoji": {
+        "description": "A custom emoji, uploaded to a space. Members write it as `:name:`.",
+        "type": "object",
+        "required": [
+          "id",
+          "image",
+          "name",
+          "spaceId"
+        ],
+        "properties": {
+          "creatorId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "image": {
+            "description": "Media server path of the image (e.g. `emoji/abc123.png`).",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "spaceId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "EmojiCreatePayload": {
+        "type": "object",
+        "required": [
+          "image",
+          "name"
+        ],
+        "properties": {
+          "image": {
+            "description": "The `url` the media server returned for an upload to its `emoji` store.",
+            "type": "string"
+          },
+          "name": {
+            "description": "2-32 letters, digits or underscores.",
+            "type": "string"
+          }
+        }
+      },
+      "EmojiPatch": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "HandleOwner": {
         "description": "Represents what entity type owns a handle",
         "oneOf": [
@@ -3079,6 +3326,13 @@
             "type": "string",
             "format": "uuid"
           },
+          "reactions": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Reaction"
+            }
+          },
           "timestamp": {
             "$ref": "#/components/schemas/Timestamp"
           }
@@ -3228,6 +3482,75 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "Reaction": {
+        "description": "Everyone who reacted to a message with one emoji.",
+        "type": "object",
+        "required": [
+          "count",
+          "emoji",
+          "userIds"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "emoji": {
+            "description": "A standard emoji shortcode (e.g. `+1`), or the id of a custom emoji. This is the `:emoji` used to add or remove the reaction.",
+            "type": "string"
+          },
+          "emojiId": {
+            "description": "Set when `emoji` is a custom emoji.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "userIds": {
+            "description": "Who reacted, earliest first.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "ReactionEvent": {
+        "description": "A user's reaction being added to or removed from a message.",
+        "type": "object",
+        "required": [
+          "channelId",
+          "emoji",
+          "messageId",
+          "userId"
+        ],
+        "properties": {
+          "channelId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "emoji": {
+            "type": "string"
+          },
+          "emojiId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "messageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },
@@ -3478,6 +3801,14 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Channel"
+            }
+          },
+          "emojis": {
+            "description": "The space's custom emoji.",
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Emoji"
             }
           },
           "handle": {
@@ -3987,6 +4318,15 @@
       "channels.onUpdate": {
         "$ref": "#/components/schemas/Channel"
       },
+      "emojis.onCreate": {
+        "$ref": "#/components/schemas/Emoji"
+      },
+      "emojis.onDelete": {
+        "$ref": "#/components/schemas/Emoji"
+      },
+      "emojis.onUpdate": {
+        "$ref": "#/components/schemas/Emoji"
+      },
       "members.onCreate": {
         "$ref": "#/components/schemas/MemberExt"
       },
@@ -4001,6 +4341,12 @@
       },
       "messages.onDelete": {
         "$ref": "#/components/schemas/MessageKey"
+      },
+      "messages.onReactionAdd": {
+        "$ref": "#/components/schemas/ReactionEvent"
+      },
+      "messages.onReactionRemove": {
+        "$ref": "#/components/schemas/ReactionEvent"
       },
       "messages.onUpdate": {
         "$ref": "#/components/schemas/MessageExt"

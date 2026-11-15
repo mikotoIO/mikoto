@@ -1,4 +1,4 @@
-use aide::axum::routing::{delete_with, get_with, patch_with, post_with};
+use aide::axum::routing::{delete_with, get_with, patch_with, post_with, put_with};
 use axum::{
     extract::{Path, Query},
     Json,
@@ -10,7 +10,7 @@ use crate::{
     db::db,
     entities::{
         Channel, ChannelUnread, Message, MessageAttachment, MessageAttachmentInput, MessageExt,
-        MessageKey, MessagePatch, Relationship,
+        MessageKey, MessagePatch, MessageReaction, ReactionEmoji, ReactionEvent, Relationship,
     },
     error::Error,
     functions::{
@@ -175,6 +175,66 @@ async fn delete(
     Ok(().into())
 }
 
+/// Adds or removes the caller's reaction, telling both participants.
+async fn set_reaction(
+    claim: Claims,
+    channel_id: Uuid,
+    message_id: Uuid,
+    emoji: &str,
+    add: bool,
+) -> Result<(), Error> {
+    let user_id: Uuid = claim.sub.parse()?;
+    let emoji = ReactionEmoji::parse(emoji)?;
+    verify_dm_access(channel_id, user_id).await?;
+    let partner_id = get_dm_partner(channel_id, user_id).await?;
+
+    let message = Message::find_by_id(message_id, db()).await?;
+    if message.channel_id != channel_id {
+        return Err(Error::NotFound);
+    }
+    // DMs aren't in a space, so only standard emoji are allowed.
+    emoji.verify(None, db()).await?;
+
+    let changed = if add {
+        MessageReaction::add(&message, user_id, &emoji, db()).await?
+    } else {
+        MessageReaction::remove(message.id, user_id, &emoji, db()).await?
+    };
+    if changed {
+        let event = ReactionEvent {
+            message_id: message.id,
+            channel_id,
+            user_id,
+            emoji: emoji.key(),
+            emoji_id: emoji.emoji_id(),
+        };
+        let name = if add {
+            "messages.onReactionAdd"
+        } else {
+            "messages.onReactionRemove"
+        };
+        emit_event(name, &event, &format!("user:{user_id}")).await?;
+        emit_event(name, &event, &format!("user:{partner_id}")).await?;
+    }
+    Ok(())
+}
+
+async fn add_reaction(
+    claim: Claims,
+    Path((channel_id, message_id, emoji)): Path<(Uuid, Uuid, String)>,
+) -> Result<Json<()>, Error> {
+    set_reaction(claim, channel_id, message_id, &emoji, true).await?;
+    Ok(().into())
+}
+
+async fn remove_reaction(
+    claim: Claims,
+    Path((channel_id, message_id, emoji)): Path<(Uuid, Uuid, String)>,
+) -> Result<Json<()>, Error> {
+    set_reaction(claim, channel_id, message_id, &emoji, false).await?;
+    Ok(().into())
+}
+
 async fn acknowledge(claim: Claims, Path(channel_id): Path<Uuid>) -> Result<Json<()>, Error> {
     let user_id: Uuid = claim.sub.parse()?;
     verify_dm_access(channel_id, user_id).await?;
@@ -222,6 +282,23 @@ pub fn router() -> AppRouter<State> {
                 o.tag(TAG)
                     .id("dm.messages.delete")
                     .summary("Delete DM Message")
+            }),
+        )
+        .route(
+            "/:messageId/reactions/:emoji",
+            put_with(add_reaction, |o| {
+                o.tag(TAG)
+                    .id("dm.messages.addReaction")
+                    .summary("Add DM Reaction")
+                    .description("The emoji is a standard emoji shortcode, like +1.")
+            }),
+        )
+        .route(
+            "/:messageId/reactions/:emoji",
+            delete_with(remove_reaction, |o| {
+                o.tag(TAG)
+                    .id("dm.messages.removeReaction")
+                    .summary("Remove DM Reaction")
             }),
         )
 }

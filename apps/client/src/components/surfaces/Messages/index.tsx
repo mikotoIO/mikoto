@@ -3,6 +3,7 @@ import {
   type MessageKey,
   type MikotoChannel,
   MikotoMessage,
+  type ReactionEvent,
 } from '@mikoto-io/mikoto.js';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import throttle from 'lodash/throttle';
@@ -12,6 +13,7 @@ import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 
 import { Surface } from '@/components/Surface';
 import { Avatar } from '@/components/atoms/Avatar';
+import { CustomEmojiProvider } from '@/components/molecules/markdown';
 import { TabName } from '@/components/tabs';
 import {
   DelayedFallback,
@@ -221,6 +223,8 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
   );
 
   const [msgs, setMsgs] = useState<MikotoMessage[] | null>(null);
+  const msgsRef = useRef(msgs);
+  msgsRef.current = msgs;
   const [loadError, setLoadError] = useState<unknown>(null);
   const [loadAttempt, setLoadAttempt] = useState(0);
   useEffect(() => {
@@ -321,6 +325,26 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
     });
   };
 
+  // Messages are valtio proxies, so reacting mutates them in place. Our own
+  // reactions were already applied optimistically; applying is idempotent.
+  const reactionFn = (added: boolean) => (x: ReactionEvent) => {
+    if (x.channelId !== channel.id) return;
+    msgsRef.current
+      ?.find((m) => m.id === x.messageId)
+      ?._applyReaction(x, added);
+  };
+
+  useEffect(() => {
+    const onReactionAdd = reactionFn(true);
+    const onReactionRemove = reactionFn(false);
+    mikoto.ws.on('messages.onReactionAdd', onReactionAdd);
+    mikoto.ws.on('messages.onReactionRemove', onReactionRemove);
+    return () => {
+      mikoto.ws.off('messages.onReactionAdd', onReactionAdd);
+      mikoto.ws.off('messages.onReactionRemove', onReactionRemove);
+    };
+  }, [channel.id]);
+
   useEffect(() => {
     mikoto.ws.on('messages.onCreate', createFn);
     mikoto.ws.on('messages.onUpdate', updateFn);
@@ -379,6 +403,7 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
         timestamp: new Date().toISOString(),
         editedTimestamp: null,
         attachments: [],
+        reactions: [],
       },
       mikoto,
       true,
@@ -613,7 +638,9 @@ export function MessageSurface({ channelId }: { channelId: string }) {
 
   return (
     <CurrentSpaceContext value={channel.space}>
-      <RealMessageView channel={channel} />
+      <CustomEmojiProvider space={channel.space}>
+        <RealMessageView channel={channel} />
+      </CustomEmojiProvider>
     </CurrentSpaceContext>
   );
 }

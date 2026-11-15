@@ -38,3 +38,28 @@ pub fn generate_png(seed: &str) -> Vec<u8> {
         .expect("PNG encoding should not fail");
     buf
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn same_seed_same_avatar() {
+        assert_eq!(generate("alice").as_bytes(), generate("alice").as_bytes());
+    }
+
+    #[test]
+    fn different_seeds_differ() {
+        assert_ne!(generate("alice").as_bytes(), generate("bob").as_bytes());
+    }
+
+    #[test]
+    fn output_is_an_upscaled_opaque_png() {
+        let png = generate_png("carol");
+        assert_eq!(&png[..8], b"\x89PNG\r\n\x1a\n");
+        let decoded = image::load_from_memory(&png).unwrap().to_rgba8();
+        assert_eq!(decoded.width() % 20, 0);
+        assert_eq!(decoded.height() % 20, 0);
+        assert!(decoded.pixels().all(|p| p.0[3] == 255));
+    }
+}

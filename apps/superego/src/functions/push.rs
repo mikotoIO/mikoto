@@ -182,3 +182,40 @@ pub async fn send_to_user(user_id: Uuid, payload: &PushPayload) {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn truncate_leaves_short_strings_alone() {
+        assert_eq!(truncate("hello", 5), "hello");
+        assert_eq!(truncate("", 0), "");
+    }
+
+    #[test]
+    fn truncate_adds_ellipsis() {
+        assert_eq!(truncate("hello world", 5), "hello…");
+    }
+
+    #[test]
+    fn truncate_counts_chars_not_bytes() {
+        // Each of these is multiple bytes; slicing by bytes would panic.
+        assert_eq!(truncate("みことみこと", 3), "みこと…");
+        assert_eq!(truncate("🦀🦀", 2), "🦀🦀");
+    }
+
+    #[test]
+    fn payload_omits_missing_icon() {
+        let payload = PushPayload {
+            title: "t".into(),
+            body: "b".into(),
+            url: "/dm/x".into(),
+            icon: None,
+            tag: "dm:x".into(),
+        };
+        let json = serde_json::to_value(&payload).unwrap();
+        assert!(json.get("icon").is_none());
+        assert_eq!(json["url"], "/dm/x");
+    }
+}

@@ -94,3 +94,71 @@ pub fn pick_random_png<'a>(dir: &Dir<'a>, rng: &mut impl Rng) -> (&'a str, &'a [
     let name = file.path().file_stem().unwrap().to_str().unwrap();
     (name, file.contents())
 }
+
+#[cfg(test)]
+mod tests {
+    use image::ImageBuffer;
+
+    use super::*;
+
+    #[test]
+    fn opaque_layer_replaces_base() {
+        let mut base = ImageBuffer::from_pixel(2, 2, Rgba([10, 20, 30, 255]));
+        let mut layer = ImageBuffer::from_pixel(2, 2, Rgba([0, 0, 0, 0]));
+        layer.put_pixel(1, 1, Rgba([200, 100, 50, 255]));
+        composite(&mut base, &layer);
+        assert_eq!(base.get_pixel(0, 0).0, [10, 20, 30, 255]);
+        assert_eq!(base.get_pixel(1, 1).0, [200, 100, 50, 255]);
+    }
+
+    #[test]
+    fn half_transparent_layer_blends() {
+        let mut base = ImageBuffer::from_pixel(1, 1, Rgba([0, 0, 0, 255]));
+        let layer = ImageBuffer::from_pixel(1, 1, Rgba([255, 255, 255, 128]));
+        composite(&mut base, &layer);
+        let [r, g, b, a] = base.get_pixel(0, 0).0;
+        assert_eq!(a, 255);
+        assert!((127..=129).contains(&r) && r == g && g == b);
+    }
+
+    #[test]
+    fn layer_over_empty_keeps_layer_color() {
+        let mut base = ImageBuffer::from_pixel(1, 1, Rgba([0, 0, 0, 0]));
+        let layer = ImageBuffer::from_pixel(1, 1, Rgba([40, 80, 120, 100]));
+        composite(&mut base, &layer);
+        assert_eq!(base.get_pixel(0, 0).0, [40, 80, 120, 100]);
+    }
+
+    #[test]
+    fn oversized_layer_is_clipped() {
+        let mut base = ImageBuffer::from_pixel(1, 1, Rgba([0, 0, 0, 255]));
+        let layer = ImageBuffer::from_pixel(3, 3, Rgba([255, 0, 0, 255]));
+        composite(&mut base, &layer);
+        assert_eq!(base.dimensions(), (1, 1));
+        assert_eq!(base.get_pixel(0, 0).0, [255, 0, 0, 255]);
+    }
+
+    #[test]
+    fn scale_alpha_scales_and_saturates() {
+        let mut img = ImageBuffer::from_pixel(1, 1, Rgba([1, 2, 3, 200]));
+        scale_alpha(&mut img, 0.5);
+        assert_eq!(img.get_pixel(0, 0).0, [1, 2, 3, 100]);
+        scale_alpha(&mut img, 10.0);
+        assert_eq!(img.get_pixel(0, 0).0[3], 255);
+    }
+
+    #[test]
+    fn outline_surrounds_opaque_pixels_orthogonally() {
+        let mut img = ImageBuffer::from_pixel(3, 3, Rgba([0, 0, 0, 0]));
+        img.put_pixel(1, 1, Rgba([255, 255, 255, 255]));
+        add_outline(&mut img);
+        for (x, y) in [(1, 0), (0, 1), (2, 1), (1, 2)] {
+            assert_eq!(img.get_pixel(x, y).0, [0, 0, 0, 255], "({x}, {y})");
+        }
+        for (x, y) in [(0, 0), (2, 0), (0, 2), (2, 2)] {
+            assert_eq!(img.get_pixel(x, y).0[3], 0, "corner ({x}, {y})");
+        }
+        // the original pixel is untouched
+        assert_eq!(img.get_pixel(1, 1).0, [255, 255, 255, 255]);
+    }
+}

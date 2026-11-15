@@ -179,3 +179,74 @@ impl From<reqwest::Error> for Error {
 }
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
+
+#[cfg(test)]
+mod tests {
+    use axum::body::to_bytes;
+
+    use super::*;
+
+    async fn render(err: Error) -> (StatusCode, serde_json::Value) {
+        let res = err.into_response();
+        let status = res.status();
+        let body = to_bytes(res.into_body(), usize::MAX).await.unwrap();
+        (status, serde_json::from_slice(&body).unwrap())
+    }
+
+    #[tokio::test]
+    async fn maps_errors_to_status_codes() {
+        let cases = [
+            (Error::NotFound, StatusCode::NOT_FOUND),
+            (Error::BadRequest, StatusCode::BAD_REQUEST),
+            (Error::ValidationFailed, StatusCode::BAD_REQUEST),
+            (Error::FileTooLarge, StatusCode::BAD_REQUEST),
+            (Error::WrongPassword, StatusCode::UNAUTHORIZED),
+            (Error::TokenExpired, StatusCode::UNAUTHORIZED),
+            (Error::WrongAuthenticationType, StatusCode::UNAUTHORIZED),
+            (Error::unauthorized("no"), StatusCode::UNAUTHORIZED),
+            (Error::forbidden("no"), StatusCode::FORBIDDEN),
+            (
+                Error::InsufficientPermissions {
+                    message: "no".into(),
+                },
+                StatusCode::FORBIDDEN,
+            ),
+            (Error::internal("boom"), StatusCode::INTERNAL_SERVER_ERROR),
+            (Error::Todo, StatusCode::INTERNAL_SERVER_ERROR),
+            (
+                Error::new("Teapot", StatusCode::IM_A_TEAPOT, "short and stout"),
+                StatusCode::IM_A_TEAPOT,
+            ),
+        ];
+        for (err, expected) in cases {
+            let name = format!("{err:?}");
+            let (status, _) = render(err).await;
+            assert_eq!(status, expected, "{name}");
+        }
+    }
+
+    #[tokio::test]
+    async fn body_has_code_and_message() {
+        let (_, body) = render(Error::NotFound).await;
+        assert_eq!(body["code"], "NotFound");
+        assert_eq!(body["message"], "Not found");
+
+        let (_, body) = render(Error::forbidden("Not your space")).await;
+        assert_eq!(body["code"], "Forbidden");
+        assert_eq!(body["message"], "Not your space");
+    }
+
+    #[test]
+    fn conversions() {
+        assert!(matches!(
+            Error::from(uuid::Uuid::parse_str("nope").unwrap_err()),
+            Error::ValidationFailed
+        ));
+        let jwt_err =
+            jsonwebtoken::errors::Error::from(jsonwebtoken::errors::ErrorKind::InvalidToken);
+        assert!(matches!(
+            Error::from(jwt_err),
+            Error::JwtValidationError { .. }
+        ));
+    }
+}

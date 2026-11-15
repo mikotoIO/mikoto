@@ -113,3 +113,77 @@ pub fn rotate_hue(img: &RgbaImage, degrees: f32) -> RgbaImage {
 
     out
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn close(a: (f32, f32, f32), b: (f32, f32, f32)) -> bool {
+        (a.0 - b.0).abs() < 1e-3 && (a.1 - b.1).abs() < 1e-3 && (a.2 - b.2).abs() < 1e-3
+    }
+
+    #[test]
+    fn primaries_to_hsv() {
+        assert!(close(rgb_to_hsv(1.0, 0.0, 0.0), (0.0, 1.0, 1.0)));
+        assert!(close(rgb_to_hsv(0.0, 1.0, 0.0), (120.0, 1.0, 1.0)));
+        assert!(close(rgb_to_hsv(0.0, 0.0, 1.0), (240.0, 1.0, 1.0)));
+        assert!(close(rgb_to_hsv(0.0, 0.0, 0.0), (0.0, 0.0, 0.0)));
+        assert!(close(rgb_to_hsv(0.5, 0.5, 0.5), (0.0, 0.0, 0.5)));
+        // magenta: red is max with g < b, hue must wrap to positive
+        assert!(close(rgb_to_hsv(1.0, 0.0, 1.0), (300.0, 1.0, 1.0)));
+    }
+
+    #[test]
+    fn hsv_round_trips() {
+        for &(r, g, b) in &[
+            (0.2, 0.4, 0.6),
+            (0.9, 0.1, 0.3),
+            (0.0, 0.7, 0.2),
+            (1.0, 1.0, 1.0),
+            (0.33, 0.33, 0.1),
+        ] {
+            let (h, s, v) = rgb_to_hsv(r, g, b);
+            assert!(close(hsv_to_rgb(h, s, v), (r, g, b)), "({r}, {g}, {b})");
+        }
+    }
+
+    fn one_pixel(p: [u8; 4]) -> RgbaImage {
+        ImageBuffer::from_pixel(1, 1, Rgba(p))
+    }
+
+    #[test]
+    fn rotate_hue_shifts_colors() {
+        let red = one_pixel([255, 0, 0, 255]);
+        assert_eq!(rotate_hue(&red, 120.0).get_pixel(0, 0).0, [0, 255, 0, 255]);
+        assert_eq!(rotate_hue(&red, -120.0).get_pixel(0, 0).0, [0, 0, 255, 255]);
+        assert_eq!(rotate_hue(&red, 360.0).get_pixel(0, 0).0, [255, 0, 0, 255]);
+    }
+
+    #[test]
+    fn transparent_pixels_are_untouched() {
+        let img = one_pixel([12, 34, 56, 0]);
+        assert_eq!(rotate_hue(&img, 90.0).get_pixel(0, 0).0, [12, 34, 56, 0]);
+        assert_eq!(
+            adjust_hsv(&img, 90.0, 2.0, 2.0).get_pixel(0, 0).0,
+            [12, 34, 56, 0]
+        );
+    }
+
+    #[test]
+    fn adjust_hsv_scales_and_clamps() {
+        let img = one_pixel([200, 100, 100, 128]);
+        // desaturate fully: grey at the same value, alpha preserved
+        assert_eq!(
+            adjust_hsv(&img, 0.0, 0.0, 1.0).get_pixel(0, 0).0,
+            [200, 200, 200, 128]
+        );
+        // value is clamped to 1.0
+        let bright = adjust_hsv(&img, 0.0, 1.0, 10.0).get_pixel(0, 0).0;
+        assert_eq!(bright[0], 255);
+        // identity
+        assert_eq!(
+            adjust_hsv(&img, 0.0, 1.0, 1.0).get_pixel(0, 0).0,
+            [200, 100, 100, 128]
+        );
+    }
+}

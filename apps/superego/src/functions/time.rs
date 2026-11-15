@@ -80,3 +80,64 @@ impl<'de> Deserialize<'de> for Timestamp {
         Ok(Self(datetime))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use chrono::NaiveDate;
+
+    use super::*;
+
+    fn ts(h: u32, m: u32, s: u32) -> Timestamp {
+        NaiveDate::from_ymd_opt(2024, 3, 1)
+            .unwrap()
+            .and_hms_opt(h, m, s)
+            .unwrap()
+            .into()
+    }
+
+    #[test]
+    fn serializes_as_utc_rfc3339() {
+        let json = serde_json::to_string(&ts(12, 30, 0)).unwrap();
+        assert_eq!(json, r#""2024-03-01T12:30:00+00:00""#);
+    }
+
+    #[test]
+    fn deserialization_normalizes_offsets_to_utc() {
+        let t: Timestamp = serde_json::from_str(r#""2024-03-01T21:30:00+09:00""#).unwrap();
+        assert_eq!(t.0, ts(12, 30, 0).0);
+        let t: Timestamp = serde_json::from_str(r#""2024-03-01T12:30:00Z""#).unwrap();
+        assert_eq!(t.0, ts(12, 30, 0).0);
+    }
+
+    #[test]
+    fn round_trips() {
+        let original = ts(1, 2, 3);
+        let back: Timestamp =
+            serde_json::from_str(&serde_json::to_string(&original).unwrap()).unwrap();
+        assert_eq!(back.0, original.0);
+    }
+
+    #[test]
+    fn rejects_non_rfc3339_strings() {
+        assert!(serde_json::from_str::<Timestamp>(r#""2024-03-01 12:30:00""#).is_err());
+        assert!(serde_json::from_str::<Timestamp>(r#""yesterday""#).is_err());
+        assert!(serde_json::from_str::<Timestamp>("1709296200").is_err());
+    }
+
+    #[test]
+    fn arithmetic() {
+        let a = ts(12, 0, 0);
+        let b = a + TimeDelta::minutes(90);
+        assert_eq!(b.0, ts(13, 30, 0).0);
+        assert_eq!(b - a, TimeDelta::minutes(90));
+        assert_eq!(a - b, TimeDelta::minutes(-90));
+    }
+
+    #[test]
+    fn schema_is_a_date_time_string() {
+        let schema = schemars::schema_for!(Timestamp);
+        let value = serde_json::to_value(&schema).unwrap();
+        assert_eq!(value["type"], "string");
+        assert_eq!(value["format"], "date-time");
+    }
+}

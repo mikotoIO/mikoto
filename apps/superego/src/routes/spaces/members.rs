@@ -15,7 +15,7 @@ use crate::{
     error::Error,
     functions::{
         jwt::Claims,
-        permissions::{permissions_or_admin, Permission},
+        permissions::{can_grant, parse_permissions, permissions_or_admin, Permission},
         pubsub::emit_event,
     },
     middlewares::load::Load,
@@ -129,6 +129,13 @@ async fn add_role(
     if role.space_id != space_id {
         return Err(Error::forbidden("Role does not belong to Space"));
     }
+    // Assigning a role grants its permissions (and removing one takes them
+    // away), so you can only do it for roles within your own permissions.
+    can_grant(
+        &space,
+        &acting_member,
+        parse_permissions(&role.permissions).unwrap_or(Permission::all()),
+    )?;
 
     RoleToSpaceUser::create(role.id, member.id, db()).await?;
     let member = MemberExt::dataload_one(member, db()).await?;
@@ -149,6 +156,13 @@ async fn remove_role(
     if role.space_id != space_id {
         return Err(Error::forbidden("Role does not belong to Space"));
     }
+    // Assigning a role grants its permissions (and removing one takes them
+    // away), so you can only do it for roles within your own permissions.
+    can_grant(
+        &space,
+        &acting_member,
+        parse_permissions(&role.permissions).unwrap_or(Permission::all()),
+    )?;
 
     RoleToSpaceUser::delete(role.id, member.id, db()).await?;
     let member = MemberExt::dataload_one(member, db()).await?;
@@ -163,6 +177,9 @@ async fn delete(
 ) -> Result<Json<()>, Error> {
     if acting_member.user.base.id == user_id {
         return Err(Error::forbidden("You cannot kick yourself"));
+    }
+    if space.base.owner_id == Some(user_id) {
+        return Err(Error::forbidden("You cannot kick the owner of the space"));
     }
     permissions_or_admin(&space, &acting_member, Permission::BAN)?;
 

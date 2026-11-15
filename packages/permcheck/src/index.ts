@@ -17,6 +17,9 @@ export const permissions = {
   sendInChannel: 1n << 12n,
   createSubChannels: 1n << 13n,
   manageSubChannels: 1n << 14n,
+
+  // Bypasses checks that moderators may skip (deleting messages, invites).
+  moderator: 1n << 15n,
 };
 
 /**

@@ -6,6 +6,9 @@ import { MemberExt, MemberUpdatePayload } from '../../api.gen';
 import { ZSchema } from '../../helpers/ZSchema';
 import { CachedManager } from '../base';
 
+/** permcheck's `superuser` bit. */
+const SUPERUSER = 1n << 0n;
+
 export class MikotoMember extends ZSchema(MemberExt) {
   client!: MikotoClient;
 
@@ -78,6 +81,8 @@ export class MikotoMember extends ZSchema(MemberExt) {
       0n,
     );
 
+    // Superusers may do anything, as on the server (permcheck's bit 0).
+    if ((totalPerms & SUPERUSER) !== 0n) return true;
     return (act & totalPerms) !== 0n;
   }
 }

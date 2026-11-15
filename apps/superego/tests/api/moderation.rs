@@ -41,7 +41,7 @@ fn role_crud_requires_manage_roles() {
             .json(json!({
                 "name": "Helpers",
                 "color": "#00ff00",
-                "permissions": Permission::MANAGE_MESSAGES.bits().to_string(),
+                "permissions": Permission::MANAGE_ROLES.bits().to_string(),
                 "position": 3,
             }))
             .send()
@@ -119,7 +119,12 @@ fn assigning_a_role_grants_its_permissions() {
             .await
             .expect(StatusCode::FORBIDDEN);
 
-        let assigner = fixtures::member_with(&space, Permission::ASSIGN_ROLES).await;
+        // (and may only hand out permissions they hold themselves)
+        let assigner = fixtures::member_with(
+            &space,
+            Permission::ASSIGN_ROLES | Permission::MANAGE_CHANNELS,
+        )
+        .await;
         let updated = app.post(&role_path).auth(&assigner).send().await.ok();
         assert_eq!(updated["roleIds"], json!([role.to_string()]));
         create_channel().send().await.ok();
@@ -253,6 +258,151 @@ fn cannot_ban_yourself() {
         app.post(&space.path("/bans"))
             .auth(&space.owner)
             .json(json!({ "userId": space.owner.id }))
+            .send()
+            .await
+            .expect(StatusCode::FORBIDDEN);
+    });
+}
+
+#[test]
+fn the_owner_cannot_be_kicked_or_banned() {
+    run(|app| async move {
+        let space = fixtures::space(&fixtures::user().await).await;
+        let admin = fixtures::member_with(&space, Permission::ADMIN).await;
+
+        app.delete(&space.path(&format!("/members/{}", space.owner.id)))
+            .auth(&admin)
+            .send()
+            .await
+            .expect(StatusCode::FORBIDDEN);
+        app.post(&space.path("/bans"))
+            .auth(&admin)
+            .json(json!({ "userId": space.owner.id }))
+            .send()
+            .await
+            .expect(StatusCode::FORBIDDEN);
+        // still in charge
+        app.patch(&space.path(""))
+            .auth(&space.owner)
+            .json(json!({ "name": "mine" }))
+            .send()
+            .await
+            .ok();
+    });
+}
+
+fn role_patch(permissions: Permission) -> Value {
+    json!({
+        "name": "Role",
+        "color": null,
+        "permissions": permissions.bits().to_string(),
+        "position": 0,
+    })
+}
+
+/// A role manager can't mint permissions they don't have.
+#[test]
+fn role_managers_cannot_escalate() {
+    run(|app| async move {
+        let space = fixtures::space(&fixtures::user().await).await;
+        let manager = fixtures::member_with(
+            &space,
+            Permission::MANAGE_ROLES | Permission::MANAGE_CHANNELS,
+        )
+        .await;
+        let role = create_role(&app, &space, &manager).await;
+        let path = space.path(&format!("/roles/{}", role["id"].as_str().unwrap()));
+
+        for forbidden in [
+            Permission::ADMIN,
+            Permission::BAN,
+            Permission::MANAGE_CHANNELS | Permission::MANAGE_SPACE,
+        ] {
+            app.patch(&path)
+                .auth(&manager)
+                .json(role_patch(forbidden))
+                .send()
+                .await
+                .expect(StatusCode::FORBIDDEN);
+        }
+        app.patch(&path)
+            .auth(&manager)
+            .json(role_patch(Permission::MANAGE_CHANNELS))
+            .send()
+            .await
+            .ok();
+
+        // nor touch roles above them
+        let admin_role = fixtures::role(&space, Permission::ADMIN).await;
+        let admin_path = space.path(&format!("/roles/{admin_role}"));
+        app.patch(&admin_path)
+            .auth(&manager)
+            .json(role_patch(Permission::NONE))
+            .send()
+            .await
+            .expect(StatusCode::FORBIDDEN);
+        app.delete(&admin_path)
+            .auth(&manager)
+            .send()
+            .await
+            .expect(StatusCode::FORBIDDEN);
+
+        // the owner can do all of it
+        app.patch(&path)
+            .auth(&space.owner)
+            .json(role_patch(Permission::ADMIN))
+            .send()
+            .await
+            .ok();
+    });
+}
+
+#[test]
+fn role_permissions_are_validated() {
+    run(|app| async move {
+        let space = fixtures::space(&fixtures::user().await).await;
+        let role = create_role(&app, &space, &space.owner).await;
+        let path = space.path(&format!("/roles/{}", role["id"].as_str().unwrap()));
+        for bad in ["lots", "-1", "", "1099511627776"] {
+            app.patch(&path)
+                .auth(&space.owner)
+                .json(json!({ "name": "x", "color": null, "permissions": bad, "position": 0 }))
+                .send()
+                .await
+                .expect(StatusCode::BAD_REQUEST);
+        }
+    });
+}
+
+/// Assigning a role hands out its permissions, so the same rule applies.
+#[test]
+fn role_assigners_cannot_escalate() {
+    run(|app| async move {
+        let space = fixtures::space(&fixtures::user().await).await;
+        let assigner = fixtures::member_with(&space, Permission::ASSIGN_ROLES).await;
+        let admin_role = fixtures::role(&space, Permission::ADMIN).await;
+        let plain_role = fixtures::role(&space, Permission::NONE).await;
+        let grant = |user: &TestUser, role: uuid::Uuid| {
+            app.post(&space.path(&format!("/members/{}/roles/{role}", user.id)))
+        };
+
+        grant(&assigner, admin_role)
+            .auth(&assigner)
+            .send()
+            .await
+            .expect(StatusCode::FORBIDDEN);
+        let member = fixtures::member(&space).await;
+        grant(&member, plain_role).auth(&assigner).send().await.ok();
+
+        // and can't strip a role they couldn't grant
+        let admin = fixtures::member(&space).await;
+        grant(&admin, admin_role)
+            .auth(&space.owner)
+            .send()
+            .await
+            .ok();
+        app.delete(&space.path(&format!("/members/{}/roles/{admin_role}", admin.id)))
+            .auth(&assigner)
             .send()
             .await
             .expect(StatusCode::FORBIDDEN);

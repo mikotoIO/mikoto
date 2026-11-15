@@ -1,6 +1,6 @@
 use std::ops::{Add, Sub};
 
-use chrono::{DateTime, NaiveDateTime, TimeDelta, Utc};
+use chrono::{DateTime, NaiveDateTime, SubsecRound, TimeDelta, Utc};
 use schemars::{schema, JsonSchema};
 use serde::{de::Error, Deserialize, Deserializer, Serialize, Serializer};
 
@@ -10,8 +10,11 @@ use serde::{de::Error, Deserialize, Deserializer, Serialize, Serializer};
 pub struct Timestamp(pub NaiveDateTime);
 
 impl Timestamp {
+    /// The current time, at the millisecond precision the database stores
+    /// (`timestamp(3)`), so a value echoed back to the client right after a
+    /// write matches what later reads return.
     pub fn now() -> Self {
-        Self(Utc::now().naive_utc())
+        Self(Utc::now().naive_utc().trunc_subsecs(3))
     }
 }
 
@@ -122,6 +125,12 @@ mod tests {
         assert!(serde_json::from_str::<Timestamp>(r#""2024-03-01 12:30:00""#).is_err());
         assert!(serde_json::from_str::<Timestamp>(r#""yesterday""#).is_err());
         assert!(serde_json::from_str::<Timestamp>("1709296200").is_err());
+    }
+
+    #[test]
+    fn now_has_millisecond_precision() {
+        let now = Timestamp::now();
+        assert_eq!(now.0.and_utc().timestamp_subsec_nanos() % 1_000_000, 0);
     }
 
     #[test]

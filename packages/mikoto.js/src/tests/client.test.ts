@@ -241,6 +241,19 @@ describe('members and roles', () => {
     expect(ownerMember.checkPermission(1n << 4n)).toBe(true);
   });
 
+  test('superusers pass every check, as on the server', async () => {
+    const data = f.space();
+    const admins = f.role(data.id, { name: 'Admins', permissions: '1' });
+    data.roles.push(admins);
+    const space = await loadSpace(data);
+    await backend.emit(
+      'members.onCreate',
+      f.member(space.id, f.user(), { roleIds: [admins.id] }),
+    );
+    const [admin] = space.members.values();
+    expect(admin.checkPermission(1n << 10n)).toBe(true);
+  });
+
   test('ensureLoaded deduplicates and remembers non-members', async () => {
     const space = await loadSpace();
     const known = f.member(space.id);

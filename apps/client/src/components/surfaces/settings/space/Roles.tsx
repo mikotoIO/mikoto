@@ -51,8 +51,40 @@ const rolePermissionData = [
   },
   {
     name: 'Manage roles',
-    description: 'Create, edit and delete roles.',
+    description:
+      'Create, edit and delete roles, with permissions they hold themselves.',
     permission: permissions.manageRoles,
+  },
+  {
+    name: 'Assign roles',
+    description:
+      'Give members roles, or take them away, up to their own permissions.',
+    permission: permissions.assignRoles,
+  },
+  {
+    name: 'Moderator',
+    description: "Delete anyone's messages and manage invites.",
+    permission: permissions.moderator,
+  },
+  {
+    name: 'Manage messages',
+    description: "Delete other members' messages.",
+    permission: permissions.manageMessages,
+  },
+  {
+    name: 'Manage invites',
+    description: 'Create, view and revoke invite links.',
+    permission: permissions.manageInvites,
+  },
+  {
+    name: 'Kick and ban members',
+    description: 'Remove members from the space, and keep them out.',
+    permission: permissions.ban,
+  },
+  {
+    name: 'Manage bots',
+    description: 'Add your bots to this space.',
+    permission: permissions.manageBots,
   },
 ];
 

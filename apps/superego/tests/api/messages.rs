@@ -51,15 +51,17 @@ fn sending_bumps_channel_activity() {
             .await
             .ok();
         let after = app.get(&channel_path).auth(&space.owner).send().await.ok();
-        let millis = |v: &serde_json::Value| {
-            chrono::DateTime::parse_from_rfc3339(v.as_str().unwrap())
-                .unwrap()
-                .timestamp_millis()
-        };
         // a fresh space's #general has no activity yet
         assert!(before["lastUpdated"].is_null());
-        // The database rounds to milliseconds; the create response has more.
-        assert!((millis(&after["lastUpdated"]) - millis(&sent["timestamp"])).abs() <= 1);
+        // what the create response says is exactly what was stored
+        assert_eq!(after["lastUpdated"], sent["timestamp"]);
+        let listed = app
+            .get(&space.messages(space.general))
+            .auth(&space.owner)
+            .send()
+            .await
+            .ok();
+        assert_eq!(listed[0]["timestamp"], sent["timestamp"]);
     });
 }
 

@@ -166,3 +166,29 @@ fn unreads_follow_acknowledgements() {
         assert_eq!(other, json!([]));
     });
 }
+
+#[test]
+fn unreads_and_acks_require_membership() {
+    run(|app| async move {
+        let space = fixtures::space(&fixtures::user().await).await;
+        let outsider = fixtures::user().await;
+        app.get(&space.path("/channels/unreads"))
+            .auth(&outsider)
+            .send()
+            .await
+            .expect(StatusCode::UNAUTHORIZED);
+        app.post(&space.path(&format!("/channels/{}/ack", space.general)))
+            .auth(&outsider)
+            .send()
+            .await
+            .expect(StatusCode::UNAUTHORIZED);
+
+        // nor a channel of another space through your own
+        let own = fixtures::space(&outsider).await;
+        app.post(&own.path(&format!("/channels/{}/ack", space.general)))
+            .auth(&outsider)
+            .send()
+            .await
+            .expect(StatusCode::NOT_FOUND);
+    });
+}

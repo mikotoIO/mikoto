@@ -675,6 +675,7 @@ const latency = () => sim.slow ? 1800 : 550;
 const resolvedTheme = () => prefs.theme === 'system' ? (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : prefs.theme;
 function addLog(s){ log.unshift(s); log.length = Math.min(log.length, 5); renderDevLog(); }
 function nowTime(){ const d = new Date(); return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0'); }
+function plainText(html){ return new DOMParser().parseFromString(html,'text/html').body.textContent || ''; }
 function fmt(text){ return esc(text).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/@(\w+)/g,'<span class="ment">@$1</span>').replace(/\n/g,'<br>'); }
 function groupOf(id){ return state.groups.find(g => g.tabs.includes(id)); }
 function focusedGroup(){ return state.groups.find(g => g.id === state.focused) || state.groups[0]; }
@@ -893,7 +894,7 @@ function msgHtml(m, cont, plain){
   return `<article class="msg ${cont?'cont':''} ${m.mention?'mention':''} ${m.state||''}" data-msg="${m.id}">
     ${cont ? `<time class="gutter-time">${m.time}</time>` : avatar(m.author)}
     <div class="msg-main">
-      ${reply ? `<div class="reply-to">${icon('corner',13)}<b>${people[reply.author].name}</b><span>${reply.html.replace(/<[^>]+>/g,'')}</span></div>` : ''}
+      ${reply ? `<div class="reply-to">${icon('corner',13)}<b>${people[reply.author].name}</b><span>${esc(plainText(reply.html))}</span></div>` : ''}
       ${cont ? '' : `<header class="msg-head">${nameHtml(p, 'button', 'name', plain)}${p.bot?'<span class="role bot">Bot</span>':''}<time>${m.time}</time></header>`}
       <div class="msg-text">${m.html}</div>
       ${m.thread ? `<button class="thread-link" data-act="open" data-id="threads">${stack(m.thread.who)}<b>${m.thread.count} replies</b><span>Last reply ${m.thread.last}</span></button>` : ''}

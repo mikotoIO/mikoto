@@ -56,9 +56,9 @@ Check `ARCHITECTURE.md`.
 
 ## Testing
 
-- **Client**: Vitest for unit/integration tests
-- **Server**: Cargo test for Rust unit tests
-- **E2E**: Not currently configured
+- **Client**: Vitest. Pure logic runs in Node; component tests opt into a DOM with `// @vitest-environment happy-dom` and use Testing Library. `src/test/mikoto.tsx` renders components against a real `MikotoClient` with in-memory REST.
+- **mikoto.js**: Vitest. `src/tests/support/` has a fake backend (REST via an axios adapter, a fake WebSocket, payload factories) for driving `MikotoClient` end to end.
+- **Server**: `cargo test`. Unit tests live next to the code; `apps/superego/tests/api` runs the real router against Postgres and Redis over HTTP and WebSocket, with DB fixtures (`fixtures.rs`: `user()`, `space()`, `member_with(space, Permission::X)`, ...). It needs `docker compose up -d postgres redis` (it skips with a warning otherwise, and fails under `CI`).
 
 ## Port Configuration
 

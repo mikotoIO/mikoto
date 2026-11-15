@@ -132,6 +132,7 @@ async fn delete(
 
 async fn list_unread(
     claim: Claims,
+    _member: Load<MemberExt>,
     Path(space_id): Path<Uuid>,
 ) -> Result<Json<Vec<ChannelUnread>>, Error> {
     let user_id: Uuid = claim.sub.parse()?;
@@ -141,8 +142,13 @@ async fn list_unread(
 
 async fn acknowledge(
     claim: Claims,
-    Path((_, channel_id)): Path<(Uuid, Uuid)>,
+    _member: Load<MemberExt>,
+    Path((space_id, channel_id)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<()>, Error> {
+    let channel = Channel::find_by_id(channel_id, db()).await?;
+    if channel.space_id != Some(space_id) {
+        return Err(Error::NotFound);
+    }
     let user_id: Uuid = claim.sub.parse()?;
     ChannelUnread::upsert(channel_id, user_id, Timestamp::now(), db()).await?;
     Ok(().into())

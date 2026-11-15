@@ -8,7 +8,7 @@ use crate::{
     entities::{MemberExt, Role, RolePatch, SpaceExt},
     error::Error,
     functions::{
-        permissions::{permissions_or_admin, Permission},
+        permissions::{can_grant, parse_permissions, permissions_or_admin, Permission},
         pubsub::emit_event,
     },
     middlewares::load::Load,
@@ -54,6 +54,11 @@ async fn update(
     if role.space_id != space.base.id {
         return Err(Error::NotFound);
     }
+    // Editing a role both takes away its old permissions and grants the new
+    // ones, so the editor must hold all of them.
+    let old = parse_permissions(&role.permissions).unwrap_or(Permission::all());
+    let new = parse_permissions(&patch.permissions)?;
+    can_grant(&space, &member, old | new)?;
     let role = role.update(&patch, db()).await?;
     emit_event("roles.onUpdate", &role, &format!("space:{}", space.base.id)).await?;
     Ok(role.into())
@@ -70,6 +75,8 @@ async fn delete(
     if role.space_id != space.base.id {
         return Err(Error::NotFound);
     }
+    let perms = parse_permissions(&role.permissions).unwrap_or(Permission::all());
+    can_grant(&space, &member, perms)?;
     role.delete(db()).await?;
     emit_event("roles.onDelete", &role, &format!("space:{}", space.base.id)).await?;
     Ok(Json(()))

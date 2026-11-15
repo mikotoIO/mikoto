@@ -14,7 +14,7 @@ use sqlx::PgPool;
 use superego::{
     entities::{Account, Channel, ChannelType, Message, Role, SpaceUser},
     error::Error as SuperegoError,
-    functions::time::Timestamp,
+    functions::{permissions::Permission, time::Timestamp},
 };
 use uuid::Uuid;
 
@@ -212,10 +212,20 @@ async fn add_member_to_space(pool: &PgPool, user_id: Uuid) -> Result<(), sqlx::E
 }
 
 async fn create_roles(pool: &PgPool) -> Result<(), sqlx::Error> {
+    let moderator = Permission::MODERATOR
+        | Permission::MANAGE_MESSAGES
+        | Permission::MANAGE_INVITES
+        | Permission::BAN;
     let roles = [
-        (Uuid::new_v4(), "@everyone", None, "0", -1),
-        (Uuid::new_v4(), "Admin", Some("#e74c3c"), "255", 1),
-        (Uuid::new_v4(), "Moderator", Some("#3498db"), "127", 0),
+        (Uuid::new_v4(), "@everyone", None, Permission::NONE, -1),
+        (
+            Uuid::new_v4(),
+            "Admin",
+            Some("#e74c3c"),
+            Permission::ADMIN,
+            1,
+        ),
+        (Uuid::new_v4(), "Moderator", Some("#3498db"), moderator, 0),
     ];
 
     for (id, name, color, permissions, position) in roles {
@@ -224,7 +234,7 @@ async fn create_roles(pool: &PgPool) -> Result<(), sqlx::Error> {
             space_id: TEST_SPACE_ID,
             name: name.to_string(),
             color: color.map(|s| s.to_string()),
-            permissions: permissions.to_string(),
+            permissions: permissions.bits().to_string(),
             position,
         };
         role.create(pool).await.map_err(|e| match e {

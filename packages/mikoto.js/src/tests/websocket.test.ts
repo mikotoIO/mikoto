@@ -4,53 +4,9 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { WebsocketApi } from '../WebsocketApi';
 import { backoffDelay, retry } from '../helpers/retry';
 import { tokenExpiry } from '../helpers/token';
+import { FakeSocket, flushMicrotasks } from './support/fakeSocket';
 
-/** Minimal stand-in for the browser WebSocket. */
-class FakeSocket {
-  static OPEN = 1;
-  static CLOSED = 3;
-  static instances: FakeSocket[] = [];
-
-  readyState = 0;
-  sent: { op: string; data: unknown }[] = [];
-  closedWith?: number;
-  onopen: (() => void) | null = null;
-  onmessage: ((ev: { data: string }) => void) | null = null;
-  onclose: (() => void) | null = null;
-  onerror: (() => void) | null = null;
-
-  constructor(public url: string) {
-    FakeSocket.instances.push(this);
-  }
-
-  send(raw: string) {
-    this.sent.push(JSON.parse(raw));
-  }
-
-  close(code?: number) {
-    this.closedWith = code;
-    this.readyState = FakeSocket.CLOSED;
-  }
-
-  // test helpers
-  serverOpen() {
-    this.readyState = FakeSocket.OPEN;
-    this.onopen?.();
-  }
-  serverSend(op: string, data: unknown = null) {
-    this.onmessage?.({ data: JSON.stringify({ op, data }) });
-  }
-  serverClose() {
-    this.readyState = FakeSocket.CLOSED;
-    this.onclose?.();
-  }
-}
-
-const latest = () => FakeSocket.instances[FakeSocket.instances.length - 1];
-/** Let pending promise callbacks run. */
-async function flushMicrotasks() {
-  for (let i = 0; i < 10; i++) await Promise.resolve();
-}
+const latest = () => FakeSocket.latest();
 /** Advance fake time in small steps, running promise callbacks in between. */
 async function advance(ms: number) {
   await flushMicrotasks();

@@ -125,3 +125,9 @@ features = ["tokio-rustls-tls"]
 version = "0.12.3"
 default-features = false
 features = ["charset", "http2", "rustls-tls"]
+
+[dev-dependencies]
+# Integration tests (tests/api) drive a real server over HTTP and WebSocket.
+# Versions match what superego/axum already pull in.
+reqwest = { version = "0.12.3", default-features = false, features = ["json", "rustls-tls"] }
+tokio-tungstenite = "0.24"

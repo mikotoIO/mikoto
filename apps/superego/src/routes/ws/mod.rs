@@ -119,11 +119,15 @@ async fn handle_socket<S: WebSocketState>(
     let params = read_auth_token::<S>(&mut reader, query).await?;
     let (state, initial_subscriptions) = S::initialize(params).await?;
 
-    let redis = {
+    // Take the message receiver once, before subscribing: a broadcast receiver
+    // only sees messages sent after it was created, so taking a new one per
+    // message would drop anything that arrives while an event is in flight.
+    let (redis, mut messages) = {
         let redis = redis().clone_new();
         redis.init().await?;
+        let messages = redis.message_rx();
         redis.subscribe(initial_subscriptions).await?;
-        redis
+        (redis, messages)
     };
 
     let state = Arc::new(RwLock::new(state));
@@ -134,7 +138,10 @@ async fn handle_socket<S: WebSocketState>(
 
     let mut server_to_client: JoinHandle<Result<(), Error>> = tokio::spawn(async move {
         let state = s2c_state;
-        while let Ok(msg) = redis.message_rx().recv().await {
+        // If this socket falls more than fred's broadcast capacity behind,
+        // recv() reports a lag and the loop ends, closing the socket: the
+        // client then reconnects and resyncs instead of silently missing events.
+        while let Ok(msg) = messages.recv().await {
             let msg = if let Some(x) = msg.value.as_string() {
                 x
             } else {

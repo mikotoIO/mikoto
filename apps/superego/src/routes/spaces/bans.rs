@@ -69,6 +69,9 @@ async fn create(
     if acting_member.user.base.id == body.user_id {
         return Err(Error::forbidden("You cannot ban yourself"));
     }
+    if space.base.owner_id == Some(body.user_id) {
+        return Err(Error::forbidden("You cannot ban the owner of the space"));
+    }
     permissions_or_admin(&space, &acting_member, Permission::BAN)?;
 
     // Check if already banned

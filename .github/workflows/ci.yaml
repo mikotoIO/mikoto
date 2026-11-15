@@ -36,4 +36,14 @@ jobs:
       - uses: taiki-e/install-action@v2
         with:
           tool: just
+      # superego's integration tests (apps/superego/tests/api) need Postgres
+      # and Redis on the docker-compose ports.
+      - name: Start Postgres and Redis
+        if: matrix.task == 'test'
+        run: |
+          docker run -d --name postgres -p 35101:5432 \
+            -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres \
+            --health-cmd pg_isready --health-interval 2s postgres:16
+          docker run -d --name redis -p 35102:6379 redis:6.2-alpine
+          until [ "$(docker inspect -f '{{.State.Health.Status}}' postgres)" = healthy ]; do sleep 1; done
       - run: just ${{ matrix.task }}

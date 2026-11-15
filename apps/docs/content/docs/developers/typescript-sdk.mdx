@@ -83,6 +83,28 @@ When the server pushes a `channel.onUpdate`, the manager mutates
 the proxy and `useSnapshot` triggers a re-render — no manual cache
 invalidation or query refetch.
 
+## Emoji and reactions
+
+Custom emoji belong to a space (`space.emojis`). In message text they
+are written as an object link, `<emoji:ID:name>`: the id says which
+emoji, and the name is only a fallback to show where it can't be
+resolved. Standard emoji are their shortcodes, like `:tada:`.
+
+```ts
+import { formatEmoji } from '@mikoto-io/mikoto.js';
+
+const parrot = space.emojis.getByName('party_parrot');
+await channel.sendMessage(`nice ${formatEmoji(parrot)}`); // or parrot.markdown
+
+await message.react('+1'); // a standard shortcode...
+await message.react(parrot.id); // ...or a custom emoji's id
+await message.unreact('+1');
+```
+
+`message.reactions` lists `{ emoji, emojiId, count, userIds }` per
+emoji. `react` and `unreact` update it immediately and roll back if
+the server refuses.
+
 ## WebSocket
 
 You don't connect manually. The SDK opens the socket after the first

@@ -6,6 +6,13 @@ import { ZSchema } from '../helpers/ZSchema';
 import { Manager } from './base';
 import type { MikotoChannel } from './channel';
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** A reaction's key: a standard shortcode, or a custom emoji's id. */
+function customEmojiId(emoji: string) {
+  return UUID.test(emoji) ? emoji : null;
+}
+
 export class MikotoMessage extends ZSchema(MessageExt) {
   client!: MikotoClient;
   pending?: boolean;
@@ -65,28 +72,23 @@ export class MikotoMessage extends ZSchema(MessageExt) {
    * custom emoji in this message's space. Shows immediately; rolls back if
    * the server refuses.
    */
-  async react(emoji: string, emojiId: string | null = null) {
-    await this.setReaction(emoji, emojiId, true);
+  async react(emoji: string) {
+    await this.setReaction(emoji, true);
   }
 
   async unreact(emoji: string) {
-    const emojiId =
-      this.reactions.find((r) => r.emoji === emoji)?.emojiId ?? null;
-    await this.setReaction(emoji, emojiId, false);
+    await this.setReaction(emoji, false);
   }
 
   /** Add the reaction if the signed-in user hasn't reacted, else remove it. */
-  async toggleReaction(emoji: string, emojiId: string | null = null) {
+  async toggleReaction(emoji: string) {
     if (this.hasReacted(emoji)) await this.unreact(emoji);
-    else await this.react(emoji, emojiId);
+    else await this.react(emoji);
   }
 
-  private async setReaction(
-    emoji: string,
-    emojiId: string | null,
-    add: boolean,
-  ) {
+  private async setReaction(emoji: string, add: boolean) {
     const userId = this.client.user.me?.id;
+    const emojiId = customEmojiId(emoji);
     const change = userId ? { userId, emoji, emojiId } : null;
     if (change) this._applyReaction(change, add);
     try {

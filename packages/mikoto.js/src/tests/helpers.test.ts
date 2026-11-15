@@ -3,6 +3,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
 
 import { ZSchema } from '../helpers/ZSchema';
+import { formatEmoji, parseEmoji, parseEmojiHref } from '../helpers/emoji';
 import { isAuthError, isTransientError, retry, sleep } from '../helpers/retry';
 import { tokenExpiry } from '../helpers/token';
 
@@ -135,5 +136,31 @@ describe('ZSchema', () => {
 
   test('strips unknown keys', () => {
     expect(Point.parse({ x: 1, y: 2, z: 3 } as never)).not.toHaveProperty('z');
+  });
+});
+
+describe('emoji objects', () => {
+  const id = '3f2a9c1e-0b7d-4c55-9a51-2d4e8f6a7b10';
+
+  test('format and parse round-trip', () => {
+    const text = formatEmoji({ id, name: 'party_parrot' });
+    expect(text).toBe(`<emoji:${id}:party_parrot>`);
+    expect(parseEmoji(text)).toEqual({ id, name: 'party_parrot' });
+    expect(parseEmojiHref(`emoji:${id}:party_parrot`)).toEqual({
+      id,
+      name: 'party_parrot',
+    });
+  });
+
+  test('rejects anything else', () => {
+    for (const bad of [
+      `<emoji:${id}>`,
+      `<emoji:not-a-uuid:x>`,
+      `<emoji:${id}:has space>`,
+      `x<emoji:${id}:x>`,
+      ':party_parrot:',
+    ]) {
+      expect(parseEmoji(bad)).toBeNull();
+    }
   });
 });

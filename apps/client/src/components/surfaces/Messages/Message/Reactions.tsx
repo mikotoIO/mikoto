@@ -46,10 +46,7 @@ async function attempt(action: Promise<void>, failure: string) {
 export function reactWith(message: MikotoMessage, emoji: EmojiEntry) {
   const key = emoji.key;
   if (message.hasReacted(key)) return;
-  void attempt(
-    message.react(key, emoji.custom?.id ?? null),
-    "Couldn't add your reaction",
-  );
+  void attempt(message.react(key), "Couldn't add your reaction");
 }
 
 /** Picker for adding a reaction. Render inside a `<Popover>`. */
@@ -137,7 +134,7 @@ function ReactionChip({
         }`}
         onClick={() =>
           void attempt(
-            message.toggleReaction(reaction.emoji, reaction.emojiId ?? null),
+            message.toggleReaction(reaction.emoji),
             mine
               ? "Couldn't remove your reaction"
               : "Couldn't add your reaction",

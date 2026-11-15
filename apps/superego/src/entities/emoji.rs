@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::LazyLock};
+use std::{borrow::Cow, collections::HashMap, sync::LazyLock};
 
 use regex::Regex;
 use schemars::JsonSchema;
@@ -70,6 +70,19 @@ pub fn validate_emoji_image(image: &str) -> Result<(), Error> {
             "Emoji images must be uploaded to the emoji store",
         ))
     }
+}
+
+/// Messages write custom emoji as `<emoji:ID:name>`. For plain-text places
+/// (push notifications) show them as `:name:` instead.
+pub fn emoji_objects_as_text(content: &str) -> Cow<'_, str> {
+    // A constant pattern, known to compile.
+    static RE: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(
+            r"<emoji:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}:(\w{1,32})>",
+        )
+        .unwrap()
+    });
+    RE.replace_all(content, ":$1:")
 }
 
 fn map_unique_violation(err: sqlx::Error) -> Error {
@@ -180,6 +193,19 @@ mod tests {
         ] {
             assert!(validate_emoji_name(bad).is_err(), "{bad}");
         }
+    }
+
+    #[test]
+    fn emoji_objects_read_as_names() {
+        let id = Uuid::new_v4();
+        assert_eq!(
+            emoji_objects_as_text(&format!("hi <emoji:{id}:blob> and <emoji:{id}:cat>!")),
+            "hi :blob: and :cat:!"
+        );
+        assert_eq!(
+            emoji_objects_as_text("<emoji:nope:blob>"),
+            "<emoji:nope:blob>"
+        );
     }
 
     #[test]

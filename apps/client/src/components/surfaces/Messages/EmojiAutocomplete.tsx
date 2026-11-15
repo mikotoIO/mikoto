@@ -1,4 +1,5 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { formatEmoji } from '@mikoto-io/mikoto.js';
 import {
   $getSelection,
   $isRangeSelection,
@@ -121,7 +122,11 @@ export function EmojiAutocompletePlugin() {
           current.node,
           current.endOffset,
         );
-        selection.insertText(`:${emoji.id}: `);
+        // Custom emoji are sent by id; the composer shows either as an image.
+        const markdown = emoji.custom
+          ? formatEmoji(emoji.custom)
+          : `:${emoji.id}:`;
+        selection.insertText(`${markdown} `);
       });
       setMatch(null);
     },

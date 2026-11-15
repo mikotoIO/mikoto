@@ -171,6 +171,10 @@
   vertical-align: middle;
 }
 
+.emojiFallback {
+  color: var(--muted);
+}
+
 .customEmoji {
   width: auto;
   height: var(--emoji-size);

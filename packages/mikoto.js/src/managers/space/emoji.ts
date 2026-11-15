@@ -4,6 +4,7 @@ import type { MikotoSpace } from '.';
 import type { MikotoClient } from '../../MikotoClient';
 import { Emoji, type EmojiCreatePayload } from '../../api.gen';
 import { ZSchema } from '../../helpers/ZSchema';
+import { formatEmoji } from '../../helpers/emoji';
 import { CachedManager } from '../base';
 
 /** A space's custom emoji. Members write it as `:name:`. */
@@ -18,6 +19,11 @@ export class MikotoEmoji extends ZSchema(Emoji) {
 
   _patch(data: Emoji) {
     Object.assign(this, data);
+  }
+
+  /** How to write this emoji in a message: `<emoji:ID:name>`. */
+  get markdown() {
+    return formatEmoji(this);
   }
 
   async rename(name: string) {
@@ -52,7 +58,7 @@ export class EmojiManager extends CachedManager<MikotoEmoji> {
     }
   }
 
-  /** The emoji called `name` (case-insensitive), as `:name:` resolves. */
+  /** The emoji called `name` (case-insensitive), e.g. for `:name:` typed in the composer. */
   getByName(name: string): MikotoEmoji | undefined {
     const lower = name.toLowerCase();
     for (const emoji of this.cache.values()) {

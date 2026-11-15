@@ -8,7 +8,7 @@ use web_push_native::{
 
 use crate::{
     db::db,
-    entities::{MessageExt, PushSubscription},
+    entities::{emoji_objects_as_text, MessageExt, PushSubscription},
     env::env,
 };
 
@@ -39,7 +39,7 @@ impl From<MessageExt> for PushPayload {
                 .as_ref()
                 .map(|a| a.name.clone())
                 .unwrap_or_else(|| "New message".to_string()),
-            body: truncate(&message.base.content, 140),
+            body: truncate(&emoji_objects_as_text(&message.base.content), 140),
             url: format!("/dm/{channel_id}"),
             icon: message.author.as_ref().and_then(|a| a.avatar.clone()),
             tag: format!("dm:{channel_id}"),

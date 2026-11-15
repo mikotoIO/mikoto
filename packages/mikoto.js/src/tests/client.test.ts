@@ -422,6 +422,15 @@ describe('reactions', () => {
     expect(message.reactions).toEqual([]);
   });
 
+  test('custom emoji reactions are keyed by id', async () => {
+    const { message, path } = await setup();
+    backend.on('put', path, () => null);
+    const id = f.uuid();
+    await message.react(id);
+    expect(message.reactions[0]).toMatchObject({ emoji: id, emojiId: id });
+    expect(backend.calls('put', path)[0].params.emoji).toBe(id);
+  });
+
   test('DM messages use the DM routes', async () => {
     const { me } = await setup();
     const dm = f.channel(null);

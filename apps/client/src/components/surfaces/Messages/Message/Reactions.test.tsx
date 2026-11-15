@@ -145,33 +145,55 @@ describe('Reactions', () => {
 });
 
 describe('custom emoji in messages', () => {
-  test(':name: renders the space emoji', async () => {
-    const { client, space } = await setup();
-    renderWithClient(
-      client,
-      <CustomEmojiProvider space={space}>
-        <Markdown content="hello :BLOB:" />
-      </CustomEmojiProvider>,
-    );
-    const img = screen.getByRole('img', { name: ':blob:' });
-    expect(img.getAttribute('src')).toContain('emoji/blob.png');
-  });
-
-  test('outside the space it is just a shortcode', async () => {
-    const { client } = await setup();
-    renderWithClient(client, <Markdown content="hello :blob:" />);
-    expect(screen.queryByRole('img', { name: ':blob:' })).toBeNull();
-  });
-
-  test('renames and new emoji show up live', async () => {
+  test('<emoji:ID:name> renders the emoji, by id', async () => {
     const { client, space, blob } = await setup();
     renderWithClient(
       client,
       <CustomEmojiProvider space={space}>
-        <Markdown content=":wave:" />
+        <Markdown content={`hello <emoji:${blob.id}:old_name>`} />
       </CustomEmojiProvider>,
     );
-    expect(screen.queryByRole('img', { name: ':wave:' })).toBeNull();
+    // the current name wins over the one written in the message
+    const img = screen.getByRole('img', { name: ':blob:' });
+    expect(img.getAttribute('src')).toContain('emoji/blob.png');
+  });
+
+  test('a :name: shortcode is never a custom emoji', async () => {
+    const { client, space } = await setup();
+    renderWithClient(
+      client,
+      <CustomEmojiProvider space={space}>
+        <Markdown content="hello :blob:" />
+      </CustomEmojiProvider>,
+    );
+    expect(screen.queryByRole('img', { name: ':blob:' })).toBeNull();
+  });
+
+  test('emoji from another space the user is in still show', async () => {
+    const { client, blob } = await setup();
+    // rendered outside any space, as in a DM
+    renderWithClient(client, <Markdown content={`<emoji:${blob.id}:blob>`} />);
+    expect(screen.getByRole('img', { name: ':blob:' })).toBeTruthy();
+  });
+
+  test('unknown emoji fall back to their name', async () => {
+    const { client } = await setup();
+    const { container } = renderWithClient(
+      client,
+      <Markdown content={`hi <emoji:${uuid()}:gone>`} />,
+    );
+    expect(screen.queryByRole('img')).toBeNull();
+    expect(container.textContent).toBe('hi :gone:');
+  });
+
+  test('renames show up live', async () => {
+    const { client, space, blob } = await setup();
+    renderWithClient(
+      client,
+      <CustomEmojiProvider space={space}>
+        <Markdown content={`<emoji:${blob.id}:blob>`} />
+      </CustomEmojiProvider>,
+    );
     act(() =>
       space.emojis
         ._get(blob.id)

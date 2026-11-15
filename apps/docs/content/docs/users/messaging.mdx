@@ -14,7 +14,23 @@ sending.
 
 Messages support **Markdown** — bold, italic, lists, links, fenced
 code blocks, blockquotes, and inline code all work. The composer
-renders a live preview as you type.
+renders a live preview as you type: formatting is styled in place
+(the `**` and other markers stay visible, so what you see is what is
+sent), mentions and links are highlighted, and emoji show as images.
+**Ctrl+B** / **Ctrl+I** (**⌘** on macOS) wrap the selection in bold
+or italic markers.
+
+## Emoji
+
+Type `:` and a few letters to search emoji, or open the picker with
+the smiley button. Typing a full shortcode like `:tada:` also works.
+
+Spaces can have their own **custom emoji**. Anyone with the "Manage
+emoji" permission can upload them under **Space settings → Emoji**
+(PNG, GIF, WebP or JPEG up to 512 KB; GIFs stay animated). Custom
+emoji show up first in the picker and autocomplete while you're in
+that space. Renaming one doesn't break messages that already use it;
+deleting one turns it into its `:name:` text.
 
 ## Mentions
 
@@ -38,10 +54,10 @@ without flooding the main channel.
 
 ## Reactions
 
-Hover a message and click the smiley icon (or press **R**) to add an
-emoji reaction. Click an existing reaction to toggle yours on or
-off. Useful for lightweight acknowledgement without sending a full
-message.
+Hover a message and click the smiley icon to add an emoji reaction,
+standard or one of the space's custom emoji. Click an existing
+reaction to toggle yours on or off, and hover it to see who reacted.
+A message can collect up to 20 different emoji.
 
 ## Editing and deleting
 

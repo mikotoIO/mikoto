@@ -1,107 +1,151 @@
-import { Box, Flex, Grid, Heading } from '@chakra-ui/react';
-import { faArrowDown, faHashtag } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  MessageExt,
-  MessageKey,
-  MikotoChannel,
+  type MessageExt,
+  type MessageKey,
+  type MikotoChannel,
   MikotoMessage,
 } from '@mikoto-io/mikoto.js';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import throttle from 'lodash/throttle';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
+import { ArrowDown, Hash, Users } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 
 import { Surface } from '@/components/Surface';
+import { Avatar } from '@/components/atoms/Avatar';
 import { TabName } from '@/components/tabs';
-import { Skeleton, SkeletonCircle } from '@/components/ui/skeleton';
+import {
+  DelayedFallback,
+  EmptyState,
+  ErrorState,
+  IconButton,
+  PaneHeader,
+  RegionErrorBoundary,
+  SkeletonGroup,
+  describeError,
+  toast,
+} from '@/design';
 import { uploadFile } from '@/functions/fileUpload';
 import { useFetchMember, useMaybeSnapshot, useMikoto } from '@/hooks';
-import { CurrentSpaceContext } from '@/store';
+import { CurrentSpaceContext, explorerPanelsState } from '@/store';
 
 import { DateSeparator, showDateSeparator } from './DateSeparator';
-import { MessageItem, messageEditState } from './Message';
-import { MessageEditor } from './MessageEditor';
+import { MessageItem, MessageSkeleton, messageEditState } from './Message';
+import { type FileUpload, MessageEditor } from './MessageEditor';
+import styles from './Messages.module.css';
 import { TypingIndicator, useTyping } from './TypingIndicator';
 
-// Simple hash to get a deterministic pseudo-random number from an index
-function seededRandom(index: number) {
-  const x = Math.sin(index * 9301 + 49297) * 49297;
-  return x - Math.floor(x);
+const GROUP_WINDOW_MS = 5 * 60 * 1000;
+const PAGE_SIZE = 50;
+
+const time = (m: MikotoMessage) => new Date(m.timestamp).getTime();
+
+/**
+ * Fold a freshly fetched newest page into the loaded list. History above the
+ * page is kept, server state wins inside it (catching missed edits and
+ * deletes), and local unsent messages stay at the end. If the page doesn't
+ * reach back to what we already had, the gap can't be stitched, so the page
+ * replaces the list and older history reloads on scroll.
+ */
+function mergeLatestPage(
+  current: MikotoMessage[] | null,
+  latest: MikotoMessage[],
+): MikotoMessage[] {
+  const local = (current ?? []).filter((m) => m.pending);
+  const loaded = (current ?? []).filter((m) => !m.pending);
+  if (latest.length === 0) return local;
+
+  const pageStart = time(latest[0]);
+  const newestLoaded = loaded.length ? time(loaded[loaded.length - 1]) : -1;
+  const hasGap = latest.length >= PAGE_SIZE && pageStart > newestLoaded;
+  if (hasGap) return [...latest, ...local];
+
+  const older = loaded.filter((m) => time(m) < pageStart);
+  const latestIds = new Set(latest.map((m) => m.id));
+  return [...older.filter((m) => !latestIds.has(m.id)), ...latest, ...local];
 }
 
-function MessageSkeleton({ index }: { index: number }) {
-  // Determine if "simple" (continuation) based on a pattern seeded by index
-  const isSimple = index > 0 && seededRandom(index) > 0.4;
-  const width = `${50 + seededRandom(index * 7 + 3) * 40}%`;
-
+function isMessageSimple(message: MikotoMessage, prevMessage?: MikotoMessage) {
+  if (!prevMessage) return false;
+  if (prevMessage.pending || message.pending) return false;
+  if (showDateSeparator(message, prevMessage)) return false;
   return (
-    <Flex gap="16px" px="20px" py={isSimple ? '2px' : '8px'} align="start">
-      {isSimple ? (
-        <Box w="40px" flexShrink={0} />
-      ) : (
-        <SkeletonCircle size="40px" />
-      )}
-      <Box flex={1}>
-        {!isSimple && (
-          <Flex gap="8px" mb="6px" align="center">
-            <Skeleton height="14px" width="120px" />
-            <Skeleton height="10px" width="60px" />
-          </Flex>
-        )}
-        <Skeleton height="14px" width={width} />
-      </Box>
-    </Flex>
-  );
-}
-
-function MessagesLoading() {
-  return (
-    <Virtuoso
-      totalCount={1000}
-      defaultItemHeight={48}
-      style={{ flexGrow: 1, overflowX: 'hidden' }}
-      itemContent={(index) => <MessageSkeleton index={index} />}
-    />
-  );
-}
-
-function isMessageSimple(message: MessageExt, prevMessage?: MessageExt) {
-  return (
-    prevMessage &&
     prevMessage.author?.id === message.author?.id &&
     new Date(message.timestamp).getTime() -
       new Date(prevMessage.timestamp).getTime() <
-      5 * 60 * 1000
+      GROUP_WINDOW_MS
   );
 }
 
-const Hed = (props: { top: string; sub: string }) => {
-  const { top, sub } = props;
+function MessagesSkeleton() {
   return (
-    <Box py={4} px={16}>
-      <Heading fontSize="24px" mb={2}>
-        {top}
-        <Box as="p" color="gray.250" m={0}>
-          {sub}
-        </Box>
-      </Heading>
-    </Box>
+    <SkeletonGroup label="messages" className={styles.skeletonList}>
+      {Array.from({ length: 8 }, (_, i) => (
+        <MessageSkeleton key={i} index={i} />
+      ))}
+    </SkeletonGroup>
   );
-};
+}
 
-const HedSkelly = () => (
-  <Box py="16px">
-    {Array.from({ length: 8 }, (_, i) => (
-      <MessageSkeleton key={i} index={i} />
-    ))}
-  </Box>
-);
+interface ListContext {
+  topLoaded: boolean;
+  isDm: boolean;
+  displayName: string;
+  dmUser?: { id: string; name: string; avatar?: string | null };
+}
+
+/** Top of the list: the channel start once fully scrolled, else skeletons. */
+function ListHeader({ context }: { context: ListContext }) {
+  if (!context.topLoaded) {
+    return (
+      <SkeletonGroup label="older messages" className={styles.loadingOlder}>
+        {[0, 1, 2].map((i) => (
+          <MessageSkeleton key={i} index={i + 3} />
+        ))}
+      </SkeletonGroup>
+    );
+  }
+  if (context.isDm) {
+    return (
+      <div className={styles.start}>
+        <div className={styles.startAvatar}>
+          <Avatar
+            src={context.dmUser?.avatar}
+            userId={context.dmUser?.id}
+            name={context.displayName}
+            size={56}
+          />
+        </div>
+        <h2>{context.displayName}</h2>
+        <p>
+          This is the start of your conversation with {context.displayName}.
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div className={styles.start}>
+      <div className={styles.startIcon}>
+        <Hash size={24} aria-hidden />
+      </div>
+      <h2>Welcome to #{context.displayName}</h2>
+      <p>This is the start of the #{context.displayName} channel.</p>
+    </div>
+  );
+}
+
+function ListFooter() {
+  return <div className={styles.footer} />;
+}
 
 // Please laugh
 // Meant to be a large sentinel value to mark the last message (when loaded) position
 // as Virtuoso does not allow negative values
 const FUNNY_NUMBER = 69_420_000;
+
+interface FailedSend {
+  content: string;
+  files: FileUpload[];
+}
 
 function RealMessageView({ channel }: { channel: MikotoChannel }) {
   useFetchMember(channel.space);
@@ -115,9 +159,11 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
     () => Array.from(membersCache.values()),
     [membersCache],
   );
+  const [panels, setPanels] = useAtom(explorerPanelsState);
 
+  const isDm = !channel.spaceId;
   // For DM channels, resolve the display name from the relationship
-  const dmRelation = !channel.spaceId
+  const dmRelation = isDm
     ? mikoto.relationships.values().find((r) => r.channelId === channel.id)
     : undefined;
   const displayName = dmRelation?.user.name ?? channel.name;
@@ -127,9 +173,15 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
   const loadingOlderRef = useRef(false);
 
   const [currentTypers, setCurrentTypers] = useTyping();
-  const [bottomState, setBottomState] = useState(false);
+  const [bottomState, setBottomState] = useState(true);
   const currentEditState = useAtomValue(messageEditState);
   const setEditState = useSetAtom(messageEditState);
+
+  // Optimistic messages whose send failed, by id, with what to resend.
+  const [failedSends, setFailedSends] = useState<Record<string, FailedSend>>(
+    {},
+  );
+  const failedRef = useRef(new Set<string>());
 
   useEffect(() => {
     const handler = (ev: { channelId: string; userId: string }) => {
@@ -160,20 +212,57 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
     };
   }, [channel.id]);
 
-  const typing = useCallback(
-    throttle(() => {
-      mikoto.ws.send('typing.start', { channelId: channel.id });
-    }, 3000),
+  const typing = useMemo(
+    () =>
+      throttle(() => {
+        mikoto.ws.send('typing.start', { channelId: channel.id });
+      }, 3000),
     [channel.id],
   );
 
   const [msgs, setMsgs] = useState<MikotoMessage[] | null>(null);
+  const [loadError, setLoadError] = useState<unknown>(null);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   useEffect(() => {
-    channel.listMessages(50, null).then((m) => {
-      setMsgs(m);
-      if (m.length === 0) setTopLoaded(true);
-    });
-  }, [channel.id]);
+    let cancelled = false;
+    channel
+      .listMessages(PAGE_SIZE, null)
+      .then((m) => {
+        if (cancelled) return;
+        setMsgs(m);
+        if (m.length === 0) setTopLoaded(true);
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) setLoadError(err);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [channel.id, loadAttempt]);
+
+  const retryLoad = () => {
+    setLoadError(null);
+    setLoadAttempt((n) => n + 1);
+  };
+
+  // After a reconnect, fetch the newest page and fold in anything missed
+  // while the connection was down.
+  useEffect(
+    () =>
+      mikoto.onResync(() => {
+        channel
+          .listMessages(PAGE_SIZE, null)
+          .then((latest) => {
+            setMsgs((xs) => mergeLatestPage(xs, latest));
+            // A full page may have replaced the list; older history exists.
+            if (latest.length >= PAGE_SIZE) setTopLoaded(false);
+          })
+          .catch(() => {
+            // Live events resume regardless; the next resync tries again.
+          });
+      }),
+    [channel.id],
+  );
 
   const [scrollToBottom, setScrollToBottom] = useState(false);
   useEffect(() => {
@@ -192,15 +281,19 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
 
   const createFn = (x: MessageExt) => {
     if (x.channelId !== channel.id) return;
+    setCurrentTypers((ts) => ts.filter((y) => y.userId !== x.author?.id));
+    channel.ack().catch(() => {});
+    setScrollToBottom(true);
 
     setMsgs((xs) => {
       if (xs === null) return null;
-      setCurrentTypers((ts) => ts.filter((y) => y.userId !== x.author?.id));
-      channel.ack().catch(() => {});
-      setScrollToBottom(true);
-      // Replace optimistic message if one exists for this user
+      // Replace this user's oldest in-flight optimistic message, if any.
+      // Failed ones stay put until the user retries or deletes them.
       const optimisticIndex = xs.findIndex(
-        (m) => m.pending && m.authorId === x.authorId,
+        (m) =>
+          m.pending &&
+          m.authorId === x.authorId &&
+          !failedRef.current.has(m.id),
       );
       if (optimisticIndex !== -1) {
         const updated = [...xs];
@@ -215,16 +308,15 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
     if (x.channelId !== channel.id) return;
     setMsgs((xs) => {
       if (xs === null) return null;
-      return xs?.map((m) => (m.id === x.id ? new MikotoMessage(x, mikoto) : m));
+      return xs.map((m) => (m.id === x.id ? new MikotoMessage(x, mikoto) : m));
     });
   };
 
   const deleteFn = (x: MessageKey) => {
     if (x.channelId !== channel.id) return;
-
+    setScrollToBottom(true);
     setMsgs((xs) => {
       if (xs === null) return null;
-      setScrollToBottom(true);
       return xs.filter((y) => y.id !== x.messageId);
     });
   };
@@ -240,134 +332,231 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
     };
   }, [channel.id]);
 
-  const isDm = !channel.spaceId;
+  const markFailed = (id: string, failed: FailedSend | null) => {
+    if (failed) failedRef.current.add(id);
+    else failedRef.current.delete(id);
+    setFailedSends((prev) => {
+      const next = { ...prev };
+      if (failed) next[id] = failed;
+      else delete next[id];
+      return next;
+    });
+  };
+
+  /** Uploads files, then sends. On failure the message stays, marked "Not sent". */
+  const deliver = async (
+    optimisticId: string,
+    content: string,
+    files: FileUpload[],
+  ) => {
+    try {
+      const attachments = await Promise.all(
+        files.map(async ({ file }) => {
+          const response = await uploadFile('/attachment', file);
+          return {
+            url: response.data.url,
+            filename: file.name,
+            contentType: file.type,
+            size: file.size,
+          };
+        }),
+      );
+      await channel.sendMessage(content, attachments);
+    } catch {
+      markFailed(optimisticId, { content, files });
+    }
+  };
+
+  const sendNew = (content: string, files: FileUpload[]) => {
+    // Insert optimistic message immediately
+    const optimisticMsg = new MikotoMessage(
+      {
+        id: crypto.randomUUID(),
+        channelId: channel.id,
+        content,
+        authorId: mikoto.user.me?.id ?? null,
+        author: mikoto.user.me ?? null,
+        timestamp: new Date().toISOString(),
+        editedTimestamp: null,
+        attachments: [],
+      },
+      mikoto,
+      true,
+    );
+    setMsgs((xs) => (xs ? [...xs, optimisticMsg] : xs));
+    setScrollToBottom(true);
+    return deliver(optimisticMsg.id, content, files);
+  };
+
+  const retrySend = (id: string) => {
+    const failed = failedSends[id];
+    if (!failed) return;
+    markFailed(id, null);
+    void deliver(id, failed.content, failed.files);
+  };
+
+  const discardSend = (id: string) => {
+    markFailed(id, null);
+    setMsgs((xs) => (xs ? xs.filter((m) => m.id !== id) : xs));
+  };
+
+  const scrollToLatest = () => {
+    virtuosoRef.current?.scrollToIndex({
+      index: 'LAST',
+      align: 'start',
+      behavior: 'smooth',
+    });
+  };
+
+  const listContext: ListContext = {
+    topLoaded,
+    isDm,
+    displayName,
+    dmUser: dmRelation?.user,
+  };
 
   return (
     <Surface key={channel.id}>
       <TabName
         name={displayName}
         icon={
-          !channel.spaceId && dmRelation
+          isDm && dmRelation
             ? (dmRelation.user.avatar ?? `default-avatar/${dmRelation.user.id}`)
-            : (channel.space?.icon ?? faHashtag)
+            : (channel.space?.icon ?? Hash)
         }
         spaceId={channel.space?.id}
         spaceName={channel.space?.name}
       />
-      <Grid templateRows="auto 24px" h="100%">
-        <Flex direction="column">
-          <Box position="relative" flex="1" overflow="hidden">
-            {msgs === null ? (
-              <MessagesLoading />
-            ) : (
-              <Virtuoso
-                ref={virtuosoRef}
-                followOutput="auto"
-                defaultItemHeight={64}
-                style={{ height: '100%', overflowX: 'hidden' }}
-                initialTopMostItemIndex={msgs.length - 1}
-                data={msgs}
-                computeItemKey={(_, msg) => msg.id}
-                atBottomStateChange={setBottomState}
-                atBottomThreshold={30}
-                overscan={1000}
-                components={{
-                  // eslint-disable-next-line @eslint-react/component-hook-factories, @eslint-react/no-nested-component-definitions
-                  Header: () =>
-                    !topLoaded ? (
-                      <HedSkelly />
-                    ) : isDm ? (
-                      <Hed
-                        top={`Conversation with ${displayName}`}
-                        sub="This is the start of your message history."
-                      />
-                    ) : (
-                      <Hed
-                        top={`Welcome to #${displayName}!`}
-                        sub="This is the start of the channel."
-                      />
-                    ),
-                }}
-                firstItemIndex={firstItemIndex}
-                startReached={async () => {
-                  if (!msgs) return;
-                  if (msgs.length === 0) return;
-                  if (loadingOlderRef.current) return;
-                  loadingOlderRef.current = true;
-                  try {
-                    const m = await channel.listMessages(50, msgs[0].id);
-                    if (m.length === 0) {
-                      setTopLoaded(true);
-                      return;
-                    }
-                    setFirstItemIndex((x) => x - m.length);
-                    setMsgs((xs) => (xs ? [...m, ...xs] : null));
-                  } finally {
-                    loadingOlderRef.current = false;
+      <PaneHeader
+        icon={
+          isDm ? (
+            <Avatar
+              src={dmRelation?.user.avatar}
+              userId={dmRelation?.user.id}
+              name={displayName}
+              size={20}
+            />
+          ) : (
+            <Hash size={18} aria-hidden />
+          )
+        }
+        title={displayName}
+        actions={
+          !isDm && (
+            <IconButton
+              aria-label={
+                panels.membersCollapsed ? 'Show members' : 'Hide members'
+              }
+              aria-pressed={!panels.membersCollapsed}
+              onClick={() =>
+                setPanels((p) => ({
+                  ...p,
+                  membersCollapsed: !p.membersCollapsed,
+                }))
+              }
+            >
+              <Users size={16} />
+            </IconButton>
+          )
+        }
+      />
+      <div className={styles.chat}>
+        <div className={styles.list}>
+          {loadError !== null && msgs === null ? (
+            <ErrorState
+              what={isDm ? 'This conversation' : `#${channel.name}`}
+              error={loadError}
+              onRetry={retryLoad}
+            />
+          ) : msgs === null ? (
+            <DelayedFallback>
+              <MessagesSkeleton />
+            </DelayedFallback>
+          ) : (
+            <Virtuoso<MikotoMessage, ListContext>
+              ref={virtuosoRef}
+              className={styles.scroller}
+              followOutput="auto"
+              defaultItemHeight={64}
+              initialTopMostItemIndex={Math.max(0, msgs.length - 1)}
+              data={msgs}
+              context={listContext}
+              computeItemKey={(_, msg) => msg.id}
+              atBottomStateChange={setBottomState}
+              atBottomThreshold={30}
+              overscan={1000}
+              components={{ Header: ListHeader, Footer: ListFooter }}
+              firstItemIndex={firstItemIndex}
+              startReached={async () => {
+                if (!msgs || msgs.length === 0) return;
+                if (topLoaded || loadingOlderRef.current) return;
+                const oldest = msgs.find((m) => !m.pending);
+                if (!oldest) return;
+                loadingOlderRef.current = true;
+                try {
+                  const m = await channel.listMessages(PAGE_SIZE, oldest.id);
+                  if (m.length === 0) {
+                    setTopLoaded(true);
+                    return;
                   }
-                }}
-                itemContent={(index, msg) => (
+                  setFirstItemIndex((x) => x - m.length);
+                  setMsgs((xs) => (xs ? [...m, ...xs] : null));
+                } catch (err) {
+                  toast({
+                    type: 'error',
+                    title: "Couldn't load older messages",
+                    description: describeError(err, { context: 'action' })
+                      .message,
+                  });
+                } finally {
+                  loadingOlderRef.current = false;
+                }
+              }}
+              itemContent={(index, msg) => {
+                const prev = msgs[index - firstItemIndex - 1];
+                return (
                   <>
-                    {showDateSeparator(
-                      msg,
-                      msgs[index - firstItemIndex - 1],
-                    ) && <DateSeparator date={new Date(msg.timestamp)} />}
+                    {showDateSeparator(msg, prev) && (
+                      <DateSeparator date={new Date(msg.timestamp)} />
+                    )}
                     <MessageItem
                       message={msg}
-                      isSimple={isMessageSimple(
-                        msg,
-                        msgs[index - firstItemIndex - 1],
-                      )}
+                      isSimple={isMessageSimple(msg, prev)}
+                      inSpace={!isDm}
+                      failed={msg.id in failedSends}
+                      onRetry={() => retrySend(msg.id)}
+                      onDiscard={() => discardSend(msg.id)}
                     />
                   </>
-                )}
-              />
-            )}
-            {!bottomState && msgs !== null && (
-              <Flex
-                justify="center"
-                position="absolute"
-                bottom="8px"
-                left="0"
-                right="0"
-                zIndex="1"
-                pointerEvents="none"
+                );
+              }}
+            />
+          )}
+          {!bottomState && msgs !== null && (
+            <div className={styles.jumpWrap}>
+              <button
+                type="button"
+                className={styles.jump}
+                onClick={scrollToLatest}
               >
-                <Flex
-                  as="button"
-                  align="center"
-                  gap="6px"
-                  px="12px"
-                  py="6px"
-                  bg="gray.600"
-                  color="white"
-                  fontSize="13px"
-                  fontWeight="medium"
-                  cursor="pointer"
-                  borderRadius="full"
-                  outline="none"
-                  border="none"
-                  pointerEvents="auto"
-                  _hover={{ bg: 'gray.500' }}
-                  transition="background 0.15s"
-                  onClick={() => {
-                    virtuosoRef.current?.scrollToIndex({
-                      index: 'LAST',
-                      align: 'start',
-                      behavior: 'smooth',
-                    });
-                  }}
-                >
-                  <FontAwesomeIcon icon={faArrowDown} fontSize="11px" />
-                  Jump to latest
-                </Flex>
-              </Flex>
-            )}
-          </Box>
+                <ArrowDown size={14} aria-hidden />
+                Jump to latest
+              </button>
+            </div>
+          )}
+        </div>
+        <RegionErrorBoundary
+          what="The message box"
+          resetKeys={[channel.id]}
+          className={styles.composerError}
+        >
           <MessageEditor
-            placeholder={`Message #${channel.name}`}
+            placeholder={
+              isDm ? `Message ${displayName}` : `Message #${channel.name}`
+            }
             key={currentEditState?.id ?? 'base'}
             members={spaceMembers}
+            above={<TypingIndicator typers={currentTypers} channel={channel} />}
             onTyping={() => {
               typing();
             }}
@@ -385,58 +574,42 @@ function RealMessageView({ channel }: { channel: MikotoChannel }) {
               if (currentEditState) {
                 const m = currentEditState;
                 setEditState(null);
-                await m.edit(msg);
+                try {
+                  await m.edit(msg);
+                } catch (err) {
+                  toast({
+                    type: 'error',
+                    title: "Couldn't save your edit",
+                    description: describeError(err, { context: 'action' })
+                      .message,
+                  });
+                }
               } else {
-                // Insert optimistic message immediately
-                const optimisticMsg = new MikotoMessage(
-                  {
-                    id: crypto.randomUUID(),
-                    channelId: channel.id,
-                    content: msg,
-                    authorId: mikoto.user.me?.id ?? null,
-                    author: mikoto.user.me ?? null,
-                    timestamp: new Date().toISOString(),
-                    editedTimestamp: null,
-                    attachments: [],
-                  },
-                  mikoto,
-                  true,
-                );
-                setMsgs((xs) => (xs ? [...xs, optimisticMsg] : null));
-                setScrollToBottom(true);
-
-                // Upload all files first
-                const attachments = await Promise.all(
-                  files.map(async ({ file }) => {
-                    const response = await uploadFile('/attachment', file);
-                    return {
-                      url: response.data.url,
-                      filename: file.name,
-                      contentType: file.type,
-                      size: file.size,
-                    };
-                  }),
-                );
-
-                await channel.sendMessage(msg, attachments).catch(() => {
-                  // Remove optimistic message on failure
-                  setMsgs((xs) =>
-                    xs ? xs.filter((m) => m.id !== optimisticMsg.id) : null,
-                  );
-                });
+                await sendNew(msg, files);
               }
             }}
           />
-        </Flex>
-        <TypingIndicator typers={currentTypers} channel={channel} />
-      </Grid>
+        </RegionErrorBoundary>
+      </div>
     </Surface>
   );
 }
 
 export function MessageSurface({ channelId }: { channelId: string }) {
   const mikoto = useMikoto();
-  const channel = mikoto.channels._get(channelId)!;
+  const channel = mikoto.channels._get(channelId);
+
+  if (!channel) {
+    return (
+      <Surface>
+        <EmptyState
+          icon={<Hash size={20} aria-hidden />}
+          title="This channel isn't available"
+          description="It may have been deleted, or you may no longer have access. Close this tab or pick another channel."
+        />
+      </Surface>
+    );
+  }
 
   return (
     <CurrentSpaceContext value={channel.space}>

@@ -1,277 +1,442 @@
-import {
-  Link as Anchor,
-  Box,
-  Flex,
-  Heading,
-  Input,
-  chakra,
-} from '@chakra-ui/react';
-import styled from '@emotion/styled';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
+import { isAxiosError } from 'axios';
+import { CircleCheck, MailCheck } from 'lucide-react';
+import { type ReactNode, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
-import { faMikoto } from '@/components/icons';
-import { Button, Field } from '@/components/ui';
+import { MikotoLogo } from '@/components/icons';
+import { Button, Field, Input, cx } from '@/design';
 import { useErrorElement } from '@/hooks/useErrorElement';
 import { authClient } from '@/store/authClient';
 
-function Logo() {
-  return (
-    <Flex
-      align="center"
-      justify="center"
-      bg="gray.900"
-      w="64px"
-      h="64px"
-      rounded={16}
-      mx="auto"
-      mb={0}
-    >
-      <FontAwesomeIcon icon={faMikoto} color="#59e6ff" fontSize="36px" />
-    </Flex>
-  );
-}
+import styles from './AuthView.module.css';
 
-const Art = styled.div`
-  width: 600px;
-  display: none;
-  @media screen and (min-width: 1000px) {
-    display: block;
+/**
+ * Auth requests fail for reasons the server explains best ("email already
+ * registered"), and a 401 here means wrong credentials, not an expired session.
+ */
+function authError(e: unknown, unauthorized: string): unknown {
+  if (!isAxiosError(e) || !e.response) return e;
+  const data: unknown = e.response.data;
+  if (
+    typeof data === 'object' &&
+    data !== null &&
+    'message' in data &&
+    typeof data.message === 'string' &&
+    data.message.length > 0 &&
+    data.message.length < 200
+  ) {
+    return data.message;
   }
-  background: url('/images/artworks/2.jpg') no-repeat center center;
-  background-size: cover;
-`;
+  if (e.response.status === 401 || e.response.status === 403)
+    return unauthorized;
+  return e;
+}
 
-function AuthView({ children }: { children: React.ReactNode }) {
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function AuthView({
+  title,
+  subtitle,
+  footer,
+  children,
+}: {
+  title: ReactNode;
+  subtitle?: ReactNode;
+  footer?: ReactNode;
+  children: ReactNode;
+}) {
   return (
-    <Flex h="100%" align="center" justify="center" bg="gray.900">
-      <Flex rounded="lg" overflow="hidden">
-        <Box p={8} bg="gray.800">
-          <Flex align="center" justify="center" direction="column" h="100%">
-            <Logo />
-            {children}
-          </Flex>
-        </Box>
-        <Art />
-      </Flex>
-    </Flex>
+    <main className={styles.page}>
+      <div className={styles.card}>
+        <MikotoLogo className={styles.logo} size={40} title="Mikoto" />
+        <h1 className={styles.title}>{title}</h1>
+        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+        {children}
+        {footer && <div className={styles.footer}>{footer}</div>}
+      </div>
+    </main>
   );
 }
 
-const AuthForm = chakra('form', {
-  base: {
-    w: '360px',
-    display: 'flex',
-    flexDir: 'column',
-    gap: 2,
-  },
-});
+function storeRefreshToken(token: string | null | undefined) {
+  if (!token) return;
+  try {
+    localStorage.setItem('REFRESH_TOKEN', token);
+  } catch {
+    // Storage blocked: the session still works until the tab closes.
+  }
+}
+
+interface LoginValues {
+  email: string;
+  password: string;
+}
 
 export function LoginView() {
-  const { register, handleSubmit, formState } = useForm();
+  const { register, handleSubmit, formState } = useForm<LoginValues>();
   const error = useErrorElement();
+  const { errors } = formState;
 
   return (
-    <AuthView>
-      <AuthForm
+    <AuthView
+      title="Log in"
+      subtitle="Welcome back. Log in to pick up where you left off."
+      footer={
+        <>
+          New to Mikoto?{' '}
+          <Link className={styles.link} to="/register">
+            Create an account
+          </Link>
+        </>
+      }
+    >
+      <form
+        className={styles.form}
+        noValidate
         onSubmit={handleSubmit(async (form) => {
+          error.setError(null);
           try {
             const tk = await authClient.login({
-              email: form.email,
+              email: form.email.trim(),
               password: form.password,
             });
-            if (tk.refreshToken) {
-              localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
-            }
-            // Screw SPAs, why not just force an actual reload at this point?
+            storeRefreshToken(tk.refreshToken);
+            // Full reload so every client starts from the new session.
             window.location.href = '/';
           } catch (e) {
-            error.setError((e as any)?.response?.data);
+            error.setError(
+              authError(
+                e,
+                "That email and password don't match. Check them and try again.",
+              ),
+            );
           }
         })}
       >
-        <Heading size="lg">Log In</Heading>
         {error.el}
-        <Field label="Email">
-          <Input {...register('email')} />
+        <Field label="Email" error={errors.email?.message}>
+          <Input
+            type="email"
+            autoComplete="email"
+            autoFocus
+            {...register('email', {
+              required: 'Enter your email address.',
+              pattern: {
+                value: EMAIL,
+                message: "That email doesn't look right.",
+              },
+            })}
+          />
         </Field>
-        <Field label="Password">
-          <Input type="password" {...register('password')} />
+        <Field label="Password" error={errors.password?.message}>
+          <Input
+            type="password"
+            autoComplete="current-password"
+            {...register('password', { required: 'Enter your password.' })}
+          />
         </Field>
-
+        <div className={styles.labelRow}>
+          <span />
+          <Link
+            className={cx(styles.link, styles.smallLink)}
+            to="/forgotpassword"
+          >
+            Forgot your password?
+          </Link>
+        </div>
         <Button
-          colorPalette="blue"
-          mt={3}
-          mb={4}
+          variant="primary"
+          size="lg"
+          block
           type="submit"
           loading={formState.isSubmitting}
         >
-          Log In
+          Log in
         </Button>
-        <Anchor asChild>
-          <Link to="/register">Register</Link>
-        </Anchor>
-        <Anchor asChild>
-          <Link to="/forgotpassword">Forgot Password?</Link>
-        </Anchor>
-      </AuthForm>
+      </form>
     </AuthView>
   );
 }
 
+interface RegisterValues {
+  name: string;
+  email: string;
+  password: string;
+}
+
 export function RegisterView() {
-  const { register, handleSubmit, formState } = useForm();
+  const { register, handleSubmit, formState } = useForm<RegisterValues>();
   const error = useErrorElement();
+  const { errors } = formState;
 
   return (
-    <AuthView>
-      <AuthForm
+    <AuthView
+      title="Create an account"
+      subtitle="Join communities, or start your own."
+      footer={
+        <>
+          Already have an account?{' '}
+          <Link className={styles.link} to="/login">
+            Log in
+          </Link>
+        </>
+      }
+    >
+      <form
+        className={styles.form}
+        noValidate
         onSubmit={handleSubmit(async (form) => {
+          error.setError(null);
           try {
             const tk = await authClient.register({
-              name: form.name,
-              email: form.email,
+              name: form.name.trim(),
+              email: form.email.trim(),
               password: form.password,
             });
-            if (tk.refreshToken) {
-              localStorage.setItem('REFRESH_TOKEN', tk.refreshToken);
-            }
+            storeRefreshToken(tk.refreshToken);
             window.location.href = '/';
           } catch (e) {
-            error.setError((e as any)?.response?.data);
+            error.setError(
+              authError(e, "Couldn't create the account. Try again."),
+            );
           }
         })}
       >
-        <Heading size="lg">Register</Heading>
         {error.el}
-        <Field label="Username">
-          <Input {...register('name')} />
+        <Field label="Username" error={errors.name?.message}>
+          <Input
+            autoComplete="username"
+            autoFocus
+            {...register('name', {
+              validate: (v) => v.trim().length > 0 || 'Choose a username.',
+            })}
+          />
         </Field>
-
-        <Field label="Email">
-          <Input {...register('email')} />
+        <Field label="Email" error={errors.email?.message}>
+          <Input
+            type="email"
+            autoComplete="email"
+            {...register('email', {
+              required: 'Enter your email address.',
+              pattern: {
+                value: EMAIL,
+                message: "That email doesn't look right.",
+              },
+            })}
+          />
         </Field>
-
-        <Field label="Password">
-          <Input type="password" {...register('password')} />
+        <Field label="Password" error={errors.password?.message}>
+          <Input
+            type="password"
+            autoComplete="new-password"
+            {...register('password', { required: 'Choose a password.' })}
+          />
         </Field>
-
         <Button
-          colorPalette="blue"
-          mt={3}
-          mb={4}
+          variant="primary"
+          size="lg"
+          block
           type="submit"
           loading={formState.isSubmitting}
         >
-          Register
+          Create account
         </Button>
-        <Anchor asChild>
-          <Link to="/login">Log In</Link>
-        </Anchor>
-      </AuthForm>
+      </form>
     </AuthView>
   );
 }
 
 export function ResetPasswordView() {
-  const { register, handleSubmit } = useForm();
-  const [sent, setSent] = useState(false);
+  const { register, handleSubmit, formState } = useForm<{ email: string }>();
+  const [sentTo, setSentTo] = useState<string | null>(null);
+  const error = useErrorElement();
+
+  if (sentTo) {
+    return (
+      <AuthView
+        title="Check your email"
+        footer={
+          <Link className={styles.link} to="/login">
+            Back to log in
+          </Link>
+        }
+      >
+        <div className={styles.success} aria-hidden>
+          <MailCheck size={20} />
+        </div>
+        <p className={styles.subtitle}>
+          If an account exists for <strong>{sentTo}</strong>, we've sent it a
+          link to reset the password. It can take a minute to arrive.
+        </p>
+      </AuthView>
+    );
+  }
 
   return (
-    <AuthView>
-      <AuthForm
+    <AuthView
+      title="Reset your password"
+      subtitle="Enter the email you signed up with and we'll send you a reset link."
+      footer={
+        <>
+          Remembered it?{' '}
+          <Link className={styles.link} to="/login">
+            Log in
+          </Link>
+        </>
+      }
+    >
+      <form
+        className={styles.form}
+        noValidate
         onSubmit={handleSubmit(async (data) => {
-          await authClient.resetPassword({
-            email: data.email,
-          });
-          setSent(true);
+          error.setError(null);
+          try {
+            const email = data.email.trim();
+            await authClient.resetPassword({ email });
+            setSentTo(email);
+          } catch (e) {
+            error.setError(
+              authError(e, "Couldn't send the reset link. Try again."),
+            );
+          }
         })}
       >
-        {sent ? (
-          <div>
-            <Heading size="lg">Instructions sent</Heading>
-            <p>Check your inbox for instructions to reset your password.</p>
-          </div>
-        ) : (
-          <>
-            <Heading size="lg">Reset Password</Heading>
-            <Field label="Email">
-              <Input {...register('email')} />
-            </Field>
-            <Button colorPalette="blue" type="submit">
-              Send Password Reset Email
-            </Button>
-          </>
-        )}
-      </AuthForm>
+        {error.el}
+        <Field label="Email" error={formState.errors.email?.message}>
+          <Input
+            type="email"
+            autoComplete="email"
+            autoFocus
+            {...register('email', {
+              required: 'Enter your email address.',
+              pattern: {
+                value: EMAIL,
+                message: "That email doesn't look right.",
+              },
+            })}
+          />
+        </Field>
+        <Button
+          variant="primary"
+          size="lg"
+          block
+          type="submit"
+          loading={formState.isSubmitting}
+        >
+          Send reset link
+        </Button>
+      </form>
     </AuthView>
   );
 }
 
+interface NewPasswordValues {
+  password: string;
+  passwordConfirm: string;
+}
+
 export function ResetChangePasswordView() {
   const params = useParams<{ token: string }>();
-  const { register, handleSubmit } = useForm();
-  const [sent, setSent] = useState(false);
+  const { register, handleSubmit, getValues, formState } =
+    useForm<NewPasswordValues>();
+  const [done, setDone] = useState(false);
   const error = useErrorElement();
   const navigate = useNavigate();
+  const { errors } = formState;
+  const token = params.token;
 
-  // TODO better error screen
-  if (!params.token) return <div>Invalid token</div>;
+  if (!token) {
+    return (
+      <AuthView
+        title="This reset link is incomplete"
+        subtitle="The link is missing its token. Open it again from the email, or request a new one."
+        footer={
+          <Link className={styles.link} to="/forgotpassword">
+            Request a new link
+          </Link>
+        }
+      >
+        {null}
+      </AuthView>
+    );
+  }
+
+  if (done) {
+    return (
+      <AuthView title="Password changed">
+        <div className={styles.success} aria-hidden>
+          <CircleCheck size={20} />
+        </div>
+        <p className={styles.subtitle}>Taking you to log in…</p>
+      </AuthView>
+    );
+  }
 
   return (
-    <AuthView>
-      {error.el}
-      <AuthForm
+    <AuthView
+      title="Choose a new password"
+      footer={
+        <Link className={styles.link} to="/login">
+          Back to log in
+        </Link>
+      }
+    >
+      <form
+        className={styles.form}
+        noValidate
         onSubmit={handleSubmit(async (data) => {
-          if (data.password !== data.passwordConfirm) {
-            // TODO checkother password conditions
-            error.setError({
-              name: 'ValidatePasswordsMatch',
-              message: 'Passwords do not match',
-            });
-            return;
-          }
-          setSent(true);
-          let timeout: NodeJS.Timeout | undefined;
+          error.setError(null);
           try {
-            timeout = setTimeout(() => {
-              navigate('/login');
-            }, 1400);
-            authClient.resetPasswordSubmit({
-              token: params.token!,
+            await authClient.resetPasswordSubmit({
+              token,
               password: data.password,
-            }); // TODO error handling
+            });
+            setDone(true);
+            setTimeout(() => navigate('/login'), 1400);
           } catch (e) {
-            if (timeout) clearTimeout(timeout);
-            error.setError((e as any)?.response?.data);
-            setSent(false);
+            error.setError(
+              authError(
+                e,
+                'This reset link has expired or was already used. Request a new one.',
+              ),
+            );
           }
         })}
       >
-        {sent ? (
-          <div>
-            <Heading size="lg">Password changed successfully!</Heading>
-            <p>Returning to login page...</p>
-          </div>
-        ) : (
-          <>
-            <Heading size="lg">Reset Password</Heading>
-            <Field label="New Password">
-              <Input type="password" {...register('password')} />
-            </Field>
-
-            <Field label="Confirm New Password">
-              <Input type="password" {...register('passwordConfirm')} />
-            </Field>
-
-            <Button colorPalette="blue" type="submit">
-              Confirm new password
-            </Button>
-          </>
-        )}
-      </AuthForm>
+        {error.el}
+        <Field label="New password" error={errors.password?.message}>
+          <Input
+            type="password"
+            autoComplete="new-password"
+            autoFocus
+            {...register('password', { required: 'Enter a new password.' })}
+          />
+        </Field>
+        <Field
+          label="Confirm new password"
+          error={errors.passwordConfirm?.message}
+        >
+          <Input
+            type="password"
+            autoComplete="new-password"
+            {...register('passwordConfirm', {
+              required: 'Enter the new password again.',
+              validate: (v) =>
+                v === getValues('password') || "The passwords don't match.",
+            })}
+          />
+        </Field>
+        <Button
+          variant="primary"
+          size="lg"
+          block
+          type="submit"
+          loading={formState.isSubmitting}
+        >
+          Change password
+        </Button>
+      </form>
     </AuthView>
   );
 }

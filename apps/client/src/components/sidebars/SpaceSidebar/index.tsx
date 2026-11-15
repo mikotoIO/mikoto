@@ -1,53 +1,26 @@
-import { Separator } from '@chakra-ui/react';
 import { DragDropProvider } from '@dnd-kit/react';
 import { isSortable, useSortable } from '@dnd-kit/react/sortable';
-import styled from '@emotion/styled';
-import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoClient, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useAtom, useSetAtom } from 'jotai';
+import { Compass, PanelLeftOpen, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useSnapshot } from 'valtio/react';
 
 import { modalState, useContextMenu } from '@/components/ContextMenu';
-import { normalizeMediaUrl } from '@/components/atoms/Avatar';
-import {
-  SpaceIconLike,
-  SpaceIconOutline,
-  StyledSpaceIcon,
-} from '@/components/atoms/SpaceIcon';
-import { faMikoto } from '@/components/icons';
+import { SpaceIcon } from '@/components/atoms/SpaceIcon';
+import { MikotoLogo } from '@/components/icons';
 import { SpaceJoinModal } from '@/components/modals/SpaceJoin';
+import { cx, describeError, toast } from '@/design';
 import { reorder } from '@/functions/reorder';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState, workspaceState } from '@/store';
+import { useTabkit } from '@/store/surface';
 import { ackStore, isSpaceUnread } from '@/store/unreads';
 
 import { Pill } from './Pill';
 import { SpaceBackContextMenu, SpaceContextMenu } from './SpaceContextMenu';
+import styles from './SpaceSidebar.module.css';
 import { SpaceIconTooltip } from './Tooltip';
-
-const StyledSpaceSidebar = styled.div`
-  align-items: center;
-  box-sizing: border-box;
-
-  flex-grow: 1;
-  overflow: scroll;
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none; /* Safari and Chrome */
-  }
-`;
-
-const StyledIconWrapper = styled.div`
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 2px;
-  padding-left: 6px;
-  padding-right: 8px;
-`;
 
 function useSpaceUnreadState(mikoto: MikotoClient) {
   useSnapshot(ackStore);
@@ -67,13 +40,13 @@ function SortableSpaceIcon({
   index,
   unread,
 }: SidebarSpaceIconProps & { index: number }) {
-  const { ref } = useSortable({
+  const { ref, isDragging } = useSortable({
     id: space.id,
     index,
   });
 
   return (
-    <div ref={ref}>
+    <div ref={ref} className={cx(styles.item, isDragging && styles.dragging)}>
       <SidebarSpaceIcon space={space} unread={unread} />
     </div>
   );
@@ -82,37 +55,33 @@ function SortableSpaceIcon({
 function SidebarSpaceIcon({ space, unread }: SidebarSpaceIconProps) {
   const [leftSidebar, setLeftSidebar] = useAtom(treebarSpaceState);
   const isActive =
-    leftSidebar &&
-    leftSidebar.kind === 'explorer' &&
-    leftSidebar.spaceId === space.id;
+    leftSidebar?.kind === 'explorer' && leftSidebar.spaceId === space.id;
   const setWorkspace = useSetAtom(workspaceState);
 
   const contextMenu = useContextMenu(() => <SpaceContextMenu space={space} />);
 
   return (
     <SpaceIconTooltip tooltip={space.name}>
-      <StyledIconWrapper>
+      <button
+        type="button"
+        className={styles.spaceBtn}
+        aria-label={unread ? `${space.name}, unread` : space.name}
+        aria-current={isActive ? 'true' : undefined}
+        onContextMenu={contextMenu}
+        onDoubleClick={() => {
+          setWorkspace((x) => ({ ...x, leftOpen: !x.leftOpen }));
+        }}
+        onClick={() => {
+          setLeftSidebar({
+            kind: 'explorer',
+            key: `explorer/${space.id}`,
+            spaceId: space.id,
+          });
+        }}
+      >
         {unread && !isActive && <Pill h={8} />}
-        <StyledSpaceIcon
-          active={isActive}
-          size={ICON_SIZE}
-          spaceId={space.id}
-          onContextMenu={contextMenu}
-          icon={space.icon ? normalizeMediaUrl(space.icon) : undefined}
-          onDoubleClick={() => {
-            setWorkspace((x) => ({ ...x, leftOpen: !x.leftOpen }));
-          }}
-          onClick={() => {
-            setLeftSidebar({
-              kind: 'explorer',
-              key: `explorer/${space.id}`,
-              spaceId: space.id,
-            });
-          }}
-        >
-          {space.icon === null ? space.name[0] : ''}
-        </StyledSpaceIcon>
-      </StyledIconWrapper>
+        <SpaceIcon space={space} active={isActive} />
+      </button>
     </SpaceIconTooltip>
   );
 }
@@ -141,34 +110,81 @@ function orderSpaces(mikoto: MikotoClient, order: string[]) {
   return [res, unordered.length === 0] as const;
 }
 
-function JoinSpaceButon() {
+function JoinSpaceButton() {
   const setModal = useSetAtom(modalState);
 
   return (
-    <SpaceIconTooltip tooltip="Add / Join Space">
-      <StyledIconWrapper>
-        <StyledSpaceIcon
-          size={ICON_SIZE}
-          color="blue.500"
-          fontSize="18px"
-          onClick={() => {
-            setModal({
-              elem: <SpaceJoinModal />,
-            });
-          }}
-        >
-          <FontAwesomeIcon icon={faCirclePlus} />
-        </StyledSpaceIcon>
-      </StyledIconWrapper>
+    <SpaceIconTooltip tooltip="Create or join a space">
+      <button
+        type="button"
+        className={cx(styles.spaceBtn, styles.plain)}
+        aria-label="Create or join a space"
+        onClick={() => {
+          setModal({ elem: <SpaceJoinModal /> });
+        }}
+      >
+        <Plus size={18} aria-hidden />
+      </button>
     </SpaceIconTooltip>
   );
 }
 
-const ICON_SIZE = '40px';
+function DiscoverButton() {
+  const tabkit = useTabkit();
+  return (
+    <SpaceIconTooltip tooltip="Discover spaces">
+      <button
+        type="button"
+        className={cx(styles.spaceBtn, styles.plain)}
+        aria-label="Discover spaces"
+        onClick={() => {
+          tabkit.openTab({ kind: 'discovery', key: 'discovery' }, false);
+        }}
+      >
+        <Compass size={18} aria-hidden />
+      </button>
+    </SpaceIconTooltip>
+  );
+}
 
+function HomeButton() {
+  const [spaceId, setSpaceId] = useAtom(treebarSpaceState);
+  const isHome = spaceId === null;
+  return (
+    <SpaceIconTooltip tooltip="Home">
+      <button
+        type="button"
+        className={cx(styles.spaceBtn, styles.home, isHome && styles.active)}
+        aria-label="Home"
+        aria-current={isHome ? 'true' : undefined}
+        onClick={() => setSpaceId(null)}
+      >
+        <MikotoLogo size={20} />
+      </button>
+    </SpaceIconTooltip>
+  );
+}
+
+function ShowSidebarButton() {
+  const [workspace, setWorkspace] = useAtom(workspaceState);
+  if (workspace.leftOpen) return null;
+  return (
+    <SpaceIconTooltip tooltip="Show sidebar">
+      <button
+        type="button"
+        className={cx(styles.spaceBtn, styles.plain)}
+        aria-label="Show sidebar"
+        onClick={() => setWorkspace((ws) => ({ ...ws, leftOpen: true }))}
+      >
+        <PanelLeftOpen size={18} aria-hidden />
+      </button>
+    </SpaceIconTooltip>
+  );
+}
+
+/** The slim space rail: Home, your spaces (drag to reorder), join, discover. */
 export function SpaceSidebar() {
   const mikoto = useMikoto();
-  const [spaceId, setSpaceId] = useAtom(treebarSpaceState);
   const { isUnread } = useSpaceUnreadState(mikoto);
 
   useSnapshot(mikoto.spaces);
@@ -180,7 +196,6 @@ export function SpaceSidebar() {
   const [spaceArray, isOrdered] = orderSpaces(mikoto, order);
   if (!isOrdered) {
     setOrder(spaceArray.map((x) => x.id));
-    return null;
   }
 
   return (
@@ -194,60 +209,43 @@ export function SpaceSidebar() {
         const toIndex = source.sortable.index;
         if (fromIndex === toIndex) return;
 
-        const reordered = reorder(
-          spaceArray.map((s) => s.id),
-          fromIndex,
-          toIndex,
-        );
+        const previous = spaceArray.map((s) => s.id);
+        const reordered = reorder(previous, fromIndex, toIndex);
         setOrder(reordered);
         if (mikoto.user.me) {
           mikoto.user.me.spaceOrder = reordered;
         }
-        void mikoto.rest['user.update']({ spaceOrder: reordered }, {});
+        mikoto.rest['user.update']({ spaceOrder: reordered }, {}).catch(
+          (err: unknown) => {
+            toast({
+              type: 'error',
+              title: "Couldn't save your space order",
+              description: describeError(err, { context: 'action' }).message,
+            });
+          },
+        );
       }}
     >
-      <StyledSpaceSidebar onContextMenu={contextMenu}>
-        <StyledIconWrapper
-          style={{
-            marginTop: '8px',
-          }}
-        >
-          <SpaceIconOutline active={spaceId === null}>
-            <SpaceIconLike
-              style={{
-                background:
-                  spaceId === null
-                    ? 'linear-gradient(133deg, #2298ff 0%, rgba(59,108,255,1) 100%)'
-                    : 'var(--chakra-colors-gray-700)',
-              }}
-              onClick={() => {
-                setSpaceId(null);
-              }}
-            >
-              <FontAwesomeIcon icon={faMikoto} fontSize="24px" />
-            </SpaceIconLike>
-          </SpaceIconOutline>
-        </StyledIconWrapper>
-        <Separator
-          borderColor="gray.600"
-          ml={3}
-          width={9}
-          borderWidth="1px"
-          my={2}
-        />
-
-        {spaceArray
-          .filter((x) => x.type === 'NONE') // TODO: filter this on the server
-          .map((space, index) => (
-            <SortableSpaceIcon
-              key={space.id}
-              space={space}
-              index={index}
-              unread={isUnread(space.id)}
-            />
-          ))}
-        <JoinSpaceButon />
-      </StyledSpaceSidebar>
+      <nav
+        className={styles.rail}
+        aria-label="Spaces"
+        onContextMenu={contextMenu}
+      >
+        <HomeButton />
+        <hr className={styles.divider} />
+        {spaceArray.map((space, index) => (
+          <SortableSpaceIcon
+            key={space.id}
+            space={space}
+            index={index}
+            unread={isUnread(space.id)}
+          />
+        ))}
+        <JoinSpaceButton />
+        <DiscoverButton />
+        <span className={styles.spacer} />
+        <ShowSidebarButton />
+      </nav>
     </DragDropProvider>
   );
 }

@@ -1,20 +1,30 @@
-import { Box } from '@chakra-ui/react';
-import styled from '@emotion/styled';
-import { faCrown, faGlasses } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { MikotoMember, MikotoSpace } from '@mikoto-io/mikoto.js';
+import type { MikotoMember, MikotoSpace } from '@mikoto-io/mikoto.js';
 import { useSetAtom } from 'jotai';
+import { Bot, Crown } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import { useSnapshot } from 'valtio';
 
 import { contextMenuState, useContextMenu } from '@/components/ContextMenu';
 import { Avatar } from '@/components/atoms/Avatar';
-import { MemberContextMenu } from '@/components/atoms/MessageAvatar';
-import { hoverableButtonLike } from '@/components/design';
+import {
+  MemberContextMenu,
+  roleNameProps,
+} from '@/components/atoms/MessageAvatar';
 import { UserContextMenu } from '@/components/modals/ContextMenus';
-import { Tag } from '@/components/ui';
+import {
+  ErrorState,
+  ItemErrorBoundary,
+  RegionErrorBoundary,
+  RoleName,
+  Skeleton,
+  SkeletonGroup,
+  Tag,
+  useSkeletonVisible,
+} from '@/design';
 import { useFetchMember, useInterval, useMikoto } from '@/hooks';
+
+import styles from './MemberListSidebar.module.css';
 
 interface ActiveTyper {
   userId: string;
@@ -56,34 +66,6 @@ function useActiveTypers(spaceId: string): Set<string> {
   return new Set(typers.map((t) => t.userId));
 }
 
-const StyledMember = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 8px;
-  padding: 4px 8px;
-  ${hoverableButtonLike}
-`;
-
-const PulsingDot = styled.span`
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--chakra-colors-green-400);
-  margin-left: 4px;
-  animation: pulse 1.2s ease-in-out infinite;
-  @keyframes pulse {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.3;
-    }
-  }
-`;
-
 function MemberElement({
   member,
   isTyping,
@@ -92,15 +74,18 @@ function MemberElement({
   isTyping?: boolean;
 }) {
   const setContextMenu = useSetAtom(contextMenuState);
-  const elemRef = useRef<HTMLDivElement>(null);
+  const elemRef = useRef<HTMLButtonElement>(null);
+  const isBot = member.user.category === 'BOT';
 
   const userContextMenu = useContextMenu(() => (
     <UserContextMenu user={member.user} member={member} />
   ));
 
   return (
-    <StyledMember
+    <button
+      type="button"
       ref={elemRef}
+      className={styles.member}
       onClick={(ev) => {
         ev.preventDefault();
         ev.stopPropagation();
@@ -115,47 +100,74 @@ function MemberElement({
       }}
       onContextMenu={userContextMenu}
     >
-      <Avatar
-        size={32}
-        src={member.user.avatar ?? undefined}
-        userId={member.user.id}
-      />
-      <Box className="name" color={member.roleColor}>
-        {member.user.name}
-      </Box>
-      {member.isOwner && (
-        <Box display="inline-block" color="yellow.500">
-          <FontAwesomeIcon className="crown" icon={faCrown} />
-        </Box>
-      )}
-
-      {member.user.category === 'BOT' && (
-        <Tag
-          size="sm"
-          fontSize="2xs"
-          px={1}
-          minH="18px"
-          variant="solid"
-          bg="blue.500"
-          color="white"
-        >
-          <FontAwesomeIcon icon={faGlasses} />
-        </Tag>
-      )}
-      {isTyping && member.user.category === 'BOT' && <PulsingDot />}
-    </StyledMember>
+      <span className={styles.avatarWrap}>
+        <Avatar
+          size={28}
+          src={member.user.avatar}
+          userId={member.user.id}
+          name={member.user.name}
+          aria-hidden
+        />
+      </span>
+      <span className={styles.text}>
+        <span className={styles.nameLine}>
+          <RoleName
+            className={styles.name}
+            name={member.user.name}
+            {...roleNameProps(member)}
+          />
+          {member.isOwner && (
+            <Crown className={styles.crown} size={13} aria-label="Owner" />
+          )}
+          {isBot && (
+            <Tag>
+              <Bot size={12} aria-hidden />
+              Bot
+            </Tag>
+          )}
+        </span>
+        {isTyping && (
+          <span className={styles.status}>
+            <span className={styles.typing}>
+              <span className={styles.pulse} aria-hidden />
+              {isBot ? 'Thinking…' : 'Typing…'}
+            </span>
+          </span>
+        )}
+      </span>
+    </button>
   );
 }
 
-const StyledMemberListSidebar = styled.div`
-  height: 100%;
-  overflow-y: auto;
-  box-sizing: border-box;
-`;
+const SKELETON_WIDTHS = [96, 72, 110, 84, 64, 100, 78];
 
-export function MemberListSidebar({ space }: { space: MikotoSpace }) {
-  useFetchMember(space);
+function MemberListSkeleton() {
+  return (
+    <SkeletonGroup label="members">
+      <Skeleton className={styles.skeletonLabel} width={90} height={10} />
+      {SKELETON_WIDTHS.map((w) => (
+        <div key={w} className={styles.skeletonRow}>
+          <Skeleton circle width={28} />
+          <Skeleton width={w} height={11} />
+        </div>
+      ))}
+    </SkeletonGroup>
+  );
+}
+
+function GroupLabel({ context }: { context: { count: number } }) {
+  return (
+    <h3 className={styles.groupLabel}>
+      Members <span>{context.count}</span>
+    </h3>
+  );
+}
+
+function MemberList({ space }: { space: MikotoSpace }) {
+  const { isLoading, error } = useFetchMember(space);
   const activeTypers = useActiveTypers(space.id);
+  const [retryError, setRetryError] = useState<unknown>(null);
+  const [retrying, setRetrying] = useState(false);
 
   // Use a snapshot of the members cache to ensure reactivity
   const members = useSnapshot(space.members.cache);
@@ -166,23 +178,65 @@ export function MemberListSidebar({ space }: { space: MikotoSpace }) {
 
   const loadMore = useCallback(() => {
     if (hasMore) {
-      space.members.list();
+      space.members.list().catch(() => {
+        // Paging failures are retried on the next scroll to the end.
+      });
     }
   }, [space, hasMore]);
 
+  const empty = spaceMembers.length === 0;
+  const showSkeleton = useSkeletonVisible(empty && (isLoading || retrying));
+  const failure = retryError ?? error;
+
+  if (empty && failure && !retrying) {
+    return (
+      <ErrorState
+        variant="region"
+        what="Members"
+        error={failure}
+        onRetry={async () => {
+          setRetrying(true);
+          setRetryError(null);
+          try {
+            await space.members.list();
+          } catch (err) {
+            setRetryError(err);
+          } finally {
+            setRetrying(false);
+          }
+        }}
+      />
+    );
+  }
+
+  if (empty) return showSkeleton ? <MemberListSkeleton /> : null;
+
   return (
-    <StyledMemberListSidebar>
-      <Virtuoso
-        style={{ height: '100%', overflowX: 'hidden' }}
-        data={spaceMembers}
-        endReached={loadMore}
-        itemContent={(_idx, member) => (
+    <Virtuoso
+      className={styles.list}
+      data={spaceMembers}
+      context={{ count: Math.max(space.memberCount, spaceMembers.length) }}
+      components={{ Header: GroupLabel }}
+      endReached={loadMore}
+      computeItemKey={(_idx, member) => member.userId}
+      itemContent={(_idx, member) => (
+        <ItemErrorBoundary what="This member">
           <MemberElement
             member={member}
             isTyping={activeTypers.has(member.user.id)}
           />
-        )}
-      />
-    </StyledMemberListSidebar>
+        </ItemErrorBoundary>
+      )}
+    />
+  );
+}
+
+export function MemberListSidebar({ space }: { space: MikotoSpace }) {
+  return (
+    <div className={styles.root} aria-label="Members">
+      <RegionErrorBoundary what="Members" resetKeys={[space.id]}>
+        <MemberList space={space} />
+      </RegionErrorBoundary>
+    </div>
   );
 }

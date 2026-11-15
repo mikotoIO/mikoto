@@ -40,6 +40,17 @@ pub mod roles;
 #[serde(rename_all = "camelCase")]
 pub struct SpaceCreatePayload {
     pub name: String,
+    /// Accent color of the space, as a `#RRGGBB` hex string.
+    pub accent: Option<String>,
+}
+
+/// Distinguishes an absent field (`None`) from an explicit `null` (`Some(None)`).
+fn deserialize_nullable<'de, D, T>(deserializer: D) -> Result<Option<Option<T>>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+    T: serde::Deserialize<'de>,
+{
+    <Option<T> as serde::Deserialize>::deserialize(deserializer).map(Some)
 }
 
 #[derive(Deserialize, JsonSchema)]
@@ -49,6 +60,16 @@ pub struct SpaceUpdatePayload {
     pub icon: Option<String>,
     pub handle: Option<String>,
     pub visibility: Option<SpaceVisibility>,
+    /// Accent color as a `#RRGGBB` hex string. Omit to leave unchanged, `null` to clear.
+    // `skip_serializing_if` only stops schemars emitting `"default": null`, which the TS
+    // codegen would turn into `.default(null)`, i.e. "clear the accent on every edit".
+    #[serde(
+        default,
+        deserialize_with = "deserialize_nullable",
+        skip_serializing_if = "Option::is_none"
+    )]
+    #[schemars(with = "Option<String>")]
+    pub accent: Option<Option<String>>,
 }
 
 impl SpaceUpdatePayload {
@@ -57,6 +78,7 @@ impl SpaceUpdatePayload {
             name: self.name.clone(),
             icon: self.icon.clone(),
             visibility: self.visibility,
+            accent: self.accent.clone(),
             ..Default::default()
         }
     }
@@ -125,7 +147,11 @@ async fn create(
     claims: Claims,
     Json(body): Json<SpaceCreatePayload>,
 ) -> Result<Json<SpaceExt>, Error> {
-    let space = Space::new(body.name, claims.sub.parse()?);
+    if let Some(accent) = &body.accent {
+        Space::validate_accent(accent)?;
+    }
+    let mut space = Space::new(body.name, claims.sub.parse()?);
+    space.accent = body.accent;
     space.create(db()).await?;
     let space = SpaceExt::dataload_one(space, db()).await?;
     join_space(&space, claims.sub.parse()?).await?;
@@ -139,6 +165,10 @@ async fn update(
     Json(body): Json<SpaceUpdatePayload>,
 ) -> Result<Json<SpaceExt>, Error> {
     permissions_or_admin(&space, &member, Permission::MANAGE_SPACE)?;
+
+    if let Some(Some(accent)) = &body.accent {
+        Space::validate_accent(accent)?;
+    }
 
     // Update handle if provided
     if let Some(ref new_handle) = body.handle {
@@ -468,4 +498,28 @@ pub fn router() -> AppRouter<State> {
                 Some(space)
             },
         )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn accent_update_payload_distinguishes_absent_and_null() {
+        let p: SpaceUpdatePayload = serde_json::from_str(r#"{}"#).unwrap();
+        assert_eq!(p.accent, None);
+        let p: SpaceUpdatePayload = serde_json::from_str(r#"{"accent":null}"#).unwrap();
+        assert_eq!(p.accent, Some(None));
+        let p: SpaceUpdatePayload = serde_json::from_str(r##"{"accent":"#2BB5A5"}"##).unwrap();
+        assert_eq!(p.accent, Some(Some("#2BB5A5".to_string())));
+    }
+
+    #[test]
+    fn accent_validation() {
+        assert!(Space::validate_accent("#2BB5A5").is_ok());
+        assert!(Space::validate_accent("#abcdef").is_ok());
+        for bad in ["2BB5A5", "#2BB5A", "#2BB5A5F", "#GGGGGG", "", "#2bb5a5\n"] {
+            assert!(Space::validate_accent(bad).is_err(), "{bad:?}");
+        }
+    }
 }

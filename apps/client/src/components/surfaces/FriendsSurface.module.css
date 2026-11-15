@@ -1,0 +1,121 @@
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.tabs {
+  margin: var(--space-2) 0 var(--space-4);
+}
+
+.tabLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.count {
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.sectionLabel {
+  margin: 0 0 var(--space-1);
+  padding: 0 var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--faint);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0 calc(var(--space-3) * -1);
+}
+
+.list + .sectionLabel {
+  margin-top: var(--space-5);
+}
+
+/* rows follow the mockup's inbox list */
+.row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 10px 12px;
+  border-radius: var(--r-ctl);
+}
+
+.row:hover {
+  background: var(--hover);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.avatar img {
+  display: block;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-av);
+  corner-shape: var(--av-corner);
+  object-fit: cover;
+}
+
+.text {
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.name {
+  font-size: var(--text-md);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.secondary {
+  margin-top: 1px;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* row actions stay visible on touch, quiet until hover on pointers */
+@media (hover: hover) {
+  .row .quiet {
+    opacity: 0;
+    transition: opacity var(--dur-fast) var(--ease);
+  }
+  .row:hover .quiet,
+  .row:focus-within .quiet {
+    opacity: 1;
+  }
+}
+
+.addRow {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.addRow > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+@container (max-width: 520px) {
+  .addRow {
+    flex-direction: column;
+  }
+}

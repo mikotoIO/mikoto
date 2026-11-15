@@ -18,7 +18,9 @@ export class MikotoUser extends ZSchema(UserExt) {
 export class UserManager extends Manager {
   constructor(public client: MikotoClient) {
     super(client);
-    proxy(this);
+    // Return the proxy (like the other managers) so `useSnapshot(mikoto.user)`
+    // works and replacing `me` re-renders subscribers.
+    return proxy(this);
   }
 
   me?: MikotoUser;

@@ -1,0 +1,1229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Mikoto redesign mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Inter:opsz,wght@14..32,400..700&family=JetBrains+Mono:wght@400;500&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ───────────── Tokens ─────────────
+   Everything derives from: theme (dark/light), one accent, density, radius, type.
+   That is the customization surface, and it is the whole surface. */
+:root{
+  --accent:#9D8CFF;
+  --on-accent:#14121C;
+  --fs:14px;
+  --font-ui:'Inter', system-ui, sans-serif;
+  --font-display:var(--font-ui);
+  --tint:0%;
+  --font-mono:'JetBrains Mono', ui-monospace, monospace;
+  --r-sheet:12px; --r-ctl:8px;
+  --row:30px; --av:34px; --msg-pad:10px;
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+:root[data-theme="dark"]{
+  --base:color-mix(in oklch, var(--accent) var(--tint), #0E0F11); --sheet:color-mix(in oklch, var(--accent) var(--tint), #17181B);
+  --raised:color-mix(in oklch, var(--accent) var(--tint), #202125); --overlay:color-mix(in oklch, var(--accent) var(--tint), #232428);
+  --hover:rgb(255 255 255 / .045); --press:rgb(255 255 255 / .08);
+  --line:color-mix(in oklch, var(--accent) var(--tint), #2A2B30); --line-strong:color-mix(in oklch, var(--accent) var(--tint), #393A40);
+  --text:#ECEDEF; --muted:#9EA0A8; --faint:#6E7078;
+  --accent-ink:color-mix(in oklch, var(--accent) 80%, white);
+  --accent-soft:color-mix(in oklch, var(--accent) 17%, transparent);
+  --danger:#FF7070; --warn:#F2B84B; --ok:#4FD18B;
+  --shimmer:rgb(255 255 255 / .05);
+  --shadow:0 12px 40px rgb(0 0 0 / .5), 0 2px 6px rgb(0 0 0 / .3);
+  --shadow-sm:0 4px 14px rgb(0 0 0 / .35);
+  --sp-l:.42; --sp-c:.09; --sp-fg:#F4F2FA;
+  --av-l:.76; --av-fg-l:.28;
+}
+:root[data-theme="light"]{
+  --base:color-mix(in oklch, var(--accent) var(--tint), #EDEEF0); --sheet:color-mix(in oklch, var(--accent) calc(var(--tint) / 3), #FFFFFF);
+  --raised:color-mix(in oklch, var(--accent) var(--tint), #F4F5F6); --overlay:#FFFFFF;
+  --hover:rgb(30 20 70 / .045); --press:rgb(30 20 70 / .08);
+  --line:color-mix(in oklch, var(--accent) var(--tint), #E2E3E6); --line-strong:color-mix(in oklch, var(--accent) var(--tint), #CFD1D6);
+  --text:#18191C; --muted:#5E6068; --faint:#8C8E96;
+  --accent-ink:color-mix(in oklch, var(--accent) 62%, black);
+  --accent-soft:color-mix(in oklch, var(--accent) 15%, transparent);
+  --danger:#D23B3B; --warn:#B87A0A; --ok:#1E9E5A;
+  --shimmer:rgb(255 255 255 / .7);
+  --shadow:0 12px 40px rgb(40 30 80 / .14), 0 2px 6px rgb(40 30 80 / .08);
+  --shadow-sm:0 4px 14px rgb(40 30 80 / .1);
+  --sp-l:.86; --sp-c:.07; --sp-fg:#1A1824;
+  --av-l:.84; --av-fg-l:.32;
+}
+:root[data-density="compact"]{ --row:26px; --av:28px; --msg-pad:6px; }
+:root[data-radius="sharp"]{ --r-sheet:4px; --r-ctl:4px; }
+:root[data-radius="round"]{ --r-sheet:18px; --r-ctl:11px; }
+:root[data-font="plex"]{ --font-ui:'IBM Plex Sans', system-ui, sans-serif; }
+:root[data-font="atkinson"]{ --font-ui:'Atkinson Hyperlegible Next', system-ui, sans-serif; }
+:root[data-font="onest"]{ --font-ui:'Onest', system-ui, sans-serif; }
+:root[data-font="system"]{ --font-ui:system-ui, -apple-system, 'Segoe UI', sans-serif; }
+:root[data-tint="subtle"]{ --tint:4%; }
+:root[data-tint="rich"]{ --tint:9%; }
+
+/* ───────────── Base ───────────── */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--base);color:var(--text);font:400 var(--fs)/1.5 var(--font-ui);-webkit-font-smoothing:antialiased;overflow:hidden}
+button,input,textarea{font:inherit;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+::selection{background:color-mix(in oklch, var(--accent) 40%, transparent)}
+.i{fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:10px;border:3px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ───────────── Shell ───────────── */
+.app{display:grid;grid-template-columns:60px 256px minmax(0,1fr);height:100dvh}
+
+.rail{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 0 12px;min-height:0;overflow-y:auto;scrollbar-width:none}
+.rail hr{width:24px;border:0;border-top:1px solid var(--line);margin:4px 0}
+.space-btn{width:38px;height:38px;border-radius:calc(var(--r-ctl) + 3px);display:grid;place-items:center;position:relative;
+  font:600 13px var(--font-display);letter-spacing:-.01em;
+  background:var(--sa, var(--raised));color:oklch(from var(--sa) 0.22 0.04 h);transition:border-radius .15s var(--ease)}
+.space-btn.home{background:var(--raised);color:var(--text)}
+.space-btn.plain{background:transparent;color:var(--muted);border:1px dashed var(--line-strong)}
+.space-btn.plain:hover{color:var(--text);border-color:var(--muted)}
+.space-btn.active{box-shadow:0 0 0 2px var(--base),0 0 0 4px var(--accent)}
+.space-btn .pip{position:absolute;left:-11px;top:50%;width:4px;height:8px;margin-top:-4px;border-radius:0 3px 3px 0;background:var(--text)}
+
+.sidebar{display:flex;flex-direction:column;min-height:0;padding:10px 8px 8px 2px}
+.sb-head{display:flex;align-items:center;gap:2px;height:40px;padding:0 0 0 8px;flex-shrink:0}
+.space-name{flex:1;display:flex;align-items:center;gap:6px;font:600 16px var(--font-display);letter-spacing:-.01em;text-align:left;height:32px;border-radius:var(--r-ctl);padding:0 6px;margin-left:-6px}
+.space-name:hover{background:var(--hover)}
+.space-name .i{color:var(--faint)}
+.sb-scroll{flex:1;overflow-y:auto;min-height:0;padding:4px 0 12px;scrollbar-width:thin}
+/* space banner: owner-defined accent (and later, an uploaded image) */
+.sb-head.space-banner{position:relative;height:96px;margin:2px 0 6px 6px;padding:8px;border-radius:calc(var(--r-ctl) + 2px);overflow:hidden;align-items:flex-end;
+  background:linear-gradient(135deg, var(--space), oklch(from var(--space) calc(l - 0.14) c h))}
+.space-banner svg.topo{position:absolute;inset:0;width:100%;height:100%;color:oklch(from var(--space) 0.22 0.05 h / .35)}
+.space-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(to top, rgb(0 0 0 / .42), transparent 65%);pointer-events:none}
+.space-banner .space-name{position:relative;z-index:1;color:#fff;margin:0;flex:0 1 auto}
+.space-banner .space-name:hover{background:rgb(255 255 255 / .14)}
+.space-banner .space-name .i{color:rgb(255 255 255 / .8)}
+.space-banner .bacts{position:absolute;top:6px;right:6px;display:flex;z-index:1}
+.space-banner .iconbtn{color:rgb(255 255 255 / .85)}
+.space-banner .iconbtn:hover{background:rgb(255 255 255 / .16);color:#fff}
+.dm{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;padding:6px 8px;border-radius:var(--r-ctl);text-align:left}
+.dm:hover{background:var(--hover)}
+.dm.active{background:var(--raised)}
+.dm .avatar{--av:30px}
+.dm .status-dot{border-color:var(--base)}
+.dm-t{display:flex;flex-direction:column;min-width:0;line-height:1.3}
+.dm-n{font-size:13.5px;font-weight:500}
+.dm.unread .dm-n{font-weight:600}
+.dm-s{font-size:12px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dm.unread .dm-s{color:var(--muted)}
+.dm-r{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.dm-r time{font-size:11px;color:var(--faint)}
+.dm-r .badge{padding:2px 5px;min-width:16px}
+.iconbtn{width:28px;height:28px;display:grid;place-items:center;border-radius:var(--r-ctl);color:var(--muted);flex-shrink:0}
+.iconbtn:hover{background:var(--hover);color:var(--text)}
+.iconbtn[aria-pressed="true"]{color:var(--text);background:var(--press)}
+.row{display:flex;align-items:center;gap:10px;width:100%;height:var(--row);padding:0 8px;border-radius:var(--r-ctl);color:var(--muted);font-size:13.5px;text-align:left;white-space:nowrap}
+.row > span.l{overflow:hidden;text-overflow:ellipsis;flex:1}
+.row:hover{background:var(--hover);color:var(--text)}
+.row.active{background:var(--raised);color:var(--text)}
+.row.unread{color:var(--text);font-weight:600}
+.row .meta{font-size:12px;color:var(--faint);font-weight:400}
+.badge{font:600 11px/1 var(--font-ui);padding:4px 6px;border-radius:999px;background:var(--accent-soft);color:var(--accent-ink);min-width:20px;text-align:center}
+.badge.mention{background:var(--accent);color:var(--on-accent)}
+.sb-label{display:flex;align-items:center;gap:4px;height:30px;padding:0 0 0 8px;margin-top:14px;font-size:12.5px;color:var(--faint);font-weight:500}
+.sb-label button.cat{display:flex;align-items:center;gap:4px;flex:1;text-align:left;height:100%}
+.sb-label button.cat:hover{color:var(--muted)}
+.sb-label .i{transition:transform .15s var(--ease)}
+.sb-label.closed .chev{transform:rotate(-90deg)}
+.voice-people{display:flex;flex-direction:column;padding:2px 0 4px 34px;gap:2px}
+.voice-person{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);height:24px}
+.voice-person .avatar{--av:20px;font-size:9px}
+.voice-person.speaking .avatar{box-shadow:0 0 0 2px var(--sheet),0 0 0 3.5px var(--ok)}
+
+.sb-foot{flex-shrink:0;display:flex;flex-direction:column;gap:6px;padding-top:6px}
+.voice-strip{display:flex;align-items:center;gap:10px;padding:8px 8px 8px 10px;border-radius:var(--r-ctl);background:color-mix(in oklch, var(--ok) 10%, var(--sheet));border:1px solid color-mix(in oklch, var(--ok) 22%, var(--line))}
+.voice-strip .t{font-size:12.5px;font-weight:600;color:var(--ok);line-height:1.25}
+.voice-strip .s{font-size:12px;color:var(--muted);line-height:1.25}
+.me{display:flex;align-items:center;gap:10px;padding:6px 4px 6px 6px;border-radius:var(--r-ctl)}
+.me .who{flex:1;min-width:0;line-height:1.25}
+.me .who b{display:block;font-size:13.5px;font-weight:600}
+.me .who span{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status-dot{position:absolute;right:-2px;bottom:-2px;width:11px;height:11px;border-radius:50%;background:var(--ok);border:2.5px solid var(--base)}
+
+.workspace{display:flex;flex-direction:column;min-width:0;min-height:0;padding:0 8px 8px 0}
+.groups{flex:1;display:flex;gap:8px;min-height:0}
+.group{flex:1 1 0;display:flex;flex-direction:column;min-width:0}
+.tabstrip{height:46px;display:flex;align-items:center;gap:4px;flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+.tab{display:flex;align-items:center;gap:8px;height:30px;padding:0 5px 0 10px;border-radius:var(--r-ctl);color:var(--muted);font-size:13px;max-width:210px;white-space:nowrap;cursor:pointer;flex-shrink:0;user-select:none}
+.tab > span{overflow:hidden;text-overflow:ellipsis}
+.tab:hover{background:var(--hover);color:var(--text)}
+.tab.active{background:var(--raised);color:var(--text)}
+.group:not(.focused) .tab.active{background:transparent;box-shadow:inset 0 0 0 1px var(--line)}
+.tab .tab-x{width:20px;height:20px;border-radius:5px;display:grid;place-items:center;color:var(--faint);visibility:hidden}
+.tab:hover .tab-x,.tab.active .tab-x{visibility:visible}
+.tab .tab-x:hover{background:var(--press);color:var(--text)}
+.tab .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.tabstrip .spacer{flex:1}
+.menu-btn{display:none}
+
+.sheet{container-type:inline-size;flex:1;min-height:0;background:var(--sheet);border-radius:var(--r-sheet);border:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;position:relative;transition:border-color .2s}
+
+.fade-in{animation:fade .22s var(--ease)}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+.conn-banner{display:flex;align-items:center;gap:10px;margin-top:8px;padding:7px 8px 7px 12px;border-radius:var(--r-ctl);font-size:13px;
+  background:color-mix(in oklch, var(--warn) 12%, var(--sheet));border:1px solid color-mix(in oklch, var(--warn) 32%, var(--line))}
+.conn-banner .i{color:var(--warn)}
+.conn-banner .grow{flex:1;color:var(--muted)}
+.conn-banner b{color:var(--text);font-weight:600}
+
+/* ───────────── Pane header ───────────── */
+.phead{height:50px;display:flex;align-items:center;gap:10px;padding:0 10px 0 18px;border-bottom:1px solid var(--line);flex-shrink:0;min-width:0}
+.phead h1{font:600 15px var(--font-ui);margin:0;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.phead h1 .i{color:var(--faint)}
+.phead .topic{color:var(--muted);font-size:13px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-left:10px;border-left:1px solid var(--line);min-width:0;flex:1}
+.phead .acts{display:flex;align-items:center;gap:2px;margin-left:auto}
+.stack{display:flex;margin-right:6px}
+.stack .avatar{--av:22px;font-size:9px;box-shadow:0 0 0 2px var(--sheet);margin-left:-6px}
+.stack .avatar:first-child{margin-left:0}
+
+/* ───────────── Messages ───────────── */
+.chat{display:flex;flex:1;min-height:0}
+.chat-main{flex:1;display:flex;flex-direction:column;min-width:0}
+.scroller{flex:1;overflow-y:auto;padding:12px 0 6px}
+/* column-reverse keeps the newest message pinned as content above it reflows */
+.scroller[data-chat]{display:flex;flex-direction:column-reverse}
+.chan-start{padding:28px 20px 12px}
+.chan-start .big{width:48px;height:48px;border-radius:calc(var(--r-ctl) + 4px);display:grid;place-items:center;background:var(--raised);color:var(--muted);margin-bottom:14px}
+.chan-start h2{font:650 24px/1.2 var(--font-display);letter-spacing:-.015em;margin:0 0 4px}
+.chan-start p{margin:0;color:var(--muted)}
+.day{display:flex;align-items:center;gap:12px;margin:14px 20px 4px;color:var(--faint);font-size:12px;font-weight:500}
+.day::before,.day::after{content:'';flex:1;border-top:1px solid var(--line)}
+.msg{display:grid;grid-template-columns:var(--av) minmax(0,1fr);column-gap:12px;padding:var(--msg-pad) 20px 2px;position:relative}
+.msg.cont{padding-top:1px}
+.msg:hover{background:var(--hover)}
+.msg.mention{background:color-mix(in oklch, var(--accent) 8%, transparent);box-shadow:inset 2px 0 var(--accent)}
+.avatar{width:var(--av);height:var(--av);border-radius:50%;flex-shrink:0;display:grid;place-items:center;position:relative;
+  background:oklch(var(--av-l) .09 var(--h));color:oklch(var(--av-fg-l) .07 var(--h));font:600 calc(var(--av) * .36) var(--font-ui)}
+.msg > .avatar{margin-top:2px}
+.gutter-time{font-size:10.5px;color:var(--faint);visibility:hidden;text-align:right;padding-top:4px;white-space:nowrap}
+.msg:hover .gutter-time{visibility:visible}
+.msg-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.name{font-weight:600}
+.name:hover{text-decoration:underline;text-underline-offset:3px}
+.role{font-size:11px;padding:1px 6px;border-radius:5px;background:var(--accent-soft);color:var(--accent-ink);font-weight:500;align-self:center}
+.role.bot{background:var(--raised);color:var(--muted)}
+/* Role colors: the space picks a hue; the client clamps lightness and chroma per theme
+   so every name clears WCAG AA against the sheet, however loud the source color is. */
+.rc{color:var(--text)}
+:root[data-theme="dark"] .rc{color:oklch(from var(--role) max(l, 0.8) min(c, 0.13) h)}
+:root[data-theme="light"] .rc{color:oklch(from var(--role) min(l, 0.48) min(c, 0.16) h)}
+.role.rt{background:oklch(from var(--role) l c h / .16)}
+:root[data-theme="dark"] .role.rt{color:oklch(from var(--role) max(l, 0.84) min(c, 0.11) h)}
+:root[data-theme="light"] .role.rt{color:oklch(from var(--role) min(l, 0.45) min(c, 0.16) h)}
+.msg-head time{font-size:12px;color:var(--faint)}
+.msg-text{max-width:76ch;overflow-wrap:anywhere}
+.msg-text p{margin:0}
+.msg-text code{font:12.5px var(--font-mono);background:var(--raised);padding:1px 5px;border-radius:5px;border:1px solid var(--line)}
+.msg-text pre{font:12.5px/1.6 var(--font-mono);background:var(--base);border:1px solid var(--line);padding:10px 12px;border-radius:var(--r-ctl);margin:6px 0 2px;overflow-x:auto;white-space:pre}
+.ment{background:var(--accent-soft);color:var(--accent-ink);border-radius:4px;padding:0 3px;font-weight:500}
+.reply-to{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);margin:0 0 2px;white-space:nowrap;overflow:hidden}
+.reply-to .i{color:var(--faint)}
+.reply-to b{font-weight:600;color:var(--text)}
+.reply-to span{overflow:hidden;text-overflow:ellipsis}
+.reactions{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.reaction{height:26px;padding:0 9px;border-radius:999px;border:1px solid var(--line);background:var(--sheet);font-size:12.5px;display:flex;gap:6px;align-items:center;color:var(--muted)}
+.reaction:hover{border-color:var(--line-strong);color:var(--text)}
+.reaction.mine{border-color:color-mix(in oklch, var(--accent) 55%, var(--line));background:var(--accent-soft);color:var(--accent-ink)}
+.thread-link{display:inline-flex;align-items:center;gap:8px;margin-top:6px;padding:4px 10px 4px 6px;border-radius:var(--r-ctl);border:1px solid var(--line);font-size:12.5px}
+.thread-link:hover{background:var(--hover);border-color:var(--line-strong)}
+.thread-link b{color:var(--accent-ink);font-weight:600}
+.thread-link span{color:var(--faint)}
+.thread-link .stack{margin:0 0 0 6px}
+.thread-link .stack .avatar{--av:18px;font-size:8px}
+.msg-actions{position:absolute;right:14px;top:-15px;display:none;background:var(--overlay);border:1px solid var(--line);border-radius:var(--r-ctl);padding:2px;box-shadow:var(--shadow-sm);z-index:2}
+.msg:hover .msg-actions,.msg:focus-within .msg-actions{display:flex}
+.msg.pending .msg-text{color:var(--muted)}
+.msg-status{display:flex;gap:10px;align-items:center;margin-top:2px;font-size:12.5px;color:var(--faint)}
+.msg-status.fail{color:var(--danger)}
+.msg-status .link{text-decoration:underline;text-underline-offset:3px;font-weight:500}
+.msg-status .link:hover{color:var(--text)}
+.broken{margin:4px 20px 4px calc(20px + var(--av) + 12px);padding:8px 12px;border:1px dashed var(--line-strong);border-radius:var(--r-ctl);font-size:13px;color:var(--muted);display:flex;align-items:center;gap:10px}
+.broken .grow{flex:1}
+.broken pre{margin:8px 0 0;font:12px var(--font-mono);white-space:pre-wrap;color:var(--faint)}
+
+.composer-wrap{padding:0 16px 16px}
+.typing{height:22px;font-size:12.5px;color:var(--muted);padding:0 4px;display:flex;align-items:center;gap:6px}
+.typing b{color:var(--text);font-weight:600}
+.dots{display:inline-flex;gap:3px}
+.dots i{width:4px;height:4px;border-radius:50%;background:var(--muted);animation:bob 1.2s infinite}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes bob{0%,60%,100%{opacity:.3;transform:none}30%{opacity:1;transform:translateY(-2px)}}
+.composer{background:var(--raised);border:1px solid var(--line);border-radius:calc(var(--r-sheet) - 2px);padding:10px 8px 6px 14px;transition:border-color .15s}
+.composer:focus-within{border-color:var(--line-strong)}
+.composer textarea{display:block;width:100%;background:none;border:0;resize:none;outline:none;min-height:22px;max-height:220px;line-height:1.5;padding:0}
+.composer textarea::placeholder{color:var(--faint)}
+.composer-bar{display:flex;align-items:center;gap:2px;margin:6px 0 0 -6px}
+.composer-bar .hint{font-size:12px;color:var(--faint);margin-left:6px}
+.composer-bar .grow{flex:1}
+.send{width:30px;height:30px;border-radius:var(--r-ctl);background:var(--accent);color:var(--on-accent);display:grid;place-items:center;transition:opacity .15s}
+.send:disabled{background:var(--press);color:var(--faint);cursor:default}
+
+.members{width:236px;flex-shrink:0;border-left:1px solid var(--line);overflow-y:auto;padding:12px 8px}
+.members h3{font-size:12.5px;font-weight:500;color:var(--faint);margin:10px 8px 4px;display:flex;gap:6px}
+.member{display:flex;align-items:center;gap:10px;height:38px;padding:0 8px;border-radius:var(--r-ctl);width:100%;text-align:left}
+.member:hover{background:var(--hover)}
+.member .avatar{--av:28px}
+.member .nm{font-size:13.5px;line-height:1.2}
+.member .st{font-size:11.5px;color:var(--faint);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.member.off{opacity:.45}
+.member .status-dot{width:10px;height:10px;border-color:var(--sheet)}
+
+
+/* ───────────── Skeletons ───────────── */
+.sk{background:var(--raised);border-radius:6px;position:relative;overflow:hidden;flex-shrink:0}
+.sk::after{content:'';position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,var(--shimmer),transparent);animation:shimmer 1.5s infinite}
+@keyframes shimmer{to{transform:translateX(100%)}}
+:root[data-motion="reduce"] .sk::after{display:none}
+@media (prefers-reduced-motion:reduce){.sk::after{display:none}.dots i{animation:none}}
+.sk-msg{display:grid;grid-template-columns:var(--av) 1fr;column-gap:12px;padding:12px 20px 4px}
+.sk-lines{display:flex;flex-direction:column;gap:8px;padding-top:3px}
+
+/* ───────────── States (error / empty) ───────────── */
+.state{flex:1;display:grid;place-items:center;padding:32px;overflow:auto}
+.state-card{max-width:400px}
+.state-icon{width:38px;height:38px;border-radius:calc(var(--r-ctl) + 2px);display:grid;place-items:center;margin-bottom:16px;background:color-mix(in oklch, var(--danger) 14%, transparent);color:var(--danger)}
+.state h2{font:600 19px/1.3 var(--font-display);letter-spacing:-.01em;margin:0 0 6px}
+.state p{color:var(--muted);margin:0 0 18px}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{height:32px;padding:0 12px;border-radius:var(--r-ctl);font-weight:500;font-size:13px;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line-strong);background:var(--sheet)}
+.btn:hover{background:var(--hover)}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:transparent}
+.btn.primary:hover{background:color-mix(in oklch, var(--accent) 88%, var(--text))}
+.btn.sm{height:26px;padding:0 9px;font-size:12.5px}
+details.tech{margin-top:18px;font-size:12.5px;color:var(--muted)}
+details.tech summary{cursor:pointer;width:max-content}
+details.tech summary:hover{color:var(--text)}
+details.tech pre{font:12px/1.6 var(--font-mono);background:var(--base);border:1px solid var(--line);border-radius:var(--r-ctl);padding:10px 12px;white-space:pre-wrap;margin:8px 0 0;color:var(--muted)}
+.region-err{margin:8px;padding:14px;border-radius:var(--r-ctl);border:1px solid var(--line);font-size:13px}
+.region-err b{display:flex;gap:8px;align-items:center;font-weight:600;margin-bottom:4px}
+.region-err b .i{color:var(--danger)}
+.region-err p{margin:0 0 10px;color:var(--muted)}
+
+/* ───────────── Docs ───────────── */
+.doc{flex:1;overflow-y:auto}
+.doc-inner{max-width:70ch;margin:0 auto;padding:44px 36px 96px}
+.doc h1{font:650 36px/1.1 var(--font-display);letter-spacing:-.025em;margin:0 0 12px}
+.doc-meta{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin-bottom:30px}
+.doc-meta .stack{margin:0 0 0 6px}
+.doc h2{font:600 20px/1.3 var(--font-display);letter-spacing:-.01em;margin:34px 0 10px}
+.doc p{line-height:1.7;margin:0 0 14px}
+.doc a{color:var(--accent-ink);text-underline-offset:3px}
+.check{display:flex;gap:12px;align-items:flex-start;padding:4px 0;line-height:1.6}
+.check .box{width:17px;height:17px;border-radius:5px;border:1.5px solid var(--line-strong);margin-top:3px;flex-shrink:0;display:grid;place-items:center;color:var(--on-accent)}
+.check.done .box{background:var(--accent);border-color:var(--accent)}
+.check.done .tx{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--faint)}
+.check .who{font-size:12px;color:var(--faint);margin-left:6px}
+.caret{display:inline-block;width:2px;height:1.25em;vertical-align:text-bottom;position:relative;background:var(--c)}
+.caret::after{content:attr(data-name);position:absolute;bottom:100%;left:0;font:600 10.5px/1.4 var(--font-ui);background:var(--c);color:#13111b;padding:1px 6px;border-radius:5px 5px 5px 0;white-space:nowrap}
+.hl{background:color-mix(in oklch, var(--c) 25%, transparent)}
+.seg{display:inline-flex;background:var(--raised);border-radius:var(--r-ctl);padding:2px;border:1px solid var(--line);gap:2px}
+.seg button{height:26px;padding:0 11px;border-radius:calc(var(--r-ctl) - 2px);font-size:12.5px;color:var(--muted);white-space:nowrap}
+.seg button:hover{color:var(--text)}
+.seg button[aria-pressed="true"]{background:var(--sheet);color:var(--text);box-shadow:0 1px 2px rgb(0 0 0 / .18),0 0 0 1px var(--line)}
+
+/* ───────────── New tab ───────────── */
+.newtab{flex:1;position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:32px 24px 8%;overflow:hidden}
+.newtab canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.launcher{position:relative;width:min(560px,100%)}
+.launcher-box{display:flex;align-items:center;gap:10px;height:50px;padding:0 10px 0 16px;background:var(--raised);border:1px solid var(--line-strong);border-radius:calc(var(--r-sheet) - 1px);box-shadow:var(--shadow)}
+
+.launcher-box input{flex:1;background:none;border:0;outline:none;font-size:15px}
+.launcher-box input::placeholder{color:var(--faint)}
+kbd{font:500 11px var(--font-ui);color:var(--muted);border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:5px;padding:2px 6px;background:var(--sheet)}
+.launcher-list{margin-top:8px;background:color-mix(in oklch, var(--overlay) 92%, transparent);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:calc(var(--r-sheet) - 1px);padding:6px;box-shadow:var(--shadow)}
+.launcher-list .lbl{font-size:12px;color:var(--faint);padding:6px 10px 4px}
+.launcher-list .row{height:34px}
+.launcher-list .empty{padding:10px;color:var(--muted);font-size:13px}
+
+/* ───────────── Lists (inbox / threads) ───────────── */
+.list{flex:1;overflow-y:auto;padding:8px}
+.lrow{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:12px;padding:10px 12px;border-radius:var(--r-ctl);text-align:left;width:100%;align-items:start}
+.lrow:hover{background:var(--hover)}
+.lrow .avatar{--av:32px}
+.lrow .t{font-size:13.5px;line-height:1.35}
+.lrow .t b{font-weight:600}
+.lrow .s{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4;margin-top:2px}
+.lrow time{font-size:12px;color:var(--faint);white-space:nowrap}
+.lrow.unread .t::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:7px;vertical-align:1px}
+
+/* ───────────── Voice ───────────── */
+.voice{flex:1;display:flex;flex-direction:column;padding:16px;gap:16px;min-height:0}
+.tiles{flex:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;align-content:center}
+.tile{aspect-ratio:16/10;border-radius:calc(var(--r-sheet) - 2px);background:var(--raised);display:grid;place-items:center;position:relative;border:1px solid var(--line)}
+.tile.speaking{box-shadow:0 0 0 2px var(--ok);border-color:transparent}
+.tile .avatar{--av:68px}
+.tile-name{position:absolute;left:10px;bottom:10px;font-size:12.5px;background:var(--sheet);padding:2px 8px;border-radius:6px;display:flex;align-items:center;gap:6px}
+.tile-name .i{color:var(--danger)}
+.voice-bar{display:flex;justify-content:center;gap:10px}
+.vbtn{width:46px;height:46px;border-radius:50%;background:var(--raised);display:grid;place-items:center;border:1px solid var(--line)}
+.vbtn:hover{background:var(--press)}
+.vbtn.leave{background:var(--danger);color:#fff;border-color:transparent}
+
+/* ───────────── Settings ───────────── */
+.settings{display:grid;grid-template-columns:200px minmax(0,1fr);flex:1;min-height:0}
+.settings nav{padding:14px 8px;border-right:1px solid var(--line);overflow-y:auto}
+.settings nav .lbl{font-size:12.5px;color:var(--faint);padding:10px 8px 4px;font-weight:500}
+.settings-body{overflow-y:auto;padding:30px 36px 64px}
+.settings-body > div{max-width:640px}
+.settings-body h2{font:650 26px/1.2 var(--font-display);letter-spacing:-.02em;margin:0 0 6px}
+.settings-body > div > p{color:var(--muted);margin:0 0 22px}
+.set{padding:20px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 20px;align-items:center}
+.set.stack-v{grid-template-columns:1fr}
+.set h3{font-size:14px;font-weight:600;margin:0}
+.set p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.theme-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:8px}
+.theme-card{border:1px solid var(--line);border-radius:calc(var(--r-ctl) + 2px);padding:6px 6px 8px;text-align:left;font-size:13px;font-weight:500}
+.theme-card:hover{border-color:var(--line-strong)}
+.theme-card[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.tprev{height:78px;border-radius:6px;display:grid;grid-template-columns:28% 1fr;gap:5px;padding:5px;margin-bottom:8px;overflow:hidden}
+.tprev i{display:block;border-radius:4px}
+.tprev .pl{display:flex;flex-direction:column;gap:4px;padding:2px}
+.tprev .pl i{height:5px;border-radius:3px}
+.tprev.sys{background:linear-gradient(135deg,#0E0F11 50%,#EDEEF0 50%)}
+.swatches{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.swatch{width:30px;height:30px;border-radius:50%;background:var(--c);position:relative}
+.swatch[aria-pressed="true"]{box-shadow:0 0 0 2px var(--sheet),0 0 0 4px var(--c)}
+.custom-color{display:flex;align-items:center;gap:8px;height:32px;padding:0 10px 0 4px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);font:12.5px var(--font-mono);color:var(--muted)}
+.custom-color input[type=color]{width:24px;height:24px;border:0;padding:0;background:none;border-radius:6px;cursor:pointer}
+.custom-color input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.custom-color input[type=color]::-webkit-color-swatch{border:0;border-radius:6px}
+.range{display:flex;align-items:center;gap:12px}
+.range input{accent-color:var(--accent);width:180px}
+.range output{font:12.5px var(--font-mono);color:var(--muted);width:36px}
+.switch{width:38px;height:22px;border-radius:999px;background:var(--line-strong);position:relative;transition:background .15s;flex-shrink:0}
+.switch::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s var(--ease);box-shadow:0 1px 2px rgb(0 0 0 / .3)}
+.switch[aria-checked="true"]{background:var(--accent)}
+.switch[aria-checked="true"]::after{transform:translateX(16px)}
+.preview{border:1px solid var(--line);border-radius:calc(var(--r-ctl) + 2px);padding:4px 0 10px;margin-bottom:24px;background:var(--sheet);overflow:hidden}
+.preview .msg:hover{background:transparent}
+
+/* ───────────── Toasts + mockup panel ───────────── */
+.toasts{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:60;pointer-events:none;align-items:center}
+.toast{pointer-events:auto;display:flex;align-items:center;gap:10px;background:var(--overlay);border:1px solid var(--line-strong);border-radius:var(--r-ctl);padding:9px 10px 9px 12px;box-shadow:var(--shadow);font-size:13px;animation:toast .22s var(--ease)}
+.toast .i{color:var(--ok)}
+.toast.err .i{color:var(--danger)}
+@keyframes toast{from{opacity:0;transform:translateY(8px)}}
+
+.dev{position:fixed;right:16px;bottom:16px;width:272px;background:var(--overlay);border:1px solid var(--line-strong);border-radius:12px;box-shadow:var(--shadow);font-size:12.5px;z-index:50;overflow:hidden}
+.dev > button.dev-h{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;font-weight:600;font-size:12.5px}
+.dev > button.dev-h .grow{flex:1;text-align:left}
+.dev > button.dev-h small{font-weight:400;color:var(--faint)}
+.dev.closed .dev-b{display:none}
+.dev.closed .dev-h .chev{transform:rotate(180deg)}
+.dev-b{padding:0 12px 12px;border-top:1px solid var(--line)}
+.dev-b p{color:var(--faint);margin:10px 0 8px;line-height:1.45}
+.dev-t{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:5px 0;width:100%;text-align:left;color:var(--muted)}
+.dev-t:hover{color:var(--text)}
+.dev-t .switch{transform:scale(.85);transform-origin:right}
+.dev .btns{margin-top:8px}
+.dev-log{margin-top:10px;font:11.5px/1.5 var(--font-mono);color:var(--faint);max-height:76px;overflow:hidden;border-top:1px solid var(--line);padding-top:8px}
+.dev-log div:first-child{color:var(--muted)}
+
+/* Pane-width rules come after component rules so they win at equal specificity. */
+@container (max-width: 780px){ .members{display:none} .settings{grid-template-columns:minmax(0,1fr)} .settings nav{display:none} .settings-body{padding:24px 24px 48px} }
+
+/* ───────────── Mobile ───────────── */
+.scrim{display:none}
+@media (max-width:820px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .rail{display:none}
+  .sidebar{position:fixed;inset:0 auto 0 0;width:min(300px,86vw);background:var(--base);z-index:40;transform:translateX(-102%);transition:transform .22s var(--ease);padding-left:8px;box-shadow:var(--shadow)}
+  .app.nav-open .sidebar{transform:none}
+  .app.nav-open .scrim{display:block;position:fixed;inset:0;background:rgb(0 0 0 / .4);z-index:39}
+  .workspace{padding:0 8px 8px}
+  .group:not(.focused){display:none}
+  .members,.split-btn,.composer-bar .hint{display:none}
+  .menu-btn{display:grid}
+  .phead .topic{display:none}
+  .settings{grid-template-columns:minmax(0,1fr)}
+  .settings nav{display:none}
+  .settings-body{padding:24px 18px 48px}
+  .theme-cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .doc-inner{padding:28px 18px 80px}
+  .doc h1{font-size:28px}
+  .dev{right:8px;bottom:8px;width:min(272px,calc(100vw - 16px))}
+  .msg{padding-left:14px;padding-right:14px}
+  .broken{margin-left:14px;margin-right:14px}
+  .composer-wrap{padding:0 10px 10px}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-hash" viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M16 13H8M16 17H8M10 9H8"/></symbol>
+  <symbol id="i-voice" viewBox="0 0 24 24"><path d="M11 4.7a.7.7 0 0 0-1.2-.5L6.4 7.6A1.4 1.4 0 0 1 5.4 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.4a1.4 1.4 0 0 1 1 .4l3.4 3.4a.7.7 0 0 0 1.2-.5z"/><path d="M16 9a5 5 0 0 1 0 6M19.4 18.4a9 9 0 0 0 0-12.8"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+  <symbol id="i-panel" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></symbol>
+  <symbol id="i-split" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+  <symbol id="i-thread" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="m16.2 7.8-2.1 6.3-6.3 2.1 2.1-6.3z"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+  <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><path d="m21.4 11-9.2 9.2a6 6 0 0 1-8.5-8.5l8.6-8.6a4 4 0 1 1 5.7 5.7l-8.6 8.6a2 2 0 0 1-2.8-2.8l8.5-8.5"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7M12 19V5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-reply" viewBox="0 0 24 24"><path d="M9 17 4 12l5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></symbol>
+  <symbol id="i-corner" viewBox="0 0 24 24"><path d="M5 4v6a4 4 0 0 0 4 4h10"/><path d="m15 10 4 4-4 4"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 8v4M12 16h.01"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+  <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M12 20h.01M8.5 16.4a5 5 0 0 1 7 0M5 12.9a10 10 0 0 1 5.2-2.7M19 12.9a10 10 0 0 0-2-1.5M2 8.8a15 15 0 0 1 4.2-2.6M22 8.8a15 15 0 0 0-11.3-3.8M2 2l20 20"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></symbol>
+  <symbol id="i-mic-off" viewBox="0 0 24 24"><path d="M2 2l20 20M18.9 13.4A7 7 0 0 0 19 12v-2M5 10v2a7 7 0 0 0 12 5M15 9.3V5a3 3 0 0 0-5.7-1.3M9 9v3a3 3 0 0 0 5.1 2.1M12 19v3"/></symbol>
+  <symbol id="i-phone-off" viewBox="0 0 24 24"><path d="M10.7 13.3a16 16 0 0 0 3.4 2.6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3.1 4.2 2 2 0 0 1 5.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.4 2.1L9.1 9.9"/><path d="M22 2 2 22"/></symbol>
+  <symbol id="i-screen" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+  <symbol id="i-headphones" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect width="13" height="13" x="9" y="9" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9.5V3M7 15h10"/></symbol>
+  <symbol id="i-logo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 0 0 17 4.5 8.5 0 0 1 0-17Z" fill="currentColor"/></symbol>
+</svg>
+
+<div class="app" id="app">
+  <nav class="rail" id="rail" aria-label="Spaces"></nav>
+  <aside class="sidebar" id="sidebar" aria-label="Space navigation"></aside>
+  <div class="scrim" data-act="close-nav"></div>
+  <main class="workspace">
+    <div id="banner"></div>
+    <div class="groups" id="groups"></div>
+  </main>
+</div>
+
+<section class="dev" id="dev" aria-label="Mockup controls"></section>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+/* ═════════════ Data ═════════════ */
+const people = {
+  rin:{name:'Rin Okabe', ini:'RO', h:310, role:'Maintainer', st:'Reviewing PRs'},
+  theo:{name:'Theo Lindqvist', ini:'TL', h:200, role:'Contributor', st:'On a Pi 4 somewhere'},
+  amara:{name:'Amara Osei', ini:'AO', h:50, role:'Style spec', st:'Writing the v3 draft'},
+  juno:{name:'Juno Park', ini:'JP', h:145, st:''},
+  mika:{name:'Mika', ini:'MK', h:265, role:'Contributor', st:'Working on offline packs'},
+  bot:{name:'Tidebot', ini:'TB', h:0, bot:true},
+  sol:{name:'Sol Reyes', ini:'SR', h:20}, pia:{name:'Pia Brandt', ini:'PB', h:95}, ike:{name:'Ike Mensah', ini:'IM', h:235},
+  lev:{name:'Lev Aronov', ini:'LA', h:170}, nadia:{name:'Nadia Haddad', ini:'NH', h:340},
+};
+const ME = 'mika';
+// Defined by the space owners. Deliberately loud source colors: the client tames them.
+const roles = {Maintainer:'#FF2D55', 'Style spec':'#FFB000', Contributor:'#2F80FF'};
+const spaces = [
+  {id:'tidepool', name:'Tidepool', ini:'Tp', accent:'#2BB5A5'},
+  {id:'kiln', name:'Kiln & Glaze', ini:'Kg', accent:'#E07A4F', unread:true},
+  {id:'lumen', name:'Lumen Labs', ini:'LL', accent:'#E3B53C'},
+  {id:'synth', name:'Synth Club', ini:'Sc', accent:'#CF6BD0', unread:true},
+  {id:'paper', name:'Paper Cuts', ini:'Pc', accent:'#6C8CF0'},
+];
+const dms = [
+  {id:'dm-theo', who:'theo', last:'Sent you the Pi 4 benchmark numbers', time:'4m', unread:2},
+  {id:'dm-rin', who:'rin', last:'You: sure, after the 0.19 cut', time:'1h'},
+  {id:'dm-amara', who:'amara', last:'Thanks for reviewing the dash proposal', time:'Tue'},
+  {id:'dm-pia', who:'pia', last:'Are you coming to the meetup on Saturday?', time:'Sun'},
+];
+const friendsList = ['theo','rin','amara','juno','pia','sol'].map(w => ({who:w, t:`<b>${people[w].name}</b>`, s:people[w].st || 'Online', time:'Online', open:'dm-' + w}));
+const channels = {
+  announcements:{kind:'text', name:'announcements', topic:'Releases and breaking changes. Only maintainers post here.'},
+  coc:{kind:'doc', name:'Code of conduct', meta:'3mo'},
+  general:{kind:'text', name:'general', topic:'Anything Tidepool. Be kind, be specific.'},
+  help:{kind:'text', name:'help', topic:'Ask questions, paste logs, mark answers solved', unread:12},
+  showcase:{kind:'text', name:'showcase', topic:'Maps people made with Tidepool'},
+  office:{kind:'voice', name:'Office hours', people:['rin','juno','mika']},
+  renderer:{kind:'text', name:'renderer', topic:'WebGPU backend, line joins, label placement', unread:3},
+  spec:{kind:'text', name:'styles-spec', topic:'Proposals for the v3 style spec', mention:1},
+  roadmap:{kind:'doc', name:'Roadmap 2027', meta:'3m'},
+  contributing:{kind:'doc', name:'Contributing', meta:'2w'},
+  inbox:{kind:'inbox', name:'Inbox'},
+  threads:{kind:'threads', name:'Threads'},
+  appearance:{kind:'settings', name:'Appearance'},
+  friends:{kind:'friends', name:'Friends'},
+};
+for (const w of ['theo','rin','amara','pia','juno','sol']) channels['dm-' + w] = {kind:'text', dm:w, name:people[w].name, topic:''};
+const sections = [
+  {name:'Information', items:['announcements','coc']},
+  {name:'Community', items:['general','help','showcase','office']},
+  {name:'Development', items:['renderer','spec','roadmap','contributing']},
+];
+const messages = {
+  general:[
+    {id:'g1', author:'rin', time:'10:02', html:'Tile cache rewrite is merged. If you\'re on <code>main</code>, run <code>tidepool cache migrate</code> once. The on-disk format changed.', reactions:[['🎉',12,true],['👀',3]], thread:{count:4, last:'12m ago', who:['theo','juno','amara']}},
+    {id:'g2', author:'theo', time:'10:05', html:'Cold start on my Pi 4 went from 9 seconds to under 2. That\'s wild.'},
+    {id:'g3', author:'theo', time:'10:05', html:'Is the cache shared between styles now, or still one per style?'},
+    {id:'g4', author:'rin', time:'10:07', reply:'g3', html:'Shared. Tiles are keyed by source and styles are applied at render time, so switching styles doesn\'t refetch anything.'},
+    {id:'g5', author:'juno', time:'10:09', broken:true, raw:'{"type":"embed/v2","provider":"tilejson","payload":"<14KB>"}'},
+    {id:'g6', author:'juno', time:'10:11', html:'Still getting this on the first request after migrating:<pre>Error: ENOENT: no such file or directory,\n  open \'/var/tiles/14/8185/5448.pbf\'\n    at TileStore.read (store.ts:118)</pre>'},
+    {id:'g7', author:'amara', time:'10:12', mention:true, html:'<span class="ment">@Mika</span> you hit this last week, right? Was it the <code>--cache-dir</code> flag?'},
+    {id:'g8', author:'mika', time:'10:14', html:'Yes. <code>--cache-dir</code> is read once and migrated, but if you keep passing it afterwards Tidepool looks in the old location. Drop the flag after migrating.'},
+    {id:'g9', author:'juno', time:'10:15', html:'Dropped it and it works. Thank you!', reactions:[['🙏',2]]},
+  ],
+  help:[
+    {id:'h1', author:'juno', time:'09:12', html:'<code>tidepool serve</code> exits right after start with <code>ENOENT: tiles/0/0/0.pbf</code>. Fresh clone, Node 22.'},
+    {id:'h2', author:'amara', time:'09:20', html:'That path is from the old cache layout. Run <code>tidepool cache migrate</code> once, or delete the cache directory.'},
+    {id:'h3', author:'juno', time:'09:24', html:'Migrate worked. Thanks!', reactions:[['✅',2]]},
+    {id:'h4', author:'bot', time:'09:24', html:'Marked as solved by Juno Park.'},
+    {id:'h5', author:'ike', time:'11:40', html:'Labels overlap at zoom 3 when I use two text fields. Is that a known issue or my style?'},
+  ],
+  announcements:[
+    {id:'a1', author:'rin', time:'Mon', html:'<b>Tidepool 0.18 is out.</b> New tile cache, cold starts up to 4× faster, and <code>--cache-dir</code> is now deprecated. Upgrade notes are in the Roadmap doc.', reactions:[['🎉',34,true],['❤️',12]]},
+  ],
+  showcase:[
+    {id:'s1', author:'amara', time:'Yesterday', html:'Made a risograph-style map for my zine. Two inks, no gradients, everything else is halftone.', reactions:[['😍',9]]},
+  ],
+  renderer:[
+    {id:'r1', author:'rin', time:'08:30', html:'Benchmarks for the WebGPU path are in <code>bench/webgpu.md</code>. Line joins are still wrong above zoom 18.'},
+    {id:'r2', author:'theo', time:'08:41', html:'I can take line joins next week if nobody else has started.'},
+    {id:'r3', author:'rin', time:'08:44', html:'All yours.', reactions:[['🙌',3]]},
+  ],
+  spec:[
+    {id:'p1', author:'amara', time:'Yesterday', html:'Posted the <code>line-dasharray</code> proposal. Main change: dash lengths scale with line width unless <code>dash-units</code> is set to <code>px</code>.'},
+    {id:'p2', author:'theo', time:'09:02', mention:true, html:'<span class="ment">@Mika</span> could you review it before Thursday? You wrote the current dash code.'},
+  ],
+  'dm-theo':[
+    {id:'d1', author:'theo', time:'10:20', html:'Ran the cold start benchmark 20 times on the Pi 4.'},
+    {id:'d2', author:'theo', time:'10:21', html:'<pre>before  9.1s  (p95 10.4s)\nafter   1.8s  (p95 2.2s)</pre>Sent you the Pi 4 benchmark numbers. Want them in the release notes?'},
+  ],
+  'dm-rin':[
+    {id:'d3', author:'rin', time:'09:02', html:'Can you take the offline packs format after 0.19?'},
+    {id:'d4', author:'mika', time:'09:10', html:'Sure, after the 0.19 cut.'},
+  ],
+};
+const inbox = [
+  {who:'theo', unread:true, t:'<b>Theo Lindqvist</b> mentioned you in #styles-spec', s:'@Mika could you review it before Thursday? You wrote the current dash code.', time:'1h', open:'spec'},
+  {who:'amara', unread:true, t:'<b>Amara Osei</b> mentioned you in #general', s:'@Mika you hit this last week, right? Was it the --cache-dir flag?', time:'2h', open:'general'},
+  {who:'rin', unread:true, t:'<b>Rin Okabe</b> invited you to edit Roadmap 2027', s:'You can now edit this doc. Changes are visible to everyone in Tidepool.', time:'3h', open:'roadmap'},
+  {who:'juno', t:'<b>Juno Park</b> replied to your message in #help', s:'Migrate worked. Thanks!', time:'Yesterday', open:'help'},
+];
+const threadList = [
+  {who:'rin', unread:true, t:'<b>Tile cache rewrite is merged</b> in #general', s:'Juno: confirmed on Windows too, no migration issues', time:'12m', open:'general'},
+  {who:'amara', t:'<b>line-dasharray proposal</b> in #styles-spec', s:'Theo: what happens with negative widths?', time:'1h', open:'spec'},
+  {who:'ike', t:'<b>Label overlap at low zoom</b> in #help', s:'No replies yet', time:'11:40', open:'help'},
+];
+
+/* ═════════════ State ═════════════ */
+const DEFAULT_PREFS = {theme:'dark', accent:'#7C8CF8', density:'comfortable', radius:'soft', font:'inter', size:14, tint:'neutral', spaceColors:true, roleStyle:'color', motion:'full'};
+let prefs = {...DEFAULT_PREFS};
+try{ Object.assign(prefs, JSON.parse(localStorage.getItem('mikoto-mock-prefs-v2')||'{}')); }catch(e){}
+const state = {
+  context:'tidepool',
+  groups:[{id:'g1', tabs:['general','help'], active:'general'}, {id:'g2', tabs:['roadmap'], active:'roadmap'}],
+  focused:'g1',
+  members:true,
+  collapsed:{},
+  docMode:{},
+};
+const sim = {slow:false, offline:false, failMembers:false, broken:false, failNext:false};
+const tabState = {};         // id -> 'ready' | 'pending' | 'skeleton' | 'error'
+const cache = new Set(['general','help','roadmap','appearance','inbox','threads','friends']);
+const loads = {}, prefetching = {};
+const drafts = {}, justLoaded = new Set();
+let membersState = 'ready';
+let newTabSeq = 0, msgSeq = 0;
+const queued = [];
+const log = [];
+
+/* ═════════════ Helpers ═════════════ */
+const $ = s => document.querySelector(s);
+const icon = (n, s=16) => `<svg class="i" width="${s}" height="${s}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const avatar = (id, extra='') => { const p = people[id]; return `<span class="avatar ${extra}" style="--h:${p.h}" aria-hidden="true">${p.bot ? icon('flask',14) : p.ini}</span>`; };
+const stack = ids => `<span class="stack">${ids.map(i => avatar(i)).join('')}</span>`;
+const kindIcon = c => c.dm ? 'user' : ({text:'hash', doc:'doc', voice:'voice', inbox:'inbox', threads:'thread', settings:'sliders', newtab:'plus', friends:'users'}[c.kind]);
+const effectiveAccent = () => { const sp = spaces.find(s => s.id === state.context); return sp && prefs.spaceColors ? sp.accent : prefs.accent; };
+// Roles belong to a space, so names outside one (Home, DMs) are never role-colored.
+const nameHtml = (p, tag='button', cls='name', plain=false) => {
+  const r = !plain && p.role && roles[p.role];
+  return `<${tag} class="${cls} ${r && prefs.roleStyle==='color' ? 'rc' : ''}" ${r ? `style="--role:${r}"` : ''}>${p.name}</${tag}>${r && prefs.roleStyle==='tag' && tag==='button' ? `<span class="role rt" style="--role:${r}">${p.role}</span>` : ''}`;
+};
+function topo(){
+  let p = '';
+  for (let k = 1; k <= 8; k++){
+    const r = k * 10; let d = '';
+    for (let a = 0; a <= 72; a++){
+      const t = a / 72 * Math.PI * 2, rr = r * (1 + 0.16 * Math.sin(3 * t + k * 0.7) + 0.07 * Math.sin(5 * t - k));
+      d += (a ? 'L' : 'M') + (196 + Math.cos(t) * rr * 1.5).toFixed(1) + ' ' + (18 + Math.sin(t) * rr).toFixed(1);
+    }
+    p += `<path d="${d}Z"/>`;
+  }
+  return `<svg class="topo" viewBox="0 0 240 96" preserveAspectRatio="xMaxYMin slice" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">${p}</svg>`;
+}
+const label = c => c.kind === 'text' ? c.name : c.name;
+const latency = () => sim.slow ? 1800 : 550;
+const resolvedTheme = () => prefs.theme === 'system' ? (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : prefs.theme;
+function addLog(s){ log.unshift(s); log.length = Math.min(log.length, 5); renderDevLog(); }
+function nowTime(){ const d = new Date(); return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0'); }
+function plainText(html){ return new DOMParser().parseFromString(html,'text/html').body.textContent || ''; }
+function fmt(text){ return esc(text).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/@(\w+)/g,'<span class="ment">@$1</span>').replace(/\n/g,'<br>'); }
+function groupOf(id){ return state.groups.find(g => g.tabs.includes(id)); }
+function focusedGroup(){ return state.groups.find(g => g.id === state.focused) || state.groups[0]; }
+
+/* ═════════════ Loading model ═════════════
+   1. What we already know (name, icon, topic) renders immediately.
+   2. Unknown content: nothing for 150ms, then a skeleton shaped like the real thing.
+   3. Once shown, a skeleton stays at least 300ms, then content fades in. No flashes.
+   4. Hovering a sidebar row prefetches, so most opens skip the skeleton entirely. */
+function load(id, {fail=false}={}){
+  const token = {}; loads[id] = token;
+  tabState[id] = 'pending'; render();
+  let shownAt = null;
+  const st = setTimeout(() => { if (loads[id] !== token) return; tabState[id] = 'skeleton'; shownAt = performance.now(); render(); }, 150);
+  const remaining = prefetching[id] ? Math.max(0, prefetching[id] - performance.now()) : latency();
+  setTimeout(() => {
+    if (loads[id] !== token) return;
+    clearTimeout(st);
+    const done = () => {
+      if (loads[id] !== token) return;
+      if (fail){ tabState[id] = 'error'; }
+      else { tabState[id] = 'ready'; cache.add(id); if (shownAt !== null) justLoaded.add(id); }
+      render();
+    };
+    if (shownAt !== null) setTimeout(done, Math.max(0, 300 - (performance.now() - shownAt))); else done();
+  }, remaining);
+}
+function prefetch(id){
+  if (cache.has(id) || prefetching[id] || !channels[id] || ['voice'].includes(channels[id].kind)) return;
+  const at = performance.now() + latency();
+  prefetching[id] = at;
+  addLog(`prefetch ${channels[id].kind==='text'?'#':''}${channels[id].name} on hover`);
+  setTimeout(() => { cache.add(id); delete prefetching[id]; }, latency());
+}
+
+/* ═════════════ Tabs ═════════════ */
+function openTab(id, {newPane=false}={}){
+  closeNav();
+  if (channels[id]) { delete channels[id].unread; delete channels[id].mention; }
+  const existing = groupOf(id);
+  if (existing && !newPane){ existing.active = id; state.focused = existing.id; render(); return; }
+  const g = focusedGroup();
+  const cur = g.active, curC = channels[cur];
+  if (curC && curC.kind === 'newtab'){ g.tabs[g.tabs.indexOf(cur)] = id; delete channels[cur]; }
+  else g.tabs.splice(g.tabs.indexOf(cur) + 1, 0, id);
+  g.active = id;
+  if (cache.has(id) || channels[id].kind === 'voice') { tabState[id] = 'ready'; render(); }
+  else load(id);
+}
+function newTab(gid){
+  const g = state.groups.find(x => x.id === gid) || focusedGroup();
+  const id = 'new' + (++newTabSeq);
+  channels[id] = {kind:'newtab', name:'New tab'};
+  tabState[id] = 'ready';
+  g.tabs.push(id); g.active = id; state.focused = g.id;
+  render();
+  requestAnimationFrame(() => document.querySelector(`[data-launcher="${id}"]`)?.focus());
+}
+function closeTab(gid, id){
+  const g = state.groups.find(x => x.id === gid); if (!g) return;
+  const i = g.tabs.indexOf(id); g.tabs.splice(i, 1);
+  if (channels[id]?.kind === 'newtab') delete channels[id];
+  if (!g.tabs.length){
+    if (state.groups.length > 1){ state.groups = state.groups.filter(x => x !== g); state.focused = state.groups[0].id; }
+    else { render(); newTab(g.id); return; }
+  } else if (g.active === id) g.active = g.tabs[Math.max(0, i - 1)];
+  render();
+}
+function toggleSplit(){
+  if (state.groups.length > 1){
+    const [a, b] = state.groups; a.tabs.push(...b.tabs.filter(t => !a.tabs.includes(t))); state.groups = [a]; state.focused = a.id;
+  } else {
+    const a = state.groups[0];
+    const id = 'new' + (++newTabSeq); channels[id] = {kind:'newtab', name:'New tab'}; tabState[id] = 'ready';
+    state.groups.push({id:'g' + Date.now(), tabs:[id], active:id}); state.focused = state.groups[1].id;
+  }
+  render();
+}
+
+/* ═════════════ Render: rail + sidebar ═════════════ */
+function renderRail(){
+  $('#rail').innerHTML = `
+    <button class="space-btn home ${state.context==='home'?'active':''}" aria-label="Home" title="Home" data-act="home">${icon('logo',20)}</button>
+    <hr>
+    ${spaces.map(s => `<button class="space-btn ${state.context===s.id?'active':''}" style="--sa:${s.accent}" aria-label="${s.name}${s.unread?', unread':''}" title="${s.name}" data-act="${s.id==='tidepool'?'space':'other-space'}">${s.unread?'<span class="pip"></span>':''}${s.ini}</button>`).join('')}
+    <button class="space-btn plain" aria-label="Create or join a space" title="Create or join a space" data-act="other-space">${icon('plus',18)}</button>
+    <button class="space-btn plain" aria-label="Discover spaces" title="Discover spaces" data-act="other-space">${icon('compass',18)}</button>`;
+}
+function sidebarRow(id){
+  const c = channels[id], fg = focusedGroup();
+  const active = fg.active === id;
+  const unread = c.unread || c.mention;
+  let right = '';
+  if (c.mention) right = `<span class="badge mention" aria-label="${c.mention} mention">${c.mention}</span>`;
+  else if (c.unread) right = `<span class="badge" aria-label="${c.unread} unread">${c.unread}</span>`;
+  else if (c.kind === 'doc') right = `<span class="meta">${c.meta}</span>`;
+  let row = `<button class="row ${active?'active':''} ${unread?'unread':''}" data-act="open" data-id="${id}" data-prefetch="${id}" ${active?'aria-current="page"':''}>${icon(kindIcon(c))}<span class="l">${c.name}</span>${right}</button>`;
+  if (c.kind === 'voice'){
+    row += `<div class="voice-people">${c.people.map((p,i) => `<div class="voice-person ${i===0?'speaking':''}">${avatar(p)}<span>${people[p].name}${p===ME?' (you)':''}</span></div>`).join('')}</div>`;
+  }
+  return row;
+}
+function renderSidebar(){
+  renderSpaceSidebar();
+  if (state.context !== 'home') return;
+  const fg = focusedGroup(), sb = $('#sidebar');
+  sb.querySelector('.sb-head').outerHTML = `<div class="sb-head"><span class="space-name">Home</span>
+      <button class="iconbtn" aria-label="Search" data-act="newtab-focused">${icon('search')}</button>
+      <button class="iconbtn" aria-label="Close navigation" data-act="close-nav">${icon('panel')}</button></div>`;
+  sb.querySelector('.sb-scroll').outerHTML = `<div class="sb-scroll">
+      <button class="row ${fg.active==='friends'?'active':''}" data-act="open" data-id="friends">${icon('users')}<span class="l">Friends</span></button>
+      <button class="row ${fg.active==='inbox'?'active':''} unread" data-act="open" data-id="inbox">${icon('inbox')}<span class="l">Inbox</span><span class="badge">3</span></button>
+      <button class="row" data-act="other-space">${icon('compass')}<span class="l">Discover spaces</span></button>
+      <div class="sb-label"><span style="flex:1">Direct messages</span><button class="iconbtn" aria-label="New message" data-act="toast" data-msg="New messages aren't in this mockup">${icon('plus',14)}</button></div>
+      ${dms.map(d => `<button class="dm ${fg.active===d.id?'active':''} ${d.unread?'unread':''}" data-act="open" data-id="${d.id}" data-prefetch="${d.id}"><span style="position:relative;display:flex">${avatar(d.who)}<span class="status-dot"></span></span><span class="dm-t"><span class="dm-n">${people[d.who].name}</span><span class="dm-s">${d.last}</span></span><span class="dm-r"><time>${d.time}</time>${d.unread?`<span class="badge mention">${d.unread}</span>`:''}</span></button>`).join('')}
+    </div>`;
+}
+function renderSpaceSidebar(){
+  const fg = focusedGroup();
+  $('#sidebar').innerHTML = `
+    <div class="sb-head space-banner" style="--space:${spaces[0].accent}">${topo()}
+      <button class="space-name" data-act="noop">Tidepool ${icon('down',14)}</button>
+      <span class="bacts"><button class="iconbtn" aria-label="Search Tidepool" data-act="newtab-focused">${icon('search')}</button>
+      <button class="iconbtn" aria-label="Close navigation" data-act="close-nav">${icon('panel')}</button></span>
+    </div>
+    <div class="sb-scroll">
+      <button class="row ${fg.active==='inbox'?'active':''} unread" data-act="open" data-id="inbox">${icon('inbox')}<span class="l">Inbox</span><span class="badge">3</span></button>
+      <button class="row ${fg.active==='threads'?'active':''}" data-act="open" data-id="threads">${icon('thread')}<span class="l">Threads</span></button>
+      ${sections.map(s => `
+        <div class="sb-label ${state.collapsed[s.name]?'closed':''}">
+          <button class="cat" data-act="collapse" data-name="${s.name}" aria-expanded="${!state.collapsed[s.name]}">${s.name} <svg class="i chev" width="13" height="13"><use href="#i-down"/></svg></button>
+          <button class="iconbtn" aria-label="New channel in ${s.name}" data-act="toast" data-msg="Channel creation isn't in this mockup">${icon('plus',14)}</button>
+        </div>
+        ${state.collapsed[s.name] ? s.items.filter(id => channels[id].unread || channels[id].mention || fg.active===id).map(sidebarRow).join('') : s.items.map(sidebarRow).join('')}
+      `).join('')}
+    </div>
+    <div class="sb-foot">
+      <div class="voice-strip">
+        <div style="flex:1;min-width:0"><div class="t">Voice connected</div><div class="s">Office hours</div></div>
+        <button class="iconbtn" aria-label="Open Office hours" data-act="open" data-id="office">${icon('voice')}</button>
+        <button class="iconbtn" aria-label="Leave voice" data-act="toast" data-msg="Left Office hours">${icon('phone-off')}</button>
+      </div>
+      <div class="me">
+        <span style="position:relative;display:flex">${avatar(ME)}<span class="status-dot"></span></span>
+        <div class="who"><b>Mika</b><span>${people.mika.st}</span></div>
+        <button class="iconbtn" aria-label="Mute microphone">${icon('mic')}</button>
+        <button class="iconbtn" aria-label="Settings" data-act="open" data-id="appearance">${icon('sliders')}</button>
+      </div>
+    </div>`;
+}
+
+/* ═════════════ Render: surfaces ═════════════ */
+function header(id){
+  const c = channels[id];
+  if (c.kind === 'newtab') return '';
+  let acts = `<button class="iconbtn" aria-label="Notification settings">${icon('bell')}</button><button class="iconbtn" aria-label="More">${icon('more')}</button>`;
+  if (c.kind === 'text') acts = `<button class="iconbtn" aria-label="Search ${c.name}">${icon('search')}</button>${c.dm ? '' : `<button class="iconbtn" aria-label="Members" aria-pressed="${state.members}" data-act="members">${icon('users')}</button>`}` + acts;
+  if (c.kind === 'doc'){
+    const mode = state.docMode[id] || 'edit';
+    acts = `${id==='roadmap'?stack(['rin','theo','amara']):''}<div class="seg" role="group" aria-label="Mode"><button aria-pressed="${mode==='read'}" data-act="docmode" data-id="${id}" data-mode="read">Read</button><button aria-pressed="${mode==='edit'}" data-act="docmode" data-id="${id}" data-mode="edit">Edit</button></div>` + acts;
+  }
+  return `<header class="phead"><h1>${icon(kindIcon(c))}${c.name}</h1>${c.topic?`<div class="topic">${c.topic}</div>`:''}<div class="acts">${acts}</div></header>`;
+}
+function surface(id){
+  const c = channels[id], st = tabState[id] || (cache.has(id) ? 'ready' : 'pending');
+  if (c.kind === 'newtab') return newTabSurface(id);
+  if (c.kind === 'settings') return header(id) + settingsSurface();
+  let body;
+  if (st === 'error') body = errorSurface(id);
+  else if (st === 'pending') body = `<div style="flex:1"></div>`;
+  else if (st === 'skeleton') body = skeletonFor(c);
+  else body = readySurface(id, c);
+  return header(id) + body;
+}
+function readySurface(id, c){
+  const fade = justLoaded.has(id) ? 'fade-in' : '';
+  if (c.kind === 'text') return chatSurface(id, fade);
+  if (c.kind === 'doc') return `<div class="doc ${fade}" data-scroll="${id}"><div class="doc-inner">${docContent(id)}</div></div>`;
+  if (c.kind === 'voice') return voiceSurface(c);
+  if (c.kind === 'inbox') return listSurface(inbox, fade);
+  if (c.kind === 'threads') return listSurface(threadList, fade);
+  if (c.kind === 'friends') return listSurface(friendsList, fade);
+  return '';
+}
+
+/* skeletons mirror the real layout so nothing jumps when content lands */
+const W = [62,88,45,74,52,81,38,67];
+function skMsg(i){ return `<div class="sk-msg"><span class="sk" style="width:var(--av);height:var(--av);border-radius:50%"></span><div class="sk-lines"><span class="sk" style="width:${90+i*13%60}px;height:12px"></span><span class="sk" style="width:${W[i%8]}%;height:12px"></span>${i%3===0?`<span class="sk" style="width:${W[(i+3)%8]-20}%;height:12px"></span>`:''}</div></div>`; }
+function skeletonFor(c){
+  if (c.kind === 'text') return `<div class="chat" aria-busy="true" aria-label="Loading messages"><div class="chat-main"><div class="scroller" style="display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden">${[0,1,2,3,4,5].map(skMsg).join('')}</div>${composer(c, true)}</div>${state.members && !c.dm ? membersSkeleton() : ''}</div>`;
+  if (c.kind === 'doc') return `<div class="doc" aria-busy="true"><div class="doc-inner"><span class="sk" style="width:55%;height:34px;margin-bottom:14px;display:block"></span><span class="sk" style="width:200px;height:12px;display:block;margin-bottom:38px"></span>${[92,97,70,0,88,95,60].map(w => w ? `<span class="sk" style="width:${w}%;height:13px;display:block;margin-bottom:12px"></span>` : `<span class="sk" style="width:30%;height:20px;display:block;margin:30px 0 14px"></span>`).join('')}</div></div>`;
+  return `<div class="list" aria-busy="true">${[0,1,2,3].map(i => `<div class="lrow"><span class="sk" style="width:32px;height:32px;border-radius:50%"></span><div><span class="sk" style="width:${W[i]}%;height:12px;display:block;margin:3px 0 9px"></span><span class="sk" style="width:${W[i+3]}%;height:11px;display:block"></span></div></div>`).join('')}</div>`;
+}
+function membersSkeleton(){ return `<aside class="members" aria-busy="true" aria-label="Loading members"><span class="sk" style="width:90px;height:10px;display:block;margin:14px 8px 10px"></span>${[0,1,2,3,4,5,6].map(i => `<div class="member"><span class="sk" style="width:28px;height:28px;border-radius:50%"></span><span class="sk" style="width:${W[i]+20}px;height:11px"></span></div>`).join('')}</aside>`; }
+
+function errorSurface(id){
+  const c = channels[id];
+  const what = c.kind === 'doc' ? 'This doc' : c.dm ? 'This conversation' : c.kind === 'text' ? `#${c.name}` : c.name;
+  return `<div class="state" role="alert"><div class="state-card">
+    <div class="state-icon">${icon('alert',20)}</div>
+    <h2>${what} didn't load</h2>
+    <p>The server returned an error. Your other tabs aren't affected${c.kind==='text' ? ", and anything you'd typed here is saved as a draft" : ''}.</p>
+    <div class="btns"><button class="btn primary" data-act="retry-tab" data-id="${id}">${icon('refresh',14)}Try again</button><button class="btn" data-act="copy-err">${icon('copy',14)}Copy details</button></div>
+    <details class="tech"><summary>Technical details</summary><pre>GET /channels/${id}/messages
+502 Bad Gateway  ·  request 7f3a9c21
+at MessageList (Messages/index.tsx:212)</pre></details>
+  </div></div>`;
+}
+
+function msgHtml(m, cont, plain){
+  const p = people[m.author];
+  const reply = m.reply ? messages.general.find(x => x.id === m.reply) : null;
+  const status = m.state === 'failed'
+    ? `<div class="msg-status fail">${icon('alert',14)} Not sent. <button class="link" data-act="resend" data-id="${m.id}">Try again</button><button class="link" data-act="discard" data-id="${m.id}">Delete</button></div>`
+    : m.state === 'pending' && sim.offline ? `<div class="msg-status">${icon('wifi-off',14)} Will send when you're back online</div>` : '';
+  return `<article class="msg ${cont?'cont':''} ${m.mention?'mention':''} ${m.state||''}" data-msg="${m.id}">
+    ${cont ? `<time class="gutter-time">${m.time}</time>` : avatar(m.author)}
+    <div class="msg-main">
+      ${reply ? `<div class="reply-to">${icon('corner',13)}<b>${people[reply.author].name}</b><span>${esc(plainText(reply.html))}</span></div>` : ''}
+      ${cont ? '' : `<header class="msg-head">${nameHtml(p, 'button', 'name', plain)}${p.bot?'<span class="role bot">Bot</span>':''}<time>${m.time}</time></header>`}
+      <div class="msg-text">${m.html}</div>
+      ${m.thread ? `<button class="thread-link" data-act="open" data-id="threads">${stack(m.thread.who)}<b>${m.thread.count} replies</b><span>Last reply ${m.thread.last}</span></button>` : ''}
+      ${m.reactions ? `<div class="reactions">${m.reactions.map(([e,n,mine]) => `<button class="reaction ${mine?'mine':''}" aria-pressed="${!!mine}" aria-label="${e} ${n} reactions">${e}<span>${n}</span></button>`).join('')}<button class="reaction" aria-label="Add reaction">${icon('smile',14)}</button></div>` : ''}
+      ${status}
+    </div>
+    <div class="msg-actions" role="toolbar" aria-label="Message actions"><button class="iconbtn" aria-label="React">${icon('smile')}</button><button class="iconbtn" aria-label="Reply">${icon('reply')}</button><button class="iconbtn" aria-label="Start thread">${icon('thread')}</button><button class="iconbtn" aria-label="More actions">${icon('more')}</button></div>
+  </article>`;
+}
+function brokenHtml(m){
+  return `<div class="broken"><span>${icon('eye',15)}</span><div class="grow">A message from <b>${people[m.author].name}</b> couldn't be displayed. It uses a format this version of Mikoto can't render yet.<details class="tech" style="margin-top:4px"><summary>View source</summary><pre>${esc(m.raw)}</pre></details></div></div>`;
+}
+function messageList(id){
+  const list = messages[id] || [];
+  const c = channels[id];
+  let html = '';
+  if (list.length < 4) html += c.dm
+    ? `<div class="chan-start"><div style="margin-bottom:14px">${avatar(c.dm).replace('class="avatar ', 'style="--av:56px;--h:' + people[c.dm].h + '" class="avatar ')}</div><h2>${c.name}</h2><p>This is the start of your conversation with ${c.name.split(' ')[0]}.</p></div>`
+    : `<div class="chan-start"><div class="big">${icon('hash',24)}</div><h2>#${c.name}</h2><p>This is the start of the channel. ${c.topic}.</p></div>`;
+  if (list.length) html += `<div class="day">Today</div>`;
+  let prev = null;
+  for (const m of list){
+    if (m.broken){ if (sim.broken){ html += brokenHtml(m); prev = null; } continue; }
+    const cont = prev && prev.author === m.author && !m.reply && !prev.state && !m.mention;
+    html += msgHtml(m, cont, !!c.dm);
+    prev = m;
+  }
+  return html;
+}
+function composer(c, disabled){
+  const id = Object.keys(channels).find(k => channels[k] === c);
+  const val = drafts[id] || '';
+  const target = c.dm ? c.name : '#' + c.name;
+  const ph = sim.offline ? `Message ${target}. It'll send when you reconnect.` : `Message ${target}`;
+  return `<div class="composer-wrap">
+    <div class="typing">${id === 'general' && !disabled ? `<span class="dots"><i></i><i></i><i></i></span><span><b>Theo</b> is typing</span>` : ''}</div>
+    <form class="composer" data-act-submit="send" data-id="${id}">
+      <label class="sr" for="c-${id}">Message ${target}</label>
+      <textarea id="c-${id}" rows="1" placeholder="${ph}" data-draft="${id}" ${disabled?'disabled':''}>${esc(val)}</textarea>
+      <div class="composer-bar">
+        <button type="button" class="iconbtn" aria-label="Attach a file">${icon('clip')}</button>
+        <button type="button" class="iconbtn" aria-label="Emoji">${icon('smile')}</button>
+        <span class="hint">Shift+Enter for a new line</span>
+        <span class="grow"></span>
+        <button class="send" type="submit" aria-label="Send" ${val.trim() && !disabled ? '' : 'disabled'}>${icon('up')}</button>
+      </div>
+    </form></div>`;
+}
+function membersPanel(){
+  if (membersState === 'skeleton') return membersSkeleton();
+  if (membersState === 'error') return `<aside class="members"><div class="region-err" role="alert"><b>${icon('alert',15)}Members didn't load</b><p>The rest of the channel still works.</p><button class="btn sm" data-act="retry-members">${icon('refresh',13)}Try again</button></div></aside>`;
+  const grp = (t, ids, off) => `<h3>${t} <span>${ids.length}</span></h3>${ids.map(i => `<button class="member ${off?'off':''}"><span style="position:relative;display:flex">${avatar(i)}${off?'':'<span class="status-dot"></span>'}</span><span style="min-width:0">${nameHtml(people[i],'div','nm')}${people[i].st?`<div class="st">${people[i].st}</div>`:''}</span></button>`).join('')}`;
+  return `<aside class="members" aria-label="Members">${grp('Maintainer',['rin'])}${grp('Style spec',['amara'])}${grp('Contributor',['theo','mika'])}${grp('Online',['juno','sol','pia','ike'])}${grp('Offline',['lev','nadia'],true)}</aside>`;
+}
+function chatSurface(id, fade){
+  const c = channels[id];
+  return `<div class="chat ${fade}"><div class="chat-main"><div class="scroller" data-scroll="${id}" data-chat><div>${messageList(id)}</div></div>${composer(c)}</div>${state.members && !c.dm ? membersPanel() : ''}</div>`;
+}
+function docContent(id){
+  if (id !== 'roadmap'){
+    const c = channels[id];
+    return `<h1>${c.name}</h1><div class="doc-meta">Edited ${c.meta} ago by Rin Okabe</div>
+      <p>${id==='coc' ? 'Tidepool is a project for anyone who makes maps. We expect members to be patient with newcomers, specific when giving feedback, and respectful when they disagree.' : 'Thanks for helping. Most contributions start in #help or #renderer. Open an issue before starting anything that takes more than a day, so nobody duplicates work.'}</p>
+      <h2>${id==='coc' ? 'Reporting' : 'Setting up'}</h2>
+      <p>${id==='coc' ? 'Message any maintainer directly. Reports are read within a day and kept private.' : 'Clone the repo, run <code>pnpm install</code>, then <code>pnpm dev</code>. The example styles live in <code>examples/</code>.'}</p>`;
+  }
+  return `<h1>Roadmap 2027</h1>
+    <div class="doc-meta">${stack(['rin','theo','amara'])}Rin, Theo and Amara are editing</div>
+    <h2>Now</h2>
+    <div class="check done"><span class="box">${icon('check',12)}</span><span class="tx">Tile cache rewrite</span></div>
+    <div class="check"><span class="box"></span><span class="tx">Style spec v3 draft<span class="who">Amara</span></span></div>
+    <div class="check"><span class="box"></span><span class="tx">WebGPU backend behind a flag<span class="who">Rin</span></span></div>
+    <div class="check"><span class="box"></span><span class="tx">Fix line joins above zoom 18<span class="who">Theo</span></span></div>
+    <h2>Next</h2>
+    <p>Offline packs are the most requested feature in #help. We'll ship the pack format first and the downloader UI after, so <span class="hl" style="--c:oklch(.8 .13 190)">third-party apps can build their own</span><span class="caret" style="--c:oklch(.8 .13 190)" data-name="Theo"></span> on top of it.</p>
+    <p>Label placement needs a rethink before v1. The current collision pass is greedy and order-dependent, which is why labels flicker when you pan.</p>
+    <h2>Later</h2>
+    <p>Terrain and hillshading. Not before the WebGPU backend is the default<span class="caret" style="--c:oklch(.78 .14 60)" data-name="Amara"></span>, because the CPU path can't keep up.</p>`;
+}
+function voiceSurface(c){
+  return `<div class="voice"><div class="tiles">${c.people.map((p,i) => `<div class="tile ${i===0?'speaking':''}">${avatar(p)}<span class="tile-name">${p===ME?icon('mic-off',13):''}${people[p].name}${p===ME?' (you)':''}</span></div>`).join('')}</div>
+    <div class="voice-bar"><button class="vbtn" aria-label="Unmute">${icon('mic-off',18)}</button><button class="vbtn" aria-label="Deafen">${icon('headphones',18)}</button><button class="vbtn" aria-label="Share screen">${icon('screen',18)}</button><button class="vbtn leave" aria-label="Leave call" data-act="toast" data-msg="Left Office hours">${icon('phone-off',18)}</button></div></div>`;
+}
+function listSurface(rows, fade){
+  return `<div class="list ${fade}">${rows.map(r => `<button class="lrow ${r.unread?'unread':''}" data-act="open" data-id="${r.open}">${avatar(r.who)}<div style="min-width:0"><div class="t">${r.t}</div><div class="s">${r.s}</div></div><time>${r.time}</time></button>`).join('')}</div>`;
+}
+function newTabSurface(id){
+  const recents = ['help','roadmap','renderer','office','dm-theo'];
+  return `<div class="newtab">
+    <div class="launcher">
+      <div class="launcher-box">${icon('search',18)}<input data-launcher="${id}" placeholder="Jump to a channel, doc or person" aria-label="Jump to a channel, doc or person"><kbd>Ctrl K</kbd></div>
+      <div class="launcher-list" data-results="${id}"><div class="lbl">Recent in Tidepool</div>${recents.map(r => `<button class="row" data-act="open" data-id="${r}" data-prefetch="${r}" data-name="${channels[r].name.toLowerCase()}">${icon(kindIcon(channels[r]))}<span class="l">${channels[r].name}</span><span class="meta">${channels[r].dm?'Direct message':channels[r].kind==='doc'?'Doc':channels[r].kind==='voice'?'Voice':'Channel'}</span></button>`).join('')}<div class="empty" hidden>Nothing matches. Try a channel name or a person.</div></div>
+    </div></div>`;
+}
+
+function settingsSurface(){
+  const seg = (key, opts) => `<div class="seg" role="group">${opts.map(([v,l]) => `<button aria-pressed="${prefs[key]===v}" data-act="pref" data-key="${key}" data-val="${v}">${l}</button>`).join('')}</div>`;
+  const sw = (key, on) => `<button class="switch" role="switch" aria-checked="${on}" data-act="toggle-pref" data-key="${key}" aria-label="${key}"></button>`;
+  const tp = (bg, sb, sh, ln) => `<div class="tprev" style="background:${bg}"><span class="pl"><i style="background:${ln}"></i><i style="background:var(--accent);width:70%"></i><i style="background:${ln};width:80%"></i><i style="background:${ln};width:60%"></i></span><i style="background:${sh};border:1px solid ${ln}"></i></div>`;
+  const accents = [['Periwinkle','#7C8CF8'],['Iris','#A78BFA'],['Tide','#4AB3E0'],['Moss','#5CC98A'],['Ember','#FF8A5B'],['Rose','#F27BB0']];
+  return `<div class="settings">
+    <nav aria-label="Settings sections"><div class="lbl">Account</div>
+      <button class="row">Profile</button><button class="row active">Appearance</button><button class="row">Notifications</button><button class="row">Language</button><button class="row">Privacy and safety</button><button class="row">Bots</button>
+      <div class="lbl">Tidepool</div><button class="row">Overview</button><button class="row">Roles</button><button class="row">Emoji</button><button class="row">Invites</button><button class="row">Bans</button></nav>
+    <div class="settings-body"><div>
+      <h2>Appearance</h2>
+      <p>Changes apply as you make them and are saved on this device.</p>
+      <div class="preview" aria-label="Preview">${msgHtml({author:'amara', time:'10:12', mention:true, html:'<span class="ment">@Mika</span> this is how mentions look with your settings.'})}${msgHtml({author:'mika', time:'10:14', html:'And this is a regular message, with <code>inline code</code>.', reactions:[['👍',2,true]]})}</div>
+      <div class="set stack-v"><div><h3>Theme</h3></div>
+        <div class="theme-cards">
+          <button class="theme-card" aria-pressed="${prefs.theme==='dark'}" data-act="pref" data-key="theme" data-val="dark">${tp('#0E0F11','#0E0F11','#17181B','#2A2B30')}Dark</button>
+          <button class="theme-card" aria-pressed="${prefs.theme==='light'}" data-act="pref" data-key="theme" data-val="light">${tp('#EDEEF0','#EDEEF0','#FFFFFF','#CFD1D6')}Light</button>
+          <button class="theme-card" aria-pressed="${prefs.theme==='system'}" data-act="pref" data-key="theme" data-val="system"><div class="tprev sys"></div>Match system</button>
+        </div></div>
+      <div class="set stack-v"><div><h3>Accent color</h3><p>Your color for Home. Used for focus rings, mentions, unread counts and the send button.</p></div>
+        <div class="swatches">${accents.map(([n,c]) => `<button class="swatch" style="--c:${c}" aria-label="${n}" title="${n}" aria-pressed="${prefs.accent.toLowerCase()===c.toLowerCase()}" data-act="pref" data-key="accent" data-val="${c}"></button>`).join('')}
+          <label class="custom-color"><input type="color" value="${prefs.accent}" data-pref-input="accent" aria-label="Custom accent color">${prefs.accent.toUpperCase()}</label></div></div>
+      <div class="set"><div><h3>Text size</h3><p>Applies to messages, docs and navigation.</p></div><div class="range"><input type="range" min="13" max="17" step="1" value="${prefs.size}" data-pref-input="size" aria-label="Text size"><output>${prefs.size}px</output></div></div>
+      <div class="set stack-v"><div><h3>Typeface</h3><p>Atkinson Hyperlegible is designed for low vision.</p></div><div>${seg('font',[['inter','Inter'],['plex','IBM Plex'],['atkinson','Atkinson'],['onest','Onest'],['system','System']])}</div></div>
+      <div class="set"><div><h3>Density</h3><p>Compact fits more messages on screen.</p></div>${seg('density',[['comfortable','Comfortable'],['compact','Compact']])}</div>
+      <div class="set"><div><h3>Corners</h3></div>${seg('radius',[['sharp','Sharp'],['soft','Soft'],['round','Round']])}</div>
+      <div class="set"><div><h3>Background tint</h3><p>Mix a little of the accent into backgrounds.</p></div>${seg('tint',[['neutral','Neutral'],['subtle','Subtle'],['rich','Rich']])}</div>
+      <div class="set"><div><h3>Space colors</h3><p>Let each space use its own accent while you're in it. Home always uses yours.</p></div>${sw('spaceColors', prefs.spaceColors)}</div>
+      <div class="set"><div><h3>Roles</h3><p>Colors come from each space's roles and are adjusted so names stay readable in both themes.</p></div>${seg('roleStyle',[['color','Colored names'],['tag','Role tags']])}</div>
+      <div class="set"><div><h3>Reduce motion</h3><p>Turns off loading shimmer and fades.</p></div>${sw('motion', prefs.motion==='reduce')}</div>
+      <div class="set" style="border-bottom:1px solid var(--line)"><div><h3>Reset appearance</h3><p>Go back to the default theme, accent and sizes.</p></div><button class="btn" data-act="reset-prefs">Reset</button></div>
+    </div></div></div>`;
+}
+
+/* ═════════════ Render: groups + banner + dev ═════════════ */
+function renderGroups(){
+  // preserve scroll + focus across re-render
+  const scrolls = {};
+  document.querySelectorAll('[data-scroll]').forEach(el => scrolls[el.dataset.scroll] = {top:el.scrollTop, bottom: el.scrollHeight - el.scrollTop - el.clientHeight < 40});
+  const ae = document.activeElement, focusDraft = ae?.dataset?.draft, sel = focusDraft ? [ae.selectionStart, ae.selectionEnd] : null;
+  const settingsScroll = document.querySelector('.settings-body')?.scrollTop;
+
+  const split = state.groups.length > 1;
+  $('#groups').className = 'groups' + (split ? ' split' : '');
+  $('#groups').innerHTML = state.groups.map((g, gi) => `
+    <section class="group ${g.id===state.focused?'focused':''}" data-group="${g.id}" aria-label="Pane ${gi+1}">
+      <div class="tabstrip" role="tablist">
+        ${gi===0 ? `<button class="iconbtn menu-btn" aria-label="Open navigation" data-act="open-nav">${icon('menu')}</button>` : ''}
+        ${g.tabs.map(t => { const c = channels[t], a = g.active === t; const busy = tabState[t]==='pending'||tabState[t]==='skeleton';
+          return `<div class="tab ${a?'active':''}" role="tab" aria-selected="${a}" tabindex="0" data-act="tab" data-group="${g.id}" data-id="${t}" title="${c.name}">${icon(kindIcon(c),14)}<span>${c.name}</span>${c.unread&&!a?'<span class="dot"></span>':''}<button class="tab-x" aria-label="Close ${c.name}" data-act="close" data-group="${g.id}" data-id="${t}">${icon('x',12)}</button></div>`; }).join('')}
+        <button class="iconbtn" aria-label="New tab" data-act="newtab" data-group="${g.id}">${icon('plus')}</button>
+        <span class="spacer"></span>
+        ${gi===state.groups.length-1 ? `<button class="iconbtn split-btn" aria-label="${split?'Merge panes':'Split pane'}" aria-pressed="${split}" data-act="split">${icon('split')}</button>` : ''}
+      </div>
+      <div class="sheet" role="tabpanel">${surface(g.active)}</div>
+    </section>`).join('');
+  justLoaded.clear();
+
+  document.querySelectorAll('[data-scroll]').forEach(el => {
+    const s = scrolls[el.dataset.scroll];
+    if (el.hasAttribute('data-chat') && (!s || s.bottom || !el.dataset.userScrolled)) el.scrollTop = el.scrollHeight;
+    else if (s) el.scrollTop = s.top;
+  });
+  if (settingsScroll) { const sb = document.querySelector('.settings-body'); if (sb) sb.scrollTop = settingsScroll; }
+  document.querySelectorAll('textarea[data-draft]').forEach(autosize);
+  if (focusDraft){ const t = document.querySelector(`textarea[data-draft="${focusDraft}"]`); if (t){ t.focus(); t.setSelectionRange(...sel); } }
+  document.querySelectorAll('canvas[data-dither]').forEach(drawDither);
+}
+function renderBanner(){
+  $('#banner').innerHTML = sim.offline ? `<div class="conn-banner" role="status">${icon('wifi-off')}<span class="grow"><b>You're offline.</b> Reconnecting… Messages you send will go out when the connection is back.</span><button class="btn sm" data-act="reconnect">Reconnect now</button></div>` : '';
+}
+function renderDev(){
+  const t = (k, l) => `<button class="dev-t" data-act="sim" data-key="${k}"><span>${l}</span><span class="switch" role="switch" aria-checked="${sim[k]}"></span></button>`;
+  const closed = $('#dev').classList.contains('closed');
+  $('#dev').innerHTML = `<button class="dev-h" data-act="dev-toggle" aria-expanded="${!closed}">${icon('flask',15)}<span class="grow">Simulate <small>mockup only</small></span><svg class="i chev" width="14" height="14"><use href="#i-down"/></svg></button>
+    <div class="dev-b"><p>Open a channel you haven't visited (like #renderer) to see the loading model. Hover first and it opens instantly.</p>
+      ${t('slow','Slow network')}${t('offline','Connection lost')}${t('failMembers','Member list fails')}${t('broken','Unrenderable message')}${t('failNext','Next send fails')}
+      <div class="btns"><button class="btn sm" data-act="crash">Fail this tab</button><button class="btn sm" data-act="reload">Reload this tab</button></div>
+      <div class="dev-log" id="devlog"></div></div>`;
+  renderDevLog();
+}
+function renderDevLog(){ const el = $('#devlog'); if (el) el.innerHTML = log.map(l => `<div>${esc(l)}</div>`).join('') || '<div>Events show up here.</div>'; }
+function render(){ renderRail(); renderSidebar(); renderBanner(); renderGroups(); }
+
+/* ═════════════ Dither wallpaper ═════════════ */
+const BAYER = [[0,32,8,40,2,34,10,42],[48,16,56,24,50,18,58,26],[12,44,4,36,14,46,6,38],[60,28,52,20,62,30,54,22],[3,35,11,43,1,33,9,41],[51,19,59,27,49,17,57,25],[15,47,7,39,13,45,5,37],[63,31,55,23,61,29,53,21]];
+const hex2rgb = h => { h = h.replace('#',''); if (h.length===3) h = [...h].map(c=>c+c).join(''); const n = parseInt(h,16); return [n>>16&255, n>>8&255, n&255]; };
+const mixc = (a,b,t) => a.map((v,i) => Math.round(v + (b[i]-v)*t));
+function drawDither(cv){
+  const r = cv.getBoundingClientRect(); const px = 3;
+  const w = Math.max(1, Math.ceil(r.width/px)), h = Math.max(1, Math.ceil(r.height/px));
+  cv.width = w; cv.height = h;
+  const dark = resolvedTheme() === 'dark';
+  const bg = hex2rgb(dark ? '#18171F' : '#FFFFFF'), ac = hex2rgb(prefs.accent);
+  const cols = dark ? [bg, mixc(bg,ac,.22), mixc(bg,ac,.55), mixc(ac,[255,255,255],.2)] : [bg, mixc(bg,ac,.2), mixc(bg,ac,.5), mixc(ac,[0,0,0],.1)];
+  const ctx = cv.getContext('2d'), img = ctx.createImageData(w,h), d = img.data;
+  for (let y=0; y<h; y++) for (let x=0; x<w; x++){
+    const nx = x/w, ny = y/h;
+    const ribbon = Math.sin(nx*5.2 + Math.sin(ny*3.4 + nx*2.1)*1.9 - ny*3.1);
+    let v = (0.5 + 0.5*ribbon) * Math.max(0, 1.15 - ny*0.95 + (nx-0.5)*0.5);
+    v = v*0.75 + 0.55*Math.exp(-((nx-0.84)**2 + (ny-0.16)**2)/0.05);
+    v *= 1 - Math.max(0, (ny - 0.55)) * 1.6;
+    v = Math.min(1, Math.max(0, v));
+    const L = cols.length - 1, s = v*L; let i = Math.floor(s);
+    if (s - i > (BAYER[y&7][x&7] + .5)/64) i++;
+    const c = cols[Math.min(L,i)], k = (y*w + x)*4;
+    d[k]=c[0]; d[k+1]=c[1]; d[k+2]=c[2]; d[k+3]=255;
+  }
+  ctx.putImageData(img,0,0);
+}
+
+/* ═════════════ Prefs ═════════════ */
+function applyPrefs(){
+  const root = document.documentElement;
+  root.dataset.theme = resolvedTheme();
+  root.dataset.density = prefs.density; root.dataset.radius = prefs.radius; root.dataset.font = prefs.font; root.dataset.motion = prefs.motion;
+  root.dataset.tint = prefs.tint;
+  const acc = effectiveAccent();
+  root.style.setProperty('--accent', acc);
+  root.style.setProperty('--fs', prefs.size + 'px');
+  const [r,g,b] = hex2rgb(acc).map(v => { v/=255; return v <= .03928 ? v/12.92 : ((v+.055)/1.055)**2.4; });
+  root.style.setProperty('--on-accent', (0.2126*r + 0.7152*g + 0.0722*b) > 0.32 ? '#14121C' : '#FFFFFF');
+  try{ localStorage.setItem('mikoto-mock-prefs-v2', JSON.stringify(prefs)); }catch(e){}
+}
+matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => { if (prefs.theme === 'system'){ applyPrefs(); render(); } });
+
+/* ═════════════ Actions ═════════════ */
+function toast(msg, err){
+  const el = document.createElement('div'); el.className = 'toast' + (err ? ' err' : '');
+  el.innerHTML = `${icon(err ? 'alert' : 'check', 15)}<span>${esc(msg)}</span>`;
+  $('#toasts').appendChild(el); setTimeout(() => el.remove(), 3200);
+}
+function closeNav(){ $('#app').classList.remove('nav-open'); }
+function deliver(m){
+  setTimeout(() => {
+    if (sim.failNext){ m.state = 'failed'; sim.failNext = false; renderDev(); addLog('send failed: 503'); }
+    else delete m.state;
+    render();
+  }, sim.slow ? 1400 : 450);
+}
+function send(id){
+  const text = (drafts[id] || '').trim(); if (!text) return;
+  drafts[id] = '';
+  const m = {id:'u' + (++msgSeq), author:ME, time:nowTime(), html:fmt(text), state:'pending'};
+  (messages[id] ||= []).push(m);
+  render();
+  const s = document.querySelector(`[data-scroll="${id}"]`); if (s) s.scrollTop = s.scrollHeight;
+  if (sim.offline){ queued.push(m); addLog('queued 1 message (offline)'); } else deliver(m);
+}
+function findMsg(mid){ for (const k in messages){ const i = messages[k].findIndex(m => m.id === mid); if (i >= 0) return [messages[k], i]; } return []; }
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const a = el.dataset.act, id = el.dataset.id;
+  const grp = e.target.closest('[data-group]');
+  if (grp && grp.dataset.group !== state.focused && a !== 'close'){ state.focused = grp.dataset.group; }
+  switch (a){
+    case 'open': openTab(id); break;
+    case 'tab': { const g = state.groups.find(x => x.id === el.dataset.group); g.active = id; state.focused = g.id; render(); break; }
+    case 'close': e.stopPropagation(); closeTab(el.dataset.group, id); break;
+    case 'newtab': newTab(el.dataset.group); break;
+    case 'newtab-focused': newTab(state.focused); closeNav(); break;
+    case 'split': toggleSplit(); break;
+    case 'members': state.members = !state.members; render(); break;
+    case 'collapse': state.collapsed[el.dataset.name] = !state.collapsed[el.dataset.name]; renderSidebar(); break;
+    case 'docmode': state.docMode[id] = el.dataset.mode; render(); break;
+    case 'retry-tab': load(id); break;
+    case 'copy-err': navigator.clipboard?.writeText('502 Bad Gateway request 7f3a9c21').catch(()=>{}); toast('Copied error details'); break;
+    case 'retry-members': sim.failMembers = false; renderDev(); membersState = 'skeleton'; render(); setTimeout(() => { membersState = 'ready'; render(); }, Math.max(450, latency())); break;
+    case 'resend': { const [arr, i] = findMsg(id); if (arr){ arr[i].state = 'pending'; render(); deliver(arr[i]); } break; }
+    case 'discard': { const [arr, i] = findMsg(id); if (arr){ arr.splice(i,1); render(); toast('Message deleted'); } break; }
+    case 'reconnect': sim.offline = false; renderDev(); render(); queued.splice(0).forEach(deliver); toast('Reconnected'); addLog('reconnected, flushing queue'); break;
+    case 'pref': prefs[el.dataset.key] = el.dataset.val; applyPrefs(); render(); break;
+    case 'toggle-pref': { const k = el.dataset.key; if (k === 'motion') prefs.motion = prefs.motion === 'reduce' ? 'full' : 'reduce'; else prefs[k] = !prefs[k]; applyPrefs(); render(); break; }
+    case 'reset-prefs': prefs = {...DEFAULT_PREFS}; applyPrefs(); render(); toast('Appearance reset'); break;
+    case 'toast': toast(el.dataset.msg); break;
+    case 'other-space': toast('This mockup only includes Home and Tidepool'); break;
+    case 'home': state.context = 'home'; applyPrefs(); render(); break;
+    case 'space': state.context = 'tidepool'; applyPrefs(); render(); break;
+    case 'open-nav': $('#app').classList.add('nav-open'); break;
+    case 'close-nav': closeNav(); break;
+    case 'dev-toggle': $('#dev').classList.toggle('closed'); renderDev(); break;
+    case 'sim': {
+      const k = el.dataset.key; sim[k] = !sim[k]; renderDev();
+      if (k === 'failMembers') membersState = sim.failMembers ? 'error' : 'ready';
+      if (k === 'offline'){ addLog(sim.offline ? 'socket closed (1006)' : 'reconnected'); if (!sim.offline) queued.splice(0).forEach(deliver); }
+      render(); break;
+    }
+    case 'crash': { const g = focusedGroup(); const c = channels[g.active]; if (['newtab','settings'].includes(c.kind)) { toast('Pick a channel or doc tab first', true); break; } tabState[g.active] = 'error'; addLog(`tab ${c.name} threw`); render(); break; }
+    case 'reload': { const g = focusedGroup(); if (['newtab','settings'].includes(channels[g.active].kind)) break; cache.delete(g.active); load(g.active); addLog(`reload ${channels[g.active].name}`); break; }
+    default: if (grp) render();
+  }
+});
+// focusing a pane by clicking anywhere in it
+document.addEventListener('pointerdown', e => {
+  const g = e.target.closest('[data-group]');
+  if (g && g.dataset.group !== state.focused && !e.target.closest('[data-act]')){ state.focused = g.dataset.group; renderSidebar(); document.querySelectorAll('.group').forEach(x => x.classList.toggle('focused', x.dataset.group === state.focused)); }
+});
+document.addEventListener('submit', e => { const f = e.target.closest('[data-act-submit]'); if (f){ e.preventDefault(); send(f.dataset.id); } });
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.draft){ drafts[t.dataset.draft] = t.value; autosize(t); const b = t.form.querySelector('.send'); b.disabled = !t.value.trim(); }
+  if (t.dataset.launcher){
+    const q = t.value.toLowerCase().trim(), box = document.querySelector(`[data-results="${t.dataset.launcher}"]`);
+    let n = 0; box.querySelectorAll('.row').forEach(r => { const show = !q || r.dataset.name.includes(q); r.hidden = !show; n += show; });
+    box.querySelector('.empty').hidden = n > 0;
+    box.querySelector('.lbl').textContent = q ? 'Results' : 'Recent in Tidepool';
+  }
+  if (t.dataset.prefInput){
+    const k = t.dataset.prefInput; prefs[k] = k === 'size' ? +t.value : t.value; applyPrefs();
+    if (k === 'size') t.nextElementSibling.textContent = t.value + 'px';
+    if (k === 'accent'){ t.parentElement.lastChild.textContent = t.value.toUpperCase(); document.querySelectorAll('canvas[data-dither]').forEach(drawDither); }
+  }
+});
+document.addEventListener('change', e => { if (e.target.dataset.prefInput) render(); });
+document.addEventListener('keydown', e => {
+  const t = e.target;
+  if (t.dataset?.draft && e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send(t.dataset.draft); }
+  if (t.dataset?.launcher && e.key === 'Enter'){ const first = document.querySelector(`[data-results="${t.dataset.launcher}"] .row:not([hidden])`); if (first) first.click(); }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'){ e.preventDefault(); newTab(state.focused); }
+  if (e.key === 'Enter' && t.classList?.contains('tab')) t.click();
+  if (e.key === 'Escape') closeNav();
+});
+let hoverT;
+document.addEventListener('pointerover', e => { const r = e.target.closest('[data-prefetch]'); clearTimeout(hoverT); if (r) hoverT = setTimeout(() => prefetch(r.dataset.prefetch), 120); });
+function autosize(t){ t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 220) + 'px'; }
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => document.querySelectorAll('canvas[data-dither]').forEach(drawDither), 120); });
+
+/* ═════════════ Boot ═════════════ */
+applyPrefs();
+$('#dev').classList.add('closed');
+renderDev();
+render();
+document.fonts?.ready.then(() => render());
+</script>
+</body>
+</html>

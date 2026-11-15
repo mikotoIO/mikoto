@@ -1,7 +1,7 @@
 import { MessageExt, MikotoClient } from '@mikoto-io/mikoto.js';
 
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
-import { toaster } from '@/components/ui/toaster';
+import { toast } from '@/design';
 
 export type NotificationMode = 'none' | 'native' | 'toast';
 
@@ -52,12 +52,7 @@ function showNotification(title: string, body: string, icon?: string) {
   if (mode === 'none') return;
 
   if (mode === 'toast') {
-    toaster.create({
-      title,
-      description: body,
-      type: 'info',
-      duration: 3000,
-    });
+    toast({ title, description: body, type: 'info', timeout: 3000 });
     playSound();
     return;
   }

@@ -171,7 +171,9 @@ export class ChannelManager extends CachedManager<MikotoChannel> {
       client.channels._insert(new MikotoChannel(data, client));
       if (data.spaceId) {
         const space = client.spaces.cache.get(data.spaceId);
-        if (space) space.channelIds.push(data.id);
+        if (space && !space.channelIds.includes(data.id)) {
+          space.channelIds.push(data.id);
+        }
       }
     });
 

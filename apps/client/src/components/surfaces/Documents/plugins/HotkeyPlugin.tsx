@@ -1,53 +1,64 @@
-import { $convertToMarkdownString, TRANSFORMERS } from '@lexical/markdown';
+import { $convertToMarkdownString } from '@lexical/markdown';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { COMMAND_PRIORITY_NORMAL, KEY_DOWN_COMMAND } from 'lexical';
-import { useEffect } from 'react';
-import { toast } from 'react-toastify';
+import { useEffect, useRef } from 'react';
 
-function saveWithToast(channel: MikotoChannel, content: string) {
+import { describeError, toast } from '@/design';
+
+import { DOCUMENT_TRANSFORMERS } from '../transformers';
+
+async function saveWithToast(channel: MikotoChannel, content: string) {
   if (!channel.spaceId) return;
-  const promise = channel.client.rest['documents.update'](
-    { content },
-    {
-      params: {
-        spaceId: channel.spaceId,
-        channelId: channel.id,
+  const id = toast({ type: 'loading', title: 'Saving doc…' });
+  try {
+    await channel.client.rest['documents.update'](
+      { content },
+      {
+        params: {
+          spaceId: channel.spaceId,
+          channelId: channel.id,
+        },
       },
-    },
-  );
-  toast.promise(promise, {
-    pending: 'Saving...',
-    success: 'Saved!',
-    error: 'Failed to save :(',
-  });
+    );
+    toast.update(id, { type: 'success', title: 'Doc saved' });
+  } catch (err) {
+    toast.update(id, {
+      type: 'error',
+      title: "Couldn't save the doc",
+      description: `${describeError(err, { context: 'action' }).message} Your edits are still here.`,
+    });
+  }
 }
 
+/** Ctrl/Cmd+S saves the doc right away instead of waiting for autosave. */
 export function HotkeyPlugin({ channel }: { channel: MikotoChannel }) {
   const [editor] = useLexicalComposerContext();
-
-  const COMMAND_MAP: Record<string, (event: KeyboardEvent) => boolean> = {
-    s: (event) => {
-      event.preventDefault();
-      const content = $convertToMarkdownString(TRANSFORMERS);
-      saveWithToast(channel, content);
-      return false;
-    },
-  };
+  const channelRef = useRef(channel);
+  channelRef.current = channel;
 
   useEffect(
     () =>
       editor.registerCommand(
         KEY_DOWN_COMMAND,
         (event) => {
-          if (!event.ctrlKey) return false;
-          const command = COMMAND_MAP[event.key];
-          if (command) return command(event);
-          return false;
+          if (!(event.ctrlKey || event.metaKey) || event.key !== 's') {
+            return false;
+          }
+          event.preventDefault();
+          // Same conversion as autosave, so checklists, images and blank
+          // lines round-trip identically.
+          const content = $convertToMarkdownString(
+            DOCUMENT_TRANSFORMERS,
+            undefined,
+            true,
+          );
+          void saveWithToast(channelRef.current, content);
+          return true;
         },
         COMMAND_PRIORITY_NORMAL,
       ),
     [editor],
   );
-  return <></>;
+  return null;
 }

@@ -1,0 +1,177 @@
+.layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  position: sticky;
+  top: 0;
+}
+.listHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 var(--space-2) var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--faint);
+}
+.roleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: var(--row);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--r-ctl);
+  background: none;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  text-align: left;
+  white-space: nowrap;
+}
+.roleRow:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+.roleRow:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.roleRow[aria-current='true'] {
+  background: var(--raised);
+  color: var(--text);
+}
+.roleName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* the dot shows the raw role color, clamped like names are */
+.dot {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+.dotColored {
+  background: oklch(from var(--role) var(--role-l) var(--role-c) h);
+}
+
+.editor {
+  min-width: 0;
+}
+.editorTitle {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+}
+
+.colors {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.swatch {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--c);
+}
+.swatch[aria-pressed='true'] {
+  box-shadow:
+    0 0 0 2px var(--sheet),
+    0 0 0 4px var(--c);
+}
+.swatch:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+.noColor {
+  display: grid;
+  place-items: center;
+  background: var(--raised);
+  color: var(--muted);
+  border: 1px dashed var(--line-strong);
+}
+.noColor[aria-pressed='true'] {
+  box-shadow:
+    0 0 0 2px var(--sheet),
+    0 0 0 4px var(--line-strong);
+}
+.custom {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 30px;
+  padding: 0 10px 0 4px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-ctl);
+  font: var(--text-sm) var(--font-mono);
+  color: var(--muted);
+  cursor: pointer;
+}
+.custom input {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+.custom input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.custom input::-webkit-color-swatch {
+  border: 0;
+  border-radius: 6px;
+}
+.custom input::-moz-color-swatch {
+  border: 0;
+  border-radius: 6px;
+}
+
+.preview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: calc(var(--r-ctl) + 2px);
+}
+.previewName {
+  font-weight: 600;
+}
+.previewItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.position {
+  width: 96px;
+}
+
+@container (max-width: 720px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+  .list {
+    position: static;
+  }
+}

@@ -1,100 +1,109 @@
-import { Box, Link } from '@chakra-ui/react';
-import styled from '@emotion/styled';
 import { useSetAtom } from 'jotai';
+import { ExternalLink, ImageOff, Link2Off } from 'lucide-react';
 import { Suspense, lazy, useState } from 'react';
 import type { Components } from 'react-markdown';
 
 import { modalState } from '@/components/ContextMenu';
-import { DialogContent } from '@/components/ui';
+import { DialogContent, ItemErrorBoundary } from '@/design';
 
-import { highlightTheme } from './rules/CodeBlock/highlightTheme';
+import styles from './Markdown.module.css';
 
 const CodeHighlight = lazy(() => import('./rules/CodeBlock/CodeHighlight'));
 const EmojiElement = lazy(() => import('./EmojiElement'));
 
-const StyledMessageImage = styled.img`
-  width: 100%;
-`;
-
-const MImage = styled.img`
-  border-radius: 4px;
-  cursor: pointer;
-`;
-
-function MessageImage({ src, alt }: { src?: string; alt?: string }) {
-  const setModal = useSetAtom(modalState);
-
+function ImagePreview({ src, alt }: { src: string; alt?: string }) {
   return (
-    <MImage
-      src={src}
-      alt={alt}
-      onClick={() => {
-        setModal({
-          elem: (
-            <DialogContent p={0} width="480px" bg="transparent">
-              <Box mb={2}>
-                <Link href={src} target="_blank" color="gray.100">
-                  Open in Browser
-                </Link>
-              </Box>
-              <StyledMessageImage src={src} alt={alt} />
-            </DialogContent>
-          ),
-        });
-      }}
-    />
+    <DialogContent
+      size="lg"
+      title={alt || 'Image'}
+      footer={
+        <a
+          href={src}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.openLink}
+        >
+          <ExternalLink size={14} aria-hidden />
+          Open original
+        </a>
+      }
+    >
+      <img className={styles.lightbox} src={src} alt={alt ?? ''} />
+    </DialogContent>
   );
 }
 
-const MentionSpan = styled.span`
-  background-color: #7591ff80;
-  border-radius: 4px;
-  padding: 0 2px;
-`;
+/**
+ * An image in a message. Clicking opens a larger preview; a broken URL shows
+ * a muted placeholder instead of the browser's broken-image icon.
+ */
+export function MessageImage({ src, alt }: { src?: string; alt?: string }) {
+  const setModal = useSetAtom(modalState);
+  const [failed, setFailed] = useState<string | null>(null);
+
+  if (!src || failed === src) {
+    return (
+      <span className={styles.imageMissing} role="img" aria-label={alt}>
+        <ImageOff size={16} aria-hidden />
+        {alt && alt !== 'Image Embed' ? alt : "This image couldn't be loaded"}
+      </span>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      className={styles.imageButton}
+      aria-label={alt ? `Open image: ${alt}` : 'Open image'}
+      onClick={() => {
+        setModal({ elem: <ImagePreview src={src} alt={alt} /> });
+      }}
+    >
+      <img
+        className={styles.image}
+        src={src}
+        alt={alt ?? ''}
+        loading="lazy"
+        onError={() => setFailed(src)}
+      />
+    </button>
+  );
+}
 
 function Spoiler({ children }: { children: React.ReactNode }) {
   const [hidden, setHidden] = useState(true);
   return (
-    <Box
-      display="inline-block"
-      backgroundColor={hidden ? 'gray.900' : 'gray.650'}
-      color={hidden ? 'transparent' : 'text'}
-      px={1}
-      borderRadius="4px"
-      cursor="pointer"
-      onClick={() => {
-        setHidden(!hidden);
-      }}
+    <button
+      type="button"
+      className={styles.spoiler}
+      aria-pressed={!hidden}
+      aria-label={hidden ? 'Spoiler, select to reveal' : undefined}
+      onClick={() => setHidden((h) => !h)}
     >
       {children}
-    </Box>
+    </button>
   );
 }
 
 function ObjectNotFound({ resource }: { resource: string }) {
   return (
-    <Box m={1} p={4} bg="gray.800" rounded="md" maxW="300px">
-      Object not found: {resource}
-    </Box>
+    <span className={styles.notFound}>
+      <Link2Off size={14} aria-hidden />
+      Can't show this {resource} link
+    </span>
   );
 }
 
-const CodeBlockWrapper = styled.div`
-  pre {
-    margin: 0;
-    text-wrap: wrap;
-  }
-  padding: 16px;
-  margin: 0;
-  background-color: ${highlightTheme.hljs.background};
-  color: ${highlightTheme.hljs.color};
-  border-radius: 4px;
-  max-width: 800px;
-
-  & > div {
-    padding: 0 !important;
-  }
-`;
+/** Small boundary so one bad embed doesn't take down its message. */
+function EmbedBoundary({
+  what,
+  children,
+}: {
+  what: string;
+  children: React.ReactNode;
+}) {
+  return <ItemErrorBoundary what={what}>{children}</ItemErrorBoundary>;
+}
 
 export const markdownComponents: Partial<Components> = {
   a({ href, children }) {
@@ -106,18 +115,25 @@ export const markdownComponents: Partial<Components> = {
       }
     }
     return (
-      <Link href={href ?? '#'} target="_blank">
+      <a href={href ?? '#'} target="_blank" rel="noopener noreferrer">
         {children}
-      </Link>
+      </a>
     );
   },
 
   img({ src, alt }) {
-    return <MessageImage src={src} alt={alt} />;
+    return (
+      <EmbedBoundary what="This image">
+        <MessageImage
+          src={typeof src === 'string' ? src : undefined}
+          alt={alt}
+        />
+      </EmbedBoundary>
+    );
   },
 
   pre({ children }) {
-    return <CodeBlockWrapper>{children}</CodeBlockWrapper>;
+    return <div className={styles.codeBlock}>{children}</div>;
   },
 
   code({ className, children }) {
@@ -125,16 +141,17 @@ export const markdownComponents: Partial<Components> = {
     if (langMatch) {
       const language = langMatch[1];
       const content = String(children).replace(/\n$/, '');
+      const plain = (
+        <pre>
+          <code>{content}</code>
+        </pre>
+      );
       return (
-        <Suspense
-          fallback={
-            <pre>
-              <code>{content}</code>
-            </pre>
-          }
-        >
-          <CodeHighlight language={language} content={content} />
-        </Suspense>
+        <EmbedBoundary what="This code block">
+          <Suspense fallback={plain}>
+            <CodeHighlight language={language} content={content} />
+          </Suspense>
+        </EmbedBoundary>
       );
     }
     return <code>{children}</code>;
@@ -143,12 +160,12 @@ export const markdownComponents: Partial<Components> = {
   // Custom elements mapped from remark plugins via data.hName
   // @ts-expect-error custom element
   mention({ username }: { username: string }) {
-    return <MentionSpan>@{username}</MentionSpan>;
+    return <span className={styles.mention}>@{username}</span>;
   },
 
   'emoji-shortcode'({ emoji }: { emoji: string }) {
     return (
-      <Suspense>
+      <Suspense fallback={`:${emoji}:`}>
         <EmojiElement emoji={emoji} />
       </Suspense>
     );

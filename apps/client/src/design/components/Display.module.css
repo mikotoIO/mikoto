@@ -1,0 +1,178 @@
+.badge {
+  display: inline-block;
+  min-width: 20px;
+  padding: 4px 6px;
+  border-radius: var(--r-pill);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  flex-shrink: 0;
+}
+.mention {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------------- tag */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  align-self: center;
+}
+.neutral {
+  background: var(--raised);
+  color: var(--muted);
+}
+.accent {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+.danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+.ok {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+.warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+/* role colors: hue from the space, lightness/chroma clamped per theme
+   (--role-l / --role-c in tokens.css) so text always clears WCAG AA */
+.roleColor {
+  color: var(--text);
+  color: oklch(from var(--role) var(--role-l) var(--role-c) h);
+}
+.roleTag {
+  background: var(--raised);
+  color: var(--muted);
+  background: oklch(from var(--role) l c h / 0.16);
+  color: oklch(from var(--role) var(--role-l) var(--role-c) h);
+}
+
+.kbd {
+  font: 500 var(--text-xs) var(--font-ui);
+  color: var(--muted);
+  border: 1px solid var(--line-strong);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  padding: 1px 6px;
+  background: var(--sheet);
+}
+
+/* -------------------------------------------------------- pane header */
+.paneHeader {
+  height: 50px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 0 10px 0 18px;
+  border-bottom: 1px solid var(--line);
+}
+.paneTitle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  margin: 0;
+  font-size: calc(var(--text-md) + 1px);
+  font-weight: 600;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.paneIcon {
+  display: flex;
+  color: var(--faint);
+}
+.paneTopic {
+  flex: 1;
+  min-width: 0;
+  padding-left: 10px;
+  border-left: 1px solid var(--line);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.paneActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* -------------------------------------------------------- page/section */
+.pageTitle {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+.pageTitle h2 {
+  font-size: var(--text-2xl);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  margin: 0 0 6px;
+}
+.pageTitle p {
+  color: var(--muted);
+  margin: 0;
+}
+.pageActions {
+  display: flex;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5) 0;
+  border-top: 1px solid var(--line);
+}
+.sectionHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.sectionHead h3 {
+  font-size: var(--text-md);
+  font-weight: 600;
+  margin: 0;
+}
+.sectionHead p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}

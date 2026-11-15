@@ -1,85 +1,86 @@
-import { Button } from '@chakra-ui/react';
-import styled from '@emotion/styled';
 import { Invite, MikotoSpace } from '@mikoto-io/mikoto.js';
+import { Share2 } from 'lucide-react';
 import { useState } from 'react';
 
-import { DialogContent } from '@/components/ui';
-import '@/components/ui';
+import { CopyField } from '@/components/surfaces/settings/common';
+import { Button, DialogClose, DialogContent, Field } from '@/design';
 import { env } from '@/env';
 import { useMikoto } from '@/hooks';
-
-const InviteLink = styled.button`
-  width: 100%;
-  font-size: 14px;
-  border-radius: 4px;
-  display: block;
-  padding: 16px;
-  margin-bottom: 8px;
-  border: none;
-  color: var(--chakra-colors-white);
-  background-color: var(--chakra-colors-gray-800);
-  font-family: var(--chakra-fonts-code);
-
-  &:hover {
-    background-color: var(--chakra-colors-gray-850);
-  }
-`;
+import { useErrorElement } from '@/hooks/useErrorElement';
 
 export function InviteModal({ space }: { space: MikotoSpace }) {
   const [invite, setInvite] = useState<Invite | null>(null);
+  const [creating, setCreating] = useState(false);
   const mikoto = useMikoto();
-  const link = invite
-    ? `${env.PUBLIC_FRONTEND_URL}/invite/${invite.id}`
-    : undefined;
+  const error = useErrorElement();
+  const link = invite ? `${env.PUBLIC_FRONTEND_URL}/invite/${invite.id}` : null;
+  const canShare = typeof navigator.share === 'function';
+
+  const create = async () => {
+    setCreating(true);
+    error.setError(null);
+    try {
+      setInvite(
+        await mikoto.rest['invites.create'](
+          {},
+          { params: { spaceId: space.id } },
+        ),
+      );
+    } catch (e) {
+      error.setError(e);
+    } finally {
+      setCreating(false);
+    }
+  };
 
   return (
-    <DialogContent rounded="md" p={4} maxW="400px">
-      <div>
-        {!invite ? (
-          <Button
-            colorPalette="primary"
-            type="button"
-            onClick={() => {
-              mikoto.rest['invites.create'](
-                {},
-                {
-                  params: { spaceId: space.id },
-                },
-              ).then((x) => {
-                setInvite(x);
-              });
-            }}
-          >
-            Generate
-          </Button>
+    <DialogContent
+      size="sm"
+      title={`Invite people to ${space.name}`}
+      description={
+        link
+          ? 'Anyone with this link can join. You can delete it later in space settings.'
+          : 'Create a link that anyone can use to join this space.'
+      }
+      footer={
+        link ? (
+          <>
+            {canShare && (
+              <Button
+                onClick={() => {
+                  navigator
+                    .share({ title: `Join ${space.name} on Mikoto`, url: link })
+                    .catch(() => {
+                      // Share sheet dismissed: nothing to do.
+                    });
+                }}
+              >
+                <Share2 size={15} aria-hidden />
+                Share
+              </Button>
+            )}
+            <DialogClose render={<Button variant="primary" />}>
+              Done
+            </DialogClose>
+          </>
         ) : (
           <>
-            <h1>Invite Link</h1>
-            <InviteLink
-              className="invite-link"
-              type="button"
-              onClick={() => {
-                // copy to clipboard
-                navigator.clipboard.writeText(link ?? '');
-              }}
-            >
-              {link}
-            </InviteLink>
-            <Button
-              type="button"
-              colorPalette="primary"
-              onClick={() => {
-                navigator.share({
-                  title: `Invite to ${space.name} on Mikoto`,
-                  url: link,
-                });
-              }}
-            >
-              Share
+            <DialogClose render={<Button variant="ghost" />}>
+              Cancel
+            </DialogClose>
+            <Button variant="primary" loading={creating} onClick={create}>
+              Create invite link
             </Button>
           </>
-        )}
-      </div>
+        )
+      }
+    >
+      {error.el}
+      {link && (
+        <Field label="Invite link">
+          <CopyField value={link} what="Invite link" />
+        </Field>
+      )}
     </DialogContent>
   );
 }

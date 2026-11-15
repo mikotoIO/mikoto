@@ -12,10 +12,14 @@ import {
   SerializedLexicalNode,
   Spread,
 } from 'lexical';
+import { ImageOff } from 'lucide-react';
 import { Resizable } from 're-resizable';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
 
 import { normalizeMediaUrl } from '@/components/atoms/Avatar';
+import { cx } from '@/design';
+
+import styles from './ImageNode.module.css';
 
 type SerializedImageNode = Spread<
   {
@@ -54,32 +58,32 @@ function ImageComponent({
     [editor, nodeKey],
   );
 
-  const img = (
+  // Keyed by src, so a new src (e.g. after an undo) gets a fresh attempt.
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const failed = failedSrc === src;
+
+  const img = failed ? (
+    <span className={styles.broken} role="img" aria-label={altText || 'Image'}>
+      <ImageOff size={16} aria-hidden />
+      <span>
+        {altText
+          ? `“${altText}” couldn't be loaded.`
+          : "This image couldn't be loaded."}
+      </span>
+    </span>
+  ) : (
     <img
       src={normalizeMediaUrl(src)}
       alt={altText}
-      className="editor-image"
+      className={cx(styles.img, width ? styles.sized : styles.auto)}
       draggable={false}
-      style={{
-        display: 'block',
-        borderRadius: '6px',
-        width: width ? '100%' : 'auto',
-        height: 'auto',
-        maxWidth: '100%',
-        maxHeight: width ? undefined : '60vh',
-      }}
+      onError={() => setFailedSrc(src)}
     />
   );
 
   if (!isEditable) {
     return (
-      <span
-        style={{
-          display: 'inline-block',
-          maxWidth: '100%',
-          width: width ?? 'auto',
-        }}
-      >
+      <span className={styles.frame} style={{ width: width ?? 'auto' }}>
         {img}
       </span>
     );
@@ -101,6 +105,7 @@ function ImageComponent({
         right: true,
         bottomRight: true,
       }}
+      handleClasses={{ right: styles.handle, bottomRight: styles.handle }}
       handleStyles={{
         right: {
           width: 6,
@@ -182,8 +187,8 @@ export class ImageNode extends DecoratorNode<ReactNode> {
 
   createDOM(config: EditorConfig): HTMLElement {
     const span = document.createElement('span');
-    const theme = config.theme as { image?: string };
-    if (theme.image) span.className = theme.image;
+    const { image } = config.theme;
+    if (typeof image === 'string') span.className = image;
     return span;
   }
 

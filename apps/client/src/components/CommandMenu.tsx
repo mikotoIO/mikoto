@@ -1,97 +1,60 @@
-import { Box } from '@chakra-ui/react';
-import styled from '@emotion/styled';
-import { faEnvelope, faHashtag } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoChannel } from '@mikoto-io/mikoto.js';
 import { Command } from 'cmdk';
 import { atom, useAtom, useSetAtom } from 'jotai';
-import { useEffect, useMemo } from 'react';
+import { Search } from 'lucide-react';
+import { type ReactNode, useEffect } from 'react';
 import { useSnapshot } from 'valtio/react';
 
+import { Avatar } from '@/components/atoms/Avatar';
+import { SpaceIcon } from '@/components/atoms/SpaceIcon';
+import {
+  channelKindLabel,
+  getIconFromChannelType,
+  tryChannelToTab,
+} from '@/components/surfaces/Explorer/channelToTab';
+import { Kbd, describeError, toast } from '@/design';
 import { useMikoto } from '@/hooks';
 import { treebarSpaceState } from '@/store';
 import { useTabkit } from '@/store/surface';
 
-import { channelToTab } from './surfaces/Explorer/channelToTab';
+import styles from './CommandMenu.module.css';
 
 export const commandMenuOpenAtom = atom(false);
 
-const Dialog = styled(Command.Dialog)`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1000;
-  background: rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
+const IS_MAC =
+  typeof navigator !== 'undefined' &&
+  /Mac|iPhone|iPad/.test(navigator.userAgent);
 
-const Input = styled(Command.Input)`
-  width: 100%;
-  padding: 16px;
-  font-size: 14px;
-  border: none;
-  border-radius: 4px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  background-color: var(--chakra-colors-gray-750);
+function Item({
+  value,
+  keywords,
+  icon,
+  label,
+  meta,
+  onSelect,
+}: {
+  value: string;
+  keywords: string[];
+  icon: ReactNode;
+  label: ReactNode;
+  meta?: ReactNode;
+  onSelect: () => void;
+}) {
+  return (
+    <Command.Item
+      className={styles.item}
+      value={value}
+      keywords={keywords}
+      onSelect={onSelect}
+    >
+      <span className={styles.itemIcon}>{icon}</span>
+      <span className={styles.itemLabel}>{label}</span>
+      {meta && <span className={styles.itemMeta}>{meta}</span>}
+    </Command.Item>
+  );
+}
 
-  &:focus {
-    outline: none;
-  }
-`;
-
-const StyledItem = styled(Command.Item)`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-
-  &[data-selected='true'] {
-    background-color: var(--chakra-colors-gray-800);
-  }
-
-  &:hover {
-    background-color: var(--chakra-colors-gray-700);
-  }
-`;
-
-const StyledGroup = styled(Command.Group)`
-  [cmdk-group-heading] {
-    font-size: 12px;
-    color: var(--chakra-colors-gray-400);
-    padding: 8px 12px 4px;
-    text-transform: uppercase;
-  }
-`;
-
-const StyledList = styled(Command.List)`
-  max-height: 320px;
-  overflow-y: auto;
-`;
-
-const SpaceIcon = styled.div<{ icon?: string }>`
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  background-color: var(--chakra-colors-gray-600);
-  background-image: ${(props) => (props.icon ? `url(${props.icon})` : 'none')};
-  background-size: cover;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-heading);
-  font-size: 12px;
-  font-weight: 600;
-`;
-
+/** The global launcher (Ctrl/⌘ K): jump to a space, channel or DM. */
 export function CommandMenuKit() {
   const [open, setOpen] = useAtom(commandMenuOpenAtom);
   const mikoto = useMikoto();
@@ -102,27 +65,21 @@ export function CommandMenuKit() {
   useSnapshot(mikoto.spaces);
   useSnapshot(mikoto.relationships.cache);
 
-  // Get all spaces
-  const spaces = useMemo(() => {
-    const spaceList = Array.from(mikoto.spaces.cache.values());
-    return spaceList.filter((space) => space.type === 'NONE');
-  }, [mikoto.spaces.cache.size]);
-
-  // Get DM friends
+  const spaces = Array.from(mikoto.spaces.cache.values()).filter(
+    (space) => space.type === 'NONE',
+  );
   const dmFriends = mikoto.relationships.friends.filter((f) => f.channelId);
 
-  // Toggle the menu when ⌘K is pressed
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+      if (e.key.toLowerCase() === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen((open) => !open);
+        setOpen((o) => !o);
       }
     };
-
     document.addEventListener('keydown', down);
     return () => document.removeEventListener('keydown', down);
-  }, []);
+  }, [setOpen]);
 
   const navigateToSpace = (spaceId: string) => {
     setLeftSidebar({
@@ -134,99 +91,131 @@ export function CommandMenuKit() {
   };
 
   const openChannel = (spaceId: string, channel: MikotoChannel) => {
-    // Navigate to the space
+    const tab = tryChannelToTab(channel);
+    setOpen(false);
+    if (!tab) {
+      toast({
+        type: 'error',
+        title: `Couldn't open #${channel.name}`,
+        description:
+          "This channel type isn't supported by this version of Mikoto. Reload to update.",
+      });
+      return;
+    }
     setLeftSidebar({
       kind: 'explorer',
       key: `explorer/${spaceId}`,
       spaceId,
     });
-    // Open the channel as a tab
-    const tab = channelToTab(channel);
     tabkit.openTab(tab, tabkit.getTabs().length > 0);
-    setOpen(false);
   };
 
   const openDm = async (friend: (typeof dmFriends)[number]) => {
-    const channel = await friend.openDm();
-    setLeftSidebar(null);
-    tabkit.openTab(
-      { kind: 'textChannel', key: channel.id, channelId: channel.id },
-      tabkit.getTabs().length > 0,
-    );
     setOpen(false);
+    try {
+      const channel = await friend.openDm();
+      setLeftSidebar(null);
+      tabkit.openTab(
+        { kind: 'textChannel', key: channel.id, channelId: channel.id },
+        tabkit.getTabs().length > 0,
+      );
+    } catch (err) {
+      toast({
+        type: 'error',
+        title: `Couldn't open your conversation with ${friend.user.name}`,
+        description: describeError(err, { context: 'action' }).message,
+      });
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen} label="Global Command Menu">
-      <Box bg="surface" rounded="md" maxW="60%" w="600px" maxH="400px">
-        <Input placeholder="Search spaces and channels..." />
-        <Box p={2}>
-          <StyledList>
-            <Command.Empty>No matching results</Command.Empty>
+    <Command.Dialog
+      open={open}
+      onOpenChange={setOpen}
+      label="Jump to a channel, space or person"
+      overlayClassName={styles.overlay}
+      contentClassName={styles.content}
+      className={styles.command}
+      loop
+    >
+      <div className={styles.box}>
+        <Search size={18} aria-hidden />
+        <Command.Input
+          className={styles.input}
+          placeholder="Jump to a channel, space or person"
+        />
+        <Kbd>{IS_MAC ? '⌘ K' : 'Ctrl K'}</Kbd>
+      </div>
+      <Command.List className={styles.list}>
+        <Command.Empty className={styles.empty}>
+          Nothing matches. Try a channel, space or person's name.
+        </Command.Empty>
 
-            {dmFriends.length > 0 && (
-              <StyledGroup heading="Direct Messages">
-                {dmFriends.map((friend) => (
-                  <StyledItem
-                    key={friend.id}
-                    value={`dm ${friend.user.name}`}
-                    onSelect={() => openDm(friend)}
-                  >
-                    <FontAwesomeIcon
-                      icon={faEnvelope}
-                      style={{ opacity: 0.6, marginLeft: 4 }}
-                    />
-                    {friend.user.name}
-                  </StyledItem>
-                ))}
-              </StyledGroup>
-            )}
+        {dmFriends.length > 0 && (
+          <Command.Group heading="Direct messages" className={styles.group}>
+            {dmFriends.map((friend) => (
+              <Item
+                key={friend.id}
+                value={`dm-${friend.id}`}
+                keywords={[friend.user.name]}
+                icon={
+                  <Avatar
+                    size={18}
+                    src={friend.user.avatar ?? undefined}
+                    userId={friend.user.id}
+                  />
+                }
+                label={friend.user.name}
+                meta="Direct message"
+                onSelect={() => openDm(friend)}
+              />
+            ))}
+          </Command.Group>
+        )}
 
-            <StyledGroup heading="Spaces">
-              {spaces.map((space) => (
-                <StyledItem
-                  key={space.id}
-                  value={`space ${space.name}`}
-                  onSelect={() => navigateToSpace(space.id)}
-                >
-                  <SpaceIcon>
-                    {space.icon === null ? space.name[0] : ''}
-                  </SpaceIcon>
-                  {space.name}
-                </StyledItem>
-              ))}
-            </StyledGroup>
+        {spaces.length > 0 && (
+          <Command.Group heading="Spaces" className={styles.group}>
+            {spaces.map((space) => (
+              <Item
+                key={space.id}
+                value={`space-${space.id}`}
+                keywords={[space.name]}
+                icon={<SpaceIcon space={space} size={18} />}
+                label={space.name}
+                meta="Space"
+                onSelect={() => navigateToSpace(space.id)}
+              />
+            ))}
+          </Command.Group>
+        )}
 
-            {spaces.map((space) => {
-              const channels = space.channels;
-              if (channels.length === 0) return null;
-
-              return (
-                <StyledGroup key={space.id} heading={`${space.name} Channels`}>
-                  {channels.map((channel) => (
-                    <StyledItem
-                      key={channel.id}
-                      value={`channel ${space.name} ${channel.name}`}
-                      onSelect={() => openChannel(space.id, channel)}
-                    >
-                      <FontAwesomeIcon
-                        icon={faHashtag}
-                        style={{ opacity: 0.6, marginLeft: 4 }}
-                      />
-                      <span>
-                        {channel.name}
-                        <span style={{ opacity: 0.5, marginLeft: 8 }}>
-                          in {space.name}
-                        </span>
-                      </span>
-                    </StyledItem>
-                  ))}
-                </StyledGroup>
-              );
-            })}
-          </StyledList>
-        </Box>
-      </Box>
-    </Dialog>
+        {spaces.map((space) => {
+          const channels = space.channels;
+          if (channels.length === 0) return null;
+          return (
+            <Command.Group
+              key={space.id}
+              heading={space.name}
+              className={styles.group}
+            >
+              {channels.map((channel) => {
+                const Icon = getIconFromChannelType(channel.type);
+                return (
+                  <Item
+                    key={channel.id}
+                    value={`channel-${channel.id}`}
+                    keywords={[channel.name, space.name]}
+                    icon={<Icon size={16} aria-hidden />}
+                    label={channel.name}
+                    meta={channelKindLabel(channel.type)}
+                    onSelect={() => openChannel(space.id, channel)}
+                  />
+                );
+              })}
+            </Command.Group>
+          );
+        })}
+      </Command.List>
+    </Command.Dialog>
   );
 }

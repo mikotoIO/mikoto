@@ -1,0 +1,182 @@
+.chat {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.list {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.scroller {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+/* bottom padding under the last message */
+.footer {
+  height: 8px;
+}
+
+/* skeleton: newest rows sit at the bottom, like the real list */
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  overflow: hidden;
+  padding-bottom: 8px;
+}
+
+/* ------------------------------------------------------- start of channel */
+.start {
+  padding: 28px 20px 12px;
+}
+.startIcon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 14px;
+  display: grid;
+  place-items: center;
+  border-radius: calc(var(--r-ctl) + 4px);
+  background: var(--raised);
+  color: var(--muted);
+}
+.startAvatar {
+  margin-bottom: 14px;
+}
+.start h2 {
+  margin: 0 0 4px;
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+.start p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.loadingOlder {
+  padding-top: 8px;
+}
+
+/* ----------------------------------------------------------- day label */
+.day {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 20px 4px;
+  color: var(--faint);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+.day::before,
+.day::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--line);
+}
+
+/* --------------------------------------------------------- jump to latest */
+.jumpWrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+}
+.jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--ctl-h-sm);
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  background: var(--overlay);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  pointer-events: auto;
+}
+.jump:hover {
+  background: var(--raised);
+}
+
+/* -------------------------------------------------------------- typing */
+.typing {
+  height: 22px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-sm);
+  color: var(--muted);
+  min-width: 0;
+}
+.typingText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.typing b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.dots {
+  display: inline-flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.dots i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--muted);
+  animation: bob 1.2s infinite;
+}
+.dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes bob {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: none;
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+:global(:root[data-motion='reduce']) .dots i {
+  animation: none;
+  opacity: 0.7;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dots i {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+.composerError {
+  margin: 0 16px 16px;
+}

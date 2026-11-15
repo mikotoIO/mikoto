@@ -1,0 +1,36 @@
+.surface {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  background: var(--sheet);
+  color: var(--text);
+  overflow: hidden;
+  container-type: inline-size;
+}
+.padded {
+  padding: var(--space-8);
+}
+.scroll {
+  overflow-y: auto;
+}
+
+/* generic pane skeleton (used before a surface's own skeleton exists) */
+.skeletonHeader {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.skeletonBody {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 28px 24px;
+  max-width: 640px;
+}

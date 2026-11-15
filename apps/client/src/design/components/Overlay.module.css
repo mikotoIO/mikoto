@@ -1,0 +1,244 @@
+/* ---------------------------------------------------------- dialog */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dialog);
+  background: var(--scrim);
+  transition: opacity var(--dur) var(--ease);
+}
+.backdrop[data-starting-style],
+.backdrop[data-ending-style] {
+  opacity: 0;
+}
+
+.dialog {
+  position: fixed;
+  z-index: var(--z-dialog);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(var(--dialog-w), calc(100vw - 24px));
+  max-height: calc(100dvh - 48px);
+  display: flex;
+  flex-direction: column;
+  background: var(--sheet);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sheet);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  transition:
+    opacity var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+.dialog[data-starting-style],
+.dialog[data-ending-style] {
+  opacity: 0;
+  transform: translate(-50%, calc(-50% + 6px)) scale(0.98);
+}
+.sm {
+  --dialog-w: 400px;
+}
+.md {
+  --dialog-w: 520px;
+}
+.lg {
+  --dialog-w: 720px;
+}
+
+.dialogHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: 18px 14px 0 20px;
+}
+.dialogTitle {
+  flex: 1;
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  padding-top: 3px;
+}
+.dialogDescription {
+  margin: 4px 20px 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.dialogBody {
+  padding: 16px 20px 20px;
+  overflow-y: auto;
+  min-height: 0;
+}
+.dialogFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: 14px 20px;
+  border-top: 1px solid var(--line);
+}
+
+.close {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--r-ctl);
+  background: none;
+  color: var(--muted);
+}
+.close:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.headerless {
+  overflow: hidden;
+}
+.headerless .dialogBody {
+  padding: 0;
+}
+/* Sits over whatever the content puts at the top, so it carries its own
+   backing instead of relying on the sheet behind it. */
+.floatingClose {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  background: color-mix(in oklch, var(--sheet) 60%, transparent);
+  backdrop-filter: blur(8px);
+  color: var(--text);
+}
+.floatingClose:hover {
+  background: color-mix(in oklch, var(--sheet) 85%, transparent);
+}
+
+/* ------------------------------------------------- floating popups */
+.positioner {
+  z-index: var(--z-menu);
+  outline: none;
+}
+
+.menu,
+.popover,
+.tooltip {
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+.menu[data-starting-style],
+.menu[data-ending-style],
+.popover[data-starting-style],
+.popover[data-ending-style],
+.tooltip[data-starting-style],
+.tooltip[data-ending-style] {
+  opacity: 0;
+  transform: scale(0.97);
+}
+
+.menu {
+  min-width: 180px;
+  max-width: 320px;
+  padding: 4px;
+  background: var(--overlay);
+  border: 1px solid var(--line-strong);
+  border-radius: calc(var(--r-ctl) + 2px);
+  box-shadow: var(--shadow);
+  outline: none;
+}
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: calc(var(--r-ctl) - 2px);
+  font-size: var(--text-sm);
+  color: var(--text);
+  cursor: default;
+  outline: none;
+  user-select: none;
+}
+.menuItem[data-highlighted] {
+  background: var(--hover);
+}
+.menuItem[data-disabled] {
+  opacity: 0.45;
+}
+.menuIcon {
+  display: flex;
+  color: var(--muted);
+}
+.menuCheck {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--accent-ink);
+}
+.menuLabel {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.danger,
+.danger .menuIcon {
+  color: var(--danger);
+}
+.danger[data-highlighted] {
+  background: var(--danger-soft);
+}
+.separator {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--line);
+}
+.groupLabel {
+  padding: 6px 10px 4px;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--faint);
+}
+
+.popover {
+  padding: var(--space-4);
+  background: var(--overlay);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sheet);
+  box-shadow: var(--shadow);
+  max-width: min(360px, calc(100vw - 24px));
+  outline: none;
+}
+.bare {
+  outline: none;
+}
+.popoverTitle {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+
+.tooltip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: var(--text);
+  color: var(--base);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  max-width: 260px;
+}
+.tooltip .shortcut {
+  color: inherit;
+  border-color: color-mix(in oklch, var(--base) 30%, transparent);
+  background: transparent;
+}
+
+.shortcut {
+  font: 500 var(--text-xs) var(--font-ui);
+  color: var(--faint);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  padding: 0 5px;
+}

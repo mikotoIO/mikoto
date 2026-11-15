@@ -1,17 +1,17 @@
 {
   "accountSettings": {
-    "title": "Account Settings",
+    "title": "Account settings",
     "general": {
       "title": "Profile",
-      "authentication": "Authentication",
-      "dangerous": "Dangerous Actions",
-      "changePassword": "Change Password",
+      "authentication": "Sign-in",
+      "dangerous": "Danger zone",
+      "changePassword": "Change password",
       "logOutOfAllDevices": "Log out of all devices",
-      "deleteAccount": "Delete Account"
+      "deleteAccount": "Delete account"
     },
     "bots": {
       "title": "Bots and API",
-      "createBot": "Create Bot"
+      "createBot": "Create bot"
     },
     "language": {
       "title": "Language"
@@ -23,14 +23,14 @@
       "title": "Connections"
     },
     "themes": {
-      "title": "Themes"
+      "title": "Appearance"
     },
     "safety": {
-      "title": "Login"
+      "title": "Privacy and safety"
     }
   },
   "spaceSettings": {
-    "spaceOverview": "Space Overview",
+    "spaceOverview": "Space overview",
     "settingsForSpace": "Settings for {{name}}",
     "overview": {
       "title": "Overview"
@@ -45,13 +45,14 @@
       "title": "Members"
     },
     "emojis": {
-      "title": "Emojis"
+      "title": "Emoji"
     },
     "bans": {
       "title": "Bans"
     }
   },
   "channelSettings": {
+    "title": "Channel settings",
     "general": {
       "title": "General"
     },

@@ -1,13 +1,3 @@
-import styled from '@emotion/styled';
-import {
-  faBold,
-  faCode,
-  faItalic,
-  faLink,
-  faStrikethrough,
-  faUnderline,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $isAtNodeEnd } from '@lexical/selection';
@@ -19,8 +9,27 @@ import {
   FORMAT_TEXT_COMMAND,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Bold,
+  Code,
+  Italic,
+  Link,
+  type LucideIcon,
+  Strikethrough,
+  Underline,
+} from 'lucide-react';
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
+
+import { cx } from '@/design';
+
+import styles from './plugins.module.css';
 
 function getSelectedNode(selection: ReturnType<typeof $getSelection>) {
   if (!$isRangeSelection(selection)) return null;
@@ -36,54 +45,34 @@ function getSelectedNode(selection: ReturnType<typeof $getSelection>) {
   return $isAtNodeEnd(anchor) ? focusNode : anchorNode;
 }
 
-const ToolbarContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 4px;
-  background: var(--chakra-colors-gray-800);
-  border: 1px solid var(--chakra-colors-gray-600);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  position: fixed;
-  z-index: 100;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s ease;
-
-  &.visible {
-    opacity: 1;
-    pointer-events: auto;
-  }
-`;
-
-const ToolbarButton = styled.button<{ active?: boolean }>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: none;
-  background: ${(p) =>
-    p.active ? 'var(--chakra-colors-gray-600)' : 'transparent'};
-  color: ${(p) =>
-    p.active
-      ? 'var(--chakra-colors-gray-50)'
-      : 'var(--chakra-colors-gray-300)'};
-  cursor: pointer;
-  font-size: 13px;
-
-  &:hover {
-    background: var(--chakra-colors-gray-700);
-    color: var(--chakra-colors-gray-50);
-  }
-`;
-
-const Divider = styled.div`
-  width: 1px;
-  height: 20px;
-  background: var(--chakra-colors-gray-600);
-  margin: 0 2px;
-`;
+function ToolButton({
+  icon: Icon,
+  label,
+  active,
+  onPress,
+}: {
+  icon: LucideIcon;
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}): ReactNode {
+  return (
+    <button
+      type="button"
+      className={styles.toolButton}
+      aria-label={label}
+      aria-pressed={active}
+      title={label}
+      // mousedown + preventDefault keeps the editor selection intact
+      onMouseDown={(e) => {
+        e.preventDefault();
+        onPress();
+      }}
+    >
+      <Icon size={15} strokeWidth={2.25} aria-hidden />
+    </button>
+  );
+}
 
 function FloatingToolbar({
   editor,
@@ -187,70 +176,56 @@ function FloatingToolbar({
     }
   }, [editor, isLink]);
 
+  const format = (
+    f: 'bold' | 'italic' | 'underline' | 'strikethrough' | 'code',
+  ) => editor.dispatchCommand(FORMAT_TEXT_COMMAND, f);
+
   return createPortal(
-    <ToolbarContainer ref={toolbarRef} className={isVisible ? 'visible' : ''}>
-      <ToolbarButton
+    <div
+      ref={toolbarRef}
+      role="toolbar"
+      aria-label="Text formatting"
+      aria-hidden={!isVisible}
+      className={cx(styles.toolbar, isVisible && styles.visible)}
+    >
+      <ToolButton
+        icon={Bold}
+        label="Bold (Ctrl+B)"
         active={isBold}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold');
-        }}
-        title="Bold (Ctrl+B)"
-      >
-        <FontAwesomeIcon icon={faBold} />
-      </ToolbarButton>
-      <ToolbarButton
+        onPress={() => format('bold')}
+      />
+      <ToolButton
+        icon={Italic}
+        label="Italic (Ctrl+I)"
         active={isItalic}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic');
-        }}
-        title="Italic (Ctrl+I)"
-      >
-        <FontAwesomeIcon icon={faItalic} />
-      </ToolbarButton>
-      <ToolbarButton
+        onPress={() => format('italic')}
+      />
+      <ToolButton
+        icon={Underline}
+        label="Underline (Ctrl+U)"
         active={isUnderline}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline');
-        }}
-        title="Underline (Ctrl+U)"
-      >
-        <FontAwesomeIcon icon={faUnderline} />
-      </ToolbarButton>
-      <ToolbarButton
+        onPress={() => format('underline')}
+      />
+      <ToolButton
+        icon={Strikethrough}
+        label="Strikethrough"
         active={isStrikethrough}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough');
-        }}
-        title="Strikethrough"
-      >
-        <FontAwesomeIcon icon={faStrikethrough} />
-      </ToolbarButton>
-      <Divider />
-      <ToolbarButton
+        onPress={() => format('strikethrough')}
+      />
+      <div className={styles.divider} aria-hidden />
+      <ToolButton
+        icon={Code}
+        label="Inline code"
         active={isCode}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code');
-        }}
-        title="Inline Code"
-      >
-        <FontAwesomeIcon icon={faCode} />
-      </ToolbarButton>
-      <ToolbarButton
+        onPress={() => format('code')}
+      />
+      <ToolButton
+        icon={Link}
+        label={isLink ? 'Remove link' : 'Add link'}
         active={isLink}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          toggleLink();
-        }}
-        title="Link"
-      >
-        <FontAwesomeIcon icon={faLink} />
-      </ToolbarButton>
-    </ToolbarContainer>,
+        onPress={toggleLink}
+      />
+    </div>,
     document.body,
   );
 }

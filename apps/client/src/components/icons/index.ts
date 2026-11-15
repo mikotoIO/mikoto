@@ -1,1 +1,1 @@
-export * from './faMikoto';
+export * from './MikotoLogo';

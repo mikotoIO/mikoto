@@ -1,15 +1,18 @@
-import { FloatingTooltip } from '@/ui';
+import { type ReactElement } from 'react';
 
+import { Tooltip } from '@/design';
+
+/** Space name to the right of a rail icon. */
 export function SpaceIconTooltip({
   children,
   tooltip,
 }: {
-  children: React.ReactElement<any>;
+  children: ReactElement;
   tooltip: string;
 }) {
   return (
-    <FloatingTooltip tooltip={tooltip} placement="right" offsetOptions={[0, 0]}>
+    <Tooltip content={tooltip} side="right">
       {children}
-    </FloatingTooltip>
+    </Tooltip>
   );
 }

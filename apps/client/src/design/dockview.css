@@ -1,0 +1,149 @@
+/*
+ * Dockview theme: each group is an inset "sheet" on the darker base, with
+ * its tabs sitting on the base above it as pills. Groups are separated by a
+ * gap, not a border. Used with `theme={mikotoDockviewTheme}` (gap set in JS,
+ * see components/DockViewSurface.tsx).
+ *
+ * Focus is shown with fills: the focused group's active tab is filled with
+ * --raised; other groups' active tabs get a hairline ring. No accent outline
+ * around any group.
+ */
+.dockview-theme-mikoto {
+  --dv-background-color: var(--base);
+  --dv-group-view-background-color: var(--base);
+  --dv-tabs-and-actions-container-background-color: var(--base);
+  --dv-tabs-and-actions-container-height: 46px;
+  --dv-tabs-and-actions-container-font-size: var(--text-sm);
+  --dv-tab-font-size: var(--text-sm);
+  --dv-tab-margin: 0;
+  --dv-border-radius: var(--r-sheet);
+
+  --dv-activegroup-visiblepanel-tab-background-color: var(--raised);
+  --dv-activegroup-hiddenpanel-tab-background-color: transparent;
+  --dv-inactivegroup-visiblepanel-tab-background-color: transparent;
+  --dv-inactivegroup-hiddenpanel-tab-background-color: transparent;
+  --dv-activegroup-visiblepanel-tab-color: var(--text);
+  --dv-activegroup-hiddenpanel-tab-color: var(--muted);
+  --dv-inactivegroup-visiblepanel-tab-color: var(--text);
+  --dv-inactivegroup-hiddenpanel-tab-color: var(--muted);
+  --dv-tab-divider-color: transparent;
+
+  --dv-separator-border: transparent;
+  --dv-sash-color: transparent;
+  --dv-active-sash-color: var(--line-strong);
+  --dv-active-sash-transition-duration: 0.1s;
+  --dv-active-sash-transition-delay: 0.3s;
+
+  --dv-paneview-active-outline-color: transparent;
+  --dv-paneview-header-border-color: var(--line);
+  --dv-drag-over-background-color: var(--accent-soft);
+  --dv-drag-over-border-color: var(--accent);
+  --dv-icon-hover-background-color: var(--hover);
+  --dv-floating-box-shadow: var(--shadow);
+  --dv-overlay-z-index: 999;
+  --dv-scrollbar-background-color: var(--line-strong);
+  --dv-tabs-container-scrollbar-color: var(--line-strong);
+
+  color: var(--text);
+  font-family: var(--font-ui);
+}
+
+/* ------------------------------------------------------------- sheets */
+.dockview-theme-mikoto .dv-groupview {
+  background: var(--base);
+}
+
+.dockview-theme-mikoto .dv-groupview > .dv-content-container {
+  background: var(--sheet);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sheet);
+  overflow: hidden;
+  /* page-like surfaces adapt to the pane's width, not the window's */
+  container-type: inline-size;
+}
+
+.dockview-theme-mikoto .dv-groupview:focus,
+.dockview-theme-mikoto .dv-groupview:focus-within {
+  outline: none;
+}
+
+/* --------------------------------------------------------------- tabs */
+.dockview-theme-mikoto .dv-tabs-and-actions-container {
+  border: 0;
+  padding: 0;
+}
+
+.dockview-theme-mikoto .dv-tabs-container {
+  align-items: center;
+  gap: var(--space-1);
+  scrollbar-width: none;
+}
+.dockview-theme-mikoto .dv-tabs-container::-webkit-scrollbar {
+  display: none;
+}
+
+.dockview-theme-mikoto .dv-tab {
+  height: 30px;
+  padding: 0 5px 0 10px;
+  border-radius: var(--r-ctl);
+  font-size: var(--text-sm);
+  transition:
+    background-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.dockview-theme-mikoto
+  .dv-groupview
+  > .dv-tabs-and-actions-container
+  .dv-tabs-container
+  > .dv-tab.dv-inactive-tab:hover {
+  background-color: var(--hover);
+  color: var(--text);
+}
+
+/* active tab in a group that isn't focused: transparent with a hairline */
+.dockview-theme-mikoto
+  .dv-groupview.dv-inactive-group
+  > .dv-tabs-and-actions-container
+  .dv-tabs-container
+  > .dv-tab.dv-active-tab {
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.dockview-theme-mikoto .dv-tab:focus-within::after,
+.dockview-theme-mikoto .dv-tab:focus::after {
+  display: none;
+}
+.dockview-theme-mikoto .dv-tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.dockview-theme-mikoto .dv-tab.dv-tab-dragging {
+  background-color: var(--raised);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------------------------------------------------------------- dnd */
+.dockview-theme-mikoto .dv-drop-target-anchor {
+  border-radius: var(--r-sheet);
+}
+
+.dockview-theme-mikoto
+  .dv-drop-target-container
+  .dv-drop-target-anchor.dv-drop-target-anchor-container-changed {
+  opacity: 0;
+  transition: none;
+}
+
+/* ------------------------------------------------------------ sashes */
+.dockview-theme-mikoto .dv-sash {
+  border-radius: var(--r-pill);
+}
+
+/* overflow dropdown */
+.dockview-theme-mikoto .dv-tabs-overflow-container,
+.dockview-theme-mikoto .dv-tabs-overflow-dropdown-default {
+  border-radius: var(--r-ctl);
+}

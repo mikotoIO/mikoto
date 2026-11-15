@@ -12,6 +12,7 @@ import {
 } from 'lexical';
 import { useEffect } from 'react';
 
+import { describeError, toast } from '@/design';
 import { uploadFile } from '@/functions/fileUpload';
 
 import { $createImageNode } from '../nodes/ImageNode';
@@ -30,12 +31,27 @@ async function uploadAndInsert(
   files: File[],
   placeSelection: (() => void) | null,
 ) {
-  const uploads = await Promise.all(
+  // Upload independently so one failed image doesn't drop the others.
+  const results = await Promise.allSettled(
     files.map(async (file) => {
       const response = await uploadFile('/attachment', file);
       return { url: response.data.url, name: file.name };
     }),
   );
+  const uploads: { url: string; name: string }[] = [];
+  results.forEach((result, i) => {
+    if (result.status === 'fulfilled') {
+      uploads.push(result.value);
+    } else {
+      toast({
+        type: 'error',
+        title: `Couldn't upload ${files[i].name}`,
+        description: describeError(result.reason, { context: 'action' })
+          .message,
+      });
+    }
+  });
+  if (uploads.length === 0) return;
 
   editor.update(() => {
     if (placeSelection) placeSelection();

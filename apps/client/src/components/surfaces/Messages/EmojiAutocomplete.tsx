@@ -1,4 +1,3 @@
-import styled from '@emotion/styled';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
   $getSelection,
@@ -15,85 +14,10 @@ import {
 } from 'lexical';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const Overlay = styled.div`
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  background-color: var(--chakra-colors-gray-800);
-  border: 1px solid var(--chakra-colors-gray-600);
-  border-radius: 8px;
-  padding: 4px;
-  max-height: 240px;
-  overflow-y: auto;
-  width: 320px;
-  z-index: 10;
-  margin-bottom: 4px;
-`;
+import { cx } from '@/design';
 
-const EmojiItem = styled.div<{ active: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  background-color: ${(p) =>
-    p.active ? 'var(--chakra-colors-gray-600)' : 'transparent'};
-
-  &:hover {
-    background-color: var(--chakra-colors-gray-600);
-  }
-`;
-
-const Native = styled.span`
-  font-size: 18px;
-  width: 24px;
-  text-align: center;
-  flex-shrink: 0;
-`;
-
-const Shortcode = styled.span`
-  color: var(--chakra-colors-gray-400);
-  font-size: 12px;
-  margin-left: auto;
-`;
-
-const Name = styled.span`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
-type EmojiEntry = {
-  id: string;
-  name: string;
-  native: string;
-  keywords: string[];
-};
-
-let emojiListCache: EmojiEntry[] | null = null;
-let loadingPromise: Promise<EmojiEntry[]> | null = null;
-
-function loadEmojis(): Promise<EmojiEntry[]> {
-  if (emojiListCache) return Promise.resolve(emojiListCache);
-  if (!loadingPromise) {
-    loadingPromise = import('@emoji-mart/data/sets/14/twitter.json').then(
-      (mod) => {
-        const data: any = (mod as any).default ?? mod;
-        const list: EmojiEntry[] = Object.values<any>(data.emojis).map((e) => ({
-          id: e.id,
-          name: e.name,
-          native: e.skins?.[0]?.native ?? '',
-          keywords: e.keywords ?? [],
-        }));
-        emojiListCache = list;
-        return list;
-      },
-    );
-  }
-  return loadingPromise;
-}
+import styles from './MessageEditor.module.css';
+import { type EmojiEntry, loadEmojis, searchEmojis } from './emojiData';
 
 interface EmojiMatch {
   search: string;
@@ -136,24 +60,6 @@ function readEmojiSearch(editor: LexicalEditor): EmojiMatch | null {
   return result;
 }
 
-function filterEmojis(emojis: EmojiEntry[], search: string): EmojiEntry[] {
-  const q = search.toLowerCase();
-  const startsWith: EmojiEntry[] = [];
-  const idIncludes: EmojiEntry[] = [];
-  const keywordIncludes: EmojiEntry[] = [];
-  for (const e of emojis) {
-    if (e.id.startsWith(q)) {
-      startsWith.push(e);
-    } else if (e.id.includes(q)) {
-      idIncludes.push(e);
-    } else if (e.keywords.some((k) => k.includes(q))) {
-      keywordIncludes.push(e);
-    }
-    if (startsWith.length >= 10) break;
-  }
-  return [...startsWith, ...idIncludes, ...keywordIncludes].slice(0, 10);
-}
-
 export function EmojiAutocompletePlugin() {
   const [editor] = useLexicalComposerContext();
   const [emojis, setEmojis] = useState<EmojiEntry[]>([]);
@@ -163,15 +69,15 @@ export function EmojiAutocompletePlugin() {
 
   useEffect(() => {
     let cancelled = false;
-    loadEmojis().then((list) => {
-      if (!cancelled) setEmojis(list);
+    loadEmojis().then((set) => {
+      if (!cancelled) setEmojis(set.list);
     });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const filtered = match ? filterEmojis(emojis, match.search) : [];
+  const filtered = match ? searchEmojis(emojis, match.search, 10) : [];
   const isOpen = match !== null && filtered.length > 0;
 
   activeIndexRef.current = activeIndex;
@@ -285,22 +191,27 @@ export function EmojiAutocompletePlugin() {
   if (!isOpen) return null;
 
   return (
-    <Overlay
+    <div
+      className={styles.popup}
+      role="listbox"
+      aria-label="Emoji"
       onMouseDown={(e) => {
         e.preventDefault();
       }}
     >
       {filtered.map((emoji, i) => (
-        <EmojiItem
+        <div
           key={emoji.id}
-          active={i === activeIndex}
+          role="option"
+          aria-selected={i === activeIndex}
+          className={cx(styles.option, i === activeIndex && styles.active)}
           onClick={() => insertEmoji(emoji)}
         >
-          <Native>{emoji.native}</Native>
-          <Name>{emoji.name}</Name>
-          <Shortcode>:{emoji.id}:</Shortcode>
-        </EmojiItem>
+          <span className={styles.native}>{emoji.native}</span>
+          <span className={styles.optionName}>{emoji.name}</span>
+          <span className={styles.optionMeta}>:{emoji.id}:</span>
+        </div>
       ))}
-    </Overlay>
+    </div>
   );
 }

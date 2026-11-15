@@ -1,165 +1,97 @@
-import { Box, Center } from '@chakra-ui/react';
-import styled from '@emotion/styled';
-import {
-  faBarsStaggered,
-  faMagnifyingGlass,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { Suspense, lazy, useEffect, useRef } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
+import { useSnapshot } from 'valtio/react';
 
-import { CommandMenuKit, commandMenuOpenAtom } from '@/components/CommandMenu';
+import { CommandMenuKit } from '@/components/CommandMenu';
 import { ContextMenuKit, ModalKit } from '@/components/ContextMenu';
 import { DockViewSurface } from '@/components/DockViewSurface';
-import { UserAreaAvatar } from '@/components/UserArea';
-import { faMikoto } from '@/components/icons';
-import { Sidebar } from '@/components/sidebars/Base';
+import { UserArea } from '@/components/UserArea';
+import { Sidebar, SidebarRowsSkeleton } from '@/components/sidebars/Base';
 import { FriendSidebar } from '@/components/sidebars/FriendSidebar';
 import { SpaceSidebar } from '@/components/sidebars/SpaceSidebar';
-import { surfaceMap } from '@/components/surfaces';
+import { renderSurface } from '@/components/surfaces';
 import { channelToTab } from '@/components/surfaces/Explorer/channelToTab';
-import { TabBarButton } from '@/components/tabs';
+import {
+  DelayedFallback,
+  RegionErrorBoundary,
+  activeSpaceAccentAtom,
+  spaceAccent,
+} from '@/design';
 import { useMikoto } from '@/hooks';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { treebarSpaceState, workspaceState } from '@/store';
-import { Tabable, useTabkit } from '@/store/surface';
+import {
+  Tabable,
+  tabNameFamily,
+  useActiveTabId,
+  useTabkit,
+} from '@/store/surface';
 
+import { ConnectionBanner } from './ConnectionBanner';
+import styles from './MainView.module.css';
 import { MikotoClientProvider } from './MikotoClientProvider';
+import { ShellSkeleton } from './ShellSkeleton';
 
 const MobileMainView = lazy(() => import('./MobileView'));
 
-const AppContainer = styled.div`
-  background-color: var(--chakra-colors-subsurface);
-  color: var(--chakra-colors-text);
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  flex: 1;
-  overflow: hidden;
-`;
+const CHANNEL_KINDS = new Set([
+  'textChannel',
+  'voiceChannel',
+  'documentChannel',
+  'channelSettings',
+]);
 
-const TopBar = styled.div`
-  background-color: var(--chakra-colors-surface);
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--chakra-colors-gray-700);
-  flex-shrink: 0;
-`;
+/**
+ * Keeps `activeSpaceAccentAtom` on the space the user is in: the space shown
+ * in the sidebar, else the focused tab's space. Null on Home, friends and DMs.
+ */
+function SpaceAccentSync() {
+  const mikoto = useMikoto();
+  const sidebar = useAtomValue(treebarSpaceState);
+  const activeTabId = useActiveTabId();
+  const activeTabName = useAtomValue(tabNameFamily(activeTabId ?? ''));
+  const setAccent = useSetAtom(activeSpaceAccentAtom);
+  useSnapshot(mikoto.spaces);
 
-const TopBarLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: 8px;
-`;
-
-const TopBarCenter = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-`;
-
-const SearchBar = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background-color: var(--chakra-colors-gray-650);
-  border-radius: 4px;
-  padding: 4px 12px;
-  font-size: 13px;
-  color: var(--chakra-colors-gray-400);
-  min-width: 240px;
-  cursor: pointer;
-  :hover {
-    background-color: var(--chakra-colors-gray-600);
-  }
-
-  &:focus-within {
-    background-color: var(--chakra-colors-gray-600);
-  }
-
-  input {
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--chakra-colors-text);
-    width: 100%;
-
-    &::placeholder {
-      color: var(--chakra-colors-gray-400);
+  let spaceId: string | undefined;
+  if (sidebar?.kind === 'explorer') {
+    spaceId = sidebar.spaceId;
+  } else if (activeTabId) {
+    const i = activeTabId.indexOf('/');
+    const kind = activeTabId.slice(0, i);
+    const key = activeTabId.slice(i + 1);
+    if (kind === 'spaceSettings') spaceId = key;
+    else if (CHANNEL_KINDS.has(kind)) {
+      spaceId =
+        mikoto.channels._get(key.replace(/^channelSettings\//, ''))?.spaceId ??
+        undefined;
     }
+    spaceId ??= activeTabName.spaceId;
   }
-`;
+  const accent = spaceId ? spaceAccent(mikoto.spaces._get(spaceId)) : null;
 
-const TopBarRight = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`;
+  useEffect(() => {
+    setAccent(accent);
+  }, [accent, setAccent]);
+  useEffect(() => () => setAccent(null), [setAccent]);
 
-const MainContent = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-`;
-
-function TabViewSwitch({ tab }: { tab: Tabable }) {
-  const Selected = surfaceMap[tab.kind] as any; // TODO: type this
-  if (!Selected) {
-    return null;
-  }
-  const { kind, key, ...rest } = tab;
-  return <Selected key={key} {...rest} />;
+  return null;
 }
 
-const LeftBar = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  flex-shrink: 0;
-
-  .top {
-    display: flex;
-    background-color: var(--chakra-colors-subsurface);
-  }
-  .bars {
-    display: flex;
-    min-height: 0;
-    flex-grow: 1;
-  }
-`;
-
-const DockViewContainer = styled.div`
-  height: 100%;
-  flex: 1;
-  min-width: 0; /* Prevent flex items from overflowing */
-
-  .dv-tabs-container {
-    border-right: 1px solid var(--chakra-colors-gray-700);
-  }
-
-  .dv-tabs-and-actions-container {
-    border-bottom: 1px solid var(--chakra-colors-gray-700);
-  }
-
-  .dv-tab {
-    font-size: 14px;
-  }
-`;
+function SidebarFallback() {
+  return (
+    <DelayedFallback>
+      <SidebarRowsSkeleton rows={8} label="sidebar" />
+    </DelayedFallback>
+  );
+}
 
 const AppView = () => {
   const [leftSidebar, setLeftSidebar] = useAtom(treebarSpaceState);
   const mikoto = useMikoto();
   const [workspace, setWorkspace] = useAtom(workspaceState);
   const tabkit = useTabkit();
-  const setCommandMenuOpen = useSetAtom(commandMenuOpenAtom);
   const {
     spaceRef: routeSpaceRef,
     channelId: routeChannelId,
@@ -188,7 +120,6 @@ const AppView = () => {
 
     let tabToOpen: Tabable | null = null;
 
-    // Global routes (no params)
     switch (pathname) {
       case '/spaces':
         tabToOpen = { kind: 'spaceExplorer', key: 'spaceExplorer' };
@@ -226,7 +157,6 @@ const AppView = () => {
             spaceId: routeSpaceId,
           };
         }
-
         // Channel settings: /space/:spaceId/channel/:channelId/settings
         else if (
           routeSpaceId &&
@@ -246,7 +176,11 @@ const AppView = () => {
         else if (routeSpaceId && routeChannelId) {
           const channel = mikoto.channels._get(routeChannelId);
           if (channel && channel.spaceId === routeSpaceId) {
-            tabToOpen = channelToTab(channel);
+            try {
+              tabToOpen = channelToTab(channel);
+            } catch {
+              // Unknown channel type: leave the route alone.
+            }
           }
         }
         // Space only: /space/:spaceRef (focus sidebar on space, no tab)
@@ -271,96 +205,62 @@ const AppView = () => {
     routeBotId,
     mikoto,
     tabkit,
+    setLeftSidebar,
   ]);
 
   return (
-    <AppContainer>
-      <TopBar>
-        <TopBarLeft>
-          <UserAreaAvatar />
-          {/* <TabBarButton
-            onClick={() => {
-              tabkit.openTab({ kind: 'spaceExplorer', key: 'spaceExplorer' });
-            }}
-          >
-            <FontAwesomeIcon icon={faGlobe} />
-          </TabBarButton> */}
-          <TabBarButton
-            onClick={() => {
-              setWorkspace((ws) => ({
-                ...ws,
-                leftOpen: !ws.leftOpen,
-              }));
-            }}
-          >
-            <FontAwesomeIcon icon={faBarsStaggered} />
-          </TabBarButton>
-          {/* <FontAwesomeIcon icon={faMikoto} /> */}
-        </TopBarLeft>
-        <TopBarCenter>
-          <SearchBar onClick={() => setCommandMenuOpen(true)}>
-            <FontAwesomeIcon icon={faMagnifyingGlass} />
-            <span>Search...</span>
-          </SearchBar>
-        </TopBarCenter>
-        <TopBarRight />
-      </TopBar>
-      <MainContent>
-        <LeftBar>
-          <div className="bars">
-            <SpaceSidebar />
-            {workspace.leftOpen && (
-              <Sidebar
-                position="left"
-                size={workspace.left || 300}
-                onResize={(size) => {
-                  setWorkspace((ws) => ({
-                    ...ws,
-                    left: (ws.left || 300) + size.width,
-                  }));
-                }}
-              >
-                {leftSidebar ? (
-                  <TabViewSwitch tab={leftSidebar} />
-                ) : (
-                  <FriendSidebar />
-                )}
-              </Sidebar>
-            )}
+    <div className={styles.app}>
+      <SpaceAccentSync />
+      <SpaceSidebar />
+      {workspace.leftOpen && (
+        <Sidebar
+          position="left"
+          size={workspace.left || 300}
+          onResize={(size) => {
+            setWorkspace((ws) => ({
+              ...ws,
+              left: (ws.left || 300) + size.width,
+            }));
+          }}
+        >
+          <div className={styles.sidebarContent}>
+            <RegionErrorBoundary
+              what={leftSidebar ? 'This space' : 'Home'}
+              resetKeys={[leftSidebar?.key]}
+            >
+              <Suspense fallback={<SidebarFallback />}>
+                {leftSidebar ? renderSurface(leftSidebar) : <FriendSidebar />}
+              </Suspense>
+            </RegionErrorBoundary>
           </div>
-        </LeftBar>
-        <DockViewContainer>
+          <RegionErrorBoundary what="Your account">
+            <UserArea />
+          </RegionErrorBoundary>
+        </Sidebar>
+      )}
+      <main className={styles.workspace}>
+        <ConnectionBanner />
+        <div className={styles.dock}>
           <DockViewSurface />
-        </DockViewContainer>
-      </MainContent>
-    </AppContainer>
+        </div>
+      </main>
+    </div>
   );
 };
-
-function Fallback() {
-  return (
-    <Center w="100%" h="100%" color="white" flexDir="column">
-      <FontAwesomeIcon icon={faMikoto} fontSize="10vw" />
-      <Box fontSize="20px" mt="10px">
-        Loading...
-      </Box>
-    </Center>
-  );
-}
 
 export default function MainView() {
   const isMobile = useIsMobile();
 
   if (isMobile) {
     return (
-      <Suspense fallback={<Fallback />}>
+      <Suspense fallback={<ShellSkeleton />}>
         <MobileMainView />
       </Suspense>
     );
   }
 
   return (
-    <MikotoClientProvider fallback={<Fallback />}>
+    <MikotoClientProvider fallback={<ShellSkeleton />}>
       <AppView />
       <CommandMenuKit />
       <ContextMenuKit />

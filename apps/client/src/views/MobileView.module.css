@@ -1,0 +1,178 @@
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--base);
+  color: var(--text);
+}
+
+/* ---------------------------------------------------------------- header */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 48px;
+  padding: 0 var(--space-2);
+  flex-shrink: 0;
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.title svg {
+  color: var(--faint);
+  flex-shrink: 0;
+}
+
+/* the open tab: one sheet, inset on the base like desktop */
+.sheet {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0 var(--space-2) var(--space-2);
+  background: var(--sheet);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sheet);
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+/* ---------------------------------------------------------------- drawer */
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-dropdown);
+  background: var(--scrim);
+  transition: opacity var(--dur) var(--ease);
+}
+
+.drawer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: calc(var(--z-dropdown) + 1);
+  width: min(300px, 86vw);
+  display: flex;
+  background: var(--base);
+  box-shadow: var(--shadow);
+  will-change: transform;
+}
+.animate {
+  transition: transform 0.25s var(--ease);
+}
+
+.strip {
+  width: 60px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 14px 0 var(--space-3);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.strip::-webkit-scrollbar {
+  display: none;
+}
+
+.stripButton {
+  display: flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: calc(var(--r-ctl) + 3px);
+}
+
+.panel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 14px var(--space-2) var(--space-2) 0;
+}
+
+.panelHead {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 var(--space-2);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+.list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: var(--space-3);
+}
+
+/* touch targets: rows are taller than on desktop */
+.list button {
+  height: 40px;
+}
+
+.subtree {
+  margin-left: 15px;
+  padding-left: 6px;
+  border-left: 1px solid var(--line);
+}
+
+.placeholder {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+/* --------------------------------------------------------------- welcome */
+.welcome {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+}
+.welcomeLogo {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: calc(var(--r-sheet) + 2px);
+  background: var(--raised);
+  margin-bottom: var(--space-2);
+}
+.welcome h1 {
+  font-size: var(--text-xl);
+}
+.welcome p {
+  color: var(--muted);
+  max-width: 32ch;
+  margin-bottom: var(--space-3);
+}

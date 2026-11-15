@@ -1,0 +1,175 @@
+/* Shared overlay chrome for the doc's floating UI (matches design menus). */
+
+.toolbar {
+  position: fixed;
+  z-index: var(--z-dropdown);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: var(--overlay);
+  border: 1px solid var(--line);
+  border-radius: var(--r-ctl);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+
+.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.toolButton {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: calc(var(--r-ctl) - 2px);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.toolButton:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.toolButton[aria-pressed='true'] {
+  background: var(--press);
+  color: var(--text);
+}
+
+.toolButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.divider {
+  width: 1px;
+  height: 18px;
+  margin: 0 3px;
+  background: var(--line);
+}
+
+/* ------------------------------------------------------------ slash menu */
+
+.menu {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  z-index: var(--z-dropdown);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 260px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 4px;
+  background: var(--overlay);
+  border: 1px solid var(--line);
+  border-radius: var(--r-ctl);
+  box-shadow: var(--shadow);
+  font-family: var(--font-ui);
+  line-height: 1.3;
+}
+
+.menuLabel {
+  padding: 6px 8px 4px;
+  font-size: var(--text-xs);
+  color: var(--faint);
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: var(--ctl-h);
+  padding: 0 8px;
+  border: 0;
+  border-radius: calc(var(--r-ctl) - 2px);
+  background: transparent;
+  color: var(--text);
+  font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.menuItem[aria-selected='true'] {
+  background: var(--hover);
+}
+
+.menuIcon {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--raised);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.menuText {
+  flex: 1;
+  min-width: 0;
+}
+
+.menuHint {
+  font-size: var(--text-xs);
+  color: var(--faint);
+}
+
+.menuEmpty {
+  padding: 8px;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+/* ------------------------------------------------------------ drag handle */
+
+.dragHandle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 22px;
+  border-radius: 5px;
+  color: var(--faint);
+  cursor: grab;
+  opacity: 0;
+  transition:
+    opacity var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease);
+  will-change: transform;
+  user-select: none;
+}
+
+.dragHandle:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.targetLine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--accent);
+  border-radius: var(--r-pill);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+  will-change: transform;
+}

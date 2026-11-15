@@ -310,6 +310,7 @@ export const SpaceVisibility = z.enum(["PRIVATE", "PUBLIC"]);
 export type SpaceVisibility = z.infer<typeof SpaceVisibility>;
 
 export const SpaceExt = z.object({
+  accent: z.union([z.string(), z.null()]).optional(),
   channels: z.array(Channel),
   handle: z.union([z.string(), z.null()]).optional(),
   icon: z.union([z.string(), z.null()]).optional(),
@@ -323,11 +324,15 @@ export const SpaceExt = z.object({
 });
 export type SpaceExt = z.infer<typeof SpaceExt>;
 
-export const SpaceCreatePayload = z.object({ name: z.string() });
+export const SpaceCreatePayload = z.object({
+  accent: z.union([z.string(), z.null()]).optional(),
+  name: z.string(),
+});
 export type SpaceCreatePayload = z.infer<typeof SpaceCreatePayload>;
 
 export const SpaceUpdatePayload = z
   .object({
+    accent: z.union([z.string(), z.null()]),
     handle: z.union([z.string(), z.null()]),
     icon: z.union([z.string(), z.null()]),
     name: z.union([z.string(), z.null()]),
@@ -976,7 +981,7 @@ const endpoints = makeApi([
       {
         name: "body",
         type: "Body",
-        schema: z.object({ name: z.string() }),
+        schema: SpaceCreatePayload,
       },
     ],
     response: SpaceExt,

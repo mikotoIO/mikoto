@@ -1,95 +1,65 @@
-import { chakra } from '@chakra-ui/react';
-import styled from '@emotion/styled';
-import {
-  faChevronDown,
-  faChevronRight,
-  faHashtag,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { ChevronDown } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { ExplorerNode, nodeSort } from './explorerNode';
+import { SidebarRow } from '@/components/sidebars/Base';
+import { cx } from '@/design';
 
-const StyledTreeBody = styled.div`
-  margin: 0;
-  padding: 4px;
-  min-height: min-content;
-  max-height: 100%;
-  flex: 1;
-  overflow-y: auto;
-  height: 100%;
-  box-sizing: border-box;
-`;
+import styles from './Explorer.module.css';
+import {
+  ExplorerNode,
+  nodeSort,
+  subtreeActive,
+  subtreeUnread,
+} from './explorerNode';
 
-const NodeBase = chakra('a', {
-  base: {
-    position: 'relative',
-    fontSize: '14px',
-    height: '32px',
-    px: '8px',
-    py: '6px',
-    borderRadius: '4px',
-    display: 'flex',
-    alignItems: 'center',
-    fontWeight: 'inherit',
-    color: 'gray.350',
-    cursor: 'pointer',
-    userSelect: 'none',
-    _hover: {
-      backgroundColor: 'gray.700',
-    },
-  },
-});
-
-const ChevronWrapper = styled.div`
-  opacity: 0.4;
-  font-size: 12px;
-  width: 10px;
-  margin-right: 8px;
-  text-align: center;
-`;
-
-const StyledSubtree = styled.div`
-  margin-left: 12px;
-  padding-left: 8px;
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
-`;
-
-function Node(props: ExplorerNode & { path: string[] }) {
-  const [open, setOpen] = useState(false);
-  const isLeaf = props.descendant === undefined;
+function Node(props: ExplorerNode) {
+  const children = nodeSort(props.descendant);
+  const isParent = Boolean(children && children.length > 0);
+  // Start open when the active channel is inside, so it's never hidden.
+  const [open, setOpen] = useState(() => isParent && subtreeActive(props));
+  const [dragging, setDragging] = useState(false);
+  const Icon = props.icon;
+  // A collapsed parent shows unread if anything inside it is.
+  const unread = open || !isParent ? props.unread : subtreeUnread(props);
 
   return (
-    <div>
-      <NodeBase
-        draggable={!!props.onDragStart}
+    <div className={styles.node}>
+      <SidebarRow
+        icon={Icon ? <Icon size={16} aria-hidden /> : undefined}
+        label={props.text}
+        active={props.active}
+        unread={unread}
+        className={cx(
+          isParent && styles.parentRow,
+          dragging && styles.dragging,
+        )}
+        draggable={Boolean(props.onDragStart)}
         onClick={props.onClick}
         onContextMenu={props.onContextMenu}
-        onDragStart={props.onDragStart}
-        color={props.unread ? 'text' : undefined}
-        fontWeight={props.unread ? '600' : undefined}
-      >
-        <ChevronWrapper
-          onClick={(ev) => {
-            ev.stopPropagation();
-            if (!isLeaf) setOpen(!open);
-          }}
+        onDragStart={(ev) => {
+          setDragging(true);
+          props.onDragStart?.(ev);
+        }}
+        onDragEnd={() => setDragging(false)}
+      />
+      {isParent && (
+        <button
+          type="button"
+          className={styles.disclosure}
+          aria-expanded={open}
+          aria-label={open ? `Collapse ${props.text}` : `Expand ${props.text}`}
+          onClick={() => setOpen((o) => !o)}
         >
-          {!isLeaf ? (
-            <FontAwesomeIcon icon={open ? faChevronDown : faChevronRight} />
-          ) : (
-            <FontAwesomeIcon icon={props.icon ?? faHashtag} />
-          )}
-        </ChevronWrapper>
-        <span>{props.text}</span>
-      </NodeBase>
-      <StyledSubtree>
-        {open &&
-          !isLeaf &&
-          nodeSort(props.descendant)?.map((x) => (
-            <Node key={x.id} {...x} path={[...props.path, x.id]} />
+          <ChevronDown size={14} aria-hidden />
+        </button>
+      )}
+      {open && children && (
+        <div className={styles.subtree} role="group">
+          {children.map((x) => (
+            <Node key={x.id} {...x} />
           ))}
-      </StyledSubtree>
+        </div>
+      )}
     </div>
   );
 }
@@ -101,8 +71,8 @@ export function ChannelTree({
   nodes: ExplorerNode[];
 }) {
   return (
-    <StyledTreeBody {...props}>
-      {nodeSort(nodes)?.map((x) => <Node key={x.id} {...x} path={[x.id]} />)}
-    </StyledTreeBody>
+    <div {...props}>
+      {nodeSort(nodes)?.map((x) => <Node key={x.id} {...x} />)}
+    </div>
   );
 }

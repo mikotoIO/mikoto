@@ -56,6 +56,17 @@ export class MikotoSpace extends ZSchema(SimpleSpaceExt) {
   _patch(data: SpaceExt) {
     Object.assign(this, SimpleSpaceExt.parse(data));
     this.roles._replace(data.roles);
+
+    // Keep the channel list in step with the server's, including channels
+    // created or deleted while we weren't listening.
+    const nextIds = data.channels.map(
+      (channel) => new MikotoChannel(channel, this.client).id,
+    );
+    const keep = new Set(nextIds);
+    for (const id of this.channelIds) {
+      if (!keep.has(id)) this.client.channels._delete(id);
+    }
+    this.channelIds = nextIds;
   }
 
   get channels() {
@@ -143,6 +154,16 @@ export class SpaceManager extends CachedManager<MikotoSpace> {
   async list() {
     const spaces = await this.client.rest['spaces.list']();
     return spaces.map((space) => new MikotoSpace(space, this.client));
+  }
+
+  /** Like `list()`, but also drops cached spaces the user is no longer in. */
+  async sync() {
+    const spaces = await this.list();
+    const current = new Set(spaces.map((space) => space.id));
+    for (const id of [...this.cache.keys()]) {
+      if (!current.has(id)) this._delete(id);
+    }
+    return spaces;
   }
 
   async discover(): Promise<SpaceExt[]> {

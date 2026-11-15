@@ -1,38 +1,51 @@
-export const lexicalTheme = {
-  code: 'editor-code',
+import type { EditorThemeClasses } from 'lexical';
+
+import styles from './Documents.module.css';
+
+/** Maps Lexical node types to the doc's CSS module classes. */
+export const lexicalTheme: EditorThemeClasses = {
+  code: styles.code,
   heading: {
-    h1: 'editor-heading-h1',
-    h2: 'editor-heading-h2',
-    h3: 'editor-heading-h3',
-    h4: 'editor-heading-h4',
-    h5: 'editor-heading-h5',
+    h1: styles.h1,
+    h2: styles.h2,
+    h3: styles.h3,
+    h4: styles.h4,
+    h5: styles.h5,
   },
-  image: 'editor-image',
-  link: 'editor-link',
+  hr: styles.hr,
+  image: styles.image,
+  link: styles.link,
   list: {
-    checklist: 'editor-list-check',
-    listitem: 'editor-listitem',
-    listitemChecked: 'editor-listitem-checked',
-    listitemUnchecked: 'editor-listitem-unchecked',
+    checklist: styles.checklist,
+    listitem: styles.listItem,
+    listitemChecked: styles.checked,
+    listitemUnchecked: styles.unchecked,
     nested: {
-      listitem: 'editor-nested-listitem',
+      listitem: styles.nestedListItem,
     },
-    ol: 'editor-list-ol',
-    ul: 'editor-list-ul',
+    ol: styles.ol,
+    ul: styles.ul,
   },
   ltr: 'ltr',
-  paragraph: 'editor-paragraph',
-  placeholder: 'editor-placeholder',
-  quote: 'editor-quote',
+  paragraph: styles.paragraph,
+  quote: styles.quote,
   rtl: 'rtl',
+  table: styles.table,
+  tableCell: styles.tableCell,
+  tableCellHeader: styles.tableCellHeader,
   text: {
-    bold: 'editor-text-bold',
-    code: 'editor-text-code',
-    hashtag: 'editor-text-hashtag',
-    italic: 'editor-text-italic',
-    overflowed: 'editor-text-overflowed',
-    strikethrough: 'editor-text-strikethrough',
-    underline: 'editor-text-underline',
-    underlineStrikethrough: 'editor-text-underlineStrikethrough',
+    bold: styles.bold,
+    code: styles.textCode,
+    italic: styles.italic,
+    strikethrough: styles.strikethrough,
+    underline: styles.underline,
+    underlineStrikethrough: styles.underlineStrikethrough,
+  },
+  // Read by @lexical/yjs when drawing other people's cursors.
+  collaboration: {
+    cursor: styles.cursor,
+    cursorName: styles.cursorName,
+    selection: styles.selection,
+    selectionBg: styles.selectionBg,
   },
 };

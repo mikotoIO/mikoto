@@ -1,120 +1,57 @@
-// modified version of the One Dark Theme
-// TOKENS
-import { chakraSystem } from '@/components/chakraTheme';
+import type { CSSProperties } from 'react';
 
-const BACKGROUND = chakraSystem.token('gray.800');
-const FOREGROUND = chakraSystem.token('gray.300');
-const COMMENT = chakraSystem.token('gray.500');
+/*
+ * One Dark-inspired highlight theme expressed in design tokens, so it follows
+ * the light and dark themes. The `--hl-*` colors are defined on the code block
+ * (see Markdown.module.css `.codeBlock`).
+ */
+const KEYWORD = { color: 'var(--hl-keyword)' };
+const NAME = { color: 'var(--hl-name)' };
+const LITERAL = { color: 'var(--hl-literal)' };
+const STRING = { color: 'var(--hl-string)' };
+const BUILTIN = { color: 'var(--hl-builtin)' };
+const NUMBER = { color: 'var(--hl-number)' };
+const TITLE = { color: 'var(--hl-title)' };
+const COMMENT = { color: 'var(--faint)', fontStyle: 'italic' };
 
-export const highlightTheme = {
+export const highlightTheme: Record<string, CSSProperties> = {
   hljs: {
     display: 'block',
-    color: FOREGROUND,
-    background: BACKGROUND,
+    color: 'var(--text)',
+    background: 'transparent',
   },
-  'hljs-comment': {
-    color: COMMENT,
-    fontStyle: 'italic',
-  },
-  'hljs-quote': {
-    color: COMMENT,
-    fontStyle: 'italic',
-  },
-  'hljs-doctag': {
-    color: '#c678dd',
-  },
-  'hljs-keyword': {
-    color: '#c678dd',
-  },
-  'hljs-formula': {
-    color: '#c678dd',
-  },
-  'hljs-section': {
-    color: '#e06c75',
-  },
-  'hljs-name': {
-    color: '#e06c75',
-  },
-  'hljs-selector-tag': {
-    color: '#e06c75',
-  },
-  'hljs-deletion': {
-    color: '#e06c75',
-  },
-  'hljs-subst': {
-    color: '#e06c75',
-  },
-  'hljs-literal': {
-    color: '#56b6c2',
-  },
-  'hljs-string': {
-    color: '#98c379',
-  },
-  'hljs-regexp': {
-    color: '#98c379',
-  },
-  'hljs-addition': {
-    color: '#98c379',
-  },
-  'hljs-attribute': {
-    color: '#98c379',
-  },
-  'hljs-meta-string': {
-    color: '#98c379',
-  },
-  'hljs-built_in': {
-    color: '#e6c07b',
-  },
-  'hljs-class .hljs-title': {
-    color: '#e6c07b',
-  },
-  'hljs-attr': {
-    color: '#d19a66',
-  },
-  'hljs-variable': {
-    color: '#d19a66',
-  },
-  'hljs-template-variable': {
-    color: '#d19a66',
-  },
-  'hljs-type': {
-    color: '#d19a66',
-  },
-  'hljs-selector-class': {
-    color: '#d19a66',
-  },
-  'hljs-selector-attr': {
-    color: '#d19a66',
-  },
-  'hljs-selector-pseudo': {
-    color: '#d19a66',
-  },
-  'hljs-number': {
-    color: '#d19a66',
-  },
-  'hljs-symbol': {
-    color: '#61aeee',
-  },
-  'hljs-bullet': {
-    color: '#61aeee',
-  },
-  'hljs-link': {
-    color: '#61aeee',
-    textDecoration: 'underline',
-  },
-  'hljs-meta': {
-    color: '#61aeee',
-  },
-  'hljs-selector-id': {
-    color: '#61aeee',
-  },
-  'hljs-title': {
-    color: '#61aeee',
-  },
-  'hljs-emphasis': {
-    fontStyle: 'italic',
-  },
-  'hljs-strong': {
-    fontWeight: 'bold',
-  },
+  'hljs-comment': COMMENT,
+  'hljs-quote': COMMENT,
+  'hljs-doctag': KEYWORD,
+  'hljs-keyword': KEYWORD,
+  'hljs-formula': KEYWORD,
+  'hljs-section': NAME,
+  'hljs-name': NAME,
+  'hljs-selector-tag': NAME,
+  'hljs-deletion': NAME,
+  'hljs-subst': NAME,
+  'hljs-literal': LITERAL,
+  'hljs-string': STRING,
+  'hljs-regexp': STRING,
+  'hljs-addition': STRING,
+  'hljs-attribute': STRING,
+  'hljs-meta-string': STRING,
+  'hljs-built_in': BUILTIN,
+  'hljs-class .hljs-title': BUILTIN,
+  'hljs-attr': NUMBER,
+  'hljs-variable': NUMBER,
+  'hljs-template-variable': NUMBER,
+  'hljs-type': NUMBER,
+  'hljs-selector-class': NUMBER,
+  'hljs-selector-attr': NUMBER,
+  'hljs-selector-pseudo': NUMBER,
+  'hljs-number': NUMBER,
+  'hljs-symbol': TITLE,
+  'hljs-bullet': TITLE,
+  'hljs-link': { ...TITLE, textDecoration: 'underline' },
+  'hljs-meta': TITLE,
+  'hljs-selector-id': TITLE,
+  'hljs-title': TITLE,
+  'hljs-emphasis': { fontStyle: 'italic' },
+  'hljs-strong': { fontWeight: 'bold' },
 };

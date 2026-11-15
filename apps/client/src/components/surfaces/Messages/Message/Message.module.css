@@ -1,0 +1,212 @@
+.msg {
+  display: grid;
+  grid-template-columns: var(--av) minmax(0, 1fr);
+  column-gap: 12px;
+  padding: var(--msg-pad) 20px 2px;
+  position: relative;
+}
+.cont {
+  padding-top: 1px;
+}
+.msg:hover,
+.msg:focus-within {
+  background: var(--hover);
+}
+
+/* mentions of the current user: a tinted row with an accent bar */
+.mention,
+.mention:hover,
+.mention:focus-within {
+  background: color-mix(in oklch, var(--accent) 8%, transparent);
+  box-shadow: inset 2px 0 var(--accent);
+}
+
+.avatarCell {
+  padding-top: 2px;
+}
+
+.gutterTime {
+  font-size: 10.5px;
+  color: var(--faint);
+  visibility: hidden;
+  text-align: right;
+  padding-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.msg:hover .gutterTime,
+.msg:focus-within .gutterTime {
+  visibility: visible;
+}
+
+.main {
+  min-width: 0;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.name {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+.name:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.name:disabled {
+  cursor: default;
+  text-decoration: none;
+}
+
+.time {
+  font-size: var(--text-xs);
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+.body {
+  min-width: 0;
+}
+
+.edited {
+  margin-left: 4px;
+  font-size: var(--text-xs);
+  color: var(--faint);
+}
+
+.pending .body {
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------- status */
+.status {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 2px;
+  font-size: var(--text-sm);
+  color: var(--faint);
+}
+.failed {
+  color: var(--danger);
+}
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.link:hover {
+  color: var(--text);
+}
+
+/* ------------------------------------------------------ attachments */
+.attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: 6px;
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 360px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-ctl);
+  background: var(--raised);
+  color: var(--text);
+  text-decoration: none;
+}
+.file:hover {
+  border-color: var(--line-strong);
+}
+.fileIcon {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.fileText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+.fileName {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fileSize {
+  font-size: var(--text-xs);
+  color: var(--faint);
+}
+
+/* ------------------------------------------------- hover toolbar */
+.actions {
+  position: absolute;
+  right: 14px;
+  top: -15px;
+  display: none;
+  gap: 1px;
+  padding: 2px;
+  background: var(--overlay);
+  border: 1px solid var(--line);
+  border-radius: var(--r-ctl);
+  box-shadow: var(--shadow-sm);
+  z-index: 2;
+}
+.msg:hover .actions,
+.msg:focus-within .actions {
+  display: flex;
+}
+
+/* ----------------------------------------------- broken-item row */
+.broken {
+  margin: 4px 20px 4px calc(20px + var(--av) + 12px);
+}
+
+/* ------------------------------------------------------- skeleton */
+.skeleton {
+  display: grid;
+  grid-template-columns: var(--av) 1fr;
+  column-gap: 12px;
+  padding: 12px 20px 4px;
+}
+.skeletonLines {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 3px;
+}
+
+@media (max-width: 600px) {
+  .msg,
+  .skeleton {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}

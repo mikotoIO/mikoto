@@ -1,4 +1,3 @@
-import styled from '@emotion/styled';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { MikotoMember } from '@mikoto-io/mikoto.js';
 import {
@@ -17,42 +16,9 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Avatar } from '@/components/atoms/Avatar';
+import { cx } from '@/design';
 
-const Overlay = styled.div`
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  background-color: var(--chakra-colors-gray-800);
-  border: 1px solid var(--chakra-colors-gray-600);
-  border-radius: 8px;
-  padding: 4px;
-  max-height: 200px;
-  overflow-y: auto;
-  width: 260px;
-  z-index: 10;
-  margin-bottom: 4px;
-`;
-
-const MentionItem = styled.div<{ active: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  background-color: ${(p) =>
-    p.active ? 'var(--chakra-colors-gray-600)' : 'transparent'};
-
-  &:hover {
-    background-color: var(--chakra-colors-gray-600);
-  }
-`;
-
-const Handle = styled.span`
-  color: var(--chakra-colors-gray-400);
-  font-size: 12px;
-`;
+import styles from './MessageEditor.module.css';
 
 interface MentionMatch {
   search: string;
@@ -230,22 +196,36 @@ export function MentionAutocompletePlugin({
   if (!isOpen) return null;
 
   return (
-    <Overlay
+    <div
+      className={styles.popup}
+      role="listbox"
+      aria-label="Members"
       onMouseDown={(e) => {
         e.preventDefault();
       }}
     >
       {filtered.map((member, i) => (
-        <MentionItem
+        <div
           key={member.userId}
-          active={i === activeIndex}
+          role="option"
+          aria-selected={i === activeIndex}
+          className={cx(styles.option, i === activeIndex && styles.active)}
           onClick={() => insertMention(member)}
         >
-          <Avatar src={member.user.avatar} userId={member.userId} size={24} />
-          <span>{member.name ?? member.user.name}</span>
-          {member.user.handle && <Handle>@{member.user.handle}</Handle>}
-        </MentionItem>
+          <Avatar
+            src={member.user.avatar}
+            userId={member.userId}
+            name={member.user.name}
+            size={22}
+          />
+          <span className={styles.optionName}>
+            {member.name ?? member.user.name}
+          </span>
+          {member.user.handle && (
+            <span className={styles.optionMeta}>@{member.user.handle}</span>
+          )}
+        </div>
       ))}
-    </Overlay>
+    </div>
   );
 }

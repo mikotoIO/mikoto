@@ -1,0 +1,93 @@
+/* Banner: runs to the dialog's top edge. Until users can upload one, it's
+   the user's hue (from their id) with a contour map like space banners,
+   its terrain also seeded by the id. */
+.banner {
+  position: relative;
+  height: 112px;
+  overflow: hidden;
+  background: oklch(0.62 0.08 var(--h));
+}
+.topo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: oklch(0.22 0.05 var(--h) / 0.2);
+}
+:global(:root[data-theme='light']) .banner {
+  background: oklch(0.86 0.06 var(--h));
+}
+:global(:root[data-theme='light']) .topo {
+  color: oklch(0.45 0.07 var(--h) / 0.18);
+}
+
+.body {
+  padding: 0 var(--space-5) var(--space-5);
+}
+
+/* Positioned so it paints over the (positioned) banner it overlaps. */
+.avatarRing {
+  position: relative;
+  display: inline-flex;
+  margin-top: -40px;
+  padding: 4px;
+  border-radius: var(--r-av);
+  corner-shape: var(--av-corner);
+  background: var(--sheet);
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.handle {
+  margin: 2px 0 0;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.section {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.label {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--faint);
+}
+
+.about {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

@@ -1,14 +1,6 @@
-import { Box, Flex, Heading, Text } from '@chakra-ui/react';
-import styled from '@emotion/styled';
-import {
-  faArrowLeft,
-  faBars,
-  faHashtag,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MikotoChannel, MikotoSpace } from '@mikoto-io/mikoto.js';
+import { ArrowLeft, Menu } from 'lucide-react';
 import { Suspense, useCallback, useRef, useState } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
 import { useSnapshot } from 'valtio/react';
 
 import { CommandMenuKit } from '@/components/CommandMenu';
@@ -17,184 +9,30 @@ import {
   ModalKit,
   useContextMenu,
 } from '@/components/ContextMenu';
-import { normalizeMediaUrl } from '@/components/atoms/Avatar';
-import { faMikoto } from '@/components/icons';
+import { SpaceIcon } from '@/components/atoms/SpaceIcon';
+import { MikotoLogo } from '@/components/icons';
+import { SidebarRow } from '@/components/sidebars/Base';
 import { SpaceContextMenu } from '@/components/sidebars/SpaceSidebar/SpaceContextMenu';
-import {
-  ErrorSurface,
-  LoadingSurface,
-  surfaceMap,
-} from '@/components/surfaces';
+import { LoadingSurface, renderSurface } from '@/components/surfaces';
 import { TreebarContextMenu } from '@/components/surfaces/Explorer';
 import { ChannelContextMenu } from '@/components/surfaces/Explorer/ChannelContextMenu';
 import {
-  channelToTab,
   getIconFromChannelType,
+  tryChannelToTab,
 } from '@/components/surfaces/Explorer/channelToTab';
+import { Button, IconButton, SurfaceErrorBoundary, cx, toast } from '@/design';
 import { useMikoto } from '@/hooks';
 import { TabContext, Tabable } from '@/store/surface';
 
 import { MikotoClientProvider } from './MikotoClientProvider';
+import styles from './MobileView.module.css';
+import { ShellSkeleton } from './ShellSkeleton';
 
 // --- Constants ---
 
 const SIDEBAR_WIDTH = 300;
-const SPACE_STRIP_WIDTH = 56;
 const SWIPE_EDGE_ZONE = 24;
 const SWIPE_THRESHOLD = 0.3; // fraction of sidebar width to snap open
-
-// --- Styled Components ---
-
-const MobileContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  background-color: var(--chakra-colors-subsurface);
-  color: var(--chakra-colors-text);
-  overflow: hidden;
-  position: relative;
-`;
-
-const MobileHeader = styled.div`
-  display: flex;
-  align-items: center;
-  height: 48px;
-  padding: 0 12px;
-  gap: 12px;
-  background-color: var(--chakra-colors-surface);
-  border-bottom: 1px solid var(--chakra-colors-gray-700);
-  flex-shrink: 0;
-`;
-
-const MobileContent = styled.div`
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-`;
-
-const HeaderButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: none;
-  color: var(--chakra-colors-gray-300);
-  cursor: pointer;
-  flex-shrink: 0;
-  font-size: 18px;
-`;
-
-// --- Sidebar Drawer ---
-
-const DrawerOverlay = styled.div<{ visible: boolean }>`
-  position: absolute;
-  inset: 0;
-  z-index: 100;
-  background-color: rgba(0, 0, 0, 0.5);
-  opacity: ${(p) => (p.visible ? 1 : 0)};
-  pointer-events: ${(p) => (p.visible ? 'auto' : 'none')};
-  transition: opacity 0.2s ease;
-`;
-
-const DrawerContainer = styled.div<{ translateX: number; animate: boolean }>`
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  z-index: 101;
-  width: ${SIDEBAR_WIDTH}px;
-  display: flex;
-  transform: translateX(${(p) => p.translateX}px);
-  transition: ${(p) => (p.animate ? 'transform 0.25s ease' : 'none')};
-  will-change: transform;
-`;
-
-const SpaceStrip = styled.div`
-  width: ${SPACE_STRIP_WIDTH}px;
-  flex-shrink: 0;
-  background-color: var(--chakra-colors-gray-850);
-  border-right: 1px solid var(--chakra-colors-gray-700);
-  overflow-y: auto;
-  scrollbar-width: none;
-  padding: 8px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
-
-const SpaceStripIcon = styled.button<{ active?: boolean; icon?: string }>`
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  border: 2px solid
-    ${(p) => (p.active ? 'var(--chakra-colors-gray-150)' : 'transparent')};
-  background-color: var(--chakra-colors-surface);
-  background-image: ${(p) => (p.icon ? `url(${p.icon})` : 'none')};
-  background-size: cover;
-  color: var(--chakra-colors-text);
-  font-size: 14px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  padding: 0;
-`;
-
-const ChannelPanel = styled.div`
-  flex: 1;
-  min-width: 0;
-  background-color: var(--chakra-colors-gray-800);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-`;
-
-const ChannelPanelHeader = styled.div`
-  padding: 12px 14px;
-  flex-shrink: 0;
-`;
-
-const ChannelPanelList = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  padding: 0 4px 8px;
-`;
-
-const MobileChannelItem = styled.button<{ depth?: number }>`
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 42px;
-  padding: 0 12px;
-  padding-left: ${(p) => 12 + (p.depth ?? 0) * 14}px;
-  gap: 8px;
-  border: none;
-  background: none;
-  color: var(--chakra-colors-gray-300);
-  font-size: 15px;
-  cursor: pointer;
-  text-align: left;
-  border-radius: 4px;
-
-  &:active {
-    background-color: var(--chakra-colors-gray-700);
-  }
-
-  svg {
-    font-size: 13px;
-    color: var(--chakra-colors-gray-500);
-    flex-shrink: 0;
-  }
-`;
 
 // --- Swipe Drawer Hook ---
 
@@ -227,9 +65,7 @@ function useSwipeDrawer() {
     (e: React.TouchEvent) => {
       const touch = e.touches[0];
       const inEdge = !isOpen && touch.clientX < SWIPE_EDGE_ZONE;
-      const inDrawer = isOpen;
-
-      if (!inEdge && !inDrawer) return;
+      if (!inEdge && !isOpen) return;
 
       trackingRef.current = true;
       directionLockedRef.current = null;
@@ -291,6 +127,8 @@ function useSwipeDrawer() {
 
 // --- Sidebar Content ---
 
+type SelectChannel = (tab: Tabable, channel: MikotoChannel) => void;
+
 function MobileSpaceIcon({
   space,
   active,
@@ -303,86 +141,73 @@ function MobileSpaceIcon({
   const contextMenu = useContextMenu(() => <SpaceContextMenu space={space} />);
 
   return (
-    <SpaceStripIcon
-      active={active}
-      icon={space.icon ? normalizeMediaUrl(space.icon) : undefined}
+    <button
+      type="button"
+      className={styles.stripButton}
+      aria-label={space.name}
+      aria-current={active ? 'true' : undefined}
       onClick={() => onSelectSpace(space.id)}
       onContextMenu={contextMenu}
     >
-      {!space.icon && space.name[0]}
-    </SpaceStripIcon>
+      <SpaceIcon space={space} size={40} active={active} />
+    </button>
   );
 }
 
-function MobileChannelPanel({
-  space,
+function MobileChannelNode({
+  channel,
+  allChannels,
+  depth,
   onSelectChannel,
 }: {
-  space: MikotoSpace;
-  onSelectChannel: (tab: Tabable, title: string) => void;
+  channel: MikotoChannel;
+  allChannels: MikotoChannel[];
+  depth: number;
+  onSelectChannel: SelectChannel;
 }) {
+  const [open, setOpen] = useState(depth === 0);
+  const children = allChannels.filter((c) => c.parentId === channel.id);
+  const isGroup = children.length > 0;
   const contextMenu = useContextMenu(() => (
-    <TreebarContextMenu space={space} />
+    <ChannelContextMenu channel={channel} />
   ));
+  const Icon = getIconFromChannelType(channel.type);
+
+  const select = () => {
+    const tab = tryChannelToTab(channel);
+    if (tab) onSelectChannel(tab, channel);
+    else
+      toast({
+        type: 'error',
+        title: `Couldn't open #${channel.name}`,
+        description:
+          "This channel type isn't supported by this version of Mikoto. Reload to update.",
+      });
+  };
 
   return (
-    <>
-      <ChannelPanelHeader>
-        <Heading fontSize="15px" fontWeight="700" truncate>
-          {space.name}
-        </Heading>
-      </ChannelPanelHeader>
-      <ChannelPanelList onContextMenu={contextMenu}>
-        <MobileChannelList space={space} onSelectChannel={onSelectChannel} />
-      </ChannelPanelList>
-    </>
-  );
-}
-
-function SidebarContent({
-  selectedSpaceId,
-  onSelectSpace,
-  onSelectChannel,
-}: {
-  selectedSpaceId: string | null;
-  onSelectSpace: (id: string) => void;
-  onSelectChannel: (tab: Tabable, title: string) => void;
-}) {
-  const mikoto = useMikoto();
-  useSnapshot(mikoto.spaces);
-
-  const spaces = Array.from(mikoto.spaces.cache.values()).filter(
-    (s) => s.type === 'NONE',
-  );
-  const selectedSpace = selectedSpaceId
-    ? mikoto.spaces._get(selectedSpaceId)
-    : null;
-
-  return (
-    <>
-      <SpaceStrip>
-        {spaces.map((space) => (
-          <MobileSpaceIcon
-            key={space.id}
-            space={space}
-            active={space.id === selectedSpaceId}
-            onSelectSpace={onSelectSpace}
-          />
-        ))}
-      </SpaceStrip>
-      <ChannelPanel>
-        {selectedSpace ? (
-          <MobileChannelPanel
-            space={selectedSpace}
-            onSelectChannel={onSelectChannel}
-          />
-        ) : (
-          <Flex align="center" justify="center" flex="1" color="gray.500">
-            <Text fontSize="14px">Select a space</Text>
-          </Flex>
-        )}
-      </ChannelPanel>
-    </>
+    <div>
+      <SidebarRow
+        icon={<Icon size={16} aria-hidden />}
+        label={channel.name}
+        aria-expanded={isGroup ? open : undefined}
+        onClick={isGroup ? () => setOpen((o) => !o) : select}
+        onContextMenu={contextMenu}
+      />
+      {isGroup && open && (
+        <div className={styles.subtree} role="group">
+          {children.map((child) => (
+            <MobileChannelNode
+              key={child.id}
+              channel={child}
+              allChannels={allChannels}
+              depth={depth + 1}
+              onSelectChannel={onSelectChannel}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -391,13 +216,23 @@ function MobileChannelList({
   onSelectChannel,
 }: {
   space: MikotoSpace;
-  onSelectChannel: (tab: Tabable, title: string) => void;
+  onSelectChannel: SelectChannel;
 }) {
   useSnapshot(space);
   useSnapshot(space.channels);
 
-  const allChannels = space.channels as MikotoChannel[];
-  const rootChannels = allChannels.filter((c) => c.parentId === null);
+  const allChannels: MikotoChannel[] = space.channels;
+  const ids = new Set(allChannels.map((c) => c.id));
+  // Channels whose parent is missing still show, at the root.
+  const rootChannels = allChannels
+    .filter((c) => !c.parentId || !ids.has(c.parentId))
+    .sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }),
+    );
+
+  if (rootChannels.length === 0) {
+    return <p className={styles.placeholder}>No channels in this space yet.</p>;
+  }
 
   return (
     <>
@@ -414,112 +249,84 @@ function MobileChannelList({
   );
 }
 
-function MobileChannelNode({
-  channel,
-  allChannels,
-  depth,
+function SidebarContent({
+  selectedSpaceId,
+  onSelectSpace,
   onSelectChannel,
 }: {
-  channel: MikotoChannel;
-  allChannels: MikotoChannel[];
-  depth: number;
-  onSelectChannel: (tab: Tabable, title: string) => void;
+  selectedSpaceId: string | null;
+  onSelectSpace: (id: string) => void;
+  onSelectChannel: SelectChannel;
 }) {
-  const [open, setOpen] = useState(depth === 0);
-  const children = allChannels.filter((c) => c.parentId === channel.id);
-  const isGroup = children.length > 0;
-  const contextMenu = useContextMenu(() => (
-    <ChannelContextMenu channel={channel} />
-  ));
+  const mikoto = useMikoto();
+  useSnapshot(mikoto.spaces);
 
-  const icon = getIconFromChannelType(channel.type) ?? faHashtag;
-
-  if (isGroup) {
-    return (
-      <div>
-        <MobileChannelItem
-          depth={depth}
-          onClick={() => setOpen(!open)}
-          onContextMenu={contextMenu}
-        >
-          <FontAwesomeIcon icon={icon} />
-          <span>{channel.name}</span>
-        </MobileChannelItem>
-        {open &&
-          children.map((child) => (
-            <MobileChannelNode
-              key={child.id}
-              channel={child}
-              allChannels={allChannels}
-              depth={depth + 1}
-              onSelectChannel={onSelectChannel}
-            />
-          ))}
-      </div>
-    );
-  }
+  const spaces = Array.from(mikoto.spaces.cache.values()).filter(
+    (s) => s.type === 'NONE',
+  );
+  const selectedSpace = selectedSpaceId
+    ? mikoto.spaces._get(selectedSpaceId)
+    : undefined;
+  const contextMenu = useContextMenu(() =>
+    selectedSpace ? <TreebarContextMenu space={selectedSpace} /> : null,
+  );
 
   return (
-    <MobileChannelItem
-      depth={depth}
-      onContextMenu={contextMenu}
-      onClick={() => {
-        try {
-          const tab = channelToTab(channel);
-          onSelectChannel(tab, channel.name);
-        } catch {
-          // Unknown channel type
-        }
-      }}
-    >
-      <FontAwesomeIcon icon={icon} />
-      <span>{channel.name}</span>
-    </MobileChannelItem>
+    <>
+      <nav className={styles.strip} aria-label="Spaces">
+        {spaces.map((space) => (
+          <MobileSpaceIcon
+            key={space.id}
+            space={space}
+            active={space.id === selectedSpaceId}
+            onSelectSpace={onSelectSpace}
+          />
+        ))}
+      </nav>
+      <div className={styles.panel}>
+        {selectedSpace ? (
+          <>
+            <h2 className={styles.panelHead}>{selectedSpace.name}</h2>
+            <nav
+              className={styles.list}
+              aria-label={`${selectedSpace.name} channels`}
+              onContextMenu={contextMenu}
+            >
+              <MobileChannelList
+                space={selectedSpace}
+                onSelectChannel={onSelectChannel}
+              />
+            </nav>
+          </>
+        ) : (
+          <p className={styles.placeholder}>
+            {spaces.length === 0
+              ? "You're not in any spaces yet. Join one with an invite link."
+              : 'Pick a space to see its channels.'}
+          </p>
+        )}
+      </div>
+    </>
   );
 }
 
 // --- Surface Screen ---
 
-function SurfaceView({ tab }: { tab: Tabable }) {
-  const SurfaceComponent = surfaceMap[tab.kind] as any;
-  if (!SurfaceComponent) return null;
-
-  const { kind, key, ...rest } = tab;
-
+function SurfaceView({ tab, title }: { tab: Tabable; title: string }) {
+  const id = `${tab.kind}/${tab.key}`;
   return (
-    <MobileContent style={{ overflow: 'hidden', display: 'flex' }}>
-      <TabContext value={{ key: `${kind}/${key}` }}>
-        <ErrorBoundary FallbackComponent={ErrorSurface}>
+    <div className={styles.sheet}>
+      <TabContext value={{ key: id }}>
+        <SurfaceErrorBoundary
+          what={title || 'This channel'}
+          resetKeys={[tab.key]}
+        >
           <Suspense fallback={<LoadingSurface />}>
-            <SurfaceComponent key={key} {...rest} />
+            {renderSurface(tab)}
           </Suspense>
-        </ErrorBoundary>
+        </SurfaceErrorBoundary>
       </TabContext>
-    </MobileContent>
-  );
-}
-
-// --- Welcome screen when no channel is selected ---
-
-function WelcomeContent({ onOpenSidebar }: { onOpenSidebar: () => void }) {
-  return (
-    <>
-      <MobileHeader>
-        <HeaderButton onClick={onOpenSidebar}>
-          <FontAwesomeIcon icon={faBars} />
-        </HeaderButton>
-        <Heading fontSize="16px" fontWeight="600">
-          Mikoto
-        </Heading>
-      </MobileHeader>
-      <Flex flex="1" align="center" justify="center" direction="column" gap={3}>
-        <FontAwesomeIcon icon={faMikoto} fontSize="48px" />
-        <Heading fontSize="18px">Welcome to Mikoto</Heading>
-        <Text color="gray.400" fontSize="14px">
-          Swipe right or tap the menu to get started
-        </Text>
-      </Flex>
-    </>
+    </div>
   );
 }
 
@@ -527,7 +334,7 @@ function WelcomeContent({ onOpenSidebar }: { onOpenSidebar: () => void }) {
 
 interface ActiveView {
   tab: Tabable;
-  title: string;
+  channel: MikotoChannel;
 }
 
 function MobileAppView() {
@@ -548,83 +355,92 @@ function MobileAppView() {
     }
   }
 
-  function handleSelectChannel(tab: Tabable, title: string) {
-    setActiveView({ tab, title });
-    drawer.close();
-  }
-
-  function handleBack() {
-    setActiveView(null);
-  }
+  const drawerVisible = drawer.offset > -SIDEBAR_WIDTH;
+  const ActiveIcon = activeView
+    ? getIconFromChannelType(activeView.channel.type)
+    : null;
 
   return (
-    <MobileContainer
+    <div
+      className={styles.container}
       onTouchStart={drawer.onTouchStart}
       onTouchMove={drawer.onTouchMove}
       onTouchEnd={drawer.onTouchEnd}
     >
-      {/* Main content area */}
-      {activeView ? (
+      {activeView && ActiveIcon ? (
         <>
-          <MobileHeader>
-            <HeaderButton onClick={handleBack}>
-              <FontAwesomeIcon icon={faArrowLeft} />
-            </HeaderButton>
-            <Heading fontSize="16px" fontWeight="600" flex="1" truncate>
-              {activeView.title}
-            </Heading>
-          </MobileHeader>
-          <SurfaceView tab={activeView.tab} />
+          <header className={styles.header}>
+            <IconButton
+              size="md"
+              aria-label="Back to channels"
+              onClick={() => {
+                setActiveView(null);
+                drawer.open();
+              }}
+            >
+              <ArrowLeft size={18} aria-hidden />
+            </IconButton>
+            <h1 className={styles.title}>
+              <ActiveIcon size={16} aria-hidden />
+              {activeView.channel.name}
+            </h1>
+          </header>
+          <SurfaceView tab={activeView.tab} title={activeView.channel.name} />
         </>
       ) : (
-        <WelcomeContent onOpenSidebar={drawer.open} />
+        <>
+          <header className={styles.header}>
+            <IconButton size="md" aria-label="Open menu" onClick={drawer.open}>
+              <Menu size={18} aria-hidden />
+            </IconButton>
+            <h1 className={styles.title}>Mikoto</h1>
+          </header>
+          <div className={cx(styles.sheet, styles.welcome)}>
+            <div className={styles.welcomeLogo}>
+              <MikotoLogo size={28} />
+            </div>
+            <h1>Welcome to Mikoto</h1>
+            <p>Swipe from the left edge or open the menu to pick a channel.</p>
+            <Button variant="primary" onClick={drawer.open}>
+              Browse channels
+            </Button>
+          </div>
+        </>
       )}
 
-      {/* Drawer overlay */}
-      <DrawerOverlay
-        visible={drawer.offset > -SIDEBAR_WIDTH}
+      <div
+        className={styles.scrim}
+        aria-hidden
         onClick={drawer.close}
         style={{
           opacity: Math.max(0, (drawer.offset + SIDEBAR_WIDTH) / SIDEBAR_WIDTH),
+          pointerEvents: drawerVisible ? 'auto' : 'none',
         }}
       />
 
-      {/* Drawer */}
-      <DrawerContainer translateX={drawer.offset} animate={drawer.animate}>
+      <aside
+        className={cx(styles.drawer, drawer.animate && styles.animate)}
+        style={{ transform: `translateX(${drawer.offset}px)` }}
+        aria-label="Navigation"
+        aria-hidden={!drawerVisible}
+        inert={!drawerVisible}
+      >
         <SidebarContent
           selectedSpaceId={selectedSpaceId}
           onSelectSpace={setSelectedSpaceId}
-          onSelectChannel={handleSelectChannel}
+          onSelectChannel={(tab, channel) => {
+            setActiveView({ tab, channel });
+            drawer.close();
+          }}
         />
-      </DrawerContainer>
-    </MobileContainer>
-  );
-}
-
-// --- Fallback ---
-
-function MobileFallback() {
-  return (
-    <MobileContainer>
-      <Flex
-        w="100%"
-        h="100%"
-        align="center"
-        justify="center"
-        direction="column"
-      >
-        <FontAwesomeIcon icon={faMikoto} fontSize="60px" />
-        <Box fontSize="18px" mt="10px">
-          Loading...
-        </Box>
-      </Flex>
-    </MobileContainer>
+      </aside>
+    </div>
   );
 }
 
 export default function MobileMainView() {
   return (
-    <MikotoClientProvider fallback={<MobileFallback />}>
+    <MikotoClientProvider fallback={<ShellSkeleton />}>
       <MobileAppView />
       <CommandMenuKit />
       <ContextMenuKit />

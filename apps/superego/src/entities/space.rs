@@ -1,3 +1,6 @@
+use std::sync::LazyLock;
+
+use regex::Regex;
 use schemars::JsonSchema;
 use uuid::Uuid;
 
@@ -35,6 +38,9 @@ entity!(
         pub space_type: SpaceType,
 
         pub visibility: Option<SpaceVisibility>,
+
+        /// Accent color of the space, as a `#RRGGBB` hex string.
+        pub accent: Option<String>,
     }
 );
 
@@ -58,9 +64,27 @@ pub struct SpacePatch {
     pub icon: Option<String>,
     pub owner_id: Option<Uuid>,
     pub visibility: Option<SpaceVisibility>,
+    /// `None` leaves the accent unchanged; `Some(None)` clears it.
+    pub accent: Option<Option<String>>,
 }
 
+static ACCENT_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^#[0-9a-fA-F]{6}$").expect("invalid regex"));
+
 impl Space {
+    /// Validate a space accent color (`#RRGGBB`).
+    pub fn validate_accent(accent: &str) -> Result<(), Error> {
+        if ACCENT_REGEX.is_match(accent) {
+            Ok(())
+        } else {
+            Err(Error::new(
+                "InvalidAccent",
+                axum::http::StatusCode::BAD_REQUEST,
+                "Accent must be a hex color in the form #RRGGBB",
+            ))
+        }
+    }
+
     pub fn new(name: String, owner_id: Uuid) -> Self {
         Self {
             id: Uuid::new_v4(),
@@ -69,6 +93,7 @@ impl Space {
             owner_id: Some(owner_id),
             space_type: SpaceType::None,
             visibility: None,
+            accent: None,
         }
     }
 
@@ -116,8 +141,8 @@ impl Space {
                 VALUES (gen_random_uuid(), $1, '@everyone', -1, '0')
                 RETURNING "id"
             )
-            INSERT INTO "Space" ("id", "name", "icon", "ownerId", "type", "visibility")
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO "Space" ("id", "name", "icon", "ownerId", "type", "visibility", "accent")
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             "##,
         )
         .bind(self.id)
@@ -126,6 +151,7 @@ impl Space {
         .bind(self.owner_id)
         .bind(self.space_type)
         .bind(self.visibility)
+        .bind(&self.accent)
         .execute(db)
         .await?;
         Ok(())
@@ -142,7 +168,8 @@ impl Space {
             "name" = COALESCE($2, "name"),
             "icon" = COALESCE($3, "icon"),
             "ownerId" = COALESCE($4, "ownerId"),
-            "visibility" = COALESCE($5, "visibility")
+            "visibility" = COALESCE($5, "visibility"),
+            "accent" = CASE WHEN $6 THEN $7 ELSE "accent" END
             WHERE "id" = $1
             RETURNING *
             "##,
@@ -152,6 +179,8 @@ impl Space {
         .bind(&patch.icon)
         .bind(patch.owner_id)
         .bind(patch.visibility)
+        .bind(patch.accent.is_some())
+        .bind(patch.accent.flatten())
         .fetch_optional(db)
         .await?
         .ok_or(Error::NotFound)?;

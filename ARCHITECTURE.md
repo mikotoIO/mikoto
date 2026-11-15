@@ -22,7 +22,7 @@ Key client directories:
 
 - `src/components/surfaces/` - Main application surfaces/views
 - `src/store/` - State management and API clients
-- `src/components/ui/` - Chakra UI-based design system components
+- `src/design/` - Design system: tokens, appearance preferences, Base UI-based components, loading and error primitives (see its README.md)
 - `src/views/` - Route-level components and providers
 
 ### Server Architecture (Rust)

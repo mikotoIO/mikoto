@@ -9,7 +9,7 @@ const toCss = (v: Size | undefined) => (typeof v === 'number' ? `${v}px` : v);
 export interface SkeletonProps {
   width?: Size;
   height?: Size;
-  /** Render as a circle (avatars). Uses `width` for both dimensions. */
+  /** Render in the avatar shape. Uses `width` for both dimensions. */
   circle?: boolean;
   radius?: Size;
   className?: string;
@@ -31,11 +31,11 @@ export function Skeleton({
   return (
     <span
       aria-hidden
-      className={cx(styles.skeleton, className)}
+      className={cx(styles.skeleton, circle && styles.avatarShape, className)}
       style={{
         width: toCss(width),
         height: toCss(circle ? width : height),
-        borderRadius: circle ? '50%' : toCss(radius),
+        borderRadius: circle ? undefined : toCss(radius),
         ...style,
       }}
     />

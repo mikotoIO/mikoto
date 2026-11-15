@@ -13,55 +13,11 @@ import {
   type TextNode,
 } from 'lexical';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { z } from 'zod';
 
 import { cx } from '@/design';
 
 import styles from './MessageEditor.module.css';
-
-const emojiDataSchema = z.object({
-  emojis: z.record(
-    z.string(),
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      keywords: z.array(z.string()).optional(),
-      skins: z.array(z.object({ native: z.string() })).optional(),
-    }),
-  ),
-});
-
-type EmojiEntry = {
-  id: string;
-  name: string;
-  native: string;
-  keywords: string[];
-};
-
-let emojiListCache: EmojiEntry[] | null = null;
-let loadingPromise: Promise<EmojiEntry[]> | null = null;
-
-function loadEmojis(): Promise<EmojiEntry[]> {
-  if (emojiListCache) return Promise.resolve(emojiListCache);
-  if (!loadingPromise) {
-    loadingPromise = import('@emoji-mart/data/sets/14/twitter.json').then(
-      (mod) => {
-        const parsed = emojiDataSchema.safeParse(mod.default);
-        const list: EmojiEntry[] = parsed.success
-          ? Object.values(parsed.data.emojis).map((e) => ({
-              id: e.id,
-              name: e.name,
-              native: e.skins?.[0]?.native ?? '',
-              keywords: e.keywords ?? [],
-            }))
-          : [];
-        emojiListCache = list;
-        return list;
-      },
-    );
-  }
-  return loadingPromise;
-}
+import { type EmojiEntry, loadEmojis, searchEmojis } from './emojiData';
 
 interface EmojiMatch {
   search: string;
@@ -104,24 +60,6 @@ function readEmojiSearch(editor: LexicalEditor): EmojiMatch | null {
   return result;
 }
 
-function filterEmojis(emojis: EmojiEntry[], search: string): EmojiEntry[] {
-  const q = search.toLowerCase();
-  const startsWith: EmojiEntry[] = [];
-  const idIncludes: EmojiEntry[] = [];
-  const keywordIncludes: EmojiEntry[] = [];
-  for (const e of emojis) {
-    if (e.id.startsWith(q)) {
-      startsWith.push(e);
-    } else if (e.id.includes(q)) {
-      idIncludes.push(e);
-    } else if (e.keywords.some((k) => k.includes(q))) {
-      keywordIncludes.push(e);
-    }
-    if (startsWith.length >= 10) break;
-  }
-  return [...startsWith, ...idIncludes, ...keywordIncludes].slice(0, 10);
-}
-
 export function EmojiAutocompletePlugin() {
   const [editor] = useLexicalComposerContext();
   const [emojis, setEmojis] = useState<EmojiEntry[]>([]);
@@ -131,15 +69,15 @@ export function EmojiAutocompletePlugin() {
 
   useEffect(() => {
     let cancelled = false;
-    loadEmojis().then((list) => {
-      if (!cancelled) setEmojis(list);
+    loadEmojis().then((set) => {
+      if (!cancelled) setEmojis(set.list);
     });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const filtered = match ? filterEmojis(emojis, match.search) : [];
+  const filtered = match ? searchEmojis(emojis, match.search, 10) : [];
   const isOpen = match !== null && filtered.length > 0;
 
   activeIndexRef.current = activeIndex;

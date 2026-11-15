@@ -43,7 +43,9 @@ export function ContextMenuKit() {
 
   // Measure, then clamp into the viewport on both axes. This has to be a
   // layout effect: the size is only known after render, and placing before
-  // paint avoids a visible jump.
+  // paint avoids a visible jump. Content can also change size after opening
+  // (lazy-loaded pickers, Suspense), so re-place whenever it resizes;
+  // otherwise a bottom-anchored menu would grow off the screen.
   useLayoutEffect(() => {
     const el = ref.current;
     if (!context || !el) {
@@ -51,19 +53,26 @@ export function ContextMenuKit() {
       setPlaced(null);
       return;
     }
-    const { width, height } = el.getBoundingClientRect();
-    const p = context.position;
-    let left = p.left ?? window.innerWidth - (p.right ?? 0) - width;
-    let top = p.top ?? window.innerHeight - (p.bottom ?? 0) - height;
-    if (left + width > window.innerWidth - MARGIN) left -= width;
-    if (top + height > window.innerHeight - MARGIN) {
-      top = window.innerHeight - MARGIN - height;
-    }
-    // eslint-disable-next-line @eslint-react/set-state-in-effect
-    setPlaced({
-      left: Math.max(MARGIN, left),
-      top: Math.max(MARGIN, top),
-    });
+    const place = () => {
+      const width = el.offsetWidth;
+      const height = el.offsetHeight;
+      const p = context.position;
+      let left = p.left ?? window.innerWidth - (p.right ?? 0) - width;
+      let top = p.top ?? window.innerHeight - (p.bottom ?? 0) - height;
+      if (left + width > window.innerWidth - MARGIN) left -= width;
+      if (top + height > window.innerHeight - MARGIN) {
+        top = window.innerHeight - MARGIN - height;
+      }
+      // eslint-disable-next-line @eslint-react/set-state-in-effect
+      setPlaced({
+        left: Math.max(MARGIN, left),
+        top: Math.max(MARGIN, top),
+      });
+    };
+    place();
+    const observer = new ResizeObserver(place);
+    observer.observe(el);
+    return () => observer.disconnect();
   }, [context]);
 
   // Focus the first item so keyboard users land inside the menu.

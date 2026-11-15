@@ -47,6 +47,9 @@
   --r-sheet: 12px;
   --r-ctl: 8px;
   --r-pill: 999px;
+  /* avatars: a squircle. Without corner-shape support, a rounded square. */
+  --r-av: 30%;
+  --av-corner: round;
 
   /* density-dependent */
   --row: 30px;
@@ -185,5 +188,12 @@
   :root {
     --dur-fast: 0ms;
     --dur: 0ms;
+  }
+}
+
+@supports (corner-shape: squircle) {
+  :root {
+    --r-av: 50%;
+    --av-corner: squircle;
   }
 }

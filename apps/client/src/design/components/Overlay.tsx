@@ -144,6 +144,9 @@ export function PopoverContent({
   sideOffset = 8,
   title,
   bare,
+  anchor,
+  initialFocus,
+  finalFocus,
   className,
   children,
 }: {
@@ -154,6 +157,10 @@ export function PopoverContent({
   title?: ReactNode;
   /** No padding/background: for pickers that bring their own chrome. */
   bare?: boolean;
+  /** Position against this element instead of the trigger. */
+  anchor?: ComponentProps<typeof BasePopover.Positioner>['anchor'];
+  initialFocus?: ComponentProps<typeof BasePopover.Popup>['initialFocus'];
+  finalFocus?: ComponentProps<typeof BasePopover.Popup>['finalFocus'];
   className?: string;
   children: ReactNode;
 }) {
@@ -163,9 +170,12 @@ export function PopoverContent({
         side={side}
         align={align}
         sideOffset={sideOffset}
+        anchor={anchor}
         className={styles.positioner}
       >
         <BasePopover.Popup
+          initialFocus={initialFocus}
+          finalFocus={finalFocus}
           className={cx(bare ? styles.bare : styles.popover, className)}
         >
           {title && (

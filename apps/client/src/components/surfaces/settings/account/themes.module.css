@@ -21,7 +21,8 @@
   width: var(--av);
   height: var(--av);
   margin-top: 2px;
-  border-radius: 50%;
+  border-radius: var(--r-av);
+  corner-shape: var(--av-corner);
   display: grid;
   place-items: center;
   background: var(--raised);

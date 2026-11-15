@@ -24,6 +24,10 @@
   position: relative;
   overflow: hidden;
 }
+.avatarShape {
+  border-radius: var(--r-av);
+  corner-shape: var(--av-corner);
+}
 .skeleton::after {
   content: '';
   position: absolute;

@@ -20,27 +20,17 @@ import {
   PASTE_COMMAND,
 } from 'lexical';
 import { ArrowUp, FileText, Paperclip, Smile, X } from 'lucide-react';
-import {
-  type ReactNode,
-  Suspense,
-  lazy,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
-import { contextMenuState } from '@/components/ContextMenu';
-import { IconButton } from '@/design';
+import { IconButton, Popover, PopoverTrigger } from '@/design';
 import { useIsMobile } from '@/hooks/useIsMobile';
 
 import { EmojiAutocompletePlugin } from './EmojiAutocomplete';
+import { EmojiPickerPopover } from './EmojiPicker';
 import { MentionAutocompletePlugin } from './MentionAutocomplete';
 import { messageEditState } from './Message';
 import styles from './MessageEditor.module.css';
-
-const EmojiPicker = lazy(() => import('./EmojiPicker'));
 
 // check if document.activeElement is either an input, textarea, or contenteditable
 function isInputLike() {
@@ -272,7 +262,8 @@ export function MessageEditor({
     ]);
   };
 
-  const setContextMenu = useSetAtom(contextMenuState);
+  const composerRef = useRef<HTMLDivElement>(null);
+  const [emojiOpen, setEmojiOpen] = useState(false);
   const [editableEl, setEditableEl] = useState<HTMLDivElement | null>(null);
   useResizeObserver(editableEl, () => {
     onResize?.();
@@ -335,7 +326,7 @@ export function MessageEditor({
   return (
     <div className={styles.wrap}>
       {above}
-      <div className={styles.composer}>
+      <div className={styles.composer} ref={composerRef}>
         <input {...dropzone.getInputProps()} />
         {currentEditState && (
           <div className={styles.editBar}>
@@ -400,31 +391,27 @@ export function MessageEditor({
             </IconButton>
           )}
           {!isMobile && (
-            <IconButton
-              aria-label="Emoji"
-              onClick={(ev) => {
-                const bounds = ev.currentTarget.getBoundingClientRect();
-                ev.preventDefault();
-                ev.stopPropagation();
-                setContextMenu({
-                  elem: (
-                    <Suspense>
-                      <EmojiPicker
-                        onEmojiSelect={(x) => {
-                          apiRef.current?.insertText(x);
-                        }}
-                      />
-                    </Suspense>
-                  ),
-                  position: {
-                    left: bounds.left,
-                    bottom: window.innerHeight - bounds.top + 8,
-                  },
-                });
-              }}
-            >
-              <Smile size={16} />
-            </IconButton>
+            <Popover open={emojiOpen} onOpenChange={setEmojiOpen}>
+              <PopoverTrigger
+                render={
+                  <IconButton aria-label="Emoji">
+                    <Smile size={16} />
+                  </IconButton>
+                }
+              />
+              <EmojiPickerPopover
+                anchor={composerRef}
+                // Hand focus back to the text, not the trigger.
+                finalFocus={() => {
+                  apiRef.current?.focus();
+                  return false;
+                }}
+                onPick={(emoji, keepOpen) => {
+                  apiRef.current?.insertText(`:${emoji.id}:`);
+                  if (!keepOpen) setEmojiOpen(false);
+                }}
+              />
+            </Popover>
           )}
           {!isMobile && (
             <span className={styles.hint}>Shift+Enter for a new line</span>

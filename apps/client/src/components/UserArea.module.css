@@ -33,7 +33,8 @@
   flex-shrink: 0;
 }
 .avatar img {
-  border-radius: 50%;
+  border-radius: var(--r-av);
+  corner-shape: var(--av-corner);
 }
 
 .text {

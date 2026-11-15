@@ -129,7 +129,8 @@
 .avatar img {
   width: 68px;
   height: 68px;
-  border-radius: 50%;
+  border-radius: var(--r-av);
+  corner-shape: var(--av-corner);
   object-fit: cover;
 }
 

@@ -15,6 +15,7 @@ import {
   roleNameProps,
   sortedRoles,
 } from '@/components/atoms/MessageAvatar';
+import { Topo } from '@/components/atoms/Topo';
 import {
   Button,
   DialogContent,
@@ -200,7 +201,8 @@ export function ProfileModal({
 
   return (
     <DialogContent
-      title="Profile"
+      title={`${user.name}'s profile`}
+      headerless
       footer={
         isMe ? undefined : (
           <div className={styles.actions}>
@@ -210,7 +212,9 @@ export function ProfileModal({
       }
     >
       <div className={styles.card} style={{ '--h': hueFromId(user.id) }}>
-        <div className={styles.banner} aria-hidden />
+        <div className={styles.banner} aria-hidden>
+          <Topo seed={hueFromId(user.id)} className={styles.topo} />
+        </div>
         <div className={styles.body}>
           <span className={styles.avatarRing}>
             <Avatar

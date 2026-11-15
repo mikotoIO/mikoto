@@ -66,6 +66,11 @@
   font: 500 var(--text-xs) var(--font-ui);
   color: var(--faint);
 }
+.check {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--accent-ink);
+}
 .separator {
   height: 1px;
   margin: 4px 6px;

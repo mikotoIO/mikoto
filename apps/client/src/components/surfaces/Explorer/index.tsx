@@ -10,6 +10,8 @@ import {
   modalState,
   useContextMenuX,
 } from '@/components/ContextMenu';
+import { hueFromId } from '@/components/atoms/Avatar';
+import { Topo } from '@/components/atoms/Topo';
 import { InviteModal } from '@/components/modals/Invite';
 import {
   RESIZABLE_DISABLES,
@@ -71,42 +73,6 @@ export function TreebarContextMenu({ space }: { space: MikotoSpace }) {
 
 /* ---------------------------------------------------------------- banner */
 
-// Contour lines for the banner, computed once. Concentric wobbly rings
-// centred off the top-right corner, like a topographic map.
-const TOPO_PATHS = Array.from({ length: 8 }, (_, i) => {
-  const k = i + 1;
-  const r = k * 10;
-  let d = '';
-  for (let a = 0; a <= 72; a++) {
-    const t = (a / 72) * Math.PI * 2;
-    const rr =
-      r * (1 + 0.16 * Math.sin(3 * t + k * 0.7) + 0.07 * Math.sin(5 * t - k));
-    d += `${a ? 'L' : 'M'}${(196 + Math.cos(t) * rr * 1.5).toFixed(1)} ${(
-      18 +
-      Math.sin(t) * rr
-    ).toFixed(1)}`;
-  }
-  return `${d}Z`;
-});
-
-function Topo() {
-  return (
-    <svg
-      className={styles.topo}
-      viewBox="0 0 240 96"
-      preserveAspectRatio="xMaxYMin slice"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1}
-      aria-hidden
-    >
-      {TOPO_PATHS.map((d) => (
-        <path key={d} d={d} />
-      ))}
-    </svg>
-  );
-}
-
 function SpaceBanner({ space }: { space: MikotoSpace }) {
   const accent = spaceAccent(space);
   const isPublic = space.visibility === 'PUBLIC';
@@ -118,7 +84,7 @@ function SpaceBanner({ space }: { space: MikotoSpace }) {
       className={cx(styles.banner, accent && styles.accented)}
       style={accent ? { '--space': accent } : undefined}
     >
-      <Topo />
+      <Topo seed={hueFromId(space.id)} className={styles.topo} />
       <SidebarHeadActions
         className={styles.bannerActions}
         searchLabel={`Search ${space.name}`}

@@ -8,7 +8,7 @@ import React, {
   useState,
 } from 'react';
 
-import { Dialog, cx } from '@/design';
+import { Dialog, MenuCheck, cx } from '@/design';
 
 import styles from './ContextMenu.module.css';
 
@@ -155,6 +155,8 @@ interface ItemProps extends Omit<ComponentProps<'button'>, 'onClick'> {
   /** Destructive actions (delete, leave, ban) are red. */
   danger?: boolean;
   shortcut?: string;
+  /** The current choice in a set (e.g. notification level): a check on the right. */
+  checked?: boolean;
 }
 
 function ContextMenuItem({
@@ -162,6 +164,7 @@ function ContextMenuItem({
   icon,
   danger,
   shortcut,
+  checked,
   disabled,
   className,
   children,
@@ -185,6 +188,7 @@ function ContextMenuItem({
       {icon && <span className={styles.icon}>{icon}</span>}
       <span className={styles.label}>{children}</span>
       {shortcut && <kbd className={styles.shortcut}>{shortcut}</kbd>}
+      {checked && <MenuCheck className={styles.check} />}
     </button>
   );
 }

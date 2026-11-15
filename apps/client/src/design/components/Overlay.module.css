@@ -91,6 +91,27 @@
   color: var(--text);
 }
 
+.headerless {
+  overflow: hidden;
+}
+.headerless .dialogBody {
+  padding: 0;
+}
+/* Sits over whatever the content puts at the top, so it carries its own
+   backing instead of relying on the sheet behind it. */
+.floatingClose {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  background: color-mix(in oklch, var(--sheet) 60%, transparent);
+  backdrop-filter: blur(8px);
+  color: var(--text);
+}
+.floatingClose:hover {
+  background: color-mix(in oklch, var(--sheet) 85%, transparent);
+}
+
 /* ------------------------------------------------- floating popups */
 .positioner {
   z-index: var(--z-menu);
@@ -147,6 +168,11 @@
 .menuIcon {
   display: flex;
   color: var(--muted);
+}
+.menuCheck {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--accent-ink);
 }
 .menuLabel {
   flex: 1;

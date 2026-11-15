@@ -4,7 +4,6 @@ import {
   AtSign,
   Bell,
   BellOff,
-  Check,
   CheckCheck,
   Copy,
   DoorOpen,
@@ -200,10 +199,10 @@ export function SpaceContextMenu({ space }: { space: MikotoSpace }) {
               key={a.id}
               icon={a.icon}
               danger={a.danger}
+              checked={a.checked}
               onClick={a.onSelect}
             >
               {a.label}
-              {a.checked && <Check size={14} aria-label="Selected" />}
             </ContextMenu.Item>
           ))}
         </Fragment>
@@ -224,10 +223,10 @@ export function SpaceMenuItems({ space }: { space: MikotoSpace }) {
           key={a.id}
           icon={a.icon}
           danger={a.danger}
+          checked={a.checked}
           onClick={a.onSelect}
         >
           {a.label}
-          {a.checked && <Check size={14} aria-label="Selected" />}
         </MenuItem>
       ))}
     </Fragment>

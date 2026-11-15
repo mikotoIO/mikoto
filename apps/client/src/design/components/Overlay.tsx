@@ -2,7 +2,7 @@ import { Dialog as BaseDialog } from '@base-ui/react/dialog';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
 import { Popover as BasePopover } from '@base-ui/react/popover';
 import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
-import { X } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { type ComponentProps, type ReactElement, type ReactNode } from 'react';
 
 import { cx } from '../cx';
@@ -26,6 +26,9 @@ export interface DialogContentProps {
   /** Footer actions, right-aligned. Primary action goes last. */
   footer?: ReactNode;
   hideClose?: boolean;
+  /** No visible header or body padding: content runs to the edges (e.g. a
+   *  banner). The title is kept for screen readers; close floats on top. */
+  headerless?: boolean;
   className?: string;
   children?: ReactNode;
 }
@@ -36,23 +39,42 @@ export function DialogContent({
   size = 'md',
   footer,
   hideClose,
+  headerless,
   className,
   children,
 }: DialogContentProps) {
+  const close = !hideClose && (
+    <BaseDialog.Close
+      className={cx(styles.close, headerless && styles.floatingClose)}
+      aria-label="Close"
+    >
+      <X size={16} />
+    </BaseDialog.Close>
+  );
   return (
     <BaseDialog.Portal>
       <BaseDialog.Backdrop className={styles.backdrop} />
-      <BaseDialog.Popup className={cx(styles.dialog, styles[size], className)}>
-        <header className={styles.dialogHeader}>
-          <BaseDialog.Title className={styles.dialogTitle}>
-            {title}
-          </BaseDialog.Title>
-          {!hideClose && (
-            <BaseDialog.Close className={styles.close} aria-label="Close">
-              <X size={16} />
-            </BaseDialog.Close>
-          )}
-        </header>
+      <BaseDialog.Popup
+        className={cx(
+          styles.dialog,
+          styles[size],
+          headerless && styles.headerless,
+          className,
+        )}
+      >
+        {headerless ? (
+          <>
+            <BaseDialog.Title className="sr-only">{title}</BaseDialog.Title>
+            {close}
+          </>
+        ) : (
+          <header className={styles.dialogHeader}>
+            <BaseDialog.Title className={styles.dialogTitle}>
+              {title}
+            </BaseDialog.Title>
+            {close}
+          </header>
+        )}
         {description && (
           <BaseDialog.Description className={styles.dialogDescription}>
             {description}
@@ -103,6 +125,7 @@ export function MenuItem({
   icon,
   danger,
   shortcut,
+  checked,
   className,
   children,
   ...props
@@ -111,6 +134,8 @@ export function MenuItem({
   icon?: ReactNode;
   danger?: boolean;
   shortcut?: string;
+  /** The current choice in a set (e.g. notification level): a check on the right. */
+  checked?: boolean;
 }) {
   return (
     <BaseMenu.Item
@@ -120,7 +145,18 @@ export function MenuItem({
       {icon && <span className={styles.menuIcon}>{icon}</span>}
       <span className={styles.menuLabel}>{children}</span>
       {shortcut && <kbd className={styles.shortcut}>{shortcut}</kbd>}
+      {checked && <MenuCheck className={styles.menuCheck} />}
     </BaseMenu.Item>
+  );
+}
+
+/** Trailing check for the selected item in a menu; announced as "selected". */
+export function MenuCheck({ className }: { className?: string }) {
+  return (
+    <span className={className}>
+      <Check size={14} aria-hidden />
+      <span className="sr-only">(selected)</span>
+    </span>
   );
 }
 

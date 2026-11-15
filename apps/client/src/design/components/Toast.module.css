@@ -1,10 +1,9 @@
 .viewport {
   position: fixed;
   z-index: var(--z-toast);
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(380px, calc(100vw - 24px));
+  bottom: 16px;
+  right: 16px;
+  width: min(360px, calc(100vw - 24px));
 }
 
 .toast {
@@ -60,6 +59,9 @@
 .toast[data-ending-style][data-swipe-direction='down'] {
   transform: translateY(calc(var(--toast-swipe-movement-y) + 150%));
 }
+.toast[data-ending-style][data-swipe-direction='right'] {
+  transform: translateX(calc(var(--toast-swipe-movement-x) + 150%));
+}
 .toast::after {
   content: '';
   position: absolute;
@@ -88,12 +90,17 @@
   flex: 1;
   min-width: 0;
 }
+/* Title renders as an <h2>; pin it to the toast's size, not the heading's. */
 .title {
   margin: 0;
+  font-size: var(--text-sm);
   font-weight: 500;
+  line-height: 1.35;
 }
 .description {
   margin: 2px 0 0;
+  font-size: var(--text-xs);
+  line-height: 1.4;
   color: var(--muted);
 }
 .description:empty {

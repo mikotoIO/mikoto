@@ -110,20 +110,29 @@
 }
 
 /* --------------------------------------------------------------- light */
+/*
+ * Light is not dark inverted. Each layer is a distinct step, so structure
+ * reads without borders:
+ *   base     the frame: a clearly grey "wooden" surround (L ~0.89)
+ *   raised   chips and wells: lighter than base (active tab/row lifts off
+ *            the frame), darker than sheet (inputs sink into the paper)
+ *   sheet    the paper: off-white, never pure white, so it doesn't glare
+ *   overlay  pure white, reserved for floating things (menus, dialogs)
+ */
 :root[data-theme='light'] {
   color-scheme: light;
-  --base: color-mix(in oklch, var(--accent) var(--tint), #edeef0);
-  --sheet: color-mix(in oklch, var(--accent) calc(var(--tint) / 3), #ffffff);
-  --raised: color-mix(in oklch, var(--accent) var(--tint), #f4f5f6);
+  --base: color-mix(in oklch, var(--accent) var(--tint), #d8dadf);
+  --sheet: color-mix(in oklch, var(--accent) calc(var(--tint) / 3), #f7f7f9);
+  --raised: color-mix(in oklch, var(--accent) var(--tint), #e8e9ed);
   --overlay: #ffffff;
-  --hover: rgb(20 20 40 / 0.045);
-  --press: rgb(20 20 40 / 0.08);
-  --line: color-mix(in oklch, var(--accent) var(--tint), #e2e3e6);
-  --line-strong: color-mix(in oklch, var(--accent) var(--tint), #cfd1d6);
+  --hover: rgb(24 28 48 / 0.06);
+  --press: rgb(24 28 48 / 0.11);
+  --line: color-mix(in oklch, var(--accent) var(--tint), #d9dbe0);
+  --line-strong: color-mix(in oklch, var(--accent) var(--tint), #bfc2c9);
 
-  --text: #18191c;
-  --muted: #5e6068;
-  --faint: #8c8e96;
+  --text: #16171a;
+  --muted: #4f525a;
+  --faint: #676a73;
 
   --accent-ink: color-mix(in oklch, var(--accent) 62%, black);
   --accent-soft: color-mix(in oklch, var(--accent) 15%, transparent);
@@ -134,9 +143,9 @@
   --danger-solid: #c93535;
 
   --shimmer: rgb(255 255 255 / 0.7);
-  --scrim: rgb(20 20 30 / 0.35);
-  --shadow: 0 12px 40px rgb(30 30 60 / 0.14), 0 2px 6px rgb(30 30 60 / 0.08);
-  --shadow-sm: 0 4px 14px rgb(30 30 60 / 0.1);
+  --scrim: rgb(20 22 34 / 0.4);
+  --shadow: 0 14px 40px rgb(24 28 52 / 0.2), 0 2px 6px rgb(24 28 52 / 0.1);
+  --shadow-sm: 0 4px 14px rgb(24 28 52 / 0.14);
 
   --role-l: min(l, 0.48);
   --role-c: min(c, 0.16);

@@ -161,7 +161,7 @@ export function applyAppearance(
   root.style.setProperty('--fs', `${appearance.textSize}px`);
   document
     .querySelector('meta[name="theme-color"]')
-    ?.setAttribute('content', theme === 'dark' ? '#0e0f11' : '#edeef0');
+    ?.setAttribute('content', theme === 'dark' ? '#0e0f11' : '#d8dadf');
 }
 
 /** Keeps <html> in sync with preferences. Mount once near the app root. */

@@ -39,7 +39,7 @@ export function role(spaceId: string, overrides: Partial<Role> = {}): Role {
     id: uuid(),
     spaceId,
     name: '@everyone',
-    permissions: '0',
+    permissions: [],
     position: -1,
     color: null,
     ...overrides,

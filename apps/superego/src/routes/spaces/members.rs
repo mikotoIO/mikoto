@@ -15,7 +15,7 @@ use crate::{
     error::Error,
     functions::{
         jwt::Claims,
-        permissions::{can_grant, parse_permissions, permissions_or_admin, Permission},
+        permissions::{can_grant, permissions_or_admin, Permission, PermissionSet},
         pubsub::emit_event,
     },
     middlewares::load::Load,
@@ -134,7 +134,7 @@ async fn add_role(
     can_grant(
         &space,
         &acting_member,
-        parse_permissions(&role.permissions).unwrap_or(Permission::all()),
+        &PermissionSet::from_names(&role.permissions),
     )?;
 
     RoleToSpaceUser::create(role.id, member.id, db()).await?;
@@ -161,7 +161,7 @@ async fn remove_role(
     can_grant(
         &space,
         &acting_member,
-        parse_permissions(&role.permissions).unwrap_or(Permission::all()),
+        &PermissionSet::from_names(&role.permissions),
     )?;
 
     RoleToSpaceUser::delete(role.id, member.id, db()).await?;

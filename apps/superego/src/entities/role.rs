@@ -13,7 +13,9 @@ entity!(
         pub space_id: Uuid,
         pub name: String,
         pub color: Option<String>,
-        pub permissions: String,
+        /// Permission names: built-ins like `manage_channels`, and custom
+        /// `namespace:name` ones like `polls:create`.
+        pub permissions: Vec<String>,
         pub position: i32,
     }
 );
@@ -31,7 +33,7 @@ pub struct RoleToSpaceUser {
 pub struct RolePatch {
     pub name: String,
     pub color: Option<String>,
-    pub permissions: String,
+    pub permissions: Vec<String>,
     pub position: i32,
 }
 
@@ -72,9 +74,12 @@ impl Role {
         Ok(())
     }
 
+    /// Apply `patch`, storing `permissions` (the patch's, checked and in
+    /// canonical order) in place of the patch's own list.
     pub async fn update<'c, X: sqlx::PgExecutor<'c>>(
         &self,
         patch: &RolePatch,
+        permissions: &[String],
         db: X,
     ) -> Result<Self, Error> {
         // use coalesce to update only non-null fields
@@ -92,7 +97,7 @@ impl Role {
         .bind(self.id)
         .bind(&patch.name)
         .bind(&patch.color)
-        .bind(&patch.permissions)
+        .bind(permissions)
         .bind(patch.position)
         .fetch_optional(db)
         .await?

@@ -6,7 +6,7 @@ use superego::{
     entities::{Account, Channel, Message, Role, RoleToSpaceUser, Space, SpaceUser},
     functions::{
         jwt::{jwt_key, Claims},
-        permissions::Permission,
+        permissions::{Permission, PermissionSet},
     },
 };
 use uuid::Uuid;
@@ -92,11 +92,38 @@ pub async fn role(space: &TestSpace, permissions: Permission) -> Uuid {
         space_id: space.id,
         name: format!("role-{}", short_id()),
         color: None,
-        permissions: permissions.bits().to_string(),
+        permissions: PermissionSet::from(permissions).to_names(),
         position: 0,
     };
     role.create(db()).await.unwrap();
     role.id
+}
+
+/// Create a role in `space` holding exactly the permissions `names`, which
+/// may include custom ones. Stored as given, unchecked.
+pub async fn role_named(space: &TestSpace, names: &[&str]) -> Uuid {
+    let role = Role {
+        id: Uuid::new_v4(),
+        space_id: space.id,
+        name: format!("role-{}", short_id()),
+        color: None,
+        permissions: names.iter().map(|n| n.to_string()).collect(),
+        position: 0,
+    };
+    role.create(db()).await.unwrap();
+    role.id
+}
+
+/// A new user who is a member of `space` with the roles `role_ids`.
+pub async fn member_with_roles(space: &TestSpace, role_ids: &[Uuid]) -> TestUser {
+    let user = user().await;
+    let member_id = join(space, &user).await;
+    for role_id in role_ids {
+        RoleToSpaceUser::create(*role_id, member_id, db())
+            .await
+            .unwrap();
+    }
+    user
 }
 
 /// A new user who is a member of `space` holding `permissions`.

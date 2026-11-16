@@ -14,7 +14,10 @@ use sqlx::PgPool;
 use superego::{
     entities::{Account, Channel, ChannelType, Message, Role, SpaceUser},
     error::Error as SuperegoError,
-    functions::{permissions::Permission, time::Timestamp},
+    functions::{
+        permissions::{Permission, PermissionSet},
+        time::Timestamp,
+    },
 };
 use uuid::Uuid;
 
@@ -234,7 +237,7 @@ async fn create_roles(pool: &PgPool) -> Result<(), sqlx::Error> {
             space_id: TEST_SPACE_ID,
             name: name.to_string(),
             color: color.map(|s| s.to_string()),
-            permissions: permissions.bits().to_string(),
+            permissions: PermissionSet::from(permissions).to_names(),
             position,
         };
         role.create(pool).await.map_err(|e| match e {

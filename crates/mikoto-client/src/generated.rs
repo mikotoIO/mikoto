@@ -446,7 +446,7 @@ pub struct Role {
     pub color: Option<String>,
     pub id: Uuid,
     pub name: String,
-    pub permissions: String,
+    pub permissions: Vec<String>,
     pub position: i32,
     pub space_id: Uuid,
 }
@@ -461,7 +461,7 @@ pub struct RolePatch {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub color: Option<String>,
     pub name: String,
-    pub permissions: String,
+    pub permissions: Vec<String>,
     pub position: i32,
 }
 

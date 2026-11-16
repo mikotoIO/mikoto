@@ -2,7 +2,7 @@
 
 use reqwest::StatusCode;
 use serde_json::{json, Value};
-use superego::functions::permissions::Permission;
+use superego::functions::permissions::{Permission, PermissionSet};
 
 use crate::{
     fixtures::{self, TestSpace, TestUser},
@@ -32,7 +32,7 @@ fn role_crud_requires_manage_roles() {
 
         let manager = fixtures::member_with(&space, Permission::MANAGE_ROLES).await;
         let role = create_role(&app, &space, &manager).await;
-        assert_eq!(role["permissions"], "0");
+        assert_eq!(role["permissions"], json!([]));
         let path = space.path(&format!("/roles/{}", role["id"].as_str().unwrap()));
 
         let updated = app
@@ -41,7 +41,7 @@ fn role_crud_requires_manage_roles() {
             .json(json!({
                 "name": "Helpers",
                 "color": "#00ff00",
-                "permissions": Permission::MANAGE_ROLES.bits().to_string(),
+                "permissions": ["manage_roles"],
                 "position": 3,
             }))
             .send()
@@ -76,7 +76,9 @@ fn roles_of_another_space_cannot_be_touched() {
 
         app.patch(&path)
             .auth(&attacker)
-            .json(json!({ "name": "x", "color": null, "permissions": "1", "position": 0 }))
+            .json(
+                json!({ "name": "x", "color": null, "permissions": ["superuser"], "position": 0 }),
+            )
             .send()
             .await
             .expect(StatusCode::NOT_FOUND);
@@ -295,7 +297,7 @@ fn role_patch(permissions: Permission) -> Value {
     json!({
         "name": "Role",
         "color": null,
-        "permissions": permissions.bits().to_string(),
+        "permissions": PermissionSet::from(permissions).to_names(),
         "position": 0,
     })
 }
@@ -363,7 +365,15 @@ fn role_permissions_are_validated() {
         let space = fixtures::space(&fixtures::user().await).await;
         let role = create_role(&app, &space, &space.owner).await;
         let path = space.path(&format!("/roles/{}", role["id"].as_str().unwrap()));
-        for bad in ["lots", "-1", "", "1099511627776"] {
+        let too_many: Vec<String> = (0..1000).map(|i| format!("x:{i}")).collect();
+        for bad in [
+            json!(["lots"]),
+            json!(["Ban"]),
+            json!(["ban", ""]),
+            json!(["polls:"]),
+            json!(["Polls:create"]),
+            json!(too_many),
+        ] {
             app.patch(&path)
                 .auth(&space.owner)
                 .json(json!({ "name": "x", "color": null, "permissions": bad, "position": 0 }))
@@ -371,6 +381,73 @@ fn role_permissions_are_validated() {
                 .await
                 .expect(StatusCode::BAD_REQUEST);
         }
+
+        // stored deduplicated, built-ins first in canonical order, then
+        // custom permissions sorted
+        let role = app
+            .patch(&path)
+            .auth(&space.owner)
+            .json(json!({
+                "name": "x",
+                "color": null,
+                "permissions": ["polls:create", "ban", "a:b", "superuser", "ban"],
+                "position": 0,
+            }))
+            .send()
+            .await
+            .ok();
+        assert_eq!(
+            role["permissions"],
+            json!(["superuser", "ban", "a:b", "polls:create"])
+        );
+    });
+}
+
+/// Custom (extension) permissions follow the same rule as built-ins: you can
+/// only hand out the ones you hold.
+#[test]
+fn custom_permissions_cannot_be_escalated() {
+    run(|app| async move {
+        let space = fixtures::space(&fixtures::user().await).await;
+        let manager = fixtures::member_with(&space, Permission::MANAGE_ROLES).await;
+        let role = create_role(&app, &space, &manager).await;
+        let path = space.path(&format!("/roles/{}", role["id"].as_str().unwrap()));
+        let patch = |perms: Value| json!({ "name": "x", "color": null, "permissions": perms, "position": 0 });
+
+        app.patch(&path)
+            .auth(&manager)
+            .json(patch(json!(["polls:create"])))
+            .send()
+            .await
+            .expect(StatusCode::FORBIDDEN);
+
+        // the owner can hand out any custom permission, and then a role
+        // manager holding it can too
+        let polls = fixtures::role_named(&space, &["manage_roles", "polls:create"]).await;
+        let pollster = fixtures::member_with_roles(&space, &[polls]).await;
+        app.patch(&path)
+            .auth(&space.owner)
+            .json(patch(json!(["polls:close"])))
+            .send()
+            .await
+            .ok();
+        // they'd take away polls:close, which they don't hold
+        app.patch(&path)
+            .auth(&pollster)
+            .json(patch(json!(["polls:create"])))
+            .send()
+            .await
+            .expect(StatusCode::FORBIDDEN);
+        let other = create_role(&app, &space, &pollster).await;
+        let other_path = space.path(&format!("/roles/{}", other["id"].as_str().unwrap()));
+        let updated = app
+            .patch(&other_path)
+            .auth(&pollster)
+            .json(patch(json!(["polls:create"])))
+            .send()
+            .await
+            .ok();
+        assert_eq!(updated["permissions"], json!(["polls:create"]));
     });
 }
 

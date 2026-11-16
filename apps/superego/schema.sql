@@ -345,9 +345,9 @@ CREATE TABLE public."Role" (
     id uuid NOT NULL,
     name character varying(64) NOT NULL,
     color text,
-    permissions character varying(128) NOT NULL,
     "position" integer NOT NULL,
-    "spaceId" uuid NOT NULL
+    "spaceId" uuid NOT NULL,
+    permissions text[] DEFAULT '{}'::text[] NOT NULL
 );
 
 

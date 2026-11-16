@@ -54,11 +54,35 @@ Routes are grouped by domain. The full mount table:
 | `/spaces/:spaceId/channels/:channelId/voice`     | LiveKit token mint                                         |
 | `/spaces/:spaceId/channels/:channelId/documents` | Y.js document metadata                                     |
 | `/spaces/:spaceId/members`                       | Membership                                                 |
-| `/spaces/:spaceId/roles`                         | Roles and permission bitsets                               |
+| `/spaces/:spaceId/roles`                         | Roles and their permissions (a list of permission names)   |
 | `/spaces/:spaceId/bans`                          | Bans                                                       |
 | `/spaces/:spaceId/invites`                       | Invite codes                                               |
 | `/push`                                          | Web Push subscriptions                                     |
 | `/.well-known`                                   | Public server discovery metadata                           |
+
+## Role permissions
+
+A role's `permissions` is a list of permission names:
+
+```json
+{ "name": "Mods", "permissions": ["manage_messages", "ban", "polls:close"] }
+```
+
+- **Built-in permissions** are snake_case names such as `superuser`,
+  `manage_space`, `manage_channels`, `manage_roles`, `assign_roles`,
+  `manage_messages`, `manage_invites`, `manage_bots`, `ban` and
+  `moderator`. `@mikoto-io/permcheck` lists them all.
+- **Custom permissions** are for extensions and look like
+  `namespace:name`: both parts lowercase letters, digits, `_`, `-` or `.`,
+  up to 64 characters in total. Mikoto stores them and hands them out like
+  built-ins, and owners and superusers hold all of them; what they allow
+  is up to the extension that checks them.
+
+Updating a role with a name that is neither a built-in nor a well-formed
+custom permission fails with `InvalidPermissions` (400). The server stores
+the list deduplicated, built-ins first in a fixed order and then custom
+permissions alphabetically. You can only grant, or take away, permissions
+you hold yourself, unless you're the owner or a superuser.
 
 ## Errors
 

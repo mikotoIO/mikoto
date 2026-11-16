@@ -3366,7 +3366,11 @@
             "type": "string"
           },
           "permissions": {
-            "type": "string"
+            "description": "Permission names: built-ins like `manage_channels`, and custom `namespace:name` ones like `polls:create`.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "position": {
             "type": "integer",
@@ -3407,7 +3411,10 @@
             "type": "string"
           },
           "permissions": {
-            "type": "string"
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "position": {
             "type": "integer",

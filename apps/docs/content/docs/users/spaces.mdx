@@ -37,9 +37,9 @@ permissions. From here you can:
 ## Roles and permissions
 
 Permissions in Mikoto are role-based. A role bundles a set of
-permission bits — "send messages", "manage channels", "kick members",
-and so on — and gets assigned to members. A member's effective
-permissions are the union of the bits on all the roles they hold.
+permissions — "manage channels", "kick and ban members", and so on —
+and gets assigned to members. A member's effective permissions are
+everything granted by all the roles they hold.
 
 The default roles in a new space:
 
@@ -48,7 +48,7 @@ The default roles in a new space:
 - **Member** — read and write in channels.
 
 Owners and admins can create new roles from the **Settings → Roles**
-panel. Each role is a colored label and a permission bitset.
+panel. Each role is a colored label and a set of permissions.
 
 ## Channels in a space
 

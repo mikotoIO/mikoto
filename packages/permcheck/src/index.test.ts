@@ -1,53 +1,99 @@
 import { describe, expect, test } from 'vitest';
 
-import { checkPermission, permissions } from '.';
+import {
+  checkPermission,
+  isBuiltinPermission,
+  isCustomPermission,
+  normalizePermissions,
+  permissions,
+  setPermission,
+} from '.';
 
 describe('permissions', () => {
-  test('every permission is a distinct single bit', () => {
+  test('every permission has a distinct name', () => {
     const values = Object.values(permissions);
     expect(new Set(values).size).toBe(values.length);
-    for (const value of values) {
-      expect(value > 0n).toBe(true);
-      expect(value & (value - 1n)).toBe(0n);
-    }
   });
 
-  test('bits are contiguous from 0', () => {
-    const combined = Object.values(permissions).reduce((a, b) => a | b, 0n);
-    expect(combined).toBe((1n << BigInt(Object.keys(permissions).length)) - 1n);
+  test('built-in names are snake_case and never look custom', () => {
+    for (const value of Object.values(permissions)) {
+      expect(value).toMatch(/^[a-z]+(_[a-z]+)*$/);
+      expect(isCustomPermission(value)).toBe(false);
+      expect(isBuiltinPermission(value)).toBe(true);
+    }
+  });
+});
+
+describe('isCustomPermission', () => {
+  test.each(['polls:create', 'my-ext.v2:do_thing', 'a:b'])('%s', (name) => {
+    expect(isCustomPermission(name)).toBe(true);
+  });
+
+  test.each([
+    'polls',
+    'polls:',
+    ':create',
+    'Polls:create',
+    'polls:cre ate',
+    'a:b:c',
+    `x:${'y'.repeat(64)}`,
+  ])('rejects %j', (name) => {
+    expect(isCustomPermission(name)).toBe(false);
   });
 });
 
 describe('checkPermission', () => {
-  const perms = permissions.manageChannels | permissions.ban;
+  const held = [permissions.manageChannels, permissions.ban, 'polls:create'];
 
-  test('accepts bigint permission sets', () => {
-    expect(checkPermission(permissions.manageChannels, perms)).toBe(true);
-    expect(checkPermission(permissions.ban, perms)).toBe(true);
-    expect(checkPermission(permissions.manageRoles, perms)).toBe(false);
+  test('checks single permissions', () => {
+    expect(checkPermission(permissions.manageChannels, held)).toBe(true);
+    expect(checkPermission(permissions.ban, held)).toBe(true);
+    expect(checkPermission('polls:create', held)).toBe(true);
+    expect(checkPermission(permissions.manageRoles, held)).toBe(false);
+    expect(checkPermission('polls:close', held)).toBe(false);
   });
 
-  test('accepts decimal string permission sets, as the API sends them', () => {
-    expect(checkPermission(permissions.ban, perms.toString())).toBe(true);
-    expect(checkPermission(permissions.superuser, perms.toString())).toBe(
+  test('a list of rules needs every one, as on the server', () => {
+    expect(
+      checkPermission([permissions.manageChannels, permissions.ban], held),
+    ).toBe(true);
+    expect(
+      checkPermission(
+        [permissions.manageChannels, permissions.manageRoles],
+        held,
+      ),
+    ).toBe(false);
+    expect(checkPermission([], held)).toBe(true);
+  });
+
+  test("superuser isn't a bypass here", () => {
+    expect(checkPermission(permissions.ban, [permissions.superuser])).toBe(
       false,
     );
-    expect(checkPermission(permissions.ban, '0')).toBe(false);
   });
 
-  test('handles bits beyond the 53-bit float range', () => {
-    const high = 1n << 60n;
-    expect(checkPermission(high, (high | 1n).toString())).toBe(true);
-    expect(checkPermission(high, '1')).toBe(false);
+  test('accepts any iterable', () => {
+    expect(checkPermission(permissions.ban, new Set(held))).toBe(true);
+  });
+});
+
+describe('normalizePermissions', () => {
+  test('orders built-ins canonically, then custom names, without duplicates', () => {
+    expect(
+      normalizePermissions([
+        'zz:b',
+        permissions.ban,
+        'aa:a',
+        permissions.superuser,
+        permissions.ban,
+      ]),
+    ).toEqual([permissions.superuser, permissions.ban, 'aa:a', 'zz:b']);
   });
 
-  test('a multi-bit rule passes if any bit is set', () => {
-    const rule = permissions.manageSpace | permissions.manageRoles;
-    expect(checkPermission(rule, permissions.manageRoles)).toBe(true);
-    expect(checkPermission(rule, permissions.ban)).toBe(false);
-  });
-
-  test('throws on a malformed string', () => {
-    expect(() => checkPermission(permissions.ban, 'abc')).toThrow();
+  test('setPermission toggles back to the same list', () => {
+    const start = [permissions.manageSpace, permissions.ban, 'polls:create'];
+    const off = setPermission(start, permissions.manageSpace, false);
+    expect(off).toEqual([permissions.ban, 'polls:create']);
+    expect(setPermission(off, permissions.manageSpace, true)).toEqual(start);
   });
 });

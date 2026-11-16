@@ -1,5 +1,9 @@
 import { MikotoSpace, Role } from '@mikoto-io/mikoto.js';
-import { checkPermission, permissions } from '@mikoto-io/permcheck';
+import {
+  checkPermission,
+  permissions,
+  setPermission,
+} from '@mikoto-io/permcheck';
 import { useSetAtom } from 'jotai';
 import { Ban, Plus, Shield, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -162,29 +166,30 @@ function RolePreview({ name, color }: { name: string; color: string | null }) {
   );
 }
 
+/**
+ * Toggles for the built-in permissions. Anything else the role holds (custom
+ * permissions from extensions) is kept as it is.
+ */
 function RolePermissionEditor({
   perms,
   onChange,
 }: {
-  perms: string;
-  onChange: (perms: string) => void;
+  perms: string[];
+  onChange: (perms: string[]) => void;
 }) {
-  const perm = BigInt(perms);
   return (
     <>
       {rolePermissionData.map((x) => (
         <Field
-          key={x.permission.toString()}
+          key={x.permission}
           orientation="horizontal"
           label={x.name}
           description={x.description}
         >
           <Switch
-            checked={checkPermission(x.permission, perm)}
+            checked={checkPermission(x.permission, perms)}
             onCheckedChange={(on) =>
-              onChange(
-                (on ? perm | x.permission : perm & ~x.permission).toString(),
-              )
+              onChange(setPermission(perms, x.permission, on))
             }
           />
         </Field>
@@ -197,7 +202,7 @@ interface RoleValues {
   name: string;
   position: number;
   color: string | null;
-  permissions: string;
+  permissions: string[];
 }
 
 const ROLE_FORM_ID = 'role-editor-form';

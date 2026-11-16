@@ -204,7 +204,10 @@ describe('members and roles', () => {
 
   test('live role events', async () => {
     const space = await loadSpace();
-    const data = f.role(space.id, { name: 'Mods', permissions: '2' });
+    const data = f.role(space.id, {
+      name: 'Mods',
+      permissions: ['manage_space'],
+    });
 
     await backend.emit('roles.onCreate', data);
     expect(space.roles._get(data.id)?.name).toBe('Mods');
@@ -217,10 +220,13 @@ describe('members and roles', () => {
   test('checkPermission combines roles and lets the owner through', async () => {
     const owner = f.user();
     const data = f.space({ ownerId: owner.id });
-    const mods = f.role(data.id, { name: 'Mods', permissions: String(1 << 3) });
+    const mods = f.role(data.id, {
+      name: 'Mods',
+      permissions: ['manage_roles', 'polls:create'],
+    });
     const helpers = f.role(data.id, {
       name: 'Help',
-      permissions: String(1 << 5),
+      permissions: ['manage_member_profiles'],
     });
     data.roles.push(mods, helpers);
     const space = await loadSpace(data);
@@ -234,16 +240,30 @@ describe('members and roles', () => {
       .values()
       .sort((a) => (a.userId === owner.id ? 1 : -1));
 
-    expect(member.checkPermission(1n << 3n)).toBe(true);
-    expect(member.checkPermission(String(1 << 5))).toBe(true);
-    expect(member.checkPermission(1n << 4n)).toBe(false);
+    expect(member.checkPermission('manage_roles')).toBe(true);
+    expect(member.checkPermission('manage_member_profiles')).toBe(true);
+    expect(member.checkPermission('polls:create')).toBe(true);
+    expect(member.checkPermission('assign_roles')).toBe(false);
+    // a list needs every permission in it, as on the server
+    expect(
+      member.checkPermission(['manage_roles', 'manage_member_profiles']),
+    ).toBe(true);
+    expect(member.checkPermission(['manage_roles', 'assign_roles'])).toBe(
+      false,
+    );
+    expect(member.effectivePermissions).toEqual(
+      new Set(['manage_roles', 'polls:create', 'manage_member_profiles']),
+    );
     expect(ownerMember.isOwner).toBe(true);
-    expect(ownerMember.checkPermission(1n << 4n)).toBe(true);
+    expect(ownerMember.checkPermission('assign_roles')).toBe(true);
   });
 
   test('superusers pass every check, as on the server', async () => {
     const data = f.space();
-    const admins = f.role(data.id, { name: 'Admins', permissions: '1' });
+    const admins = f.role(data.id, {
+      name: 'Admins',
+      permissions: ['superuser'],
+    });
     data.roles.push(admins);
     const space = await loadSpace(data);
     await backend.emit(
@@ -251,7 +271,8 @@ describe('members and roles', () => {
       f.member(space.id, f.user(), { roleIds: [admins.id] }),
     );
     const [admin] = space.members.values();
-    expect(admin.checkPermission(1n << 10n)).toBe(true);
+    expect(admin.checkPermission('ban')).toBe(true);
+    expect(admin.checkPermission('polls:create')).toBe(true);
   });
 
   test('ensureLoaded deduplicates and remembers non-members', async () => {

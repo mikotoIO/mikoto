@@ -138,7 +138,7 @@ impl Space {
             ),
             "r" AS (
                 INSERT INTO "Role" ("id", "spaceId", "name", "position", "permissions")
-                VALUES (gen_random_uuid(), $1, '@everyone', -1, '0')
+                VALUES (gen_random_uuid(), $1, '@everyone', -1, '{}')
                 RETURNING "id"
             )
             INSERT INTO "Space" ("id", "name", "icon", "ownerId", "type", "visibility", "accent")

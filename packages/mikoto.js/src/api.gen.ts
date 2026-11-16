@@ -297,7 +297,7 @@ export const Role = z.object({
   color: z.union([z.string(), z.null()]).optional(),
   id: z.string().uuid(),
   name: z.string(),
-  permissions: z.string(),
+  permissions: z.array(z.string()),
   position: z.number().int(),
   spaceId: z.string().uuid(),
 });
@@ -427,7 +427,7 @@ export type RoleCreatePayload = z.infer<typeof RoleCreatePayload>;
 export const RolePatch = z.object({
   color: z.union([z.string(), z.null()]).optional(),
   name: z.string(),
-  permissions: z.string(),
+  permissions: z.array(z.string()),
   position: z.number().int(),
 });
 export type RolePatch = z.infer<typeof RolePatch>;

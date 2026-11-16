@@ -6,8 +6,8 @@ import { MemberExt, MemberUpdatePayload } from '../../api.gen';
 import { ZSchema } from '../../helpers/ZSchema';
 import { CachedManager } from '../base';
 
-/** permcheck's `superuser` bit. */
-const SUPERUSER = 1n << 0n;
+/** permcheck's `superuser` permission, which grants every other one. */
+const SUPERUSER = 'superuser';
 
 export class MikotoMember extends ZSchema(MemberExt) {
   client!: MikotoClient;
@@ -70,20 +70,28 @@ export class MikotoMember extends ZSchema(MemberExt) {
     );
   }
 
-  checkPermission(action: string | bigint) {
+  /** Every permission this member holds through their roles. */
+  get effectivePermissions(): Set<string> {
+    const held = new Set<string>();
+    for (const role of this.roles) {
+      role?.permissions.forEach((p) => held.add(p));
+    }
+    return held;
+  }
+
+  /**
+   * Whether this member may do something needing `action`: a permission
+   * name (see `@mikoto-io/permcheck`), or a list of them, all of which are
+   * needed. Owners and superusers may do anything, as on the server.
+   */
+  checkPermission(action: string | readonly string[]) {
     if (!this.space) return false;
     if (this.isOwner) return true;
 
-    const act = typeof action === 'string' ? BigInt(action) : action;
-
-    const totalPerms = this.roles.reduce(
-      (acc, x) => (x ? acc | BigInt(x.permissions) : acc),
-      0n,
-    );
-
-    // Superusers may do anything, as on the server (permcheck's bit 0).
-    if ((totalPerms & SUPERUSER) !== 0n) return true;
-    return (act & totalPerms) !== 0n;
+    const held = this.effectivePermissions;
+    if (held.has(SUPERUSER)) return true;
+    const rules = typeof action === 'string' ? [action] : action;
+    return rules.every((r) => held.has(r));
   }
 }
 

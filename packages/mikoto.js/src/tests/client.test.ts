@@ -6,6 +6,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { MikotoClient } from '../MikotoClient';
+import { MikotoMessage } from '../managers/message';
 import * as f from './support/factories';
 import {
   type FakeBackend,
@@ -317,6 +318,129 @@ describe('members and roles', () => {
     expect(space.members.hasMore).toBe(false);
     await space.members.list(); // nothing more to fetch
     expect(backend.calls('get', '/spaces/:spaceId/members')).toHaveLength(2);
+  });
+});
+
+describe('custom emoji', () => {
+  test('come with the space and follow live events', async () => {
+    const data = f.space();
+    const blob = f.emoji(data.id, { name: 'Blob' });
+    data.emojis = [blob];
+    const space = await loadSpace(data);
+    expect(space.emojis.getByName('blob')?.id).toBe(blob.id);
+
+    const wave = f.emoji(space.id, { name: 'wave' });
+    await backend.emit('emojis.onCreate', wave);
+    expect(space.emojis._get(wave.id)?.name).toBe('wave');
+    await backend.emit('emojis.onUpdate', { ...wave, name: 'wave2' });
+    expect(space.emojis.getByName('wave2')?.id).toBe(wave.id);
+    await backend.emit('emojis.onDelete', wave);
+    expect(space.emojis._get(wave.id)).toBeUndefined();
+
+    await backend.emit('spaces.onUpdate', { ...data, emojis: [] });
+    expect(space.emojis.values()).toEqual([]);
+  });
+
+  test('create posts the uploaded image and caches the result', async () => {
+    const space = await loadSpace();
+    backend.on('post', '/spaces/:spaceId/emojis', (req) => ({
+      ...f.emoji(space.id),
+      ...(req.body as object),
+    }));
+    const emoji = await space.emojis.create({
+      name: 'party',
+      image: 'emoji/abc.png',
+    });
+    expect(emoji.name).toBe('party');
+    expect(space.emojis._get(emoji.id)).toBe(emoji);
+    // the server's broadcast of the same emoji doesn't duplicate it
+    await backend.emit('emojis.onCreate', {
+      id: emoji.id,
+      spaceId: space.id,
+      name: 'party',
+      image: 'emoji/abc.png',
+      creatorId: null,
+    });
+    expect(space.emojis.values()).toHaveLength(1);
+  });
+});
+
+describe('reactions', () => {
+  async function setup() {
+    const me = f.user();
+    backend.on('get', '/users/me', () => me);
+    await client.user.load();
+    const space = await loadSpace();
+    const channelId = space.channelIds[0];
+    const message = new MikotoMessage(f.message(channelId), client);
+    const path =
+      '/spaces/:spaceId/channels/:channelId/messages/:messageId/reactions/:emoji';
+    return { me, space, message, path };
+  }
+
+  test('react shows at once and calls the API', async () => {
+    const { me, message, path } = await setup();
+    backend.on('put', path, () => null);
+
+    const pending = message.react('+1');
+    expect(message.reactions).toEqual([
+      { emoji: '+1', emojiId: null, count: 1, userIds: [me.id] },
+    ]);
+    expect(message.hasReacted('+1')).toBe(true);
+    await pending;
+    expect(backend.calls('put', path)[0].params.emoji).toBe('+1');
+
+    // the server's event for our own reaction changes nothing
+    message._applyReaction({ userId: me.id, emoji: '+1', emojiId: null }, true);
+    expect(message.reactions[0].count).toBe(1);
+  });
+
+  test('a refused reaction is rolled back', async () => {
+    const { message, path } = await setup();
+    backend.on('put', path, () => {
+      throw new HttpError(400);
+    });
+    await expect(message.react('tada')).rejects.toBeTruthy();
+    expect(message.reactions).toEqual([]);
+  });
+
+  test('toggle removes an existing reaction', async () => {
+    const { me, message, path } = await setup();
+    const other = f.uuid();
+    message._applyReaction({ userId: other, emoji: 'heart' }, true);
+    message._applyReaction({ userId: me.id, emoji: 'heart' }, true);
+    expect(message.reactions[0].count).toBe(2);
+
+    backend.on('delete', path, () => null);
+    await message.toggleReaction('heart');
+    expect(message.reactions).toEqual([
+      { emoji: 'heart', emojiId: null, count: 1, userIds: [other] },
+    ]);
+    expect(backend.calls('delete', path)).toHaveLength(1);
+
+    message._applyReaction({ userId: other, emoji: 'heart' }, false);
+    expect(message.reactions).toEqual([]);
+  });
+
+  test('custom emoji reactions are keyed by id', async () => {
+    const { message, path } = await setup();
+    backend.on('put', path, () => null);
+    const id = f.uuid();
+    await message.react(id);
+    expect(message.reactions[0]).toMatchObject({ emoji: id, emojiId: id });
+    expect(backend.calls('put', path)[0].params.emoji).toBe(id);
+  });
+
+  test('DM messages use the DM routes', async () => {
+    const { me } = await setup();
+    const dm = f.channel(null);
+    await backend.emit('channels.onCreate', dm);
+    const message = new MikotoMessage(f.message(dm.id), client);
+    const path = '/dm/:channelId/messages/:messageId/reactions/:emoji';
+    backend.on('put', path, () => null);
+    await message.react('wave');
+    expect(backend.calls('put', path)).toHaveLength(1);
+    expect(message.reactions[0].userIds).toEqual([me.id]);
   });
 });
 

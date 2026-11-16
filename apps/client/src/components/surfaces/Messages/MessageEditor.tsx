@@ -5,7 +5,7 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { PlainTextPlugin } from '@lexical/react/LexicalPlainTextPlugin';
-import type { MikotoMember } from '@mikoto-io/mikoto.js';
+import { type MikotoMember, formatEmoji } from '@mikoto-io/mikoto.js';
 import useResizeObserver from '@react-hook/resize-observer';
 import { useAtomValue, useSetAtom } from 'jotai';
 import {
@@ -31,6 +31,8 @@ import { EmojiPickerPopover } from './EmojiPicker';
 import { MentionAutocompletePlugin } from './MentionAutocomplete';
 import { messageEditState } from './Message';
 import styles from './MessageEditor.module.css';
+import { MarkdownPreviewPlugin } from './editor/MarkdownPreviewPlugin';
+import { MESSAGE_EDITOR_NODES } from './editor/nodes';
 
 // check if document.activeElement is either an input, textarea, or contenteditable
 function isInputLike() {
@@ -273,6 +275,7 @@ export function MessageEditor({
     () => ({
       namespace: 'MessageEditor',
       editable: true,
+      nodes: MESSAGE_EDITOR_NODES,
       onError(error: Error) {
         throw error;
       },
@@ -370,6 +373,7 @@ export function MessageEditor({
               ErrorBoundary={LexicalErrorBoundary}
             />
             <HistoryPlugin />
+            <MarkdownPreviewPlugin />
             <FilePastePlugin onFiles={addFiles} />
             <SubmitPlugin
               onSubmit={handleSubmit}
@@ -407,7 +411,9 @@ export function MessageEditor({
                   return false;
                 }}
                 onPick={(emoji, keepOpen) => {
-                  apiRef.current?.insertText(`:${emoji.id}:`);
+                  apiRef.current?.insertText(
+                    emoji.custom ? formatEmoji(emoji.custom) : `:${emoji.id}:`,
+                  );
                   if (!keepOpen) setEmojiOpen(false);
                 }}
               />

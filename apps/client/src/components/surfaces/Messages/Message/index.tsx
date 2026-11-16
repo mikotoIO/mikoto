@@ -7,9 +7,10 @@ import {
   Ellipsis,
   FileText,
   Pencil,
+  SmilePlus,
   Trash2,
 } from 'lucide-react';
-import { type ReactNode, useRef } from 'react';
+import { type ReactNode, useRef, useState } from 'react';
 import { useSnapshot } from 'valtio/react';
 
 import {
@@ -27,6 +28,8 @@ import { Markdown, MessageImage } from '@/components/molecules/markdown';
 import {
   IconButton,
   ItemErrorBoundary,
+  Popover,
+  PopoverTrigger,
   RoleName,
   Skeleton,
   Tag,
@@ -37,6 +40,7 @@ import {
 import { useMikoto } from '@/hooks';
 
 import styles from './Message.module.css';
+import { ReactionPickerPopover, Reactions } from './Reactions';
 import { Timestamp } from './Timestamp';
 
 export { Timestamp } from './Timestamp';
@@ -114,6 +118,7 @@ function MessageRow({
   const editing = useAtomValue(messageEditState);
   const setContextMenu = useSetAtom(contextMenuState);
   const nameRef = useRef<HTMLButtonElement>(null);
+  const [reactPickerOpen, setReactPickerOpen] = useState(false);
 
   const me = mikoto.user.me;
   const isMine = !!me && message.authorId === me.id;
@@ -262,6 +267,9 @@ function MessageRow({
             })}
           </div>
         )}
+        {!isPending && !failed && (
+          <Reactions message={message} inSpace={inSpace} />
+        )}
         {failed && (
           <div className={cx(styles.status, styles.failed)} role="alert">
             <CircleAlert size={14} aria-hidden />
@@ -282,10 +290,23 @@ function MessageRow({
 
       {!isPending && !failed && editing?.id !== message.id && (
         <div
-          className={styles.actions}
+          className={cx(styles.actions, reactPickerOpen && styles.actionsOpen)}
           role="toolbar"
           aria-label="Message actions"
         >
+          <Popover open={reactPickerOpen} onOpenChange={setReactPickerOpen}>
+            <PopoverTrigger
+              render={
+                <IconButton aria-label="Add reaction">
+                  <SmilePlus size={16} />
+                </IconButton>
+              }
+            />
+            <ReactionPickerPopover
+              message={message}
+              onClose={() => setReactPickerOpen(false)}
+            />
+          </Popover>
           {isMine && (
             <IconButton
               aria-label="Edit message"

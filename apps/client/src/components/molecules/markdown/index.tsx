@@ -1,4 +1,5 @@
-import ReactMarkdown from 'react-markdown';
+import { EMOJI_OBJECT_PATTERN } from '@mikoto-io/mikoto.js';
+import ReactMarkdown, { defaultUrlTransform } from 'react-markdown';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 
@@ -15,6 +16,7 @@ import {
 } from './plugins';
 
 export { MessageImage } from './components';
+export * from './customEmoji';
 
 function isUrl(s: string) {
   let url;
@@ -32,7 +34,15 @@ function isUrlImage(url: string): boolean {
   return url.match(/\.(jpeg|jpg|gif|png)$/) !== null;
 }
 
-const EMOJI_ONLY_REGEX = /^\s*:(\+1|[-\w]+):(\s*:(\+1|[-\w]+):)*\s*$/;
+const ONE_EMOJI = `(?::(?:\\+1|[-\\w]+):|${EMOJI_OBJECT_PATTERN.source})`;
+const EMOJI_ONLY_REGEX = new RegExp(
+  `^\\s*${ONE_EMOJI}(?:\\s*${ONE_EMOJI})*\\s*$`,
+);
+
+/** Keep `emoji:` object links (`<emoji:ID:name>`), which the default drops. */
+function urlTransform(url: string) {
+  return url.startsWith('emoji:') ? url : defaultUrlTransform(url);
+}
 
 function isEmojiOnly(content: string): boolean {
   return EMOJI_ONLY_REGEX.test(content);
@@ -60,6 +70,7 @@ export function Markdown({ content }: { content: string }) {
       <ReactMarkdown
         remarkPlugins={REMARK_PLUGINS}
         components={markdownComponents}
+        urlTransform={urlTransform}
       >
         {co}
       </ReactMarkdown>

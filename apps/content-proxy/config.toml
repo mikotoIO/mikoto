@@ -13,3 +13,9 @@ image_resize = { width = 512, height = 512 }
 store_type = "attachment"
 # 50 MB
 max_size = 52428800
+
+# Custom emoji. Not resized, so animated GIFs keep their frames.
+[stores.emoji]
+store_type = "image"
+# 512 KB
+max_size = 524288

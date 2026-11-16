@@ -1,10 +1,17 @@
 import { proxy, ref } from 'valtio/vanilla';
 
 import type { MikotoClient } from '../MikotoClient';
-import { MessageExt } from '../api.gen';
+import { MessageExt, type ReactionEvent } from '../api.gen';
 import { ZSchema } from '../helpers/ZSchema';
 import { Manager } from './base';
 import type { MikotoChannel } from './channel';
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** A reaction's key: a standard shortcode, or a custom emoji's id. */
+function customEmojiId(emoji: string) {
+  return UUID.test(emoji) ? emoji : null;
+}
 
 export class MikotoMessage extends ZSchema(MessageExt) {
   client!: MikotoClient;
@@ -19,6 +26,105 @@ export class MikotoMessage extends ZSchema(MessageExt) {
 
   _patch(data: MessageExt) {
     Object.assign(this, data);
+  }
+
+  /**
+   * Apply one user's reaction being added or removed. Idempotent, so an
+   * optimistic local change and the server's event for it agree.
+   */
+  _applyReaction(
+    event: Pick<ReactionEvent, 'userId' | 'emoji' | 'emojiId'>,
+    added: boolean,
+  ) {
+    const index = this.reactions.findIndex((r) => r.emoji === event.emoji);
+    const reaction = index === -1 ? undefined : this.reactions[index];
+    if (added) {
+      if (!reaction) {
+        this.reactions.push({
+          emoji: event.emoji,
+          emojiId: event.emojiId ?? null,
+          count: 1,
+          userIds: [event.userId],
+        });
+      } else if (!reaction.userIds.includes(event.userId)) {
+        reaction.userIds.push(event.userId);
+        reaction.count += 1;
+      }
+      return;
+    }
+    if (!reaction || !reaction.userIds.includes(event.userId)) return;
+    reaction.userIds = reaction.userIds.filter((id) => id !== event.userId);
+    reaction.count -= 1;
+    if (reaction.count <= 0) this.reactions.splice(index, 1);
+  }
+
+  /** Whether the signed-in user has reacted with `emoji`. */
+  hasReacted(emoji: string) {
+    const me = this.client.user.me?.id;
+    if (!me) return false;
+    return !!this.reactions
+      .find((r) => r.emoji === emoji)
+      ?.userIds.includes(me);
+  }
+
+  /**
+   * React with `emoji`: a standard emoji shortcode (`+1`) or the id of a
+   * custom emoji in this message's space. Shows immediately; rolls back if
+   * the server refuses.
+   */
+  async react(emoji: string) {
+    await this.setReaction(emoji, true);
+  }
+
+  async unreact(emoji: string) {
+    await this.setReaction(emoji, false);
+  }
+
+  /** Add the reaction if the signed-in user hasn't reacted, else remove it. */
+  async toggleReaction(emoji: string) {
+    if (this.hasReacted(emoji)) await this.unreact(emoji);
+    else await this.react(emoji);
+  }
+
+  private async setReaction(emoji: string, add: boolean) {
+    const userId = this.client.user.me?.id;
+    const emojiId = customEmojiId(emoji);
+    const change = userId ? { userId, emoji, emojiId } : null;
+    if (change) this._applyReaction(change, add);
+    try {
+      const spaceId = this.channel.spaceId;
+      if (spaceId) {
+        const params = {
+          spaceId,
+          channelId: this.channelId,
+          messageId: this.id,
+          emoji,
+        };
+        if (add) {
+          await this.client.rest['messages.addReaction'](undefined, {
+            params,
+          });
+        } else {
+          await this.client.rest['messages.removeReaction'](undefined, {
+            params,
+          });
+        }
+      } else {
+        const params = { channelId: this.channelId, messageId: this.id, emoji };
+        if (add) {
+          await this.client.rest['dm.messages.addReaction'](undefined, {
+            params,
+          });
+        } else {
+          await this.client.rest['dm.messages.removeReaction'](undefined, {
+            params,
+          });
+        }
+      }
+    } catch (err) {
+      if (change) this._applyReaction(change, !add);
+      throw err;
+    }
   }
 
   get channel(): MikotoChannel {

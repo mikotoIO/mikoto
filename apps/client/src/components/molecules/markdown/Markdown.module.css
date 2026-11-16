@@ -171,6 +171,17 @@
   vertical-align: middle;
 }
 
+.emojiFallback {
+  color: var(--muted);
+}
+
+.customEmoji {
+  width: auto;
+  height: var(--emoji-size);
+  max-width: calc(var(--emoji-size) * 3);
+  object-fit: contain;
+}
+
 .notFound {
   display: inline-flex;
   align-items: center;

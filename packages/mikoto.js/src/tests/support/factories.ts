@@ -4,6 +4,7 @@
  */
 import type {
   Channel,
+  Emoji,
   MemberExt,
   MessageExt,
   RelationshipExt,
@@ -57,6 +58,19 @@ export function space(overrides: Partial<SpaceExt> = {}): SpaceExt {
     memberCount: 1,
     channels: [channel(id)],
     roles: [role(id)],
+    emojis: [],
+    ...overrides,
+  };
+}
+
+export function emoji(spaceId: string, overrides: Partial<Emoji> = {}): Emoji {
+  const id = overrides.id ?? uuid();
+  return {
+    id,
+    spaceId,
+    name: `emoji_${id.slice(0, 6)}`,
+    image: `emoji/${id.slice(0, 8)}.png`,
+    creatorId: null,
     ...overrides,
   };
 }
@@ -91,6 +105,7 @@ export function message(
     timestamp: new Date().toISOString(),
     editedTimestamp: null,
     attachments: [],
+    reactions: [],
     ...overrides,
   };
 }

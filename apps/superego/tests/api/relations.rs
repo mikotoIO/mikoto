@@ -8,7 +8,7 @@ use crate::{
     harness::{run, TestApp},
 };
 
-async fn befriend(app: &TestApp, a: &TestUser, b: &TestUser) {
+pub async fn befriend(app: &TestApp, a: &TestUser, b: &TestUser) {
     app.post(&format!("/relations/{}/request", b.id))
         .auth(a)
         .send()

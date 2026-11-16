@@ -148,6 +148,7 @@
 .cell img {
   width: 24px;
   height: 24px;
+  object-fit: contain;
   pointer-events: none;
   transition: transform var(--dur-fast) var(--ease);
 }
@@ -202,6 +203,7 @@
 }
 .previewImage {
   flex-shrink: 0;
+  object-fit: contain;
 }
 .previewText {
   display: flex;

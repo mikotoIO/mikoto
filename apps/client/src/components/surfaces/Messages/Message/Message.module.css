@@ -165,6 +165,76 @@
   color: var(--faint);
 }
 
+/* -------------------------------------------------------- reactions */
+.reactions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: 4px;
+}
+
+.reaction {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--raised);
+  color: var(--muted);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
+}
+.reaction:hover {
+  border-color: var(--line-strong);
+}
+.reactionMine {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+.reactionMine:hover {
+  border-color: var(--accent);
+}
+
+.reactionEmoji {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+.reactionText {
+  max-width: 12ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-xs);
+}
+.reactionCount {
+  font-weight: 500;
+}
+
+/* only shown on hover, like the toolbar; always there for touch */
+.addReaction {
+  opacity: 0;
+}
+.msg:hover .addReaction,
+.msg:focus-within .addReaction,
+.addReaction[data-popup-open] {
+  opacity: 1;
+}
+@media (hover: none) {
+  .addReaction {
+    opacity: 1;
+  }
+}
+
 /* ------------------------------------------------- hover toolbar */
 .actions {
   position: absolute;
@@ -180,7 +250,8 @@
   z-index: 2;
 }
 .msg:hover .actions,
-.msg:focus-within .actions {
+.msg:focus-within .actions,
+.actionsOpen {
   display: flex;
 }
 

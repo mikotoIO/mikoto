@@ -7,8 +7,10 @@ mod ws;
 
 mod account;
 mod channels;
+mod emojis;
 mod messages;
 mod moderation;
+mod reactions;
 mod realtime;
 mod relations;
 mod spaces;

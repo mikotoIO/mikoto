@@ -34,6 +34,8 @@ pub trait EventHandler: Send + Sync {
     async fn message_create(&self, _ctx: Context, _message: MessageExt) {}
     async fn message_update(&self, _ctx: Context, _message: MessageExt) {}
     async fn message_delete(&self, _ctx: Context, _key: MessageKey) {}
+    async fn reaction_add(&self, _ctx: Context, _event: ReactionEvent) {}
+    async fn reaction_remove(&self, _ctx: Context, _event: ReactionEvent) {}
 
     async fn channel_create(&self, _ctx: Context, _channel: Channel) {}
     async fn channel_update(&self, _ctx: Context, _channel: Channel) {}
@@ -46,6 +48,10 @@ pub trait EventHandler: Send + Sync {
     async fn role_create(&self, _ctx: Context, _role: Role) {}
     async fn role_update(&self, _ctx: Context, _role: Role) {}
     async fn role_delete(&self, _ctx: Context, _role: Role) {}
+
+    async fn emoji_create(&self, _ctx: Context, _emoji: Emoji) {}
+    async fn emoji_update(&self, _ctx: Context, _emoji: Emoji) {}
+    async fn emoji_delete(&self, _ctx: Context, _emoji: Emoji) {}
 
     async fn space_create(&self, _ctx: Context, _space: SpaceExt) {}
     async fn space_update(&self, _ctx: Context, _space: SpaceExt) {}

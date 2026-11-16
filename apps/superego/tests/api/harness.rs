@@ -175,6 +175,9 @@ impl TestApp {
     pub fn patch(&self, path: &str) -> Req {
         self.request(Method::PATCH, path)
     }
+    pub fn put(&self, path: &str) -> Req {
+        self.request(Method::PUT, path)
+    }
     pub fn delete(&self, path: &str) -> Req {
         self.request(Method::DELETE, path)
     }

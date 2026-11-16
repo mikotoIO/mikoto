@@ -77,6 +77,11 @@ const rolePermissionData = [
     permission: permissions.manageInvites,
   },
   {
+    name: 'Manage emoji',
+    description: "Upload, rename and delete the space's custom emoji.",
+    permission: permissions.manageEmojis,
+  },
+  {
     name: 'Kick and ban members',
     description: 'Remove members from the space, and keep them out.',
     permission: permissions.ban,

@@ -1,4 +1,5 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { formatEmoji } from '@mikoto-io/mikoto.js';
 import {
   $getSelection,
   $isRangeSelection,
@@ -12,12 +13,18 @@ import {
   type LexicalEditor,
   type TextNode,
 } from 'lexical';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { useCustomEmojis } from '@/components/molecules/markdown';
 import { cx } from '@/design';
 
 import styles from './MessageEditor.module.css';
-import { type EmojiEntry, loadEmojis, searchEmojis } from './emojiData';
+import {
+  type EmojiEntry,
+  customEmojiEntries,
+  loadEmojis,
+  searchEmojis,
+} from './emojiData';
 
 interface EmojiMatch {
   search: string;
@@ -77,7 +84,13 @@ export function EmojiAutocompletePlugin() {
     };
   }, []);
 
-  const filtered = match ? searchEmojis(emojis, match.search, 10) : [];
+  const customSet = useCustomEmojis();
+  // The space's own emoji rank ahead of standard ones with similar names.
+  const all = useMemo(
+    () => [...customEmojiEntries(customSet.list), ...emojis],
+    [customSet.list, emojis],
+  );
+  const filtered = match ? searchEmojis(all, match.search, 10) : [];
   const isOpen = match !== null && filtered.length > 0;
 
   activeIndexRef.current = activeIndex;
@@ -109,7 +122,11 @@ export function EmojiAutocompletePlugin() {
           current.node,
           current.endOffset,
         );
-        selection.insertText(`:${emoji.id}: `);
+        // Custom emoji are sent by id; the composer shows either as an image.
+        const markdown = emoji.custom
+          ? formatEmoji(emoji.custom)
+          : `:${emoji.id}:`;
+        selection.insertText(`${markdown} `);
       });
       setMatch(null);
     },
@@ -201,13 +218,22 @@ export function EmojiAutocompletePlugin() {
     >
       {filtered.map((emoji, i) => (
         <div
-          key={emoji.id}
+          key={emoji.key}
           role="option"
           aria-selected={i === activeIndex}
           className={cx(styles.option, i === activeIndex && styles.active)}
           onClick={() => insertEmoji(emoji)}
         >
-          <span className={styles.native}>{emoji.native}</span>
+          {emoji.custom ? (
+            <img
+              className={styles.customEmoji}
+              src={emoji.custom.url}
+              alt=""
+              draggable={false}
+            />
+          ) : (
+            <span className={styles.native}>{emoji.native}</span>
+          )}
           <span className={styles.optionName}>{emoji.name}</span>
           <span className={styles.optionMeta}>:{emoji.id}:</span>
         </div>

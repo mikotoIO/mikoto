@@ -1,12 +1,14 @@
+import { parseEmojiHref } from '@mikoto-io/mikoto.js';
 import { useSetAtom } from 'jotai';
 import { ExternalLink, ImageOff, Link2Off } from 'lucide-react';
 import { Suspense, lazy, useState } from 'react';
 import type { Components } from 'react-markdown';
 
 import { modalState } from '@/components/ContextMenu';
-import { DialogContent, ItemErrorBoundary } from '@/design';
+import { DialogContent, ItemErrorBoundary, Tooltip } from '@/design';
 
 import styles from './Markdown.module.css';
+import { useCustomEmojiById } from './customEmoji';
 
 const CodeHighlight = lazy(() => import('./rules/CodeBlock/CodeHighlight'));
 const EmojiElement = lazy(() => import('./EmojiElement'));
@@ -85,6 +87,32 @@ function Spoiler({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * A custom emoji, written `<emoji:ID:name>`. Unknown ones (deleted, or from
+ * a space we aren't in) show as `:name:`.
+ */
+function CustomEmojiElement({ id, name }: { id: string; name: string }) {
+  const custom = useCustomEmojiById(id);
+  const [failed, setFailed] = useState(false);
+  const label = `:${custom?.name ?? name}:`;
+  if (!custom || failed) {
+    return <span className={styles.emojiFallback}>{label}</span>;
+  }
+  return (
+    <Tooltip content={label}>
+      <span className={styles.emoji}>
+        <img
+          className={styles.customEmoji}
+          src={custom.url}
+          alt={label}
+          draggable={false}
+          onError={() => setFailed(true)}
+        />
+      </span>
+    </Tooltip>
+  );
+}
+
 function ObjectNotFound({ resource }: { resource: string }) {
   return (
     <span className={styles.notFound}>
@@ -107,6 +135,8 @@ function EmbedBoundary({
 
 export const markdownComponents: Partial<Components> = {
   a({ href, children }) {
+    const emoji = href ? parseEmojiHref(href) : null;
+    if (emoji) return <CustomEmojiElement id={emoji.id} name={emoji.name} />;
     // Intercept autolinks with non-http schemes like <type:data>
     if (href && !/^https?:\/\//.test(href)) {
       const match = /^(\w+):(.*)$/.exec(href);

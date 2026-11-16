@@ -78,17 +78,19 @@ The official SDK does all of this for you — see
 
 A non-exhaustive list of the most useful events:
 
-| Op                  | Meaning                                         |
-| ------------------- | ----------------------------------------------- |
-| `message.onCreate`  | A new message was sent in a channel you can see |
-| `message.onUpdate`  | A message was edited                            |
-| `message.onDelete`  | A message was deleted                           |
-| `channel.onUpdate`  | Channel metadata changed                        |
-| `space.onUpdate`    | Space metadata changed                          |
-| `member.onUpdate`   | A member's roles or nickname changed            |
-| `presence.onUpdate` | A friend's presence state changed               |
-| `typing.onUpdate`   | Someone in a channel started/stopped typing     |
-| `relation.onUpdate` | A friend relationship state changed             |
+| Op                                                     | Meaning                                               |
+| ------------------------------------------------------ | ----------------------------------------------------- |
+| `message.onCreate`                                     | A new message was sent in a channel you can see       |
+| `message.onUpdate`                                     | A message was edited                                  |
+| `message.onDelete`                                     | A message was deleted                                 |
+| `messages.onReactionAdd` / `messages.onReactionRemove` | Someone reacted to a message, or took a reaction back |
+| `emojis.onCreate` / `onUpdate` / `onDelete`            | A space's custom emoji changed                        |
+| `channel.onUpdate`                                     | Channel metadata changed                              |
+| `space.onUpdate`                                       | Space metadata changed                                |
+| `member.onUpdate`                                      | A member's roles or nickname changed                  |
+| `presence.onUpdate`                                    | A friend's presence state changed                     |
+| `typing.onUpdate`                                      | Someone in a channel started/stopped typing           |
+| `relation.onUpdate`                                    | A friend relationship state changed                   |
 
 Browse the full list under `websocket` in
 [`/api.json`](/developers/rest-api#live-schema), or by op-prefix in

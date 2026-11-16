@@ -219,6 +219,12 @@
   text-align: center;
   flex-shrink: 0;
 }
+.customEmoji {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
 
 @media (max-width: 600px) {
   .wrap {
@@ -227,4 +233,51 @@
   .hint {
     display: none;
   }
+}
+
+/* ---------------------------------------------- live markdown preview */
+.mdBold {
+  font-weight: 600;
+}
+.mdItalic {
+  font-style: italic;
+}
+.mdStrike {
+  text-decoration: line-through;
+  text-decoration-color: var(--muted);
+}
+.mdSpoiler {
+  background: var(--press);
+  border-radius: 4px;
+}
+.mdCode,
+.mdCodeBlock {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  background: var(--raised);
+  border-radius: 4px;
+}
+.mdMention {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  border-radius: 4px;
+  font-weight: 500;
+}
+.mdLink {
+  color: var(--accent-ink);
+}
+
+/* An emoji is one character in the text: keep it on the line. */
+.emojiNode {
+  display: inline;
+}
+.emojiImage {
+  width: 1.375em;
+  height: 1.375em;
+  object-fit: contain;
+  vertical-align: -0.3em;
+  margin: 0 1px;
+}
+.emojiText {
+  color: var(--muted);
 }

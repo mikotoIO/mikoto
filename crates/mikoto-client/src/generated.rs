@@ -166,6 +166,28 @@ pub struct DocumentPatch {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Emoji {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub creator_id: Option<Uuid>,
+    pub id: Uuid,
+    pub image: String,
+    pub name: String,
+    pub space_id: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EmojiCreatePayload {
+    pub image: String,
+    pub name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EmojiPatch {
+    pub name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum HandleOwner {
     #[serde(rename = "user")]
@@ -317,6 +339,8 @@ pub struct MessageExt {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub edited_timestamp: Option<DateTime<Utc>>,
     pub id: Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reactions: Option<Vec<Reaction>>,
     pub timestamp: DateTime<Utc>,
 }
 
@@ -387,6 +411,27 @@ pub struct Ping {
 pub struct PushConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub public_key: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Reaction {
+    pub count: i64,
+    pub emoji: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub emoji_id: Option<Uuid>,
+    pub user_ids: Vec<Uuid>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ReactionEvent {
+    pub channel_id: Uuid,
+    pub emoji: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub emoji_id: Option<Uuid>,
+    pub message_id: Uuid,
+    pub user_id: Uuid,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -486,6 +531,8 @@ pub struct SpaceExt {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub accent: Option<String>,
     pub channels: Vec<Channel>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub emojis: Option<Vec<Emoji>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub handle: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1018,6 +1065,24 @@ impl<'a> HttpApi<'a> {
         Ok(resp.json().await?)
     }
 
+    pub async fn dm_messages_add_reaction(&self, channel_id: Uuid, message_id: Uuid, emoji: String) -> Result<(), ClientError> {
+        let path = format!("/dm/{}/messages/{}/reactions/{}", channel_id, message_id, emoji);
+        let mut req = self.client.put(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
+    }
+
+    pub async fn dm_messages_remove_reaction(&self, channel_id: Uuid, message_id: Uuid, emoji: String) -> Result<(), ClientError> {
+        let path = format!("/dm/{}/messages/{}/reactions/{}", channel_id, message_id, emoji);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
+    }
+
     pub async fn dm_unreads(&self) -> Result<Vec<ChannelUnread>, ClientError> {
         let path = "/dm/unreads".to_string();
         let mut req = self.client.get(self.url(&path))
@@ -1286,6 +1351,24 @@ impl<'a> HttpApi<'a> {
         Ok(resp.json().await?)
     }
 
+    pub async fn messages_add_reaction(&self, space_id: Uuid, channel_id: Uuid, message_id: Uuid, emoji: String) -> Result<(), ClientError> {
+        let path = format!("/spaces/{}/channels/{}/messages/{}/reactions/{}", space_id, channel_id, message_id, emoji);
+        let mut req = self.client.put(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
+    }
+
+    pub async fn messages_remove_reaction(&self, space_id: Uuid, channel_id: Uuid, message_id: Uuid, emoji: String) -> Result<(), ClientError> {
+        let path = format!("/spaces/{}/channels/{}/messages/{}/reactions/{}", space_id, channel_id, message_id, emoji);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
+    }
+
     pub async fn voice_join(&self, space_id: Uuid, channel_id: Uuid) -> Result<VoiceToken, ClientError> {
         let path = format!("/spaces/{}/channels/{}/voice/", space_id, channel_id);
         let mut req = self.client.post(self.url(&path))
@@ -1433,6 +1516,41 @@ impl<'a> HttpApi<'a> {
         Ok(())
     }
 
+    pub async fn emojis_list(&self, space_id: Uuid) -> Result<Vec<Emoji>, ClientError> {
+        let path = format!("/spaces/{}/emojis/", space_id);
+        let mut req = self.client.get(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn emojis_create(&self, space_id: Uuid, body: &EmojiCreatePayload) -> Result<Emoji, ClientError> {
+        let path = format!("/spaces/{}/emojis/", space_id);
+        let mut req = self.client.post(self.url(&path))
+            .bearer_auth(self.token);
+        req = req.json(body);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
+    pub async fn emojis_delete(&self, space_id: Uuid, emoji_id: Uuid) -> Result<(), ClientError> {
+        let path = format!("/spaces/{}/emojis/{}", space_id, emoji_id);
+        let mut req = self.client.delete(self.url(&path))
+            .bearer_auth(self.token);
+        let resp = req.send().await?.error_for_status()?;
+        let _ = resp.text().await?;
+        Ok(())
+    }
+
+    pub async fn emojis_update(&self, space_id: Uuid, emoji_id: Uuid, body: &EmojiPatch) -> Result<Emoji, ClientError> {
+        let path = format!("/spaces/{}/emojis/{}", space_id, emoji_id);
+        let mut req = self.client.patch(self.url(&path))
+            .bearer_auth(self.token);
+        req = req.json(body);
+        let resp = req.send().await?.error_for_status()?;
+        Ok(resp.json().await?)
+    }
+
     pub async fn invites_list(&self, space_id: Uuid) -> Result<Vec<Invite>, ClientError> {
         let path = format!("/spaces/{}/invites/", space_id);
         let mut req = self.client.get(self.url(&path))
@@ -1481,6 +1599,12 @@ pub enum WsEvent {
     ChannelsOnDelete(Channel),
     #[serde(rename = "channels.onUpdate")]
     ChannelsOnUpdate(Channel),
+    #[serde(rename = "emojis.onCreate")]
+    EmojisOnCreate(Emoji),
+    #[serde(rename = "emojis.onDelete")]
+    EmojisOnDelete(Emoji),
+    #[serde(rename = "emojis.onUpdate")]
+    EmojisOnUpdate(Emoji),
     #[serde(rename = "members.onCreate")]
     MembersOnCreate(MemberExt),
     #[serde(rename = "members.onDelete")]
@@ -1491,6 +1615,10 @@ pub enum WsEvent {
     MessagesOnCreate(MessageExt),
     #[serde(rename = "messages.onDelete")]
     MessagesOnDelete(MessageKey),
+    #[serde(rename = "messages.onReactionAdd")]
+    MessagesOnReactionAdd(ReactionEvent),
+    #[serde(rename = "messages.onReactionRemove")]
+    MessagesOnReactionRemove(ReactionEvent),
     #[serde(rename = "messages.onUpdate")]
     MessagesOnUpdate(MessageExt),
     #[serde(rename = "pong")]

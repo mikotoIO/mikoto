@@ -9,6 +9,7 @@ import {
   PawPrint,
   Search,
   Smile,
+  Sparkles,
   Volleyball,
 } from 'lucide-react';
 import {
@@ -17,24 +18,23 @@ import {
   type RefObject,
   memo,
   useCallback,
-  useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
 import { z } from 'zod';
 
+import { useCustomEmojis } from '@/components/molecules/markdown';
 import { PopoverContent, Skeleton, cx } from '@/design';
 import { LocalDB } from '@/store/LocalDB';
 
 import styles from './EmojiPicker.module.css';
 import {
   type EmojiEntry,
-  type EmojiSet,
+  customEmojiEntries,
   emojiImageUrl,
-  getLoadedEmojis,
-  loadEmojis,
   searchEmojis,
+  useEmojiSet,
 } from './emojiData';
 
 const COLS = 9;
@@ -62,21 +62,6 @@ interface Section {
   id: string;
   label: string;
   emojis: EmojiEntry[];
-}
-
-function useEmojiSet() {
-  const [set, setSet] = useState<EmojiSet | null>(getLoadedEmojis);
-  useEffect(() => {
-    if (set) return;
-    let cancelled = false;
-    loadEmojis().then((s) => {
-      if (!cancelled) setSet(s);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [set]);
-  return set;
 }
 
 /** Arrow-key movement through the grid, by geometry so it works across
@@ -132,11 +117,11 @@ const EmojiSection = memo(function EmojiSection({
       <div className={styles.grid}>
         {section.emojis.map((e) => (
           <button
-            key={e.id}
+            key={e.key}
             type="button"
             tabIndex={-1}
             className={styles.cell}
-            data-emoji={e.id}
+            data-emoji={e.key}
             aria-label={e.name}
             onPointerEnter={() => onHover(e)}
             onFocus={() => onHover(e)}
@@ -164,6 +149,18 @@ export interface EmojiPickerProps {
 
 export function EmojiPicker({ onPick, searchRef }: EmojiPickerProps) {
   const set = useEmojiSet();
+  const customSet = useCustomEmojis();
+  const custom = useMemo(
+    () => customEmojiEntries(customSet.list),
+    [customSet.list],
+  );
+  const customLabel = customSet.spaceName ?? 'Custom';
+  /** Every pickable emoji by `key`: standard keys are their shortcodes. */
+  const byKey = useMemo(() => {
+    const map = new Map<string, EmojiEntry>(set?.byId);
+    for (const e of custom) map.set(e.key, e);
+    return map;
+  }, [set, custom]);
   const [query, setQuery] = useState('');
   const [hovered, setHovered] = useState<EmojiEntry | null>(null);
   const [recent, setRecent] = useState(() => recentEmojiDB.get());
@@ -181,29 +178,36 @@ export function EmojiPicker({ onPick, searchRef }: EmojiPickerProps) {
         {
           id: 'results',
           label: 'Results',
-          emojis: searchEmojis(set.list, query),
+          emojis: searchEmojis([...custom, ...set.list], query),
         },
       ];
     }
-    const recentEmojis = recent.flatMap((id) => set.byId.get(id) ?? []);
+    const recentEmojis = recent.flatMap((key) => byKey.get(key) ?? []);
     const base = set.categories.map((c) => ({
       id: c.id,
       label: CATEGORY_META[c.id]?.label ?? c.id,
       emojis: c.emojis,
     }));
-    return recentEmojis.length
-      ? [
-          { id: 'recent', label: 'Recently used', emojis: recentEmojis },
-          ...base,
-        ]
-      : base;
-  }, [set, searching, query, recent]);
+    return [
+      ...(recentEmojis.length
+        ? [{ id: 'recent', label: 'Recently used', emojis: recentEmojis }]
+        : []),
+      ...(custom.length
+        ? [{ id: 'custom', label: customLabel, emojis: custom }]
+        : []),
+      ...base,
+    ];
+  }, [set, searching, query, recent, custom, customLabel, byKey]);
 
+  // Not derived from `sections`: the tabs stay put while searching.
   const tabIds = useMemo(() => {
     if (!set) return [];
-    const ids = set.categories.map((c) => c.id);
-    return recent.length ? ['recent', ...ids] : ids;
-  }, [set, recent]);
+    return [
+      ...(recent.some((key) => byKey.has(key)) ? ['recent'] : []),
+      ...(custom.length ? ['custom'] : []),
+      ...set.categories.map((c) => c.id),
+    ];
+  }, [set, recent, custom, byKey]);
 
   const currentActive = searching ? null : (active ?? tabIds[0] ?? null);
 
@@ -221,7 +225,7 @@ export function EmojiPicker({ onPick, searchRef }: EmojiPickerProps) {
   const onHover = useCallback((e: EmojiEntry) => setHovered(e), []);
 
   const pick = (e: EmojiEntry, keepOpen: boolean) => {
-    const next = [e.id, ...recent.filter((id) => id !== e.id)].slice(
+    const next = [e.key, ...recent.filter((key) => key !== e.key)].slice(
       0,
       RECENT_MAX,
     );
@@ -233,8 +237,8 @@ export function EmojiPicker({ onPick, searchRef }: EmojiPickerProps) {
 
   const emojiFromEvent = (target: EventTarget) => {
     if (!(target instanceof HTMLElement)) return null;
-    const id = target.closest<HTMLElement>('[data-emoji]')?.dataset.emoji;
-    return id ? (set?.byId.get(id) ?? null) : null;
+    const key = target.closest<HTMLElement>('[data-emoji]')?.dataset.emoji;
+    return key ? (byKey.get(key) ?? null) : null;
   };
 
   const onGridClick = (ev: MouseEvent) => {
@@ -326,7 +330,10 @@ export function EmojiPicker({ onPick, searchRef }: EmojiPickerProps) {
 
       <nav className={styles.tabs} aria-label="Emoji categories">
         {tabIds.map((id) => {
-          const meta = CATEGORY_META[id];
+          const meta =
+            id === 'custom'
+              ? { label: customLabel, icon: Sparkles }
+              : CATEGORY_META[id];
           if (!meta) return null;
           const Icon = meta.icon;
           return (
